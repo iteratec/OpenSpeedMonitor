@@ -8,6 +8,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var chart = null,
+        width = 600,
         height = 600,
         legendPosition = {x: 200, y: 10, width: 100, height: 100},
         margins = {left: 60, right: 100, top: 110, bottom: 150},
@@ -28,12 +29,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var drawChart = function (barchartData) {
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
-        if($("#adjust-barchart-modal").hasClass("hidden"))
+        if ($("#adjust-barchart-modal").hasClass("hidden"))
             $("#adjust-barchart-modal").removeClass("hidden");
 
+        // Reset fields
         allMeasurandSeries = {};
         yAxes = {};
         xAxis = null;
+        height = 600;
 
         svg = dimple.newSvg("#" + chartIdentifier, "100%", height);
         chart = new dimple.chart(svg, null);
@@ -79,13 +82,21 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         chart.addLegend(legendPosition.x, legendPosition.y, legendPosition.width, legendPosition.height, "right");
         chart.draw();
+        initWidth();
         resize();
     };
 
     var adjustChart = function () {
         var xAxisLabel = $("#x-axis-label").val();
         xAxis.title = xAxisLabel;
-        chart.draw(0, true);
+
+        var newWidth = $("#inputChartWidth").val() + "px";
+        var newHeight = $("#inputChartHeight").val() + "px";
+
+        width = newWidth;
+        height = newHeight;
+
+        resize();
     };
 
 
@@ -104,24 +115,48 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
     };
 
-    var resize = function () {
-        var svgWidth, maxWidth, containerWidth;
+    var initWidth = function () {
+        var maxWidth, containerWidth;
 
         containerWidth = $("#" + chartIdentifier).width();
         maxWidth = Object.keys(allMeasurandSeries).length * $(".dimple-axis-x .tick").length * maxWidthPerBar;
-        svgWidth = containerWidth < maxWidth ? "100%" : "" + maxWidth + "px";
+        width = containerWidth < maxWidth ? "100%" : "" + maxWidth + "px";
+    };
 
-        svg.setAttribute("width", svgWidth);
+    var resize = function () {
+        if (svg) {
+            svg.setAttribute("width", width);
+            svg.setAttribute("height", height);
+            chart.legends[0].x = parseInt(width) - legendPosition.width - margins.right;
 
-        chart.legends[0].x = (containerWidth < maxWidth) ? (containerWidth - legendPosition.width - margins.right) : (maxWidth - legendPosition.width - margins.right);
-        // second parameter allows to draw without reprocessing data.
-        chart.draw(0, true);
-
-        positionBars();
+            // second parameter allows to draw without reprocessing data.
+            chart.draw(0, true);
+            positionBars();
+        }
     };
 
     var getXLabel = function () {
         return xAxis.title;
+    };
+    var getWidth = function () {
+        var svgWidth = svg.getAttribute("width");
+        if (svgWidth.endsWith("px")) {
+            return parseInt(svgWidth);
+        } else if (svgWidth.endsWith("%")) {
+            return parseInt(svgWidth) * $("#" + chartIdentifier).width() / 100;
+        } else {
+            return svgWidth;
+        }
+    };
+    var getHeight = function () {
+        var svgHeight = svg.getAttribute("height");
+        if (svgHeight.endsWith("px")) {
+            return parseInt(svgHeight);
+        } else if (svgHeight.endsWith("%")) {
+            return parseInt(svgHeight) * $("#" + chartIdentifier).height() / 100;
+        } else {
+            return svgHeight;
+        }
     };
 
     // returns a new array without removed duplicates
@@ -136,6 +171,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     return {
         adjustChart: adjustChart,
         drawChart: drawChart,
+        getHeight: getHeight,
+        getWidth: getWidth,
         getXLabel: getXLabel
     };
 });
