@@ -85,7 +85,7 @@ class LocationController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<Location> result = Location.createCriteria().list(params) {
-            createAlias('csiConfiguration', 'wptServerAlias', JoinType.LEFT_OUTER_JOIN)
+            createAlias('wptServer', 'wptServerAlias', JoinType.LEFT_OUTER_JOIN)
 
             if(params.filter)
                 or{
