@@ -49,7 +49,7 @@
     </div>
 </div>
 
-<script>
+<asset:script>
     $(window).load(function () {
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" absolute="true"/>')
     });
@@ -71,4 +71,4 @@
         $("#pngWidth").val(svg.width());
         $("#pngHeight").val(svg.height());
     }
-</script>
+</asset:script>

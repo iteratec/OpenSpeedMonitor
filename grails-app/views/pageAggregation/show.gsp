@@ -4,6 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
+    <asset:stylesheet src="/pageAggregation/show.css"/>
 </head>
 
 <body>
@@ -56,7 +57,8 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#downloadAsPngModal" id="dia-save-chart-as-png" class="btn btn-primary btn-sm disabled" data-toggle="modal" role="button"
+                        <a href="#downloadAsPngModal" id="dia-save-chart-as-png" class="btn btn-primary btn-sm disabled"
+                           data-toggle="modal" role="button"
                            style="vertical-align: top;" onclick="setDefaultValues('svg-container')">
                             <g:message code="de.iteratec.ism.ui.button.save.name"/>
                         </a>
@@ -149,7 +151,7 @@
     </div>
 </div>
 
-<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']" />
+<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
     <asset:javascript src="csidashboard/csiDashboard.js"/>
@@ -167,7 +169,8 @@
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-            var spinner = OpenSpeedMonitor.Spinner("#svg-container");
+            var spinner = OpenSpeedMonitor.Spinner("#chart-container");
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
             spinner.start();
             $.ajax({
                 type: 'POST',
@@ -192,7 +195,7 @@
                     if (!$.isEmptyObject(data)) {
                         if (!$("#no-data-div").hasClass("hidden"))
                             $("#no-data-div").addClass("hidden");
-                        OpenSpeedMonitor.ChartModules.PageAggregation("svg-container").drawChart(data);
+                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $("#no-data-div").removeClass("hidden")

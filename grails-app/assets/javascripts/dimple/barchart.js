@@ -6,11 +6,11 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
+OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var chart = null,
-        height = 400,
+        height = 600,
         legendPosition = {x: 200, y: 10, width: 100, height: 100},
-        margins = {left: 60, right: 100, top: 110, bottom: 70},
+        margins = {left: 60, right: 100, top: 110, bottom: 150},
         maxWidthPerBar = 150,
         allMeasurandSeries = {},
         svg = null,
@@ -28,6 +28,12 @@ OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
     var drawChart = function (barchartData) {
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
+        if($("#adjust-barchart-modal").hasClass("hidden"))
+            $("#adjust-barchart-modal").removeClass("hidden");
+
+        allMeasurandSeries = {};
+        yAxes = {};
+        xAxis = null;
 
         svg = dimple.newSvg("#" + chartIdentifier, "100%", height);
         chart = new dimple.chart(svg, null);
@@ -76,6 +82,12 @@ OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
         resize();
     };
 
+    var adjustChart = function () {
+        var xAxisLabel = $("#x-axis-label").val();
+        xAxis.title = xAxisLabel;
+        chart.draw(0, true);
+    };
+
 
     var positionBars = function () {
         // Move Bars side to side
@@ -108,6 +120,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
         positionBars();
     };
 
+    var getXLabel = function () {
+        return xAxis.title;
+    };
+
     // returns a new array without removed duplicates
     var removeDuplicatesFromArray = function (array) {
         return array.reduce(function (p, c) {
@@ -118,6 +134,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
 
     init();
     return {
-        drawChart: drawChart
+        adjustChart: adjustChart,
+        drawChart: drawChart,
+        getXLabel: getXLabel
     };
-};
+});
