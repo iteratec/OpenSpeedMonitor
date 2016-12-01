@@ -3,7 +3,6 @@ package de.iteratec.osm.result
 import de.iteratec.osm.api.dto.JobGroupDto
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
-import org.hibernate.FetchMode
 import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
@@ -30,17 +29,8 @@ class ResultSelectionController {
                     "Invalid time frame: 'from' value needs to be before 'to'")
             return
         }
-        if (!command.measuredEventIds && !command.pageIds && !command.browserIds && !command.locationIds) {
-            def availableJobGroups = jobGroupDaoService.findByJobResultsInTimeFrame(command.from.toDate(), command.to.toDate())
-            ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
-            return
-        }
-
         def start = DateTime.now().getMillis()
-        def availableJobGroups = EventResult.createCriteria().list {
-            fetchMode('page', FetchMode.JOIN)
-            fetchMode('measuredEvent', FetchMode.JOIN)
-            fetchMode('jobGroup', FetchMode.JOIN)
+        def availableJobGroups = ResultSelectionInformation.createCriteria().list {
 
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
@@ -67,23 +57,19 @@ class ResultSelectionController {
             }
 
             projections {
-                jobGroup {
-                    distinct('id')
-                    property('name')
-                }
+                distinct('jobGroup')
             }
         }
-        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        def jobGroupDtos = availableJobGroups.collect { ([id: it[0], name: it[1]] as JobGroupDto) }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        def jobGroupDtos = availableJobGroups.collect { ([id: it.id, name: it.name] as JobGroupDto) }
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, jobGroupDtos)
     }
 
     def getMeasuredEvents(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def start = DateTime.now().getMillis()
-        def measuredEvents = EventResult.createCriteria().list {
-            fetchMode('page', FetchMode.JOIN)
-            fetchMode('measuredEvent', FetchMode.JOIN)
+        def measuredEvents = ResultSelectionInformation.createCriteria().list {
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -104,31 +90,24 @@ class ResultSelectionController {
             }
 
             projections {
-                measuredEvent {
-                    distinct('id')
-                    property('name')
-                }
-                page {
-                    property('id')
-                    property('name')
-                }
+                distinct('measuredEvent')
+                property('page')
             }
         }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         def measuredEventDtos = measuredEvents.collect {[
-                id: it[0],
-                name: it[1],
-                parent: [id: it[2], name: it[3]]
+                id: it[0].id,
+                name: it[0].name,
+                parent: [id: it[1].id, name: it[1].name]
         ]}
-        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
     }
 
     def getLocations(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def start = DateTime.now().getMillis()
-        def measuredEvents = EventResult.createCriteria().list {
-            fetchMode('location', FetchMode.JOIN)
-            fetchMode('browser', FetchMode.JOIN)
+        def measuredEvents = ResultSelectionInformation.createCriteria().list {
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -158,34 +137,25 @@ class ResultSelectionController {
             }
 
             projections {
-                location {
-                    distinct('id')
-                    property('label')
-
-                    wptServer {
-                        property('label')
-                    }
-                }
-                browser {
-                    property('id')
-                    property('name')
-                }
+                distinct('location')
+                property('browser')
             }
         }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         def measuredEventDtos = measuredEvents.collect { [
-                id: it[0],
-                name: it[1] + " @ " + it[2] + " (" + it[4] + ")",
-                parent: [id: it[3], name: it[4]]
+                id: it[0].id,
+                name: it[0].toString(),
+                parent: [id: it[1].id, name: it[1].name]
         ] }
-        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
     }
 
     def getConnectivityProfiles(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
-        def start = DateTime.now().getMillis()
-        def connectivityProfiles = EventResult.createCriteria().list {
-            fetchMode('connectivityProfile', FetchMode.JOIN)
+        def totalStart = DateTime.now().getMillis()
+        def start = totalStart
+        def connectivityProfiles = ResultSelectionInformation.createCriteria().list {
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -214,23 +184,19 @@ class ResultSelectionController {
             }
 
             projections {
-                connectivityProfile {
-                    distinct('id')
-                    property('name')
-                    property('bandwidthDown')
-                    property('bandwidthUp')
-                    property('latency')
-                    property('packetLoss')
-                }
+                distinct('connectivityProfile')
             }
         }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
 
         def dtos = connectivityProfiles.collect { [
-                id: it[0],
-                name: "${it[1]}: ${it[2]}/${it[3]} Kbps, ${it[4]}ms Latency" + (it[5] ? "${it[5]}% PLR" : "")
+                id: it.id,
+                name: it.toString()
         ] }
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        start = DateTime.now().getMillis()
 
-        def customProfiles = EventResult.createCriteria().list {
+        def customProfiles = ResultSelectionInformation.createCriteria().list {
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -263,9 +229,12 @@ class ResultSelectionController {
                 distinct('customConnectivityName')
             }
         }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         dtos.addAll(customProfiles.collect {[id:MetaConnectivityProfileId.Custom.value, name: it]})
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        start = DateTime.now().getMillis()
 
-        def nativeConnectivity = EventResult.createCriteria().list(max: 1) {
+        def nativeConnectivity = ResultSelectionInformation.createCriteria().list(max: 1) {
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -298,11 +267,13 @@ class ResultSelectionController {
                 property('id')
             }
         }
+        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         if (nativeConnectivity) {
             dtos.add([id: MetaConnectivityProfileId.Native.value, name: "Native"])
         }
+        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
 
-        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        println "All total took " + ((DateTime.now().getMillis() - totalStart) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 }
