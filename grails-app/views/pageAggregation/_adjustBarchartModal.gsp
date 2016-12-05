@@ -11,11 +11,11 @@
             <div id="collapseAdjustment" class="modal-body form-horizontal">
                 <!-- x axis label -->
                 <div class="form-group row">
-                    <label class="col-md-3 control-label" for="x-axis-label">
+                    <label class="col-sm-3 control-label" for="x-axis-label">
                         <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
                     </label>
 
-                    <div class="col-md-8">
+                    <div class="col-sm-8">
                         <input id="x-axis-label" class="form-control" type="text">
                     </div>
                 </div>

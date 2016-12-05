@@ -25,7 +25,6 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     var barchartMeasuringCard = $("#barchartMeasuringCard");
     var additionalMeasurandClone = barchartMeasuringCard.find("#additionalMeasurand-clone");
     var additionalBarClone = barchartMeasuringCard.find("#measurandSeries-clone");
-    var measurandSeries = [];
 
     var init = function () {
         addBar();
@@ -62,11 +61,12 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         var clone = additionalBarClone.clone();
         clone.removeClass("hidden");
         clone.removeAttr("id");
+        clone.addClass("measurandSeries");
         clone.find(".firstMeasurandSelect").change(selectionChangeListener);
         clone.insertBefore(additionalBarClone);
         clone.find(".addMeasurandButton").click(addMeasurand);
         clone.find(".removeMeasurandButton").click(removeMeasurand);
-        measurandSeries.push(clone);
+        clone.find(".removeMeasurandSeriesButton").click(removeSeries);
     };
 
     var addMeasurand = function (e) {
@@ -81,9 +81,9 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         enableDisableSelectionGroup(clone.find("select"), selectedOptGroupLabel);
 
         // Make stacked selection visible
-        var stackedSlectContainer = $(e.target).closest(".panel").find(".stackedSelectContainer");
-        if (stackedSlectContainer.hasClass("hidden")) {
-            stackedSlectContainer.removeClass("hidden")
+        var stackedSelectContainer = $(e.target).closest(".panel").find(".stackedSelectContainer");
+        if (stackedSelectContainer.hasClass("hidden")) {
+            stackedSelectContainer.removeClass("hidden")
         }
     };
 
@@ -95,19 +95,24 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         $element.closest(".addMeasurandRow").remove();
     };
 
+    var removeSeries = function (e) {
+        var $element = $(e.target);
+        $element.closest(".panel").remove();
+    };
+
     var getValues = function () {
         var result = [];
 
-        measurandSeries.forEach(function (bar) {
+        $(".measurandSeries").each(function () {
             var currentSeries = {};
             var measurands = [];
 
-            bar.find(".addMeasurandRow select").each(function () {
+            $(this).find(".addMeasurandRow select").each(function () {
                 measurands.push($(this).val());
             });
 
             currentSeries['measurands'] = measurands;
-            currentSeries['stacked'] = bar.find(".stackedSelect").val() === "stacked";
+            currentSeries['stacked'] = $(this).find(".stackedSelect").val() === "stacked";
             result.push(currentSeries);
         });
 

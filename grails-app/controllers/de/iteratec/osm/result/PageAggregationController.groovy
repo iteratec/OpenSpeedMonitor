@@ -7,11 +7,8 @@ import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.dimple.GetBarchartCommand
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -22,15 +19,8 @@ class PageAggregationController {
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
-    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    def intervals = ['not', 'hourly', 'daily', 'weekly']
-
-
-    PageDaoService pageDaoService
-    BrowserDaoService browserDaoService
-    LocationDaoService locationDaoService
     JobGroupDaoService jobGroupDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -173,6 +163,10 @@ class PageAggregationController {
      */
     private String getErrorMessages(GetBarchartCommand cmd) {
         String result = ""
+        if (!cmd.selectedSeries) {
+            result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
+            result += "<br />"
+        }
         if (!cmd.selectedPages) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage", "Please select at least one page")
             result += "<br />"
