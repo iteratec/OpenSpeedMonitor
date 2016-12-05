@@ -18,6 +18,44 @@ class ResultSelectionController {
         int value
     }
 
+    enum ResultSelectionType {
+        JobGroups,
+        MeasuredEvents,
+        Locations,
+        ConnectivityProfiles
+    }
+
+    Closure resultSelectionFilters = { command, resultSelectionType ->
+        and {
+            between("jobResultDate", command.from.toDate(), command.to.toDate())
+            if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
+                jobGroup {
+                    'in'("id", command.jobGroupIds)
+                }
+            }
+
+            if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
+                measuredEvent {
+                    'in'("id", command.measuredEventIds)
+                }
+            } else if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
+                page {
+                    'in'("id", command.pageIds)
+                }
+            }
+
+            if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
+                location {
+                    'in'("id", command.locationIds)
+                }
+            } else if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
+                browser {
+                    'in'("id", command.browserIds)
+                }
+            }
+        }
+    }
+
     def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
@@ -32,29 +70,8 @@ class ResultSelectionController {
         def start = DateTime.now().getMillis()
         def availableJobGroups = ResultSelectionInformation.createCriteria().list {
 
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-
-                if (command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
-                } else if (command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
-                }
-
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.JobGroups)
 
             projections {
                 distinct('jobGroup')
@@ -70,24 +87,8 @@ class ResultSelectionController {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def start = DateTime.now().getMillis()
         def measuredEvents = ResultSelectionInformation.createCriteria().list {
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-                if (command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
-                }
-
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.MeasuredEvents)
 
             projections {
                 distinct('measuredEvent')
@@ -108,33 +109,8 @@ class ResultSelectionController {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def start = DateTime.now().getMillis()
         def measuredEvents = ResultSelectionInformation.createCriteria().list {
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-                if (command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
-                }
-                if (command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
-                } else if (command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
-                }
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.Locations)
 
             projections {
                 distinct('location')
@@ -156,32 +132,8 @@ class ResultSelectionController {
         def totalStart = DateTime.now().getMillis()
         def start = totalStart
         def connectivityProfiles = ResultSelectionInformation.createCriteria().list {
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-                if (command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
-                }
-                if (command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
-                } else if (command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
-                }
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
 
             projections {
                 distinct('connectivityProfile')
@@ -197,33 +149,9 @@ class ResultSelectionController {
         start = DateTime.now().getMillis()
 
         def customProfiles = ResultSelectionInformation.createCriteria().list {
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-                if (command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
-                }
-                if (command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
-                } else if (command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
-                }
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-                isNotNull('customConnectivityName')
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
+            isNotNull('customConnectivityName')
 
             projections {
                 distinct('customConnectivityName')
@@ -235,33 +163,9 @@ class ResultSelectionController {
         start = DateTime.now().getMillis()
 
         def nativeConnectivity = ResultSelectionInformation.createCriteria().list(max: 1) {
-            and {
-                between("jobResultDate", command.from.toDate(), command.to.toDate())
-                if (command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
-                }
-                if (command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
-                } else if (command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
-                }
-                if (command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
-                } else if (command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
-                }
-                eq('noTrafficShapingAtAll', true)
-            }
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
+            eq('noTrafficShapingAtAll', true)
 
             projections {
                 property('id')
