@@ -66,6 +66,24 @@
 
                     </div>
                 </div>
+                %{--toggle chart axes and gridlines--}%
+                <div class="form-group row">
+                    <div class="checkbox col-sm-offset-3">
+                        <label>
+                            <input type="checkbox" id="inputShowGridlines"> Show Gridlines
+                        </label>
+                    </div>
+                    <div class="checkbox col-sm-offset-3">
+                        <label>
+                            <input type="checkbox" id="inputShowYAxis"> Show y-Axis
+                        </label>
+                    </div>
+                    <div class="checkbox col-sm-offset-3">
+                        <label>
+                            <input type="checkbox" id="inputShowXAxis"> Show x-Axis
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="row hidden" id="assign-color-clone">
@@ -93,14 +111,18 @@
     </div>
 </div>
 
-<asset:script>
+<asset:script type="text/javascript">
     function initModalDialogValues() {
-        $("#x-axis-label").val(OpenSpeedMonitor.ChartModules.PageAggregationBarChart.getXLabel());
-        $("#inputChartWidth").val(OpenSpeedMonitor.ChartModules.PageAggregationBarChart.getWidth());
-        $("#inputChartHeight").val(OpenSpeedMonitor.ChartModules.PageAggregationBarChart.getHeight());
+        var chart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart;
+        $("#x-axis-label").val(chart.getXLabel());
+        $("#inputChartWidth").val(chart.getWidth());
+        $("#inputChartHeight").val(chart.getHeight());
+        $("#inputShowXAxis").prop("checked", chart.getShowXAxis());
+        $("#inputShowYAxis").prop("checked", chart.getShowYAxis());
+        $("#inputShowGridlines").prop("checked", chart.getShowGridlines());
         $("#assign-color-container").empty();
         $("#y-axis-alias-container").empty();
-        var colorAssignments = OpenSpeedMonitor.ChartModules.PageAggregationBarChart.getColorAssignments();
+        var colorAssignments = chart.getColorAssignments();
         colorAssignments.forEach(function(assignment) {
             var clone = $("#assign-color-clone").clone();
             clone.removeAttr("id");
@@ -109,7 +131,7 @@
             clone.find("label").html(assignment.label);
             clone.find("input").val(assignment.color);
         });
-        var yLabels = OpenSpeedMonitor.ChartModules.PageAggregationBarChart.getYLabels();
+        var yLabels = chart.getYLabels();
         yLabels.forEach(function(label) {
             var clone = $("#y-axis-alias-clone").clone();
             clone.removeAttr("id");

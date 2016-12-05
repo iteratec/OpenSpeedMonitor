@@ -17,7 +17,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         svg = null,
         seriesCount = 0,
         xAxis = null,
-        yAxes = {};
+        yAxes = {},
+        showXAxis = true,
+        showYAxis = true,
+        showGridlines = true;
 
     var init = function () {
         // add eventHandler
@@ -104,6 +107,32 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
             colorAssignments.push({"label": $(this).find("label").html(), "color": $(this).find("input").val()});
         });
         assignColor(colorAssignments);
+
+        // Toggle gridlines
+        showGridlines = $("#inputShowGridlines").prop("checked");
+        if (showGridlines) {
+            d3.select(".dimple-gridline").style("opacity", 1);
+        } else {
+            d3.select(".dimple-gridline").style("opacity", 0);
+        }
+
+        // Toggle yAxis
+        showYAxis = $("#inputShowYAxis").prop("checked");
+        if (showYAxis) {
+            d3.selectAll(".dimple-axis.dimple-axis-y").style("opacity", 1);
+        } else {
+            d3.selectAll(".dimple-axis.dimple-axis-y").style("opacity", 0);
+        }
+
+        // Toggle xAxis
+        showXAxis = $("#inputShowXAxis").prop("checked");
+        if (showXAxis) {
+            d3.select(".domain.dimple-custom-axis-line").style("opacity", 1);
+            d3.select(".dimple-axis-x").selectAll("line").style("opacity", 1);
+        } else {
+            d3.select(".domain.dimple-custom-axis-line").style("opacity", 0);
+            d3.select(".dimple-axis-x").selectAll("line").style("opacity", 0);
+        }
 
         resize();
     };
@@ -197,6 +226,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         });
         return result;
     };
+    var getShowXAxis = function () {
+        return showXAxis;
+    };
+    var getShowYAxis = function () {
+        return showYAxis;
+    };
+    var getShowGridlines = function () {
+        return showGridlines;
+    };
 
     // returns a new array without removed duplicates
     var removeDuplicatesFromArray = function (array) {
@@ -214,6 +252,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         getHeight: getHeight,
         getWidth: getWidth,
         getXLabel: getXLabel,
-        getYLabels: getYLabels
+        getYLabels: getYLabels,
+        getShowXAxis: getShowXAxis,
+        getShowYAxis: getShowYAxis,
+        getShowGridlines: getShowGridlines
     };
 });
