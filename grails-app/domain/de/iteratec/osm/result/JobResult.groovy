@@ -18,6 +18,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.JobStatisticService
+import grails.util.Environment
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -261,7 +262,8 @@ class JobResult {
      */
     def beforeUpdate(){
         try {
-            if (isDirty(httpStatusCode)){
+            boolean noTest = Environment.getCurrent() != Environment.TEST
+            if (noTest && isDirty(httpStatusCode)) {
                 jobStatisticService.updateStatsFor(job)
             }
         }catch (Exception e){
@@ -273,7 +275,10 @@ class JobResult {
      * {@link JobStatistic}s of {@link Job} has to be updated.
      */
     def afterInsert(){
-        jobStatisticService.updateStatsFor(job)
+        boolean noTest = Environment.getCurrent() != Environment.TEST
+        if (noTest){
+            jobStatisticService.updateStatsFor(job)
+        }
     }
 
 }
