@@ -88,10 +88,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var adjustChart = function () {
-        xAxis.title = $("#x-axis-label").val();
-
+        // change size
         width = $("#inputChartWidth").val() + "px";
         height = $("#inputChartHeight").val() + "px";
+
+        // change labels
+        xAxis.title = $("#x-axis-label").val();
+        $("#y-axis-alias-container").children().each(function () {
+            yAxes[$(this).find(".unitInput").val()].title = $(this).find(".labelInput").val()
+        });
 
         // assign colors
         var colorAssignments = [];
@@ -158,6 +163,13 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var getXLabel = function () {
         return xAxis.title;
     };
+    var getYLabels = function () {
+        var result = [];
+        Object.keys(yAxes).forEach(function (key) {
+            result.push({"unit": key, "label": yAxes[key].title})
+        });
+        return result;
+    };
     var getWidth = function () {
         var svgWidth = svg.getAttribute("width");
         if (svgWidth.endsWith("px")) {
@@ -201,6 +213,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         getColorAssignments: getColorAssignments,
         getHeight: getHeight,
         getWidth: getWidth,
-        getXLabel: getXLabel
+        getXLabel: getXLabel,
+        getYLabels: getYLabels
     };
 });
