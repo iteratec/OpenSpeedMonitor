@@ -29,8 +29,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var drawChart = function (barchartData) {
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
-        if ($("#adjust-barchart-modal").hasClass("hidden"))
-            $("#adjust-barchart-modal").removeClass("hidden");
+        var $adjustBarchartButton = $("#adjust-barchart-modal");
+        if ($adjustBarchartButton.hasClass("hidden"))
+            $adjustBarchartButton.removeClass("hidden");
 
         // Reset fields
         allMeasurandSeries = {};
@@ -87,18 +88,37 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var adjustChart = function () {
-        var xAxisLabel = $("#x-axis-label").val();
-        xAxis.title = xAxisLabel;
+        xAxis.title = $("#x-axis-label").val();
 
-        var newWidth = $("#inputChartWidth").val() + "px";
-        var newHeight = $("#inputChartHeight").val() + "px";
+        width = $("#inputChartWidth").val() + "px";
+        height = $("#inputChartHeight").val() + "px";
 
-        width = newWidth;
-        height = newHeight;
+        // assign colors
+        var colorAssignments = [];
+        $("#assign-color-container").children().each(function () {
+            colorAssignments.push({"label": $(this).find("label").html(), "color": $(this).find("input").val()});
+        });
+        assignColor(colorAssignments);
 
         resize();
     };
 
+    var assignColor = function (colorAssignments) {
+        colorAssignments.forEach(function (assignment) {
+            chart.assignColor(assignment.label, assignment.color);
+        });
+
+        // reassign data to series so series are redrawn
+        chart.series.forEach(function (s) {
+            var seriesData = s.data;
+            // fake some data change
+            s.data = [{"grouping": s.data[0].grouping, "index": "", "indexValue": 0}];
+            chart.draw();
+            s.data = seriesData;
+        });
+
+        chart.draw();
+    };
 
     var positionBars = function () {
         // Move Bars side to side
@@ -158,6 +178,13 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
             return svgHeight;
         }
     };
+    var getColorAssignments = function () {
+        var result = [];
+        chart.legends[0]._getEntries().forEach(function (legendEntry) {
+            result.push({"label": legendEntry.key, "color": legendEntry.fill});
+        });
+        return result;
+    };
 
     // returns a new array without removed duplicates
     var removeDuplicatesFromArray = function (array) {
@@ -171,6 +198,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     return {
         adjustChart: adjustChart,
         drawChart: drawChart,
+        getColorAssignments: getColorAssignments,
         getHeight: getHeight,
         getWidth: getWidth,
         getXLabel: getXLabel

@@ -19,3 +19,9 @@
 #chart-container {
     position: relative;
 }
+
+#inputChartWidth,
+#inputChartHeight {
+    width: 100px;
+    margin-left: 10px;
+}
