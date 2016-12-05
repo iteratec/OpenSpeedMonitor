@@ -66,7 +66,7 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
     };
 
 	var setTime = function(time) {
-		var pattern = new RegExp("([0-9]|[01][0-9]|2[0-3]):([0-5][0-9])");
+		var pattern = new RegExp("([0-9]|[01][0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?");
 		if (!pattern.test(time)) {
 			console.log("Invalid time to set. Expected in format hh:mm");
 			time = autoTime;
@@ -132,10 +132,12 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
     var getValuesAsDate = function() {
 		var values = getValues();
 		var date = parseDateInternal(values.date);
-		if (values.manualTime && values.time) {
-			var hoursMinutes = values.time.split(":");
-			date.setHours(hoursMinutes[0]);
-			date.setMinutes(hoursMinutes[1]);
+		var timeString = (values.manualTime && values.time) ? values.time : autoTime;
+		var timeParts = timeString.split(":");
+		date.setHours(timeParts[0]);
+		date.setMinutes(timeParts[1]);
+		if (timeParts[2]) {
+			date.setSeconds(timeParts[2]);
 		}
 		return date;
 	};
