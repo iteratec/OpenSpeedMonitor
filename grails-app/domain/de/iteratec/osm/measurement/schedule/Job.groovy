@@ -33,6 +33,7 @@ import org.quartz.CronExpression
  * @see Script
  */
 class Job implements Taggable {
+
     def jobProcessingService
 
     Long id;
@@ -171,6 +172,8 @@ class Job implements Taggable {
     JobGroup jobGroup;
     static belongsTo = [jobGroup: JobGroup];
 
+    JobStatistic jobStatistic
+
     static transients = ['nextExecutionTime']
 
     static constraints = {
@@ -246,6 +249,7 @@ class Job implements Taggable {
         provideAuthenticateInformation(nullable: false)
         authUsername(nullable: true, maxSize: 255)
         authPassword(nullable: true, maxSize: 255, password: true)
+        jobStatistic(nullable: true)
     }
 
     static mapping = {

@@ -17,11 +17,13 @@
 		<g:if test="${url}">
 			<a href="${url}">
 		</g:if>
-		 <abbr class="timeago" 
-				title="${nextRunISO}" 
-				data-date-diff-ms="${dateDiffMs}"
-				<g:if test="${cronstring}">data-cronstring="${cronstring}"</g:if>
-			>${nextRunHumanReadable}</abbr>
+		 <abbr class="timeago" title="${nextRunISO}"
+            data-date-diff-ms="${dateDiffMs}"
+            <g:if test="${cronstring}">
+                data-cronstring="${cronstring}"
+            </g:if> >
+			${nextRunHumanReadable}
+         </abbr>
 		<g:if test="${url}">
 			</a>
 		</g:if>

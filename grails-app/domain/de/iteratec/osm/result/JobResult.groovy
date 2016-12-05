@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.JobStatisticService
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -40,6 +41,8 @@ import org.grails.databinding.BindUsing
  * @see EventResult
  */
 class JobResult {
+
+    JobStatisticService jobStatisticService
 
 	Long id
 
@@ -155,7 +158,7 @@ class JobResult {
 		wptStatus(type: 'text')
 	}
 
-    static transients = ['eventResults']
+    static transients = ['eventResults', 'jobStatisticService']
 
 	String toString(){
 		return (testId?:id)?:super.toString()
@@ -252,4 +255,25 @@ class JobResult {
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'
     }
+
+    /**
+     * If {@link httpStatusCode} will change {@link JobStatistic}s of {@link Job} has to be updated.
+     */
+    def beforeUpdate(){
+        try {
+            if (isDirty(httpStatusCode)){
+                jobStatisticService.updateStatsFor(job)
+            }
+        }catch (Exception e){
+            log.info("An exception occurred trying to update statistics of job '${job.label}': ${e.message}")
+        }
+        return true
+    }
+    /**
+     * {@link JobStatistic}s of {@link Job} has to be updated.
+     */
+    def afterInsert(){
+        jobStatisticService.updateStatsFor(job)
+    }
+
 }

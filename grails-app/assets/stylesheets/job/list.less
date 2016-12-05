@@ -1,88 +1,143 @@
 /*
 *= require_self
 */
-
 @import "../bower_components/bootstrap/less/variables.less";
 
+
 table#jobtable tr.success td {
-	background: rgb(171, 248, 171) !important;
+  background: rgb(171, 248, 171) !important;
 }
 
 table#jobtable tr.failure td {
-	background: rgb(255, 194, 194);
+  background: rgb(255, 194, 194);
 }
 
 .status {
-	display: block;
-}
-.done {
-	
+  display: block;
 }
 
+.done {
+
+}
 
 label {
-	display: inline !important;
-	margin-right: 1em;
-}
-.cronExpression {
-/*	display: none;*/
-}
-#serverdown {
-	display: none;
+  display: inline !important;
+  margin-right: 1em;
 }
 
-ul.tags	{
-	display: inline-block;
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
+.cronExpression {
+  /*	display: none;*/
 }
+
+#serverdown {
+  display: none;
+}
+
+ul.tags {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
 ul.tags li { /*display: inline;*/
-display: block;
-   float: left;
-   margin: 0 3px 0 0;
-   border: 1px #ccc solid;
-   padding: 1px 2px 1px 2px;
-   border-radius: 5px;
-   background: #ddd;
+  display: block;
+  float: left;
+  margin: 0 3px 0 0;
+  border: 1px #ccc solid;
+  padding: 1px 2px 1px 2px;
+  border-radius: 5px;
+  background: #ddd;
 }
 
 .chosen-container {
-	width: 100%;
-	border-radius: 4px;
-	border: 1px solid #cccccc;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	color: #555555;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #555555;
 }
 
 .chosen-container .search-field {
-	height: 32px;
+  height: 32px;
 }
 
 .inactiveJob {
-	font-weight: normal;
+  font-weight: normal;
 }
+
 .running {
-    background: center left no-repeat url(../../images/loading_indicator.gif);
-    padding-left: 20px;
+  background: center left no-repeat url(../../images/loading_indicator.gif);
+  padding-left: 20px;
 }
 
 #updateHints {
-	line-height: 21px;
-	padding: 6px;
+  line-height: 21px;
+  padding: 6px;
 }
 
 .show-chart-buttons {
-	float: right;
+  float: right;
 	display: block;
 }
 
 .show-chart-buttons a {
-	padding: 5px 8px;
-	border-radius: 4px;
+  padding: 5px 8px;
+  border-radius: 4px;
 	display: inline-block;
-	&:hover, &:focus {
+  &:hover, &:focus {
 		background-color: rgba(0, 0, 0, 0.07);
-	}
+  }
+}
+
+.job-status {
+  font-size: 1rem;
+  display: inline-block;
+  color: #fff;
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  height: 1.3rem;
+}
+
+.job-status-150 {
+  &:extend(.job-status);
+  border-radius: 0.2rem;
+  width: 10rem;
+  position: relative;
+}
+
+.job-status-25 {
+  &:extend(.job-status);
+  border-radius: 0 0.2rem 0.2rem 0;
+  width: 3rem;
+  position: absolute;
+  right: 0;
+}
+
+.job-status-5 {
+  &:extend(.job-status);
+  border-radius: 0 0.2rem 0.2rem 0;
+  width: 0.9rem;
+  padding-top: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+}
+
+.job-status-good {
+  background-color: #5CB85C; /*botstrap success*/
+}
+
+.job-status-warn {
+  background-color: #F0AD4E; /*botstrap warning*/
+}
+
+.job-status-error {
+  background-color: #D9534F; /*botstrap danger*/
+}
+
+.job-status-nodata {
+  background-color: #777; /*botstrap gray-light*/
 }

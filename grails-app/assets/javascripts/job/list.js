@@ -286,7 +286,7 @@ function doOnDomReady(
     var stringUtils = OpenSpeedMonitor.stringUtils();
     var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils();
 
-	$('#updateHints').popover();
+  $('[data-toggle="popover"]').popover()
 	$('#checkAll').on('click', function() {
 	    // set checked attribute on fixed-header
 		$('#checkAll').prop("checked", this.checked);

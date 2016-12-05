@@ -235,4 +235,84 @@ databaseChangeLog = {
                 select id from csi_aggregation);
         ''')
     }
+
+    // ### BEGIN job statistic ###
+
+    changeSet(author: "nkuhn", id: "1479457659-1") {
+        createTable(tableName: "job_statistic") {
+            column(autoIncrement: "true", name: "id", type: "bigint") {
+                constraints(nullable: "false", primaryKey: "true", primaryKeyName: "job_statistic_id_tyPK")
+            }
+
+            column(name: "version", type: "bigint") {
+                constraints(nullable: "false")
+            }
+
+            column(name: "percentage_successful_tests_of_last5", type: "double precision") {
+                constraints(nullable: "true")
+            }
+            column(name: "percentage_successful_tests_of_last25", type: "double precision") {
+                constraints(nullable: "true")
+            }
+            column(name: "percentage_successful_tests_of_last150", type: "double precision") {
+                constraints(nullable: "true")
+            }
+
+        }
+    }
+    changeSet(author: "nkuhn", id: "1479457659-2") {
+        addColumn(tableName: "job") {
+            column(name: "job_statistic_id", type: "bigint")
+        }
+    }
+    changeSet(author: "nkuhn", id: "1479457659-3") {
+        addForeignKeyConstraint(baseColumnNames: "job_statistic_id", baseTableName: "job", constraintName: "FK_job_job_statistic_id", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_statistic")
+    }
+
+    changeSet(author: "nkuhn", id: "1480788858-1") {
+        grailsChange {
+            change {
+
+                def log = LogFactory.getLog("liquibase")
+                float successfulWithinLast150
+                float successfulWithinLast25
+                float successfulWithinLast5
+                float percentageLast150
+                float percentageLast25
+                float percentageLast5
+
+                sql.eachRow("select id,label from job;") { row ->
+
+                    log.debug("calculation of job stats for job '${row.label}'")
+
+                    successfulWithinLast150 = sql.firstRow("select count(subselect_table.id) from \n" +
+                            "(select id,http_status_code from job_result where job_id = ${row.id} and http_status_code >= 200 order by date desc limit 150) subselect_table \n" +
+                            "where subselect_table.http_status_code = 200;")[0]
+                    successfulWithinLast25 = sql.firstRow("select count(subselect_table.id) from \n" +
+                            "(select id,http_status_code from job_result where job_id = ${row.id} and http_status_code >= 200 order by date desc limit 25) subselect_table \n" +
+                            "where subselect_table.http_status_code = 200;")[0]
+                    successfulWithinLast5 = sql.firstRow("select count(subselect_table.id) from \n" +
+                            "(select id,http_status_code from job_result where job_id = ${row.id} and http_status_code >= 200 order by date desc limit 5) subselect_table \n" +
+                            "where subselect_table.http_status_code = 200;")[0]
+                    percentageLast150 = (successfulWithinLast150/150)*100
+                    percentageLast25 = (successfulWithinLast25/25)*100
+                    percentageLast5 = (successfulWithinLast5/5)*100
+                    log.debug "percentageLast5 = $percentageLast5"
+                    log.debug "percentageLast25 = $percentageLast25"
+                    log.debug "percentageLast150 = $percentageLast150"
+
+                    log.debug("insert job_statistic for job '${row.label}'")
+                    long new_job_stat_id = sql.executeInsert("insert into job_statistic (version, percentage_successful_tests_of_last5,percentage_successful_tests_of_last25,percentage_successful_tests_of_last150) " +
+                            "values (0, ${percentageLast5}, ${percentageLast25}, ${percentageLast150})")[0][0]
+                    log.debug("insert job_statistic for job '${row.label}'... DONE")
+                    log.debug("set id of new job_stat for job '${row.label}'")
+                    sql.executeUpdate("update job set job_statistic_id = ${new_job_stat_id} where id = ${row.id}")
+                    log.debug("set id of new job_stat for job '${row.label}'... DONE")
+                }
+            }
+        }
+    }
+
+    // ### END job statistic ###
+
 }

@@ -914,10 +914,14 @@ class TestDataUtil implements OsmTestLogin {
      * @return A newly created result, not <code>null</code>.
      */
     static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation) {
+        return createJobResult(testId, dateOfJobRun, parentJob, agentLocation, 200)
+    }
+
+    static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation, Integer httpStatusCode) {
         return new JobResult(
                 date: dateOfJobRun,
                 testId: testId,
-                httpStatusCode: 200,
+                httpStatusCode: httpStatusCode,
                 jobConfigLabel: parentJob.label,
                 jobConfigRuns: 1,
                 description: '',
