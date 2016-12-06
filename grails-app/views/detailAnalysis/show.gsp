@@ -25,10 +25,6 @@
     </div>
 </div>
 
-<a class="btn btn-primary" href="${createLink(controller: 'eventResultDashboard', action: 'showAll', params: params)}">
-    <i class="fa fa-caret-left" aria-hidden="true"></i> <g:message message="de.iteratec.osm.detailAnalysis.backButton" default="Back" />
-</a>
-
 <g:if test="${osmDetailAnalysisRequest}">
     <div id="detailDatenContainer">${osmDetailAnalysisRequest}</div>
 </g:if>
