@@ -146,4 +146,5 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     return {
         getTimeFrame : getTimeFrame
     }
+
 })();

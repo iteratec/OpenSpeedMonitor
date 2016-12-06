@@ -5,6 +5,7 @@
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
     <asset:stylesheet src="/pageAggregation/show.css"/>
+
 </head>
 
 <body>
@@ -117,15 +118,19 @@
 <content tag="include.bottom">
     <asset:javascript src="csidashboard/csiDashboard.js"/>
     <asset:javascript src="pngDownloader.js"/>
+    <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:script type="text/javascript">
-
-        $(document).ready(function () {
-            doOnDomReady(
-                    '${dateFormat}',
+        OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
+                $(document).ready(function () {
+                    doOnDomReady(
+                            '${dateFormat}',
         ${weekStart},
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
+
         });
+
+
 
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();

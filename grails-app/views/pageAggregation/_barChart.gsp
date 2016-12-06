@@ -10,6 +10,6 @@
 <g:render template="/pageAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/dimple/barchart.js" absolute="true"/>')
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/dimple/barchart.js" absolute="true"/>',true,'barchart')
     });
 </asset:script>

@@ -51,7 +51,7 @@
 
 <asset:script>
     $(window).load(function () {
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" absolute="true"/>')
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" absolute="true"/>', true, 'pngDownloader')
     });
 
     function downloadPNG(chartContainerID) {
