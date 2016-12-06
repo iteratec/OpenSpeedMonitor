@@ -46,7 +46,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setBrowser(params);
         setConnectivity(params);
         setMeasurands(params);
-        setStacked(params);
         setTrim(params);
         // if(params != null){
         //     clickShowButton();
@@ -74,17 +73,36 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
     
     var setMeasurands = function (params) {
-        var measurands = params['measurand'];
-        if(measurands )
-        if(measurands.constructor === Array){
-            addMeasurands(measurands);
+        var measurandGroups = params['measurand'];
+        var currentGroup;
+        if(measurandGroups.constructor === Array){
+            currentGroup = JSON.parse(decodeURIComponent(measurandGroups.shift()));
+            addMeasurands(currentGroup, 0);
+            var addButton =   $("#addMeasurandSeriesButton");
+            var length = measurandGroups.length;
+            for(var i = 0;i<length;i++){
+                addButton.click();
+                addMeasurands(JSON.parse(decodeURIComponent(measurandGroups.shift())), i+1);
+            }
         } else{
-            setMultiSelect("firstMeasurandSelect", measurands);
+            currentGroup = JSON.parse(decodeURIComponent(measurandGroups));
+            addMeasurands(currentGroup, 0);
         }
     };
-    
-    var setStacked = function (params) {
-        setMultiSelect("stackedSelect", params['stacked']);
+
+    var addMeasurands = function (measurands, index) {
+        var firstSelect = $(".firstMeasurandSelect").eq(index);
+        firstSelect.val(measurands['values'].shift());
+        var length = measurands['values'].length;
+        var currentPanel = firstSelect.closest(".panel");
+        var currentAddButton =   currentPanel.find("#firstMeasurandAdd");
+        for(var i=0;i<length;i++){
+            currentAddButton.click();
+            currentPanel.find(".additionalMeasurand").eq(i).val(measurands['values'].shift());
+            currentAddButton = currentPanel.find(".addMeasurandButton").eq(i+1);
+        }
+        currentPanel.find("#stackedSelect").val(measurands['stacked'])
+
     };
 
     var setTrim = function (params) {
@@ -94,20 +112,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         $("#appendedInputAboveRequestCounts").val(params["trimAboveRequestCounts"]);
         $("#appendedInputBelowRequestSizes").val(params["trimBelowRequestSizes"]);
         $("#appendedInputAboveRequestSizes").val(params["trimAboveRequestSizes"]);
-    };
-
-    var addMeasurands = function (measurands) {
-        var currentMeasurand = measurands.shift();
-        setMultiSelect("firstMeasurandSelect", currentMeasurand);
-        var i;
-        var length = measurands.length;
-        var currentAddButton =   $("#firstMeasurandAdd");
-        for(i=0;i<length;i++){
-            currentAddButton.click();
-            var clone = $("#additionalMeasurand-clone-"+(i+1));
-            clone.find(".additionalMeasurand").val(measurands.shift());
-            currentAddButton = clone.find(".addMeasurandButton");
-        }
     };
 
 
