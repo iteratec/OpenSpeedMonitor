@@ -95,24 +95,16 @@
                 </div>
                 %{--the rest----------------------------------------------------------------------------------------------}%
                 <div id="filter-complete-tabbable" class="col-md-5">
-                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
-                              model="['locationsOfBrowsers'             : locationsOfBrowsers,
-                                      'eventsOfPages'                   : eventsOfPages,
-                                      'pages'                           : pages,
-                                      'selectedPages'                   : selectedPages,
-                                      'measuredEvents'                  : measuredEvents,
-                                      'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                                      'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                                      'browsers'                        : browsers,
-                                      'selectedBrowsers'                : selectedBrowsers,
-                                      'selectedAllBrowsers'             : selectedAllBrowsers,
-                                      'locations'                       : locations,
-                                      'selectedLocations'               : selectedLocations,
-                                      'selectedAllLocations'            : selectedAllLocations,
-                                      'connectivityProfiles'            : connectivityProfiles,
-                                      'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                      'showExtendedConnectivitySettings': false]"/>
+                    <div class="card" id="select-page-location">
+                        <legend>
+                            <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
+                        </legend>
+                        <g:render template="/_resultSelection/selectPageContent" model="[
+                                'pages'                : pages,
+                                'selectedPages'        : selectedPages,
+                                'showMeasuredEventForm': false
+                        ]"/>
+                    </div>
                 </div>
             </div>
 

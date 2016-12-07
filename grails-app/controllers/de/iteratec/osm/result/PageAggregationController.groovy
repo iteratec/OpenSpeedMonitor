@@ -39,61 +39,10 @@ class PageAggregationController {
         List<Page> pages = eventResultDashboardService.getAllPages()
         modelToRender.put('pages', pages)
 
-        // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
-        modelToRender.put('measuredEvents', measuredEvents)
-
-        // Browsers
-        List<Browser> browsers = eventResultDashboardService.getAllBrowser()
-        modelToRender.put('browsers', browsers)
-
-        // Locations
-        List<Location> locations = eventResultDashboardService.getAllLocations()
-        modelToRender.put('locations', locations)
-
-        // ConnectivityProfiles
-        modelToRender['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
-
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put("weekStart", MONDAY_WEEKSTART)
 
-        // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
-        Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
-        for (Page eachPage : pages) {
-            Set<Long> eventIds = new HashSet<Long>();
-
-            Collection<Long> ids = measuredEvents.findResults {
-                it.testedPage.getId() == eachPage.getId() ? it.getId() : null
-            }
-            if (!ids.isEmpty()) {
-                eventIds.addAll(ids);
-            }
-
-            eventsOfPages.put(eachPage.getId(), eventIds);
-        }
-        modelToRender.put('eventsOfPages', eventsOfPages);
-
-        // --- Map<BrowserID, Set<LocationID>> for fast view filtering:
-        Map<Long, Set<Long>> locationsOfBrowsers = new HashMap<Long, Set<Long>>()
-        for (Browser eachBrowser : browsers) {
-            Set<Long> locationIds = new HashSet<Long>();
-
-            Collection<Long> ids = locations.findResults {
-                it.browser.getId() == eachBrowser.getId() ? it.getId() : null
-            }
-            if (!ids.isEmpty()) {
-                locationIds.addAll(ids);
-            }
-
-            locationsOfBrowsers.put(eachBrowser.getId(), locationIds);
-        }
-        modelToRender.put('locationsOfBrowsers', locationsOfBrowsers);
-
-        modelToRender.put('selectedAllMeasuredEvents', true)
-        modelToRender.put('selectedAllBrowsers', true)
-        modelToRender.put('selectedAllLocations', true)
-        modelToRender.put('selectedAllConnectivityProfiles', true)
         modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
