@@ -6,14 +6,17 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     var cardElement = $('#select-jobgroup-card');
     var tagToJobGroupNameMap = cardElement.data('tagToJobGroupNameMap') || {};
     var jobGroupSelectElement = $('#folderSelectHtmlId');
-    var initialOptions = jobGroupSelectElement.find('option').clone();
-    var currentOptions = initialOptions;
+    var currentOptionValues = [];
     var selectedTag = '';
     var triggerEventsEnabled = true;
     var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use i18n
 
 
     var init = function() {
+        currentOptionValues = $.map(jobGroupSelectElement.find('option'), function(option) {
+            return { id: option.value, name: option.text };
+        });
+
         registerEvents();
     };
 
@@ -31,18 +34,11 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
 
     var filterByTag = function(tag) {
         selectedTag = tag;
-        var oldSelection = jobGroupSelectElement.val();
-        jobGroupSelectElement.empty();
         var jobGroupNamesToShow = tagToJobGroupNameMap[tag];
-        currentOptions.forEach(function (option) {
-            if (tag === '' || $.inArray($(option).text(), jobGroupNamesToShow) > -1) {
-                jobGroupSelectElement.append(option);
-            }
+        var optionsToShow = currentOptionValues.filter(function (value) {
+            return (tag === '' || $.inArray(value.name, jobGroupNamesToShow) > -1);
         });
-        if (!jobGroupSelectElement.children().length) {
-            jobGroupSelectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
-        }
-        jobGroupSelectElement.val(oldSelection);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(jobGroupSelectElement, optionsToShow, noResultsText);
     };
 
     var enableEventTrigger = function(enable) {
@@ -54,7 +50,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     var updateJobGroups = function(jobGroups) {
         var wasTriggerEventsEnabled = enableEventTrigger(false);
 
-        currentOptions = OpenSpeedMonitor.domUtils.createOptionsByIdAndName(jobGroups);
+        currentOptionValues = jobGroups;
         filterByTag(selectedTag);
 
         enableEventTrigger(wasTriggerEventsEnabled);

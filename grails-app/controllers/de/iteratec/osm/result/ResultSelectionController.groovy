@@ -14,12 +14,12 @@ class ResultSelectionController {
     PerformanceLoggingService performanceLoggingService
 
     enum MetaConnectivityProfileId {
-        Custom(-2), Native(1)
+        Custom("custom"), Native("native")
 
-        MetaConnectivityProfileId(int value) {
+        MetaConnectivityProfileId(String value) {
             this.value = value
         }
-        int value
+        String value
     }
 
     enum ResultSelectionType {

@@ -12,6 +12,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
     var browserSelectElement = $("#selectedBrowsersHtmlId");
     var locationsSelectElement =  $("#selectedLocationsHtmlId");
+    var connectivitySelectElement = $("#selectedConnectivityProfilesHtmlId");
     var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
     var browserLocationConnectedSelects;
@@ -23,14 +24,9 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
             measuredEventsSelectElement, $("#selectedAllMeasuredEvents"));
         browserLocationConnectedSelects = OpenSpeedMonitor.ConnectedSelects(browserSelectElement,
             $("#selectedAllBrowsers"), locationsSelectElement, $("#selectedAllLocations"));
-        initConnectivityControls();
+        OpenSpeedMonitor.SelectWithSelectAllCheckBox(connectivitySelectElement, "#selectedAllConnectivityProfiles");
         fixChosen();
         registerEvents();
-    };
-
-    var initConnectivityControls = function () {
-        OpenSpeedMonitor.SelectWithSelectAllCheckBox("#selectedConnectivityProfilesHtmlId", "#selectedAllConnectivityProfiles");
-        initTextFieldAndCheckBoxFunction("#includeCustomConnectivity", "#customConnectivityName");
     };
 
     var registerEvents = function() {
@@ -64,12 +60,6 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         return oldValue;
     };
 
-    var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
-        $(checkBox).on('change', function(event) {
-            $(textField).prop('disabled', !event.currentTarget.checked);
-        });
-    };
-
     var updateMeasuredEvents = function (measuredEventsWithPages) {
         var wasTriggerEnabled = enableTriggerEvents(false);
         pageEventsConnectedSelects.updateOptions(measuredEventsWithPages);
@@ -82,10 +72,17 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         enableTriggerEvents(wasTriggerEnabled);
     };
 
+    var updateConnectivityProfiles = function (connectivityProfiles) {
+        var wasTriggerEnabled = enableTriggerEvents(false);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, noResultsText);
+        enableTriggerEvents(wasTriggerEnabled);
+    };
+
     init();
     return {
         updateMeasuredEvents: updateMeasuredEvents,
-        updateLocations: updateLocations
+        updateLocations: updateLocations,
+        updateConnectivityProfiles: updateConnectivityProfiles
     };
 })();
 

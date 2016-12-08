@@ -14,7 +14,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var updatesEnabled = true;
     var ajaxRequests = {};
 
-    if (!resultSelectionUrls["jobGroups"] || !resultSelectionUrls["pages"] || !resultSelectionUrls["browsers"]) {
+    if (!resultSelectionUrls["jobGroups"] || !resultSelectionUrls["pages"] || !resultSelectionUrls["browsers"] || !resultSelectionUrls["connectivity"]) {
         throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
     }
 
@@ -72,6 +72,9 @@ OpenSpeedMonitor.resultSelection = (function(){
         }
         if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "browsers") {
             updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations);
+        }
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "connectivity") {
+            updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles);
         }
     };
 

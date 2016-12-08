@@ -253,10 +253,28 @@ OpenSpeedMonitor.domUtils = (function () {
         return selectElement.find(":not(:selected)").length == 0 && selectElement.find("option").length > 0;
     };
 
+    /**
+     * Updates a select element with new values
+     * @param selectElement The select element to update
+     * @param idAndNameList A list of objects with id and name
+     * @param noResultsText If set, a disabled option with this text is appended if the idAndNameList is empty
+     */
+    var updateSelectOptions = function (selectElement, idAndNameList, noResultsText) {
+        selectElement = $(selectElement);
+        var selection = selectElement.val();
+        selectElement.empty();
+        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(idAndNameList));
+        if (!selectElement.children().length && noResultsText) {
+            selectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
+        }
+        selectElement.val(selection);
+    };
+
     return {
         createOptionsByIdAndName: createOptionsByIdAndName,
         getAllOptionValues: getAllOptionValues,
-        hasAllOptionsSelected: hasAllOptionsSelected
+        hasAllOptionsSelected: hasAllOptionsSelected,
+        updateSelectOptions: updateSelectOptions
     };
 })();
 

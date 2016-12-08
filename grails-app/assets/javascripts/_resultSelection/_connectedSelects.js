@@ -80,16 +80,6 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         childSelectAllCheckbox.prop('checked', !childSelect.val());
     };
 
-    var updateParentSelect = function (parentList) {
-        var selection = parentSelect.val();
-        parentSelect.empty();
-        parentSelect.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(parentList));
-        if (!parentSelect.children().length) {
-            parentSelect.append($("<option/>", { disabled: "disabled", text: noResultsText }));
-        }
-        parentSelect.val(selection);
-    };
-
     var updateOptions = function (childWithParentList) {
         var parentList = [];
         parentChildMapping = {};
@@ -101,7 +91,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
             }
             parentChildMapping[parent.id].push(child);
         });
-        updateParentSelect(parentList);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(parentSelect, parentList, noResultsText);
         updateChildValues();
     };
 
