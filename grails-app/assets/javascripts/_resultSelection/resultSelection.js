@@ -15,6 +15,8 @@ OpenSpeedMonitor.resultSelection = (function(){
     var warningNoData = $('#warning-no-data');
     var showButtons = $('#show-button-group input, #show-button-group button');
     var warningLongProcessing = $('#warning-long-processing');
+    var warningNoJobGroupSelected = $('#warning-no-job-group');
+    var warningNoPageSelected = $('#warning-no-page');
     var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
     var currentQueryArgs = {};
     var updatesEnabled = true;
@@ -22,6 +24,9 @@ OpenSpeedMonitor.resultSelection = (function(){
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
     var initiators = ["jobGroups", "pages", "browsers", "connectivity", "resultCount"];
+    var hasJobGroupSelection = false;
+    var hasPageSelection = false;
+    var lastResultCount = 1;
 
     if (!initiators.every(function(i) {return resultSelectionUrls[i] !== undefined})) {
         throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
@@ -43,10 +48,12 @@ OpenSpeedMonitor.resultSelection = (function(){
             updateCards("timeFrame");
         });
         selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroupSelection) {
+            hasJobGroupSelection = !!(jobGroupSelection && jobGroupSelection.ids && jobGroupSelection.ids.length > 0);
             currentQueryArgs.jobGroupIds = jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
             updateCards("jobGroups");
         });
         selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pageSelection) {
+            hasPageSelection = !!(pageSelection && pageSelection.ids && pageSelection.ids.length > 0);
             currentQueryArgs.pageIds = pageSelection.hasAllSelected ? null : pageSelection.ids;
             updateCards("pages");
         });
@@ -76,6 +83,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var updateCards = function (initiator) {
+        validateForm();
         if (!updatesEnabled) {
             return;
         }
@@ -102,10 +110,17 @@ OpenSpeedMonitor.resultSelection = (function(){
         updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
     };
 
-    var updateResultCount = function(resultCount) {
-        warningLongProcessing.toggle(resultCount < 0);
+    var validateForm = function () {
+        warningNoPageSelected.toggle(!hasPageSelection && lastResultCount != 0);
+        warningNoJobGroupSelected.toggle(!hasJobGroupSelection && lastResultCount != 0);
+        showButtons.prop("disabled", lastResultCount == 0 || !hasJobGroupSelection || !hasPageSelection);
+    };
+
+    var updateResultCount = function (resultCount) {
+        lastResultCount = resultCount;
+        warningLongProcessing.toggle(resultCount < 0 && hasPageSelection && hasJobGroupSelection);
         warningNoData.toggle(resultCount == 0);
-        showButtons.prop("disabled", resultCount == 0);
+        validateForm();
     };
 
     var enableUpdates = function (enable) {

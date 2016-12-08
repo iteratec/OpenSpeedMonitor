@@ -195,6 +195,12 @@
             <p class="invisible-warning bg-danger pull-right" id="warning-no-data">
                 <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
             </p>
+            <p class="invisible-warning bg-danger pull-right" id="warning-no-job-group">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.noJobGroupSelected"/>
+            </p>
+            <p class="invisible-warning bg-danger pull-right" id="warning-no-page">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.noPageSelected"/>
+            </p>
             <!-- Actual tabs -->
             <ul class="nav nav-tabs card-well-tabs">
                 <li class="active" >
