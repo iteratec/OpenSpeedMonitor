@@ -40,7 +40,9 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         var startValues = defaultValueForStart();
         startDateTimePicker.setValues(startValues);
         endDateTimePicker.setValues(defaultValueForEnd());
-        endDateTimePicker.setStartDate(startValues.date);
+        if (startValues !== undefined && startValues != null){
+          endDateTimePicker.setStartDate(startValues.date);
+        }
 
         var timeFramePreselection = defaultValueForTimeFramePreselection();
         timeFrameSelectElement.val(timeFramePreselection);
