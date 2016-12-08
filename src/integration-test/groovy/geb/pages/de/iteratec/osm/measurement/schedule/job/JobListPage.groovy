@@ -4,7 +4,6 @@ import geb.pages.de.iteratec.osm.I18nGebPage
 
 class JobListPage extends I18nGebPage {
 
-
     static url = getUrl("/job/index")
 
     static at = {

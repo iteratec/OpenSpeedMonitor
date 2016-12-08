@@ -4,7 +4,6 @@ import geb.pages.de.iteratec.osm.I18nGebPage
 
 class JobCreatePage extends I18nGebPage {
 
-
     static url = getUrl("/job/create")
 
     static at = {

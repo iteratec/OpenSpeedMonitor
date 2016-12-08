@@ -1,13 +1,14 @@
 package geb.pages.de.iteratec.osm.result
 
-import geb.Page
+import geb.pages.de.iteratec.osm.I18nGebPage
+import org.openqa.selenium.Keys
 
 /**
  * Created by marcus on 16.06.16.
  */
-class EventResultDashboardPage extends Page {
+class EventResultDashboardPage extends I18nGebPage {
 
-    static url = "/eventResultDashboard/showAll"
+    static url = getUrl("/eventResultDashboard/showAll")
 
     static at = {
         title == "Time Series"
@@ -78,10 +79,43 @@ class EventResultDashboardPage extends Page {
 
         adjustChartButton{$("#rickshaw_adjust_chart_link")}
         adjustChartApply{$("#adjustChartApply")}
+        cardTabsUl{$("#erd-card-tabs")}
 
     }
 
+    public clickVariableSelectionTab(){
+        if (!isVariableSelectionTabActive()){
+            tabVariableSelection.click()
+        }
+    }
 
+    public boolean isVariableSelectionTabActive(){
+        return cardTabsUl.children("li")[1].classes().contains("active")
+    }
+
+    public void scrollTop(){
+        js.exec("scrollTo(0, 0);")
+    }
+    public void scrollBottom(){
+        js.exec("scrollTo(0,document.body.scrollHeight);")
+    }
+
+    public void clickShowButton(){
+        waitFor { showButton.displayed }
+        scrollTop()
+        waitFor { showButton.click() }
+    }
+
+    public insertIntoAboveRequestSizeTextField(String aboveRequestSizeValueToSet){
+        waitFor { appendedInputAboveRequestSizesTextField.displayed }
+        appendedInputAboveRequestSizesTextField << aboveRequestSizeValueToSet
+    }
+
+    public clearAboveRequestSizeTextField(){
+        waitFor { appendedInputAboveRequestSizesTextField.displayed }
+        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.CONTROL, "a")
+        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.DELETE)
+    }
 
     public void clickSaveAsDashboardButton() {
         // Scroll object into view so it becomes clickable

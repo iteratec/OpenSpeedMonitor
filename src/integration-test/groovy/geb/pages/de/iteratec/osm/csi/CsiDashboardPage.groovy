@@ -1,12 +1,11 @@
 package geb.pages.de.iteratec.osm.csi
 
-import geb.Page
-
+import geb.pages.de.iteratec.osm.I18nGebPage
 /**
  * Created by marko on 07.07.16.
  */
-class CsiDashboardPage extends Page{
-    static url = "/csiDashboard/showAll"
+class CsiDashboardPage extends I18nGebPage{
+    static url = getUrl("/csiDashboard/showAll")
 
     static at = {
         title == "Dashboard"

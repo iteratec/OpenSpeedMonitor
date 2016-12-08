@@ -204,7 +204,7 @@
                 </ul>
             </div>
             <!-- Actual tabs -->
-            <ul class="nav nav-tabs card-well-tabs">
+            <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">
                 <li class="active" >
                     <a data-toggle="tab" href="#tabJobSelection" id="tabJobSelectionElement" >
                         <g:message code="de.iteratec.sri.wptrd.time.filter.heading"

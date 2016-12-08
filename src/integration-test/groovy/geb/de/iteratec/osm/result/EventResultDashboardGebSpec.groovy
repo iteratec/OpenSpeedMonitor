@@ -27,10 +27,8 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Created by marko on 22.06.16.
  */
@@ -70,9 +68,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         to EventResultDashboardPage
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "The system shows him a helpful error message"
         waitFor { at EventResultDashboardPage }
@@ -81,9 +77,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         } //check that the error box appears
         waitFor {
             $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one job group")
-        } //check that the correct error message is displayed
-        waitFor {
-            $("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")
         } //check that the correct error message is displayed
     }
 
@@ -97,9 +90,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageList[0].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -116,10 +107,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageList[0].click()
 
         when: "User wants to see a graph"
-
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -140,10 +128,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectBrowsersList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-
-        showButton.click()
+        clickShowButton()
 
         then: "No Data Warning is displayed"
         waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
@@ -155,9 +140,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectBrowsersList[1].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -177,9 +160,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectAllBrowserButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -202,9 +183,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectLocationList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "No Data Warning is displayed"
         waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
@@ -219,9 +198,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectLocationList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -240,9 +217,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectAllLocationsButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -263,9 +238,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectConnectivityProfilesList[1].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "No Data Warning is displayed"
         waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
@@ -278,9 +251,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectConnectivityProfilesList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -298,9 +269,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         includeNativeConnectivityButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -325,9 +294,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         includeCustomConnectivityButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -352,9 +319,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         selectAllConnectivityButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        clickShowButton()
 
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
@@ -369,13 +334,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     void "Trimm minimal time"() {
         given: "User defines minimal load time"
 
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         appendedInputBelowLoadTimesTextField << "250"
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -388,7 +351,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565480, y:638]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         waitFor { appendedInputBelowLoadTimesTextField.displayed }
         appendedInputBelowLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowLoadTimesTextField << Keys.chord(Keys.DELETE)
@@ -400,9 +363,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveLoadTimesTextField << "830"
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -415,7 +376,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:238], [x:1466565480, y:638]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         waitFor { appendedInputAboveLoadTimesTextField.displayed }
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
@@ -429,9 +390,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[7].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -444,7 +403,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565480, y:5]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
@@ -457,9 +416,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveRequestCountsTextField << "5"
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -472,7 +429,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565300, y:3]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
@@ -486,9 +443,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[9].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -501,21 +456,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565480, y:71.976]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm maximal size"() {
+    void "Trim maximal size"() {
         given: "User defines maximal bytes until doc"
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
-        appendedInputAboveRequestSizesTextField << "73"
+        insertIntoAboveRequestSizeTextField("73")
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        scrollTop()
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -528,10 +482,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:21.976], [x:1466565480, y:71.976]]
 
         cleanup:
-        tabVariableSelection.click()
-        waitFor { appendedInputAboveRequestSizesTextField.displayed }
-        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.DELETE)
+        scrollBottom()
+        clickVariableSelectionTab()
+        clearAboveRequestSizeTextField()
     }
 
 
@@ -541,11 +494,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[0].click()
 
         when: "User wants to see a graph"
-
-
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -558,7 +507,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:266], [x:1466565480, y:366]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[0].click()
     }
 
@@ -569,10 +518,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[1].click()
 
         when: "User wants to see a graph"
-
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -585,7 +531,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:170], [x:1466565300, y:53], [x:1466565480, y:153]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[1].click()
 
     }
@@ -596,10 +542,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[2].click()
 
         when: "User wants to see a graph"
-
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -612,7 +555,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:192], [x:1466565300, y:285], [x:1466565480, y:185]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[2].click()
     }
 
@@ -622,9 +565,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[4].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -637,7 +578,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:1300], [x:1466565300, y:266], [x:1466565480, y:1766]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[4].click()
     }
 
@@ -646,9 +587,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[5].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -661,7 +600,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:500], [x:1466565300, y:250], [x:1466565480, y:750]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[5].click()
     }
 
@@ -670,9 +609,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[6].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -685,7 +622,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:2557], [x:1466565300, y:1005], [x:1466565480, y:2005]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[6].click()
 
     }
@@ -695,9 +632,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[7].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -710,7 +645,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565300, y:3], [x:1466565480, y:5]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[7].click()
     }
 
@@ -719,9 +654,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[8].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -734,7 +667,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:48], [x:1466565300, y:26], [x:1466565480, y:36]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[8].click()
     }
 
@@ -743,9 +676,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[9].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -758,7 +689,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565300, y:21.976], [x:1466565480, y:71.976]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[9].click()
     }
 
@@ -767,9 +698,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[10].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -782,7 +711,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:184.46], [x:1466565300, y:23.36], [x:1466565480, y:133.36]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[10].click()
     }
 
@@ -791,9 +720,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[11].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -806,7 +733,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:88], [x:1466565300, y:23], [x:1466565480, y:63]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[11].click()
     }
 
@@ -815,9 +742,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[12].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
@@ -830,7 +755,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:99.6157], [x:1466565300, y:23.6157], [x:1466565480, y:73.6157]]
 
         cleanup:
-        tabVariableSelection.click()
+        clickVariableSelectionTab()
         firstViewList[12].click()
     }
 
@@ -839,9 +764,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[13].click()
 
         when: "User wants to see a graph"
-        waitFor { showButton.displayed }
-        sleep(100)
-        waitFor { showButton.click() }
+        clickShowButton()
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
