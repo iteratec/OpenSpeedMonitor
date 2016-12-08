@@ -180,9 +180,7 @@ grails:
             maxRequestSize: 10000000
     converters:
         encoding: UTF-8
-        default:
-                pretty:
-                      print: true
+
     views:
         default:
             codec: none
