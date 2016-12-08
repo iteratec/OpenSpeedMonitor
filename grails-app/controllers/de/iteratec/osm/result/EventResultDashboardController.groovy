@@ -176,16 +176,8 @@ class EventResultDashboardController {
                     }
 
                     int countOfSelectedAggregators = cmd.selectedAggrGroupValuesCached.size() + cmd.selectedAggrGroupValuesUnCached.size();
-
-                    warnAboutLongProcessingTimeInsteadOfShowingData = cmd.shouldWarnAboutLongProcessingTime(countOfSelectedAggregators, countOfSelectedBrowser);
-
                 }
-
-                if (warnAboutLongProcessingTimeInsteadOfShowingData) {
-                    modelToRender.put('warnAboutLongProcessingTime', true)
-                } else {
-                    fillWithCsiAggregationData(modelToRender, cmd);
-                }
+                fillWithCsiAggregationData(modelToRender, cmd);
             }
         }
         modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
