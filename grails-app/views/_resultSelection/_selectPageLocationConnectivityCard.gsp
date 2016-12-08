@@ -6,24 +6,24 @@ A card to select page & measured step, browser & location, and the connectivity
 <div class="card" id="select-page-location-connectivity">
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
-            <a href="#tab1" data-toggle="tab">
+            <a href="#page-tab" data-toggle="tab">
                 <g:message code="de.iteratec.osm.result.page.label" default="Page"/>&nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
             </a>
         </li>
         <li id="filter-navtab-browser-and-location">
-            <a href="#tab2" data-toggle="tab">
+            <a href="#browser-tab" data-toggle="tab">
                 <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/>
             </a>
         </li>
         <li id="filter-navtab-connectivityprofile">
-            <a href="#tab3" data-toggle="tab">
+            <a href="#connectivity-tab" data-toggle="tab">
                 <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
             </a>
         </li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane active" id="tab1">
+        <div class="tab-pane active" id="page-tab">
             <g:render template="/_resultSelection/selectPageContent" model="[
                     showMeasuredEventForm: true,
                     pages: pages,
@@ -35,7 +35,7 @@ A card to select page & measured step, browser & location, and the connectivity
             ]" />
         </div>
 
-        <div class="tab-pane" id="tab2">
+        <div class="tab-pane" id="browser-tab">
             <div id="filter-browser-and-location">
                 <g:select id="selectedBrowsersHtmlId"
                           class="form-control"
@@ -73,7 +73,7 @@ A card to select page & measured step, browser & location, and the connectivity
                 </label>
             </div>
         </div>
-        <div class="tab-pane" id="tab3">
+        <div class="tab-pane" id="connectivity-tab">
             <div id="filter-connectivityprofile">
                 <g:select id="selectedConnectivityProfilesHtmlId"
                           class="form-control"

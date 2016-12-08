@@ -9,12 +9,18 @@ OpenSpeedMonitor.resultSelection = (function(){
     var selectIntervalTimeframeCard = $("#select-interval-timeframe-card");
     var selectJobGroupCard = $("#select-jobgroup-card");
     var selectPageLocationConnectivityCard = $('#select-page-location-connectivity');
+    var pageTabElement = $('#page-tab');
+    var browserTabElement = $('#browser-tab');
+    var connectivityTabElement = $('#connectivity-tab');
     var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
     var currentQueryArgs = {};
     var updatesEnabled = true;
     var ajaxRequests = {};
+    var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
+    var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
+    var initiators = ["jobGroups", "pages", "browsers", "connectivity"];
 
-    if (!resultSelectionUrls["jobGroups"] || !resultSelectionUrls["pages"] || !resultSelectionUrls["browsers"] || !resultSelectionUrls["connectivity"]) {
+    if (!initiators.every(function(i) {return resultSelectionUrls[i] !== undefined})) {
         throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
     }
 
@@ -34,7 +40,7 @@ OpenSpeedMonitor.resultSelection = (function(){
             updateCards("timeFrame");
         });
         selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroupSelection) {
-            currentQueryArgs.jobGroupIds =  jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
+            currentQueryArgs.jobGroupIds = jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
             updateCards("jobGroups");
         });
         selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pageSelection) {
@@ -71,16 +77,24 @@ OpenSpeedMonitor.resultSelection = (function(){
             return;
         }
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
-            updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
+            spinnerJobGroup.start();
+            updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups, spinnerJobGroup);
         }
+        if (initiator != "pages" && initiator != "browsers" && initiator != "connectivity") {
+            spinnerPageLocationConnectivity.start();
+        }
+        var spinner = null;
         if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "pages") {
-            updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
+            spinner = pageTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+            updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents, spinner);
         }
         if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "browsers") {
-            updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations);
+            spinner = browserTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+            updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations, spinner);
         }
         if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "connectivity") {
-            updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles);
+            spinner = connectivityTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+            updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
         }
     };
 
@@ -90,7 +104,7 @@ OpenSpeedMonitor.resultSelection = (function(){
         return oldValue;
     };
 
-    var updateCard = function(url, handler) {
+    var updateCard = function(url, handler, spinner) {
         if (ajaxRequests[url]) {
             ajaxRequests[url].abort();
         }
@@ -103,9 +117,15 @@ OpenSpeedMonitor.resultSelection = (function(){
                 var updateWasEnabled = enableUpdates(false);
                 handler(data);
                 enableUpdates(updateWasEnabled);
+                if (spinner) {
+                    spinner.stop();
+                }
             },
             error: function (e, statusText) {
                 if (statusText != "abort") {
+                    if (spinner) {
+                        spinner.stop();
+                    }
                     // TODO(sburnicki): Show a proper error in the UI
                     throw e;
                 }
