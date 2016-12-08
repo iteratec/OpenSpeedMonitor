@@ -91,7 +91,7 @@ class ResultSelectionController {
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", IndentationDepth.NULL, {
             def jobGroups = query(command, ResultSelectionType.JobGroups, { existing ->
                 if (existing) {
-                    not { 'in'('connectivityProfile', existing) }
+                    not { 'in'('jobGroup', existing) }
                 }
                 projections {
                     distinct('jobGroup')

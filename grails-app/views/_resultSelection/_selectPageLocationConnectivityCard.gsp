@@ -4,6 +4,7 @@ A card to select page & measured step, browser & location, and the connectivity
 --%>
 
 <div class="card" id="select-page-location-connectivity">
+    <button class="reset-selection soft-button" type="button"><i class="fa fa-undo"></i></button>
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
             <a href="#page-tab" data-toggle="tab">

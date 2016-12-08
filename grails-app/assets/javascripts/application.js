@@ -288,11 +288,25 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.val(selection);
     };
 
+    /**
+     * Deselects all selected options in a select element
+     * @param selectElement The select element
+     * @param avoidEvent Optional. If true, no change event will be triggered
+     */
+    var deselectAllOptions = function (selectElement, avoidEvent) {
+        selectElement = $(selectElement);
+        selectElement.find("option:selected").removeAttr("selected");
+        if (!avoidEvent) {
+            selectElement.trigger("change");
+        }
+    };
+
     return {
         createOptionsByIdAndName: createOptionsByIdAndName,
         getAllOptionValues: getAllOptionValues,
         hasAllOptionsSelected: hasAllOptionsSelected,
-        updateSelectOptions: updateSelectOptions
+        updateSelectOptions: updateSelectOptions,
+        deselectAllOptions: deselectAllOptions
     };
 })();
 

@@ -8,6 +8,7 @@ OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
+    var resetButtonElement = cardElement.find(".reset-selection");
     var pageSelectElement = $("#pageSelectHtmlId");
     var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
     var browserSelectElement = $("#selectedBrowsersHtmlId");
@@ -16,8 +17,6 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
     var browserLocationConnectedSelects;
-    var triggerEventsEnabled = true;
-
 
     var init = function() {
         pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
@@ -56,7 +55,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         });
         connectivitySelectElement.on("change", function () {
             triggerChangeEvent("connectivitySelectionChanged", {
-                ids: connectivitySelectElement.val().filter(OpenSpeedMonitor.stringUtils.isNumeric),
+                ids: (connectivitySelectElement.val() || []).filter(OpenSpeedMonitor.stringUtils.isNumeric),
                 customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
                     return option.text;
                 }),
@@ -64,36 +63,29 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
                 hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(connectivitySelectElement)
             });
         });
+        resetButtonElement.on("click", function() {
+            OpenSpeedMonitor.domUtils.deselectAllOptions(pageSelectElement, true);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(measuredEventsSelectElement);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(browserSelectElement, true);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(locationsSelectElement);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(connectivitySelectElement);
+        });
     };
 
     var triggerChangeEvent = function (eventType, values) {
-        if (triggerEventsEnabled) {
-            cardElement.trigger(eventType, values);
-        }
-    };
-
-    var enableTriggerEvents = function(enable) {
-        var oldValue = triggerEventsEnabled;
-        triggerEventsEnabled = enable;
-        return oldValue;
+        cardElement.trigger(eventType, values);
     };
 
     var updateMeasuredEvents = function (measuredEventsWithPages) {
-        var wasTriggerEnabled = enableTriggerEvents(false);
         pageEventsConnectedSelects.updateOptions(measuredEventsWithPages);
-        enableTriggerEvents(wasTriggerEnabled);
     };
 
     var updateLocations = function (locationsWithBrowsers) {
-        var wasTriggerEnabled = enableTriggerEvents(false);
         browserLocationConnectedSelects.updateOptions(locationsWithBrowsers);
-        enableTriggerEvents(wasTriggerEnabled);
     };
 
     var updateConnectivityProfiles = function (connectivityProfiles) {
-        var wasTriggerEnabled = enableTriggerEvents(false);
         OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, noResultsText);
-        enableTriggerEvents(wasTriggerEnabled);
     };
 
     init();

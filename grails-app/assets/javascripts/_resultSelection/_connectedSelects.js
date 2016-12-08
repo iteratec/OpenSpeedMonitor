@@ -78,6 +78,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         childSelect.val(childSelection);
         childSelect.trigger("chosen:updated");
         childSelectAllCheckbox.prop('checked', !childSelect.val());
+        childSelect.trigger("change");
     };
 
     var updateOptions = function (childWithParentList) {
