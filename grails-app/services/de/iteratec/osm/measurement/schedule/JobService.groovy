@@ -17,19 +17,14 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
-import grails.converters.JSON
 import grails.transaction.Transactional
-import groovy.json.JsonSlurper
+import grails.web.mapping.LinkGenerator
 import groovy.time.TimeCategory
 import org.joda.time.DateTime
 import org.quartz.CronExpression
-
-import grails.web.mapping.LinkGenerator
-import org.springframework.security.access.method.P
 
 class JobService {
 
@@ -210,7 +205,7 @@ class JobService {
 
     String createPageAggregationLinkForJob(Job job){
         Map params = createCommonParams(job)
-        List<Long> pageIds = []
+        Set<Long> pageIds = []
         new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
            pageIds << pageService.getPageByStepName(it).id
         }
