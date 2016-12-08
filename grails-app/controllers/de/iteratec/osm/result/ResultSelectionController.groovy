@@ -1,13 +1,17 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.api.dto.JobGroupDto
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import grails.converters.JSON
 import org.joda.time.DateTime
+import org.joda.time.Days
 import org.springframework.http.HttpStatus
 
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 class ResultSelectionController {
-    JobGroupDaoService jobGroupDaoService
+    PerformanceLoggingService performanceLoggingService
 
     enum MetaConnectivityProfileId {
         Custom(-2), Native(1)
@@ -25,9 +29,9 @@ class ResultSelectionController {
         ConnectivityProfiles
     }
 
-    Closure resultSelectionFilters = { command, resultSelectionType ->
+    Closure resultSelectionFilters = { from, to, command, resultSelectionType ->
         and {
-            between("jobResultDate", command.from.toDate(), command.to.toDate())
+            between("jobResultDate", from.toDate(), to.toDate())
             if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
                 jobGroup {
                     'in'("id", command.jobGroupIds)
@@ -58,127 +62,209 @@ class ResultSelectionController {
 
     def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
-                    "Invalid parameters: " + command.getErrors().fieldErrors.each{it.field}.join(", "))
+            sendError(command)
             return
         }
-        if (!command.from.isBefore(command.to)) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
-                    "Invalid time frame: 'from' value needs to be before 'to'")
-            return
-        }
-        def start = DateTime.now().getMillis()
-        def availableJobGroups = ResultSelectionInformation.createCriteria().list {
-
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.JobGroups)
-
-            projections {
-                distinct('jobGroup')
-            }
-        }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        def jobGroupDtos = availableJobGroups.collect { ([id: it.id, name: it.name] as JobGroupDto) }
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        ControllerUtils.sendObjectAsJSON(response, jobGroupDtos)
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", IndentationDepth.NULL, {
+            def jobGroups = query(command, ResultSelectionType.JobGroups, { existing ->
+                if (existing) {
+                    not { 'in'('connectivityProfile', existing) }
+                }
+                projections {
+                    distinct('jobGroup')
+                }
+            })
+            return jobGroups.collect {[
+                id: it.id,
+                name: it.name
+            ]}
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
     def getMeasuredEvents(ResultSelectionCommand command) {
-        // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
-        def start = DateTime.now().getMillis()
-        def measuredEvents = ResultSelectionInformation.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.MeasuredEvents)
-
-            projections {
-                distinct('measuredEvent')
-                property('page')
-            }
+        if (command.hasErrors()) {
+            sendError(command)
+            return
         }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        def measuredEventDtos = measuredEvents.collect {[
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", IndentationDepth.NULL, {
+            def measuredEvents = query(command, ResultSelectionType.MeasuredEvents, { existing ->
+                if (existing) {
+                    or {
+                        not { 'in'('measuredEvent', existing.collect { it[0] }) }
+                        not { 'in'('page', existing.collect { it[1] }) }
+                    }
+                }
+                projections {
+                    distinct('measuredEvent')
+                    property('page')
+                }
+            })
+            return measuredEvents.collect {[
                 id: it[0].id,
                 name: it[0].name,
                 parent: [id: it[1].id, name: it[1].name]
-        ]}
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
+            ]}
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
     def getLocations(ResultSelectionCommand command) {
-        // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
-        def start = DateTime.now().getMillis()
-        def measuredEvents = ResultSelectionInformation.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.Locations)
-
-            projections {
-                distinct('location')
-                property('browser')
-            }
+        if (command.hasErrors()) {
+            sendError(command)
+            return
         }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        def measuredEventDtos = measuredEvents.collect { [
-                id: it[0].id,
-                name: it[0].toString(),
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", IndentationDepth.NULL, {
+            def locations = query(command, ResultSelectionType.Locations, { existing ->
+                if (existing) {
+                    or {
+                        not { 'in'('location', existing.collect { it[0] }) }
+                        not { 'in'('browser', existing.collect { it[1] }) }
+                    }
+                }
+                projections {
+                    distinct('location')
+                    property('browser')
+                }
+            })
+            return locations.collect {[
+                id    : it[0].id,
+                name  : it[0].toString(),
                 parent: [id: it[1].id, name: it[1].name]
-        ] }
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
+            ]}
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
     def getConnectivityProfiles(ResultSelectionCommand command) {
-        // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
-        def totalStart = DateTime.now().getMillis()
-        def start = totalStart
-        def connectivityProfiles = ResultSelectionInformation.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
-
-            projections {
-                distinct('connectivityProfile')
-            }
+        if (command.hasErrors()) {
+            sendError(command)
+            return
         }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
 
-        def dtos = connectivityProfiles.collect { [
-                id: it.id,
-                name: it.toString()
-        ] }
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        start = DateTime.now().getMillis()
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", IndentationDepth.NULL, {
+            def dtos = getPredefinedConnectivityProfiles(command)
+            dtos += getCustomConnectivity(command)
+            dtos += getNativeConnectivity(command)
+            return dtos
+        })
 
-        def customProfiles = ResultSelectionInformation.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
-            isNotNull('customConnectivityName')
-
-            projections {
-                distinct('customConnectivityName')
-            }
-        }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        dtos.addAll(customProfiles.collect {[id:MetaConnectivityProfileId.Custom.value, name: it]})
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        start = DateTime.now().getMillis()
-
-        def nativeConnectivity = ResultSelectionInformation.createCriteria().list(max: 1) {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(command, ResultSelectionType.ConnectivityProfiles)
-            eq('noTrafficShapingAtAll', true)
-
-            projections {
-                property('id')
-            }
-        }
-        println "Query took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-        if (nativeConnectivity) {
-            dtos.add([id: MetaConnectivityProfileId.Native.value, name: "Native"])
-        }
-        println "Total took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
-
-        println "All total took " + ((DateTime.now().getMillis() - totalStart) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", IndentationDepth.ONE, {
+            def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
+                isNotNull('connectivityProfile')
+                if (existing) {
+                    not { 'in'('connectivityProfile', existing) }
+                }
+                projections {
+                    distinct('connectivityProfile')
+                }
+            })
+            return connectivityProfiles.collect {[
+                id  : it.id,
+                name: it.toString()
+            ]}
+        })
+    }
+
+    private getCustomConnectivity(ResultSelectionCommand command) {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", IndentationDepth.ONE, {
+            def customProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
+                isNotNull('customConnectivityName')
+
+                if (existing) {
+                    not { 'in'('customConnectivityName', existing) }
+                }
+
+                projections {
+                    distinct('customConnectivityName')
+                }
+            })
+            return customProfiles.collect {[
+                id  : MetaConnectivityProfileId.Custom.value,
+                name: it
+            ]}
+        })
+    }
+
+    private getNativeConnectivity(ResultSelectionCommand command) {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", IndentationDepth.ONE, {
+            def nativeConnectivity = query(command, ResultSelectionType.ConnectivityProfiles, {
+                eq('noTrafficShapingAtAll', true)
+                maxResults 1
+                projections {
+                    distinct('noTrafficShapingAtAll')
+                }
+            })
+            return nativeConnectivity ? [[id: MetaConnectivityProfileId.Native.value, name: "Native"]] : []
+        })
+    }
+
+    private def sendError(ResultSelectionCommand command) {
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
+            "Invalid parameters: " + command.getErrors().fieldErrors.each{it.field}.join(", "))
+    }
+
+    private def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {
+        boolean isStartOfDay = isStartOfDay(command.from)
+        def fromFullDay = command.from.withTimeAtStartOfDay()
+        if (!isStartOfDay) {
+            fromFullDay = fromFullDay.plusDays(1)
+        }
+
+        boolean isEndOfDay = isEndOfDay(command.to)
+        def toFullDay = command.to.withTimeAtStartOfDay()
+        if (isEndOfDay) {
+            toFullDay = toFullDay.plusDays(1)
+        }
+
+        boolean isFullDayBetween = Days.daysBetween(fromFullDay, toFullDay).getDays() > 0
+
+        if (!isFullDayBetween) {
+            return queryEventTable(command.from, command.to, command, type, projection, null)
+        }
+
+        def availableJobGroups = queryResultSelectionTable(fromFullDay, toFullDay, command, type, projection, null)
+        if (!isStartOfDay) {
+            availableJobGroups += queryEventTable(command.from, fromFullDay, command, type, projection, availableJobGroups)
+        }
+        if (!isEndOfDay) {
+            availableJobGroups += queryEventTable(toFullDay, command.to, command, type, projection, availableJobGroups)
+        }
+        return availableJobGroups
+    }
+
+    private def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
+        return EventResult.createCriteria().list {
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(from, to, command, type)
+            projection.delegate = delegate
+            projection(existingResults)
+        }
+    }
+
+    private def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
+        return ResultSelectionInformation.createCriteria().list {
+            resultSelectionFilters.delegate = delegate
+            resultSelectionFilters(from, to, command, type)
+            projection.delegate = delegate
+            projection(existingResults)
+        }
+    }
+
+    private boolean isStartOfDay(DateTime dateTime) {
+        return dateTime.getMillisOfDay() <= 1000
+    }
+
+    private boolean isEndOfDay(DateTime dateTime) {
+        def millisOfDay = dateTime.getMillisOfDay()
+        def maxMillis = dateTime.millisOfDay().withMaximumValue().getMillisOfDay()
+        return (maxMillis - millisOfDay) <= 1000
     }
 }
 
@@ -190,4 +276,13 @@ class ResultSelectionCommand {
     List<Long> measuredEventIds
     List<Long> browserIds
     List<Long> locationIds
+
+    static constraints = {
+        from(blank: false, nullable: false)
+        to(blank: false, nullable: false, validator: { val, obj ->
+            if (!val.isAfter(obj.from)) {
+               return ['datePriorTo', val.toString(), obj.from.toString()] // TODO(sburnicki): Implement datePrior error
+            }
+        })
+    }
 }

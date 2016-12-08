@@ -62,7 +62,7 @@ class PerformanceLoggingService {
 
     def logExecutionTime(LogLevel level, String description, IndentationDepth indentation, Closure toMeasure) {
 		DateTime started = new DateTime()
-		toMeasure.call()
+		def returnValue = toMeasure.call()
 		if (level==LogLevel.FATAL && log.fatalEnabled) {
 			log.fatal(getMessage(started, description, indentation))
 		}else if (level==LogLevel.ERROR && log.errorEnabled) {
@@ -76,6 +76,7 @@ class PerformanceLoggingService {
 		}else if (level==LogLevel.TRACE && log.traceEnabled) {
 			log.trace(getMessage(started, description, indentation))
 		}
+		return returnValue
     }
     void resetExecutionTimeLoggingSession(){
         loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
