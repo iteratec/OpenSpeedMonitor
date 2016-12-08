@@ -138,9 +138,9 @@ class PageAggregationController {
             return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.dimensionalUnit", "ms")
         } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
             return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.dimensionalUnit", "percent %")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS)) {
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
             return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.dimensionalUnit", "count")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES)) {
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
             return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.dimensionalUnit", "kb")
         } else {
             return ""
