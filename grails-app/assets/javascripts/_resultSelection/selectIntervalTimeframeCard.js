@@ -140,7 +140,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     };
 
     var triggerTimeFrameChanged = function() {
-        cardElement.trigger("timeFrameChanged", getTimeFrame());
+        cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
     };
 
     init();

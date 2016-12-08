@@ -30,38 +30,19 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var registerEvents = function() {
         pageSelectElement.on("change", function () {
-            triggerChangeEvent("pageSelectionChanged", {
-                ids: pageSelectElement.val(),
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement)
-            });
+            triggerChangeEvent("pageSelectionChanged", getPageSelection());
         });
         measuredEventsSelectElement.on("change", function () {
-            triggerChangeEvent("measuredEventSelectionChanged", {
-                ids: measuredEventsSelectElement.val(),
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement)
-            });
+            triggerChangeEvent("measuredEventSelectionChanged", getMeasuredEventSelection());
         });
         browserSelectElement.on("change", function () {
-            triggerChangeEvent("browserSelectionChanged", {
-                ids: browserSelectElement.val(),
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
-            });
+            triggerChangeEvent("browserSelectionChanged", getBrowserSelection());
         });
         locationsSelectElement.on("change", function () {
-            triggerChangeEvent("locationSelectionChanged", {
-                ids: locationsSelectElement.val(),
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
-            });
+            triggerChangeEvent("locationSelectionChanged", getLocationSelection());
         });
         connectivitySelectElement.on("change", function () {
-            triggerChangeEvent("connectivitySelectionChanged", {
-                ids: (connectivitySelectElement.val() || []).filter(OpenSpeedMonitor.stringUtils.isNumeric),
-                customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
-                    return option.text;
-                }),
-                native: connectivitySelectElement.find('option[value="native"]:selected').length > 0,
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(connectivitySelectElement)
-            });
+            triggerChangeEvent("connectivitySelectionChanged", getConnectivitySelection());
         });
         resetButtonElement.on("click", function() {
             OpenSpeedMonitor.domUtils.deselectAllOptions(pageSelectElement, true);
@@ -88,11 +69,55 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, noResultsText);
     };
 
+    var getMeasuredEventSelection = function () {
+        return {
+            ids: measuredEventsSelectElement.val(),
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement)
+        };
+    };
+
+    var getPageSelection = function () {
+        return {
+            ids: pageSelectElement.val(),
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement)
+        };
+    };
+
+    var getLocationSelection = function() {
+        return {
+            ids: locationsSelectElement.val(),
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+        };
+    };
+
+    var getBrowserSelection = function() {
+        return {
+            ids: browserSelectElement.val(),
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+        };
+    };
+
+    var getConnectivitySelection = function () {
+        return {
+            ids: (connectivitySelectElement.val() || []).filter(OpenSpeedMonitor.stringUtils.isNumeric),
+            customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
+                return option.text;
+            }),
+            native: connectivitySelectElement.find('option[value="native"]:selected').length > 0,
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(connectivitySelectElement)
+        }
+    };
+
     init();
     return {
         updateMeasuredEvents: updateMeasuredEvents,
         updateLocations: updateLocations,
-        updateConnectivityProfiles: updateConnectivityProfiles
+        updateConnectivityProfiles: updateConnectivityProfiles,
+        getMeasuredEventSelection: getMeasuredEventSelection,
+        getPageSelection: getPageSelection,
+        getLocationSelection: getLocationSelection,
+        getBrowserSelection: getBrowserSelection,
+        getConnectivitySelection: getConnectivitySelection
     };
 })();
 

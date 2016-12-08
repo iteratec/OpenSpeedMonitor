@@ -33,58 +33,80 @@ OpenSpeedMonitor.resultSelection = (function(){
     }
 
     var init = function() {
+        enableUpdates(false);
         registerEvents();
 
-        // if the time frame selection is already initialized, we directly update job groups and jobs
+        // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
-            setQueryArgsFromTimeFrame(OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
-            updateCards();
+            setQueryArgsFromTimeFrame(null, OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
         }
+        if (OpenSpeedMonitor.selectJobGroupCard) {
+            setQueryArgsFromJobGroupSelection(null, OpenSpeedMonitor.selectJobGroupCard.getJobGroupSelection());
+        }
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard) {
+            setQueryArgsFromPageSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getPageSelection());
+            setQueryArgsFromMeasuredEventSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getMeasuredEventSelection());
+            setQueryArgsFromBrowserSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getBrowserSelection());
+            setQueryArgsFromLocationSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getLocationSelection());
+            setQueryArgsFromConnectivitySelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getConnectivitySelection());
+        }
+        enableUpdates(true);
+        updateCards();
     };
 
     var registerEvents = function() {
-        selectIntervalTimeframeCard.on("timeFrameChanged", function (ev, start, end) {
-            setQueryArgsFromTimeFrame([start, end]);
-            updateCards("timeFrame");
-        });
-        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroupSelection) {
-            hasJobGroupSelection = !!(jobGroupSelection && jobGroupSelection.ids && jobGroupSelection.ids.length > 0);
-            currentQueryArgs.jobGroupIds = jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
-            updateCards("jobGroups");
-        });
-        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pageSelection) {
-            hasPageSelection = !!(pageSelection && pageSelection.ids && pageSelection.ids.length > 0);
-            currentQueryArgs.pageIds = pageSelection.hasAllSelected ? null : pageSelection.ids;
-            updateCards("pages");
-        });
-        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEventSelection) {
-            currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
-            updateCards("pages");
-        });
-        selectPageLocationConnectivityCard.on("browserSelectionChanged", function (ev, browserSelection) {
-            currentQueryArgs.browserIds = browserSelection.hasAllSelected ? null : browserSelection.ids;
-            updateCards("browsers");
-        });
-        selectPageLocationConnectivityCard.on("locationSelectionChanged", function (ev, locationSelection) {
-            currentQueryArgs.locationIds =  locationSelection.hasAllSelected ? null : locationSelection.ids;
-            updateCards("browsers");
-        });
-        selectPageLocationConnectivityCard.on("connectivitySelectionChanged", function (ev, connectivitySelection) {
-            currentQueryArgs.connectivityIds = connectivitySelection.hasAllSelected ? null : connectivitySelection.ids;
-            currentQueryArgs.nativeConnectivity = connectivitySelection.hasAllSelected ? null : connectivitySelection.native;
-            currentQueryArgs.customConnectivities = connectivitySelection.hasAllSelected ? null : connectivitySelection.customNames;
-            updateCards("connectivity");
-        });
+        selectIntervalTimeframeCard.on("timeFrameChanged", setQueryArgsFromTimeFrame);
+        selectJobGroupCard.on("jobGroupSelectionChanged", setQueryArgsFromJobGroupSelection);
+        selectPageLocationConnectivityCard.on("pageSelectionChanged", setQueryArgsFromPageSelection);
+        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", setQueryArgsFromMeasuredEventSelection);
+        selectPageLocationConnectivityCard.on("browserSelectionChanged", setQueryArgsFromBrowserSelection);
+        selectPageLocationConnectivityCard.on("locationSelectionChanged", setQueryArgsFromLocationSelection);
+        selectPageLocationConnectivityCard.on("connectivitySelectionChanged", setQueryArgsFromConnectivitySelection);
     };
 
-    var setQueryArgsFromTimeFrame = function(timeFrame) {
-        currentQueryArgs.from = timeFrame[0].toISOString();
-        currentQueryArgs.to = timeFrame[1].toISOString();
+    var setQueryArgsFromTimeFrame = function (event, timeFrameSelection) {
+        currentQueryArgs.from = timeFrameSelection[0].toISOString();
+        currentQueryArgs.to = timeFrameSelection[1].toISOString();
+        updateCards("timeFrame");
+    };
+
+    var setQueryArgsFromJobGroupSelection = function (event, jobGroupSelection) {
+        hasJobGroupSelection = !!(jobGroupSelection && jobGroupSelection.ids && jobGroupSelection.ids.length > 0);
+        currentQueryArgs.jobGroupIds = jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
+        updateCards("jobGroups");
+    };
+
+    var setQueryArgsFromPageSelection = function (event, pageSelection) {
+        hasPageSelection = !!(pageSelection && pageSelection.ids && pageSelection.ids.length > 0);
+        currentQueryArgs.pageIds = pageSelection.hasAllSelected ? null : pageSelection.ids;
+        updateCards("pages");
+    };
+
+    var setQueryArgsFromBrowserSelection = function (event, browserSelection) {
+        currentQueryArgs.browserIds = browserSelection.hasAllSelected ? null : browserSelection.ids;
+        updateCards("browsers");
+    };
+
+    var setQueryArgsFromLocationSelection = function (ev, locationSelection) {
+        currentQueryArgs.locationIds =  locationSelection.hasAllSelected ? null : locationSelection.ids;
+        updateCards("browsers");
+    };
+
+    var setQueryArgsFromConnectivitySelection = function (event, connectivitySelection) {
+        currentQueryArgs.connectivityIds = connectivitySelection.hasAllSelected ? null : connectivitySelection.ids;
+        currentQueryArgs.nativeConnectivity = connectivitySelection.hasAllSelected ? null : connectivitySelection.native;
+        currentQueryArgs.customConnectivities = connectivitySelection.hasAllSelected ? null : connectivitySelection.customNames;
+        updateCards("connectivity");
+    };
+
+    var setQueryArgsFromMeasuredEventSelection = function (event, measuredEventSelection) {
+        currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
+        updateCards("pages");
     };
 
     var updateCards = function (initiator) {
         validateForm();
-        if (!updatesEnabled) {
+        if (!updatesEnabled || !currentQueryArgs.from || !currentQueryArgs.to) {
             return;
         }
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {

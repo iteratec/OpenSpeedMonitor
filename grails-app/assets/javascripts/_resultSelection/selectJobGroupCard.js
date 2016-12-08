@@ -25,14 +25,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
            filterByTag($(this).data('tag'));
         });
         jobGroupSelectElement.on("change", function() {
-            var selectedValues = $(this).val();
-            if (!selectedValues && selectedTag) {
-                selectedValues = OpenSpeedMonitor.domUtils.getAllOptionValues(jobGroupSelectElement);
-            }
-            cardElement.trigger("jobGroupSelectionChanged", {
-                ids: selectedValues,
-                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected($(this)) && !selectedTag
-            });
+            cardElement.trigger("jobGroupSelectionChanged", getJobGroupSelection());
         });
         resetButtonElement.on("click", function () {
             OpenSpeedMonitor.domUtils.deselectAllOptions(jobGroupSelectElement, true);
@@ -55,8 +48,20 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
         filterByTag(selectedTag);
     };
 
+    var getJobGroupSelection = function () {
+        var selectedValues = jobGroupSelectElement.val();
+        if (!selectedValues && selectedTag) {
+            selectedValues = OpenSpeedMonitor.domUtils.getAllOptionValues(jobGroupSelectElement);
+        }
+        return {
+            ids: selectedValues,
+            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(jobGroupSelectElement) && !selectedTag
+        };
+    };
+
     init();
     return {
-        updateJobGroups: updateJobGroups
+        updateJobGroups: updateJobGroups,
+        getJobGroupSelection: getJobGroupSelection
     }
 })();
