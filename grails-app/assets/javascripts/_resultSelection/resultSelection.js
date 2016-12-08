@@ -36,8 +36,8 @@ OpenSpeedMonitor.resultSelection = (function(){
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
     var initiators = ["jobGroups", "pages", "browsers", "connectivity", "resultCount"];
-    var hasJobGroupSelection = false;
-    var hasPageSelection = false;
+    var hasJobGroupSelection = !!$("#folderSelectHtmlId").val();
+    var hasPageSelection = !!$("#pageSelectHtmlId").val();
     var lastResultCount = 1;
 
     if (!initiators.every(function(i) {return resultSelectionUrls[i] !== undefined})) {
