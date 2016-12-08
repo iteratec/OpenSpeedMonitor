@@ -4,6 +4,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
+import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class ResultSelectionController {
+    private final static MAX_RESULT_COUNT = 50000
+
     PerformanceLoggingService performanceLoggingService
 
     enum MetaConnectivityProfileId {
@@ -26,7 +29,8 @@ class ResultSelectionController {
         JobGroups,
         MeasuredEvents,
         Locations,
-        ConnectivityProfiles
+        ConnectivityProfiles,
+        Results
     }
 
     Closure resultSelectionFilters = { from, to, command, resultSelectionType ->
@@ -81,6 +85,27 @@ class ResultSelectionController {
                 }
             }
         }
+    }
+
+    def getResultCount(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+        def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", IndentationDepth.NULL, {
+            // we select static '1' for up to MAX_RESULT_COUNT records and count them afterwards
+            // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
+            return EventResult.createCriteria().list {
+                resultSelectionFilters.delegate = delegate
+                resultSelectionFilters(command.from, command.to, command, ResultSelectionType.Results)
+                maxResults MAX_RESULT_COUNT
+                projections {
+                    sqlProjection '1 as c', 'c', StandardBasicTypes.INTEGER
+                }
+            }.size()
+        })
+        def result = count < MAX_RESULT_COUNT ? count : -1
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
     }
 
     def getJobGroups(ResultSelectionCommand command) {

@@ -100,20 +100,6 @@
             </div>
         </div>
     </g:if>
-    <g:else>
-
-        <g:if test="${startedBatchActivity == null}"> %{--User didnt try to load assets--}%
-            <g:if test="${request.queryString}">
-                <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
-                        <div class="alert alert-info text-center">
-                            <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
-                        </div>
-                    </div>
-                </g:if>
-            </g:if>
-        </g:if>
-    </g:else>
 </div>
 
 <form method="get" action="" id="dashBoardParamsForm">
@@ -144,7 +130,7 @@
     <div class="row">
         <div class="col-md-12">
             <!-- Split button to show/download/detail analysis, etc -->
-            <div class="btn-group pull-right">
+            <div class="btn-group pull-right" id="show-button-group">
                 <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                                 action="showAll" id="graphButtonHtmlId" class="btn btn-primary"/>
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
@@ -203,6 +189,12 @@
                     </sec:ifAnyGranted>
                 </ul>
             </div>
+            <p class="invisible-warning bg-warning pull-right" id="warning-long-processing">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime"/>
+            </p>
+            <p class="invisible-warning bg-danger pull-right" id="warning-no-data">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
+            </p>
             <!-- Actual tabs -->
             <ul class="nav nav-tabs card-well-tabs">
                 <li class="active" >
@@ -335,6 +327,7 @@
                pages: "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}",
                browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
                connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
+               resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}",
            };
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')

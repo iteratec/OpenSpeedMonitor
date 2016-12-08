@@ -12,13 +12,16 @@ OpenSpeedMonitor.resultSelection = (function(){
     var pageTabElement = $('#page-tab');
     var browserTabElement = $('#browser-tab');
     var connectivityTabElement = $('#connectivity-tab');
+    var warningNoData = $('#warning-no-data');
+    var showButtons = $('#show-button-group input, #show-button-group button');
+    var warningLongProcessing = $('#warning-long-processing');
     var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
     var currentQueryArgs = {};
     var updatesEnabled = true;
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
-    var initiators = ["jobGroups", "pages", "browsers", "connectivity"];
+    var initiators = ["jobGroups", "pages", "browsers", "connectivity", "resultCount"];
 
     if (!initiators.every(function(i) {return resultSelectionUrls[i] !== undefined})) {
         throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
@@ -96,6 +99,13 @@ OpenSpeedMonitor.resultSelection = (function(){
             spinner = connectivityTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
             updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
         }
+        updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
+    };
+
+    var updateResultCount = function(resultCount) {
+        warningLongProcessing.toggle(resultCount < 0);
+        warningNoData.toggle(resultCount == 0);
+        showButtons.prop("disabled", resultCount == 0);
     };
 
     var enableUpdates = function (enable) {
