@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import grails.transaction.Transactional
+import groovy.time.TimeCategory
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 
@@ -163,26 +164,35 @@ class JobService {
         return executionDates
     }
 
-    String createResultLinkForJob(Job it){
+    String createResultLinkForJob(Job job){
         Map<String,Object> params = [:]
         params["_overwriteWarningAboutLongProcessingTime"] = ""
         params["&overwriteWarningAboutLongProcessingTime"] = "on"
         params["_action_showAll"] = "Anzeigen"
         params["selectedInterval"] = "-1"
-        params["selectedTimeFrameInterval"] = "604800"// One Week
-        params["selectedFolder"] = "$it.jobGroupId"
+        params["selectedTimeFrameInterval"] = "0"
+        Date fromDate = job.lastRun-7
+        params["from"] = fromDate.format('d.MM.yyyy')
+        params["fromHour"] = fromDate.format('HH:mm')
+        Date toDate
+        use(TimeCategory) {
+            toDate = job.lastRun + 1.minute // We add one minute because our time selection doesn't count seconds, so otherwise we could miss the last run
+        }
+        params["to"] = toDate.format('d.MM.yyyy')
+        params["toHour"] = toDate.format('HH:mm')
+        params["selectedFolder"] = "$job.jobGroupId"
         Set pages = []
-        it.script.testedPages.each {page ->
+        job.script.testedPages.each {page ->
             pages << "$page.id"
         }
         params["selectedPages"] = pages
         params["_selectedAllMeasuredEvents"] = ""
         params["selectedAllMeasuredEvents"] = "on"
-        params["selectedBrowsers"] = "$it.location.browserId"
+        params["selectedBrowsers"] = "$job.location.browserId"
         params["_selectedAllBrowsers"] = ""
-        params["selectedLocations"] = "$it.location.id"
+        params["selectedLocations"] = "$job.location.id"
         params["_selectedAllLocations"] = ""
-        params["selectedConnectivityProfiles"] = "$it.connectivityProfileId"
+        params["selectedConnectivityProfiles"] = "$job.connectivityProfileId"
         params["_selectedAllConnectivityProfiles"] = ""
         params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
