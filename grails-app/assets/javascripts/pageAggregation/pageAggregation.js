@@ -43,10 +43,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         var params = getUrlParameter();
         setJobGroups(params);
         setPages(params);
-        setBrowser(params);
-        setConnectivity(params);
         setMeasurands(params);
-        setTrim(params);
+        // setTrim(params);
         // if(params != null){
         //     clickShowButton();
         // }
@@ -59,13 +57,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setMultiSelect("folderSelectHtmlId", params['jobGroups']);
     };
     var setPages = function (params) {
-        setMultiSelect("pageSelectHtmlId", params['pages']);
-    };
-    var setBrowser = function (params) {
-        setMultiSelect("selectedBrowsersHtmlId", params['browser']);
-    };
-    var setConnectivity = function (params) {
-        setMultiSelect("selectedConnectivityProfilesHtmlId", params['connectivities']);
+        setMultiSelect("pageSelectHtmlId", params['selectedPages']);
     };
 
     var clickShowButton = function(){
@@ -95,23 +87,23 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         firstSelect.val(measurands['values'].shift());
         var length = measurands['values'].length;
         var currentPanel = firstSelect.closest(".panel");
-        var currentAddButton =   currentPanel.find("#firstMeasurandAdd");
+        var currentAddButton =   currentPanel.find(".addMeasurandButton");
         for(var i=0;i<length;i++){
             currentAddButton.click();
             currentPanel.find(".additionalMeasurand").eq(i).val(measurands['values'].shift());
             currentAddButton = currentPanel.find(".addMeasurandButton").eq(i+1);
         }
-        currentPanel.find("#stackedSelect").val(measurands['stacked'])
+        currentPanel.find(".stackedSelect").val(measurands['stacked'])
 
     };
 
     var setTrim = function (params) {
-        $("#appendedInputBelowLoadTimes").val(params["trimAboveLoadTimes"]);
-        $("#appendedInputAboveLoadTimes").val(params["trimAboveLoadTimes"]);
-        $("#appendedInputBelowRequestCounts").val(params["trimBelowRequestCounts"]);
-        $("#appendedInputAboveRequestCounts").val(params["trimAboveRequestCounts"]);
-        $("#appendedInputBelowRequestSizes").val(params["trimBelowRequestSizes"]);
-        $("#appendedInputAboveRequestSizes").val(params["trimAboveRequestSizes"]);
+        // $("#appendedInputBelowLoadTimes").val(params["trimAboveLoadTimes"]);
+        // $("#appendedInputAboveLoadTimes").val(params["trimAboveLoadTimes"]);
+        // $("#appendedInputBelowRequestCounts").val(params["trimBelowRequestCounts"]);
+        // $("#appendedInputAboveRequestCounts").val(params["trimAboveRequestCounts"]);
+        // $("#appendedInputBelowRequestSizes").val(params["trimBelowRequestSizes"]);
+        // $("#appendedInputAboveRequestSizes").val(params["trimAboveRequestSizes"]);
     };
 
 
