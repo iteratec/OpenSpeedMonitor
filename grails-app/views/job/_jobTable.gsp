@@ -12,7 +12,8 @@
 			<td>
 				<div class="show-chart-buttons">
 				<g:if test="${job.lastRun}" >
-					<a href="${jobService.createResultLinkForJob(job)}" class="show-chart"><i class="fa fa-line-chart"></i></a>
+					<a href="${jobService.createResultLinkForJob(job)}" class="show-chart"><i class="fa fa-line-chart"></i></a><br/>
+					<a href="${jobService.createPageAggregationLinkForJob(job)}" class="show-chart"><i class="fa fa-bar-chart"></i></a>
 				</g:if>
 				</div>
 				<strong><a

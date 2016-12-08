@@ -17,17 +17,25 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.result.PageService
+import grails.converters.JSON
 import grails.transaction.Transactional
+import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 
 import grails.web.mapping.LinkGenerator
+import org.springframework.security.access.method.P
 
 class JobService {
 
     JobDaoService jobDaoService
     LinkGenerator grailsLinkGenerator
+    PageService pageService
 
     /**
      * <p>
@@ -165,10 +173,26 @@ class JobService {
     }
 
     String createResultLinkForJob(Job job){
-        Map<String,Object> params = [:]
+        Map<String,Object> params = createCommonParams(job)
+        params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
         params["_overwriteWarningAboutLongProcessingTime"] = ""
         params["&overwriteWarningAboutLongProcessingTime"] = "on"
         params["_action_showAll"] = "Anzeigen"
+        params["_selectedAllMeasuredEvents"] = ""
+        params["selectedAllMeasuredEvents"] = "on"
+        params["selectedBrowsers"] = "$job.location.browserId"
+        params["_selectedAllBrowsers"] = ""
+        params["selectedLocations"] = "$job.location.id"
+        params["_selectedAllLocations"] = ""
+        params["selectedConnectivityProfiles"] = "$job.connectivityProfileId"
+        params["_selectedAllConnectivityProfiles"] = ""
+        params["_includeNativeConnectivity"] = ""
+        params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
+        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll',absolute: true, params: params)
+    }
+
+    Map createCommonParams(Job job){
+        Map params = [:]
         params["selectedInterval"] = "-1"
         params["selectedTimeFrameInterval"] = "0"
         Date fromDate = job.lastRun-7
@@ -181,28 +205,18 @@ class JobService {
         params["to"] = toDate.format('d.MM.yyyy')
         params["toHour"] = toDate.format('HH:mm')
         params["selectedFolder"] = "$job.jobGroupId"
-        Set pages = []
-        job.script.testedPages.each {page ->
-            pages << "$page.id"
+        return params
+    }
+
+    String createPageAggregationLinkForJob(Job job){
+        Map params = createCommonParams(job)
+        List<Long> pageIds = []
+        new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
+           pageIds << pageService.getPageByStepName(it).id
         }
-        params["selectedPages"] = pages
-        params["_selectedAllMeasuredEvents"] = ""
-        params["selectedAllMeasuredEvents"] = "on"
-        params["selectedBrowsers"] = "$job.location.browserId"
-        params["_selectedAllBrowsers"] = ""
-        params["selectedLocations"] = "$job.location.id"
-        params["_selectedAllLocations"] = ""
-        params["selectedConnectivityProfiles"] = "$job.connectivityProfileId"
-        params["_selectedAllConnectivityProfiles"] = ""
-        params["_includeNativeConnectivity"] = ""
-        params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
-        params["trimBelowLoadTimes"] = ""
-        params["trimAboveLoadTimes"] = ""
-        params["trimBelowRequestCounts"] = ""
-        params["trimAboveRequestCounts"] = ""
-        params["trimBelowRequestSizes"] = ""
-        params["trimAboveRequestSizes"] = ""
-        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll',absolute: true, params: params)
+        params["selectedPages"] = pageIds
+        params["measurand"]= "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
+        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show',absolute: true, params: params)
     }
 
 
