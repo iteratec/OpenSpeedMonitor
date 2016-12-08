@@ -71,17 +71,16 @@
                             'affectedController' : 'eventResultDashboard'
                     ]}"/>
                 </li>
+                <li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}">
+                    <g:link controller="pageAggregation" action="show"><i
+                            class="fa fa-bar-chart"></i> <g:message code="de.iteratec.pageAggregation.title"
+                                                                  default="Page Aggregation"/></g:link>
+                </li>
                 <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}">
                     <g:link controller="tabularResultPresentation" action="listResults"><i
                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                                   default="Einzelergebnisse"/></g:link>
                 </li>
-                %{--Toggled until pageAggregation is finished--}%
-                %{--<li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}">--}%
-                    %{--<g:link controller="pageAggregation" action="show"><i--}%
-                            %{--class="fa fa-bar-chart"></i> <g:message code="de.iteratec.pageAggregation.title"--}%
-                                                                  %{--default="Page Aggregation"/></g:link>--}%
-                %{--</li>--}%
             </g:elseif>
 
         <%-- CSI --%>

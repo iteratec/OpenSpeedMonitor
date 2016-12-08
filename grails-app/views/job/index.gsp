@@ -180,8 +180,9 @@
                     <a href="<g:createLink action="create"/>" class="btn btn-primary">
                         <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                     </a>
-                    <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon pull-right" rel="popover"
-                       data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"></a>
+                    <a href="#" id="updateHints" class="fa fa-question-circle fa-lg pull-right" data-toggle="popover"
+                        title="${g.message(code: 'de.iteratec.osm.joblist.activeruns.title', default: 'Active job runs')}"
+                       data-placement="bottom" data-content="${render(template: "updateHints")}" data-trigger="hover" data-html="true"></a>
                 </div>
             </div>
 
@@ -191,7 +192,7 @@
                 <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
             </div>
             <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <table class="table table-bordered table-striped" id="jobtable">
+            <table class="table table-striped" id="jobtable">
                 <thead class="header">
                 <tr>
                     <th><input type="checkbox" id="checkAll"/></th>
@@ -200,7 +201,8 @@
                                 code="de.iteratec.iss.script" default="Skript"/>
                         </span>
                     </g:set>
-                    <g:set var="executionScheduleLabel"><g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                    <g:set var="executionScheduleLabel">
+                        <g:message code="job.executionSchedule.label" default="Execution Schedule"/>
                     </g:set>
                     <g:sortableColumn property="label" title="${titleHeader}"/>
                     <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>

@@ -41,16 +41,31 @@ OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
  */
 OpenSpeedMonitor.postLoadUrls = OpenSpeedMonitor.postLoadUrls || [];
 OpenSpeedMonitor.postLoadUrls.forEach( function (scriptUrl) {
-   $.getScript(scriptUrl);
+    console.log("a");
+   $.getScript(scriptUrl, function( data, textStatus, jqxhr ) {
+        console.log( data ); // Data returned
+        console.log( textStatus ); // Success
+        console.log( jqxhr.status ); // 200
+        console.log( "Load was performed." );
+    });
 });
 
 OpenSpeedMonitor.postLoader = (function (){
 
   var head = document.getElementsByTagName("head")[0];
 
-  var loadJavascript = function(url, async){
+  var loadJavascript = function(url, async, name){
     async = async || true;
     var script = document.createElement("script");
+      script.onload = script.onreadystatechange = function() {
+          //console.log( this.readyState ); //uncomment this line to see which ready states are called.
+          var r;
+          if ( !r && (!this.readyState || this.readyState == 'complete') )
+          {
+              r = true;
+              fireWindowEvent(""+name+"Loaded");
+          }
+      };
     script.setAttribute("src",url);
     script.setAttribute("type","text/javascript");
     script.setAttribute("async",async);

@@ -203,6 +203,10 @@ function filterJobList() {
         }
         tr.toggle(showRow);
     });
+	// reapply striping
+    $("#joblist tr:not(.hidden)").each(function (index) {
+        $(this).toggleClass("stripe", !!(index & 1));
+    });
 }
 
 function initTable(nextExecutionLink) {
@@ -282,7 +286,7 @@ function doOnDomReady(
     var stringUtils = OpenSpeedMonitor.stringUtils;
     var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils();
 
-	$('#updateHints').popover();
+  $('[data-toggle="popover"]').popover()
 	$('#checkAll').on('click', function() {
 	    // set checked attribute on fixed-header
 		$('#checkAll').prop("checked", this.checked);

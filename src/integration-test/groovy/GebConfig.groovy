@@ -1,5 +1,6 @@
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.DesiredCapabilities
@@ -27,7 +28,9 @@ environments {
     // ./gradlew -Dgeb.env=chrome integrationTest
     chrome {
         driver = {
-            def driverInstance = new ChromeDriver()
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--lang=en-us")
+            def driverInstance = new ChromeDriver(options)
             driverInstance.manage().window().setSize(new Dimension(1000,1000))// width of bootstrap 3  viewport of col-md-* is 970px
             driverInstance
         }

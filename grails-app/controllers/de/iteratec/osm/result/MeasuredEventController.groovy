@@ -88,7 +88,7 @@ class MeasuredEventController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<MeasuredEvent> result = MeasuredEvent.createCriteria().list(params) {
-            createAlias('csiConfiguration', 'testedPageAlias', JoinType.LEFT_OUTER_JOIN)
+            createAlias('testedPage', 'testedPageAlias', JoinType.LEFT_OUTER_JOIN)
 
             if(params.filter)
                 or{

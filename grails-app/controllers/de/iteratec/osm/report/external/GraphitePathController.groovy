@@ -104,7 +104,7 @@ class GraphitePathController {
         params.offset = params.offset as Integer
 
         List<GraphitePath> result = GraphitePath.createCriteria().list(params) {
-            createAlias('csiConfiguration', 'measurandAlias', JoinType.LEFT_OUTER_JOIN)
+            createAlias('measurand', 'measurandAlias', JoinType.LEFT_OUTER_JOIN)
             if(params.filter)
                 or{
                     ilike("prefix","%"+params.filter+"%")

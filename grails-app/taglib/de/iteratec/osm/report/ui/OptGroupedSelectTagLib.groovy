@@ -25,7 +25,7 @@ class OptGroupedSelectTagLib {
 		Map dataMap = attrs['dataMap']
 		String optionKey = attrs['optionKey']
 		String optionValue = attrs['optionValue']
-		String multiple = attrs['multiple']
+		String multiple = attrs['multiple'] ? "multiple" : ""
 		String id = attrs['id']
 		String cssClass = attrs['class']
 		String style = attrs['style']

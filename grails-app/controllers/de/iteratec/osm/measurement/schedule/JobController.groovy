@@ -28,15 +28,12 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.async.Promise
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
 import org.quartz.CronExpression
 import org.springframework.http.HttpStatus
-
-import static grails.async.Promises.task
 
 class JobController {
 
@@ -95,11 +92,11 @@ class JobController {
                 measurementsEnabled                            : inMemoryConfigService.areMeasurementsGenerallyEnabled(),
                 lastNMinutesToShowSuccessfulResultsInJoblist   : LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,
                 lastNHoursToShowFailedResultsInJoblist         : LAST_N_HOURS_TO_SHOW_FAILED_RESULTS_IN_JOBLIST,
-                lastNHoursToShowPendingOrRunnngResultsInJoblist: LAST_N_HOURS_TO_SHOW_PENDING_OR_RUNNNG_RESULTS_IN_JOBLIST]
+                lastNHoursToShowPendingOrRunnngResultsInJoblist: LAST_N_HOURS_TO_SHOW_PENDING_OR_RUNNNG_RESULTS_IN_JOBLIST
+        ]
         if (forceShowAllJobs)
             model << ['filters': ['filterInactiveJobs': true]]
         if (request.xhr) {
-//            render(template: 'jobTable', model: model)
             String templateAsPlainText = g.render(template: 'jobTable', model: model)
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
         } else {

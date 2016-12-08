@@ -1,7 +1,7 @@
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <div class="btn-group">
     <g:link controller="${affectedController}" action="showAll" class="btn btn-default"><i class="fa fa-line-chart"></i>
-        <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard"/></g:link>
+        <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Time Series"/></g:link>
     <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
        aria-haspopup="true" aria-expanded="false" id="customDashboardDropdownButton">
         <span class="caret"></span>
@@ -9,7 +9,7 @@
     <ul class="dropdown-menu" id="customDashBoardSelection">
         <li class="dropdown-header">
             <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                       default="View a custom Dashboard"/>
+                       default="View a custom time series"/>
         </li>
         <g:if test="${availableDashboards}">
             <g:each in="${availableDashboards}" var="availableDashboard">

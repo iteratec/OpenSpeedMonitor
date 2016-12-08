@@ -8,7 +8,9 @@ import geb.Page
 class CsiDashboardPage extends Page{
     static url = "/csiDashboard/showAll"
 
-    static at = { title == "Dashboard" }
+    static at = {
+        title == "Dashboard"
+    }
 
     static content = {
         adjustChartButton{$("#rickshaw_adjust_chart_link")}

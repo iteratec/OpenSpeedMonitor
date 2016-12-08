@@ -36,7 +36,8 @@
 
         OpenSpeedMonitor.postLoader.loadJavascript(
             '<g:assetPath src="postload/application-postload.js" absolute="true"/>',
-            true
+            true,
+                "postload"
         )
 
     });

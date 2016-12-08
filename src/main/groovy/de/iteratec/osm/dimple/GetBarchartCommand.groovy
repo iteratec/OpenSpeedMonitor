@@ -4,7 +4,7 @@ import grails.databinding.BindUsing
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
 
-class GetBarchartCommand implements Validateable{
+class GetBarchartCommand implements Validateable {
     Date from
     Date to
 
@@ -12,8 +12,14 @@ class GetBarchartCommand implements Validateable{
         return new JsonSlurper().parseText(source['selectedPages'])
     })
     List<String> selectedPages
+
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['selectedJobGroups'])
     })
     List<String> selectedJobGroups
+
+    @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['selectedSeries'])
+    })
+    List selectedSeries
 }
