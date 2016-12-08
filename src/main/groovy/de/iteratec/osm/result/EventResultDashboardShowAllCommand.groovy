@@ -347,9 +347,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         selectedFolder(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
             if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
-        selectedPages(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage']
-        })
+        selectedPages(nullable: true)
         selectedBrowsers(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
             if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedBrowsers.error.validator.error.selectedBrowsers']
         })
