@@ -45,9 +45,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setPages(params);
         setMeasurands(params);
         // setTrim(params);
-        // if(params != null){
-        //     clickShowButton();
-        // }
+        if(params != null){
+            clickShowButton();
+        }
 
     };
     var setMultiSelect = function(id, values){
