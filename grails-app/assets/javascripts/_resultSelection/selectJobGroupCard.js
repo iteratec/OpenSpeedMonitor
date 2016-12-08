@@ -26,8 +26,10 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
         });
         jobGroupSelectElement.on("change", function() {
             if (triggerEventsEnabled) {
-                var allSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected($(this));
-                cardElement.trigger("jobGroupSelectionChanged", [$(this).val(), allSelected]);
+                cardElement.trigger("jobGroupSelectionChanged", {
+                    ids: $(this).val(),
+                    hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected($(this))
+                });
             }
         });
     };

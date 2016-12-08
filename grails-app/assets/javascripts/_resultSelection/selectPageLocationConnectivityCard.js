@@ -31,20 +31,38 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var registerEvents = function() {
         pageSelectElement.on("change", function () {
-            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement);
-            triggerChangeEvent("pageSelectionChanged", [pageSelectElement.val(), hasAllSelected]);
+            triggerChangeEvent("pageSelectionChanged", {
+                ids: pageSelectElement.val(),
+                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement)
+            });
         });
         measuredEventsSelectElement.on("change", function () {
-            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement);
-            triggerChangeEvent("measuredEventSelectionChanged", [measuredEventsSelectElement.val(), hasAllSelected]);
+            triggerChangeEvent("measuredEventSelectionChanged", {
+                ids: measuredEventsSelectElement.val(),
+                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement)
+            });
         });
         browserSelectElement.on("change", function () {
-            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement);
-            triggerChangeEvent("browserSelectionChanged", [browserSelectElement.val(), hasAllSelected]);
+            triggerChangeEvent("browserSelectionChanged", {
+                ids: browserSelectElement.val(),
+                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+            });
         });
         locationsSelectElement.on("change", function () {
-            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(locationsSelectElement);
-            triggerChangeEvent("locationSelectionChanged", [locationsSelectElement.val(), hasAllSelected]);
+            triggerChangeEvent("locationSelectionChanged", {
+                ids: locationsSelectElement.val(),
+                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+            });
+        });
+        connectivitySelectElement.on("change", function () {
+            triggerChangeEvent("connectivitySelectionChanged", {
+                ids: connectivitySelectElement.val().filter(OpenSpeedMonitor.stringUtils.isNumeric),
+                customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
+                    return option.text;
+                }),
+                native: connectivitySelectElement.find('option[value="native"]:selected').length > 0,
+                hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(connectivitySelectElement)
+            });
         });
     };
 

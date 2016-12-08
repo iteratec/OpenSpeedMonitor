@@ -75,35 +75,38 @@ OpenSpeedMonitor.postLoader = (function (){
 
 /**
  * Global string utilities module.
- * @returns {{
- *      stringToBoolean: publicApi.stringToBoolean}}
  */
-OpenSpeedMonitor.stringUtils = function(){
-    var publicApi = {
-        stringToBoolean: function(string) {
-
-            if (!string) {
+OpenSpeedMonitor.stringUtils = (function(){
+    var stringToBoolean = function(string) {
+        if (!string) {
+            return false;
+        }
+        switch (string.toLowerCase()) {
+            case "true":
+            case "yes":
+            case "1":
+            case "on":
+                return true;
+            case "false":
+            case "no":
+            case "0":
+            case "off":
+            case null:
                 return false;
-            }
-            switch (string.toLowerCase()) {
-                case "true":
-                case "yes":
-                case "1":
-                case "on":
-                    return true;
-                case "false":
-                case "no":
-                case "0":
-                case "off":
-                case null:
-                    return false;
-                default:
-                    return false;
-            }
+            default:
+                return false;
         }
     };
-    return publicApi;
-};
+
+    var isNumeric = function (string) {
+        return !isNaN(string);
+    };
+
+    return {
+        isNumeric: isNumeric,
+        stringToBoolean: stringToBoolean
+    };
+})();
 
 /**
  * Global module providing functionalities for storage of data in the browser.

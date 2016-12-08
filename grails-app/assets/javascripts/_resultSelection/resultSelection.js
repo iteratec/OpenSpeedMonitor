@@ -33,25 +33,31 @@ OpenSpeedMonitor.resultSelection = (function(){
             setQueryArgsFromTimeFrame([start, end]);
             updateCards("timeFrame");
         });
-        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroups, allSelected) {
-            currentQueryArgs.jobGroupIds =  allSelected ? null : jobGroups;
+        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroupSelection) {
+            currentQueryArgs.jobGroupIds =  jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
             updateCards("jobGroups");
         });
-        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pages, allSelected) {
-            currentQueryArgs.pageIds = allSelected ? null : pages;
+        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pageSelection) {
+            currentQueryArgs.pageIds = pageSelection.hasAllSelected ? null : pageSelection.ids;
             updateCards("pages");
         });
-        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEvents, allSelected) {
-            currentQueryArgs.measuredEventIds =  allSelected ? null : measuredEvents;
+        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEventSelection) {
+            currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
             updateCards("pages");
         });
-        selectPageLocationConnectivityCard.on("browserSelectionChanged", function (ev, browsers, allSelected) {
-            currentQueryArgs.browserIds = allSelected ? null : browsers;
+        selectPageLocationConnectivityCard.on("browserSelectionChanged", function (ev, browserSelection) {
+            currentQueryArgs.browserIds = browserSelection.hasAllSelected ? null : browserSelection.ids;
             updateCards("browsers");
         });
-        selectPageLocationConnectivityCard.on("locationSelectionChanged", function (ev, locations, allSelected) {
-            currentQueryArgs.locationIds =  allSelected ? null : locations;
+        selectPageLocationConnectivityCard.on("locationSelectionChanged", function (ev, locationSelection) {
+            currentQueryArgs.locationIds =  locationSelection.hasAllSelected ? null : locationSelection.ids;
             updateCards("browsers");
+        });
+        selectPageLocationConnectivityCard.on("connectivitySelectionChanged", function (ev, connectivitySelection) {
+            currentQueryArgs.connectivityIds = connectivitySelection.hasAllSelected ? null : connectivitySelection.ids;
+            currentQueryArgs.nativeConnectivity = connectivitySelection.hasAllSelected ? null : connectivitySelection.native;
+            currentQueryArgs.customConnectivities = connectivitySelection.hasAllSelected ? null : connectivitySelection.customNames;
+            updateCards("connectivity");
         });
     };
 

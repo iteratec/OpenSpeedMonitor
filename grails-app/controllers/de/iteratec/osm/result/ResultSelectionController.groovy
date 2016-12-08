@@ -57,6 +57,29 @@ class ResultSelectionController {
                     'in'("id", command.browserIds)
                 }
             }
+
+            if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
+                or {
+                    if (command.connectivityIds) {
+                        connectivityProfile {
+                            'in'("id", command.connectivityIds)
+                        }
+                    }
+
+                    if (command.nativeConnectivity) {
+                        and {
+                            isNull("connectivityProfile")
+                            eq("noTrafficShapingAtAll", true)
+                        }
+                    }
+                    if (command.customConnectivities) {
+                        and {
+                            isNull("connectivityProfile")
+                            'in'("customConnectivityName", command.customConnectivities)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -229,14 +252,14 @@ class ResultSelectionController {
             return queryEventTable(command.from, command.to, command, type, projection, null)
         }
 
-        def availableJobGroups = queryResultSelectionTable(fromFullDay, toFullDay, command, type, projection, null)
+        def results = queryResultSelectionTable(fromFullDay, toFullDay, command, type, projection, null)
         if (!isStartOfDay) {
-            availableJobGroups += queryEventTable(command.from, fromFullDay, command, type, projection, availableJobGroups)
+            results += queryEventTable(command.from, fromFullDay, command, type, projection, results)
         }
         if (!isEndOfDay) {
-            availableJobGroups += queryEventTable(toFullDay, command.to, command, type, projection, availableJobGroups)
+            results += queryEventTable(toFullDay, command.to, command, type, projection, results)
         }
-        return availableJobGroups
+        return results
     }
 
     private def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
@@ -276,6 +299,9 @@ class ResultSelectionCommand {
     List<Long> measuredEventIds
     List<Long> browserIds
     List<Long> locationIds
+    List<Long> connectivityIds
+    Boolean nativeConnectivity
+    List<String> customConnectivities
 
     static constraints = {
         from(blank: false, nullable: false)
@@ -284,5 +310,6 @@ class ResultSelectionCommand {
                return ['datePriorTo', val.toString(), obj.from.toString()] // TODO(sburnicki): Implement datePrior error
             }
         })
+        nativeConnectivity(blank: true, nullable: true)
     }
 }
