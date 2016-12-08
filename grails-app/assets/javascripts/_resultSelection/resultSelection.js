@@ -18,7 +18,19 @@ OpenSpeedMonitor.resultSelection = (function(){
     var warningNoJobGroupSelected = $('#warning-no-job-group');
     var warningNoPageSelected = $('#warning-no-page');
     var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
-    var currentQueryArgs = {};
+    var currentQueryArgs = {
+        from: null,
+        to: null,
+        jobGroupIds: null,
+        pageIds: null,
+        measuredEventIds: null,
+        browserIds: null,
+        locationIds: null,
+        connectivityIds: null,
+        nativeConnectivity: null,
+        customConnectivities: null
+    };
+    var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = true;
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
@@ -106,9 +118,11 @@ OpenSpeedMonitor.resultSelection = (function(){
 
     var updateCards = function (initiator) {
         validateForm();
-        if (!updatesEnabled || !currentQueryArgs.from || !currentQueryArgs.to) {
+        var currentUpdateJSON = JSON.stringify(currentQueryArgs);
+        if (!updatesEnabled || !currentQueryArgs.from || !currentQueryArgs.to || lastUpdateJSON == currentUpdateJSON) {
             return;
         }
+        lastUpdateJSON = currentUpdateJSON;
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
             spinnerJobGroup.start();
             updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups, spinnerJobGroup);
@@ -145,12 +159,6 @@ OpenSpeedMonitor.resultSelection = (function(){
         validateForm();
     };
 
-    var enableUpdates = function (enable) {
-        var oldValue = updatesEnabled;
-        updatesEnabled = enable;
-        return oldValue;
-    };
-
     var updateCard = function(url, handler, spinner) {
         if (ajaxRequests[url]) {
             ajaxRequests[url].abort();
@@ -179,6 +187,12 @@ OpenSpeedMonitor.resultSelection = (function(){
             },
             traditional: true // grails compatible parameter array encoding
         });
+    };
+
+    var enableUpdates = function (enable) {
+        var oldValue = updatesEnabled;
+        updatesEnabled = enable;
+        return oldValue;
     };
 
     init();

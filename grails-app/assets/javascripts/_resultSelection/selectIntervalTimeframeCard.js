@@ -32,6 +32,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     var defaultIntervalSelection = "-1"; // Raw data
     var defaultTimeFramePreselect = (3 * 24 * 60 * 60).toString(); // 3 days
     var isSavedDashboard = OpenSpeedMonitor.urlUtils.getVar("dashboardID") !== undefined;
+    var eventsEnabled = true;
 
     var init = function() {
         // initialize controls with values. Either from presets, from URL, from local storage or defaults
@@ -130,7 +131,9 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         manualTimeFrameFieldSet.prop("disabled", true);
         var now = new Date();
         var startDate = new Date(now.getTime() - (value * 1000));
+        enableEvents(false);
         startDateTimePicker.setValuesByDate(startDate);
+        enableEvents(true);
         endDateTimePicker.setValuesByDate(now);
         endDateTimePicker.setStartDate(startDate);
     };
@@ -139,8 +142,16 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
       return [startDateTimePicker.getValuesAsDate(), endDateTimePicker.getValuesAsDate()];
     };
 
+    var enableEvents = function(enable) {
+        var oldValue = eventsEnabled;
+        eventsEnabled = enable;
+        return oldValue;
+    };
+
     var triggerTimeFrameChanged = function() {
-        cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
+        if (eventsEnabled) {
+            cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
+        }
     };
 
     init();
