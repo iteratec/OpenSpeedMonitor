@@ -11,7 +11,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
     childSelect = $(childSelect);
     childSelectAllCheckbox = $(childSelectAllCheckbox);
     var parentChildMapping = {};
-    var noResultsText = "Nor results"; // TODO(sburnicki): use i18n string
+    var noResultsText = "No results"; // TODO(sburnicki): use i18n string
 
 
     var init = function () {

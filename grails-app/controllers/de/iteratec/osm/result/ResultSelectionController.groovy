@@ -33,60 +33,6 @@ class ResultSelectionController {
         Results
     }
 
-    Closure resultSelectionFilters = { from, to, command, resultSelectionType ->
-        and {
-            between("jobResultDate", from.toDate(), to.toDate())
-            if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
-                jobGroup {
-                    'in'("id", command.jobGroupIds)
-                }
-            }
-
-            if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
-                measuredEvent {
-                    'in'("id", command.measuredEventIds)
-                }
-            } else if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
-                page {
-                    'in'("id", command.pageIds)
-                }
-            }
-
-            if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
-                location {
-                    'in'("id", command.locationIds)
-                }
-            } else if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
-                browser {
-                    'in'("id", command.browserIds)
-                }
-            }
-
-            if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
-                or {
-                    if (command.connectivityIds) {
-                        connectivityProfile {
-                            'in'("id", command.connectivityIds)
-                        }
-                    }
-
-                    if (command.nativeConnectivity) {
-                        and {
-                            isNull("connectivityProfile")
-                            eq("noTrafficShapingAtAll", true)
-                        }
-                    }
-                    if (command.customConnectivities) {
-                        and {
-                            isNull("connectivityProfile")
-                            'in'("customConnectivityName", command.customConnectivities)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     def getResultCount(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -96,8 +42,7 @@ class ResultSelectionController {
             // we select static '1' for up to MAX_RESULT_COUNT records and count them afterwards
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
             return EventResult.createCriteria().list {
-                resultSelectionFilters.delegate = delegate
-                resultSelectionFilters(command.from, command.to, command, ResultSelectionType.Results)
+                applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
                 maxResults MAX_RESULT_COUNT
                 projections {
                     sqlProjection '1 as c', 'c', StandardBasicTypes.INTEGER
@@ -289,8 +234,7 @@ class ResultSelectionController {
 
     private def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return EventResult.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(from, to, command, type)
+            applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
             projection(existingResults)
         }
@@ -298,11 +242,72 @@ class ResultSelectionController {
 
     private def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return ResultSelectionInformation.createCriteria().list {
-            resultSelectionFilters.delegate = delegate
-            resultSelectionFilters(from, to, command, type)
+            applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
             projection(existingResults)
         }
+    }
+
+    private void applyResultSelectionFilters(Object criteriaBuilder, DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType resultSelectionType) {
+        def filterClosure = {
+            and {
+                between("jobResultDate", from.toDate(), to.toDate())
+                if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
+                    jobGroup {
+                        'in'("id", command.jobGroupIds)
+                    }
+                }
+
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                }
+
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+
+                if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                }
+
+                if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
+                    }
+                }
+
+                if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
+                    or {
+                        if (command.connectivityIds) {
+                            connectivityProfile {
+                                'in'("id", command.connectivityIds)
+                            }
+                        }
+
+                        if (command.nativeConnectivity) {
+                            and {
+                                isNull("connectivityProfile")
+                                eq("noTrafficShapingAtAll", true)
+                            }
+                        }
+                        if (command.customConnectivities) {
+                            and {
+                                isNull("connectivityProfile")
+                                'in'("customConnectivityName", command.customConnectivities)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        filterClosure.delegate = criteriaBuilder
+        filterClosure()
     }
 
     private boolean isStartOfDay(DateTime dateTime) {
