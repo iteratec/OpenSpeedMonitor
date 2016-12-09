@@ -19,51 +19,29 @@
  * This script is loaded after window.load event.
  *
  * This script Calls custom Event PostLoadedScriptArrived. An event handler is registered in _common/_postloadInitializedJS.gsp
- * which publishes PostLoaded functionality under namespace POSTLOADED by instantiate an instance of class PostLoaded.
+ * which publishes PostLoaded functionality under namespace OpenSpeedMonitor.postLoaded by instantiate an instance of class PostLoaded.
  *
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
 //= require bower_components/spin.js/spin.js
 //= require_self
-function PostLoaded(dataFromGsp){
-
-    this.i18n_duplicatePrompt = dataFromGsp.i18n_duplicatePrompt;
-    this.i18n_duplicateSuffix = dataFromGsp.i18n_duplicateSuffix;
-    this.i18n_deletionConfirmMessage = dataFromGsp.i18n_deletionConfirmMessage;
-    this.i18n_updateConfirmMessage = dataFromGsp.i18n_updateConfirmMessage;
-    this.i18n_loadTimeIntegerError = dataFromGsp.i18n_loadTimeIntegerError;
-    this.i18n_customerFrustrationDoubleError = dataFromGsp.i18n_customerFrustrationDoubleError;
-    this.i18n_defaultMappingFormatError = dataFromGsp.i18n_defaultMappingFormatError;
-    this.i18n_defaultMappingNotAllvaluesError = dataFromGsp.i18n_defaultMappingNotAllvaluesError;
-    this.i18n_customerSatisfactionNotInPercentError = dataFromGsp.i18n_customerSatisfactionNotInPercentError;
-    this.i18n_percentagesBetween0And1Error = dataFromGsp.i18n_percentagesBetween0And1Error;
-    this.i18n_deletePageMappingConfirmation = dataFromGsp.i18n_deletePageMappingConfirmation;
-    this.i18n_deletePageMappingProcessing = dataFromGsp.i18n_deletePageMappingProcessing;
-    this.i18n_nameAlreadyExistMsg = dataFromGsp.i18n_nameAlreadyExistMsg;
-    this.i18n_overwritingWarning = dataFromGsp.i18n_overwritingWarning;
-    this.i18n_deleteCsiConfigurationConfirmation = dataFromGsp.i18n_deleteCsiConfigurationConfirmation;
-    this.i18n_deleteCsiConfigurationWarning = dataFromGsp.i18n_deleteCsiConfigurationWarning;
-    this.i18n_showMsg = dataFromGsp.i18n_showMsg;
-    this.link_getNamesOfDefaultMappings = dataFromGsp.link_getNamesOfDefaultMappings;
-    this.link_validateDeletionOfCsiConfiguration = dataFromGsp.link_validateDeletionOfCsiConfiguration;
-    this.link_getJobGroupsUsingCsiConfiguration = dataFromGsp.link_getJobGroupsUsingCsiConfiguration;
-    this.link_CsiConfigurationSaveCopy = dataFromGsp.link_CsiConfigurationSaveCopy;
-    this.link_CsiConfigurationConfigurations = dataFromGsp.link_CsiConfigurationConfigurations;
-    this.link_CsiConfigurationDeletion = dataFromGsp.link_CsiConfigurationDeletion;
-    this.idOfItemToDelete = dataFromGsp.idOfItemToDelete;
-    this.idOfItemToUpdate = dataFromGsp.idOfItemToUpdate;
-
-    this.setDeleteConfirmationInformations = function(link){
+OpenSpeedMonitor = OpenSpeedMonitor || {};
+OpenSpeedMonitor.postLoaded = (function() {
+    var setDeleteConfirmationInformations = function(link){
         setTimeout (function () {
             //TODO find out why this. doesn't work
-            var text = domainDeleteConfirmation(dataFromGsp.i18n_deletionConfirmMessage, dataFromGsp.idOfItemToDelete, link);
+            var text = domainDeleteConfirmation( OpenSpeedMonitor.postLoaded.i18n_deletionConfirmMessage,  OpenSpeedMonitor.postLoaded.idOfItemToDelete, link);
             $('#DeleteModal').find('p').html(text);
             },
             10
         );
     };
-}
+
+    return {
+        setDeleteConfirmationInformations: setDeleteConfirmationInformations
+    };
+})();
 
 $('.dropdown-toggle').dropdown();
 fireWindowEvent('PostLoadedScriptArrived');

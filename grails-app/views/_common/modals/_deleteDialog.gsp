@@ -2,7 +2,7 @@
 This is the standard dialog that initiates the delete action.
 -->
 <div id="DeleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel"
-     aria-hidden="true" onshow="POSTLOADED.setDeleteConfirmationInformations('${controllerLink}');">
+     aria-hidden="true" onshow="OpenSpeedMonitor.postLoaded.setDeleteConfirmationInformations('${controllerLink}');">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

@@ -68,8 +68,8 @@
                 }
                 function promptForDuplicateName() {
                     var newName = prompt(
-                            POSTLOADED.i18n_duplicatePrompt,
-                            $('input#label').val() + POSTLOADED.i18n_duplicateSuffix
+                            OpenSpeedMonitor.postLoaded.i18n_duplicatePrompt,
+                            $('input#label').val() + OpenSpeedMonitor.postLoaded.i18n_duplicateSuffix
                     );
                     if (newName != null && newName != '') {
                         $('input#label').val(newName);

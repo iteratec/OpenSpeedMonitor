@@ -21,7 +21,7 @@ function removeSelectedPageMapping(removePageMappingLink, csiConfId){
 
     if(nameOfSelectedPage != ""){
 
-        if(confirm(POSTLOADED.i18n_deletePageMappingConfirmation + "\n\n" + nameOfSelectedPage) == false){
+        if(confirm(OpenSpeedMonitor.postLoaded.i18n_deletePageMappingConfirmation + "\n\n" + nameOfSelectedPage) == false){
             return;
         }
         var btnRemovePageMapping = $('#removePageMapping');
@@ -42,7 +42,7 @@ function removeSelectedPageMapping(removePageMappingLink, csiConfId){
 
         var strongMessage = document.createElement("strong");
         var textNodeWaitingToFinish = document.createTextNode(
-            POSTLOADED.i18n_deletePageMappingProcessing + ": " + nameOfSelectedPage
+            OpenSpeedMonitor.postLoaded.i18n_deletePageMappingProcessing + ": " + nameOfSelectedPage
         );
         strongMessage.appendChild(textNodeWaitingToFinish);
         messageDiv.appendChild(strongMessage);

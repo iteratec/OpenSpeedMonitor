@@ -70,8 +70,8 @@
                 });
                 function promptForDuplicateName() {
                     var newName = prompt(
-                            encodeURIComponent(POSTLOADED.i18n_duplicatePrompt),
-                            encodeURIComponent($('input#label').val() + POSTLOADED.i18n_duplicateSuffix)
+                            encodeURIComponent(OpenSpeedMonitor.postLoaded.i18n_duplicatePrompt),
+                            encodeURIComponent($('input#label').val() + OpenSpeedMonitor.postLoaded.i18n_duplicateSuffix)
                     );
                     if (newName != null && newName != '') {
                         $('input#label').val(newName);

@@ -181,7 +181,6 @@ OpenSpeedMonitor.resultSelection = (function(){
                     if (spinner) {
                         spinner.stop();
                     }
-                    // TODO(sburnicki): Show a proper error in the UI
                     throw e;
                 }
             },

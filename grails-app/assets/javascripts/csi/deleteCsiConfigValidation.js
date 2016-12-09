@@ -7,14 +7,14 @@ function validatedDeletion() {
     var deletingAllowed = false;
     $("#errorDeletingCsiConfiguration").hide();
 
-    var deleteConfirmationMsg = POSTLOADED.i18n_deleteCsiConfigurationConfirmation + ":\n\n" + actualCsiConfigurationLabel;
-    var deleteWarning = POSTLOADED.i18n_deleteCsiConfigurationWarning;
+    var deleteConfirmationMsg = OpenSpeedMonitor.postLoaded.i18n_deleteCsiConfigurationConfirmation + ":\n\n" + actualCsiConfigurationLabel;
+    var deleteWarning = OpenSpeedMonitor.postLoaded.i18n_deleteCsiConfigurationWarning;
 
     $.ajax({
         type: 'POST',
         dataType: "json",
         async: false,
-        url: POSTLOADED.link_validateDeletionOfCsiConfiguration,
+        url: OpenSpeedMonitor.postLoaded.link_validateDeletionOfCsiConfiguration,
         success: function (response) {
             if(response.errorMessages.length > 0) {
                 $("#errorDeletingCsiConfiguration").show();
@@ -43,7 +43,7 @@ function validatedDeletion() {
 }
 
 function setDeletionLinkHref(){
-    var linkDeletion = POSTLOADED.link_CsiConfigurationDeletion;
+    var linkDeletion = OpenSpeedMonitor.postLoaded.link_CsiConfigurationDeletion;
     var params = $.param( { label:actualCsiConfigurationLabel } );
     $('#deleteCsiConfigurationHref').attr('href',linkDeletion + '?' + params);
 }
@@ -61,7 +61,7 @@ function getUserConfirmation(label, sureDeleteMessage, overwriteWarningMessage) 
         dataType: "json",
         async: false,
         data: {csiConfigurationLabel: label},
-        url: POSTLOADED.link_getJobGroupsUsingCsiConfiguration,
+        url: OpenSpeedMonitor.postLoaded.link_getJobGroupsUsingCsiConfiguration,
         success: function (response) {
             var confirmationMessage = sureDeleteMessage + "\n\n";
             if(response.jobGroupNames && response.jobGroupNames.length > 0) {
