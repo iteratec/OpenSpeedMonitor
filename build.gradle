@@ -29,7 +29,7 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.2"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.11.2'
         classpath "org.grails.plugins:hibernate4:5.0.4"
-        classpath 'com.moowork.gradle:gradle-node-plugin:0.13'
+        classpath 'com.moowork.gradle:gradle-node-plugin:1.0.1'
     }
 }
 
@@ -154,7 +154,8 @@ node {
     // Set the work directory for unpacking node
     workDir = file("${project.buildDir}/nodejs")
     // Set the work directory where node_modules should be located
-    nodeModulesDir = file("${project.projectDir}/node_modules")
+//    nodeModulesDir = file("${project.projectDir}/node_modules")
+    nodeModulesDir = file("${project.projectDir}")
 }
 
 
