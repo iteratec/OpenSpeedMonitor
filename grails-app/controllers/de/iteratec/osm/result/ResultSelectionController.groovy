@@ -4,6 +4,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
+import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -13,6 +14,7 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class ResultSelectionController {
     private final static MAX_RESULT_COUNT = 50000
+    private final static RESULT_COUNT_MAX_SECONDS = 1
 
     PerformanceLoggingService performanceLoggingService
 
@@ -41,13 +43,18 @@ class ResultSelectionController {
         def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", IndentationDepth.NULL, {
             // we select static '1' for up to MAX_RESULT_COUNT records and count them afterwards
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
-            return EventResult.createCriteria().list {
-                applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
-                maxResults MAX_RESULT_COUNT
-                projections {
-                    sqlProjection '1 as c', 'c', StandardBasicTypes.INTEGER
-                }
-            }.size()
+            try {
+                return EventResult.createCriteria().list {
+                    applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
+                    maxResults MAX_RESULT_COUNT
+                    timeout RESULT_COUNT_MAX_SECONDS
+                    projections {
+                        sqlProjection '1 as c', 'c', StandardBasicTypes.INTEGER
+                    }
+                }.size()
+            } catch (GenericJDBCException ignored) {
+                return -1 // on timeout
+            }
         })
         def result = count < MAX_RESULT_COUNT ? count : -1
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
