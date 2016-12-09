@@ -36,6 +36,12 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
 
 /**
+ * Map for i18n to use
+ */
+OpenSpeedMonitor.urls = OpenSpeedMonitor.i18n || {};
+
+
+/**
  * Loads all registered JavaScript files. Used by microservices.
  * @type {Array}
  */

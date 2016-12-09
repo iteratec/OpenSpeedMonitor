@@ -65,7 +65,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var updateConnectivityProfiles = function (connectivityProfiles) {
-        OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"]);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, OpenSpeedMonitor.i18n.noResultsMsg);
     };
 
     var getMeasuredEventSelection = function () {

@@ -20,7 +20,7 @@
 //= require_self
 
 function changeCsiConfiguration(id) {
-    window.location.href=OpenSpeedMonitor.postLoaded.link_CsiConfigurationConfigurations + "/" + id;
+    window.location.href=OpenSpeedMonitor.urls.CsiConfigurationConfigurations + "/" + id;
 }
 
 function callControllerActionWithId(controllerActionLink) {
@@ -31,7 +31,7 @@ function callControllerActionWithId(controllerActionLink) {
 function copyCsiConfiguration(csiConfigurations) {
 
     var linkToCopyCsiConfig = promptForNewName(
-        OpenSpeedMonitor.postLoaded.link_CsiConfigurationSaveCopy, OpenSpeedMonitor.postLoaded.i18n_nameAlreadyExistMsg, csiConfigurations);
+        OpenSpeedMonitor.urls.CsiConfigurationSaveCopy, OpenSpeedMonitor.i18n.nameAlreadyExistMsg, csiConfigurations);
 
     if(linkToCopyCsiConfig) {
         var spinner = new OpenSpeedMonitor.Spinner();
@@ -71,8 +71,8 @@ function promptForNewName(anchorLink, nameExistsErrorMessage, csiConfigurations)
 
     var actualLabel = $('#headerCsiConfLabel').text();
     var newName = prompt(
-        OpenSpeedMonitor.postLoaded.i18n_duplicatePrompt,
-        actualLabel + OpenSpeedMonitor.postLoaded.i18n_duplicateSuffix
+        OpenSpeedMonitor.i18n.duplicatePrompt,
+        actualLabel + OpenSpeedMonitor.i18n.duplicateSuffix
     );
     if (newName === null || newName === '') {
         return false;

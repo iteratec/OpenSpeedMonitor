@@ -19,7 +19,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         parentSelect.change(updateChildValues);
         parentSelectAllCheckbox.change(updateChildValues);
         updateChildValues();
-        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"] });
+        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.i18n.noResultsMsg });
     };
 
     var initParentChildMapping = function() {
@@ -90,7 +90,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
             }
             parentChildMapping[parent.id].push(child);
         });
-        OpenSpeedMonitor.domUtils.updateSelectOptions(parentSelect, parentList, noResultsText);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(parentSelect, parentList, OpenSpeedMonitor.i18n.noResultsMsg);
         updateChildValues();
     };
 

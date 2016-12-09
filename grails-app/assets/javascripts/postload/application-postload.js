@@ -31,7 +31,7 @@ OpenSpeedMonitor.postLoaded = (function() {
     var setDeleteConfirmationInformations = function(link){
         setTimeout (function () {
             //TODO find out why this. doesn't work
-            var text = domainDeleteConfirmation( OpenSpeedMonitor.postLoaded.i18n_deletionConfirmMessage,  OpenSpeedMonitor.postLoaded.idOfItemToDelete, link);
+            var text = domainDeleteConfirmation( OpenSpeedMonitor.i18n.deletionConfirmMessage, OpenSpeedMonitor.postLoaded.idOfItemToDelete, link);
             $('#DeleteModal').find('p').html(text);
             },
             10

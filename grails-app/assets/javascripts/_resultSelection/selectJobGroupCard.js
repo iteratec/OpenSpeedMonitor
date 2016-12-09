@@ -46,7 +46,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
         var optionsToShow = currentOptionValues.filter(function (value) {
             return (!tag || $.inArray(value.name, jobGroupNamesToShow) > -1);
         });
-        OpenSpeedMonitor.domUtils.updateSelectOptions(jobGroupSelectElement, optionsToShow, OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"]);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(jobGroupSelectElement, optionsToShow, OpenSpeedMonitor.i18n.noResultsMsg);
         jobGroupSelectElement.trigger("change");
     };
 

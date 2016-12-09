@@ -118,7 +118,7 @@ OpenSpeedMonitor.resultSelection = (function(){
             return;
         }
         lastUpdateJSON = currentUpdateJSON;
-        var resultSelectionUrls = OpenSpeedMonitor.postLoaded["link_resultSelection"];
+        var resultSelectionUrls = OpenSpeedMonitor.urls.resultSelection;
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
             spinnerJobGroup.start();
             updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups, spinnerJobGroup);
