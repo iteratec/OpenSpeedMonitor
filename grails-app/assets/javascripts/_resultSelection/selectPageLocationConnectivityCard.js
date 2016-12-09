@@ -14,7 +14,6 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var browserSelectElement = $("#selectedBrowsersHtmlId");
     var locationsSelectElement =  $("#selectedLocationsHtmlId");
     var connectivitySelectElement = $("#selectedConnectivityProfilesHtmlId");
-    var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
     var browserLocationConnectedSelects;
 
@@ -66,7 +65,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var updateConnectivityProfiles = function (connectivityProfiles) {
-        OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, noResultsText);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(connectivitySelectElement, connectivityProfiles, OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"]);
     };
 
     var getMeasuredEventSelection = function () {

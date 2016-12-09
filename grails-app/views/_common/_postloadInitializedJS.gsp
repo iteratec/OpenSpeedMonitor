@@ -29,6 +29,14 @@
             OpenSpeedMonitor.postLoaded.i18n_CsiConfigurationConfigurations = '${createLink(absolute: true, controller: 'csiConfiguration', action: 'configurations')}';
             OpenSpeedMonitor.postLoaded.i18n_CsiConfigurationDeletion = '${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration')}';
             OpenSpeedMonitor.postLoaded.idOfItemToDelete = idOfItemToBeDeleted ? idOfItemToBeDeleted : 'not relevant on this page';
+
+            OpenSpeedMonitor.postLoaded.link_resultSelection = {
+                jobGroups: "${createLink(absolute: true, controller: 'resultSelection', action: 'getJobGroups')}",
+                pages: "${createLink(absolute: true, controller: 'resultSelection', action: 'getMeasuredEvents')}",
+                browsers: "${createLink(absolute: true, controller: 'resultSelection', action: 'getLocations')}",
+                connectivity: "${createLink(absolute: true, controller: 'resultSelection', action: 'getConnectivityProfiles')}",
+                resultCount: "${createLink(absolute: true, controller: 'resultSelection', action: 'getResultCount')}",
+            };
         });
 
         OpenSpeedMonitor.postLoader.loadJavascript(

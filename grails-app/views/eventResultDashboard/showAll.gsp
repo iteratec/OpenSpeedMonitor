@@ -330,13 +330,6 @@
         });
 
         $(window).load(function() {
-           OpenSpeedMonitor.urls.resultSelection = {
-               jobGroups: "${createLink(controller: 'resultSelection', action: 'getJobGroups')}",
-               pages: "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}",
-               browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
-               connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
-               resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}",
-           };
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });

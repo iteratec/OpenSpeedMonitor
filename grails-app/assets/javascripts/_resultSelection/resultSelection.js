@@ -35,14 +35,9 @@ OpenSpeedMonitor.resultSelection = (function(){
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
-    var initiators = ["jobGroups", "pages", "browsers", "connectivity", "resultCount"];
     var hasJobGroupSelection = !!$("#folderSelectHtmlId").val();
     var hasPageSelection = !!$("#pageSelectHtmlId").val();
     var lastResultCount = 1;
-
-    if (!initiators.every(function(i) {return resultSelectionUrls[i] !== undefined})) {
-        throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
-    }
 
     var init = function() {
         enableUpdates(false);
@@ -123,6 +118,7 @@ OpenSpeedMonitor.resultSelection = (function(){
             return;
         }
         lastUpdateJSON = currentUpdateJSON;
+        var resultSelectionUrls = OpenSpeedMonitor.postLoaded["link_resultSelection"];
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
             spinnerJobGroup.start();
             updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups, spinnerJobGroup);

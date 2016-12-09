@@ -9,8 +9,6 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     var jobGroupSelectElement = $('#folderSelectHtmlId');
     var currentOptionValues = [];
     var selectedTag = '';
-    var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use i18n
-
 
     var init = function() {
         currentOptionValues = $.map(jobGroupSelectElement.find('option'), function(option) {
@@ -48,7 +46,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
         var optionsToShow = currentOptionValues.filter(function (value) {
             return (!tag || $.inArray(value.name, jobGroupNamesToShow) > -1);
         });
-        OpenSpeedMonitor.domUtils.updateSelectOptions(jobGroupSelectElement, optionsToShow, noResultsText);
+        OpenSpeedMonitor.domUtils.updateSelectOptions(jobGroupSelectElement, optionsToShow, OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"]);
         jobGroupSelectElement.trigger("change");
     };
 

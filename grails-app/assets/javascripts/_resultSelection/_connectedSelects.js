@@ -11,8 +11,6 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
     childSelect = $(childSelect);
     childSelectAllCheckbox = $(childSelectAllCheckbox);
     var parentChildMapping = {};
-    var noResultsText = "No results"; // TODO(sburnicki): use i18n string
-
 
     var init = function () {
         OpenSpeedMonitor.SelectWithSelectAllCheckBox(parentSelect, parentSelectAllCheckbox);
@@ -21,7 +19,7 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         parentSelect.change(updateChildValues);
         parentSelectAllCheckbox.change(updateChildValues);
         updateChildValues();
-        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: noResultsText });
+        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.postLoaded["i18n_noResultsMsg"] });
     };
 
     var initParentChildMapping = function() {
