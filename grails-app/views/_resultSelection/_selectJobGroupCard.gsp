@@ -5,7 +5,7 @@ A card with controls to select a job group
 <div class="card" id="select-jobgroup-card" data-tag-to-job-group-name-map='${tagToJobGroupNameMap as grails.converters.JSON}'>
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>
-        <button class="reset-selection soft-button" type="button"><i class="fa fa-undo"></i></button>
+        <button class="reset-selection soft-button" type="button" title="Reset"><i class="fa fa-undo"></i></button>
         <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
     </legend>
     <g:select id="folderSelectHtmlId" class="form-control"
@@ -13,11 +13,6 @@ A card with controls to select a job group
               optionValue="name" value="${selectedFolder}"
               multiple="true"/>
     <div data-toggle="buttons" class="filter-buttons">
-        <div class="btn-group">
-            <button type="button" class="btn btn-xs btn-default filter-button" data-tag="">
-                <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>
-            </button>
-        </div>
         <g:each in="${tagToJobGroupNameMap.keySet().collate(5)}" var="tagSubset">
             <div class="btn-group">
                 <g:each in="${tagSubset}" var="tag">

@@ -21,14 +21,23 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     };
 
     var registerEvents = function() {
-        cardElement.find(".filter-button").on('click', function() {
-           filterByTag($(this).data('tag'));
+        var filterButtons = cardElement.find(".filter-button");
+        filterButtons.on('click', function() {
+            var wasActive = $(this).hasClass("active");
+            filterButtons.removeClass("active");
+            if (wasActive) {
+                filterByTag('');
+            } else {
+                $(this).addClass("active");
+                filterByTag($(this).data('tag'));
+            }
         });
         jobGroupSelectElement.on("change", function() {
             cardElement.trigger("jobGroupSelectionChanged", getJobGroupSelection());
         });
         resetButtonElement.on("click", function () {
             OpenSpeedMonitor.domUtils.deselectAllOptions(jobGroupSelectElement, true);
+            cardElement.find(".filter-button").removeClass("active");
             filterByTag('');
         })
     };
