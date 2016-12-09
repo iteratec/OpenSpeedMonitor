@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat
  */
 class TabularResultPresentationController {
 
-    private final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
+    private final static String DATE_FORMAT_STRING = 'dd.mm.yyyy'
     private final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
@@ -60,7 +60,6 @@ class TabularResultPresentationController {
     LocationDaoService locationDaoService
     PerformanceLoggingService performanceLoggingService
 
-    OsmDataSourceService osmDataSourceService
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
     EventResultDashboardService eventResultDashboardService
