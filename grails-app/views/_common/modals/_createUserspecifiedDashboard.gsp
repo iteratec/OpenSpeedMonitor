@@ -204,6 +204,16 @@
                     200: function (response) {
                         $("#saveDashboardSuccessDiv").show();
                         window.scrollTo(0, 0);
+                        var jsonResponse = JSON.parse(response);
+                        var linkText = document.createTextNode(dashboardName);
+                        var li= document.createElement("li");
+                        var a = document.createElement("a");
+                        a.appendChild(linkText);
+                        li.appendChild(a);
+                        a.setAttribute("href", jsonResponse.path+"showAll?dashboardID="+jsonResponse.dashboardId);
+                        var customDashBoardSelection = document.getElementById("customDashBoardSelection");
+                        customDashBoardSelection.appendChild(li);
+
                         return false;
                     },
                     400: function (response) {

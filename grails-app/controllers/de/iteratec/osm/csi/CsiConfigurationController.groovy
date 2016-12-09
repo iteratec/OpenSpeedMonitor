@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.UserspecificDashboardService
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
@@ -181,6 +182,7 @@ class CsiConfigurationController {
                     'newCsiConfigLabel'   : newCsiConfig.label,
                     'newCsiConfigId'      : newCsiConfig.ident(),
                     'allCsiConfigurations': csi_configurations
+
             ] as JSON)
         }
     }
@@ -303,8 +305,8 @@ class CsiConfigurationController {
         csiConf.description = csiConfNewDescription
         csiConf.save(failOnError: true)
 
-        response.status = 200
-        render "Updated CSI configuration successfully."
+        response.setStatus(200)
+        ControllerUtils.sendObjectAsJSON(response, ["path":"/csiConfiguration/", "configId":csiConf.id], false)
 
     }
 

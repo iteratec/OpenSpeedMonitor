@@ -425,7 +425,8 @@ class EventResultDashboardController {
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
             }
-            response.sendError(200, 'OK')
+            response.setStatus(200)
+            ControllerUtils.sendObjectAsJSON(response, ["path":"/eventResultDashboard/", "dashboardId":newCustomDashboard.id], false)
         }
     }
 

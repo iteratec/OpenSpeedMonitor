@@ -69,6 +69,13 @@
                 window.scrollTo(0, 0);
                 document.getElementById('headerCsiConfLabel').innerHTML = csiConfLabel;
                 document.getElementById('headerCsiConfDescription').innerHTML = csiConfDescription;
+                $('#customCsiConfigurationSelection').children('li').each(function () {
+                    if($(this).children("a")[0]){
+                        if($(this).children("a")[0].href.endsWith(actualCsiConfigurationId)){
+                            $(this).children("a")[0].innerHTML = csiConfLabel;
+                        }
+                    }
+                });
                 return false;
             },
             error: function(result, textStatus, errorThrown) {
