@@ -15,16 +15,9 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.schedule.dao;
+package de.iteratec.osm.measurement.schedule.dao
 
-import de.iteratec.osm.measurement.schedule.JobGroup;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import de.iteratec.osm.measurement.schedule.JobGroup
 /**
  * <p>
  * An data-access object (DAO) for {@link de.iteratec.osm.measurement.schedule.JobGroup}.
@@ -94,13 +87,4 @@ public interface JobGroupDaoService {
      * a list of all {@link JobGroup} names which contain that tag.
      */
     public Map<String, List<String>> getTagToJobGroupNameMap();
-
-	/**
-	 * Returns a Collection with all {@link JobGroup} which are linked to
-	 * JobResults in a specified time frame
-	 * @param from Start date of time frame
-	 * @param to End date of time frame
-	 * @return Collection of JobGroups with results in the specified time frame
-	 */
-	Collection<JobGroup> findByJobResultsInTimeFrame(Date from, Date to);
 }

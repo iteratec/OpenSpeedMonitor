@@ -6,11 +6,9 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.Script
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.grails.web.json.JSONArray
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
@@ -35,16 +33,16 @@ class ResultSelectionControllerSpec extends Specification {
 
     void "get an error if the timeframe is invalid"(def from, def to) {
         given:
-        controller.jobGroupDaoService = Stub(JobGroupDaoService)
+        def command = new ResultSelectionCommand()
 
         when:
         params.from = from
         params.to = to
-        controller.getJobGroupsInTimeFrame()
+        controller.bindData(command, params)
 
         then:
-        response.status == 400
-        response.text.contains("Invalid time frame")
+        !command.validate()
+        command.hasErrors()
 
         where:
         from                   | to
@@ -52,72 +50,32 @@ class ResultSelectionControllerSpec extends Specification {
         "2016-11-15T11:00:00Z" | "2016-11-15T11:00:00Z"
     }
 
-    void "get empty array in time frame without results"() {
-        given:
-        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
-            findByJobResultsInTimeFrame(_, _) >> []
-        }
-
-        when:
-        params.from = "2015-11-15"
-        params.to = "2015-11-20"
-        controller.getJobGroupsInTimeFrame()
-
-        then:
-        response.status == 200
-        response.text == "[]"
-    }
-
-    void "get JobGroups as DTOs for correct time frame"() {
-        given:
-        def allJobGroups = JobGroup.findAll()
-        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
-            findByJobResultsInTimeFrame(_, _) >> allJobGroups
-        }
-
-        when:
-        params.from = "2016-11-15"
-        params.to = "2016-11-20"
-        controller.getJobGroupsInTimeFrame()
-
-        then:
-        response.status == 200
-        JSONArray resultArray = response.json
-        resultArray.length() == allJobGroups.size()
-        (resultArray.collect { [it.id, it.name] } as Set) == (allJobGroups.collect { [it.id, it.name] } as Set)
-    }
-
-
     void "narrow timeframe is valid"() {
         given:
-        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
-            findByJobResultsInTimeFrame(_, _) >> [jobGroup1]
-        }
+        def command = new ResultSelectionCommand()
 
         when:
         params.from = "2016-11-15T08:30:00Z"
         params.to = "2016-11-15T08:30:02Z"
-        controller.getJobGroupsInTimeFrame()
+        controller.bindData(command, params)
 
         then:
-        response.status == 200
-        JSONArray resultArray = response.json
-        resultArray.length() == 1
-        resultArray[0].id == jobGroup1.id
-        resultArray[0].name == jobGroup1.name
+        command.validate()
+        !command.getErrors().hasErrors()
     }
 
     void "iso timestamp can be bound to joda DateTime object"() {
         given:
-        params.from = "2016-11-15T08:30:00.23Z"
+        params.from = "2016-11-14T08:30:00.23Z"
         params.to = "2016-11-15" // local time zone
-        def command = new ResultSelectionTimeFrameCommand()
+        def command = new ResultSelectionCommand()
 
         when:
         controller.bindData(command, params)
 
         then:
-        command.from == new DateTime(2016, 11, 15, 8, 30, 0, 230, DateTimeZone.UTC)
+        command.validate()
+        command.from == new DateTime(2016, 11, 14, 8, 30, 0, 230, DateTimeZone.UTC)
         command.to== new DateTime(2016, 11, 15, 0, 0) // local time zone
     }
 }

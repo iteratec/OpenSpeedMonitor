@@ -344,7 +344,7 @@ class ResultSelectionCommand {
         from(blank: false, nullable: false)
         to(blank: false, nullable: false, validator: { val, obj ->
             if (!val.isAfter(obj.from)) {
-               return ['datePriorTo', val.toString(), obj.from.toString()] // TODO(sburnicki): Implement datePrior error
+               return ['datePriorTo', val.toString(), obj.from.toString()]
             }
         })
         nativeConnectivity(blank: true, nullable: true)
