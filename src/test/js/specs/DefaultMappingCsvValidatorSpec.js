@@ -1,6 +1,5 @@
 describe("validate csv", function () {
-    OpenSpeedMonitor = {};
-    OpenSpeedMonitor.postLoaded = {};
+    OpenSpeedMonitor.i18n = {};
 
     beforeEach(function () {
         OpenSpeedMonitor.i18n.defaultMappingFormatError = "DefaultMappingFormatError";
