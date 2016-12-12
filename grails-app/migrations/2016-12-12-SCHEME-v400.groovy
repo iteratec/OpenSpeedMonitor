@@ -56,7 +56,7 @@ databaseChangeLog = {
                  connectivity_profile_id, custom_connectivity_name, no_traffic_shaping_at_all)
             SELECT
                 0 as version,
-                DATE(job_result_date) as job_result_date,
+                CAST(job_result_date as date) as job_result_date,
                 page_id,
                 measured_event_id,
                 job_group_id,
@@ -68,7 +68,7 @@ databaseChangeLog = {
             FROM
                 event_result
             GROUP BY
-                DATE(job_result_date), page_id, measured_event_id, job_group_id, location_id, browser_id,
+                CAST(job_result_date as date), page_id, measured_event_id, job_group_id, location_id, browser_id,
                 connectivity_profile_id, custom_connectivity_name, no_traffic_shaping_at_all
         ''')
     }
