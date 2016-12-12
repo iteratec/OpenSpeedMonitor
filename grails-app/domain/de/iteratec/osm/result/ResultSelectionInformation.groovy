@@ -24,5 +24,7 @@ class ResultSelectionInformation {
         browser(nullable: false)
         page(nullable: false)
         location(nullable: false)
+        customConnectivityName(nullable: true)
+        connectivityProfile(nullable: true)
     }
 }
