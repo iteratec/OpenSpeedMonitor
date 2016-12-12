@@ -250,16 +250,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
             desc == desc || false;
             xAxis._orderRules = [];
             xAxis.addOrderRule(function (a, b) {
-                var sumA = a.indexValue[0];
-                var sumB = b.indexValue[0];
+                var valueA = parseFloat(a.indexValue[0]);
+                var valueB = parseFloat(b.indexValue[0]);
 
-                if (sumA < sumB) {
+                if (valueA < valueB) {
                     return -1;
-                }
-                else if (sumA === sumB) {
+                } else if (valueA === valueB) {
                     return 0;
-                }
-                else {
+                } else {
                     return 1;
                 }
             }, desc);
@@ -339,6 +337,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
             return p;
         }, []);
     };
+
 
     init();
     return {
