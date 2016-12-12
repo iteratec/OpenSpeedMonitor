@@ -11,7 +11,7 @@
 </p>
 </g:if>
 <g:else>
-<table class="table table-striped table-bordered table-condensed">
+<table class="table table-striped table-condensed">
     <thead>
         <tr>
             <th rowspan="2">
@@ -19,6 +19,8 @@
                <br />
                <small><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.link.description" /></small>
             </th>
+            <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.page" /></th>
+            <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.measuredEvent" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.measuringDate" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.firstView" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.timeToFirstByteInMillis" /></th>
@@ -47,6 +49,8 @@
                    ${eachResult.label}
                </g:else>
            </td>
+           <td>${eachResult.pageName}</td>
+           <td>${eachResult.measuredEventName}</td>
            <td>${eachResult.measuringDate}</td>
            <td><g:if test="${eachResult.firstView}">&radic;</g:if></td>
            <td>${eachResult.timeToFirstByteInMillis}</td>

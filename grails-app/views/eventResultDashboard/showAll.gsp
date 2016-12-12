@@ -100,20 +100,6 @@
             </div>
         </div>
     </g:if>
-    <g:else>
-
-        <g:if test="${startedBatchActivity == null}"> %{--User didnt try to load assets--}%
-            <g:if test="${request.queryString}">
-                <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
-                        <div class="alert alert-info text-center">
-                            <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
-                        </div>
-                    </div>
-                </g:if>
-            </g:if>
-        </g:if>
-    </g:else>
 </div>
 
 <form method="get" action="" id="dashBoardParamsForm">
@@ -144,7 +130,7 @@
     <div class="row">
         <div class="col-md-12">
             <!-- Split button to show/download/detail analysis, etc -->
-            <div class="btn-group pull-right">
+            <div class="btn-group pull-right" id="show-button-group">
                 <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                                 action="showAll" id="graphButtonHtmlId" class="btn btn-primary"/>
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
@@ -203,6 +189,20 @@
                     </sec:ifAnyGranted>
                 </ul>
             </div>
+            <div class="pull-right invisible-warnings">
+                <p class="bg-warning" id="warning-long-processing">
+                    <g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime"/>
+                </p>
+                <p class="bg-danger" id="warning-no-data">
+                    <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
+                </p>
+                <p class="bg-danger" id="warning-no-job-group">
+                    <g:message code="de.iteratec.isocsi.CsiDashboardController.noJobGroupSelected"/>
+                </p>
+                <p class="bg-danger" id="warning-no-page">
+                    <g:message code="de.iteratec.isocsi.CsiDashboardController.noPageSelected"/>
+                </p>
+            </div>
             <!-- Actual tabs -->
             <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">
                 <li class="active" >
@@ -250,8 +250,7 @@
                                         'selectedAllLocations'            : selectedAllLocations,
                                         'connectivityProfiles'            : connectivityProfiles,
                                         'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                        'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                        'showExtendedConnectivitySettings': true]}"/>
+                                        'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]}"/>
                 </div>
                 <div class="tab-pane" id="tabVariableSelection">
                     <g:render template="/_resultSelection/selectMeasuredVariables"
@@ -285,21 +284,6 @@
     <asset:javascript src="iteratecChartRickshaw.js"/>
     <asset:script type="text/javascript">
 
-        var pagesToEvents = [];
-        <g:each var="page" in="${pages}">
-        <g:if test="${eventsOfPages[page.id] != null}">
-        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
-        </g:if>
-        </g:each>
-
-        var browserToLocation = [];
-        <g:each var="browser" in="${browsers}">
-        <g:if test="${locationsOfBrowsers[browser.id] != null}">
-        browserToLocation[${browser.id}] = [<g:each var="location"
-                                                           in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
-        </g:if>
-        </g:each>
-
         var chartContextMenuI18N = ${i18n};
 
         function setAdjustments() {
@@ -331,8 +315,6 @@
 
         $(document).ready(function () {
 
-            initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
-
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
@@ -346,8 +328,10 @@
             }
             setAdjustments();
         });
+
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });
 
     </asset:script>

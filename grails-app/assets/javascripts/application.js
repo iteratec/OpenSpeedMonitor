@@ -29,6 +29,18 @@
  * Global namespace for OpenSpeedMonitor application.
  */
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
+
+/**
+ * Map for URLs to use
+ */
+OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
+
+/**
+ * Map for i18n to use
+ */
+OpenSpeedMonitor.urls = OpenSpeedMonitor.i18n || {};
+
+
 /**
  * Loads all registered JavaScript files. Used by microservices.
  * @type {Array}
@@ -84,35 +96,38 @@ OpenSpeedMonitor.postLoader = (function (){
 
 /**
  * Global string utilities module.
- * @returns {{
- *      stringToBoolean: publicApi.stringToBoolean}}
  */
-OpenSpeedMonitor.stringUtils = function(){
-    var publicApi = {
-        stringToBoolean: function(string) {
-
-            if (!string) {
+OpenSpeedMonitor.stringUtils = (function(){
+    var stringToBoolean = function(string) {
+        if (!string) {
+            return false;
+        }
+        switch (string.toLowerCase()) {
+            case "true":
+            case "yes":
+            case "1":
+            case "on":
+                return true;
+            case "false":
+            case "no":
+            case "0":
+            case "off":
+            case null:
                 return false;
-            }
-            switch (string.toLowerCase()) {
-                case "true":
-                case "yes":
-                case "1":
-                case "on":
-                    return true;
-                case "false":
-                case "no":
-                case "0":
-                case "off":
-                case null:
-                    return false;
-                default:
-                    return false;
-            }
+            default:
+                return false;
         }
     };
-    return publicApi;
-};
+
+    var isNumeric = function (string) {
+        return !isNaN(string);
+    };
+
+    return {
+        isNumeric: isNumeric,
+        stringToBoolean: stringToBoolean
+    };
+})();
 
 /**
  * Global module providing functionalities for storage of data in the browser.
@@ -218,6 +233,86 @@ OpenSpeedMonitor.urlUtils = (function() {
 	return {
         getAllVars: getAllVars,
         getVar: getVar
+    };
+})();
+
+OpenSpeedMonitor.domUtils = (function () {
+    /**
+     * Creates option elements by a list of values which all contain an 'id' and a 'name'
+     * @param values Array with objects containing id and name
+     * @return Array The list of newly created option elements, sorted by name
+     */
+    var createOptionsByIdAndName = function (values) {
+        var options = [];
+        if (!values) {
+            return [];
+        }
+        values.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        values.forEach(function(value) {
+            if (value && value.id && value.name) {
+                options.push($("<option/>", {
+                    value: value.id,
+                    text: value.name
+                }));
+            }
+        });
+        return options;
+    };
+
+    /**
+     * Gets all values of all option elements in a select element
+     * @param selectElement The select element with options as children
+     * @returns Array An array with all values of all options
+     */
+    var getAllOptionValues = function (selectElement) {
+        return $.map($(selectElement).find("option"), function (option) {
+            return option.value;
+        });
+    };
+
+    var hasAllOptionsSelected = function (selectElement) {
+        selectElement = $(selectElement);
+        return selectElement.find(":not(:selected)").length == 0 && selectElement.find("option").length > 0;
+    };
+
+    /**
+     * Updates a select element with new values
+     * @param selectElement The select element to update
+     * @param idAndNameList A list of objects with id and name
+     * @param noResultsText If set, a disabled option with this text is appended if the idAndNameList is empty
+     */
+    var updateSelectOptions = function (selectElement, idAndNameList, noResultsText) {
+        selectElement = $(selectElement);
+        var selection = selectElement.val();
+        selectElement.empty();
+        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(idAndNameList));
+        if (!selectElement.children().length && noResultsText) {
+            selectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
+        }
+        selectElement.val(selection);
+    };
+
+    /**
+     * Deselects all selected options in a select element
+     * @param selectElement The select element
+     * @param avoidEvent Optional. If true, no change event will be triggered
+     */
+    var deselectAllOptions = function (selectElement, avoidEvent) {
+        selectElement = $(selectElement);
+        selectElement.find("option:selected").removeAttr("selected");
+        if (!avoidEvent) {
+            selectElement.trigger("change");
+        }
+    };
+
+    return {
+        createOptionsByIdAndName: createOptionsByIdAndName,
+        getAllOptionValues: getAllOptionValues,
+        hasAllOptionsSelected: hasAllOptionsSelected,
+        updateSelectOptions: updateSelectOptions,
+        deselectAllOptions: deselectAllOptions
     };
 })();
 

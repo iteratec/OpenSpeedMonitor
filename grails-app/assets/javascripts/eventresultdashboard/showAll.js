@@ -21,8 +21,6 @@
  */
 function doOnDomReady(noResultsTextForChosenSelects){
 
-    initChosenSelects(noResultsTextForChosenSelects);
-
     updateSelectionConstraints();
     addInfoHandlers();
 

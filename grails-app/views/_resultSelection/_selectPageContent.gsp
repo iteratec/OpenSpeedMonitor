@@ -19,6 +19,7 @@
                   from="${measuredEvents}"
                   optionKey="id"
                   optionValue="name"
+                  data-parent-child-mapping='${eventsOfPages as grails.converters.JSON}'
                   value="${selectedMeasuredEventIds}"
                   multiple="true"/>
         <label class="checkbox-inline">

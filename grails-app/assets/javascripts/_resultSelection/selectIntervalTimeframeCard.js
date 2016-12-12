@@ -9,9 +9,9 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     var cardElement = $("#select-interval-timeframe-card");
     var startDateTimePickerElement = $("#startDateTimePicker");
-    var startDateTimePicker = OpenSpeedMonitor.DateTimePicker(startDateTimePickerElement, "00:00");
+    var startDateTimePicker = OpenSpeedMonitor.DateTimePicker(startDateTimePickerElement, "00:00:00");
     var endDateTimePickerElement = $("#endDateTimePicker");
-    var endDateTimePicker = OpenSpeedMonitor.DateTimePicker(endDateTimePickerElement, "23:59");
+    var endDateTimePicker = OpenSpeedMonitor.DateTimePicker(endDateTimePickerElement, "23:59:59");
     var timeFrameSelectElement = $("#timeframeSelect");
     var manualTimeFrameFieldSet = $("#manual-timeframe-selection");
     var intervalSelectElement = $("#selectedIntervalHtmlId");
@@ -32,6 +32,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     var defaultIntervalSelection = "-1"; // Raw data
     var defaultTimeFramePreselect = (3 * 24 * 60 * 60).toString(); // 3 days
     var isSavedDashboard = OpenSpeedMonitor.urlUtils.getVar("dashboardID") !== undefined;
+    var eventsEnabled = true;
 
     var init = function() {
         // initialize controls with values. Either from presets, from URL, from local storage or defaults
@@ -49,6 +50,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         setTimeFramePreselection(timeFramePreselection);
 
         registerEvents();
+        triggerTimeFrameChanged(); // initial event
     };
 
     var defaultValueForInterval = function() {
@@ -112,12 +114,12 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         startDateTimePickerElement.on("changeDateTime", function(ev, dateTimeValues) {
             clientStorage.setObjectToLocalStorage(clientStorageStartObjectKeys, dateTimeValues);
             endDateTimePicker.setStartDate(dateTimeValues.date);
-            timeFrameChanged();
+            triggerTimeFrameChanged();
         });
 
         endDateTimePickerElement.on("changeDateTime", function(ev, dateTimeValues) {
             clientStorage.setObjectToLocalStorage(clientStorageEndObjectKeys, dateTimeValues);
-            timeFrameChanged();
+            triggerTimeFrameChanged();
         });
     };
 
@@ -131,7 +133,9 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         manualTimeFrameFieldSet.prop("disabled", true);
         var now = new Date();
         var startDate = new Date(now.getTime() - (value * 1000));
+        enableEvents(false);
         startDateTimePicker.setValuesByDate(startDate);
+        enableEvents(true);
         endDateTimePicker.setValuesByDate(now);
         endDateTimePicker.setStartDate(startDate);
     };
@@ -140,8 +144,16 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
       return [startDateTimePicker.getValuesAsDate(), endDateTimePicker.getValuesAsDate()];
     };
 
-    var timeFrameChanged = function() {
-        cardElement.trigger("timeFrameChanged", getTimeFrame());
+    var enableEvents = function(enable) {
+        var oldValue = eventsEnabled;
+        eventsEnabled = enable;
+        return oldValue;
+    };
+
+    var triggerTimeFrameChanged = function() {
+        if (eventsEnabled) {
+            cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
+        }
     };
 
     init();

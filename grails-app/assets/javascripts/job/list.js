@@ -283,7 +283,7 @@ function doOnDomReady(
 	getLastRunLink,
 	nextExecutionLink){
 
-    var stringUtils = OpenSpeedMonitor.stringUtils();
+    var stringUtils = OpenSpeedMonitor.stringUtils;
     var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils();
 
   $('[data-toggle="popover"]').popover()

@@ -61,9 +61,9 @@ class EventResultDashboardPage extends I18nGebPage {
         appendedInputBelowRequestSizesTimesTextField { $("#appendedInputBelowRequestSizes") }
         appendedInputAboveRequestSizesTextField { $("#appendedInputAboveRequestSizes") }
 
-        pageTab{$("a",href:"#tab1")}
-        browserTab{$("a",href:"#tab2")}
-        connectivityTab{$("a",href:"#tab3")}
+        pageTab{$("a",href:"#page-tab")}
+        browserTab{$("a",href:"#browser-tab")}
+        connectivityTab{$("a",href:"#connectivity-tab")}
         selectBrowsersList{$("#selectedBrowsersHtmlId").find("option").contextElements }
         selectAllBrowserButton{$("#selectedAllBrowsers")}
         selectConnectivityProfilesList{$("#selectedConnectivityProfilesHtmlId").find("option").contextElements }
