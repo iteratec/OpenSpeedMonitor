@@ -62,6 +62,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
     var setMultiSelect = function (id, values) {
         $("#" + id).val(values);
+        $("#" + id).trigger("change")
     };
     var setJobGroups = function (params) {
         var selectedFolderParam = params['selectedFolder'];

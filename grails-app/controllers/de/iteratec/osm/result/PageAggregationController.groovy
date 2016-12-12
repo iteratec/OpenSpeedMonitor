@@ -75,7 +75,7 @@ class PageAggregationController {
 
         allJobGroups.each { currentJobGroup ->
             allPages.each { currentPage ->
-                List<EventResult> eventResults = EventResult.findAllByDateCreatedBetweenAndJobGroupAndPage(cmd.from, cmd.to, currentJobGroup, currentPage)
+                List<EventResult> eventResults = EventResult.findAllByDateCreatedBetweenAndJobGroupAndPage(cmd.from.toDate(), cmd.to.toDate(), currentJobGroup, currentPage)
                 if (eventResults) {
                     Map<String, String> datum = ['jobGroup': currentJobGroup.name, 'page': currentPage.name]
                     allMeasurands.each { m ->
@@ -89,7 +89,7 @@ class PageAggregationController {
         }
 
         // return if no data is available
-        if(!data) {
+        if (!data) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
