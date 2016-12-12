@@ -14,11 +14,7 @@
 <table class="table table-striped table-condensed">
     <thead>
         <tr>
-            <th rowspan="2">
-               <g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.label" />
-               <br />
-               <small><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.link.description" /></small>
-            </th>
+            <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.label" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.page" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.measuredEvent" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.measuringDate" /></th>
@@ -26,14 +22,18 @@
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.timeToFirstByteInMillis" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.startToRenderInMillis" /></th>
             <th rowspan="2"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.domTimeInMillis" /></th>
-            <th colspan="3" rowspan="1"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow_docComplete" /></th>
-            <th colspan="3" rowspan="1"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow_fullyLoaded" /></th>
+            <th colspan="3" rowspan="1" class="extra-header">
+                <g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow_docComplete" />
+            </th>
+            <th colspan="3" rowspan="1" class="extra-header separate-col">
+                <g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow_fullyLoaded" />
+            </th>
         </tr>
         <tr>
             <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.docCompleteTimeInMillis" /></th>
             <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.docCompleteRequests" /></th>
             <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.docCompleteIncomingBytes" /></th>
-            <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.fullyLoadedTimeInMillis" /></th>
+            <th class="separate-col"><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.fullyLoadedTimeInMillis" /></th>
             <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.fullyLoadedRequestCount" /></th>
             <th><g:message code="ui.table.header.de.iteratec.isr.ui.EventResultListingRow.fullyLoadedIncomingBytes" /></th>
         </tr>
@@ -61,7 +61,7 @@
            <td>${eachResult.docCompleteRequests}</td>
            <td>${eachResult.docCompleteIncomingBytes}</td>
            <%-- fully loaded --%>
-           <td>${eachResult.fullyLoadedTimeInMillis}</td>
+           <td class="separate-col">${eachResult.fullyLoadedTimeInMillis}</td>
            <td>${eachResult.fullyLoadedRequestCount}</td>
            <td>${eachResult.fullyLoadedIncomingBytes}</td>
         </tr>

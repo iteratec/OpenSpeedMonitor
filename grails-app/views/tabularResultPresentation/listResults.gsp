@@ -24,6 +24,17 @@
                 </div>
             </g:hasErrors>
         </g:if>
+
+        <g:if test="showEventResultsListing">
+
+            <g:render template="listResults"
+                      model="${[model: eventResultsListing]}" />
+
+            <g:render template="pagination"
+                      model="${[model: paginationListing] }" />
+
+        </g:if>
+
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
@@ -69,15 +80,6 @@
             </div>
         </form>
 
-        <g:if test="showEventResultsListing">
-
-            <g:render template="listResults"
-                  model="${[model: eventResultsListing]}" />
-
-            <g:render template="pagination"
-                model="${[model: paginationListing] }" />
-
-        </g:if>
         <content tag="include.bottom">
             <asset:javascript src="eventresult/eventResult.js"/>
             <asset:script type="text/javascript">
