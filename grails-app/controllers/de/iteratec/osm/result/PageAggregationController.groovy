@@ -68,28 +68,23 @@ class PageAggregationController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-
-        def data = []
-
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
 
-        allJobGroups.each { currentJobGroup ->
-            allPages.each { currentPage ->
-                List<EventResult> eventResults = EventResult.findAllByDateCreatedBetweenAndJobGroupAndPage(cmd.from.toDate(), cmd.to.toDate(), currentJobGroup, currentPage)
-                if (eventResults) {
-                    Map<String, String> datum = ['jobGroup': currentJobGroup.name, 'page': currentPage.name]
-                    allMeasurands.each { m ->
-                        List allValues = eventResults*.getAt(m).findAll { it != null }
-                        Double mAverage = allValues ? (allValues.sum { it } / allValues.size()) : null
-                        datum.put(m, mAverage)
-                    }
-                    data.add(datum)
+        List allEventResults = EventResult.createCriteria().list {
+            'in'('page', allPages)
+            'in'('jobGroup', allJobGroups)
+            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            projections {
+                groupProperty('page')
+                groupProperty('jobGroup')
+                allMeasurands.each { m ->
+                    avg(m)
                 }
             }
         }
 
         // return if no data is available
-        if (!data) {
+        if (!allEventResults) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
@@ -97,14 +92,12 @@ class PageAggregationController {
         List allSeries = cmd.selectedSeries
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
 
-
-
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
-                data.each { datum ->
+                allEventResults.each { datum ->
                     barchartSeries.data.add(
-                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[currentMeasurand.replace("Uncached", "")], grouping: "${datum['page']} / ${datum['jobGroup']}"))
+                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], grouping: "${datum[0]} / ${datum[1]}"))
                 }
             }
 
