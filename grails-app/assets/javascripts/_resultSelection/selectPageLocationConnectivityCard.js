@@ -44,9 +44,9 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
             triggerChangeEvent("connectivitySelectionChanged", getConnectivitySelection());
         });
         resetButtonElement.on("click", function() {
-            OpenSpeedMonitor.domUtils.deselectAllOptions(pageSelectElement, true);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(pageSelectElement);
             OpenSpeedMonitor.domUtils.deselectAllOptions(measuredEventsSelectElement);
-            OpenSpeedMonitor.domUtils.deselectAllOptions(browserSelectElement, true);
+            OpenSpeedMonitor.domUtils.deselectAllOptions(browserSelectElement);
             OpenSpeedMonitor.domUtils.deselectAllOptions(locationsSelectElement);
             OpenSpeedMonitor.domUtils.deselectAllOptions(connectivitySelectElement);
         });
