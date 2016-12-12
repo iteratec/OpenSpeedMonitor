@@ -19,7 +19,7 @@
 
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.BarchartMeasurings = (function () {
     var barchartMeasuringCard = $("#barchartMeasuringCard");

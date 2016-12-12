@@ -26,7 +26,7 @@
  */
 //= require bower_components/spin.js/spin.js
 //= require_self
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.postLoaded = (function() {
     var setDeleteConfirmationInformations = function(link){
         setTimeout (function () {

@@ -1,6 +1,6 @@
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectJobGroupCard = (function() {
     var cardElement = $('#select-jobgroup-card');

@@ -3,7 +3,7 @@
 
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckbox, childSelect, childSelectAllCheckbox) {
     parentSelect = $(parentSelect);

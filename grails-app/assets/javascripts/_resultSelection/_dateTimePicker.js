@@ -143,6 +143,10 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
     };
 
     var setValues = function (newValues) {
+        if (newValues == undefined || newValues == null) {
+            return;
+        }
+
         if (newValues.date) {
             setDate(newValues.date);
         }

@@ -1,6 +1,6 @@
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.SelectWithSelectAllCheckBox = function(selectElement, checkBoxElement) {
     checkBoxElement = $(checkBoxElement);
