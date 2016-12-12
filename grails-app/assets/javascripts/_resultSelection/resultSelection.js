@@ -127,15 +127,15 @@ OpenSpeedMonitor.resultSelection = (function(){
             spinnerPageLocationConnectivity.start();
         }
         var spinner = null;
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "pages") {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && pageTabElement.length > 0 && initiator != "pages") {
             spinner = pageTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
             updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents, spinner);
         }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "browsers") {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && browserTabElement.length > 0 && initiator != "browsers") {
             spinner = browserTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
             updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations, spinner);
         }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "connectivity") {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && connectivityTabElement.length > 0 && initiator != "connectivity") {
             spinner = connectivityTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
             updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
         }
