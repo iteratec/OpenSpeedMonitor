@@ -76,6 +76,13 @@
                                     'connectivityProfiles'              :connectivityProfiles,
                                     'selectedConnectivityProfiles'      :selectedConnectivityProfiles,
                                     'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles]}"/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                                <i class="fa fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
                 </g:else>
             </div>
         </form>

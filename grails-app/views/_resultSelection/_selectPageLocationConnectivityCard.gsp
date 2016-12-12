@@ -6,7 +6,6 @@ A card to select page & measured step, browser & location, and the connectivity
 <div class="card" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
     <g:if test="${showOnlyPage}">
         <legend>
-            <button class="reset-selection soft-button" type="button" title="Reset"><i class="fa fa-undo"></i></button>
             <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
             <g:if test="${!hideMeasuredEventForm}">
                 &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
@@ -14,7 +13,6 @@ A card to select page & measured step, browser & location, and the connectivity
         </legend>
     </g:if>
     <g:else>
-    <button class="reset-selection soft-button" type="button" title="Reset"><i class="fa fa-undo"></i></button>
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
             <a href="#page-tab" data-toggle="tab">
