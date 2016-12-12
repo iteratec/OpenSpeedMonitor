@@ -325,6 +325,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
+            ResultSelectionInformation.list().each {
+                it.delete()
+            }
             EventResult.list().each {
                 it.delete()
             }
@@ -620,6 +623,38 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1
+            ).save()
+
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult3.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    connectivityProfile: connectivityProfile,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: false
+            ).save()
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult2.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
+                    noTrafficShapingAtAll: false
+            ).save()
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult3.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: true
             ).save()
         }
 
