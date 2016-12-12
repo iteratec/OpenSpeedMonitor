@@ -88,6 +88,12 @@ class PageAggregationController {
             }
         }
 
+        // return if no data is available
+        if(!data) {
+            ControllerUtils.sendObjectAsJSON(response, [:])
+            return
+        }
+
         List allSeries = cmd.selectedSeries
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
 
@@ -107,8 +113,7 @@ class PageAggregationController {
 
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 
-        def result = data ? barchartDTO : [:]
-        ControllerUtils.sendObjectAsJSON(response, result)
+        ControllerUtils.sendObjectAsJSON(response, barchartDTO)
     }
 
     /**

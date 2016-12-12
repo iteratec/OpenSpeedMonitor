@@ -8,10 +8,19 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
 
     var getUrlParameter = function () {
         var vars = [], hash;
-        var paramIndex = window.location.href.indexOf('?');
+        var currentUrl = window.location.href;
+
+        // remove html anchor if exists
+        var anchorIndex = currentUrl.indexOf('#');
+        if (anchorIndex > 0) {
+            currentUrl = currentUrl.replace(/#\w*/, "")
+        }
+
+        var paramIndex = currentUrl.indexOf('?');
         if (paramIndex < 0)
             return vars;
-        var hashes = window.location.href.slice(paramIndex + 1).split('&');
+
+        var hashes = currentUrl.slice(paramIndex + 1).split('&');
         for (var i = 0; i < hashes.length; i++) {
             hash = hashes[i].split('=');
             var currentValue = vars[hash[0]];
