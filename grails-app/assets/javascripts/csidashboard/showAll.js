@@ -1,4 +1,5 @@
-/* 
+//= require iteratecChartRickshaw.js
+/*
  * OpenSpeedMonitor (OSM)
  * Copyright 2014 iteratec GmbH
  *
@@ -20,8 +21,6 @@
  * Initializes DOM-nodes and registers events.
  */
 function doOnDomReady(noResultsTextForChosenSelects) {
-
-    initChosenSelects(noResultsTextForChosenSelects);
 
     $("input[name='aggrGroupAndInterval']").change(setFilterElementsVisibility);
 

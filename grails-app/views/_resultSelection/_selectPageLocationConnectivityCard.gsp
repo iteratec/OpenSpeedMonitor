@@ -3,7 +3,7 @@
 A card to select page & measured step, browser & location, and the connectivity
 --%>
 
-<div class="card" id="select-page-location-connectivity">
+<div class="card" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
     <g:if test="${showOnlyPage}">
         <legend>
             <button class="reset-selection soft-button" type="button" title="Reset"><i class="fa fa-undo"></i></button>
