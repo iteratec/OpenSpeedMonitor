@@ -189,20 +189,7 @@
                     </sec:ifAnyGranted>
                 </ul>
             </div>
-            <div class="pull-right invisible-warnings">
-                <p class="bg-warning" id="warning-long-processing">
-                    <g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime"/>
-                </p>
-                <p class="bg-danger" id="warning-no-data">
-                    <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
-                </p>
-                <p class="bg-danger" id="warning-no-job-group">
-                    <g:message code="de.iteratec.isocsi.CsiDashboardController.noJobGroupSelected"/>
-                </p>
-                <p class="bg-danger" id="warning-no-page">
-                    <g:message code="de.iteratec.isocsi.CsiDashboardController.noPageSelected"/>
-                </p>
-            </div>
+            <g:render template="/_resultSelection/hiddenWarnings" />
             <!-- Actual tabs -->
             <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">
                 <li class="active" >

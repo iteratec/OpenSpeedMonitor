@@ -4,7 +4,7 @@
               value="${selectedPages}"
               title="${message(code: 'de.iteratec.isr.wptrd.labels.filterPage')}"/>
 </div>
-<g:if test="${showMeasuredEventForm}">
+<g:if test="${!hideMeasuredEventForm}">
     <div id="filter-measured-event" class="form-group">
         <label for="selectedMeasuredEventsHtmlId">
             <strong>

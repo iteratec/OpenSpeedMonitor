@@ -23,13 +23,6 @@
                        default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
         </p>
 
-        %{-- no data message --}%
-        <div id="no-data-div" class="col-md-12 hidden">
-            <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.ism.no.data.on.current.selection.heading"/></strong>
-                <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
-            </div>
-        </div>
         %{-- error messages --}%
         <div id="error-div" class="col-md-12 hidden">
             <div class="alert alert-danger">
@@ -51,7 +44,7 @@
             <div class="action-row">
                 <div class="col-md-12">
 
-                    <div class="btn-group pull-right">
+                    <div class="btn-group pull-right" id="show-button-group">
                         <button type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
@@ -70,7 +63,7 @@
                             </li>
                         </ul>
                     </div>
-
+                    <g:render template="/_resultSelection/hiddenWarnings" />
                 </div>
             </div>
 
@@ -96,16 +89,12 @@
                 </div>
                 %{--the rest----------------------------------------------------------------------------------------------}%
                 <div id="filter-complete-tabbable" class="col-md-5">
-                    <div class="card" id="select-page-location">
-                        <legend>
-                            <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
-                        </legend>
-                        <g:render template="/_resultSelection/selectPageContent" model="[
-                                'pages'                : pages,
-                                'selectedPages'        : selectedPages,
-                                'showMeasuredEventForm': false
-                        ]"/>
-                    </div>
+                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard" model="[
+                            'showOnlyPage'         : true,
+                            'hideMeasuredEventForm': true,
+                            'pages'                : pages,
+                            'selectedPages'        : selectedPages
+                    ]"/>
                 </div>
             </div>
 
@@ -116,21 +105,13 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="csidashboard/csiDashboard.js"/>
     <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:script type="text/javascript">
         OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
-                $(document).ready(function () {
-                    doOnDomReady(
-                            '${dateFormat}',
-        ${weekStart},
-                    '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
-            );
-
+        $(window).load(function() {
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });
-
-
 
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
@@ -159,12 +140,11 @@
                         $("#error-div").addClass("hidden");
 
                     if (!$.isEmptyObject(data)) {
-                        if (!$("#no-data-div").hasClass("hidden"))
-                            $("#no-data-div").addClass("hidden");
+                        $('#warning-no-data').hide();
                         OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
-                        $("#no-data-div").removeClass("hidden")
+                        $('#warning-no-data').show();
                     }
                 },
                 error: function (e) {

@@ -27,9 +27,10 @@
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
-                    <g:actionSubmit class="btn btn-primary pull-right"
+                    <g:actionSubmit class="btn btn-primary pull-right" id="show-button"
                                     value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
                                     action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" />
+                    <g:render template="/_resultSelection/hiddenWarnings" />
                 </div>
             </div>
             <div class="row card-well">
