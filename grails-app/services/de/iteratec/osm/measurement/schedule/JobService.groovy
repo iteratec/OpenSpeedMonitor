@@ -191,13 +191,15 @@ class JobService {
         params["selectedInterval"] = "-1"
         params["selectedTimeFrameInterval"] = "0"
         Date fromDate = job.lastRun-7
-        params["from"] = fromDate.format('d.MM.yyyy')
+        params["from"] = fromDate.format('dd.MM.yyyy')
         params["fromHour"] = fromDate.format('HH:mm')
+        params["setFromHour"] = "on"
+        params["setToHour"] = "on"
         Date toDate
         use(TimeCategory) {
             toDate = job.lastRun + 1.minute // We add one minute because our time selection doesn't count seconds, so otherwise we could miss the last run
         }
-        params["to"] = toDate.format('d.MM.yyyy')
+        params["to"] = toDate.format('dd.MM.yyyy')
         params["toHour"] = toDate.format('HH:mm')
         params["selectedFolder"] = "$job.jobGroupId"
         return params

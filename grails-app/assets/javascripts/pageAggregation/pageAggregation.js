@@ -32,6 +32,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
   };
 
   var getTimeFrame = function (map) {
+    map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
+    map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
     map["from"] = $("#fromDatepicker").val();
     map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
     map["to"] = $("#toDatepicker").val();
@@ -64,6 +66,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     $('#folderSelectHtmlId').on('change', updateUrl);
     $('#pageSelectHtmlId').on('change', updateUrl);
     $('#timeframeSelect').on('change', updateUrl);
+    $('#setFromHour').on('change', updateUrl);
+    $('#setToHour').on('change', updateUrl);
     $('#select-interval-timeframe-card').find('.form-control').on('change',updateUrl);
     $(".firstMeasurandSelect").on('change', updateUrl);
     $(".additionalMeasurand").on('change', updateUrl);
@@ -90,7 +94,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     setPages(params);
     setMeasurands(params);
     // setTrim(params);
-    if (params != null) {
+    if (params["selectedFolder"] != "" && params["selectedPages"] != "") {
       clickShowButton();
     }
 
@@ -166,24 +170,27 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
   var markTimeCardAsResolved = function () {
     timecardResolved = true;
     if (allLoaded()) {
-      setSelections();
-      addHandler();
-      updateUrl()
+      init();
     }
   };
   var markBarChartAsResolved = function () {
     barChartResolved = true;
     if (allLoaded()) {
-      setSelections();
-      addHandler();
-      updateUrl()
+      init();
     }
   };
+
+  var init = function () {
+    setSelections();
+    addHandler();
+    updateUrl()
+  };
+
   var allLoaded = function () {
     return timecardResolved && barChartResolved;
   };
 
-  var init = function () {
+  var initWaitForPostLoad = function () {
     $(window).on("selectIntervalTimeframeCardLoaded", function () {
       markTimeCardAsResolved();
     });
@@ -195,6 +202,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
   return {
     setSelections: setSelections,
     clickShowButton: clickShowButton,
-    init: init
+    init: initWaitForPostLoad
   };
 });
