@@ -7,34 +7,81 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
 
   var getUrlParameter = function () {
-    var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for (var i = 0; i < hashes.length; i++) {
-      hash = hashes[i].split('=');
-      var currentValue = vars[hash[0]];
+    var vars = [], currentParam;
+    var hashIndex = window.location.href.indexOf("#");
+    var toIndex;
+    if(hashIndex>0){
+      toIndex = hashIndex
+    } else{
+      toIndex = window.location.href.length;
+    }
+    var params = window.location.href.slice(window.location.href.indexOf('?') + 1, toIndex).split('&');
+    for (var i = 0; i < params.length; i++) {
+      currentParam = params[i].split('=');
+      var currentValue = vars[currentParam[0]];
       if (currentValue == null) {
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
+        vars.push(currentParam[0]);
+        vars[currentParam[0]] = currentParam[1];
       } else if (currentValue.constructor === Array) {
-        vars[hash[0]].push(hash[1]);
+        vars[currentParam[0]].push(currentParam[1]);
       } else {
-        vars[hash[0]] = [vars[hash[0]], hash[1]]
+        vars[currentParam[0]] = [vars[currentParam[0]], currentParam[1]]
       }
     }
     return vars;
   };
 
+  var getTimeFrame = function (map) {
+    map["from"] = $("#fromDatepicker").val();
+    map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
+    map["to"] = $("#toDatepicker").val();
+    map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
+  };
+
+  var getJobGroup = function (map) {
+    map["selectedFolder"] = $("#folderSelectHtmlId").val();
+  };
+
+  var getPage = function (map) {
+    map["selectedPages"] = $("#pageSelectHtmlId").val();
+  };
+
+  var getMeasurands = function (map) {
+    var measurands = [];
+    var measurandObjects = $('.measurandSeries');
+    $.each(measurandObjects, function (_,currentSeries) {
+      var currentMeasurands = [$(currentSeries).find(".firstMeasurandSelect").val()];
+      $(currentSeries).find(".additionalMeasurand").each(function(_,additionalMeasurand){
+        currentMeasurands.push($(additionalMeasurand).val());
+      });
+      var json = JSON.stringify({"stacked":$(currentSeries).find(".stackedSelect").val(),"values":currentMeasurands});
+      measurands.push(json);
+    });
+    map['measurand'] = measurands
+  };
+
   var addHandler = function () {
-    $('#selectedBrowsersHtmlId').on('change', updateSelectionConstraintBrowser);
+    $('#folderSelectHtmlId').on('change', updateUrl);
+    $('#pageSelectHtmlId').on('change', updateUrl);
+    $('#timeframeSelect').on('change', updateUrl);
+    $('#select-interval-timeframe-card').find('.form-control').on('change',updateUrl);
+    $(".firstMeasurandSelect").on('change', updateUrl);
+    $(".additionalMeasurand").on('change', updateUrl);
+    $(".stackedSelect").on('change', updateUrl);
+    $("#addMeasurandSeriesButton").on('click', updateUrl);
+    $(".removeMeasurandSeriesButton").on('click', updateUrl);
+    $(".removeMeasurandButton").on('click', updateUrl);
+    $(".addMeasurandButton").on('click', updateUrl);
   };
 
   var updateUrl = function () {
-    var url = window.location.href;
-    //get url after/
-    var value = url.substring(url.lastIndexOf('/') + 1);
-    //get the part after before ?
-    value = value.split("?")[0];
-    return value;
+    var map = {};
+    getTimeFrame(map);
+    getJobGroup(map);
+    getPage(map);
+    getMeasurands(map);
+    var path = "show?"+$.param(map,true);
+    window.history.pushState("object or string", "Title", path);
   };
 
   var setSelections = function () {
@@ -120,12 +167,16 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     timecardResolved = true;
     if (allLoaded()) {
       setSelections();
+      addHandler();
+      updateUrl()
     }
   };
   var markBarChartAsResolved = function () {
     barChartResolved = true;
     if (allLoaded()) {
       setSelections();
+      addHandler();
+      updateUrl()
     }
   };
   var allLoaded = function () {
