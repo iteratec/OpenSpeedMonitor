@@ -1663,5 +1663,6 @@ function ChartExporter(args) {
 // escapes special characters
 //
 function makeValidSelector(identifier) {
-    return identifier.replace(/(\/|:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
+    return identifier.replace(/(\^|\!|\"|\$|\&|\(|\)|\{|\}|\?|\\|\`|\=|\¸|\,|\*|\+|\~|\'|\#|\-|\_|\.|\:|\,|\;|\<|\>|\/|:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
+
 }

@@ -20,6 +20,8 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.RickshawTransformableCsMapping
 import de.iteratec.osm.result.CachedView
+import groovy.json.StringEscapeUtils
+
 
 class RickshawHtmlCreater {
 
@@ -51,7 +53,6 @@ class RickshawHtmlCreater {
      * will be called, which is responsible to draw the rickshaw graph.
      */
     def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax ->
-
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
         def height = heightOfChart
@@ -123,7 +124,7 @@ class RickshawHtmlCreater {
      * into a datastructure which can be used in javascript.
      */
     def transformData = { List<OsmChartGraph> graphs, List<OsmChartAxis> yAxesLabels ->
-
+        def StringEscapeUtils escapeUtils = new StringEscapeUtils()
         def sw = new StringWriter()
         def prefix1 = ""
 
@@ -137,9 +138,9 @@ class RickshawHtmlCreater {
                 }
             }
 
-            sw << prefix1 + """ { measurandGroup: "${graph.measurandGroup}", """
-            sw << """yAxisLabel: "${label}", """
-            sw << """name: "${graph.label}", """
+            sw << prefix1 + """ { measurandGroup: "${escapeUtils.escapeJava(graph.measurandGroup.toString())}", """
+            sw << """yAxisLabel: "${escapeUtils.escapeJava(label)}", """
+            sw << """name: "${escapeUtils.escapeJava(graph.label)}", """
             sw << """data: """ + generateDataPoints(graph) + """ }"""
             prefix1 = ", "
         }
