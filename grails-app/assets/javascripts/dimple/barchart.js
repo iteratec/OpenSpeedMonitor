@@ -19,6 +19,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         seriesCount = 0,
         xAxis = null,
         yAxes = {},
+        showBarLabels = false,
         showXAxis = true,
         showYAxis = true,
         showGridlines = true;
@@ -43,9 +44,6 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         yAxes = {};
         xAxis = null;
         height = 600;
-        showXAxis = true;
-        showYAxis = true;
-        showGridlines = true;
 
         // Create SVG
         svg = dimple.newSvg("#" + chartIdentifier, "100%", height);
@@ -68,7 +66,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
             var yAxis = yAxes[currentSeries['dimensionalUnit']];
             if (!yAxis) {
                 yAxis = chart.addMeasureAxis("y", "indexValue");
-                yAxis.title = currentSeries['dimensionalUnit'];
+                yAxis.title = currentSeries['yAxisLabel'];
                 yAxes[currentSeries['dimensionalUnit']] = yAxis;
             }
 
@@ -103,6 +101,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         draw(false);
         initWidth();
         resize();
+
+        addBarLabels(barchartData);
     };
 
     var adjustChart = function () {
@@ -147,6 +147,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         } else {
             d3.select(".domain.dimple-custom-axis-line").style("opacity", 0);
             d3.select(".dimple-axis-x").selectAll("line").style("opacity", 0);
+        }
+
+        // Toggle bar labels
+        showBarLabels = $("#inputShowBarLabels").prop("checked");
+        if (showYAxis) {
+            d3.selectAll(".bar-label").style("opacity", 1);
+        } else {
+            d3.selectAll(".bar-label").style("opacity", 0);
         }
 
         resize();
@@ -283,6 +291,64 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
     };
 
+    var addBarLabels = function (barchartData) {
+        // barchartData:
+        // stacked: true
+        // [[6],[3]]
+        // stacked: false
+        // [[6],[3]]
+
+        // bar.series:
+        // stacked: true
+        // [[6],[3]]
+        // stacked: false
+        // [[3],[3],[3]]
+
+        // allMeasurandSeries:
+        // stacked: true
+        // [0,1] -> [[0],[0]]
+        // stacked: false
+        // [0,1] -> [[[0],[1]],[0]]
+
+        for (var barIndex in allMeasurandSeries) {
+            allMeasurandSeries[barIndex].forEach( function (seriesIndex) {
+                // create labels group container
+                var currentSeriesLabelClass = "dimple-series-group-" + seriesIndex.toString() + "-labels";
+                chart.svg.append("g").attr("class", currentSeriesLabelClass);
+
+                var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesIndex).selectAll("rect");
+                currentSeriesRects[0].forEach( function (rectangle, rectangleIndex) {
+                    // get the unit
+                    // stacked/overlayed bars can only be of the same dimensional unit, therefore accessing the first is sufficient
+                    var unit = barchartData.series[barIndex].dimensionalUnit;
+                    // get the measurand value and format it
+                    var value = barchartData.series[barIndex].data[rectangleIndex].indexValue.toString();
+                    value = (unit == "%") ? parseFloat(value).toFixed(1) : Math.round(value);
+
+                    // set the label
+                    var label = (unit == "#") ? unit + " " + value : value + " " + unit;
+
+                    // append the label
+                    d3.selectAll("." + currentSeriesLabelClass).append("text")
+                        .attr("x", rectangle.x.baseVal.value + rectangle.width.baseVal.value / 2)
+                        .attr("y", rectangle.y.baseVal.value - 10)
+                        .text(label)
+                        .style("text-anchor", "middle")
+                        .attr("class", "bar-label");
+                });
+                // move labels if necessary
+                var currentSeriesLabels = d3.selectAll(".dimple-series-group-" + seriesIndex + "-labels").selectAll("text");
+                var width = parseInt(currentSeriesRects.attr("width"));
+                var translateX = barIndex * width;
+                currentSeriesLabels.attr("transform", "translate(" + translateX + ", 0)");
+
+                // hide the labels initially
+                if (!showBarLabels)
+                    currentSeriesLabels.style("opacity", 0);
+            });
+        }
+    };
+
     var getXLabel = function () {
         return xAxis.title;
     };
@@ -329,6 +395,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var getShowGridlines = function () {
         return showGridlines;
     };
+    var getShowBarLabels = function () {
+        return showBarLabels;
+    };
 
     // returns a new array without removed duplicates
     var removeDuplicatesFromArray = function (array) {
@@ -351,6 +420,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         getShowXAxis: getShowXAxis,
         getShowYAxis: getShowYAxis,
         getShowGridlines: getShowGridlines,
+        getShowBarLabels: getShowBarLabels,
         resize: resize
     };
 

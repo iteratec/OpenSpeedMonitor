@@ -93,7 +93,7 @@ class PageAggregationController {
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), stacked: series.stacked)
+            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), yAxisLabel: getYAxisLabel(series.measurands[0]), stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
@@ -205,13 +205,34 @@ class PageAggregationController {
     private String getDimensionalUnit(String measurand) {
         def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
         if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.dimensionalUnit", "ms")
+            return "ms"
         } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.dimensionalUnit", "percent %")
+            return "%"
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.dimensionalUnit", "count")
+            return "#"
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.dimensionalUnit", "kb")
+            return "kb"
+        } else {
+            return ""
+        }
+
+    }
+
+    /**
+     * Returns the y-axis label for the given measurand
+     * @param measurand the {@link MeasurandGroup}
+     * @return the y-axis label as string
+     */
+    private String getYAxisLabel(String measurand) {
+        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
+        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.yAxisLabel", "Loading Time [ms]")
+        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.yAxisLabel", "Percent [%]")
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.yAxisLabel", "Amount")
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [kb]")
         } else {
             return ""
         }

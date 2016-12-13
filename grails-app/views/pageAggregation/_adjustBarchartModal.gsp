@@ -91,6 +91,14 @@
                                 default="Show x-Axis"/>
                         </label>
                     </div>
+
+                    <div class="checkbox col-sm-offset-3">
+                        <label>
+                            <input type="checkbox" id="inputShowBarLabels"><g:message
+                                code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
+                                default="Show Barlabels"/>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -128,6 +136,7 @@
         $("#inputShowXAxis").prop("checked", chart.getShowXAxis());
         $("#inputShowYAxis").prop("checked", chart.getShowYAxis());
         $("#inputShowGridlines").prop("checked", chart.getShowGridlines());
+        $("#inputShowBarLabels").prop("checked", chart.getShowBarLabels());
         $("#assign-color-container").empty();
         $("#y-axis-alias-container").empty();
         var colorAssignments = chart.getColorAssignments();
