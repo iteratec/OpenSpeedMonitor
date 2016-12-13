@@ -2,10 +2,10 @@
 <%--
 A card with controls to select a job group
 --%>
-<div class="card" id="select-jobgroup-card" data-tag-to-job-group-name-map='${tagToJobGroupNameMap as grails.converters.JSON}'>
+<div class="card" id="select-jobgroup-card" data-no-auto-update="${(boolean) noAutoUpdate}"
+     data-tag-to-job-group-name-map='${tagToJobGroupNameMap as grails.converters.JSON}'>
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>
-        <button class="reset-selection soft-button" type="button" title="Reset"><i class="fa fa-undo"></i></button>
         <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
     </legend>
     <g:select id="folderSelectHtmlId" class="form-control"

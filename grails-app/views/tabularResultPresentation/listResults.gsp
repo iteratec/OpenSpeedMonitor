@@ -24,6 +24,17 @@
                 </div>
             </g:hasErrors>
         </g:if>
+
+        <g:if test="showEventResultsListing">
+
+            <g:render template="listResults"
+                      model="${[model: eventResultsListing]}" />
+
+            <g:render template="pagination"
+                      model="${[model: paginationListing] }" />
+
+        </g:if>
+
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
@@ -65,19 +76,17 @@
                                     'connectivityProfiles'              :connectivityProfiles,
                                     'selectedConnectivityProfiles'      :selectedConnectivityProfiles,
                                     'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles]}"/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                                <i class="fa fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
                 </g:else>
             </div>
         </form>
 
-        <g:if test="showEventResultsListing">
-
-            <g:render template="listResults"
-                  model="${[model: eventResultsListing]}" />
-
-            <g:render template="pagination"
-                model="${[model: paginationListing] }" />
-
-        </g:if>
         <content tag="include.bottom">
             <asset:javascript src="eventresult/eventResult.js"/>
             <asset:script type="text/javascript">

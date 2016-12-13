@@ -71,8 +71,6 @@ class EventResultDashboardPage extends I18nGebPage {
         selectLocationField{$("#selectedLocationsHtmlId_chosen")}
         selectLocationList{$(".active-result")}
         selectAllLocationsButton{$("#selectedAllLocations")}
-        includeNativeConnectivityButton{$("#includeNativeConnectivity")}
-        includeCustomConnectivityButton{$("#includeCustomConnectivity")}
 
         tabJobSelection{$("#tabJobSelectionElement")}
         tabVariableSelection{$("#tabVariableSelectionElement")}

@@ -96,8 +96,10 @@
                             'selectedPages'        : selectedPages
                     ]"/>
                 </div>
+                <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                    <i class="fa fa-undo"></i> Reset
+                </button>
             </div>
-
         </form>
     </div>
 </div>

@@ -8,7 +8,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
-    var resetButtonElement = cardElement.find(".reset-selection");
+    var resetButtonElement = $('.reset-result-selection');
     var pageSelectElement = $("#pageSelectHtmlId");
     var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
     var browserSelectElement = $("#selectedBrowsersHtmlId");

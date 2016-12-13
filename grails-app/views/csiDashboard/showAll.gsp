@@ -290,7 +290,7 @@
                     <div id="filter-navtab-jobGroup">
                         <g:render template="/_resultSelection/selectJobGroupCard"
                                   model="['folders': folders, 'selectedFolder': selectedFolder,
-                                          'tagToJobGroupNameMap': tagToJobGroupNameMap]" />
+                                          'tagToJobGroupNameMap': tagToJobGroupNameMap, 'noAutoUpdate': true]" />
                     </div>
                     <div class="card">
                         <legend>
@@ -334,7 +334,8 @@
                                       'selectedAllLocations'            : selectedAllLocations,
                                       'connectivityProfiles'            : connectivityProfiles,
                                       'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]"/>
+                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
+                                      'noAutoUpdate': true]"/>
                 </div>
             </div>
             <g:if test="${exceedsTimeframeBoundary}">
@@ -362,24 +363,8 @@
 </div>
 
 <content tag="include.bottom">
-    <asset:javascript src="csidashboard/csiDashboard.js"/>
-    <asset:javascript src="iteratecChartRickshaw.js"/>
+    <asset:javascript src="csidashboard/showAll.js"/>
     <asset:script type="text/javascript">
-
-        var pagesToEvents = [];
-        <g:each var="page" in="${pages}">
-        <g:if test="${eventsOfPages[page.id] != null}">
-        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
-        </g:if>
-        </g:each>
-
-        var browserToLocation = [];
-        <g:each var="browser" in="${browsers}">
-        <g:if test="${locationsOfBrowsers[browser.id] != null}">
-        browserToLocation[${browser.id}] = [<g:each var="location"
-                                                            in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
-        </g:if>
-        </g:each>
 
         var selectedCsiSystems = [];
         <g:each var="csiSystem" in="${selectedCsiSystems}">
@@ -414,8 +399,6 @@
 
         $(document).ready(function () {
 
-            initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
-
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             )
@@ -430,6 +413,10 @@
             setAdjustments();
 
         });
+        $(window).load(function() {
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
+        });
+
 
     </asset:script>
 </content>

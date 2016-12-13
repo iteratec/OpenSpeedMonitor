@@ -37,3 +37,16 @@
     min-height: 10em;
     height: 10em;
 }
+
+.table > thead > tr > th.separate-col,
+.table > tbody > tr > td.separate-col {
+    padding-left: 3em;
+}
+
+.table > thead > tr > th.extra-header {
+    border-bottom: 0;
+}
+
+.table > thead > tr > th {
+    border-top: 0;
+}

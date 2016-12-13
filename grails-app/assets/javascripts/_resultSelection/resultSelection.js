@@ -17,7 +17,6 @@ OpenSpeedMonitor.resultSelection = (function(){
     var warningLongProcessing = $('#warning-long-processing');
     var warningNoJobGroupSelected = $('#warning-no-job-group');
     var warningNoPageSelected = $('#warning-no-page');
-    var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
     var currentQueryArgs = {
         from: null,
         to: null,
@@ -31,16 +30,15 @@ OpenSpeedMonitor.resultSelection = (function(){
         customConnectivities: null
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
-    var updatesEnabled = true;
+    var updatesEnabled = false;
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
-    var hasJobGroupSelection = !!$("#folderSelectHtmlId").val();
-    var hasPageSelection = !!$("#pageSelectHtmlId").val();
+    var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
+    var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
     var lastResultCount = 1;
 
     var init = function() {
-        enableUpdates(false);
         registerEvents();
 
         // if the cards are already initialized, we directly update job groups and jobs
@@ -57,7 +55,7 @@ OpenSpeedMonitor.resultSelection = (function(){
             setQueryArgsFromLocationSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getLocationSelection());
             setQueryArgsFromConnectivitySelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getConnectivitySelection());
         }
-        enableUpdates(true);
+        enableUpdates(!selectJobGroupCard.data("noAutoUpdate") || !selectPageLocationConnectivityCard.data("noAutoUpdate"));
         updateCards();
     };
 
@@ -119,27 +117,37 @@ OpenSpeedMonitor.resultSelection = (function(){
         }
         lastUpdateJSON = currentUpdateJSON;
         var resultSelectionUrls = OpenSpeedMonitor.urls.resultSelection;
-        if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
+        var updateStarted = false;
+        if (OpenSpeedMonitor.selectJobGroupCard && !selectJobGroupCard.data("noAutoUpdate") && initiator != "jobGroups") {
             spinnerJobGroup.start();
             updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups, spinnerJobGroup);
+            updateStarted = true;
         }
-        if (initiator != "pages" && initiator != "browsers" && initiator != "connectivity") {
-            spinnerPageLocationConnectivity.start();
+
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && !selectPageLocationConnectivityCard.data("noAutoUpdate")) {
+            if (initiator != "pages" && initiator != "browsers" && initiator != "connectivity") {
+                spinnerPageLocationConnectivity.start();
+            }
+            var spinner = null;
+            if (pageTabElement.length > 0 && initiator != "pages") {
+                spinner = pageTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+                updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents, spinner);
+                updateStarted = true;
+            }
+            if (browserTabElement.length > 0 && initiator != "browsers") {
+                spinner = browserTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+                updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations, spinner);
+                updateStarted = true;
+            }
+            if (connectivityTabElement.length > 0 && initiator != "connectivity") {
+                spinner = connectivityTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
+                updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
+                updateStarted = true;
+            }
         }
-        var spinner = null;
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "pages") {
-            spinner = pageTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
-            updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents, spinner);
+        if (updateStarted) {
+            updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
         }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "browsers") {
-            spinner = browserTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
-            updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations, spinner);
-        }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "connectivity") {
-            spinner = connectivityTabElement.hasClass("active") ? spinnerPageLocationConnectivity : null;
-            updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
-        }
-        updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
     };
 
     var validateForm = function () {

@@ -4,7 +4,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectJobGroupCard = (function() {
     var cardElement = $('#select-jobgroup-card');
-    var resetButtonElement = cardElement.find(".reset-selection");
+    var resetButtonElement = $(".reset-result-selection");
     var tagToJobGroupNameMap = cardElement.data('tagToJobGroupNameMap') || {};
     var jobGroupSelectElement = $('#folderSelectHtmlId');
     var currentOptionValues = [];

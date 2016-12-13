@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat
 class TabularResultPresentationController {
 
     private final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
+    private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
     private final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
@@ -279,7 +280,7 @@ class TabularResultPresentationController {
         result.put('locationsOfBrowsers', locationsOfBrowsers);
 
         // JavaScript-Utility-Stuff:
-        result.put("dateFormat", DATE_FORMAT_STRING)
+        result.put("dateFormat", JAVASCRIPT_DATE_FORMAT_STRING)
         result.put("weekStart", MONDAY_WEEKSTART)
 
         result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
