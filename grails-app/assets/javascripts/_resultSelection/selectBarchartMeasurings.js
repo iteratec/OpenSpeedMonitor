@@ -27,21 +27,8 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     var additionalBarClone = barchartMeasuringCard.find("#measurandSeries-clone");
 
     var init = function () {
-        addCloneChangeListener();
         addBar();
         barchartMeasuringCard.find("#addMeasurandSeriesButton").click(addBar);
-    };
-
-    var addCloneChangeListener = function () {
-        //We already add the listener to the clones to make sure that they
-        //are the first events to be fired, even if there will be additional listeners be added in the future
-        additionalBarClone.find(".firstMeasurandSelect").change(selectionChangeListener);
-        additionalBarClone.find(".addMeasurandButton").click(addMeasurand);
-        additionalBarClone.find(".removeMeasurandButton").click(removeMeasurand);
-        additionalBarClone.find(".removeMeasurandSeriesButton").click(removeSeries);
-
-        additionalMeasurandClone.find(".addMeasurandButton").click(addMeasurand);
-        additionalMeasurandClone.find(".removeMeasurandButton").click(removeMeasurand);
     };
 
     var selectionChangeListener = function (e) {
@@ -71,17 +58,23 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     };
 
     var addBar = function () {
-        var clone = additionalBarClone.clone(true, true);
+        var clone = additionalBarClone.clone();
         clone.removeClass("hidden");
         clone.removeAttr("id");
         clone.addClass("measurandSeries");
+        clone.find(".firstMeasurandSelect").change(selectionChangeListener);
         clone.insertBefore(additionalBarClone);
+        clone.find(".addMeasurandButton").click(addMeasurand);
+        clone.find(".removeMeasurandButton").click(removeMeasurand);
+        clone.find(".removeMeasurandSeriesButton").click(removeSeries);
     };
 
     var addMeasurand = function (e) {
-        var clone = additionalMeasurandClone.clone(true, true);
+        var clone = additionalMeasurandClone.clone();
         clone.removeClass("hidden");
         clone.removeAttr("id");
+        clone.find(".addMeasurandButton").click(addMeasurand);
+        clone.find(".removeMeasurandButton").click(removeMeasurand);
         clone.insertAfter($(e.target).closest(".addMeasurandRow"));
 
         var selectedOptGroupLabel = clone.closest(".panel").find(".firstMeasurandSelect :selected").parent().attr("label");
