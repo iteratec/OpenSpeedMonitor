@@ -1,13 +1,13 @@
 describe("validate csv", function () {
-    POSTLOADED = {};
+    OpenSpeedMonitor.i18n = {};
 
     beforeEach(function () {
-        POSTLOADED.i18n_defaultMappingFormatError = "DefaultMappingFormatError";
-        POSTLOADED.i18n_loadTimeIntegerError = "LoadTimeIntegerError";
-        POSTLOADED.i18n_customerFrustrationDoubleError = "CustomerFrustrationDoubleError";
-        POSTLOADED.i18n_defaultMappingNotAllvaluesError = "DefaultMappingNotAllValuesError";
-        POSTLOADED.i18n_customerSatisfactionNotInPercentError = "CustomerSatisfactionNotInPercentError";
-        POSTLOADED.i18n_percentagesBetween0And1Error = "PercentagesBetween0And1Eroor";
+        OpenSpeedMonitor.i18n.defaultMappingFormatError = "DefaultMappingFormatError";
+        OpenSpeedMonitor.i18n.loadTimeIntegerError = "LoadTimeIntegerError";
+        OpenSpeedMonitor.i18n.customerFrustrationDoubleError = "CustomerFrustrationDoubleError";
+        OpenSpeedMonitor.i18n.defaultMappingNotAllvaluesError = "DefaultMappingNotAllValuesError";
+        OpenSpeedMonitor.i18n.customerSatisfactionNotInPercentError = "CustomerSatisfactionNotInPercentError";
+        OpenSpeedMonitor.i18n.percentagesBetween0And1Error = "PercentagesBetween0And1Eroor";
     });
 
     it("correct csv file return no error message", function () {
@@ -31,7 +31,7 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(1);
-        expect(errorMessages[0]).toBe(POSTLOADED.i18n_percentagesBetween0And1Error);
+        expect(errorMessages[0]).toBe(OpenSpeedMonitor.i18n.percentagesBetween0And1Error);
     });
 
     it("customer satisfaction not in range of 0 and 100 should resolve in error", function () {
@@ -44,7 +44,7 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(1);
-        expect(errorMessages[0]).toBe(POSTLOADED.i18n_customerSatisfactionNotInPercentError);
+        expect(errorMessages[0]).toBe(OpenSpeedMonitor.i18n.customerSatisfactionNotInPercentError);
     });
 
     it("negative customer satisfaction should resolve in error", function () {
@@ -57,9 +57,9 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(3);
-        expect(errorMessages.indexOf(POSTLOADED.i18n_customerSatisfactionNotInPercentError) >= 0).toBeTruthy();
-        expect(errorMessages.indexOf(POSTLOADED.i18n_percentagesBetween0And1Error) >= 0).toBeTruthy();
-        expect(errorMessages.indexOf(POSTLOADED.i18n_customerFrustrationDoubleError) >= 0).toBeTruthy();
+        expect(errorMessages.indexOf(OpenSpeedMonitor.i18n.customerSatisfactionNotInPercentError) >= 0).toBeTruthy();
+        expect(errorMessages.indexOf(OpenSpeedMonitor.i18n.percentagesBetween0And1Error) >= 0).toBeTruthy();
+        expect(errorMessages.indexOf(OpenSpeedMonitor.i18n.customerFrustrationDoubleError) >= 0).toBeTruthy();
     });
 
     it("customer satisfaction not as double should resolve in error", function () {
@@ -72,7 +72,7 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(1);
-        expect(errorMessages[0]).toBe(POSTLOADED.i18n_customerFrustrationDoubleError);
+        expect(errorMessages[0]).toBe(OpenSpeedMonitor.i18n.customerFrustrationDoubleError);
     });
 
     it("load time not as integer should resolve in error", function () {
@@ -85,7 +85,7 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(1);
-        expect(errorMessages[0]).toBe(POSTLOADED.i18n_loadTimeIntegerError);
+        expect(errorMessages[0]).toBe(OpenSpeedMonitor.i18n.loadTimeIntegerError);
     });
 
     it("csv does not contain values between 0 and 20000 in 50ms steps resolve in error", function () {
@@ -97,7 +97,7 @@ describe("validate csv", function () {
 
         var errorMessages = validate(csv);
         expect(errorMessages.length).toBe(1);
-        expect(errorMessages[0]).toBe(POSTLOADED.i18n_defaultMappingNotAllvaluesError);
+        expect(errorMessages[0]).toBe(OpenSpeedMonitor.i18n.defaultMappingNotAllvaluesError);
     });
 });
 

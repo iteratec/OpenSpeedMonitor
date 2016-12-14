@@ -4,7 +4,7 @@
               value="${selectedPages}"
               title="${message(code: 'de.iteratec.isr.wptrd.labels.filterPage')}"/>
 </div>
-<g:if test="${showMeasuredEventForm}">
+<g:if test="${!hideMeasuredEventForm}">
     <div id="filter-measured-event" class="form-group">
         <label for="selectedMeasuredEventsHtmlId">
             <strong>
@@ -19,6 +19,7 @@
                   from="${measuredEvents}"
                   optionKey="id"
                   optionValue="name"
+                  data-parent-child-mapping='${eventsOfPages as grails.converters.JSON}'
                   value="${selectedMeasuredEventIds}"
                   multiple="true"/>
         <label class="checkbox-inline">

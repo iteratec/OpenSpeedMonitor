@@ -2,7 +2,7 @@ describe("OpenSpeedMonitor.onReadyUtils()", function () {
 
     var osmOnReadyUtils;
     beforeEach(function () {
-        osmOnReadyUtils = OpenSpeedMonitor.stringUtils();
+        osmOnReadyUtils = OpenSpeedMonitor.stringUtils;
     });
 
     it("function stringToBoolean(string) provides true for string 'yes'", function () {

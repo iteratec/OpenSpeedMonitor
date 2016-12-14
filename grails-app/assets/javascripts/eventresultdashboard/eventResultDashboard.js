@@ -1,3 +1,2 @@
-//= require osmDashboardDatetimeAndChart.js
+//= require iteratecChartRickshaw.js
 //= require showAll.js
-//= require select-measurings.js

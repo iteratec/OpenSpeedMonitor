@@ -1,3 +1,5 @@
+@import-once "bower_components/bootstrap/less/variables";
+
 // min-heights, margin, and positioning used to make the footer sticky
 html {
   min-height: 100%;
@@ -268,9 +270,10 @@ body {
 }
 .spinnerSmallContainer {
   @spinnerContainerTemplate();
-  right: 0;
-  height: 40px;
-  width: 40px;
+  right: 15px;
+  top: 15px;
+  height: 30px;
+  width: 30px;
 }
 .spinnerBackground {
   height: inherit;
@@ -465,6 +468,37 @@ a.control-label {
   border: 0;
   right: 0;
   z-index: 1040;
+}
+
+.soft-button {
+  padding: 5px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  background: transparent;
+  color: @link-color;
+  border: 0;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.07);
+  }
+}
+
+.reset-result-selection {
+  float: right;
+}
+
+.card-well .reset-result-selection {
+  margin-top: 15px;
+  margin-right: -8px;
+  margin-bottom: -1px;
+}
+
+.hidden-warnings p {
+  display: none;
+  font-weight: bold;
+  padding: 7px 15px;
+  margin: 0 5px 0 0;
+  border-radius: 4px;
+  float: left;
 }
 
 .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}

@@ -109,11 +109,6 @@ OpenSpeedMonitor.Spinner = function(spinnerTargetElement, size) {
         // create the spinner
         spinner = new Spinner(spinnerOptions);
 
-        // create the background
-        var spinnerBackground = $('<div/>');
-        spinnerBackground.addClass('spinnerBackground');
-        spinnerContainer.append(spinnerBackground);
-
         // add spinner DOM elements
         spinnerTargetElement.prepend(spinnerContainer);
     };
@@ -125,6 +120,11 @@ OpenSpeedMonitor.Spinner = function(spinnerTargetElement, size) {
         // spin inserts the spinner div as first element of its target
         // spin needs the actual node, not a jquery object
         spinner.spin(spinnerContainer[0]);
+
+        // create the background
+        var spinnerBackground = $('<div/>');
+        spinnerBackground.addClass('spinnerBackground');
+        spinnerContainer.append(spinnerBackground);
 
         // show the spinner container
         spinnerContainer.css('display', 'block');

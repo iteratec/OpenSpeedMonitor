@@ -18,7 +18,6 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-
 /**
  * <p>
  * Default implementation of {@link de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService}.

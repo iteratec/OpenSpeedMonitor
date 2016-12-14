@@ -12,10 +12,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -27,8 +24,10 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
+
 /**
  * Created by marko on 22.06.16.
  */
@@ -62,51 +61,137 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanUpData()
     }
 
-    void "Nothing selected causes error-message"() {
-        given: "Data is available but neither page nor jobgroup is selected"
+    void "Wrong timeframe causes no data available message"() {
+        given: "User goes to the dashboard page"
         createData()
         to EventResultDashboardPage
 
-        when: "User wants to see a graph"
-        clickShowButton()
-
-        then: "The system shows him a helpful error message"
-        waitFor { at EventResultDashboardPage }
-        waitFor {
-            $("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
-        } //check that the error box appears
-        waitFor {
-            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one job group")
-        } //check that the correct error message is displayed
-    }
-
-    void "Wrong timeframe causes no data available message"() {
-        given: "User selects valid timeframe, page and jobgroup"
-        to EventResultDashboardPage
+        when: "User selects a wrong time frame again"
         timeFrameSelect.click()
         selectDateInDatepicker(fromDatepicker, "21.06.2015")
         selectDateInDatepicker(toDatepicker, "23.06.2015")
-        jobGroupList[0].click()
-        pageList[0].click()
 
-        when: "User wants to see a graph"
-        clickShowButton()
-
-        then: "A graph with a line is shown"
+        then: "The selections show only warnings, a no data warning appears, and the show button is disabled"
         at EventResultDashboardPage
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor {
+            !$("#warning-no-page").displayed
+        }
+        waitFor {
+            $("#warning-no-data").displayed
+        }
+        waitFor {
+            pageList.size() == 1
+            !pageList[0].enabled
+        }
+        waitFor {
+            selectBrowsersList.size() == 1
+            !selectBrowsersList[0].enabled
+        }
+        waitFor {
+            selectConnectivityProfilesList.size() == 1
+            !selectConnectivityProfilesList[0].enabled
+        }
+        waitFor {
+            showButton.disabled
+        }
     }
 
-    void "Valid selection graph is shown"() {
-        given: "User selects valid timeframe, page and jobgroup"
+    void "Only valid options and error messages to select job group and page are shown"() {
+        given: "User is on dashboard page"
         to EventResultDashboardPage
+
+        when: "User selects valid timeframe"
+        timeFrameSelect.click()
+        selectDateInDatepicker(fromDatepicker, "21.06.2016")
+        selectDateInDatepicker(toDatepicker, "23.06.2016")
+
+        then:
+        waitFor {
+            pageList.size() == 1
+            pageList[0].enabled
+        }
+        waitFor {
+            selectBrowsersList.size() == 1
+            selectBrowsersList[0].enabled
+        }
+        waitFor {
+            selectConnectivityProfilesList.size() == 3
+            selectConnectivityProfilesList[0].enabled
+        }
+        waitFor {
+            $("#warning-no-job-group").displayed
+        }
+        waitFor {
+            $("#warning-no-page").displayed
+        }
+        waitFor {
+            !$("#warning-no-data").displayed
+        }
+        waitFor {
+            showButton.disabled
+        }
+    }
+
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "No page selection warning is shown"() {
+        given: "User is on dashboard page"
+        to EventResultDashboardPage
+
+        when: "User selects valid time frame and jobgroup"
+        timeFrameSelect.click()
+        selectDateInDatepicker(fromDatepicker, "21.06.2016")
+        selectDateInDatepicker(toDatepicker, "23.06.2016")
+        jobGroupList[0].click()
+
+        then:
+        waitFor {
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor {
+            $("#warning-no-page").displayed
+        }
+        waitFor {
+            !$("#warning-no-data").displayed
+        }
+        waitFor {
+            showButton.disabled
+        }
+    }
+
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "The user sees no warning on valid selection"() {
+        given: "User is on dashboard page"
+        to EventResultDashboardPage
+
+        when: "User selects time frame, job group and page"
         timeFrameSelect.click()
         selectDateInDatepicker(fromDatepicker, "21.06.2016")
         selectDateInDatepicker(toDatepicker, "23.06.2016")
         jobGroupList[0].click()
         pageList[0].click()
 
-        when: "User wants to see a graph"
+        then:
+        waitFor {
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor {
+            !$("#warning-no-data").displayed
+        }
+        waitFor {
+            !$("#warning-no-page").displayed
+        }
+        waitFor {
+            !showButton.disabled
+        }
+    }
+
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Valid selection graph is shown"() {
+
+        when: "User wants to see the graph"
         clickShowButton()
 
         then: "A graph with a line is shown"
@@ -119,25 +204,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries.size() == 1
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
-    void "NotUsedBrowser leads to no data"(){
-        given: "User selects NotUsedBrowser"
 
-        browserTab.click()
-        waitFor {selectAllBrowserButton.click()}
-        waitFor {selectBrowsersList.displayed}
-        selectBrowsersList[0].click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
         waitFor {selectBrowsersList.displayed}
-        selectBrowsersList[1].click()
+        selectBrowsersList[0].click()
 
         when: "User clicks on \"Show\" button"
         clickShowButton()
@@ -153,6 +226,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Browsers\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -172,23 +246,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    void "NotUsedLocation leads to no data"(){
-        given: "User selects NotUsedLocation"
-        browserTab.click()
-        waitFor {selectAllLocationsButton.displayed}
-        selectAllLocationsButton.click()
-        waitFor {selectLocationField.displayed}
-        selectLocationField.click()
-        waitFor { selectLocationList[0].displayed }
-        selectLocationList[0].click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Location"(){
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -210,6 +268,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Locations\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -229,21 +288,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    void "NotUsedConnectivity leads to no data"(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        waitFor {selectAllConnectivityButton.displayed}
-        selectAllConnectivityButton.click()
-        waitFor {selectConnectivityProfilesList.displayed}
-        selectConnectivityProfilesList[1].click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
-
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for correct Connectivity Profile"(){
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
@@ -262,6 +307,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries.size() == 1
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
+
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for native connectivity"(){
         given: "User selects native connectivity"
         connectivityTab.click()
@@ -287,6 +334,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageTab.click()
     }
 
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for custom connectivity"(){
         given: "User selects custom connectivity"
         connectivityTab.click()
@@ -312,6 +360,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageTab.click()
     }
 
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for \"Select all Connectivity Profiles\""(){
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
@@ -331,7 +380,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    void "Trimm minimal time"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal time"() {
         given: "User defines minimal load time"
 
         clickVariableSelectionTab()
@@ -358,7 +408,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
-    void "Trimm maximal time"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim maximal time"() {
         given: "User defines maximal load time"
         appendedInputAboveLoadTimesTextField << "830"
 
@@ -382,7 +433,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm minimal requests"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal requests"() {
         given: "User defines maximal request count"
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << "3"
@@ -409,7 +461,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm maximal requests"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim maximal requests"() {
         given: "User defines maximal request count"
 
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
@@ -435,7 +488,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm minimal size"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal size"() {
         given: "User defines minimal bytes until doc"
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
         appendedInputBelowRequestSizesTimesTextField << "30"
@@ -462,6 +516,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim maximal size"() {
         given: "User defines maximal bytes until doc"
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
@@ -487,7 +542,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         clearAboveRequestSizeTextField()
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[9].click()
@@ -511,7 +566,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[0].click()
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -536,6 +591,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -559,6 +615,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[2].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Visually complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -582,6 +639,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[4].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Dom time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[5].click()
@@ -604,6 +662,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[5].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Fully loaded time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[6].click()
@@ -627,6 +686,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[7].click()
@@ -649,6 +709,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[7].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[8].click()
@@ -671,6 +732,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[8].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[9].click()
@@ -693,6 +755,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[9].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[10].click()
@@ -715,6 +778,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[10].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[11].click()
@@ -737,6 +801,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[11].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[12].click()
@@ -759,6 +824,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[12].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[13].click()
@@ -780,6 +846,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
+            ResultSelectionInformation.list().each {
+                it.delete()
+            }
             EventResult.list().each {
                 it.delete()
             }
@@ -1075,6 +1144,38 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     location: location1,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
                     noTrafficShapingAtAll: false
+            ).save()
+
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult3.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    connectivityProfile: connectivityProfile,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: false
+            ).save()
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult2.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
+                    noTrafficShapingAtAll: false
+            ).save()
+            new ResultSelectionInformation(
+                    jobResultDate: jobResult3.date,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: true
             ).save()
         }
 

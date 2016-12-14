@@ -32,5 +32,4 @@ databaseChangeLog = {
     }
 
     // ### END Refactoring of tag attribute ###
-
 }

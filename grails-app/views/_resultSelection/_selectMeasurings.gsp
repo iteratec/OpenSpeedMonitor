@@ -46,6 +46,5 @@ GSP-Template Mappings:
                       'selectedAllLocations'            : selectedAllLocations,
                       'connectivityProfiles'            : connectivityProfiles,
                       'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                      'showExtendedConnectivitySettings': true]"/>
+                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]"/>
 </div>

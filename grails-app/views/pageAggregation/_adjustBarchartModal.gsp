@@ -70,17 +70,33 @@
                 <div class="form-group row">
                     <div class="checkbox col-sm-offset-3">
                         <label>
-                            <input type="checkbox" id="inputShowGridlines"> Show Gridlines
+                            <input type="checkbox" id="inputShowGridlines"><g:message
+                                code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
+                                default="Show Gridlines"/>
                         </label>
                     </div>
+
                     <div class="checkbox col-sm-offset-3">
                         <label>
-                            <input type="checkbox" id="inputShowYAxis"> Show y-Axis
+                            <input type="checkbox" id="inputShowYAxis"><g:message
+                                code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
+                                default="Show y-Axis"/>
                         </label>
                     </div>
+
                     <div class="checkbox col-sm-offset-3">
                         <label>
-                            <input type="checkbox" id="inputShowXAxis"> Show x-Axis
+                            <input type="checkbox" id="inputShowXAxis"><g:message
+                                code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
+                                default="Show x-Axis"/>
+                        </label>
+                    </div>
+
+                    <div class="checkbox col-sm-offset-3">
+                        <label>
+                            <input type="checkbox" id="inputShowBarLabels"><g:message
+                                code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
+                                default="Show Barlabels"/>
                         </label>
                     </div>
                 </div>
@@ -120,6 +136,7 @@
         $("#inputShowXAxis").prop("checked", chart.getShowXAxis());
         $("#inputShowYAxis").prop("checked", chart.getShowYAxis());
         $("#inputShowGridlines").prop("checked", chart.getShowGridlines());
+        $("#inputShowBarLabels").prop("checked", chart.getShowBarLabels());
         $("#assign-color-container").empty();
         $("#y-axis-alias-container").empty();
         var colorAssignments = chart.getColorAssignments();

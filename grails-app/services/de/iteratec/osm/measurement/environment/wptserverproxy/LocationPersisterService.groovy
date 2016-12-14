@@ -57,29 +57,62 @@ class LocationPersisterService implements iLocationListener {
         log.info("Location.count before creating non-existent= ${Location.count()}")
         def query
         result.data.location.each { locationTagInXml ->
-            Browser browserOfLocation = browserService.findByNameOrAlias(locationTagInXml.Browser.toString())
-            query = Location.where {
-                wptServer == wptserverForLocation && browser == browserOfLocation && uniqueIdentifierForServer == locationTagInXml.id.toString()
+            List<Location> locations
+            if(locationTagInXml.Browsers.size()!= 0){
+                List<String> browserNames = locationTagInXml.Browsers.toString().split(",")
+                List<Browser> browsersOfLocation = []
+                browserNames.each{
+                    browsersOfLocation.add(browserService.findByNameOrAlias(it))
+                }
+                locations = Location.findAllByWptServerAndBrowserInListAndUniqueIdentifierForServer(wptserverForLocation, browsersOfLocation,locationTagInXml.id.toString())
+                if (locations.size() == 0) {
+                    browsersOfLocation.each {Browser browser ->
+                        Location newLocation = new Location(
+                                active: true,
+                                valid: 1,
+                                uniqueIdentifierForServer: locationTagInXml.id.toString()+":"+browser.name, // z.B. Agent1-wptdriver:Chrome
+                                location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
+                                label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
+                                browser: browser,//z.B. Firefox
+                                wptServer: wptserverForLocation,
+                                dateCreated: new Date(),
+                                lastUpdated: new Date()
+                        ).save(failOnError: true);
+                        addedLocations << newLocation
+                        log.info("new location written while fetching locations: ${newLocation}")
+                    }
+
+                } else if (locations.size() > 1) {
+                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
+                }
             }
 
-            List<Location> locations = query.list();
+            else{ // only maintained for compatibility with WPT 2.18 //TODO: throw out when WPT 2.18 is not supported anymore
+                println(locationTagInXml.Browser.toString())
+                Browser browserOfLocation = browserService.findByNameOrAlias(locationTagInXml.Browser.toString())
+                query = Location.where {
+                    wptServer == wptserverForLocation && browser == browserOfLocation && uniqueIdentifierForServer == locationTagInXml.id.toString()
+                }
 
-            if (locations.size() == 0) {
-                Location newLocation = new Location(
-                        active: true,
-                        valid: 1,
-                        uniqueIdentifierForServer: locationTagInXml.id.toString(), // z.B. Agent1-wptdriver:Chrome
-                        location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
-                        label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
-                        browser: browserOfLocation,//z.B. Firefox
-                        wptServer: wptserverForLocation,
-                        dateCreated: new Date(),
-                        lastUpdated: new Date()
-                ).save(failOnError: true);
-                addedLocations << newLocation
-                log.info("new location written while fetching locations: ${newLocation}")
-            } else if (locations.size() > 1) {
-                log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
+                locations = query.list();
+
+                if (locations.size() == 0) {
+                    Location newLocation = new Location(
+                            active: true,
+                            valid: 1,
+                            uniqueIdentifierForServer: locationTagInXml.id.toString(), // z.B. Agent1-wptdriver:Chrome
+                            location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
+                            label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
+                            browser: browserOfLocation,//z.B. Firefox
+                            wptServer: wptserverForLocation,
+                            dateCreated: new Date(),
+                            lastUpdated: new Date()
+                    ).save(failOnError: true);
+                    addedLocations << newLocation
+                    log.info("new location written while fetching locations: ${newLocation}")
+                } else if (locations.size() > 1) {
+                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
+                }
             }
 
         }

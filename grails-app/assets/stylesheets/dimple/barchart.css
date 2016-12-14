@@ -19,3 +19,11 @@
 #chart-container {
     position: relative;
 }
+
+#filter-dropdown-group {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    z-index: 500;
+    padding: 6px 12px;
+}

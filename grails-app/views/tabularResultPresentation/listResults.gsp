@@ -24,12 +24,24 @@
                 </div>
             </g:hasErrors>
         </g:if>
+
+        <g:if test="showEventResultsListing">
+
+            <g:render template="listResults"
+                      model="${[model: eventResultsListing]}" />
+
+            <g:render template="pagination"
+                      model="${[model: paginationListing] }" />
+
+        </g:if>
+
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
-                    <g:actionSubmit class="btn btn-primary pull-right"
+                    <g:actionSubmit class="btn btn-primary pull-right" id="show-button"
                                     value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
                                     action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" />
+                    <g:render template="/_resultSelection/hiddenWarnings" />
                 </div>
             </div>
             <div class="row card-well">
@@ -63,47 +75,24 @@
                                     'selectedAllLocations'              :selectedAllLocations,
                                     'connectivityProfiles'              :connectivityProfiles,
                                     'selectedConnectivityProfiles'      :selectedConnectivityProfiles,
-                                    'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles,
-                                    'showExtendedConnectivitySettings'  : true]}"/>
+                                    'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles]}"/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                                <i class="fa fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
                 </g:else>
             </div>
         </form>
 
-        <g:if test="showEventResultsListing">
-
-            <g:render template="listResults"
-                  model="${[model: eventResultsListing]}" />
-
-            <g:render template="pagination"
-                model="${[model: paginationListing] }" />
-
-        </g:if>
         <content tag="include.bottom">
             <asset:javascript src="eventresult/eventResult.js"/>
             <asset:script type="text/javascript">
-
-                var pagesToEvents = [];
-                <g:each var="page" in="${pages}">
-                    <g:if test="${eventsOfPages[page.id] != null}">
-                        pagesToEvents[${page.id}]= [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
-                    </g:if>
-                </g:each>
-
-                var browserToLocation = [];
-                <g:each var="browser" in="${browsers}">
-                    <g:if test="${locationsOfBrowsers[browser.id] != null}">
-                        browserToLocation[${browser.id}]=[ <g:each var="location"
-                                                                   in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
-                    </g:if>
-                </g:each>
-
-                initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
-
-                $(document).ready(
-                    doOnDomReady(
-                        '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
-                    )
-                );
+                $(window).load(function() {
+                   OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
+                });
             </asset:script>
         </content>
     </body>

@@ -29,12 +29,12 @@ function validate(csv) {
     var allCustomerSatisfactions = [];
     var errorList = [];
     // Get I18N error messages
-    var formatError = POSTLOADED.i18n_defaultMappingFormatError;
-    var intError = POSTLOADED.i18n_loadTimeIntegerError;
-    var doubleError = POSTLOADED.i18n_customerFrustrationDoubleError;
-    var notEveryValueError = POSTLOADED.i18n_defaultMappingNotAllvaluesError;
-    var customerSatisfactionNotInPercentError = POSTLOADED.i18n_customerSatisfactionNotInPercentError;
-    var percentagesBetween0And1Error = POSTLOADED.i18n_percentagesBetween0And1Error;
+    var formatError = OpenSpeedMonitor.i18n.defaultMappingFormatError;
+    var intError = OpenSpeedMonitor.i18n.loadTimeIntegerError;
+    var doubleError = OpenSpeedMonitor.i18n.customerFrustrationDoubleError;
+    var notEveryValueError = OpenSpeedMonitor.i18n.defaultMappingNotAllvaluesError;
+    var customerSatisfactionNotInPercentError = OpenSpeedMonitor.i18n.customerSatisfactionNotInPercentError;
+    var percentagesBetween0And1Error = OpenSpeedMonitor.i18n.percentagesBetween0And1Error;
 
     for (var i = 1; i < allTextLines.length; i++) {
         // exclude empty lines
@@ -124,7 +124,7 @@ function checkForNeedToOverwrite(csv) {
     $.ajax({
         type: 'POST',
         dataType: "json",
-        url: POSTLOADED.link_getNamesOfDefaultMappings,
+        url: OpenSpeedMonitor.urls.getNamesOfDefaultMappings,
         success: function (response) {
             checkOverwrite(response, csv);
         },
@@ -150,7 +150,7 @@ function checkOverwrite(names, csv) {
         $("#warningsOverwriting").text("");
         for (var y in existingNames) {
             var warning = existingNames[y];
-            $("#warningsOverwriting").append(warning + " " + POSTLOADED.i18n_overwritingWarning + "<br/>");
+            $("#warningsOverwriting").append(warning + " " + OpenSpeedMonitor.i18n.overwritingWarning + "<br/>");
         }
     }
     $("#defaultMappingUploadButton").prop("disabled", false);

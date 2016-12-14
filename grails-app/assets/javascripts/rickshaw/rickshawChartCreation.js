@@ -67,7 +67,7 @@ function RickshawGraphBuilder(args) {
                 top: args.top
             });
         self.initializeEventListeners();
-    }
+    };
 
     this.addDataLabels = function () {
         if (($('#to-enable-label').is(':checked')) && (!this.dataLabelsHaveBeenAdded)) {
@@ -107,7 +107,7 @@ function RickshawGraphBuilder(args) {
             });
             this.dataLabelsHaveBeenAdded = true;
         }
-    }
+    };
 
     this.updateDataLabels = function () {
         //remove labels
@@ -117,18 +117,18 @@ function RickshawGraphBuilder(args) {
         //re-add labels
         this.dataLabelsHaveBeenAdded = false;
         self.addDataLabels();
-    }
+    };
 
     this.update = function () {
         self.xAxis.updateXAxis();
         self.removeGrid();
         self.updateYAxes();
         self.updateDataLabels();
-    }
+    };
 
     this.updateBorders = function (args) {
         self.graph.updateBorders(args);
-    }
+    };
 
     this.updateSize = function (args) {
 
@@ -223,7 +223,7 @@ function RickshawGraphBuilder(args) {
                 axisContainer.removeClass("disabledYAxis");
             }
         });
-    }
+    };
 
     this.updateColorsOfSeries = function (args) {
         /*
@@ -247,7 +247,7 @@ function RickshawGraphBuilder(args) {
         self.graph.render();
         // TODO Slider.Preview zeigt dennoch die alten Farben an
         self.initializeSlider();
-    }
+    };
 
     this.updateDrawPointMarkers = function (drawPointMarkers) {
         if (drawPointMarkers) {
@@ -256,7 +256,7 @@ function RickshawGraphBuilder(args) {
         } else {
             $("#rickshaw_chart > .pointMarker").remove();
         }
-    }
+    };
 
     this.updateDrawPointLabels = function (drawPointLabels) {
         $(".dataLabel").each(function (index) {
@@ -266,7 +266,7 @@ function RickshawGraphBuilder(args) {
         if (drawPointLabels) {
             self.addDataLabels();
         }
-    }
+    };
 
     this.initializeGraph = function (args) {
         self.graph = new Rickshaw.Graph({
@@ -280,12 +280,12 @@ function RickshawGraphBuilder(args) {
             drawPointMarkers: args.drawPointMarkers,
             drawPointLabels: args.drawPointLabels
         });
-    }
+    };
 
     this.initializeHoverDetail = function () {
         var xFormatter = function (x) {
             return new Date(x * 1000).toLocaleString();
-        }
+        };
         var hoverDetail = new Rickshaw.Graph.HoverDetail({
             xFormatter: xFormatter,
             graph: self.graph
@@ -305,7 +305,7 @@ function RickshawGraphBuilder(args) {
                     name = aliasDiv.find("#alias").val();
                 }
                 // highlight the value of the active point
-                var optionalHighlighting = "<tr>"
+                var optionalHighlighting = "<tr>";
                 if (point == activePoint) {
                     optionalHighlighting = "<tr class=\"highlighted_detail_value\">";
                 }
@@ -322,7 +322,7 @@ function RickshawGraphBuilder(args) {
                 "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
                 "</table>";
         };
-    }
+    };
 
     this.initializeAnnotator = function (args) {
         var annotator = new Rickshaw.Graph.Annotate({
@@ -335,7 +335,7 @@ function RickshawGraphBuilder(args) {
             }
             annotator.update();
         }
-    }
+    };
 
     this.initializeLegend = function () {
         self.legend = new Rickshaw.Graph.Legend({
@@ -347,14 +347,14 @@ function RickshawGraphBuilder(args) {
             graph: self.graph,
             legend: self.legend
         });
-    }
+    };
 
     this.initializeSlider = function () {
         self.slider = new Rickshaw.Graph.RangeSlider.Preview({
             graph: self.graph,
             element: document.querySelector("#rickshaw_slider")
         });
-    }
+    };
 
     this.initializeYAxes = function (args) {
         var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
@@ -380,7 +380,7 @@ function RickshawGraphBuilder(args) {
             });
             self.yAxes.push(axis);
         }
-    }
+    };
 
     this.removeGrid = function () {
         // delete x-axis-grid
@@ -403,10 +403,10 @@ function RickshawGraphBuilder(args) {
                 }
             }
         });
-    }
+    };
 
     this.composeSeries = function (data) {
-        var measurandGroups = []
+        var measurandGroups = [];
         var series = [];
         var scale = d3.scale.linear().domain([0, 1]);
         var palette = new Rickshaw.Color.Palette({
@@ -437,10 +437,10 @@ function RickshawGraphBuilder(args) {
             if ($.inArray(dataTupleList[i][1].measurandGroup, measurandGroups) == -1) {
                 measurandGroups.push(dataTupleList[i][1].measurandGroup);
             }
-        };
+        }
         series.numberOfMeasurandGroups = measurandGroups.length;
         return series;
-    }
+    };
 
     this.initializeEventListeners = function() {
         $(window).resize(function() {
@@ -452,7 +452,7 @@ function RickshawGraphBuilder(args) {
                 height: 'auto'
             });
         });
-    }
+    };
 
     this.initialize(args);
     self.updateSize(args);
@@ -472,19 +472,19 @@ function XAxis(args) {
             orientation: 'bottom',
             element: document.getElementById('rickshaw_x-axis')
         });
-    }
+    };
 
     this.updateXAxis = function () {
         self.setNumberOfTicks();
         self.setTickValueLabels();
         self.rickshawXAxis.render();
         self.formatXAxisLabels();
-    }
+    };
 
     this.setNumberOfTicks = function () {
         var width = self.graph.width;
         self.NUMBER_OF_TICKS = Math.floor(width / 80);
-    }
+    };
 
     this.setTickValueLabels = function () {
         var DAYS = [];
@@ -683,7 +683,7 @@ function XAxis(args) {
         }
 
         self.rickshawXAxis.tickValues = tickValuesResult;
-    }
+    };
 
     this.getYearsInRange = function (minDate, maxDate) {
         var years = [];
@@ -705,7 +705,7 @@ function XAxis(args) {
             }
         }
         return years;
-    }
+    };
 
     this.getMonthsInRange = function (minDate, maxDate) {
         var months = [];
@@ -724,7 +724,7 @@ function XAxis(args) {
             }
         }
         return months;
-    }
+    };
 
     this.getDaysInRange = function (minDate, maxDate) {
         var days = [];
@@ -743,7 +743,7 @@ function XAxis(args) {
             }
         }
         return days;
-    }
+    };
 
     this.getHoursInRange = function (minDate, maxDate) {
         var hours = [];
@@ -760,7 +760,7 @@ function XAxis(args) {
             }
         }
         return hours;
-    }
+    };
 
     this.getMinutesInRange = function (minDate, maxDate) {
         var minutes = [];
@@ -776,7 +776,7 @@ function XAxis(args) {
             }
         }
         return minutes;
-    }
+    };
 
     this.getDefaultTickValues = function (minDate, maxDate) {
         var dif = maxDate.getTime() - minDate.getTime();
@@ -788,7 +788,7 @@ function XAxis(args) {
             tickValues.push(tick / 1000);
         }
         return tickValues;
-    }
+    };
 
     this.formatXAxisLabels = function () {
         // Converts the strings "_nl_" into new lines
@@ -804,12 +804,12 @@ function XAxis(args) {
                         tspan.attr('x', 0).attr('dy', '15');
                 }
             });
-    }
+    };
 
     this.getDateISO = function (date) {
         return date.getFullYear() + "-" + (date.getMonth() + 1) + "-"
             + date.getDate();
-    }
+    };
 
     this.getTimeString = function (date) {
         var result = date.getHours();
@@ -821,7 +821,7 @@ function XAxis(args) {
             result = result + ":" + date.getMinutes();
         }
         return result;
-    }
+    };
 
     this.increaseMonth = function (date) {
         if (date.getMonth() == 11) {
@@ -830,7 +830,7 @@ function XAxis(args) {
         } else {
             date.setMonth(date.getMonth() + 1);
         }
-    }
+    };
 
     this.increaseDay = function (date) {
         var month = date.getMonth() + 1;
@@ -841,7 +841,7 @@ function XAxis(args) {
             } else {
                 date.setDate(date.getDate() + 1);
             }
-        }
+        };
 
         if (month == 2) {
             if (date.getFullYear() % 4 == 0) {
@@ -854,7 +854,7 @@ function XAxis(args) {
         } else {
             increase(date, 30);
         }
-    }
+    };
 
     this.increaseHour = function (date) {
         if (date.getHours() == 23) {
@@ -863,7 +863,7 @@ function XAxis(args) {
         } else {
             date.setHours(date.getHours() + 1);
         }
-    }
+    };
 
     this.increaseMinute = function (date) {
         if (date.getMinutes() == 59) {
@@ -872,7 +872,7 @@ function XAxis(args) {
         } else {
             date.setMinutes(date.getMinutes() + 1);
         }
-    }
+    };
 
     this.initialize(args);
 }
@@ -897,7 +897,7 @@ function YValueFormatter() {
         }
 
         return result;
-    }
+    };
 
     this.getFormatterForLoadTimes = function (measurandGroup) {
         var result = {};
@@ -922,7 +922,7 @@ function YValueFormatter() {
             };
         }
         return result;
-    }
+    };
 
     this.getFormatterForRequestSizes = function (measurandGroup) {
         var result = {};
@@ -933,7 +933,7 @@ function YValueFormatter() {
         if (dif >= measurandGroup.NUMBER_OF_YAXIS_TICKS) {
             result.forAxis = function (y) {
                 return y;
-            }
+            };
             result.forAxis.unit = "[kb]";
             result.forHoverDetail = function (y) {
                 return parseFloat(y).toFixed(0);
@@ -948,7 +948,7 @@ function YValueFormatter() {
             };
         }
         return result;
-    }
+    };
 
     this.getFormatterForRequestCounts = function () {
         var result = {};
@@ -958,9 +958,9 @@ function YValueFormatter() {
         result.forAxis.unit = "[c]";
         result.forHoverDetail = function (y) {
             return parseFloat(y).toFixed(0);
-        }
+        };
         return result;
-    }
+    };
 
     this.getFormatterForPercentages = function () {
         var result = {};
@@ -970,20 +970,20 @@ function YValueFormatter() {
         result.forAxis.unit = "[%]";
         result.forHoverDetail = function (y) {
             return parseFloat(y).toFixed(2);
-        }
+        };
         return result;
-    }
+    };
 
     this.getDefaultFormatter = function () {
         var result = {};
 
         result.forAxis = function (y) {
             return y;
-        }
+        };
         result.forAxis.unit = "";
         result.forHoverDetail = function (y) {
             return parseFloat(y).toFixed(0);
-        }
+        };
 
         return result;
     }
@@ -1002,13 +1002,13 @@ function HtmlProvider(args) {
         self._generateRightYAxes();
         self._setHeightOfChartContainer();
         self._setWidthOfHtmlComponents();
-    }
+    };
 
     this._generateLeftYAxis = function () {
         var height = self.HEIGHT_OF_CHART;
         $("#rickshaw_yAxis_0").height(height).append(
             "<div class=\"rickshaw_y-axis_left_label\"> </div>");
-    }
+    };
 
     this._generateRightYAxes = function () {
         var height = self.HEIGHT_OF_CHART;
@@ -1027,13 +1027,13 @@ function HtmlProvider(args) {
             $('<div>').addClass("rickshaw_y-axis_right_label").html("")
                 .appendTo($("#" + id));
         }
-    }
+    };
 
     this._setHeightOfChartContainer = function () {
         $("#rickshaw_chart").css({
             "height": self.HEIGHT_OF_CHART + "px"
         });
-    }
+    };
 
     this._setWidthOfHtmlComponents = function () {
         var WIDTH_OF_SINGLE_YAXIS = $(".rickshaw_y-axis_left").width();
@@ -1086,7 +1086,7 @@ function HtmlProvider(args) {
         $("#rickshaw_slider").css({
             "width": eval(parseInt(widthOfGraph) + 10) + "px"
         });
-    }
+    };
     this.initialize(args);
 }
 
@@ -1099,7 +1099,7 @@ function ChartAdjuster(graphBuilder, args) {
         self.createYAxisAdjuster(args);
         self.addFunctionalityShowDataMarker();
         self.addFunctionalityShowDataLabels();
-    }
+    };
 
     this.registerEventHandlers = function () {
         $('#adjustChartApply').bind('click', function () {
@@ -1114,14 +1114,14 @@ function ChartAdjuster(graphBuilder, args) {
         aliasChildList.bind("graphAliasColorChanged", function (event, nameAndColor) {
             self.graphBuilder.updateColorsOfSeries(nameAndColor);
         });
-    }
+    };
 
     this.updateSize = function () {
-        var diaWidth = $('#dia-width').val()
-        var diaHeight = $('#dia-height').val()
-        var maxWidth = 5000
-        var minWidth = 540
-        var maxHeight = 3000
+        var diaWidth = $('#dia-width').val();
+        var diaHeight = $('#dia-height').val();
+        var maxWidth = 5000;
+        var minWidth = 540;
+        var maxHeight = 3000;
         var widthNumeric = $.isNumeric(diaWidth) &&
             parseInt(diaWidth) <= maxWidth &&
             parseInt(diaWidth) >= minWidth;
@@ -1152,7 +1152,7 @@ function ChartAdjuster(graphBuilder, args) {
                 .alert("Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
             return false
         }
-    }
+    };
 
     this.createYAxisAdjuster = function (args) {
         var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
@@ -1177,7 +1177,7 @@ function ChartAdjuster(graphBuilder, args) {
             inputMax.val("auto");
         });
         blankYAxisAdjuster.remove();
-    }
+    };
 
     this.updateAllYAxis = function () {
         var success = true;
@@ -1185,7 +1185,7 @@ function ChartAdjuster(graphBuilder, args) {
             success = self.updateOneYAxis(el) && success
         });
         return success;
-    }
+    };
 
     this.updateOneYAxis = function(container) {
         container = $(container);
@@ -1214,14 +1214,14 @@ function ChartAdjuster(graphBuilder, args) {
             window.alert("Minimum and maximum of Y-Axis has to be \"auto\" or numeric values and maximum must be greater than minimum!");
         }
         return valid;
-    }
+    };
 
     this.addFunctionalityShowDataMarker = function () {
         $('#to-enable-marker').bind('change', function () {
             var toEnableMarkers = $(this).is(':checked');
             self.graphBuilder.updateDrawPointMarkers(toEnableMarkers);
         });
-    }
+    };
 
     this.addFunctionalityShowDataLabels = function () {
         $('#to-enable-label').bind('change', function () {
@@ -1233,7 +1233,7 @@ function ChartAdjuster(graphBuilder, args) {
                 self.graphBuilder.updateDrawPointLabels(toEnableLabels);
             }
         });
-    }
+    };
 
     this.initialize(graphBuilder, args);
 }
@@ -1467,7 +1467,7 @@ function ChartExporter(args) {
                 } // handle IE
             });
         });
-    }
+    };
 
     this.renameChildNodeIds = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
@@ -1477,7 +1477,7 @@ function ChartExporter(args) {
                 child.id = "workingCopy_" + child.id;
             }
         }
-    }
+    };
 
     this.assignAllRelevantCssToStyleAttributes = function () {
         d3.selectAll("#rickshaw_y-axes_right").style({
@@ -1527,7 +1527,7 @@ function ChartExporter(args) {
             "font-family": "Helvetica,Arial,sans-serif",
             "line-height": "20px",
         });
-    }
+    };
 
     this.modifyStylesForRendering = function () {
         d3.select("#originalGraph").selectAll("#rickshaw_x-axis").style({
@@ -1543,7 +1543,7 @@ function ChartExporter(args) {
             "-ms-transform": "none", /* IE9 */
             "transform": "none", /* W3C */
         });
-    }
+    };
 
     this.modifyStylesAfterRendering = function () {
         d3.select("#originalGraph").selectAll(".rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label").style({
@@ -1553,7 +1553,7 @@ function ChartExporter(args) {
             "-ms-transform": "rotate(-90deg)", /* IE9 */
             "transform": "rotate(-90deg)", /* W3C */
         });
-    }
+    };
 
     this.renderDomElementOnNewCanvasWithDelay = function (domElement, newCanvasId, deferrer) {
         html2canvas(domElement, {
@@ -1566,7 +1566,7 @@ function ChartExporter(args) {
             width: 3000,
             height: 5000
         });
-    }
+    };
 
 
     this.resizeGraphTo = function (width, height, deferrer) {
@@ -1589,7 +1589,7 @@ function ChartExporter(args) {
             });
         }
         deferrer.resolve();
-    }
+    };
 
     this.renderSvgElementOnNewCanvasWithDelay = function (svgElement, newCanvasId, deferrer) {
         var html2 = svgElement.clone().wrapAll("<div/>").parent().html();
@@ -1639,7 +1639,7 @@ function ChartExporter(args) {
         useMe = document.querySelector(sourceCanvasId);
         targetContext.drawImage(useMe, distanceLeft, distanceTop);
         removeObjectFromDom(sourceCanvasId);
-    }
+    };
 
     this.mergeLabelCanvases = function (originalElement, sourceCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft) {
         ctx.save();
@@ -1655,7 +1655,7 @@ function ChartExporter(args) {
         ctx.drawImage(useMe, (((originalElement.width()) / 2) * -1), (((originalElement.height()) / 2) * -1));
         removeObjectFromDom(sourceCanvasId);
         ctx.restore();
-    }
+    };
 
     this.initialize(args);
 }
@@ -1663,5 +1663,6 @@ function ChartExporter(args) {
 // escapes special characters
 //
 function makeValidSelector(identifier) {
-    return identifier.replace(/(:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
+    return identifier.replace(/(\^|\!|\"|\$|\&|\(|\)|\{|\}|\?|\\|\`|\=|\¸|\,|\*|\+|\~|\'|\#|\-|\_|\.|\:|\,|\;|\<|\>|\/|:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
+
 }

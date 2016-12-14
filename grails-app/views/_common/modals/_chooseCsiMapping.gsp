@@ -3,7 +3,7 @@ This is a dialog to choose from different default csi mappings.
 -->
 <%@ defaultCodec="none" %>
 <!-- Modal dialog -->
-<div id="CsiMappingModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" onshow="POSTLOADED.setDeleteConfirmationInformations('${controllerLink}')";>
+<div id="CsiMappingModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" onshow="OpenSpeedMonitor.postLoaded.setDeleteConfirmationInformations('${controllerLink}')";>
     <div id="csiMappingModalDialog" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

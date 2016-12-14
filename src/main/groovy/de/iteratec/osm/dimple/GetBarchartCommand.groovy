@@ -3,10 +3,11 @@ package de.iteratec.osm.dimple
 import grails.databinding.BindUsing
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
+import org.joda.time.DateTime
 
 class GetBarchartCommand implements Validateable {
-    Date from
-    Date to
+    DateTime from
+    DateTime to
 
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['selectedPages'])

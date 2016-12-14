@@ -15,16 +15,9 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.schedule.dao;
+package de.iteratec.osm.measurement.schedule.dao
 
-import de.iteratec.osm.measurement.schedule.JobGroup;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import de.iteratec.osm.measurement.schedule.JobGroup
 /**
  * <p>
  * An data-access object (DAO) for {@link de.iteratec.osm.measurement.schedule.JobGroup}.

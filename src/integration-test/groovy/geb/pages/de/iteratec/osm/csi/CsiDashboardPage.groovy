@@ -54,9 +54,9 @@ class CsiDashboardPage extends I18nGebPage{
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
         customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
         customDashboardSelectionList { $("#customDashBoardSelection") }
-        pageTab{$("a",href:"#tab1")}
-        browserTab{$("a",href:"#tab2")}
-        connectivityTab{$("a",href:"#tab3")}
+        pageTab{$("a",href:"#page-tab")}
+        browserTab{$("a",href:"#browser-tab")}
+        connectivityTab{$("a",href:"#connectivity-tab")}
     }
 
     public void clickSaveAsDashboardButton() {

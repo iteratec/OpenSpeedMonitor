@@ -17,9 +17,12 @@
 
 package de.iteratec.osm.util
 
-import grails.converters.JSON;
-import org.springframework.http.HttpStatus;
-import javax.servlet.http.HttpServletResponse;
+import grails.converters.JSON
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * <p>
@@ -44,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
  * @since IT-106
  */
 class ControllerUtils {
+	static Logger log = LoggerFactory.getLogger(ControllerUtils.class)
 
 	/**
 	 * <p>
@@ -91,10 +95,13 @@ class ControllerUtils {
 		response.setContentType('text/plain;charset=UTF-8')
 		response.status = httpStatus.value()
 
-		Writer textOut = new OutputStreamWriter(response.getOutputStream())
-		textOut.write(message)
-		textOut.flush()
-		response.getOutputStream().flush()
+		try {
+			response.getOutputStream().withWriter {
+				it.write(message)
+			}
+		} catch (IOException e) {
+			log.info("Error writing HTTP response stream", e)
+		}
 	}
 
 	/**
