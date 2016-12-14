@@ -27,6 +27,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var init = function () {
         // add eventHandler
         window.onresize = function () {
+            calcChartWidth();
             resize();
         };
     };
@@ -99,7 +100,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         chart.addLegend(legendPosition.x, legendPosition.y, legendPosition.width, legendPosition.height, "right");
         draw(false);
-        initWidth();
+        calcChartWidth();
         resize();
 
         addBarLabels(barchartData);
@@ -202,7 +203,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
     };
 
-    var initWidth = function () {
+    var calcChartWidth = function () {
         var maxWidth, containerWidth;
 
         containerWidth = $("#" + chartIdentifier).width();
