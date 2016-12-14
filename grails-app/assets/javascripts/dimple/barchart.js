@@ -293,37 +293,20 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var addBarLabels = function (barchartData) {
-        // barchartData:
-        // stacked: true
-        // [[6],[3]]
-        // stacked: false
-        // [[6],[3]]
-
-        // bar.series:
-        // stacked: true
-        // [[6],[3]]
-        // stacked: false
-        // [[3],[3],[3]]
-
-        // allMeasurandSeries:
-        // stacked: true
-        // [0,1] -> [[0],[0]]
-        // stacked: false
-        // [0,1] -> [[[0],[1]],[0]]
-
         for (var barIndex in allMeasurandSeries) {
-            allMeasurandSeries[barIndex].forEach( function (seriesIndex) {
+            allMeasurandSeries[barIndex].forEach( function (seriesID, seriesIndex) {
                 // create labels group container
-                var currentSeriesLabelClass = "dimple-series-group-" + seriesIndex.toString() + "-labels";
+                var currentSeriesLabelClass = "dimple-series-group-" + seriesID.toString() + "-labels";
                 chart.svg.append("g").attr("class", currentSeriesLabelClass);
 
-                var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesIndex).selectAll("rect");
+                var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesID).selectAll("rect");
                 currentSeriesRects[0].forEach( function (rectangle, rectangleIndex) {
                     // get the unit
                     // stacked/overlayed bars can only be of the same dimensional unit, therefore accessing the first is sufficient
                     var unit = barchartData.series[barIndex].dimensionalUnit;
                     // get the measurand value and format it
-                    var value = barchartData.series[barIndex].data[rectangleIndex].indexValue.toString();
+                    var barchartSeriesDataIndex = seriesIndex * currentSeriesRects[0].length + rectangleIndex;
+                    var value = barchartData.series[barIndex].data[barchartSeriesDataIndex].indexValue.toString();
                     value = (unit == "%") ? parseFloat(value).toFixed(1) : Math.round(value);
 
                     // set the label
@@ -338,7 +321,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
                         .attr("class", "bar-label");
                 });
                 // move labels if necessary
-                var currentSeriesLabels = d3.selectAll(".dimple-series-group-" + seriesIndex + "-labels").selectAll("text");
+                var currentSeriesLabels = d3.selectAll(".dimple-series-group-" + seriesID + "-labels").selectAll("text");
                 var width = parseInt(currentSeriesRects.attr("width"));
                 var translateX = barIndex * width;
                 currentSeriesLabels.attr("transform", "translate(" + translateX + ", 0)");
