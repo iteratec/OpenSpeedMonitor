@@ -76,6 +76,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Document Complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         timeFrameSelect.click()
@@ -103,6 +104,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
 
@@ -119,6 +121,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { chartTitle == "CustomTitle" }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Size to illegal values"() {
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
@@ -136,6 +139,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         result == "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Size"() {
         given: "User edits chart size"
         chartWidthInputField.firstElement().clear()
@@ -163,7 +167,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         graphYGridLastTick == "840"
     }
 
-    //TODO:
     @Ignore("Not yet sure how to trigger the js part")
     void "Add graph alias"() {
         given: "User clicks on the add graph aliases button"
@@ -179,7 +182,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { graphName == "CustomAlias" }
     }
 
-    //TODO:
     @Ignore("Not yet sure how to trigger the js part")
     void "Change Graph color"() {
         when: "User changes graph color"
@@ -195,7 +197,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { graphColorField == 'background-color: rgb(170, 170, 170);' }
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Section"() {
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
@@ -223,6 +225,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         graphYGridLastTick == "600"
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Markers"() {
         given: "User clicked adjust chart"
         waitFor { adjustChartButton.click() }
@@ -243,6 +246,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { dataMarker.attr("style").contains("top: 543px; left: 216px;") }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Labels"() {
         given: "User clicked adjust chart"
         waitFor { adjustChartButton.click() }
@@ -265,7 +269,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         }
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Save custom dashboard"() {
         given: "User clicked on \"Save as dashboard\"-button"
         clickSaveAsDashboardButton()
@@ -289,6 +293,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load custom dashboard"() {
         given: "User visits the EventResultDashboardPage"
         to EventResultDashboardPage

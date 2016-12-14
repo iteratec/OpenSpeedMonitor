@@ -135,6 +135,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "No page selection warning is shown"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
@@ -160,6 +161,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "The user sees no warning on valid selection"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
@@ -186,6 +188,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Valid selection graph is shown"() {
 
         when: "User wants to see the graph"
@@ -202,6 +205,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -222,6 +226,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Browsers\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -241,6 +246,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Location"(){
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -262,6 +268,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Locations\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -281,7 +288,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("Needs to get fixed in [IT-1415]")
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for correct Connectivity Profile"(){
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
@@ -301,7 +308,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("Needs to get fixed in [IT-1415]")
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for native connectivity"(){
         given: "User selects native connectivity"
         connectivityTab.click()
@@ -327,7 +334,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageTab.click()
     }
 
-    @Ignore("Needs to get fixed in [IT-1415]")
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for custom connectivity"(){
         given: "User selects custom connectivity"
         connectivityTab.click()
@@ -353,7 +360,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         pageTab.click()
     }
 
-    @Ignore("Needs to get fixed in [IT-1415]")
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for \"Select all Connectivity Profiles\""(){
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
@@ -373,7 +380,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    void "Trimm minimal time"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal time"() {
         given: "User defines minimal load time"
 
         clickVariableSelectionTab()
@@ -400,7 +408,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
-    void "Trimm maximal time"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim maximal time"() {
         given: "User defines maximal load time"
         appendedInputAboveLoadTimesTextField << "830"
 
@@ -424,7 +433,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm minimal requests"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal requests"() {
         given: "User defines maximal request count"
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << "3"
@@ -451,7 +461,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm maximal requests"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim maximal requests"() {
         given: "User defines maximal request count"
 
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
@@ -477,7 +488,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    void "Trimm minimal size"() {
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    void "Trim minimal size"() {
         given: "User defines minimal bytes until doc"
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
         appendedInputBelowRequestSizesTimesTextField << "30"
@@ -504,6 +516,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim maximal size"() {
         given: "User defines maximal bytes until doc"
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
@@ -529,7 +542,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         clearAboveRequestSizeTextField()
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[9].click()
@@ -553,7 +566,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[0].click()
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -578,6 +591,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -601,6 +615,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[2].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Visually complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
@@ -624,6 +639,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[4].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Dom time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[5].click()
@@ -646,6 +662,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[5].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Fully loaded time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[6].click()
@@ -669,6 +686,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[7].click()
@@ -691,6 +709,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[7].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[8].click()
@@ -713,6 +732,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[8].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[9].click()
@@ -735,6 +755,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[9].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[10].click()
@@ -757,6 +778,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[10].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[11].click()
@@ -779,6 +801,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[11].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[12].click()
@@ -801,6 +824,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         firstViewList[12].click()
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         firstViewList[13].click()

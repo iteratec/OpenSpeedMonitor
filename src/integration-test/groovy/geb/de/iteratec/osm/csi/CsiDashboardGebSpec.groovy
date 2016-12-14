@@ -125,6 +125,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "NotUsedBrowser leads to no data"() {
         given: "User selects NotUsedBrowser"
         waitFor { browserTab.click() }
@@ -191,6 +192,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "NotUsedLocation leads to no data"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -259,6 +261,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "NotUsedConnectivity leads to no data"() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
@@ -275,6 +278,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
+    @Ignore("[IT-1415] need to implement new connectivity selection")
     void "Graph is shown for correct Connectivity Profile"() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()

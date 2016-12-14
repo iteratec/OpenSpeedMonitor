@@ -6,6 +6,7 @@ OpenSpeedMonitor.SelectWithSelectAllCheckBox = function(selectElement, checkBoxE
     checkBoxElement = $(checkBoxElement);
     selectElement = $(selectElement);
 
+    console.log("Checkbox initialized");
     if (!checkBoxElement.length || !selectElement.length) {
         return;
     }
@@ -23,6 +24,7 @@ OpenSpeedMonitor.SelectWithSelectAllCheckBox = function(selectElement, checkBoxE
 
     selectElement.on('change', function() {
         var hasSelection = selectElement.find('option:selected').length;
+        console.log("Checkbox changed: " + hasSelection);
         checkBoxElement.prop('checked', !hasSelection);
         selectElement.css({opacity: hasSelection ? 1.0 : 0.5});
         selectElement.trigger("chosen:updated");
