@@ -215,12 +215,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         var $filterDropdownGroup = $("#filter-dropdown-group");
         var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
 
+        // remove old filter
+        $filterDropdownGroup.find('.filterRule').remove();
+
         if ($filterDropdownGroup.hasClass("hidden"))
             $filterDropdownGroup.removeClass("hidden");
 
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li><a href='#'>" + filterRuleKey + "</a></li>");
+                var link = $("<li class='filterRule'><a href='#'>" + filterRuleKey + "</a></li>");
                 link.click(function (e) {
                     filterCustomerJourney(e.target.innerText);
                 });
@@ -294,13 +297,13 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
     var addBarLabels = function (barchartData) {
         for (var barIndex in allMeasurandSeries) {
-            allMeasurandSeries[barIndex].forEach( function (seriesID, seriesIndex) {
+            allMeasurandSeries[barIndex].forEach(function (seriesID, seriesIndex) {
                 // create labels group container
                 var currentSeriesLabelClass = "dimple-series-group-" + seriesID.toString() + "-labels";
                 chart.svg.append("g").attr("class", currentSeriesLabelClass);
 
                 var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesID).selectAll("rect");
-                currentSeriesRects[0].forEach( function (rectangle, rectangleIndex) {
+                currentSeriesRects[0].forEach(function (rectangle, rectangleIndex) {
                     // get the unit
                     // stacked/overlayed bars can only be of the same dimensional unit, therefore accessing the first is sufficient
                     var unit = barchartData.series[barIndex].dimensionalUnit;
