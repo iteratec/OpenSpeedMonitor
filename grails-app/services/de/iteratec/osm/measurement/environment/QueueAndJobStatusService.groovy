@@ -28,7 +28,6 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -45,11 +44,11 @@ import org.quartz.CronExpression
 class QueueAndJobStatusService {
 
     HttpRequestService httpRequestService
-    EventResultDaoService eventResultDaoService
     I18nService i18nService
     JobService jobService
     JobDaoService jobDaoService
     PageService pageService
+    BrowserService browserService
 
     /**
      * Retrieves only those locations for the given WebPageTestServer from the database which are also returned
@@ -63,9 +62,14 @@ class QueueAndJobStatusService {
         List locations = []
         if (locationsResponse != null) {
             locationsResponse.data.location.each { locationTagInXml ->
-                Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, locationTagInXml.id.text())
-                if (location)
-                    locations << [location: location, tag: locationTagInXml]
+                List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
+                List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
+                browsersForLocation.each { Browser currentBrowser ->
+                    String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
+                    Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, uniqueIdentfierForServer)
+                    if (location)
+                        locations << [location: location, tag: locationTagInXml]
+                }
             }
 
         }

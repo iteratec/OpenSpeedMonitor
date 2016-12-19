@@ -49,18 +49,21 @@ class LocationPersisterService implements iLocationListener {
         List<Location> addedLocations = []
 
         log.info("Location.count before creating non-existent= ${Location.count()}")
+        List<String> locationIdentifiersForWptServer = []
         result.data.location.each { locationTagInXml ->
             List<Location> locations
             // for wpt versions above 2.18 there is a Browsers-Attribute
             List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
             List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
             browsersForLocation.each { currentBrowser ->
-                List<Location> locationsForCurrentBrowserAndWptServer = Location.findAllByWptServerAndUniqueIdentifierForServerAndBrowser(wptserverForLocation, locationTagInXml.id.toString(), currentBrowser)
+                String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
+                locationIdentifiersForWptServer << uniqueIdentfierForServer
+                List<Location> locationsForCurrentBrowserAndWptServer = Location.findAllByWptServerAndUniqueIdentifierForServerAndBrowser(wptserverForLocation, uniqueIdentfierForServer, currentBrowser)
                 if (!locationsForCurrentBrowserAndWptServer) {
                     Location newLocation = new Location(
                             active: true,
                             valid: 1,
-                            uniqueIdentifierForServer: locationTagInXml.id.toString(), // z.B. Agent1-wptdriver
+                            uniqueIdentifierForServer: uniqueIdentfierForServer, // z.B. Agent1-wptdriver:Firefox
                             location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
                             label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
                             browser: currentBrowser,//z.B. Firefox
@@ -74,26 +77,29 @@ class LocationPersisterService implements iLocationListener {
                     log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${currentBrowser}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
                 }
             }
-            deactivateLocations(wptserverForLocation, locationTagInXml.id.toString(), browsersForLocation)
         }
+
+        deactivateLocations(wptserverForLocation, locationIdentifiersForWptServer)
+
         log.info("Location.count after creating non-existent= ${Location.count()}")
 
         return addedLocations
     }
 
     /**
-     * Deactivates all stored locations which no longer exist for webPageTestServer
+     * Deactivates all stored locations which no longer exist for given webPageTestServer
      * @param webPageTestServer the webPageTestServer
-     * @param uniqueIdentifierForServer the identifier for the location
-     * @param browsers all browsers which still exist
+     * @param uniqueIdentifiersForServer the locationIdentifiers for the webPageTestServer
      */
-    void deactivateLocations(WebPageTestServer webPageTestServer, String uniqueIdentifierForServer, List<Browser> browsers) {
-        List<Location> allLocations = Location.findAllByWptServerAndUniqueIdentifierForServer(webPageTestServer, uniqueIdentifierForServer)
-        allLocations.each { currentLocation ->
-            if (!(currentLocation.browser in browsers) && currentLocation.active) {
-                currentLocation.active = false
-                currentLocation.save(failOnError: true)
-            }
+    void deactivateLocations(WebPageTestServer webPageTestServer, List<String> uniqueIdentifiersForServer) {
+        List<Location> locationsToDeactivate = Location.createCriteria().list {
+            eq('wptServer', webPageTestServer)
+            not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersForServer) }
+            eq('active', true)
+        }
+        locationsToDeactivate.each { currentLocation ->
+            currentLocation.active = false
+            currentLocation.save(failOnError: true)
         }
     }
 }

@@ -215,14 +215,16 @@ class PersistingLocationsTests {
         Browser browser1 = Browser.list()[0]
         Browser browser2 = Browser.list()[1]
 
-        TestDataUtil.createLocation(server1, "location", browser1, true)
-        TestDataUtil.createLocation(server1, "location", browser2, true)
+        TestDataUtil.createLocation(server1, "location:${browser1.name}", browser1, true)
+        TestDataUtil.createLocation(server1, "location:${browser2.name}", browser2, true)
 
         assertEquals(2, Location.count())
         assertEquals([true, true], Location.list()*.active)
 
+        List<String> identifiers = ["location:${browser1.name}"]
+
         // test execution
-        serviceUnderTest.deactivateLocations(server1, "location", [browser1])
+        serviceUnderTest.deactivateLocations(server1, identifiers)
 
         assertEquals(true, Location.findByBrowser(browser1).active)
         assertEquals(false, Location.findByBrowser(browser2).active)
