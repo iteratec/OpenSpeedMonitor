@@ -30,7 +30,8 @@
 
                 <div>
                     <g:if test="${mode == 'edit'}">
-                        <g:actionSubmit class="btn btn-primary" action="update"
+                        <input type="button" class="btn btn-primary"
+                                        onclick="checkForNewPageOrMeasuredEventNames();"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
                         <g:actionSubmit class="btn btn-primary" action="save"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
@@ -66,6 +67,7 @@
                     linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                     linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
                     linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
+                    linkCheckForNewPageOrMeasuredEventNames: '${createLink(action: 'getNewPagesAndMeasuredEvents', absolute: true)}',
                     readonly: false
                 });
                 function promptForDuplicateName() {
@@ -79,6 +81,18 @@
                     } else {
                         return false;
                     }
+                }
+                function saveScript(){
+
+                }
+                function  displayPrompt(newPageAndMeasuredEventMap) {
+                    var promptText = "";
+                    if (newPageAndMeasuredEventMap.newPageNames!="") promptText +="The following pages do not exist yet and will be created: "+ newPageAndMeasuredEventMap.newPageNames+"\n"
+                    if (newPageAndMeasuredEventMap.newMeasuredEventNames) promptText += "The following measuredEvents do not exist yet and will be created: "+newPageAndMeasuredEventMap.newMeasuredEventNames
+                    var shouldCreate = confirm(promptText);
+                }
+                function checkForNewPageOrMeasuredEventNames() {
+                    editor.checkForNewPageOrMeasuredEventNames(displayPrompt);
                 }
             </asset:script>
         </content>

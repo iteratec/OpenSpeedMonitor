@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
@@ -59,7 +60,7 @@ class ScriptController {
 	}
 	
 	def create() {
-		[script: new Script(params), measuredEvents: MeasuredEvent.findAllByNameNotLike("% %") as JSON]
+		[script: new Script(params),pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON]
 	}
 	
 	def save() {
@@ -78,7 +79,7 @@ class ScriptController {
 		Script script = Script.get(params.id)
 		redirectIfNotFound(script, params.id)
 		// only MeasuredEvents whose names do not contain spaces
-		[script: script, measuredEvents: MeasuredEvent.findAllByNameNotLike("% %") as JSON]
+		[script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON]
 	}
 	
 	def update() {
@@ -144,6 +145,32 @@ class ScriptController {
 			content = script.getParsedNavigationScript(job)
 		}
 		ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
+	}
+
+	def getNewPagesAndMeasuredEvents(String navigationScript){
+		ScriptParser parser = new ScriptParser(pageService, navigationScript)
+		def eventNames = parser.eventNames
+		Set<String> newPageNames = []
+		Set<String> newMeasuredEventNames = []
+
+		eventNames.each {String eventName ->
+			def page
+			def measuredEvent
+			if(eventName.contains(":::")) {
+				def splittedEventName = eventName.split(":::")
+				page = splittedEventName[0]
+				measuredEvent = splittedEventName[1]
+			}else {
+				measuredEvent = eventName
+			}
+			if(page) if(Page.countByName(page) == 0 ) newPageNames.add(page)
+			if(MeasuredEvent.countByName(measuredEvent) == 0 ) newMeasuredEventNames.add(measuredEvent)
+
+		}
+		ControllerUtils.sendObjectAsJSON(response, [
+				newPageNames: newPageNames,
+				newMeasuredEventNames: newMeasuredEventNames
+		])
 	}
 
 }

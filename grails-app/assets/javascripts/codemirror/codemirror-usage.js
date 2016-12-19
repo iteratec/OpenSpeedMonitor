@@ -24,6 +24,7 @@ function CodemirrorEditor(data) {
     this.linkParseScriptAction = data.linkParseScriptAction;
     this.linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
     this.linkGetScriptSource = data.linkGetScriptSource;
+    this.linkCheckForNewPageOrMeasuredEventNames = data.linkCheckForNewPageOrMeasuredEventNames;
     this.markedLines;
     this.measuredEvents = data.measuredEvents;
     this.idCodemirrorElement = data.idCodemirrorElement;
@@ -199,6 +200,22 @@ function CodemirrorEditor(data) {
             editorInMethodScope.removeLineClass(lineNumber, 'background', null);
         });
         this.markedLines = [];
+    }
+    this.checkForNewPageOrMeasuredEventNames = function(displayPrompt) {
+        var codeMirrorEditor = this;
+
+        $.ajax({
+            type : 'GET',
+            url : codeMirrorEditor.linkCheckForNewPageOrMeasuredEventNames,
+            data: { navigationScript: codeMirrorEditor.editor.getValue() },
+            success : function(result) {
+                console.log(result)
+                displayPrompt (JSON.parse(result));
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                return ""
+            }
+        });
     }
 
     this.init();
