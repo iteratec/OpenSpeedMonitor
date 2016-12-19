@@ -1,5 +1,5 @@
 //= require /bower_components/d3/d3.min.js
-//= require /bower_components/dimple/dist/dimple.latest.min.js
+//= require /bower_components/dimple/dist/dimple.v2.2.0.js
 
 "use strict";
 
