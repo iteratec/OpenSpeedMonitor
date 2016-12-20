@@ -53,7 +53,7 @@ function CodemirrorEditor(data) {
             codemirrorEditor.editor.refresh();
         });
         // Create a Javascript array with all MeasuredEvents for auto complete
-        CodeMirror.measuredEvents = []
+        CodeMirror.measuredEvents = [];
         for (index = 0; index < this.measuredEvents.length; ++index) {
             CodeMirror.measuredEvents.push({
                 text: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name,
@@ -130,7 +130,7 @@ function CodemirrorEditor(data) {
 
 
 
-    }
+    };
 
     this.updateWarnings = function() {
         var codeMirrorEditor = this;
@@ -181,27 +181,27 @@ function CodemirrorEditor(data) {
                 codeMirrorEditor.clearGutterAndLines();
             }
         });
-    }
+    };
 
     this.loadNewContent = function(content) {
         this.clearGutterAndLines();
         this.editor.getDoc().setValue(content);
-    }
+    };
 
     this.markLine = function(lineNumber, cssClass) {
         this.editor.addLineClass(lineNumber, 'background', cssClass);
         this.markedLines.push(lineNumber);
-    }
+    };
 
     this.clearGutterAndLines = function() {
         this.editor.clearGutter('setEventName-warning-gutter');
-        var editorInMethodScope = this.editor
+        var editorInMethodScope = this.editor;
         this.markedLines.map(function (lineNumber) {
             editorInMethodScope.removeLineClass(lineNumber, 'background', null);
         });
         this.markedLines = [];
-    }
-    this.checkForNewPageOrMeasuredEventNames = function(displayPrompt) {
+    };
+    this.checkForNewPageOrMeasuredEventNames = function(displayPrompt, saveScript) {
         var codeMirrorEditor = this;
 
         $.ajax({
@@ -209,14 +209,15 @@ function CodemirrorEditor(data) {
             url : codeMirrorEditor.linkCheckForNewPageOrMeasuredEventNames,
             data: { navigationScript: codeMirrorEditor.editor.getValue() },
             success : function(result) {
-                console.log(result)
-                displayPrompt (JSON.parse(result));
+                var parsedResult = JSON.parse(result);
+                if (parsedResult.newPageNames.length > 0|| parsedResult.newMeasuredEventNames.length > 0) displayPrompt (parsedResult);
+                else saveScript();  // Without new pages/measuredEvents we can save the script directly
             },
             error : function(XMLHttpRequest, textStatus, errorThrown) {
                 return ""
             }
         });
-    }
+    };
 
     this.init();
 

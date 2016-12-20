@@ -16,6 +16,26 @@
         <g:render template="/layouts/mainMenu"/>
 
         <section id="${mode}-script" class="first">
+            <!-- Modal -->
+            <div id="showCreateModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">${message(code: 'script.validation.create.confirmation.title')}</h4>
+                        </div>
+                        <div class="modal-body" id="createModalBody"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="saveScript()">${message(code: 'default.button.create.label', default: 'Create')}</button>
+                            <button type="button" class="btn btn-error" data-dismiss="modal"><g:message code="default.button.cancel.label" default="Cancel"/></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>
 
@@ -27,12 +47,12 @@
                 <fieldset class="form">
                     <g:render template="form"/>
                 </fieldset>
-
                 <div>
                     <g:if test="${mode == 'edit'}">
                         <input type="button" class="btn btn-primary"
                                         onclick="checkForNewPageOrMeasuredEventNames();"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
+                        <g:actionSubmit value="!" style="display: none" action="update" id="updateScriptActionSubmit"/>
                         <g:actionSubmit class="btn btn-primary" action="save"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
                                         onclick="return promptForDuplicateName();"/>
@@ -40,6 +60,7 @@
                     <g:elseif test="${mode == 'create'}">
                         <g:actionSubmit class="btn btn-primary" action="save"
                                         value="${message(code: 'default.button.create.label', default: 'Create')}"/>
+                        <g:actionSubmit value="!" style="display: none" action="update" id="saveScriptActionSubmit"/>
                     </g:elseif>
 
                     <a href="<g:createLink action="list"/>" class="btn btn-warning"
@@ -71,6 +92,7 @@
                     readonly: false
                 });
                 function promptForDuplicateName() {
+
                     var newName = prompt(
                             encodeURIComponent(OpenSpeedMonitor.i18n.duplicatePrompt),
                             encodeURIComponent($('input#label').val() + OpenSpeedMonitor.i18n.duplicateSuffix)
@@ -83,16 +105,17 @@
                     }
                 }
                 function saveScript(){
-
+                    if ("${mode}" == "edit") $("#updateScriptActionSubmit").click();
+                    else if ("${mode}" == "create") $("#saveScriptActionSubmit").click();
                 }
                 function  displayPrompt(newPageAndMeasuredEventMap) {
-                    var promptText = "";
-                    if (newPageAndMeasuredEventMap.newPageNames!="") promptText +="The following pages do not exist yet and will be created: "+ newPageAndMeasuredEventMap.newPageNames+"\n"
-                    if (newPageAndMeasuredEventMap.newMeasuredEventNames) promptText += "The following measuredEvents do not exist yet and will be created: "+newPageAndMeasuredEventMap.newMeasuredEventNames
-                    var shouldCreate = confirm(promptText);
+                    $("#createModalBody").empty();
+                    if (newPageAndMeasuredEventMap.newPageNames!="") $("#createModalBody").append($("<p>",{html:"${message(code: 'script.validation.create.confirmation.page')}"+ newPageAndMeasuredEventMap.newPageNames}));
+                    if (newPageAndMeasuredEventMap.newMeasuredEventNames) $("#createModalBody").append($("<p>",{html:"${message(code: 'script.validation.create.confirmation.measuredEvent')}"+newPageAndMeasuredEventMap.newMeasuredEventNames}));
+                    $('#showCreateModal').modal('show');
                 }
                 function checkForNewPageOrMeasuredEventNames() {
-                    editor.checkForNewPageOrMeasuredEventNames(displayPrompt);
+                    editor.checkForNewPageOrMeasuredEventNames(displayPrompt, saveScript);
                 }
             </asset:script>
         </content>

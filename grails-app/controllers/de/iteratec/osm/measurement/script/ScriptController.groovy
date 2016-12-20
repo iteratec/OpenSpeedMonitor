@@ -103,6 +103,14 @@ class ScriptController {
 			render(view: 'edit', model: [script: s])
 			return
 		}
+		def (Set<String> newPageNames, Map<String,String> newMeasuredEventNames) = extractNewPagesAndMeasuredEvents(s.navigationScript)
+		newPageNames.each {String name ->
+			Page.findOrSaveByName(name)
+		}
+		newMeasuredEventNames.each {String measuredEventName, String pageName ->
+			def page = Page.findByName(pageName)
+			MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
+		}
 
 		flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
 		redirect(action: 'edit',  id: s.id)
@@ -148,29 +156,38 @@ class ScriptController {
 	}
 
 	def getNewPagesAndMeasuredEvents(String navigationScript){
+		def (Set<String> newPageNames, Map<String,String> newMeasuredEventNames) = extractNewPagesAndMeasuredEvents(navigationScript)
+		ControllerUtils.sendObjectAsJSON(response, [
+				newPageNames: newPageNames,
+				newMeasuredEventNames: newMeasuredEventNames.keySet()
+		])
+	}
+
+	private List extractNewPagesAndMeasuredEvents(String navigationScript) {
 		ScriptParser parser = new ScriptParser(pageService, navigationScript)
 		def eventNames = parser.eventNames
 		Set<String> newPageNames = []
-		Set<String> newMeasuredEventNames = []
+		Map<String,String> newMeasuredEventNames = [:]
 
-		eventNames.each {String eventName ->
-			def page
+		eventNames.each { String eventName ->
+			def page = "undefined"
 			def measuredEvent
-			if(eventName.contains(":::")) {
+			if (eventName.contains(":::")) {
 				def splittedEventName = eventName.split(":::")
 				page = splittedEventName[0]
 				measuredEvent = splittedEventName[1]
-			}else {
+			} else {
 				measuredEvent = eventName
 			}
-			if(page) if(Page.countByName(page) == 0 ) newPageNames.add(page)
-			if(MeasuredEvent.countByName(measuredEvent) == 0 ) newMeasuredEventNames.add(measuredEvent)
+			if (page != "undefined") {
+				if (Page.countByName(page) == 0) {
+					newPageNames.add(page)
+					newMeasuredEventNames[measuredEvent]= page
+				}
+			} else if (MeasuredEvent.countByName(measuredEvent) == 0) newMeasuredEventNames[measuredEvent] = page
 
 		}
-		ControllerUtils.sendObjectAsJSON(response, [
-				newPageNames: newPageNames,
-				newMeasuredEventNames: newMeasuredEventNames
-		])
+		[newPageNames, newMeasuredEventNames]
 	}
 
 }
