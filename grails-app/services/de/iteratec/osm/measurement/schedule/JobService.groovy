@@ -111,6 +111,7 @@ class JobService {
         job.label = job.label + "_deleted_id_" + job.id
         job.active = false
         job.deleted = true
+        job.script = null
         job.save(failOnError: true, flush: true)
     }
 
