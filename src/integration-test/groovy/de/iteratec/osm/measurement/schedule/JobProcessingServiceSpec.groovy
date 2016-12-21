@@ -33,6 +33,7 @@ import grails.transaction.Rollback
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.http.HttpVersion
 import org.apache.http.message.BasicHttpResponse
+import org.joda.time.DateTime
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
@@ -195,6 +196,31 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         jobProcessingService.unscheduleJob(activeJob2)
     }
 
+    void "closeRunningAndPengingJobs test"() {
+        given:
+        DateTime currentDate = new DateTime(2016, 12, 12, 0, 0)
+        DateTime maxDate = currentDate.minusHours(24)
+        Job notOfInterest = createJob(false)
+
+        TestDataUtil.createJobResult("running test", currentDate.toDate(), notOfInterest, location, 100)
+        TestDataUtil.createJobResult("pending test", currentDate.toDate(), notOfInterest, location, 101)
+        TestDataUtil.createJobResult("outdated running test", currentDate.minusDays(3).toDate(), notOfInterest, location, 100)
+        TestDataUtil.createJobResult("outdated pending test", currentDate.minusDays(5).toDate(), notOfInterest, location, 101)
+        TestDataUtil.createJobResult("finished test", currentDate.minusDays(5).toDate(), notOfInterest, location, 200)
+        TestDataUtil.createJobResult("failed test", currentDate.minusDays(5).toDate(), notOfInterest, location, 504)
+
+        when: "closing running and pending job results"
+        jobProcessingService.closeRunningAndPengingJobResults(maxDate.toDate())
+
+        then:
+        JobResult.findByTestId("running test").httpStatusCode == 100
+        JobResult.findByTestId("pending test").httpStatusCode == 101
+        JobResult.findByTestId("outdated running test").httpStatusCode == 900
+        JobResult.findByTestId("outdated pending test").httpStatusCode == 900
+        JobResult.findByTestId("finished test").httpStatusCode == 200
+        JobResult.findByTestId("failed test").httpStatusCode == 504
+    }
+
     /**
      * Tests the following methods of JobProcessingService:
      * 	getCurrentlyRunningJobs
@@ -221,13 +247,13 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         // cause quartz scheduling doesn't seem to work trustable in tests
         Job.withNewTransaction {
             job = jobDaoService.getJobById(jobId)
-        jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
+            jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
         }
         TriggerKey subtriggerKey
 
         Job.withNewTransaction {
             // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
-             subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
+            subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         }
         Trigger subtrigger
         // no Job in  JobStore, because no Triger was created --> returns null

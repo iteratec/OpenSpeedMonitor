@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.result.CachedView;
+import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.WptXmlResultVersion
 import groovy.util.slurpersupport.GPathResult
 
@@ -204,4 +204,7 @@ class WptResultXml {
 
     }
 
+    boolean hasRuns() {
+        return responseNode.data.runs.toString().isInteger()
+    }
 }
