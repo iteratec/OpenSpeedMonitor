@@ -135,9 +135,9 @@ class PaginationService {
 			'action': 'listResults',
 			'params': [
 						'selectedTimeFrameInterval': 0,
-						'from': fmtDate.format(cmd.getFrom()),
+						'from': cmd.getFrom()?fmtDate.format(cmd.getFrom()):null,
 						'fromHour': cmd.getFromHour(),
-						'to': fmtDate.format(cmd.getTo()),
+						'to': cmd.getTo()?fmtDate.format(cmd.getTo()):null,
 						'toHour': cmd.getToHour(),
 						'selectedFolder': cmd.getSelectedFolder(),
 						'selectedPages': cmd.getSelectedPages(),
