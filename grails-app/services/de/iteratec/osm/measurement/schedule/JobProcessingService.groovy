@@ -550,8 +550,13 @@ class JobProcessingService {
     /**
      * Setting the http status code of running and pending jobResults older than maxDate
      */
-    void closeRunningAndPengingJobResults(Date maxDate) {
-        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200, maxDate)
+    void closeRunningAndPengingJobResults() {
+        DateTime currentDate = new DateTime()
+        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(200)
+        jobResults = jobResults.findAll {
+            // Close the jobResult, if its job timeout is exceeded by twice the amount
+            currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
+        }
         if (jobResults) {
             jobResults.each {
                 it.httpStatusCode = 900

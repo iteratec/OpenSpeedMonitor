@@ -16,16 +16,12 @@
 */
 
 package de.iteratec.osm.measurement.schedule
-
-import org.joda.time.DateTime
-
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
  * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
  */
 class CloseRunningAndPendingJobResultsJob {
 
-    public static final int maxAgeOfRunningAndPendingJobResultsInHours = 24
     JobProcessingService jobProcessingService
 
     static triggers = {
@@ -39,7 +35,6 @@ class CloseRunningAndPendingJobResultsJob {
      * Entrypoint for all the dynamically scheduled and unscheduled quartz triggers
      */
     def execute() {
-        DateTime maxDate = new DateTime().minusHours(maxAgeOfRunningAndPendingJobResultsInHours)
-        jobProcessingService.closeRunningAndPengingJobResults(maxDate.toDate())
+        jobProcessingService.closeRunningAndPengingJobResults()
     }
 }
