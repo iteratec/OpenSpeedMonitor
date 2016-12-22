@@ -9,6 +9,7 @@
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management"/></g:elseif>
+<g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unnknown"/></g:else>
 
@@ -59,6 +60,10 @@
                 <li class="controller ${controllerName.equals('connectivityProfile') ? 'active' : ''}">
                     <g:link controller="connectivityProfile" action="list"><i class="fa fa-globe"></i> <g:message
                             code="connectivityProfile.label.plural"/></g:link>
+                </li>
+                <li class="controller ${controllerName.equals('jobResult') ? 'active' : ''}">
+                    <g:link controller="jobResult" action="listFailed"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <g:message
+                            code="de.iteratec.osm.failedJobResults.buttonToPage" default="Failed JobResults"/></g:link>
                 </li>
             </g:if>
 

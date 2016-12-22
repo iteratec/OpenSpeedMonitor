@@ -275,6 +275,7 @@ grails:
                             {pattern: '/job/getRunningAndRecentlyFinishedJobs',         access: ["permitAll"]},
                             {pattern: '/job/nextExecution',                             access: ["permitAll"]},
                             {pattern: '/job/getLastRun',                                access: ["permitAll"]},
+                            {pattern: '/jobResult/**',                                  access: ["permitAll"]},
                             {pattern: '/script/list',                                   access: ["permitAll"]},
                             {pattern: '/register/*',                                    access: ["permitAll"]},
                             {pattern: '/queueStatus/list',                              access: ["permitAll"]},

@@ -46,7 +46,7 @@
                           model="${['date': job.lastRun, 'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),
                                     'url': createLink(controller: 'tabularResultPresentation', action: 'listResultsForJob', params: ['job.id': job.id], absolute: true)]}" />
                 <br>
-                <a href="#" data-toggle="popover" title="${g.message(code: 'de.iteratec.osm.job.status.description.title', default: 'State') + ': ' + job.label}"
+                <a href="/jobResult/listFailed?jobId=${job.id}" data-toggle="popover" title="${g.message(code: 'de.iteratec.osm.job.status.description.title', default: 'State') + ': ' + job.label}"
                    data-placement="bottom" data-trigger="hover" data-html="true" data-content="${render(template: "jobStatusBarHoverInfo")}">
                     <g:render template="jobStatusBar"
                               model="${[
