@@ -21,7 +21,7 @@
                                            value="${selectedAggrGroupValuesUnCached}"/>
 
                 <div class="col-sm-2">
-                    <a href="#" class="addMeasurandButton">
+                    <a href="#/" class="addMeasurandButton">
                         <i class="fa fa-lg fa-plus-circle"></i>
                     </a>
                 </div>
@@ -56,10 +56,10 @@
                                    value="${selectedAggrGroupValuesUnCached}"/>
 
         <div class="col-sm-2">
-            <a href="#" class="addMeasurandButton">
+            <a href="#/" class="addMeasurandButton">
                 <i class="fa fa-lg fa-plus-circle"></i>
             </a>
-            <a href="#" class="removeMeasurandButton">
+            <a href="#/" class="removeMeasurandButton">
                 <i class="fa fa-lg fa-minus-circle"></i>
             </a>
         </div>
@@ -68,7 +68,7 @@
     <div class="row">
         <div class="col-sm-2">
             <br/>
-            <a href="#" id="addMeasurandSeriesButton" class="btn btn-xs btn-primary">
+            <a href="#/" id="addMeasurandSeriesButton" class="btn btn-xs btn-primary">
                 <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
                            default="add measurand series"/></a>
         </div>
