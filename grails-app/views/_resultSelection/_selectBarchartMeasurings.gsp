@@ -1,4 +1,4 @@
-<div class="card" id="barchartMeasuringCard">
+<div class="card form-horizontal" id="barchartMeasuringCard">
     <legend for="selectAggregatorUncachedHtmlId"><g:message
             code="de.iteratec.osm.selectMeasurings"
             default="Measurings"/></legend>
@@ -8,70 +8,77 @@
                 var="selectedAggrGroupValuesUnCached"
                 value="${['docCompleteTimeInMillisecsUncached']}"/></g:if>
 
-        <div class="panel-body">
+        <div class="panel-body" style="position: relative;">
 
-            <div class="row addMeasurandRow">
-                <label class="col-sm-3"><g:message code="de.iteratec.osm.dimple.barchart.measurands"
-                                                   default="Measurands"/></label>
+            <div style="position: absolute; right: 5px; top: 2px;">
+                <a href="#/" class="removeMeasurandSeriesButton">
+                    <i class="fa fa-times" aria-hidden="true" style="color: #cccccc;"></i>
+                </a>
+            </div>
 
-                <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
-                                           class="firstMeasurandSelect col-sm-7"
-                                           name="selectedAggrGroupValuesUnCached"
-                                           optionKey="value" optionValue="value"
-                                           value="${selectedAggrGroupValuesUnCached}"/>
+            <div class="row form-group addMeasurandRow">
+                <label class="col-sm-3 control-label" for="selectedAggrGroupValuesUnCached">
+                    <g:message code="de.iteratec.osm.dimple.barchart.measurands"
+                               default="Measurands:"/>
+                </label>
 
-                <div class="col-sm-2">
+                <div class="col-sm-7">
+                    <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
+                                               class="firstMeasurandSelect form-control"
+                                               name="selectedAggrGroupValuesUnCached"
+                                               optionKey="value" optionValue="value"
+                                               value="${selectedAggrGroupValuesUnCached}"/>
+                </div>
+
+                <div class="col-sm-2 control-label" style="text-align: left;">
                     <a href="#/" class="addMeasurandButton">
                         <i class="fa fa-lg fa-plus-circle"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="row stackedSelectContainer hidden">
-                <label class="col-sm-3"><g:message code="de.iteratec.osm.dimple.barchart.stacked.label"
-                                                   default="stacked?"/></label>
-
-                <select class="stackedSelect col-sm-7">
-                    <option value="stacked"><g:message code="de.iteratec.osm.dimple.barchart.stacked.true.label"
-                                                       default="stacked"/></option>
-                    <option value="notStacked"><g:message code="de.iteratec.osm.dimple.barchart.stacked.false.label"
-                                                          default="notStacked"/></option>
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-3">
-                    <a href="#" class="btn btn-xs btn-primary removeMeasurandSeriesButton">
-                        <g:message code="de.iteratec.osm.dimple.barchart.removeMeasurandSeriesButton.label"
-                                   default="remove measurand series"/></a>
+            <div class="row form-group stackedSelectContainer hidden">
+                <label class="col-sm-3 control-label">
+                    <g:message code="de.iteratec.osm.dimple.barchart.stacked.label"
+                               default="Stacked?"/>
+                </label>
+                <div class="col-sm-7">
+                    <select class="stackedSelect form-control">
+                        <option value="stacked"><g:message code="de.iteratec.osm.dimple.barchart.stacked.true.label"
+                                                           default="stacked"/></option>
+                        <option value="notStacked"><g:message code="de.iteratec.osm.dimple.barchart.stacked.false.label"
+                                                              default="notStacked"/></option>
+                    </select>
                 </div>
             </div>
+
         </div>
     </div>
 
     <div id="additionalMeasurand-clone" class="row hidden addMeasurandRow">
-        <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
-                                   class="additionalMeasurand col-sm-7 col-sm-offset-3"
-                                   optionKey="value" optionValue="value"
-                                   value="${selectedAggrGroupValuesUnCached}"/>
+        <div class="col-sm-7 col-sm-offset-3">
+            <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
+                                       class="additionalMeasurand form-control"
+                                       optionKey="value" optionValue="value"
+                                       value="${selectedAggrGroupValuesUnCached}"/>
+        </div>
 
-        <div class="col-sm-2">
+        <div class="col-sm-2 control-label" style="text-align: left;">
             <a href="#/" class="addMeasurandButton">
-                <i class="fa fa-lg fa-plus-circle"></i>
+                <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
             </a>
             <a href="#/" class="removeMeasurandButton">
-                <i class="fa fa-lg fa-minus-circle"></i>
+                <i class="fa fa-lg fa-minus-circle" aria-hidden="true"></i>
             </a>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-sm-2">
-            <br/>
-            <a href="#/" id="addMeasurandSeriesButton" class="btn btn-xs btn-primary">
-                <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
-                           default="add measurand series"/></a>
-        </div>
+        <a href="#/" id="addMeasurandSeriesButton">
+            <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
+            <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
+                       default="Add Measurand Series"/>
+        </a>
     </div>
 </div>
 
