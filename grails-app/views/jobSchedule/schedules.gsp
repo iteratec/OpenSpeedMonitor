@@ -95,27 +95,35 @@
     <%-- main menu --%>
     <g:render template="/layouts/mainMenu"/>
 
-    %{--<g:each in="${chartList}" var="notUsed" status="i">--}%
+    <div class="form-group">
+        <input type="text" class="form-control" id="schedule-filter" placeholder="<g:message code="de.iteratec.osm.ui.filter.location" default="Filter by location"/>" />
+        %{--TODO: Add toggle buttons for selecting what to filter by--}%
+    </div>
+
     <g:each in="${chartMap}" var="server" status="i">
-        <h3>
-            <span class="text-muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
-        </h3>
-        <hr />
-        <g:each in="${server.value}" var="location" status="j">
-            <h4>
-                <span class="text-muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
-            </h4>
-            <g:if test="${location.jobs.size() > 0}">
-                <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
-            </g:if>
-            <g:else>
-                <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="no jobs within the next 24 hours"/>
-            </g:else>
+        <div id="${server.key}" class="server-div">
+            <h3>
+                <span class="text-muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
+            </h3>
+            <hr />
+            <g:each in="${server.value}" var="location" status="j">
+                <div id="${location.name}" class="location-div">
+                    <h4>
+                        <span class="text-muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
+                    </h4>
+                    <g:if test="${location.jobs.size() > 0}">
+                        <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
+                    </g:if>
+                    <g:else>
+                        <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="no jobs within the next 24 hours"/>
+                    </g:else>
+                    <br/>
+                    <br/>
+                </div>
+            </g:each>
             <br/>
             <br/>
-        </g:each>
-        <br/>
-        <br/>
+        </div>
     </g:each>
 
     <content tag="include.bottom">
@@ -135,7 +143,6 @@
                             "${"show-overused-queues" + i + j}",
                             "${createLink(controller: 'job', action: 'edit', absolute: true)}"
                         )
-                        $('#${"show-overused-queues" + i + j} button[value="on"]').click()
                     </g:if>
                 </g:each>
             </g:each>
