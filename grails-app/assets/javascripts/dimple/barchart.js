@@ -8,6 +8,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var chart = null,
+        chartData = null,
         width = 600,
         height = 600,
         legendPosition = {x: 200, y: 10, width: 100, height: 100},
@@ -33,12 +34,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var drawChart = function (barchartData) {
+        chartData = barchartData;
+
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
         var $adjustBarchartButton = $("#adjust-barchart-modal");
         if ($adjustBarchartButton.hasClass("hidden"))
             $adjustBarchartButton.removeClass("hidden");
-        initFilterDropdown(barchartData.filterRules);
+        initFilterDropdown(chartData.filterRules);
 
         // Reset fields
         allMeasurandSeries = {};
@@ -51,17 +54,17 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         chart = new dimple.chart(svg, null);
         chart.setMargins(margins.left, margins.right, margins.top, margins.bottom);
         svg = svg.node();
-        seriesCount = Object.keys(barchartData['series']).length;
+        seriesCount = Object.keys(chartData['series']).length;
 
         // Add x axis
         xAxis = chart.addCategoryAxis("x", "grouping");
-        xAxis.title = barchartData['groupingLabel'];
-        filterRules = barchartData.filterRules;
+        xAxis.title = chartData['groupingLabel'];
+        filterRules = chartData.filterRules;
 
         // Add series
         var seriesId = 0;
-        for (var currentSeriesId in barchartData.series) {
-            var currentSeries = barchartData.series[currentSeriesId];
+        for (var currentSeriesId in chartData.series) {
+            var currentSeries = chartData.series[currentSeriesId];
 
             // get correct y axis
             var yAxis = yAxes[currentSeries['dimensionalUnit']];
@@ -103,7 +106,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         calcChartWidth();
         resize();
 
-        addBarLabels(barchartData);
+        addBarLabels();
     };
 
     var adjustChart = function () {
@@ -159,6 +162,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         resize();
+
+        addBarLabels();
     };
 
     var assignColor = function (colorAssignments) {
@@ -282,6 +287,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         draw(false);
         resize();
+
+        addBarLabels();
     };
 
     var resize = function () {
@@ -295,21 +302,30 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
     };
 
-    var addBarLabels = function (barchartData) {
+    var addBarLabels = function () {
+        // save width of rectangles for comparison with label width
+        var rectangleWidth = null;
+
         for (var barIndex in allMeasurandSeries) {
             allMeasurandSeries[barIndex].forEach(function (seriesID, seriesIndex) {
-                // create labels group container
                 var currentSeriesLabelClass = "dimple-series-group-" + seriesID.toString() + "-labels";
+
+                // remove labels if they exist and replot them afterwards
+                d3.selectAll("." + currentSeriesLabelClass).remove();
+
+                // create labels group container
                 chart.svg.append("g").attr("class", currentSeriesLabelClass);
 
                 var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesID).selectAll("rect");
                 currentSeriesRects[0].forEach(function (rectangle, rectangleIndex) {
+                    rectangleWidth = rectangle.width.baseVal.value;
+
                     // get the unit
                     // stacked/overlayed bars can only be of the same dimensional unit, therefore accessing the first is sufficient
-                    var unit = barchartData.series[barIndex].dimensionalUnit;
+                    var unit = chartData.series[barIndex].dimensionalUnit;
                     // get the measurand value and format it
                     var barchartSeriesDataIndex = seriesIndex * currentSeriesRects[0].length + rectangleIndex;
-                    var value = barchartData.series[barIndex].data[barchartSeriesDataIndex].indexValue.toString();
+                    var value = chartData.series[barIndex].data[barchartSeriesDataIndex].indexValue.toString();
                     value = (unit == "%") ? parseFloat(value).toFixed(1) : Math.round(value);
 
                     // set the label
@@ -334,6 +350,35 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
                     currentSeriesLabels.style("opacity", 0);
             });
         }
+
+        // check if labels need to be rotated
+        var rotate = false;
+        d3.selectAll(".bar-label").each(function () {
+            if (d3.select(this).node().getComputedTextLength() > rectangleWidth) {
+                rotate = true;
+            }
+        });
+
+        if (rotate)
+            rotateLabels();
+    };
+
+    var rotateLabels = function () {
+        d3.selectAll(".bar-label")
+            .style("text-anchor", "start")
+            .each(function () {
+                var x = d3.select(this).attr("x");
+                var y = d3.select(this).attr("y");
+                // get the translate value
+                var t = d3.transform(d3.select(this).attr("transform"));
+                var translateX = t.translate[0];
+                var translateY = t.translate[1];
+                // calculate the x value for rotation
+                var rotateX = parseFloat(x) + translateX;
+                console.log(rotateX);
+                d3.select(this)
+                    .attr("transform", "translate(" + translateX + "," + translateY + ")rotate(" + -45 + ", " + x + ", " + y + ")");
+            });
     };
 
     var getXLabel = function () {
