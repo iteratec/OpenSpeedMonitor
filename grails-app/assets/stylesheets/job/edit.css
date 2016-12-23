@@ -1,5 +1,6 @@
 /*
-*= require bower_components/chosen/chosen.css
+*= require bower_components/bootstrap-chosen/bootstrap-chosen.less
+*= require bower_components/bootstrap-chosen/bootstrap-chosen-variables.less
 *= require tagit.css
 *= require_self
 */
