@@ -12,7 +12,7 @@
 			<td>
 				<div class="show-chart-buttons">
 				<g:if test="${job.lastRun}" >
-					<a href="${jobService.createResultLinkForJob(job)}" class="show-chart"><i class="fa fa-line-chart"></i></a><br/>
+					<a href="${jobService.createResultLinkForJob(job)}" class="show-chart"><i class="fa fa-line-chart"></i></a>
 					<a href="${jobService.createPageAggregationLinkForJob(job)}" class="show-chart"><i class="fa fa-bar-chart"></i></a>
 				</g:if>
 				</div>
@@ -20,7 +20,6 @@
 					href="${createLink(action: 'edit', id: job.id, absolute: true)}" class="jobName ${job.active==false?'inactiveJob':''}"> ${job.label}
 				</a></strong>
 				<g:if test="${tags}">
-					<br/>
 					<ul class="tags">
 						<g:each in="${tags}">
 							<li>${it}</li>
@@ -28,7 +27,6 @@
 					</ul>
 				</g:if>
 				<g:if test="${job.script}">
-					<br />
 					<a
 						href="${createLink(controller: 'script', action: 'edit', id: job.script.id, absolute: true)}" class="skript">
 						${job.script.label}
@@ -45,7 +43,6 @@
                 <g:render template="timeago"
                           model="${['date': job.lastRun, 'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),
                                     'url': createLink(controller: 'tabularResultPresentation', action: 'listResultsForJob', params: ['job.id': job.id], absolute: true)]}" />
-                <br>
                 <a href="/jobResult/listFailed?jobId=${job.id}" data-toggle="popover" title="${g.message(code: 'de.iteratec.osm.job.status.description.title', default: 'State') + ': ' + job.label}"
                    data-placement="bottom" data-trigger="hover" data-html="true" data-content="${render(template: "jobStatusBarHoverInfo")}">
                     <g:render template="jobStatusBar"

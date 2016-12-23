@@ -61,96 +61,97 @@
                 <a class="close" data-dismiss="alert">×</a>
                 <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
             </div>
-            <div class="row section">
-                <div class="col-md-1">
-                    <div class="btn-group" id="show-button-group">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                            <span class="caret"></span>
-                            <g:message code="de.iteratec.isj.job.selected" default="Markierte Jobs"/>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <g:actionSubmit action="activate"
-                                                value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
-                            </li>
-                            <li>
-                                <g:actionSubmit action="deactivate"
-                                                value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
-                            </li>
-                            <li role="separator" class="divider"></li>
-                            <li>
-                                <g:actionSubmit action="execute"
-                                                value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
-                            </li>
-                        </ul>
-                    </div>
+            <div id="filterRow">
+                <div class="btn-group" id="actionForSelectedContainer">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                            id="actionForSelected">
+                        <span class="caret"></span>
+                        <g:message code="job.list.actionForSelected" default="Action"/>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <g:actionSubmit action="activate"
+                                            value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
+                        </li>
+                        <li>
+                            <g:actionSubmit action="deactivate"
+                                            value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <g:actionSubmit action="execute"
+                                            value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
+                        </li>
+                    </ul>
                 </div>
-                <div class="col-md-7">
-                    <div class="input-group">
-                        <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
-                               placeholder="<g:message code="hob.list.filter" default="Jobs filtern"/>"
-                               name="filters.filterByLabel" value="${filters?.filterByLabel}"/>
-                        <span class="input-group-addon"><g:message code="job.list.filter.by" default="by"/></span>
-                        <span class="input-group-btn" data-toggle="buttons">
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByName"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.name" default="Name" />
-                            </label>
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByScript"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.script" default="Script" />
-                            </label>
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByJobGroup"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.group" default="Job Group" />
-                            </label>
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByJobGroup"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.location" default="Location" />
-                            </label>
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByJobGroup"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.browser" default="Browser" />
-                            </label>
-                            <label class="btn btn-default">
-                                <g:checkBox onchange="filterJobList()" id="filterByJobGroup"
-                                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                                <g:message code="job.list.filter.by.tags" default="Tags" />
-                            </label>
-                        </span>
-                    </div>
+                <div id="filterInputContainer">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterInput"
+                           placeholder="<g:message code="job.list.filter" default="Jobs filtern"/>"
+                           name="filter" value="${filters?.filter}"/>
                 </div>
-                <div class="col-md-3">
-                    <label><g:message code="job.list.filter.showOnly" default="Show only" /></label>
+                <div class="filterButtonsContainer">
+                    <span class="description">
+                        <g:message code="job.list.filter.by" default="by" />
+                    </span>
+                    <span class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByName"
+                                    name="filters.filterByName" />
+                            <g:message code="job.list.filter.by.name" default="Name" />
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByScript"
+                                    name="filters.filterByScript" />
+                            <g:message code="job.list.filter.by.script" default="Script" />
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByJobGroup"
+                                    name="filters.filterByJobGroup" />
+                            <g:message code="job.list.filter.by.group" default="Job Group" />
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByLocation"
+                                    name="filters.filterByLocation" />
+                            <g:message code="job.list.filter.by.location" default="Location" />
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByBrowser"
+                                    name="filters.filterByBrowser" />
+                            <g:message code="job.list.filter.by.browser" default="Browser" />
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="checkbox" onchange="filterJobList()" id="filterByTags"
+                                    name="filters.filterByTags" />
+                            <g:message code="job.list.filter.by.tags" default="Tags" />
+                        </label>
+                    </span>
+                </div>
+                <div class="filterButtonsContainer" id="filterShowOnly">
+                    <span class="description"><g:message code="job.list.filter.showOnly" default="Show only" /></span>
                     <div class="btn-group" data-toggle="buttons">
                         <label class="btn btn-default">
-                            <g:checkBox onchange="filterJobList()" id="filterCheckedJobs" class="checkbox-inline"
-                                name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
+                            <input type="checkbox" onchange="filterJobList()" id="filterCheckedJobs"
+                                    name="filters.filterCheckedJobs" />
                             <g:message code="job.list.filter.checkedJobs"/>
                         </label>
                         <label class="btn btn-default">
-                            <g:checkBox onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox-inline"
-                                        name="filters.filterHighlightedJobs" value="${filters?.filterHighlightedJobs}"/>
+                            <input type="checkbox" onchange="filterJobList()" id="filterHighlightedJobs"
+                                    name="filters.filterHighlightedJobs" />
                             <g:message code="job.list.filter.highlightedJobs"/>
                         </label>
                         <label class="btn btn-default">
-                            <g:checkBox onchange="filterJobList()" id="filterRunningJobs" class="checkbox-inline"
-                                        name="filters.filterRunningJobs" value="${filters?.filterRunningJobs}"/>
+                            <input type="checkbox" onchange="filterJobList()" id="filterRunningJobs"
+                                    name="filters.filterRunningJobs" />
                             <g:message code="job.list.filter.runningJobs"/>
                         </label>
                         <label class="btn btn-default active">
-                            <g:checkBox onchange="filterJobList()" id="filterInactiveJobs" class="checkbox-inline"
-                                        name="filters.filterInactiveJobs" value="${filters?.filterInactiveJobs}"/>
+                            <input type="checkbox" onchange="filterJobList()" id="filterInactiveJobs"
+                                    name="filters.filterInactiveJobs" checked />
                             <g:message code="job.list.filter.activeJobs"/>
                         </label>
                     </div>
                 </div>
-                <div class="col-md-1">
+                <div id="createJobContainer">
                     <a href="<g:createLink action="create"/>" class="btn btn-primary pull-right">
                         <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                     </a>
@@ -168,7 +169,9 @@
                         </span>
                     </g:set>
                     <g:set var="executionScheduleLabel">
-                        <g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                        <abbr title="<g:message code="job.executionSchedule.hint" default="Cron String"/>">
+                            <g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                        </abbr>
                     </g:set>
                     <g:sortableColumn property="label" title="${titleHeader}" />
                     <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>

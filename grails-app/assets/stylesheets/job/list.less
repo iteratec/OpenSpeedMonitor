@@ -2,6 +2,70 @@
 *= require_self
 */
 @import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins/clearfix.less";
+
+#filterRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+#filterRow > div {
+  flex: 0 1 auto;
+  margin-bottom: 10px;
+}
+
+#filterRow #actionForSelectedContainer {
+  margin-right: 15px;
+}
+
+#filterRow #filterInputContainer {
+  flex-grow: 1;
+  input {
+    min-width: 5em;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+#filterRow .filterButtonsContainer {
+
+  .description {
+    padding: @padding-base-vertical @padding-base-horizontal;
+    border: 1px @btn-default-border solid;
+    border-right: 0;
+    display: block;
+    float: left;
+    position: relative;
+    vertical-align: middle;
+    margin-left: -1px;
+    background: @input-group-addon-bg;
+  }
+
+  .btn-group .btn:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+#filterRow #filterBy .description {
+
+}
+
+#filterRow #filterShowOnly {
+  margin-left: 15px;
+  .description {
+    border-top-left-radius: @border-radius-base;
+    border-bottom-left-radius: @border-radius-base;
+  }
+}
+
+#filterRow #createJobContainer {
+  margin-left: 15px;
+}
+
 
 
 table#jobtable tr.success td {
@@ -20,6 +84,12 @@ table#jobtable tr.failure td {
 
 }
 
+#actionForSelected {
+  padding-left: 9px;
+  .caret {
+    margin-right: 15px;
+  }
+}
 
 .cronExpression {
   /*	display: none;*/
@@ -29,34 +99,28 @@ table#jobtable tr.failure td {
   display: none;
 }
 
+#jobtable th {
+  vertical-align: top;
+}
+
+
+
 ul.tags {
-  display: inline-block;
+  display: block;
   margin: 0;
   padding: 0;
   list-style-type: none;
+  .clearfix();
 }
 
-ul.tags li { /*display: inline;*/
+ul.tags li {
   display: block;
   float: left;
   margin: 0 3px 0 0;
   border: 1px #ccc solid;
-  padding: 1px 2px 1px 2px;
-  border-radius: 5px;
-  background: #ddd;
-}
-
-.chosen-container {
-  width: 100%;
+  padding: 1px 3px 1px 3px;
   border-radius: 4px;
-  border: 1px solid #cccccc;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  color: #555555;
-}
-
-.chosen-container .search-field {
-  height: 32px;
+  background: rgba(255, 255, 255, 1);
 }
 
 .inactiveJob {
@@ -81,9 +145,9 @@ ul.tags li { /*display: inline;*/
 .show-chart-buttons a {
   padding: 5px 8px;
   border-radius: 4px;
-	display: inline-block;
+  display: block;
   &:hover, &:focus {
-		background-color: rgba(0, 0, 0, 0.07);
+    background-color: rgba(0, 0, 0, 0.07);
   }
 }
 
