@@ -108,6 +108,13 @@
     </div>
 
     <div class="col-md-4" id="selectionSummary">
+        <g:if test="${help}">
+            <a href="#" id="help" class="btn btn-default pull-right" data-toggle="popover"
+               title="${g.message(code: 'de.iteratec.osm.joblist.activeruns.title', default: 'Active job runs')}"
+               data-placement="bottom" data-content="${help}" data-trigger="hover" data-html="true">
+                <i class="fa fa-info"></i>
+            </a>
+        </g:if>
         <g:if test="${controllerName == 'eventResultDashboard'}">
             <table>
                 <tr id="selectionConstraintBrowser">
