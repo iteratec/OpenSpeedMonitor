@@ -25,8 +25,23 @@
                 <div class="tab-content">
                     <div id="userMenu" class="tab-pane fade in active">
                         <g:hiddenField name="version" value="${user?.version}" />
-                        <fieldset class="form">
-                            <f:all bean="user"/>
+                        <fieldset class="form-horizontal">
+                            <f:field bean="user" property="username"/>
+                            <div class="form-group fieldcontain required">
+                                <label for="password" class="control-label col-md-3">Password
+                                    <span class="required-indicator">*</span>
+                                </label>
+                                <div class="controls col-md-6">
+                                    <input type="password" name="password" value="" id="password" data-cip-id="password" class="form-control" />
+                                </div>
+                            </div>
+                            <f:with bean="user">
+                                <f:field property="email"/>
+                                <f:field property="enabled"/>
+                                <f:field property="accountExpired"/>
+                                <f:field property="accountLocked"/>
+                                <f:field property="passwordExpired"/>
+                            </f:with>
                         </fieldset>
                     </div>
                     <div id="roleMenu" class="tab-pane fade form-horizontal">

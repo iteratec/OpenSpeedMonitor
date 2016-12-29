@@ -1,4 +1,5 @@
 package de.iteratec.osm.security
+import de.iteratec.osm.security.User
 
 class UserController extends grails.plugin.springsecurity.ui.UserController {
 
@@ -17,6 +18,13 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     def search(){
         params.action = "index"
         redirect(params)
+    }
+    def update(){
+        if (params.password == "*****" ||params.password == "")
+            params.password = de.iteratec.osm.security.User.findById(params.id).password
+        doUpdate { user ->
+            uiUserStrategy.updateUser params, user, roleNamesFromParams()
+        }
     }
 
 }
