@@ -139,6 +139,12 @@ class ScriptController {
 			output.warnings = parser.warnings.groupBy { it.lineNumber }
 		else
 			output.warnings = []
+		if (parser.errors)
+			output.errors = parser.errors.groupBy {it.lineNumber}
+		else
+			output.errors = []
+		output.newPages = parser.newPages
+		output.newMeasuredEvents = parser.newMeasuredEvents
 		output.steps = parser.steps
 		output.variables = PlaceholdersUtility.getPlaceholdersUsedInScript(navigationScript).unique()
 		render output as JSON

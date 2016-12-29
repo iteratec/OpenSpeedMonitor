@@ -40,25 +40,34 @@
             <g:render template="messages"/>
 
             <p><g:message code="default.form.asterisk"/></p>
-
             <g:form method="post" role="form" class="form-horizontal">
                 <g:hiddenField name="id" value="${entity?.id}"/>
                 <g:hiddenField name="version" value="${entity?.version}"/>
                 <fieldset class="form">
                     <g:render template="form"/>
                 </fieldset>
+                <div id="newPageOrMeasuredEventInfo" class="card" style="display:none;">
+                    <div id="newPagesContainer" style="display:none;">
+                        We will create the following new pages:
+                        <div id="newPages"></div>
+                    </div>
+                    <div id="newMeasuredEventsContainer" style="display:none;">
+                        We will create the following new measuredEvents:
+                        <div id="newMeasuredEvents"></div>
+                    </div>
+                </div>
                 <div>
                     <g:if test="${mode == 'edit'}">
-                        <input type="button" class="btn btn-primary"
+                        <input type="button" class="btn btn-primary" id="saveButton"
                                         onclick="checkForNewPageOrMeasuredEventNames();"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
                         <g:actionSubmit value="!" style="display: none" action="update" id="updateScriptActionSubmit"/>
-                        <g:actionSubmit class="btn btn-primary" action="save"
+                        <g:actionSubmit class="btn btn-primary" action="save" id="saveCopyButton"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
                                         onclick="return promptForDuplicateName();"/>
                     </g:if>
                     <g:elseif test="${mode == 'create'}">
-                        <g:actionSubmit class="btn btn-primary" action="save"
+                        <g:actionSubmit class="btn btn-primary" action="save" id="saveButton"
                                         value="${message(code: 'default.button.create.label', default: 'Create')}"/>
                         <g:actionSubmit value="!" style="display: none" action="update" id="saveScriptActionSubmit"/>
                     </g:elseif>
@@ -84,6 +93,8 @@
                     i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',
                     i18nMessage_DANGLING_SETEVENTNAME_STATEMENT: '${message(code: 'script.DANGLING_SETEVENTNAME_STATEMENT.warning')}',
                     i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
+                    i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
+                    i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
                     measuredEvents: ${measuredEvents},
                     linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                     linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',

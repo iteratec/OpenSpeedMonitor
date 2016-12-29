@@ -57,7 +57,7 @@ class ScriptStatement {
  * @author dri
  */
 enum ScriptEventNameCmdWarningType {
-	/** 
+	/**
 	 * setEventName has no effect because it is not followed by a page view statement.
 	 */
 	DANGLING_SETEVENTNAME_STATEMENT,
@@ -73,21 +73,53 @@ enum ScriptEventNameCmdWarningType {
 	 * This is a valid step (setEventName statement followed by a page view command)
 	 * but logData is set to zero.
 	 */
-	STEP_NOT_RECORDED
+	STEP_NOT_RECORDED,
+
+	/**
+	 * There is no page defined. Therefore we have to assign the measuredEvent to the page "unknown"
+	 */
+	NO_PAGE_DEFINED
+
 }
+enum ScriptErrorEnum {
+	/**
+	 * Page and MeasuredEvent already exist but the MeasuredEvent is assigned to a different page
+	 */
+	WRONG_PAGE,
+
+	/**
+	 * EventName contains more then one ;;;
+	 */
+	TOO_MANY_SEPARATORS
+}
+
+
 
 /**
  * A warning reporting misplaced setEventName statements in a script
- *  
+ *
  * @author dri
  */
-class ScriptEventNameCmdWarning {	
+class ScriptEventNameCmdWarning {
 	ScriptEventNameCmdWarningType type
 	/**
 	 * The line in the script responsible for this warning
 	 */
 	int lineNumber
 }
+
+/**
+ * An error reporting wrong statements in a script
+ *
+ */
+class ScriptEventNameCmdError {
+	ScriptErrorEnum type
+	/**
+	 * The line in the script responsible for this warning
+	 */
+	int lineNumber
+}
+
 
 
 /**
@@ -146,13 +178,20 @@ class ScriptParser {
 	 */
 	public List<ScriptEventNameCmdWarning> warnings
 	/**
+	 * Errors that are severe enough to prevent saving of the script
+	 */
+	public List<ScriptEventNameCmdError> errors
+	/**
 	 * Pairs of line numbers of detected measured steps
 	 * Every even number marks a line where a step begins,
 	 * every odd number marks a line where a step ends.
 	 */
 	public List<Integer> steps
 
+	public Set<String> newPages
+	public Set<String> newMeasuredEvents
 	private PageService pageService
+
 		
 	/**
 	 * Parse the given navigationScript
@@ -185,7 +224,7 @@ class ScriptParser {
 	private void reportDanglingSetEventNameCommand(List<ScriptStatement> statements, int lookBackFrom) {
 		warnings << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT,
-			lineNumber: statements.take(lookBackFrom).reverse().find { it.keyword == setEventNameCmd }.lineNumber
+			lineNumber: statements.take(lookBackFrom+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber
 		)
 	}
 	
@@ -230,7 +269,11 @@ class ScriptParser {
 	public List<ScriptStatement> interpret(String navigationScript) {
 		measuredEventsCount = 0
 		eventNames = []
+		newMeasuredEvents=[]
+		newPages=[]
+
 		warnings = []
+		errors = []
 		steps = []
 		
 		if (!navigationScript)
@@ -260,8 +303,42 @@ class ScriptParser {
 			} else if (stmt.keyword == setEventNameCmd) {
 				// if a setEventName statement has been found before and was not cancelled by a
 				// navigate/execAndWait statement following it, issue a warning:
-				if (setEventNameStmtFound && logData)
+				if (setEventNameStmtFound ) {
 					reportDanglingSetEventNameCommand(statements, i)
+				}
+				if(stmt.parameter) {
+					String pageName = ""
+					String measuredEventName
+					Page page
+					MeasuredEvent measuredEvent
+					if (stmt.parameter.split(":::").length ==2) {
+						pageName = stmt.parameter.split(":::")[0]
+						measuredEventName = stmt.parameter.split(":::")[1]
+						page = Page.findByName(pageName)
+					} else if(stmt.parameter.split(":::").length >2){
+						errors << new ScriptEventNameCmdError(
+								type:ScriptErrorEnum.TOO_MANY_SEPARATORS,
+								lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
+					} else {
+						measuredEventName = stmt.parameter
+					}
+					measuredEvent = MeasuredEvent.findByName(measuredEventName)
+					if (pageName && !page) {
+						if(!newPages.contains('${')||!newPages.contains('}'))
+							newPages.add(pageName)
+					}
+					if (measuredEventName && !measuredEvent) {
+						if(!measuredEventName.contains('${')||!measuredEventName.contains('}'))
+							newMeasuredEvents.add(measuredEventName)
+					}
+					if(page && measuredEvent && measuredEvent.testedPage != page){
+						errors << new ScriptEventNameCmdError(
+							type:ScriptErrorEnum.WRONG_PAGE,
+							lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
+
+					}
+				}
+
 				setEventNameStmtFound = true
 				eventNames << stmt.parameter
 			// navigate or execAndWait command

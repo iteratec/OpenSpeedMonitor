@@ -21,6 +21,8 @@ function CodemirrorEditor(data) {
     this.DANGLING_SETEVENTNAME_STATEMENT = data.i18nMessage_DANGLING_SETEVENTNAME_STATEMENT;
     this.MISSING_SETEVENTNAME_STATEMENT = data.i18nMessage_MISSING_SETEVENTNAME_STATEMENT;
     this.STEP_NOT_RECORDED = data.i18nMessage_STEP_NOT_RECORDED;
+    this.WRONG_PAGE = data.i18nMessage_WRONG_PAGE;
+    this.TOO_MANY_SEPARATORS = data.i18nMessage_TOO_MANY_SEPARATORS;
     this.linkParseScriptAction = data.linkParseScriptAction;
     this.linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
     this.linkGetScriptSource = data.linkGetScriptSource;
@@ -70,7 +72,9 @@ function CodemirrorEditor(data) {
         NO_STEPS_FOUND: this.NO_STEPS_FOUND,
         STEP_NOT_RECORDED: this.STEP_NOT_RECORDED,
         DANGLING_SETEVENTNAME_STATEMENT: this.DANGLING_SETEVENTNAME_STATEMENT,
-        MISSING_SETEVENTNAME_STATEMENT: this.MISSING_SETEVENTNAME_STATEMENT
+        MISSING_SETEVENTNAME_STATEMENT: this.MISSING_SETEVENTNAME_STATEMENT,
+        WRONG_PAGE: this.WRONG_PAGE,
+        TOO_MANY_SEPARATORS: this.TOO_MANY_SEPARATORS
     };
 
     this.update = function() {
@@ -132,6 +136,32 @@ function CodemirrorEditor(data) {
 
     };
 
+    function clearNewPagesOrNewMeasuredEventsInfo() {
+        $("#newPages").empty();
+        $("#newMeasuredEvents").empty();
+        $("#newPageOrMeasuredEventInfo").hide();
+        $("#newPagesContainer").hide();
+        $("#newMeasuredEventsContainer").hide();
+        $('#saveButton').prop('disabled', false);
+        $('#saveCopyButton').prop('disabled', false);
+    }
+
+    function appendElementsFromListToDiv(elementList,containerDiv,divToAppendTo) {
+        var newElementsString = "";
+        var arrayLength = elementList.length;
+        for (var i = 0; i < arrayLength; i++) {
+            $("#newPageOrMeasuredEventInfo").show();
+            $(containerDiv).show();
+            if (i >= 1) {
+                newElementsString += ", ";
+            }
+            newElementsString += elementList[i]
+        }
+        jQuery('<span/>', {
+            text: newElementsString
+        }).appendTo(divToAppendTo);
+    }
+
     this.updateWarnings = function() {
         var codeMirrorEditor = this;
         $.ajax({
@@ -140,11 +170,25 @@ function CodemirrorEditor(data) {
             data: { navigationScript: codeMirrorEditor.editor.getValue() },
             success: function (result) {
                 codeMirrorEditor.clearGutterAndLines();
-
+                clearNewPagesOrNewMeasuredEventsInfo();
+                appendElementsFromListToDiv(result.newPages,"#newPagesContainer","#newPages");
+                appendElementsFromListToDiv(result.newMeasuredEvents,"#newMeasuredEventsContainer","#newMeasuredEvents");
                 for (var lineNumber in result.warnings) {
                     lineNumber = parseInt(lineNumber);
                     codeMirrorEditor.markLine(lineNumber, 'setEventName-warning-line');
                     var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return codeMirrorEditor.warningMsgs[warning.type.name]; }).join('</li><a>');
+                    codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
+                        $('#setEventName-warning-clone').clone()
+                            .attr('id', '')
+                            .attr('title', '<ul><li>' + warningsForCurrentLine + '</li></ul>')
+                            .css('display', 'block')[0]);
+                }
+                for (var lineNumber in result.errors) {
+                    $('#saveButton').prop('disabled', true);
+                    $('#saveCopyButton').prop('disabled', true);
+                    lineNumber = parseInt(lineNumber);
+                    codeMirrorEditor.markLine(lineNumber, 'setEventName-error-line');
+                    var warningsForCurrentLine = result.errors[lineNumber].map(function(errors) { return codeMirrorEditor.warningMsgs[errors.type.name]; }).join('</li><a>');
                     codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
                         $('#setEventName-warning-clone').clone()
                             .attr('id', '')
