@@ -22,11 +22,11 @@ function CodemirrorEditor(data) {
     this.MISSING_SETEVENTNAME_STATEMENT = data.i18nMessage_MISSING_SETEVENTNAME_STATEMENT;
     this.STEP_NOT_RECORDED = data.i18nMessage_STEP_NOT_RECORDED;
     this.WRONG_PAGE = data.i18nMessage_WRONG_PAGE;
+    this.MEASUREDEVENT_NOT_UNIQUE = data.i18nMessage_MEASUREDEVENT_NOT_UNIQUE;
     this.TOO_MANY_SEPARATORS = data.i18nMessage_TOO_MANY_SEPARATORS;
     this.linkParseScriptAction = data.linkParseScriptAction;
     this.linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
     this.linkGetScriptSource = data.linkGetScriptSource;
-    this.linkCheckForNewPageOrMeasuredEventNames = data.linkCheckForNewPageOrMeasuredEventNames;
     this.markedLines;
     this.measuredEvents = data.measuredEvents;
     this.idCodemirrorElement = data.idCodemirrorElement;
@@ -74,7 +74,8 @@ function CodemirrorEditor(data) {
         DANGLING_SETEVENTNAME_STATEMENT: this.DANGLING_SETEVENTNAME_STATEMENT,
         MISSING_SETEVENTNAME_STATEMENT: this.MISSING_SETEVENTNAME_STATEMENT,
         WRONG_PAGE: this.WRONG_PAGE,
-        TOO_MANY_SEPARATORS: this.TOO_MANY_SEPARATORS
+        TOO_MANY_SEPARATORS: this.TOO_MANY_SEPARATORS,
+        MEASUREDEVENT_NOT_UNIQUE: this.MEASUREDEVENT_NOT_UNIQUE
     };
 
     this.update = function() {
@@ -233,6 +234,7 @@ function CodemirrorEditor(data) {
     };
 
     this.markLine = function(lineNumber, cssClass) {
+        this.editor.removeLineClass(lineNumber,'background','setEventName-warning-line');
         this.editor.addLineClass(lineNumber, 'background', cssClass);
         this.markedLines.push(lineNumber);
     };
@@ -245,23 +247,7 @@ function CodemirrorEditor(data) {
         });
         this.markedLines = [];
     };
-    this.checkForNewPageOrMeasuredEventNames = function(displayPrompt, saveScript) {
-        var codeMirrorEditor = this;
 
-        $.ajax({
-            type : 'GET',
-            url : codeMirrorEditor.linkCheckForNewPageOrMeasuredEventNames,
-            data: { navigationScript: codeMirrorEditor.editor.getValue() },
-            success : function(result) {
-                var parsedResult = JSON.parse(result);
-                if (parsedResult.newPageNames.length > 0|| parsedResult.newMeasuredEventNames.length > 0) displayPrompt (parsedResult);
-                else saveScript();  // Without new pages/measuredEvents we can save the script directly
-            },
-            error : function(XMLHttpRequest, textStatus, errorThrown) {
-                return ""
-            }
-        });
-    };
 
     this.init();
 

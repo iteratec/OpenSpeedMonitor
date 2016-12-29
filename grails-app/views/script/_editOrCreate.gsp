@@ -16,26 +16,6 @@
         <g:render template="/layouts/mainMenu"/>
 
         <section id="${mode}-script" class="first">
-            <!-- Modal -->
-            <div id="showCreateModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">${message(code: 'script.validation.create.confirmation.title')}</h4>
-                        </div>
-                        <div class="modal-body" id="createModalBody"></div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" onclick="saveScript()">${message(code: 'default.button.create.label', default: 'Create')}</button>
-                            <button type="button" class="btn btn-error" data-dismiss="modal"><g:message code="default.button.cancel.label" default="Cancel"/></button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
             <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>
 
@@ -48,20 +28,19 @@
                 </fieldset>
                 <div id="newPageOrMeasuredEventInfo" class="card" style="display:none;">
                     <div id="newPagesContainer" style="display:none;">
-                        We will create the following new pages:
+                        ${message(code: 'script.newPage.info')}
                         <div id="newPages"></div>
+                        <hr class="style-one">
                     </div>
                     <div id="newMeasuredEventsContainer" style="display:none;">
-                        We will create the following new measuredEvents:
+                        ${message(code: 'script.newMeasuredEvent.info')}
                         <div id="newMeasuredEvents"></div>
                     </div>
                 </div>
                 <div>
                     <g:if test="${mode == 'edit'}">
-                        <input type="button" class="btn btn-primary" id="saveButton"
-                                        onclick="checkForNewPageOrMeasuredEventNames();"
+                        <g:actionSubmit type="button" class="btn btn-primary" id="saveButton" action="update"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
-                        <g:actionSubmit value="!" style="display: none" action="update" id="updateScriptActionSubmit"/>
                         <g:actionSubmit class="btn btn-primary" action="save" id="saveCopyButton"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
                                         onclick="return promptForDuplicateName();"/>
@@ -69,7 +48,6 @@
                     <g:elseif test="${mode == 'create'}">
                         <g:actionSubmit class="btn btn-primary" action="save" id="saveButton"
                                         value="${message(code: 'default.button.create.label', default: 'Create')}"/>
-                        <g:actionSubmit value="!" style="display: none" action="update" id="saveScriptActionSubmit"/>
                     </g:elseif>
 
                     <a href="<g:createLink action="list"/>" class="btn btn-warning"
@@ -95,11 +73,11 @@
                     i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
                     i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
                     i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
+                    i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
                     measuredEvents: ${measuredEvents},
                     linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                     linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
                     linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
-                    linkCheckForNewPageOrMeasuredEventNames: '${createLink(action: 'getNewPagesAndMeasuredEvents', absolute: true)}',
                     readonly: false
                 });
                 function promptForDuplicateName() {
@@ -114,19 +92,6 @@
                     } else {
                         return false;
                     }
-                }
-                function saveScript(){
-                    if ("${mode}" == "edit") $("#updateScriptActionSubmit").click();
-                    else if ("${mode}" == "create") $("#saveScriptActionSubmit").click();
-                }
-                function  displayPrompt(newPageAndMeasuredEventMap) {
-                    $("#createModalBody").empty();
-                    if (newPageAndMeasuredEventMap.newPageNames!="") $("#createModalBody").append($("<p>",{html:"${message(code: 'script.validation.create.confirmation.page')}"+ newPageAndMeasuredEventMap.newPageNames}));
-                    if (newPageAndMeasuredEventMap.newMeasuredEventNames) $("#createModalBody").append($("<p>",{html:"${message(code: 'script.validation.create.confirmation.measuredEvent')}"+newPageAndMeasuredEventMap.newMeasuredEventNames}));
-                    $('#showCreateModal').modal('show');
-                }
-                function checkForNewPageOrMeasuredEventNames() {
-                    editor.checkForNewPageOrMeasuredEventNames(displayPrompt, saveScript);
                 }
             </asset:script>
         </content>

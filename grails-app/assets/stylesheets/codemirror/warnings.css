@@ -32,3 +32,9 @@ p#usedVariables span, .placeholder-row label {
 	border: 1px black;
 	margin: 15px -7.5px 15px  -7.5px;
 }
+hr.style-one {
+	border: 0;
+	height: 1px;
+	background: #ccc;
+
+}

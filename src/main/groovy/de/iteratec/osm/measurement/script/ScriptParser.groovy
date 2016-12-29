@@ -90,7 +90,12 @@ enum ScriptErrorEnum {
 	/**
 	 * EventName contains more then one ;;;
 	 */
-	TOO_MANY_SEPARATORS
+	TOO_MANY_SEPARATORS,
+
+	/**
+	 * MeasuredEvent is used twice
+	 */
+	MEASUREDEVENT_NOT_UNIQUE
 }
 
 
@@ -189,7 +194,9 @@ class ScriptParser {
 	public List<Integer> steps
 
 	public Set<String> newPages
-	public Set<String> newMeasuredEvents
+	public Map<String,String> newMeasuredEvents
+	public Set<String> allMeasuredEvents
+
 	private PageService pageService
 
 		
@@ -269,8 +276,9 @@ class ScriptParser {
 	public List<ScriptStatement> interpret(String navigationScript) {
 		measuredEventsCount = 0
 		eventNames = []
-		newMeasuredEvents=[]
+		newMeasuredEvents=[:]
 		newPages=[]
+		allMeasuredEvents=[]
 
 		warnings = []
 		errors = []
@@ -308,7 +316,7 @@ class ScriptParser {
 				}
 				if(stmt.parameter) {
 					String pageName = ""
-					String measuredEventName
+					String measuredEventName =""
 					Page page
 					MeasuredEvent measuredEvent
 					if (stmt.parameter.split(":::").length ==2) {
@@ -322,6 +330,12 @@ class ScriptParser {
 					} else {
 						measuredEventName = stmt.parameter
 					}
+					if(allMeasuredEvents.contains(measuredEventName)){
+						errors << new ScriptEventNameCmdError(
+								type:ScriptErrorEnum.MEASUREDEVENT_NOT_UNIQUE,
+								lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
+					}
+					allMeasuredEvents.add(measuredEventName)
 					measuredEvent = MeasuredEvent.findByName(measuredEventName)
 					if (pageName && !page) {
 						if(!newPages.contains('${')||!newPages.contains('}'))
@@ -329,9 +343,9 @@ class ScriptParser {
 					}
 					if (measuredEventName && !measuredEvent) {
 						if(!measuredEventName.contains('${')||!measuredEventName.contains('}'))
-							newMeasuredEvents.add(measuredEventName)
+							newMeasuredEvents[measuredEventName]= pageName!=""?pageName:"undefined"
 					}
-					if(page && measuredEvent && measuredEvent.testedPage != page){
+					if(pageName && measuredEvent && measuredEvent.testedPage.name != pageName){
 						errors << new ScriptEventNameCmdError(
 							type:ScriptErrorEnum.WRONG_PAGE,
 							lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)

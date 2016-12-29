@@ -69,7 +69,7 @@ class ScriptController {
 			render(view: 'create', model: [script: s])
 			return
 		}
-		
+		createNewPagesAndMeasuredEvents(s)
 		def flashMessageArgs = [getScriptI18n(), s.label]
 		flash.message = message(code: 'default.created.message', args: flashMessageArgs)
 		redirect(action: "list", id: s.id)
@@ -103,19 +103,23 @@ class ScriptController {
 			render(view: 'edit', model: [script: s])
 			return
 		}
-		def (Set<String> newPageNames, Map<String,String> newMeasuredEventNames) = extractNewPagesAndMeasuredEvents(s.navigationScript)
-		newPageNames.each {String name ->
-			Page.findOrSaveByName(name)
-		}
-		newMeasuredEventNames.each {String measuredEventName, String pageName ->
-			def page = Page.findByName(pageName)
-			MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
-		}
+		createNewPagesAndMeasuredEvents(s)
 
 		flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
 		redirect(action: 'edit',  id: s.id)
 	}
-	
+
+	private void createNewPagesAndMeasuredEvents(Script s) {
+		ScriptParser parser = new ScriptParser(pageService, s.navigationScript)
+		parser.newPages.each { String name ->
+			Page.findOrSaveByName(name)
+		}
+		parser.newMeasuredEvents.each { String measuredEventName, String pageName ->
+			def page = Page.findByName(pageName)
+			MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
+		}
+	}
+
 	def delete() {
 		Script script = Script.get(params.id)
 		redirectIfNotFound(script, params.id)
@@ -144,7 +148,7 @@ class ScriptController {
 		else
 			output.errors = []
 		output.newPages = parser.newPages
-		output.newMeasuredEvents = parser.newMeasuredEvents
+		output.newMeasuredEvents = parser.newMeasuredEvents.keySet()
 		output.steps = parser.steps
 		output.variables = PlaceholdersUtility.getPlaceholdersUsedInScript(navigationScript).unique()
 		render output as JSON
@@ -161,39 +165,5 @@ class ScriptController {
 		ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
 	}
 
-	def getNewPagesAndMeasuredEvents(String navigationScript){
-		def (Set<String> newPageNames, Map<String,String> newMeasuredEventNames) = extractNewPagesAndMeasuredEvents(navigationScript)
-		ControllerUtils.sendObjectAsJSON(response, [
-				newPageNames: newPageNames,
-				newMeasuredEventNames: newMeasuredEventNames.keySet()
-		])
-	}
-
-	private List extractNewPagesAndMeasuredEvents(String navigationScript) {
-		ScriptParser parser = new ScriptParser(pageService, navigationScript)
-		def eventNames = parser.eventNames
-		Set<String> newPageNames = []
-		Map<String,String> newMeasuredEventNames = [:]
-
-		eventNames.each { String eventName ->
-			def page = "undefined"
-			def measuredEvent
-			if (eventName.contains(":::")) {
-				def splittedEventName = eventName.split(":::")
-				page = splittedEventName[0]
-				measuredEvent = splittedEventName[1]
-			} else {
-				measuredEvent = eventName
-			}
-			if (page != "undefined") {
-				if (Page.countByName(page) == 0) {
-					newPageNames.add(page)
-					newMeasuredEventNames[measuredEvent]= page
-				}
-			} else if (MeasuredEvent.countByName(measuredEvent) == 0) newMeasuredEventNames[measuredEvent] = page
-
-		}
-		[newPageNames, newMeasuredEventNames]
-	}
 
 }
