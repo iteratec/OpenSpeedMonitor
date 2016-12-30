@@ -66,7 +66,7 @@ class ScriptController {
 	def save() {
 		Script s = new Script(params)
 		if (!s.save(flush: true)) {
-			render(view: 'create', model: [script: s])
+			render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON])
 			return
 		}
 		createNewPagesAndMeasuredEvents(s)
@@ -93,14 +93,14 @@ class ScriptController {
 				s.errors.rejectValue("version", "default.optimistic.locking.failure",
 						  [getScriptI18n()] as Object[],
 						  "Another user has updated this script while you were editing")
-				render(view: 'edit', model: [script: s])
+				render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON])
 				return
 			}
 		}
 
 		s.properties = params;
 		if (!s.save(flush: true)) {
-			render(view: 'edit', model: [script: s])
+			render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON])
 			return
 		}
 		createNewPagesAndMeasuredEvents(s)
