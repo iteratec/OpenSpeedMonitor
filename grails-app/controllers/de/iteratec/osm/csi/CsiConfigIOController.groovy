@@ -131,16 +131,20 @@ class CsiConfigIOController {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream(), selectedCsiConfiguration)
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
+        session.errorMessagesCsiValidation = errorMessagesCsiValidation
         redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
     def uploadPageWeights() {
         MultipartFile csv = request.getFile('pageCsv')
+        println(csv)
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.PAGE, csv.getInputStream())
         CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['selectedCsiConfigurationId'])
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream(), selectedCsiConfiguration)
         }
+        session.errorMessagesCsiValidation = errorMessagesCsiValidation
+
         redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
@@ -151,6 +155,7 @@ class CsiConfigIOController {
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream(), selectedCsiConfiguration)
         }
+        session.errorMessagesCsiValidation = errorMessagesCsiValidation
         redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
@@ -158,8 +163,7 @@ class CsiConfigIOController {
         MultipartFile csv = request.getFile('defaultTimeToCsMappingCsv')
         customerSatisfactionWeightService.persistNewDefaultMapping(csv.inputStream)
 
-        redirect(controller: 'CsiConfiguration',
-                action: 'configurations')
+        redirect(controller: 'CsiConfiguration',action: 'configurations')
     }
 
     def getNamesOfDefaultCsiMappings() {

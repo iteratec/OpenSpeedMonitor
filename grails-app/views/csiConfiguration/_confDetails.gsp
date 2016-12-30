@@ -389,19 +389,29 @@
 
     var registerEventHandlersForFileUploadControls = function () {
         $('input[id=theBrowserConnectivityCsvFile]').change(function () {
-            $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
+             var vals = $(this).val(),
+                val = vals.length ? vals.split('\\').pop() : '';
+            $('#theBrowserConnectivityCsvFileTwitter').val(val);
         });
         $('input[id=theBrowserCsvFile]').change(function () {
-            $('#theBrowserCsvFileTwitter').val($(this).val());
+            var vals = $(this).val(),
+                val = vals.length ? vals.split('\\').pop() : '';
+            $('#theBrowserCsvFileTwitter').val(val);
         });
         $('input[id=thePageCsvFile]').change(function () {
-            $('#thePageCsvFileTwitter').val($(this).val());
+            var vals = $(this).val(),
+                val = vals.length ? vals.split('\\').pop() : '';
+            $('#thePageCsvFileTwitter').val(val);
         });
         $('input[id=theHourOfDayCsvFile]').change(function () {
-            $('#theHourOfDayCsvFileTwitter').val($(this).val());
+            var vals = $(this).val(),
+                val = vals.length ? vals.split('\\').pop() : '';
+            $('#theHourOfDayCsvFileTwitter').val(val);
         });
         $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
-            $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
+            var vals = $(this).val(),
+                val = vals.length ? vals.split('\\').pop() : '';
+            $('#defaultTimeToCsMappingCsvFileVisible').val(val);
         });
     };
 

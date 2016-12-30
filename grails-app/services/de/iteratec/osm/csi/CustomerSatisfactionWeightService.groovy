@@ -49,7 +49,6 @@ class CustomerSatisfactionWeightService {
         List<String> lines = new ArrayList<>()
 
         csv.eachLine { line -> lines.add(line) }
-
         switch (weightFactor) {
             case WeightFactor.HOUROFDAY:
                 errorMessages.addAll(validateHourofDay(lines))
@@ -89,6 +88,9 @@ class CustomerSatisfactionWeightService {
             ++rowCounter
         }
 
+        if(lines.size() <=0) {
+            errorMessages.add(i18nService.msg("de.iteratec.osm.csi.csvErrors.empty"))
+        }
         if (incorrectLine > 0) {
             String csvFormat = "[" + classes*.getSimpleName().join(";") + "]"
             errorMessages.add(i18nService.msg("de.iteratec.osm.csi.csvErrors.incorrectLine", "incorrect Line in csv", [csvFormat]))
@@ -100,7 +102,7 @@ class CustomerSatisfactionWeightService {
     private boolean lineCorrect(String line, int columnCount, List<Class> classes) {
         boolean correct = true
         List tokenized = line.tokenize(";")
-
+        if(tokenized.size()!= 2) correct = false
 
         for (int i = 0; i < classes.size(); i++) {
             if (classes[i] == String.class) {
