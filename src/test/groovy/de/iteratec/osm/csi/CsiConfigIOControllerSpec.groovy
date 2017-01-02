@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.util.ServiceMocker
 import org.apache.commons.io.FileUtils
 import org.grails.plugins.testing.GrailsMockMultipartFile
 import spock.lang.Specification
@@ -86,6 +87,7 @@ class CsiConfigIOControllerSpec extends Specification{
         csiConfigurationEmpty = TestDataUtil.createCsiConfiguration()
         csiConfigurationEmpty.label = "emptyConf"
         csiConfigurationEmpty.save(flush: true)
+        ServiceMocker.create().mockI18nService(controller.customerSatisfactionWeightService)
     }
 
     void tearDown() {

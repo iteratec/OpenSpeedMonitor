@@ -102,7 +102,7 @@ class CustomerSatisfactionWeightService {
     private boolean lineCorrect(String line, int columnCount, List<Class> classes) {
         boolean correct = true
         List tokenized = line.tokenize(";")
-        if(tokenized.size()!= 2) correct = false
+        if(tokenized.size()!= classes.size()) correct = false
 
         for (int i = 0; i < classes.size(); i++) {
             if (classes[i] == String.class) {
