@@ -11,7 +11,6 @@ class LocationDto {
     Date dateCreated
     Date lastUpdated
     boolean active
-    int valid
     String location
     BrowserDto browser
     WptServerDto wptServer
@@ -30,7 +29,6 @@ class LocationDto {
         result.dateCreated = location.dateCreated
         result.lastUpdated = location.lastUpdated
         result.active = location.active
-        result.valid = location.valid
         result.location = location.location
         result.browser = BrowserDto.create(location.browser)
         result.wptServer = WptServerDto.create(location.wptServer)

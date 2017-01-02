@@ -62,7 +62,6 @@ class LocationPersisterService implements iLocationListener {
                 if (!locationsForCurrentBrowserAndWptServer) {
                     Location newLocation = new Location(
                             active: true,
-                            valid: 1,
                             uniqueIdentifierForServer: uniqueIdentfierForServer, // z.B. Agent1-wptdriver:Firefox
                             location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
                             label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)

@@ -145,7 +145,6 @@ class PersistingLocationsTests {
 
         new Location(
                 active: true,
-                valid: 1,
                 location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
                 label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
                 browser: undefinedBrowser,//z.B. Firefox

@@ -282,7 +282,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     private void mockLocation(String locationIdentifier, Browser browser, WebPageTestServer server) {
         new Location(
                 active: true,
-                valid: 1,
                 uniqueIdentifierForServer: locationIdentifier, // z.B. Agent1-wptdriver:Chrome
                 location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
                 label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)

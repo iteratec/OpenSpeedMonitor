@@ -206,7 +206,6 @@ class JobServiceTests extends Specification {
 
         ffAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'physNetLabAgent01-FF',
                 label: 'physNetLabAgent01 - FF up to date',
                 browser: browserFF,
@@ -217,7 +216,6 @@ class JobServiceTests extends Specification {
 
         ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'physNetLabAgent01-IE8',
                 label: 'physNetLabAgent01 - IE 8',
                 browser: browserIE,
@@ -228,7 +226,6 @@ class JobServiceTests extends Specification {
 
         ieHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-IE8',
                 label: 'hetznerAgent01 - IE 8',
                 browser: browserIE,
@@ -239,7 +236,6 @@ class JobServiceTests extends Specification {
 
         i8eHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-IE8',
                 label: 'hetznerAgent01 - IE 8',
                 browser: browserIE,
@@ -250,7 +246,6 @@ class JobServiceTests extends Specification {
 
         ffHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-FF',
                 label: 'hetznerAgent01 - FF up to date',
                 browser: browserFF,

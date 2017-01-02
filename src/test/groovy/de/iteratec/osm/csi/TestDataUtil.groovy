@@ -679,7 +679,6 @@ class TestDataUtil implements OsmTestLogin {
         Location ffAgent1, ieAgent1
         ffAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'ffLocationLocation',
                 label: 'ffLocationLabel',
                 browser: browserFF,
@@ -689,7 +688,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
         ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'ieLocationLocation',
                 label: 'ieLocationLabel',
                 browser: browserIE,
@@ -703,7 +701,6 @@ class TestDataUtil implements OsmTestLogin {
     static Location createLocation(WebPageTestServer server, String uniqueIdentifierForServer, Browser browser, Boolean active) {
         return new Location(
                 active: active,
-                valid: 1,
                 uniqueIdentifierForServer: uniqueIdentifierForServer,
                 location: uniqueIdentifierForServer,
                 label: uniqueIdentifierForServer,

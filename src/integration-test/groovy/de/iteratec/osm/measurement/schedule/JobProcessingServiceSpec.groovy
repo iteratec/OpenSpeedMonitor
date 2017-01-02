@@ -125,7 +125,6 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 label: 'Unnamed location',
                 dateCreated: new Date(),
                 active: true,
-                valid: 1,
                 wptServer: wptServer,
                 location: 'location',
                 browser: browser

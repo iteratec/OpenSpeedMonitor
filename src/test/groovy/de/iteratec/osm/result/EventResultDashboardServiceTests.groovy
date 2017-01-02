@@ -494,7 +494,6 @@ class EventResultDashboardServiceTests {
 
         location = new Location(
                 active: true,
-                valid: 1,
                 location: location1Location,
                 label: location1Label,
                 browser: browser,
@@ -508,7 +507,6 @@ class EventResultDashboardServiceTests {
 
         Location ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: location2Location,
                 label: location2Label,
                 browser: browser2,

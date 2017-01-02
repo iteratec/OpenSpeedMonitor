@@ -74,7 +74,6 @@ class PaginationServiceTest {
 
 		ffAgent = new Location(
 				active: true,
-				valid: 1,
 				location: 'physNetLabAgent01-FF',
 				label: 'physNetLabAgent01 - FF up to date',
 				browser: browserFF,

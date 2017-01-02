@@ -371,7 +371,6 @@ class UpdateEventResultDependentCsiAggregationsTests {
         Browser browser = Browser.findByName(browserName)
         new Location(
                 active: true,
-                valid: 1,
                 location: locationLocation,
                 label: 'physNetLabAgent01 - FF up to date',
                 browser: browser,

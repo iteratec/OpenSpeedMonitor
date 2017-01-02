@@ -378,7 +378,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         ).save(failOnError: true, flush: true)
         Location ffAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'physNetLabAgent01-FF',
                 label: 'physNetLabAgent01 - FF up to date',
                 browser: browser,
