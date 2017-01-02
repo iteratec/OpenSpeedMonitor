@@ -124,95 +124,9 @@ JobStatusUpdater = function() {
 	}
 }();
 
-function filterJobSet(selectedJobSetName, selectedJobSetJobs) {
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs', selectedJobSetJobs);
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetName', selectedJobSetName);
-	$('#jobSetButton').html(selectedJobSetName + ' <span class="caret"></span>');
-	filterJobList();
-}
-function clearFilterJobSet(filterByJobSetText) {
-	localStorage.removeItem('de.iteratec.osm.job.list.filters.jobSetJobs');
-	localStorage.removeItem('de.iteratec.osm.job.list.filters.jobSetName');
-	$('#jobSetButton').html(filterByJobSetText  + ' <span class="caret"></span>');
-	filterJobList();
-}
-function saveJobSet () {
-	console.log("Save JobSet: " + $('#jobSetName').val());
-	$('#saveJobSetModal').modal('hide');
-}
-
-function filterJobList() {
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
-    var filterText = $.trim($('#filterByLabel').val());
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobname',filterText);
-    var filterJobGroup = $.trim($('#filterByJobGroup').val());
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
-    var filterLocation = $.trim($('#filterByLocation').val());
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);
-    var filterSkript = $.trim($('#filterBySkript').val());
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.skript',filterSkript);
-    var filterBrowser = $.trim($('#filterByBrowser').val());
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.browser',filterBrowser);
-    var filterCheckedJobs = $('#filterCheckedJobs').prop('checked');
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
-    var filterInactiveJobs = $('#filterInactiveJobs').prop('checked');
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs',filterInactiveJobs);
-    var filterHighlightedJobs = $('#filterHighlightedJobs').prop('checked');
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs',filterHighlightedJobs);
-    var filterRunningJobs = $('#filterRunningJobs').prop('checked');
-    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.runningjobs',filterRunningJobs);
-    var checkedTags = $('#filterTags').val();
-    $('#filterTags_chosen > ul > li.search-choice').size();
-	var filterJobSetJobs = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs');
-	console.log("Storage: " + filterJobSetJobs);
-
-    var reText = new RegExp(filterText, 'i');
-    var reJobGroup = new RegExp(filterJobGroup, 'i');
-    var reLocation = new RegExp(filterLocation, 'i');
-    var reBrowser = new RegExp(filterBrowser, 'i');
-    var reSkript = new RegExp(filterSkript, 'i');
-
-	$('table tbody tr').each(function() {
-        var tr = $(this);
-        var jobName = $('.jobName', tr).text();
-        var jobGroup = $('.jobgroup', tr).text();
-        var location = $('.location', tr).text();
-        var browser = $('.browser', tr).text();
-        var skript = $('.skript', tr).text();
-        var showRow = true;
-        if (showRow && filterJobSetJobs) {showRow = filterJobSetJobs.indexOf($.trim(jobName)) >= 0}
-        if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
-        if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
-        if (showRow && !filterInactiveJobs) { showRow = $('.job_active', tr).val() == 'true'; }
-        if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
-
-        if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
-        if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
-        if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
-        if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
-        if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
-
-        if (showRow && checkedTags) {
-            showRow = false;
-            checkedTags.map(function(currentTag) {
-                var usedTags = tr.attr('data-tags');
-                if (usedTags && usedTags.split(',').indexOf(currentTag) > -1)
-                    showRow = true;
-            });
-        }
-        tr.toggle(showRow);
-    });
-	// reapply striping
-    $("#joblist tr:not(.hidden)").each(function (index) {
-        $(this).toggleClass("stripe", !!(index & 1));
-    });
-}
-
 function initTable(nextExecutionLink) {
 	FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
 	updatePrettyCrons();
-	filterJobList();
 }
 
 InactiveJobLoader = function(listLink, nextExecutionLink) {
@@ -283,9 +197,6 @@ function doOnDomReady(
 	getLastRunLink,
 	nextExecutionLink){
 
-    var stringUtils = OpenSpeedMonitor.stringUtils;
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils();
-
   $('[data-toggle="popover"]').popover()
 	$('#checkAll').on('click', function() {
 	    // set checked attribute on fixed-header
@@ -299,36 +210,6 @@ function doOnDomReady(
 		$('form').attr('action', $(this).attr('href')).submit();
 		return false;
 	});
-
-	if ($('#filterTags').size() == 0) {
-		$('#filterTags').hide();
-	} else {
-		$('#filterTags').chosen({ no_results_text: '' }).change(filterJobList);
-	}
-
-    var filterValueJobname = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
-    var filterValueJobgroup = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
-    var filterValueLocation = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
-    var filterValueSkript = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.skript');
-    var filterValueBrowser = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.browser');
-    var filterJobSetName = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetName');
-
-	var filterValueCheckedJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
-	var filterValueInactiveJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
-	var filterValueHighlightedJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs'));
-	var filterValueRunningJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.runningjobs'));
-
-    if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
-    if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
-    if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
-    if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
-    if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
-
-	if(filterValueCheckedJobs != null) $('#filterCheckedJobs').prop("checked",filterValueCheckedJobs);
-	if(filterValueInactiveJobs != null) $('#filterInactiveJobs').prop("checked",filterValueInactiveJobs);
-	if(filterValueHighlightedJobs != null) $('#filterHighlightedJobs').prop("checked",filterValueHighlightedJobs);
-	if(filterValueRunningJobs != null) $('#filterRunningJobs').prop("checked",filterValueRunningJobs);
-	if(filterJobSetName != null) $('#jobSetButton ').html(filterJobSetName  + '<span class="caret"></span>');
 
 	initTable(nextExecutionLink);
 

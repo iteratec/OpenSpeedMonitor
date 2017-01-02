@@ -85,9 +85,10 @@
                     </ul>
                 </div>
                 <div id="filterInputContainer">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterInput"
+                    <input class="form-control" type="text" id="filterInput"
                            placeholder="<g:message code="job.list.filter" default="Jobs filtern"/>"
                            name="filter" value="${filters?.filter}"/>
+                    <span class="fa fa-times-circle" id="clearFilter"></span>
                 </div>
                 <div class="filterButtonsContainer">
                     <span class="description">
@@ -95,33 +96,27 @@
                     </span>
                     <span class="btn-group" data-toggle="buttons">
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByName"
-                                    name="filters.filterByName" />
+                            <input type="checkbox" id="filterByName" name="filters.filterByName"/>
                             <g:message code="job.list.filter.by.name" default="Name" />
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByScript"
-                                    name="filters.filterByScript" />
+                            <input type="checkbox" id="filterByScript" name="filters.filterByScript"/>
                             <g:message code="job.list.filter.by.script" default="Script" />
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByJobGroup"
-                                    name="filters.filterByJobGroup" />
+                            <input type="checkbox" id="filterByJobGroup" name="filters.filterByJobGroup"/>
                             <g:message code="job.list.filter.by.group" default="Job Group" />
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByLocation"
-                                    name="filters.filterByLocation" />
+                            <input type="checkbox" id="filterByLocation" name="filters.filterByLocation"/>
                             <g:message code="job.list.filter.by.location" default="Location" />
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByBrowser"
-                                    name="filters.filterByBrowser" />
+                            <input type="checkbox" id="filterByBrowser" name="filters.filterByBrowser"/>
                             <g:message code="job.list.filter.by.browser" default="Browser" />
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterByTags"
-                                    name="filters.filterByTags" />
+                            <input type="checkbox" id="filterByTags" name="filters.filterByTags"/>
                             <g:message code="job.list.filter.by.tags" default="Tags" />
                         </label>
                     </span>
@@ -129,25 +124,21 @@
                 <div class="filterButtonsContainer" id="filterShowOnly">
                     <span class="description"><g:message code="job.list.filter.showOnly" default="Show only" /></span>
                     <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="checkbox" id="filterActiveJobs" name="filters.filterActiveJobs" checked />
+                            <g:message code="job.list.filter.activeJobs"/>
+                        </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterCheckedJobs"
-                                    name="filters.filterCheckedJobs" />
+                            <input type="checkbox" id="filterCheckedJobs" name="filters.filterCheckedJobs"/>
                             <g:message code="job.list.filter.checkedJobs"/>
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterHighlightedJobs"
-                                    name="filters.filterHighlightedJobs" />
+                            <input type="checkbox" id="filterHighlightedJobs" name="filters.filterHighlightedJobs" />
                             <g:message code="job.list.filter.highlightedJobs"/>
                         </label>
                         <label class="btn btn-default">
-                            <input type="checkbox" onchange="filterJobList()" id="filterRunningJobs"
-                                    name="filters.filterRunningJobs" />
+                            <input type="checkbox" id="filterRunningJobs" name="filters.filterRunningJobs"/>
                             <g:message code="job.list.filter.runningJobs"/>
-                        </label>
-                        <label class="btn btn-default active">
-                            <input type="checkbox" onchange="filterJobList()" id="filterInactiveJobs"
-                                    name="filters.filterInactiveJobs" checked />
-                            <g:message code="job.list.filter.activeJobs"/>
                         </label>
                     </div>
                 </div>
@@ -158,13 +149,13 @@
                 </div>
             </div>
             <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <table class="table table-striped" id="jobtable">
+            <table class="table" id="jobtable">
                 <thead class="header">
                 <tr>
                     <th><input type="checkbox" id="checkAll"/></th>
                     <g:set var="titleHeader">
                         <g:message code="de.iteratec.isj.job" default="Job"/><br/>
-                        <span style="font-weight: normal"><g:message
+                        <span class="script"><g:message
                                 code="de.iteratec.iss.script" default="Skript"/>
                         </span>
                     </g:set>

@@ -16,22 +16,22 @@
 					<a href="${jobService.createPageAggregationLinkForJob(job)}" class="show-chart"><i class="fa fa-bar-chart"></i></a>
 				</g:if>
 				</div>
-				<strong><a
+				<div class="jobNameContainer"><a
 					href="${createLink(action: 'edit', id: job.id, absolute: true)}" class="jobName ${job.active==false?'inactiveJob':''}"> ${job.label}
-				</a></strong>
+				</a></div>
+				<g:if test="${job.script}">
+					<a
+						href="${createLink(controller: 'script', action: 'edit', id: job.script.id, absolute: true)}" class="script">
+						${job.script.label}
+					</a>
+					<span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>
+				</g:if>
 				<g:if test="${tags}">
 					<ul class="tags">
 						<g:each in="${tags}">
 							<li>${it}</li>
 						</g:each>
 					</ul>
-				</g:if>
-				<g:if test="${job.script}">
-					<a
-						href="${createLink(controller: 'script', action: 'edit', id: job.script.id, absolute: true)}" class="skript">
-						${job.script.label}
-					</a>
-					<span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>
 				</g:if>
 				<span class="status" id="runningstatus-${job.id}"> </span> 
 				<span class="status"> ${ massExecutionResults ? (massExecutionResults[job.id]?.message ? "<br />" + massExecutionResults[job.id].message : '' ) : '' }</span>

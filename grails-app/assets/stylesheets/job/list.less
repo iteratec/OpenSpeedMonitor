@@ -23,11 +23,24 @@
 
 #filterRow #filterInputContainer {
   flex-grow: 1;
+  position: relative;
   input {
     min-width: 5em;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
   }
+}
+
+#filterRow #clearFilter {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  height: @font-size-large;
+  margin: auto;
+  font-size: @font-size-large;
+  cursor: pointer;
+  color: @gray;
 }
 
 #filterRow .filterButtonsContainer {
@@ -50,10 +63,6 @@
   }
 }
 
-#filterRow #filterBy .description {
-
-}
-
 #filterRow #filterShowOnly {
   margin-left: 15px;
   .description {
@@ -66,6 +75,26 @@
   margin-left: 15px;
 }
 
+#jobtable tr.stripe {
+  background-color: @table-bg-accent;
+}
+
+#jobtable .jobName {
+  font-weight: bold;
+}
+
+#jobtable .script {
+  font-style: italic;
+  font-weight: normal;
+}
+
+#jobtable td ul.tags {
+  margin-top: 5px;
+}
+
+#jobtable td .jobStatusBar {
+  display: block;
+}
 
 
 table#jobtable tr.success td {
@@ -123,7 +152,7 @@ ul.tags li {
   background: rgba(255, 255, 255, 1);
 }
 
-.inactiveJob {
+#jobtable .inactiveJob {
   font-weight: normal;
 }
 
