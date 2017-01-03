@@ -29,7 +29,7 @@ databaseChangeLog = {
                 // link tags with name of the jobset to jobs
                 sql.executeInsert('''INSERT INTO tags_links (version, tag_id, tag_ref, type)
                     SELECT 
-                        0, t.id, jsj.job_id, "job"
+                        0, t.id, jsj.job_id, 'job'
                     FROM
                         job_set_job jsj
                             INNER JOIN
