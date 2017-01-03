@@ -74,6 +74,7 @@
                     i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
                     i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
                     i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
+                    i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
                     measuredEvents: ${measuredEvents},
                     linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                     linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',

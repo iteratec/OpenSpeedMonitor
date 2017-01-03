@@ -95,7 +95,12 @@ enum ScriptErrorEnum {
 	/**
 	 * MeasuredEvent is used twice
 	 */
-	MEASUREDEVENT_NOT_UNIQUE
+	MEASUREDEVENT_NOT_UNIQUE,
+
+	/**
+	 * Urls have to start with http(s)://
+	 */
+	WRONG_URL_FORMAT
 }
 
 
@@ -365,6 +370,16 @@ class ScriptParser {
 						possibleUnrecordedSteps << i
 					setEventNameStmtFound = false
 				} else {
+					if(stmt.keyword == navigateCmd){
+						if(stmt.parameter &&
+								!stmt.parameter.startsWith("http://") &&
+								!stmt.parameter.startsWith("https://")&&
+								!stmt.parameter.startsWith('${')){
+							errors << new ScriptEventNameCmdError(
+									type:ScriptErrorEnum.WRONG_URL_FORMAT,
+									lineNumber:statements.take(i+1).reverse().find { it.keyword == navigateCmd }.lineNumber)
+						}
+					}
 					if (possibleUnrecordedSteps.size() > 0) {
 						if (!setEventNameStmtFound)
 							possibleUnrecordedSteps.each { reportStepNotRecorded(statements[it]) }
