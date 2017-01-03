@@ -11,6 +11,7 @@ OpenSpeedMonitor.jobResult = (function (url) {
         spinner;
 
     var init = function () {
+        $(".chosen-select").chosen({ search_contains: true });
         spinner = OpenSpeedMonitor.Spinner("#jobResultTable");
 
         // add on change listener to select element
@@ -44,7 +45,7 @@ OpenSpeedMonitor.jobResult = (function (url) {
         $jobResultTable.removeClass("hidden");
         jobResults.forEach(function (jobResult) {
             $jobResultTable.find("tbody").append('<tr><td><a href="' + jobResult['testUrl'] + '">' + jobResult['testId'] + '</a></td> + ' + // testID
-                '<td>' + new Date(jobResult['date']).toUTCString() + '</td>' + // date
+                '<td>' + jobResult['date'] + '</td>' + // date
                 '<td>' + jobResult['httpStatusCode'] + '</td>' + // http status
                 '<td>' + jobResult['wptStatus'] + '</td>' + // wpt status
                 '<td>' + jobResult['description'] + '</td></tr>'); // description

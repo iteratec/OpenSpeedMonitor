@@ -2,9 +2,11 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
 
+import java.text.SimpleDateFormat
+
 class FailedJobResultDTO {
     String testId
-    Date date
+    String date
     Integer httpStatusCode
     String wptStatus
     String description
@@ -12,7 +14,7 @@ class FailedJobResultDTO {
 
     FailedJobResultDTO(JobResult jobResult) {
         testId = jobResult.testId
-        date = jobResult.date
+        date = new SimpleDateFormat().format(jobResult.date)
         httpStatusCode = jobResult.httpStatusCode
         wptStatus = jobResult.wptStatus ?: ''
         description = jobResult.description ?: ''
