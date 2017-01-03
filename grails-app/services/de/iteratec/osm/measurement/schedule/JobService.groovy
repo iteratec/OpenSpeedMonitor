@@ -102,7 +102,6 @@ class JobService {
      */
     void deleteJob(Job job) {
         Job.withSession {
-            removeJobFromJobSet(job)
             markAsDeleted(job)
         }
     }
@@ -113,30 +112,6 @@ class JobService {
         job.deleted = true
         job.script = null
         job.save(failOnError: true, flush: true)
-    }
-
-    /**
-     * Removes deleted Job from JobSets.
-     * If it was the last job in JobSet, the jobSet gets deleted
-     */
-    private void removeJobFromJobSet(Job job) {
-        List<JobSet> jobSets = JobSet.createCriteria().list {
-            'jobs' {
-                idEq(job.id)
-            }
-        }
-
-        List<JobSet> jobSetsToRemove = []
-        jobSets.each {
-            if (it.jobs.size() == 1) {
-                jobSetsToRemove << it
-            } else {
-                it.jobs.remove(job)
-                it.save(flush: true)
-            }
-        }
-
-        jobSetsToRemove*.delete(flush: true)
     }
 
     /**

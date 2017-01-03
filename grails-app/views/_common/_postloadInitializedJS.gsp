@@ -32,17 +32,22 @@
             browsers: "${createLink(absolute: true, controller: 'resultSelection', action: 'getLocations')}",
             connectivity: "${createLink(absolute: true, controller: 'resultSelection', action: 'getConnectivityProfiles')}",
             resultCount: "${createLink(absolute: true, controller: 'resultSelection', action: 'getResultCount')}"
+        },
+        jobTags: {
+            getTagsForJobs: "${createLink(absolute: true, controller: 'job', action: 'getTagsForJobs')}",
+            removeTag: "${createLink(absolute: true, controller: 'job', action: 'removeTag')}",
+            addTagToJobs: "${createLink(absolute: true, controller: 'job', action: 'addTagToJobs')}"
         }
     };
-    $( window ).load(function() {
-        window.addEventListener("PostLoadedScriptArrived",function() {
+    $(window).load(function () {
+        window.addEventListener("PostLoadedScriptArrived", function () {
             OpenSpeedMonitor.postLoaded.idOfItemToDelete = ${item ? item.id : params.id ?: 'null'};
         });
 
         OpenSpeedMonitor.postLoader.loadJavascript(
             '<g:assetPath src="postload/application-postload.js" absolute="true"/>',
             true,
-                "postload"
+            "postload"
         )
 
     });

@@ -61,7 +61,6 @@
                                      'GraphitePathController',
                                      'GraphiteEventSourcePathController',
                                      'GraphiteServerController',
-                                     'JobSetController',
                                      'JobGroupController',
                                      'LocationController',
                                      'MeasuredEventController',

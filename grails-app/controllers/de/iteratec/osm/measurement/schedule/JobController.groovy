@@ -87,7 +87,6 @@ class JobController {
         def model = [
                 jobs                                           : jobs,
                 jobsWithTags                                   : jobService.listJobsWithTags(),
-                jobSets                                        : JobSet.findAll(),
                 filters                                        : params.filters,
                 measurementsEnabled                            : inMemoryConfigService.areMeasurementsGenerallyEnabled(),
                 lastNMinutesToShowSuccessfulResultsInJoblist   : LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,
@@ -397,26 +396,28 @@ class JobController {
         ]
     }
 
-    def saveJobSet() {
-        if (params.selected) {
+    def getTagsForJobs() {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+        List<String> tagNames = Job.getAll(jobIds)*.tags.flatten().unique(false).sort()
+        ControllerUtils.sendObjectAsJSON(response, ["tags": tagNames])
+    }
 
-            List<Long> selectedIds = params.selected.findAll { jobId -> jobId.key.isLong() && "on".equals(jobId.value) }
-                    .collect { jobId -> jobId.key.toLong() }
-
-            if (selectedIds.size() > 0) {
-
-                JobSet jobSet = new JobSet(name: params.jobSetName)
-                selectedIds.each {
-                    jobSet.addToJobs(Job.get(it))
-                }
-                if (!jobSet.save(flush: true)) {
-                    render(view: 'index', model: getListModel() << [selectedIds: selectedIds, filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetUniqueError", "unique")])
-                    return
-                }
-                render(view: 'index', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobSetSuccess", "success")])
-                return
-            }
+    def removeTag(String tag) {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+        Job.getAll(jobIds).each { job ->
+            job.removeTag(tag)
+            job.save(failOnError: true)
         }
-        render(view: 'index', model: getListModel() << [filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetEmptyJobList", "empty list")])
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+    }
+
+    def addTagToJobs(String tag) {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+
+        Job.getAll(jobIds).each { job ->
+            job.addTag(tag)
+            job.save(failOnError: true)
+        }
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
     }
 }

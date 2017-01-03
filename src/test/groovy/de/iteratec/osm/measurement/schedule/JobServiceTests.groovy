@@ -40,7 +40,7 @@ import static org.junit.Assert.*
  * Test-suite of {@link JobService}.
  */
 @TestFor(JobService)
-@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay, JobSet])
+@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay])
 class JobServiceTests extends Specification {
 
     WebPageTestServer server1
@@ -156,23 +156,15 @@ class JobServiceTests extends Specification {
     }
 
     void "test deleteJob"() {
-        given: "a job to delete and a jobSet which contains this job"
+        given: "a job to delete"
         Job deleteJob = job1
-        Job unusedJob = job2
-        new JobSet(name: "jobSet", jobs: [deleteJob, unusedJob]).save(failOnError: true, flush: true)
 
         when: "user deletes job"
         service.deleteJob(deleteJob)
-        JobSet resultJobSet = JobSet.findByName("jobSet")
 
         then: "job as marked as deleted"
         deleteJob.deleted
         deleteJob.label.contains("_deleted_")
-
-        and: "jobSet does not contain deleted job"
-        resultJobSet.jobs.size() == 1
-        resultJobSet.jobs.contains(unusedJob)
-        !resultJobSet.jobs.contains(deleteJob)
     }
 
     private void createTestDataCommonForAllTests() {
