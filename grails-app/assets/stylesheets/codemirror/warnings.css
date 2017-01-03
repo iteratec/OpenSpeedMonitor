@@ -22,8 +22,8 @@ p#usedVariables span, .placeholder-row label {
 }
 
 .CodeMirror-scroll {
-  max-height: 400px;
-  min-height: 200px;
+  max-height: 700px;
+  min-height: 700px;
   overflow-y: hidden;
   overflow-x: auto;
 }
@@ -36,5 +36,36 @@ hr.style-one {
 	border: 0;
 	height: 1px;
 	background: #ccc;
+}
+#versionControlModal .modal-lg{
+	width: 1700px;
+}
+.versionControlMinCellWidth{
+	width: 180px;
+}
+.highlight td {
+	background-color: lightgrey;
+}
 
+#archivedNavigationScriptTableWrapper {
+	position:relative;
+}
+#archivedNavigationScriptTableScroll {
+	height:700px;
+	overflow:auto;
+	margin-top:20px;
+}
+#archivedNavigationScriptTableWrapper table {
+	width:100%;
+}
+#archivedNavigationScriptTableWrapper table * {
+	color:black;
+}
+#archivedNavigationScriptTableWrapper table thead th .text {
+	position:absolute;
+	top:-20px;
+	z-index:2;
+	height:20px;
+	width:35%;
+	border:1px solid red;
 }

@@ -79,21 +79,43 @@ class ScriptController {
 		Script script = Script.get(params.id)
 		redirectIfNotFound(script, params.id)
 		// only MeasuredEvents whose names do not contain spaces
-		[script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON]
+		[script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(script)]
 	}
-	
+
+	private  getListOfArchivedScripts(Script script) {
+		def archiveParams = [:]
+		archiveParams.order = "desc"
+		archiveParams.sort =  "dateCreated"
+		def returnList = []
+		ArchivedScript.createCriteria().list(archiveParams) {
+			eq("script", script)
+			projections {
+				property("id","id")
+				property("dateCreated","dateCreated")
+				property("archiveTag","archiveTag")
+			}
+		}.each{
+			def returnValue = [:]
+			returnValue["id"] = it[0]
+			returnValue["dateCreated"] = it[1]
+			returnValue["archiveTag"] = it[2]
+			returnList.add(returnValue)
+		}
+		return returnList
+	}
+
 	def update() {
 		Script s = Script.get(params.id)
 		def flashMessageArgs = [getScriptI18n(), s.label]
 		redirectIfNotFound(s, params.id)
-		
+		ArchivedScript archivedScript = createArchiveScript(s)
 		if (params.version) {
 			def version = params.version.toLong()
 			if (s.version > version) {
 				s.errors.rejectValue("version", "default.optimistic.locking.failure",
 						  [getScriptI18n()] as Object[],
 						  "Another user has updated this script while you were editing")
-				render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON])
+				render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents:  getListOfArchivedScripts(s)])
 				return
 			}
 		}
@@ -104,9 +126,19 @@ class ScriptController {
 			return
 		}
 		createNewPagesAndMeasuredEvents(s)
+		archivedScript.save(failOnError:true, flush:true)
 
 		flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
 		redirect(action: 'edit',  id: s.id)
+	}
+
+	private ArchivedScript createArchiveScript(Script s){
+		return new ArchivedScript(archiveTag: s.description,
+				description: s.description,
+				label: s.label,
+				navigationScript: s.navigationScript,
+				script: s)
+
 	}
 
 	private void createNewPagesAndMeasuredEvents(Script s) {
@@ -154,6 +186,12 @@ class ScriptController {
 		render output as JSON
 	}
 
+	def getArchivedNavigationScript(long scriptId){
+		def navigationScript = ArchivedScript.findById(scriptId).navigationScript
+		ControllerUtils.sendObjectAsJSON(response, [
+				navigationScript: navigationScript
+		])
+	}
 
 	def getParsedScript(long scriptId, long jobId){
 		Script script = Script.get(scriptId)
@@ -165,5 +203,14 @@ class ScriptController {
 		ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
 	}
 
-
+	def loadArchivedScript(long archivedScriptId ){
+		Script s = Script.get(params.id)
+		createArchiveScript(s).save(failOnError:true, flush:true)
+		ArchivedScript archivedScript  = ArchivedScript.get(archivedScriptId)
+		s.label = archivedScript.label
+		s.description = archivedScript.description
+		s.navigationScript = archivedScript.navigationScript
+		s.save(failOnError:true, flush:true)
+		redirect(action: "edit", id:s.id)
+	}
 }
