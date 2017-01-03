@@ -9,5 +9,9 @@ databaseChangeLog = {
         ''')
     }
 
+    changeSet(author: "marko (generated)", id: "1483441134102-6") {
+        dropColumn(columnName: "valid", tableName: "location")
+    }
+
 
 }
