@@ -17,7 +17,8 @@ databaseChangeLog = {
         grailsChange {
             change {
                 // create tags from old jobSets
-                sql.executeInsert('''INSERT IGNORE INTO tags (version, name) SELECT 0, name FROM job_set;''')
+                sql.executeInsert('''INSERT INTO tags (version, name) SELECT 0,js.name FROM job_set js
+                                    WHERE NOT EXISTS (SELECT name FROM tags t WHERE t.name=js.name);''')
             }
         }
     }
