@@ -43,7 +43,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     @Shared
     String location1Name = "TestLocation1-564892#Afef1"
     @Shared
-    String Location2Name = "TestLocation2-564892#Afef1"
+    String location2Name = "TestLocation2-564892#Afef1"
     @Shared
     String jobGroup1Name = "TestJobGroup1-564892#Afef1"
     @Shared
@@ -277,6 +277,30 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "Reset filter Job by Browser"() {
+        given: "User is on the job list, inactive jobs are shown"
+        page.enableShowOnlyActiveJobs(false)
+
+        when: "The user deletes the input from the text field"
+        page.filterTextbox.value(Keys.chord(Keys.CONTROL, "A") + Keys.BACK_SPACE)
+
+        then: "There should be no hided row"
+        page.invisibleRows.size() == 0
+    }
+
+    void "Filter Job by Group and Location"() {
+        given: "User is on the job list, inactive jobs are shown"
+        page.enableShowOnlyActiveJobs(false)
+
+        when: "The user enables the browser filter and types the name of a browser in the filter textbox"
+        page.enableFilterByButtons([page.filterByJobGroupButton, page.filterByLocationButton])
+        page.filterTextbox << jobGroup1Name << " " << location2Name
+
+
+        then: "There should be 2 hidden rows"
+        page.invisibleRows.size() == 2
+    }
+
+    void "Reset filter Job by Group and Location"() {
         given: "User is on the job list, inactive jobs are shown"
         page.enableShowOnlyActiveJobs(false)
 
