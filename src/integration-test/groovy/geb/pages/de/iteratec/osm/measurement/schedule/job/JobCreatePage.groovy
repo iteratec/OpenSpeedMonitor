@@ -10,6 +10,16 @@ class JobCreatePage extends I18nGebPage {
         title == "Create Job"
     }
 
+    public void scrollBottom(){
+        js.exec("scrollTo(0,document.body.scrollHeight);")
+    }
+
+    public void clickCreateButton(){
+        waitFor { createButton.displayed }
+        scrollBottom()
+        sleep(200)
+        createButton.click()
+    }
 
     static content = {
         nameText{$("input",name:"label")}
