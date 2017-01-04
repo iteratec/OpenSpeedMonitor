@@ -224,27 +224,37 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
     var offsetFixedHeader = $('.navbar-header').height();
     $("#jobtable").stickyTableHeaders({fixedOffset: offsetFixedHeader});
 
-    $("#actionForSelected").click(function () {
-        $("#remove-tag-dropdown").empty();
-        $.ajax({
-            url: OpenSpeedMonitor.urls.jobTags.getTagsForJobs,
-            data: {jobIds: JSON.stringify(getSelectedJobIds())}
-        }).done(function (result) {
-            fillDropdown(jQuery.parseJSON(result).tags);
+    initEventHandlers();
+
+    function initEventHandlers() {
+
+        $("#actionForSelected").click(function () {
+            $("#remove-tag-select .tagLink").remove();
+            $.ajax({
+                url: OpenSpeedMonitor.urls.jobTags.getTagsForJobs,
+                data: {jobIds: JSON.stringify(getSelectedJobIds())}
+            }).done(function (result) {
+                fillDropdown(jQuery.parseJSON(result).tags);
+            });
         });
-    });
-    $("#add-tag-confirm-button").click(function () {
-        var tag = $("#add-tag-input").val();
-        $.ajax({
-            url: OpenSpeedMonitor.urls.jobTags.addTagToJobs,
-            data: {
-                jobIds: JSON.stringify(getSelectedJobIds()),
-                tag: tag
-            }
-        }).done(function () {
-            addTag(tag);
-        })
-    });
+        $("#add-tag-confirm-button").click(function () {
+            var tag = $("#add-tag-input").val();
+            $.ajax({
+                url: OpenSpeedMonitor.urls.jobTags.addTagToJobs,
+                data: {
+                    jobIds: JSON.stringify(getSelectedJobIds()),
+                    tag: tag
+                }
+            }).done(function () {
+                addTag(tag);
+            })
+        });
+
+        $('.chosen-select').on('change', function(evt, params) {
+            removeTag(params.selected);
+        });
+    }
+
 
     function getSelectedJobIds() {
         var ids = [];
@@ -255,12 +265,18 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
     }
 
     function fillDropdown(tags) {
-        var dropdownContainer = $("#remove-tag-dropdown");
+        var selectContainer = $("#remove-tag-select");
         tags.forEach(function (tag) {
-            var tagElem = $("<li><a href='#'>" + tag + "</a></li>");
+            var tagElem = $("<option class='tagLink'><a href='#'>" + tag + "</a></option>");
             tagElem.click(removeTag);
-            dropdownContainer.append(tagElem);
+            selectContainer.append(tagElem);
         });
+        $("#remove-tag-select").val("0");
+        $("#remove-tag-select").parent().click(function (e) {
+            e.stopPropagation();
+        });
+        $(".chosen-select").chosen({search_contains: true});
+        $('.chosen-select').trigger('chosen:updated');
     }
 
     function unhighlightRows() {
@@ -269,8 +285,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
         });
     }
 
-    function removeTag(e) {
-        var selectedTag = e.target.text;
+    function removeTag(selectedTag) {
         $.ajax({
             url: OpenSpeedMonitor.urls.jobTags.removeTag,
             data: {
@@ -294,18 +309,19 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
                 });
             });
             OpenSpeedMonitor.jobListFilter.filter();
-        })
+        });
+        $("#remove-tag-select").val("0");
+        $('.chosen-select').trigger('chosen:updated');
+        $("#actionForSelectedContainer").removeClass("open");
     }
 
     function addTag(tag) {
-        var tagExists = $('#filterTags option').filter(function () {
-                return $(this).val() === tag
-            }).length >= 1;
         unhighlightRows();
+
         $(".jobCheckbox:checked").each(function () {
             // append tag to data-tag-attribute
             var row = $(this).closest("tr");
-            if (!row.attr("data-tags")) {
+            if (!row.attr("data-tags") || row.attr("data-tags") === "") {
                 row.attr("data-tags", tag)
             } else {
                 row.attr("data-tags", row.attr("data-tags") + "," + tag);
@@ -318,6 +334,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
                 row.find(".tags").append("<li>" + tag + "</li>");
             }
         });
+
         OpenSpeedMonitor.jobListFilter.filter();
     }
 

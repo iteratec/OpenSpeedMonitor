@@ -96,7 +96,6 @@
   display: block;
 }
 
-
 table#jobtable tr.success td {
   background: rgb(171, 248, 171) !important;
 }
@@ -132,8 +131,6 @@ table#jobtable tr.failure td {
   vertical-align: top;
 }
 
-
-
 ul.tags {
   display: block;
   margin: 0;
@@ -168,7 +165,7 @@ ul.tags li {
 
 .show-chart-buttons {
   float: right;
-	display: block;
+  display: block;
 }
 
 .show-chart-buttons a {
@@ -229,4 +226,27 @@ ul.tags li {
 
 .job-status-nodata {
   background-color: #777; /*botstrap gray-light*/
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+  top: 100%;
+  left: 0;
+  margin-top: -1px;
+}
+
+#add-tag-container,
+#remove-tag-container {
+  margin: 5px 10px 5px 20px;
+}
+
+#actionForSelectedContainer .dropdown-menu {
+  min-width: 250px;
+}
+
+#remove-tag-select {
+  width: 100%;
 }

@@ -11,18 +11,6 @@
 
     <asset:stylesheet src="job/list"/>
 
-    <style>
-    .dropdown-submenu {
-        position: relative;
-    }
-
-    .dropdown-submenu .dropdown-menu {
-        top: 0;
-        left: 100%;
-        margin-top: -1px;
-    }
-    </style>
-
 </head>
 
 <body>
@@ -83,6 +71,11 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
+                    <g:actionSubmit action="execute"
+                                    value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
                     <g:actionSubmit action="activate"
                                     value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
                 </li>
@@ -91,28 +84,20 @@
                                     value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
                 </li>
                 <li role="separator" class="divider"></li>
-                <li class="dropdown-submenu">
-                    <a class="test" tabindex="-1"
-                       href="#">${message(code: "de.iteratec.isj.job.addTag", default: "add Tag")}</a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <input id="add-tag-input" class="form-control" placeholder="tag">
-                            <a href="#" id="add-tag-confirm-button" class="btn btn-primary"><i class="fa fa-check"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown-submenu">
-                    <a class="test" tabindex="-1"
-                       href="#">${message(code: "de.iteratec.isj.job.removeTag", default: "remove Tag")}</a>
-                    <ul class="dropdown-menu" id="remove-tag-dropdown">
-                    </ul>
-                </li>
-
-                <li role="separator" class="divider"></li>
                 <li>
-                    <g:actionSubmit action="execute"
-                                    value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
+                    <div id="add-tag-container" class="input-group input-group-sm">
+                        <input id="add-tag-input" class="form-control" placeholder="tag">
+                        <a href="#" id="add-tag-confirm-button"
+                           class="btn btn-primary btn-sm input-group-addon">${message(code: "de.iteratec.isj.job.addTag", default: "add Tag")}
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div id="remove-tag-container">
+                    <select id="remove-tag-select" class="input-sm chosen-select chosen">
+                        <option value="0" disabled selected>${message(code: "de.iteratec.isj.job.removeTag", default: "remove Tag")}</option>
+                    </select>
+                    </div>
                 </li>
             </ul>
         </div>
