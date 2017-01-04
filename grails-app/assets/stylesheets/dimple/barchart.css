@@ -27,3 +27,21 @@
     z-index: 500;
     padding: 6px 12px;
 }
+
+#download-as-png-button {
+    color: #333333;
+    opacity: 0.5;
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    border-radius: 4px;
+    z-index: 500;
+    font-size: 25px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+#download-as-png-button:hover,
+#download-as-png-button:focus {
+    background: #eeeeee;
+}

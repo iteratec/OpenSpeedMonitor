@@ -39,8 +39,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
         var $adjustBarchartButton = $("#adjust-barchart-modal");
+        var $downloadAsPngButton = $("#download-as-png-button");
         if ($adjustBarchartButton.hasClass("hidden"))
             $adjustBarchartButton.removeClass("hidden");
+        if ($downloadAsPngButton.hasClass("hidden"))
+            $downloadAsPngButton.removeClass("hidden");
         initFilterDropdown(chartData.filterRules);
 
         // Reset fields

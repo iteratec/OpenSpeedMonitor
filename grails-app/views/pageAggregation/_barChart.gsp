@@ -21,6 +21,11 @@
        class="hidden" onclick="initModalDialogValues()">
         <i class="fa fa-sliders"></i>
     </a>
+    <a href="#downloadAsPngModal" id="download-as-png-button"
+       class="hidden"
+       data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')">
+        <i class="fa fa-download"></i>
+    </a>
 
     <div id="svg-container">
     </div>

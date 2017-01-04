@@ -79,115 +79,109 @@
     </div>
 </div>
 
-<g:if test="${wptCustomerSatisfactionValues}">
-    <div class="row">
-        <div class="col-md-12">
-            <div id="chart-table-toggle" class="btn-group" data-toggle="buttons" id="job-filter-toggle">
-                <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
-                        code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
-                <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message
-                        code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/></button>
+<form method="get" action="" id="dashBoardParamsForm">
+    <g:if test="${wptCustomerSatisfactionValues}">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="chart-table-toggle" class="btn-group" data-toggle="buttons" id="job-filter-toggle">
+                    <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
+                            code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
+                    <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message
+                            code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/></button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <a name="chart-table"></a>
+        <a name="chart-table"></a>
 
-    <div class="row">
-        <%-- chart --%>
-        <g:set var="openDataPointLinksInNewWindow" value="false"/>
-        <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
-            <g:set var="openDataPointLinksInNewWindow" value="true"/>
-        </g:if>
-
-        %{-- chart title--}%
-        <g:if test="${!chartTitle}">
+        <div class="row">
+            <%-- chart --%>
+            <g:set var="openDataPointLinksInNewWindow" value="false"/>
             <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
-                <g:set var="chartTitle"
-                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.measured_steps.title')}"/>
                 <g:set var="openDataPointLinksInNewWindow" value="true"/>
             </g:if>
-            <g:elseif
-                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
-                <g:set var="chartTitle"
-                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.pages.title')}"/>
-            </g:elseif>
-            <g:elseif
-                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
-                <g:set var="chartTitle"
-                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
-            </g:elseif>
-            <g:elseif
-                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">
-                <g:set var="chartTitle"
-                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
-            </g:elseif>
-        </g:if>
-        <div class="col-md-12 section">
-            <div id="chartbox">
-                <g:render template="/highchart/chart"
-                          model="[
-                                  singleYAxis                  : 'false',
-                                  chartData                    : wptCustomerSatisfactionValues,
-                                  chartTitle                   : chartTitle,
-                                  yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : chartWidth,
-                                  initialChartHeight           : chartHeight,
-                                  chartUnit                    : '%',
-                                  globalLineWidth              : '2',
-                                  xAxisMin                     : fromTimestampForHighChart,
-                                  xAxisMax                     : toTimestampForHighChart,
-                                  markerEnabled                : markerShouldBeEnabled,
-                                  dataLabelsActivated          : labelShouldBeEnabled,
-                                  yAxisScalable                : 'false',
-                                  optimizeForExport            : 'false',
-                                  openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
-                                  annotations                  : annotations,
-                                  labelSummary                 : labelSummary,
-                          ]"/>
+
+            %{-- chart title--}%
+            <g:if test="${!chartTitle}">
+                <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
+                    <g:set var="chartTitle"
+                           value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.measured_steps.title')}"/>
+                    <g:set var="openDataPointLinksInNewWindow" value="true"/>
+                </g:if>
+                <g:elseif
+                        test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
+                    <g:set var="chartTitle"
+                           value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.pages.title')}"/>
+                </g:elseif>
+                <g:elseif
+                        test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
+                    <g:set var="chartTitle"
+                           value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
+                </g:elseif>
+                <g:elseif
+                        test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">
+                    <g:set var="chartTitle"
+                           value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
+                </g:elseif>
+            </g:if>
+            <div class="col-md-12 section">
+                <div id="chartbox">
+                    <g:render template="/highchart/chart"
+                              model="[
+                                      singleYAxis                  : 'false',
+                                      chartData                    : wptCustomerSatisfactionValues,
+                                      chartTitle                   : chartTitle,
+                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
+                                      initialChartWidth            : chartWidth,
+                                      initialChartHeight           : chartHeight,
+                                      chartUnit                    : '%',
+                                      globalLineWidth              : '2',
+                                      xAxisMin                     : fromTimestampForHighChart,
+                                      xAxisMax                     : toTimestampForHighChart,
+                                      markerEnabled                : markerShouldBeEnabled,
+                                      dataLabelsActivated          : labelShouldBeEnabled,
+                                      yAxisScalable                : 'false',
+                                      optimizeForExport            : 'false',
+                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      annotations                  : annotations,
+                                      labelSummary                 : labelSummary,
+                                      downloadPngLabel             : null,
+                                      downloadCsvSubmitButton      : g.actionSubmit([value: g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV'), action: 'csiValuesCsv'])
+                              ]"/>
+                </div>
+            </div>
+            <%-- table --%>
+            <div id="csi-table" class="col-md-12" style="display: none;">
+                <g:if test="${flash.tableDataError}">
+                    <div class="alert alert-danger">
+                        <g:message error="${flash.tableDataError}"/>
+                    </div>
+                </g:if>
+                <g:if test="${wptCustomerSatisfactionValuesForTable != null}">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td class="text-info">
+                                ${wptCustomerSatisfactionValuesForTable.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </g:if>
             </div>
         </div>
-        <%-- table --%>
-        <div id="csi-table" class="col-md-12" style="display: none;">
-            <g:if test="${flash.tableDataError}">
-                <div class="alert alert-danger">
-                    <g:message error="${flash.tableDataError}"/>
+    </g:if>
+    <g:else>
+        <g:if test="${request.queryString}">
+            <g:if test="${!warnAboutLongProcessingTime}">
+                <div class="alert alert-info text-center" id="noDataForCurrentSelectionWarning">
+                    <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
                 </div>
             </g:if>
-            <g:if test="${wptCustomerSatisfactionValuesForTable != null}">
-                <table class="table table-bordered">
-                    <tbody>
-                    <tr>
-                        <td class="text-info">
-                            ${wptCustomerSatisfactionValuesForTable.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </g:if>
-        </div>
-    </div>
-</g:if>
-<g:else>
-    <g:if test="${request.queryString}">
-        <g:if test="${!warnAboutLongProcessingTime}">
-            <div class="alert alert-info text-center" id="noDataForCurrentSelectionWarning">
-                <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
-            </div>
         </g:if>
-    </g:if>
-</g:else>
-
-<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-<g:if test="${params.dashboardID}">
-    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
-        <g:render template="/_common/modals/deleteDialog" model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
-    </g:if>
-</g:if>
-
-<div class="row">
-    <div class="col-md-12">
-        <form method="get" action="" id="dashBoardParamsForm">
+    </g:else>
+    <div class="row">
+        <div class="col-md-12">
             <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
                     code="de.iteratec.ism.ui.labels.save.success"
                     default="Successfully saved these settings as custom dashboard."/></div>
@@ -217,19 +211,14 @@
                     <div class="btn-group pull-right">
                         <g:actionSubmit id="chart-submit"
                                         value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                        action="showAll" class="btn btn-primary" />
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <g:actionSubmit action="csiValuesCsv"
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}" />
-                            </li>
-
-                            <sec:ifLoggedIn>
+                                        action="showAll" class="btn btn-primary"/>
+                        <sec:ifLoggedIn>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
                                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                     <li class="separator"></li>
                                     <li>
@@ -238,31 +227,34 @@
                                         </a>
                                     </li>
                                 </sec:ifAnyGranted>
-                            </sec:ifLoggedIn>
-                            <g:if test="${params.dashboardID}">
-                                <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
-                                    <li>
-                                        <a href="#" role="button" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
-                                            ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
-                                        </a>
-                                        <a href="#DeleteModal" role="button" data-toggle="modal">
-                                            ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
-                                        </a>
-                                    </li>
+                                <g:if test="${params.dashboardID}">
+                                    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                                        <li>
+                                            <a href="#" role="button"
+                                               onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
+                                                ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
+                                            </a>
+                                            <a href="#DeleteModal" role="button" data-toggle="modal">
+                                                ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
+                                            </a>
+                                        </li>
+                                    </g:if>
                                 </g:if>
-                            </g:if>
-                        </ul>
+                            </ul>
+                        </sec:ifLoggedIn>
                     </div>
                 </div>
             </div>
+
             <div class="row card-well">
                 <div class="col-md-4">
                     <div class="card">
                         <fieldset>
                             <legend>
                                 <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                                               default="Aggregator"/>
+                                           default="Aggregator"/>
                             </legend>
+
                             <div id="aggregationRadioButtons">
                                 <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
                                               values="${aggrGroupValues}"
@@ -274,10 +266,11 @@
                     </div>
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                               model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                        'fromHour': fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
-                                        'includeInterval': includeInterval, 'dateFormat': dateFormat,
-                                        'weekStart': weekStart]}"/>
+                                        'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
+                                        'includeInterval'          : includeInterval, 'dateFormat': dateFormat,
+                                        'weekStart'                : weekStart]}"/>
                 </div>
+
                 <div class="col-md-3">
                     <div class="card" id="filter-navtab-csiSystem">
                         <legend>
@@ -287,15 +280,18 @@
                                   name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
                                   optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
                     </div>
+
                     <div id="filter-navtab-jobGroup">
                         <g:render template="/_resultSelection/selectJobGroupCard"
-                                  model="['folders': folders, 'selectedFolder': selectedFolder,
-                                          'tagToJobGroupNameMap': tagToJobGroupNameMap, 'noAutoUpdate': true]" />
+                                  model="['folders'             : folders, 'selectedFolder': selectedFolder,
+                                          'tagToJobGroupNameMap': tagToJobGroupNameMap, 'noAutoUpdate': true]"/>
                     </div>
+
                     <div class="card">
                         <legend>
                             <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
                         </legend>
+
                         <div class="checkbox">
                             <label for="csiTypeDocComplete">
                                 <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
@@ -305,6 +301,7 @@
                                 &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
                             </label>
                         </div>
+
                         <div class="checkbox">
                             <label for="csiTypeVisuallyComplete">
                                 <input type="checkbox" name="csiTypeVisuallyComplete"
@@ -319,23 +316,23 @@
                 %{--the rest----------------------------------------------------------------------------------------------}%
                 <div id="filter-complete-tabbable" class="col-md-5">
                     <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
-                              model="['locationsOfBrowsers'             : locationsOfBrowsers,
-                                      'eventsOfPages'                   : eventsOfPages,
-                                      'pages'                           : pages,
-                                      'selectedPages'                   : selectedPages,
-                                      'measuredEvents'                  : measuredEvents,
-                                      'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                                      'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                                      'browsers'                        : browsers,
-                                      'selectedBrowsers'                : selectedBrowsers,
-                                      'selectedAllBrowsers'             : selectedAllBrowsers,
-                                      'locations'                       : locations,
-                                      'selectedLocations'               : selectedLocations,
-                                      'selectedAllLocations'            : selectedAllLocations,
-                                      'connectivityProfiles'            : connectivityProfiles,
-                                      'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                      'noAutoUpdate': true]"/>
+                              model="['locationsOfBrowsers'            : locationsOfBrowsers,
+                                      'eventsOfPages'                  : eventsOfPages,
+                                      'pages'                          : pages,
+                                      'selectedPages'                  : selectedPages,
+                                      'measuredEvents'                 : measuredEvents,
+                                      'selectedAllMeasuredEvents'      : selectedAllMeasuredEvents,
+                                      'selectedMeasuredEvents'         : selectedMeasuredEvents,
+                                      'browsers'                       : browsers,
+                                      'selectedBrowsers'               : selectedBrowsers,
+                                      'selectedAllBrowsers'            : selectedAllBrowsers,
+                                      'locations'                      : locations,
+                                      'selectedLocations'              : selectedLocations,
+                                      'selectedAllLocations'           : selectedAllLocations,
+                                      'connectivityProfiles'           : connectivityProfiles,
+                                      'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
+                                      'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles,
+                                      'noAutoUpdate'                   : true]"/>
                 </div>
             </div>
             <g:if test="${exceedsTimeframeBoundary}">
@@ -346,7 +343,7 @@
                 </g:if>
                 <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
                     <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                                                      default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                 </g:elseif>
                 <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
                     <p class="text-danger"><g:message
@@ -355,12 +352,19 @@
                 </g:elseif>
                 <g:else>
                     <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                                                      default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                 </g:else>
             </g:if>
-        </form>
+        </div>
     </div>
-</div>
+</form>
+<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+<g:if test="${params.dashboardID}">
+    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+        <g:render template="/_common/modals/deleteDialog"
+                  model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
+    </g:if>
+</g:if>
 
 <content tag="include.bottom">
     <asset:javascript src="csidashboard/showAll.js"/>
@@ -368,7 +372,7 @@
 
         var selectedCsiSystems = [];
         <g:each var="csiSystem" in="${selectedCsiSystems}">
-        selectedCsiSystems.push(${csiSystem});
+            selectedCsiSystems.push(${csiSystem});
         </g:each>
 
         function setAdjustments() {
@@ -403,20 +407,16 @@
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             )
 
-            if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
-                $("#dia-save-chart-as-png").removeClass("btn-primary");
-                $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
-                $("#dia-save-chart-as-png").attr("disabled", "disabled");
-                $("#dia-save-chart-as-png").attr("title", "<g:message
-            code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
+            if (navigator.userAgent.indexOf('MSIE') === -1 && navigator.appVersion.indexOf('Trident/') <= 0 && navigator.appVersion.indexOf('Edge/') <= 0) {
+                $("#download-dropdown").removeClass("hidden");
             }
             setAdjustments();
 
         });
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
+                                                                    absolute="true"/>')
         });
-
 
     </asset:script>
 </content>

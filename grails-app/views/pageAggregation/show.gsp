@@ -40,28 +40,13 @@
 <div class="row">
     <div class="col-md-12">
         <form id="dashBoardParamsForm">
-            <!-- Split button to show/download -->
+            <!-- show button -->
             <div class="action-row">
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <button type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary">
-                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="#downloadAsPngModal" id="dia-save-chart-as-png"
-                                   class="btn btn-primary btn-sm disabled"
-                                   data-toggle="modal" role="button"
-                                   style="vertical-align: top;" onclick="setDefaultValues('svg-container')">
-                                    <g:message code="de.iteratec.ism.ui.button.save.name"/>
-                                </a>
-                            </li>
-                        </ul>
+                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary">
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings" />
                 </div>
