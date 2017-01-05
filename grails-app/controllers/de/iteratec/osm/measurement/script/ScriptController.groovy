@@ -27,7 +27,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
 class ScriptController {
-
+	def messageSource
 	PageService pageService
 
 	private String getScriptI18n() {
@@ -60,13 +60,13 @@ class ScriptController {
 	}
 	
 	def create() {
-		[script: new Script(params),pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON]
+		[script: new Script(params),pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:""]
 	}
 	
 	def save() {
 		Script s = new Script(params)
 		if (!s.save(flush: true)) {
-			render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON])
+			render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
 			return
 		}
 		createNewPagesAndMeasuredEvents(s)
@@ -78,8 +78,8 @@ class ScriptController {
 	def edit() {
 		Script script = Script.get(params.id)
 		redirectIfNotFound(script, params.id)
-		// only MeasuredEvents whose names do not contain spaces
-		[script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(script)]
+//		 only MeasuredEvents whose names do not contain spaces
+		[script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(script)]
 	}
 
 	private  getListOfArchivedScripts(Script script) {
@@ -92,13 +92,13 @@ class ScriptController {
 			projections {
 				property("id","id")
 				property("dateCreated","dateCreated")
-				property("archiveTag","archiveTag")
+				property("versionDescription","versionDescription")
 			}
 		}.each{
 			def returnValue = [:]
 			returnValue["id"] = it[0]
 			returnValue["dateCreated"] = it[1]
-			returnValue["archiveTag"] = it[2]
+			returnValue["versionDescription"] = it[2]
 			returnList.add(returnValue)
 		}
 		return returnList
@@ -115,14 +115,14 @@ class ScriptController {
 				s.errors.rejectValue("version", "default.optimistic.locking.failure",
 						  [getScriptI18n()] as Object[],
 						  "Another user has updated this script while you were editing")
-				render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents:  getListOfArchivedScripts(s)])
+				render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(s)])
 				return
 			}
 		}
 
 		s.properties = params;
 		if (!s.save(flush: true)) {
-			render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON])
+			render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(s)])
 			return
 		}
 		createNewPagesAndMeasuredEvents(s)
@@ -133,7 +133,7 @@ class ScriptController {
 	}
 
 	private ArchivedScript createArchiveScript(Script s){
-		return new ArchivedScript(archiveTag: s.description,
+		return new ArchivedScript(versionDescription: s.description,
 				description: s.description,
 				label: s.label,
 				navigationScript: s.navigationScript,
@@ -205,12 +205,21 @@ class ScriptController {
 
 	def loadArchivedScript(long archivedScriptId ){
 		Script s = Script.get(params.id)
+		def flashMessageArgs = [getScriptI18n(), s.label]
 		createArchiveScript(s).save(failOnError:true, flush:true)
 		ArchivedScript archivedScript  = ArchivedScript.get(archivedScriptId)
 		s.label = archivedScript.label
 		s.description = archivedScript.description
 		s.navigationScript = archivedScript.navigationScript
 		s.save(failOnError:true, flush:true)
+		flash.message = message(code: 'script.versionControl.load.success', args: flashMessageArgs)
 		redirect(action: "edit", id:s.id)
+	}
+
+	def updateVersionDescriptionUrl(long archivedScriptId, String newVersionDescription){
+		def archivedScript  = ArchivedScript.get(archivedScriptId)
+		archivedScript.versionDescription = newVersionDescription
+		archivedScript.save(failOnError:true, flush:true)
+		ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK,newVersionDescription)
 	}
 }

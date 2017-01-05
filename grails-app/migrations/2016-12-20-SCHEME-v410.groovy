@@ -23,7 +23,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "archive_tag", type: "VARCHAR(255)") {
+            column(name: "version_description", type: "VARCHAR(255)") {
                 constraints(nullable: "false")
             }
 

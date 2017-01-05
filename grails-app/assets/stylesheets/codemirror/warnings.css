@@ -17,20 +17,17 @@ p#usedVariables span, .placeholder-row label {
 	text-decoration: underline;
 }
 
-.CodeMirror {
+#archivedNavigationScriptColumn .CodeMirror {
 	height: auto;
+
 }
 
-.CodeMirror-scroll {
-  max-height: 700px;
-  min-height: 700px;
-  overflow-y: hidden;
-  overflow-x: auto;
-}
-#newPageOrMeasuredEventInfo{
-	background: #d4f5fe;
-	border: 1px black;
-	margin: 15px -7.5px 15px  -7.5px;
+#archivedNavigationScriptColumn .CodeMirror-scroll {
+	margin-right: 7px;
+	max-height: 700px;
+	min-height: 700px;
+	overflow-y: hidden;
+overflow-x: auto;
 }
 hr.style-one {
 	border: 0;
@@ -58,9 +55,6 @@ hr.style-one {
 #archivedNavigationScriptTableWrapper table {
 	width:100%;
 }
-#archivedNavigationScriptTableWrapper table * {
-	color:black;
-}
 #archivedNavigationScriptTableWrapper table thead th .text {
 	position:absolute;
 	top:-20px;
@@ -68,4 +62,36 @@ hr.style-one {
 	height:20px;
 	width:35%;
 	border:1px solid red;
+}
+.float-right{
+	float: right;
+}
+.script-textarea{
+	resize: none;
+	overflow-y: hidden ;
+	height: 100%;
+	width: 100%;
+}
+.script-save-abort-container{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	float: right;
+}
+.script-icon {
+	padding: 5px 8px;
+	border-radius: 4px;
+	display: block;
+}
+
+.script-icon:hover {
+	background-color: rgba(0, 0, 255, 0.12);
+	padding: 5px 8px;
+	border-radius: 4px;
+	display: block;
+}
+
+.script-abort{
+}
+.script-save{
 }

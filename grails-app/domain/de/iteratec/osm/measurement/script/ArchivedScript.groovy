@@ -17,9 +17,9 @@ class ArchivedScript {
     })
     String description
     @BindUsing({
-        obj, source -> source['archiveTag']
+        obj, source -> source['versionDescription']
     })
-    String archiveTag
+    String versionDescription
     String navigationScript
 
     static mapping = {
@@ -29,7 +29,7 @@ class ArchivedScript {
     static constraints = {
         label(blank: false, maxSize: 255)
         description(blank: true, maxSize: 255)
-        archiveTag (blank: true, maxSize: 255)
+        navigationScript (blank: true)
 
     }
 }
