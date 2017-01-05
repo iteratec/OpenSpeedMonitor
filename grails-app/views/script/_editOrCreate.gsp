@@ -7,7 +7,7 @@
         <meta name="layout" content="kickstart_osm"/>
         <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>
 
-        <asset:stylesheet src="codemirror/codemirrorManifest.css"/>
+        <asset:stylesheet src="script/scriptManifest.css"/>
 
     </head>
 
@@ -107,7 +107,7 @@
                 }
                 createCodeMirror("navigationScript",false);
                 window.onload = function() {
-                    initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
+                    OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
                 }
             </asset:script>
         </content>
