@@ -247,6 +247,7 @@ grails:
                             {pattern: '/css/**',                                        access: ["permitAll"]},
                             {pattern: '/js/**',                                         access: ["permitAll"]},
                             {pattern: '/images/**',                                     access: ["permitAll"]},
+                            {pattern: '/fonts/**',                                     access: ["permitAll"]},
                             {pattern: '/less/**',                                       access: ["permitAll"]},
                             {pattern: '/',                                              access: ["permitAll"]},
                             {pattern: '/proxy/**',                                      access: ["permitAll"]},

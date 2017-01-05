@@ -20,21 +20,10 @@ p#usedVariables span, .placeholder-row label {
 .CodeMirror {
 	height: auto;
 }
-
 .CodeMirror-scroll {
-  max-height: 400px;
-  min-height: 200px;
-  overflow-y: hidden;
-  overflow-x: auto;
+	max-height: 400px;
+	min-height: 200px;
+	overflow-y: hidden;
+	overflow-x: auto;
 }
-#newPageOrMeasuredEventInfo{
-	background: #d4f5fe;
-	border: 1px black;
-	margin: 15px -7.5px 15px  -7.5px;
-}
-hr.style-one {
-	border: 0;
-	height: 1px;
-	background: #ccc;
 
-}
