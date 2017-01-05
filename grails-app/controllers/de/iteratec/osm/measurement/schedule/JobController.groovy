@@ -422,13 +422,11 @@ class JobController {
     }
 
     def showLastResultForJob(Long id){
-        println id
         Job job = Job.get(id)
         redirect (url:jobService.createResultLinkForJob(job))
     }
 
     def showLastPageAggregationForJob(Long id){
-        println id
         Job job = Job.get(id)
         redirect (url:jobService.createPageAggregationLinkForJob(job))
     }
