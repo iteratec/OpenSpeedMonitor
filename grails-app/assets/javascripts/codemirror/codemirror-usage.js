@@ -147,6 +147,7 @@ function CodemirrorEditor(data) {
         $("#newMeasuredEventsContainer").hide();
         $('#saveButton').prop('disabled', false);
         $('#saveCopyButton').prop('disabled', false);
+        $('.tooltip.fade.right.in').remove();
     }
 
     function appendElementsFromListToDiv(elementList,containerDiv,divToAppendTo) {
@@ -191,7 +192,15 @@ function CodemirrorEditor(data) {
                     $('#saveCopyButton').prop('disabled', true);
                     lineNumber = parseInt(lineNumber);
                     codeMirrorEditor.markLine(lineNumber, 'setEventName-error-line');
-                    var warningsForCurrentLine = result.errors[lineNumber].map(function(errors) { return codeMirrorEditor.warningMsgs[errors.type.name]; }).join('</li><a>');
+                    var warningsForCurrentLine = result.errors[lineNumber].map(
+                        function(error) {
+                            var returnValue =  codeMirrorEditor.warningMsgs[error.type.name];
+                            if (error.type.name == "WRONG_PAGE") {
+                                var re = new RegExp("{page}", 'g');
+                                returnValue = returnValue.replace(re, result.correctPageName[lineNumber][0].correctPageName);
+                            }
+                            return returnValue;
+                        }).join('</li><li>');
                     codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
                         $('#setEventName-warning-clone').clone()
                             .attr('id', '')

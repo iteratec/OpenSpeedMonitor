@@ -180,7 +180,8 @@ class ScriptController {
 		else
 			output.errors = []
 		output.newPages = parser.newPages
-		output.newMeasuredEvents = parser.newMeasuredEvents.keySet()
+		output.newMeasuredEvents = parser.newMeasuredEvents.collect {"${it.key} (${it.value})"}
+		output.correctPageName = parser.correctPageName.groupBy { it.lineNumber }
 		output.steps = parser.steps
 		output.variables = PlaceholdersUtility.getPlaceholdersUsedInScript(navigationScript).unique()
 		render output as JSON

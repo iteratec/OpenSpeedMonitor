@@ -27,3 +27,9 @@ p#usedVariables span, .placeholder-row label {
 	overflow-x: auto;
 }
 
+.tooltip-inner{
+	text-align: left;
+}
+.tooltip-inner ul{
+	margin-left: -20px;
+}

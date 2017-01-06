@@ -130,6 +130,11 @@ class ScriptEventNameCmdError {
 	int lineNumber
 }
 
+class CorrectPageForMeasuredEvent{
+	String correctPageName
+	int lineNumber
+}
+
 
 
 /**
@@ -200,6 +205,7 @@ class ScriptParser {
 
 	public Set<String> newPages
 	public Map<String,String> newMeasuredEvents
+	public Set<CorrectPageForMeasuredEvent> correctPageName
 	public Set<String> allMeasuredEvents
 
 	private PageService pageService
@@ -284,6 +290,7 @@ class ScriptParser {
 		newMeasuredEvents=[:]
 		newPages=[]
 		allMeasuredEvents=[]
+		correctPageName = []
 
 		warnings = []
 		errors = []
@@ -355,6 +362,9 @@ class ScriptParser {
 							type:ScriptErrorEnum.WRONG_PAGE,
 							lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
 
+						correctPageName << new CorrectPageForMeasuredEvent(
+							correctPageName: measuredEvent.testedPage.name,
+							lineNumber:statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
 					}
 				}
 
