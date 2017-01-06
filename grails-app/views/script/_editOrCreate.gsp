@@ -75,7 +75,7 @@
             <asset:javascript src="script/versionControl.js"/>
             <asset:script type="text/javascript">
                 function createCodeMirror(idCodemirrorElement, readonly){
-                    new CodemirrorEditor({
+                    OpenSpeedMonitor.script.codemirrorEditor.init({
                         idCodemirrorElement: idCodemirrorElement,
                         i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
                         i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',

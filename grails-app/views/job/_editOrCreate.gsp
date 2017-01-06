@@ -104,7 +104,7 @@
                     }
 
                     window.addEventListener("CodeMirrorManifestArrived",function(){
-                        var editor = new CodemirrorEditor({
+                        var editor = OpenSpeedMonitor.script.codemirrorEditor.init({
                             idCodemirrorElement: "navigationScript",
                             i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
                             i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',

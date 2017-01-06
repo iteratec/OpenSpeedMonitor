@@ -14,80 +14,100 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function CodemirrorEditor(data) {
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
+OpenSpeedMonitor.script = OpenSpeedMonitor.script ||{};
+OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEditor || (function(){
 
-    this.editor;
-    this.NO_STEPS_FOUND = data.i18nMessage_NO_STEPS_FOUND;
-    this.DANGLING_SETEVENTNAME_STATEMENT = data.i18nMessage_DANGLING_SETEVENTNAME_STATEMENT;
-    this.MISSING_SETEVENTNAME_STATEMENT = data.i18nMessage_MISSING_SETEVENTNAME_STATEMENT;
-    this.STEP_NOT_RECORDED = data.i18nMessage_STEP_NOT_RECORDED;
-    this.WRONG_PAGE = data.i18nMessage_WRONG_PAGE;
-    this.WRONG_URL_FORMAT = data.i18nMessage_WRONG_URL_FORMAT;
-    this.MEASUREDEVENT_NOT_UNIQUE = data.i18nMessage_MEASUREDEVENT_NOT_UNIQUE;
-    this.TOO_MANY_SEPARATORS = data.i18nMessage_TOO_MANY_SEPARATORS;
-    this.linkParseScriptAction = data.linkParseScriptAction;
-    this.linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
-    this.linkGetScriptSource = data.linkGetScriptSource;
-    this.markedLines;
-    this.measuredEvents = data.measuredEvents;
-    this.idCodemirrorElement = data.idCodemirrorElement;
-    this.editorReadonly = data.readonly;
-    this.parsedScriptUrl = data.parsedScriptUrl;
-    this.clipboard;
+    var NO_STEPS_FOUND;
+    var DANGLING_SETEVENTNAME_STATEMENT;
+    var MISSING_SETEVENTNAME_STATEMENT;
+    var STEP_NOT_RECORDED;
+    var WRONG_PAGE;
+    var WRONG_URL_FORMAT;
+    var MEASUREDEVENT_NOT_UNIQUE;
+    var TOO_MANY_SEPARATORS;
+    var linkParseScriptAction;
+    var linkMergeDefinedAndUsedPlaceholders;
+    var linkGetScriptSource;
+    var markedLines;
+    var measuredEvents;
+    var idCodemirrorElement;
+    var editorReadonly;
+    var parsedScriptUrl;
+    var clipboard;
+    var editor;
 
-    this.init = function(){
 
-        this.editor = CodeMirror.fromTextArea(document.getElementById(this.idCodemirrorElement), {
+    var init = function(data){
+        NO_STEPS_FOUND = data.i18nMessage_NO_STEPS_FOUND;
+        DANGLING_SETEVENTNAME_STATEMENT = data.i18nMessage_DANGLING_SETEVENTNAME_STATEMENT;
+        MISSING_SETEVENTNAME_STATEMENT = data.i18nMessage_MISSING_SETEVENTNAME_STATEMENT;
+        STEP_NOT_RECORDED = data.i18nMessage_STEP_NOT_RECORDED;
+        WRONG_PAGE = data.i18nMessage_WRONG_PAGE;
+        WRONG_URL_FORMAT = data.i18nMessage_WRONG_URL_FORMAT;
+        MEASUREDEVENT_NOT_UNIQUE = data.i18nMessage_MEASUREDEVENT_NOT_UNIQUE;
+        TOO_MANY_SEPARATORS = data.i18nMessage_TOO_MANY_SEPARATORS;
+        linkParseScriptAction = data.linkParseScriptAction;
+        linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
+        linkGetScriptSource = data.linkGetScriptSource;
+        measuredEvents = data.measuredEvents;
+        idCodemirrorElement = data.idCodemirrorElement;
+        editorReadonly = data.readonly;
+        parsedScriptUrl = data.parsedScriptUrl;
+
+        editor = CodeMirror.fromTextArea(document.getElementById(idCodemirrorElement), {
             lineNumbers: true,
             extraKeys: { "Ctrl-Space": "autocomplete" },
-            readOnly: this.editorReadonly,
+            readOnly: editorReadonly,
             gutters: ['setEventName-warning-gutter'],
             lineWrapping: true
         });
-        this.markedLines = [];
+        markedLines = [];
         //this.editor.setSize(900,300);
 
-        var codemirrorEditor = this;
-        this.editor.on('change', function(){
-            codemirrorEditor.updateWarnings.call(codemirrorEditor)
+        editor.on('change', function(){
+            updateWarnings.call()
         });
         $('#lineBreakToggle').click(function() {
-            codemirrorEditor.editor.setOption('lineWrapping', $(this).prop('checked'));
-            codemirrorEditor.editor.refresh();
+            editor.setOption('lineWrapping', $(this).prop('checked'));
+            editor.refresh();
         });
         // Create a Javascript array with all MeasuredEvents for auto complete
         CodeMirror.measuredEvents = [];
-        for (index = 0; index < this.measuredEvents.length; ++index) {
+        for (index = 0; index < measuredEvents.length; ++index) {
             CodeMirror.measuredEvents.push({
-                text: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name,
-                displayText: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name
+                text: measuredEvents[index].testedPage.name + ":::" + measuredEvents[index].name,
+                displayText: measuredEvents[index].testedPage.name + ":::" + measuredEvents[index].name
             });
         }
         CodeMirror.measuredEvents.sort(function(a, b) {
             return a.displayText.localeCompare(b.displayText);
         });
-        codemirrorEditor.editor.refresh();
+        editor.refresh();
+        updateWarnings();
+        return this;
+
     };
 
-    this.warningMsgs = {
-        NO_STEPS_FOUND: this.NO_STEPS_FOUND,
-        STEP_NOT_RECORDED: this.STEP_NOT_RECORDED,
-        DANGLING_SETEVENTNAME_STATEMENT: this.DANGLING_SETEVENTNAME_STATEMENT,
-        MISSING_SETEVENTNAME_STATEMENT: this.MISSING_SETEVENTNAME_STATEMENT,
-        WRONG_PAGE: this.WRONG_PAGE,
-        WRONG_URL_FORMAT: this.WRONG_URL_FORMAT,
-        TOO_MANY_SEPARATORS: this.TOO_MANY_SEPARATORS,
-        MEASUREDEVENT_NOT_UNIQUE: this.MEASUREDEVENT_NOT_UNIQUE
+    var warningMsgs = function (key) {
+        switch(key) {
+            case "NO_STEPS_FOUND" :                     return NO_STEPS_FOUND;
+            case "STEP_NOT_RECORDED" :                  return STEP_NOT_RECORDED;
+            case "DANGLING_SETEVENTNAME_STATEMENT" :    return DANGLING_SETEVENTNAME_STATEMENT;
+            case "MISSING_SETEVENTNAME_STATEMENT" :     return MISSING_SETEVENTNAME_STATEMENT;
+            case "WRONG_PAGE" :                         return WRONG_PAGE;
+            case "WRONG_URL_FORMAT" :                   return WRONG_URL_FORMAT;
+            case "TOO_MANY_SEPARATORS" :                return TOO_MANY_SEPARATORS;
+            case "MEASUREDEVENT_NOT_UNIQUE" :           return MEASUREDEVENT_NOT_UNIQUE;
+        }
     };
-
-    this.update = function() {
-        if (!this.editor) {
+    var update = function() {
+        if (!editor) {
             return;
         }
-        var codeMirrorEditor = this;
         $.ajax({
             type : 'POST',
-            url : codeMirrorEditor.linkMergeDefinedAndUsedPlaceholders,
+            url : linkMergeDefinedAndUsedPlaceholders,
             data: {
                 'jobId': $('input#id').val(),
                 'scriptId': $('#script').val()
@@ -99,16 +119,16 @@ function CodemirrorEditor(data) {
                 $("#placeholderCandidates").html('');
             }
         });
-        if(this.clipboard != null) this.clipboard.destroy();
+        if(clipboard != null) clipboard.destroy();
         $.ajax({
             type : 'GET',
-            url : codeMirrorEditor.parsedScriptUrl,
+            url : parsedScriptUrl,
             data: {
                 'jobId': $('input#id').val(),
                 'scriptId': $('#script').val()
             },
             success : function(result) {
-                codeMirrorEditor.clipboard = new Clipboard("#copyToClipboard",{
+                clipboard = new Clipboard("#copyToClipboard",{
                     text :function (trigger) {
                         return result
                     }
@@ -121,17 +141,15 @@ function CodemirrorEditor(data) {
 
         $.ajax({
             type : 'POST',
-            url : codeMirrorEditor.linkGetScriptSource,
+            url : linkGetScriptSource,
             data: {
                 'scriptId': $('#script').val()
             },
             success : function(result) {
-                //var scriptToLoad = result;
-                //if(typeof result != 'undefined') {scriptToLoad = result.innerHtml();}
-                codeMirrorEditor.loadNewContent(result);
+                loadNewContent(result);
             },
             error : function(XMLHttpRequest, textStatus, errorThrown) {
-                codeMirrorEditor.loadNewContent('Error');
+                loadNewContent('Error');
             }
         });
 
@@ -139,7 +157,7 @@ function CodemirrorEditor(data) {
 
     };
 
-    function clearNewPagesOrNewMeasuredEventsInfo() {
+    var clearNewPagesOrNewMeasuredEventsInfo= function () {
         $("#newPages").empty();
         $("#newMeasuredEvents").empty();
         $("#newPageOrMeasuredEventInfo").hide();
@@ -148,9 +166,9 @@ function CodemirrorEditor(data) {
         $('#saveButton').prop('disabled', false);
         $('#saveCopyButton').prop('disabled', false);
         $('.tooltip.fade.right.in').remove();
-    }
+    };
 
-    function appendElementsFromListToDiv(elementList,containerDiv,divToAppendTo) {
+    var appendElementsFromListToDiv =  function (elementList,containerDiv,divToAppendTo) {
         var newElementsString = "";
         var arrayLength = elementList.length;
         for (var i = 0; i < arrayLength; i++) {
@@ -164,24 +182,23 @@ function CodemirrorEditor(data) {
         jQuery('<span/>', {
             text: newElementsString
         }).appendTo(divToAppendTo);
-    }
+    };
 
-    this.updateWarnings = function() {
-        var codeMirrorEditor = this;
+    var updateWarnings = function() {
         $.ajax({
             type: 'POST',
-            url: codeMirrorEditor.linkParseScriptAction,
-            data: { navigationScript: codeMirrorEditor.editor.getValue() },
+            url: linkParseScriptAction,
+            data: { navigationScript: editor.getValue() },
             success: function (result) {
-                codeMirrorEditor.clearGutterAndLines();
+                clearGutterAndLines();
                 clearNewPagesOrNewMeasuredEventsInfo();
                 appendElementsFromListToDiv(result.newPages,"#newPagesContainer","#newPages");
                 appendElementsFromListToDiv(result.newMeasuredEvents,"#newMeasuredEventsContainer","#newMeasuredEvents");
                 for (var lineNumber in result.warnings) {
                     lineNumber = parseInt(lineNumber);
-                    codeMirrorEditor.markLine(lineNumber, 'setEventName-warning-line');
-                    var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return codeMirrorEditor.warningMsgs[warning.type.name]; }).join('</li><li>');
-                    codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
+                    markLine(lineNumber, 'setEventName-warning-line');
+                    var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return warningMsgs(warning.type.name); }).join('</li><li>');
+                    editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
                         $('#setEventName-warning-clone').clone()
                             .attr('id', '')
                             .attr('title', '<ul><li>' + warningsForCurrentLine + '</li></ul>')
@@ -191,17 +208,17 @@ function CodemirrorEditor(data) {
                     $('#saveButton').prop('disabled', true);
                     $('#saveCopyButton').prop('disabled', true);
                     lineNumber = parseInt(lineNumber);
-                    codeMirrorEditor.markLine(lineNumber, 'setEventName-error-line');
+                    markLine(lineNumber, 'setEventName-error-line');
                     var warningsForCurrentLine = result.errors[lineNumber].map(
                         function(error) {
-                            var returnValue =  codeMirrorEditor.warningMsgs[error.type.name];
+                            var returnValue =  warningMsgs(error.type.name);
                             if (error.type.name == "WRONG_PAGE") {
                                 var re = new RegExp("{page}", 'g');
                                 returnValue = returnValue.replace(re, result.correctPageName[lineNumber][0].correctPageName);
                             }
                             return returnValue;
                         }).join('</li><li>');
-                    codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
+                    editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
                         $('#setEventName-warning-clone').clone()
                             .attr('id', '')
                             .attr('title', '<ul><li>' + warningsForCurrentLine + '</li></ul>')
@@ -213,13 +230,13 @@ function CodemirrorEditor(data) {
                         var startLineNumber = result.steps[i];
                         var endLineNumber = result.steps[i + 1];
                         if (startLineNumber == endLineNumber) {
-                            codeMirrorEditor.markLine(startLineNumber, 'eventBlock-oneline');
+                            markLine(startLineNumber, 'eventBlock-oneline');
                         } else {
-                            codeMirrorEditor.markLine(startLineNumber, 'eventBlock-top');
+                            markLine(startLineNumber, 'eventBlock-top');
                             for (var j = startLineNumber + 1; j < endLineNumber; j++) {
-                                codeMirrorEditor.markLine(j, 'eventBlock-middle');
+                                markLine(j, 'eventBlock-middle');
                             }
-                            codeMirrorEditor.markLine(endLineNumber, 'eventBlock-bottom');
+                            markLine(endLineNumber, 'eventBlock-bottom');
                         }
                     }
                 }
@@ -234,34 +251,36 @@ function CodemirrorEditor(data) {
                 }
             },
             error: function () {
-                codeMirrorEditor.clearGutterAndLines();
+                clearGutterAndLines();
             }
         });
     };
 
-    this.loadNewContent = function(content) {
-        this.clearGutterAndLines();
-        this.editor.getDoc().setValue(content);
+    var loadNewContent = function(content) {
+        clearGutterAndLines();
+        editor.getDoc().setValue(content);
     };
 
-    this.markLine = function(lineNumber, cssClass) {
-        this.editor.removeLineClass(lineNumber,'background','setEventName-warning-line');
-        this.editor.addLineClass(lineNumber, 'background', cssClass);
-        this.markedLines.push(lineNumber);
+    var markLine = function(lineNumber, cssClass) {
+        editor.removeLineClass(lineNumber,'background','setEventName-warning-line');
+        editor.addLineClass(lineNumber, 'background', cssClass);
+        markedLines.push(lineNumber);
     };
 
-    this.clearGutterAndLines = function() {
-        this.editor.clearGutter('setEventName-warning-gutter');
-        var editorInMethodScope = this.editor;
-        this.markedLines.map(function (lineNumber) {
+    var clearGutterAndLines = function() {
+        editor.clearGutter('setEventName-warning-gutter');
+        var editorInMethodScope = editor;
+        markedLines.map(function (lineNumber) {
             editorInMethodScope.removeLineClass(lineNumber, 'background', null);
         });
-        this.markedLines = [];
+        markedLines = [];
     };
 
 
-    this.init();
+    return {
+        init:init,
+        update:update
+    };
 
-    this.updateWarnings();
 
-}
+})();
