@@ -3,6 +3,7 @@
     <head>
         <meta name="layout" content="kickstart_osm" />
         <title><g:message code="de.iteratec.isocsi.eventResult"/></title>
+        <asset:javascript src="chartSwitch"/>
         <asset:stylesheet src="tabularResultPresentation/listResults.css"/>
     </head>
     <body>
@@ -93,6 +94,9 @@
                 $(window).load(function() {
                    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
                 });
+                OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
+                        "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
+                        "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}").init();
             </asset:script>
         </content>
     </body>

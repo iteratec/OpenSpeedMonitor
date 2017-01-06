@@ -4,6 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
+    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="/pageAggregation/show.css"/>
 
 </head>
@@ -141,6 +142,10 @@
                 }
             });
         }
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
+                    "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
+                    "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}").init();
+
     </asset:script>
 </content>
 

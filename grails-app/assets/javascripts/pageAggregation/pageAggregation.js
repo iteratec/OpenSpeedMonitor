@@ -99,7 +99,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             setJobGroups(params);
             setPages(params);
             setMeasurands(params);
-            clickShowButton();
+            if(!params.hideGraph){
+                clickShowButton();
+            }
         }
 
     };

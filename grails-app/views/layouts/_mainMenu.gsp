@@ -12,7 +12,6 @@
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unnknown"/></g:else>
-
 <div id="main-menu" class="row">
 
     <%-- ---------------------------------------------------------------------------------------------- tabs --%>
@@ -70,18 +69,18 @@
         <%-- Results --%>
 
             <g:elseif test="${mainTab.equals('results')}">
-                <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}">
+                <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}" id="eventResultMainMenu">
                     <g:render template="/layouts/dashboardButton" model="${[
                             'availableDashboards': availableDashboards,
                             'affectedController' : 'eventResultDashboard'
                     ]}"/>
                 </li>
-                <li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}">
+                <li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}" id="pageAggregationMainMenu">
                     <g:link controller="pageAggregation" action="show"><i
                             class="fa fa-bar-chart"></i> <g:message code="de.iteratec.pageAggregation.title"
                                                                   default="Page Aggregation"/></g:link>
                 </li>
-                <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}">
+                <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}" id="tabularResultMainMenu">
                     <g:link controller="tabularResultPresentation" action="listResults"><i
                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                                   default="Einzelergebnisse"/></g:link>

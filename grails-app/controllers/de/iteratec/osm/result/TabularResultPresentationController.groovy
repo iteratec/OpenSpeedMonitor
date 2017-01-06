@@ -74,9 +74,8 @@ class TabularResultPresentationController {
 
         EventResultListing eventResultsListing = new EventResultListing();
         PaginationListing paginationListing = new PaginationListing();
-
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
-        if( !ControllerUtils.isEmptyRequest(params) ) {
+        if( !ControllerUtils.isEmptyRequest(params) && !params.hideGraph) {
             if(!cmd.validate() )
             {
                 modelToRender.put('command', cmd)
