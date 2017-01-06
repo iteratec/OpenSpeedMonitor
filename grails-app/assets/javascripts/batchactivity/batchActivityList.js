@@ -1,7 +1,7 @@
 //=require responsiveTable/responsiveTable.js
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
-OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || {
+OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || (function(responsiveTable) {
 
     /**
      * Refreshes the table data every 2 seconds
@@ -12,40 +12,39 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || {
      * @param rowUpdateUrl
      *          url to update all rows (method getUpdate within BatchActivityController)
      */
-
-    init: function(updateTableUrlParameter, checkUrl, rowUpdateUrl,batchActivityCount, i18nParameter, columnToSortByParameter) {
+    var initBatchActivity= function(updateTableUrlParameter, checkUrl, rowUpdateUrl,batchActivityCount, i18nParameter, columnToSortByParameter) {
         $('#filterBatchesByActiveCheckbox').change(function () {
-            OpenSpeedMonitor.responsiveTable.onlyActive =$('#filterBatchesByActiveCheckbox').is(":checked");
-            OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrlParameter);
+            responsiveTable.onlyActive =$('#filterBatchesByActiveCheckbox').is(":checked");
+            responsiveTable.updateElementTable(updateTableUrlParameter);
         });
-        OpenSpeedMonitor.responsiveTable.init(updateTableUrlParameter, i18nParameter, columnToSortByParameter);
-        OpenSpeedMonitor.batchActivity.updateIfNecessary(updateTableUrlParameter, checkUrl, rowUpdateUrl);
-    },
+        responsiveTable.init(updateTableUrlParameter, i18nParameter, columnToSortByParameter);
+        updateIfNecessary(updateTableUrlParameter, checkUrl, rowUpdateUrl);
+    };
 
 
-    updateIfNecessary: function(updateTableUrl, checkUrl, rowUpdateUrl) {
+    var updateIfNecessary= function(updateTableUrl, checkUrl, rowUpdateUrl) {
         setInterval(function () {
-            var ids = OpenSpeedMonitor.batchActivity.collectActiveIds();
+            var ids = collectActiveIds();
             jQuery.ajax({
                 type: 'GET',
                 url: checkUrl+"?activeCount="+ids.length,
                 success: function (content) {
                     if (content == "true") {
-                        OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+                        responsiveTable.updateElementTable(updateTableUrl);
                     }else {
-                        if(ids.length > 0)OpenSpeedMonitor.batchActivity.updateRows(ids,rowUpdateUrl);
+                        if(ids.length > 0)updateRows(ids,rowUpdateUrl);
                     }
                 }
             });
         }, 2000);
-    },
+    };
 
     /**
      * Updates all rows with the given ids
      * @param ids row ids to update
      * @param rowUpdateUrl url to get a row update
      */
-    updateRows: function(ids, rowUpdateUrl) {
+    var updateRows= function(ids, rowUpdateUrl) {
 
         jQuery.ajax({
             type: 'GET',
@@ -55,19 +54,19 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || {
             async: false,
             success: function (content) {
                 $.each(content, function(i, update){
-                    OpenSpeedMonitor.batchActivity.updateRow(update);
+                    updateRow(update);
                 });
             },
             error: function (content) {
             }
         });
 
-    },
+    };
     /**
      * Updates a single row with the given rowObject
      * @param rowObject([activity,endDate,htmlId,lastFailureMessage,lastUpdated,progress,startDate,status])
      */
-    updateRow: function(rowObject) {
+    var updateRow= function(rowObject) {
         var idxFieldActivity = 1;
         var idxFieldStatus = 2;
         var idxFieldStage = 3;
@@ -87,16 +86,19 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || {
         $("tr#" + rowObject.htmlId + " td:eq("+idxFieldEndDate+")").html(rowObject.endDate);
         $("tr#" + rowObject.htmlId + " td:eq("+idxFieldRemainingTime+")").html(rowObject.remainingTime);
         $("tr#" + rowObject.htmlId).attr("status", rowObject.statusEN)
-    },
+    };
     /**
      * Returns an array with all row ids where status = active
      * @returns {Array}
      */
-    collectActiveIds: function() {
+    var collectActiveIds= function() {
         var ids = [];
         $("[status='ACTIVE']").each(function (index, element) {
             ids.push([$(element).attr("id").replace("batchActivity_", "")]);
         });
         return ids;
+    };
+    return{
+        init:initBatchActivity
     }
-};
+})(OpenSpeedMonitor.responsiveTable || {});
