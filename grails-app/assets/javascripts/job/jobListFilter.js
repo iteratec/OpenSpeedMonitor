@@ -86,7 +86,7 @@ OpenSpeedMonitor.jobListFilter = (function(){
         }
     };
     $.extend(allFilterCheckboxes, showOnlyCheckboxes);
-    var filterByCheckboxes = [ allFilterCheckboxes.byName, allFilterCheckboxes.byJobGroup,
+    var filterByCheckboxes = [ allFilterCheckboxes.byName, allFilterCheckboxes.byJobGroup, allFilterCheckboxes.byTags,
         allFilterCheckboxes.byScript, allFilterCheckboxes.byLocation, allFilterCheckboxes.byBrowser];
 
     var init = function () {
@@ -159,10 +159,13 @@ OpenSpeedMonitor.jobListFilter = (function(){
             return (checkAll || checkbox.isChecked) &&
                    row.find(checkbox.valueClassName).text().toLowerCase().indexOf(filterTerm) >= 0;
         });
-        return isMatch || ((checkAll || allFilterCheckboxes.byTags.isChecked) && filterTermMatchesTags(filterTerm, row));
+        return isMatch || filterTermMatchesTags(filterTerm, row, checkAll);
     };
 
-    var filterTermMatchesTags = function (filterTerm, row) {
+    var filterTermMatchesTags = function (filterTerm, row, checkAll) {
+        if (!checkAll && !allFilterCheckboxes.byTags.isChecked) {
+            return false;
+        }
         var usedTags = row.attr('data-tags');
         return (usedTags && usedTags.toLowerCase().indexOf(filterTerm) >= 0);
     };
