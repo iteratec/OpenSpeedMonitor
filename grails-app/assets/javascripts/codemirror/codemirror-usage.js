@@ -180,7 +180,7 @@ function CodemirrorEditor(data) {
                 for (var lineNumber in result.warnings) {
                     lineNumber = parseInt(lineNumber);
                     codeMirrorEditor.markLine(lineNumber, 'setEventName-warning-line');
-                    var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return codeMirrorEditor.warningMsgs[warning.type.name]; }).join('</li><a>');
+                    var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return codeMirrorEditor.warningMsgs[warning.type.name]; }).join('</li><li>');
                     codeMirrorEditor.editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
                         $('#setEventName-warning-clone').clone()
                             .attr('id', '')
