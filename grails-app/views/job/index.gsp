@@ -71,17 +71,22 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <g:actionSubmit action="execute"
-                                    value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
-                </li>
-                <li role="separator" class="divider"></li>
-                <li>
-                    <g:actionSubmit action="activate"
-                                    value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
+                    <button type="submit" name="_action_execute">
+                        <i class="fa fa-play"></i>
+                        <g:message code="de.iteratec.isj.job.runonce" default="Run now" />
+                    </button>
                 </li>
                 <li>
-                    <g:actionSubmit action="deactivate"
-                                    value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
+                    <button type="submit" name="_action_activate">
+                        <i class="fa fa-toggle-on"></i>
+                        <g:message code="de.iteratec.isj.job.activate" default="Activate" />
+                    </button>
+                </li>
+                <li>
+                    <button type="submit" name="_action_deactivate">
+                        <i class="fa fa-toggle-off"></i>
+                        <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate" />
+                    </button>
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
