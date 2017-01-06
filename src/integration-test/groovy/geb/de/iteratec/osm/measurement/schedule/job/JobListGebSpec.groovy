@@ -314,30 +314,30 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     void "Activate Job"() {
         given: "User is on the job list, inactive jobs are shown, no job is selected"
         page.enableShowOnlyActiveJobs(true)
-        def visibleActiveJobsBefore = countVisibleActiveJobs()
+        def visibleActiveJobsBefore = page.countVisibleActiveJobs()
         page.enableShowOnlyActiveJobs(false)
         page.enableCheckAll(true)
         page.enableCheckAll(false)
 
 
         when: "The user activates a job"
-        page.changeCheckbox(getCheckboxForJobName(job4Name), true)
-        page.activateButton.click()
+        page.changeCheckbox(page.getCheckboxForJobName(job4Name), true)
+        page.clickActivateJob()
 
         then: "There should be one more active job"
         at JobListPage
         sleep(2000)//Otherwise the element is not clickable with chrome
-        page.enableShowInactiveJobs(false)
+        page.enableShowOnlyActiveJobs(true)
         page.countVisibleActiveJobs() == visibleActiveJobsBefore + 1
     }
 
     void "Deactivate Job"() {
         given: "User is on the job list, only active jobs are shown"
-        def visibleActiveJobsBefore = countVisibleActiveJobs()
+        def visibleActiveJobsBefore = page.countVisibleActiveJobs()
 
         when: "The user deletes the input from the text field"
-        page.changeCheckbox(getCheckboxForJobName(job4Name), true)
-        $("input", name: "_action_deactivate").click()
+        page.changeCheckbox(page.getCheckboxForJobName(job4Name), true)
+        page.clickDeactivateJob()
 
         then: "There should be no hided row"
         at JobListPage

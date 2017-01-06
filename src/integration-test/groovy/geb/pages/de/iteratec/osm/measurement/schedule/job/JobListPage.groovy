@@ -28,6 +28,7 @@ class JobListPage extends I18nGebPage {
         showOnlyActiveJobsButton{$("#filterActiveJobs").parent()}
         checkAll{$("#checkAll")[0]}
         //Buttons
+        actionMenuButton{$("#actionForSelected")}
         activateButton{$("input",name:"_action_activate")}
         deactivateButton{$("input",name:"_action_deactivate")}
         executeNowButton{$("input",name:"_action_execute")}
@@ -76,6 +77,22 @@ class JobListPage extends I18nGebPage {
 
     def getCheckboxForJobName(String jobname){
         $("a",text: jobname).parent().parent().parent().find(".jobCheckbox")
+    }
+
+    def clickActivateJob() {
+        actionMenuButton.click()
+        waitFor {
+            activateButton.displayed
+        }
+        activateButton.click()
+    }
+
+    def clickDeactivateJob() {
+        actionMenuButton.click()
+        waitFor {
+            deactivateButton.displayed
+        }
+        deactivateButton.click()
     }
 
     void changeButton(def button, boolean active) {
