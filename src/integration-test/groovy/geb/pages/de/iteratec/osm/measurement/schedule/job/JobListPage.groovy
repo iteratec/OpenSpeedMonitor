@@ -29,9 +29,9 @@ class JobListPage extends I18nGebPage {
         checkAll{$("#checkAll")[0]}
         //Buttons
         actionMenuButton{$("#actionForSelected")}
-        activateButton{$("input",name:"_action_activate")}
-        deactivateButton{$("input",name:"_action_deactivate")}
-        executeNowButton{$("input",name:"_action_execute")}
+        activateButton{$("button",name:"_action_activate")}
+        deactivateButton{$("button",name:"_action_deactivate")}
+        executeNowButton{$("button",name:"_action_execute")}
         createJobButton{$("a",href:"/job/create")}
         //"Data"
         inactiveJobs{$(".jobName.inactiveJob")}
