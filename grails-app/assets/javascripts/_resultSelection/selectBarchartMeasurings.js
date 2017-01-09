@@ -47,7 +47,7 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     var selectionChangeListener = function (e) {
         var $selectElement = $(e.target);
         var selectedOptionGroupLabel = $selectElement.find(":selected").parent().attr('label');
-        var additionalMeasurands = $selectElement.closest(".panel").find(".additionalMeasurand");
+        var additionalMeasurands = $selectElement.closest(".measurandSeries").find(".additionalMeasurand");
         additionalMeasurands.each(function (index, currentMeasurand) {
             enableDisableSelectionGroup(currentMeasurand, selectedOptionGroupLabel);
         })
@@ -84,11 +84,11 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         clone.removeAttr("id");
         clone.insertAfter($(e.target).closest(".addMeasurandRow"));
 
-        var selectedOptGroupLabel = clone.closest(".panel").find(".firstMeasurandSelect :selected").parent().attr("label");
+        var selectedOptGroupLabel = clone.closest(".measurandSeries").find(".firstMeasurandSelect :selected").parent().attr("label");
         enableDisableSelectionGroup(clone.find("select"), selectedOptGroupLabel);
 
         // Make stacked selection visible
-        var stackedSelectContainer = $(e.target).closest(".panel").find(".stackedSelectContainer");
+        var stackedSelectContainer = $(e.target).closest(".measurandSeries").find(".stackedSelectContainer");
         if (stackedSelectContainer.hasClass("hidden")) {
             stackedSelectContainer.removeClass("hidden")
         }
@@ -96,15 +96,15 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
 
     var removeMeasurand = function (e) {
         var $element = $(e.target);
-        if ($element.closest(".panel").find(".addMeasurandRow").length <= 2) {
-            $element.closest(".panel").find(".stackedSelectContainer").addClass("hidden");
+        if ($element.closest(".measurandSeries").find(".addMeasurandRow").length <= 2) {
+            $element.closest(".measurandSeries").find(".stackedSelectContainer").addClass("hidden");
         }
         $element.closest(".addMeasurandRow").remove();
     };
 
     var removeSeries = function (e) {
         var $element = $(e.target);
-        $element.closest(".panel").remove();
+        $element.closest(".measurandSeries").remove();
     };
 
     var getValues = function () {
@@ -119,7 +119,14 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
             });
 
             currentSeries['measurands'] = measurands;
-            currentSeries['stacked'] = $(this).find(".stackedSelect").val() === "stacked";
+
+            var stackedOptions = Array.from($(this).find('.stackedSelectContainer .stackedOptions .stackedOption'));
+            stackedOptions.forEach(function (opt) {
+                if (opt.checked)
+                    currentSeries['stacked'] = (opt.value == "stacked");
+            });
+
+
             result.push(currentSeries);
         });
 

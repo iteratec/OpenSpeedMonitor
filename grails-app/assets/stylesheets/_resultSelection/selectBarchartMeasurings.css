@@ -1,7 +1,24 @@
-.measurandSeries{
-    border-radius: 10px;
+.measurandSeries {
+    position: relative;
+    padding-top: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .measurandSeries .row{
     margin-bottom: 15px;
+}
+
+.removeMeasurandSeriesContainer {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+.removeMeasurandSeriesButton {
+    color: #cccccc;
+}
+
+.control-label.removeAddMeasurands {
+    text-align: left;
 }
