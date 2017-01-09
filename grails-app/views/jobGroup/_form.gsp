@@ -66,7 +66,7 @@
                                                                        default="Persist Detaildata"/></label>
 
         <div>
-            <bs:checkBox name="persistDetailData" value="${jobGroup.persistDetailData}"/>
+            <bs:checkBox name="persistDetailData" value="${jobGroup?.persistDetailData}"/>
         </div>
     </g:if>
 

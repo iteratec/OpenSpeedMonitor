@@ -15,6 +15,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.hibernate.sql.JoinType
+import org.springframework.http.HttpStatus
 
 import static org.springframework.http.HttpStatus.*
 
@@ -23,7 +24,7 @@ import static org.springframework.http.HttpStatus.*
 class JobGroupController {
 
     static scaffold = JobGroup
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", createAsync: "POST"]
 
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
@@ -147,7 +148,7 @@ class JobGroupController {
 
 
         jobGroup.graphiteServers.clear()
-        params.list('graphiteServers').each{
+        params.list('graphiteServers').each {
             jobGroup.graphiteServers.add(GraphiteServer.findById(it))
         }
         params.remove('graphiteServers')
@@ -172,11 +173,8 @@ class JobGroupController {
     }
 
 
-
-
     def index() {
     }
-
 
 
     def create() {
@@ -184,21 +182,20 @@ class JobGroupController {
     }
 
 
-
     def edit(JobGroup jobGroup) {
         respond jobGroup
     }
 
-    def updateTable(){
+    def updateTable() {
         params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<JobGroup> result = JobGroup.createCriteria().list(params) {
             createAlias('csiConfiguration', 'csiConfigurationAlias', JoinType.LEFT_OUTER_JOIN)
-            if(params.filter)
-                or{
-                    ilike("name","%"+params.filter+"%")
+            if (params.filter)
+                or {
+                    ilike("name", "%" + params.filter + "%")
                     ilike("csiConfigurationAlias.label", "%" + params.filter + "%")
                 }
         }
@@ -218,7 +215,24 @@ class JobGroupController {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
                 redirect action: "index", method: "GET"
             }
-            '*'{ render status: NOT_FOUND }
+            '*' { render status: NOT_FOUND }
+        }
+    }
+
+    def createAsync() {
+        String name = params['name']
+        List<GraphiteServer> graphiteServers = params["graphiteServers"] != "null" ? GraphiteServer.getAll(params["graphiteServers"].tokenize(',[]\"')*.toLong()) : []
+        CsiConfiguration csiConfiguration = params['csiConfiguration'] ? CsiConfiguration.findByLabel(params['csiConfiguration']) : null
+        boolean persistDetailData = params['persistDetailData'].toBoolean()
+        List<String> tags = params['tags'] != "null" ? params['tags'].tokenize(',[]\"') : []
+
+        JobGroup jobGroup = new JobGroup(name: name, graphiteServers: graphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
+        if (!jobGroup.save(flush: true)) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
+        } else {
+            jobGroup.tags = tags
+            jobGroup.save(flush: true)
+            ControllerUtils.sendObjectAsJSON(response, ['jobGroupName': jobGroup.name, 'jobGroupId': jobGroup.id])
         }
     }
 }

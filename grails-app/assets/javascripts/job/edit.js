@@ -1,34 +1,32 @@
 /* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
+ * OpenSpeedMonitor (OSM)
+ * Copyright 2014 iteratec GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 //= require prettycron/prettycronManifest.js
 //= require bower_components/tagit/js/tag-it.min.js
 //= require_self
-function doOnDomReady(
-    newJob,
-    nextExecutionLink,
-    customConnNameForNative,
-    connectivityProfileId,
-    noTrafficShapingAtAll,
-    tagsLink
-) {
+function doOnDomReady(newJob,
+                      nextExecutionLink,
+                      customConnNameForNative,
+                      connectivityProfileId,
+                      noTrafficShapingAtAll,
+                      tagsLink) {
 
-    $("ul[name='tags']").tagit({select:true, tagSource: tagsLink});
+    $("ul[name='tags']").tagit({select: true, tagSource: tagsLink});
 
-    $("[rel=tooltip]").tooltip({ html: true });
+    $("[rel=tooltip]").tooltip({html: true});
     $("[rel=popover]").popover();
 
     $('#active').change(function () {
@@ -40,7 +38,7 @@ function doOnDomReady(
 
     initializeSelects();
 
-    $('#maxDownloadTimeInMinutes a').click(function() {
+    $('#maxDownloadTimeInMinutes a').click(function () {
         $('#maxDownloadTimeInMinutes input')
             .removeClass('non-editable')
             .removeAttr('readonly');
@@ -64,47 +62,48 @@ function doOnDomReady(
             );
 
         },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {}
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+        }
     });
 
 };
 
 function initializeSelects() {
-	  var chosenOptions = {
-			  disable_search_threshold: 10,
-			  no_results_text: '',
-			  width: "35em",
-			  search_contains: true
-	  };
-	  if ($('select#jobgroup').size() > 0) {
-		  $('select#jobgroup').chosen(chosenOptions);
-	  }
-	  if ($('select#location').size() > 0) {
-		  $('select#location').chosen(chosenOptions);
-	  }
-	  if ($('select#connectivityProfile').size() > 0) {
-		  $('select#connectivityProfile').chosen(chosenOptions);
-	  }
-	  if ($('select#script').size() > 0) {
-		  chosenOptions.allow_single_deselect = true;
-		  $('select#script').chosen(chosenOptions);
-	  }
+    var chosenOptions = {
+        disable_search_threshold: 10,
+        no_results_text: '',
+        width: "35em",
+        search_contains: true
+    };
+    if ($('select#jobgroup').size() > 0) {
+        $('select#jobgroup').chosen(chosenOptions);
+    }
+    if ($('select#location').size() > 0) {
+        $('select#location').chosen(chosenOptions);
+    }
+    if ($('select#connectivityProfile').size() > 0) {
+        $('select#connectivityProfile').chosen(chosenOptions);
+    }
+    if ($('select#script').size() > 0) {
+        chosenOptions.allow_single_deselect = true;
+        $('select#script').chosen(chosenOptions);
+    }
 }
 
 function warnInactive(data, notActiveMessage) {
-	if (!$('input[name="active"]').prop('checked') && !/^\s*$/.test(data)) {
-		return notActiveMessage;
-	} else {
-		return '';
-	}
+    if (!$('input[name="active"]').prop('checked') && !/^\s*$/.test(data)) {
+        return notActiveMessage;
+    } else {
+        return '';
+    }
 }
 
 function updateScriptEditHref(baseUrl, scriptId) {
-	$('a#editScriptLink').attr('href', baseUrl + '/' + scriptId);
+    $('a#editScriptLink').attr('href', baseUrl + '/' + scriptId);
 }
 
-jQuery.fn.visibilityToggle = function() {
-    return this.css('visibility', function(i, visibility) {
+jQuery.fn.visibilityToggle = function () {
+    return this.css('visibility', function (i, visibility) {
         return (visibility == 'visible') ? 'hidden' : 'visible';
     });
 };
@@ -121,11 +120,11 @@ jQuery.fn.visibilityToggle = function() {
  * @param connectivityProfileId Id of job associated connectivity profile. May be null if job has 'Native' or 'Custom' connectivity.
  * @param noTrafficShapingAtAll True, if job has 'Native' connectivity. Otherwise false.
  */
-function prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll){
+function prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
 
     addNullProfileOptions(customConnNameForNative)
     registerConnectivityProfilesEventHandlers(customConnNameForNative)
-    if(connectivityProfileId == null){
+    if (connectivityProfileId == null) {
         selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative)
     }
 
@@ -138,7 +137,7 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
  * </ul>
  * @param customConnNameForNative Custom connectivity name for native connectivity.
  */
-function addNullProfileOptions(customConnNameForNative){
+function addNullProfileOptions(customConnNameForNative) {
     var optNative = document.createElement('option');
     optNative.value = null;
     optNative.text = customConnNameForNative;
@@ -151,13 +150,13 @@ function addNullProfileOptions(customConnNameForNative){
     connProfileSelect.dispatchEvent(new Event("chosen:updated"));
 }
 
-function selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative){
+function selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative) {
 
     var profilesSelect = document.getElementById('connectivityProfile');
 
-    if(newJob){
+    if (newJob) {
         profilesSelect.selectedIndex = 0;
-    } else if(noTrafficShapingAtAll){
+    } else if (noTrafficShapingAtAll) {
 
         for (var i = 0; i < profilesSelect.options.length; i++) {
             if (profilesSelect.options[i].text === customConnNameForNative) {
@@ -172,7 +171,7 @@ function selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNam
             if (profilesSelect.options[i].text != customConnNameForNative && profilesSelect.options[i].value == "null") {
 
                 var customConnNameInput = document.getElementById('custom-connectivity-name');
-                if(getCustomConnNameFromDom() != customConnNameInput.value){
+                if (getCustomConnNameFromDom() != customConnNameInput.value) {
                     customConnNameInput.readOnly = false;
                     document.getElementById('setCustomConnNameManually').checked = true;
                     removeUpdateCustomNameEventListeners();
@@ -187,22 +186,22 @@ function selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNam
     }
     profilesSelect.options[profilesSelect.options.selectedIndex].selected = true;
 }
-function registerConnectivityProfilesEventHandlers(customConnNameForNative){
-    document.getElementById('connectivityProfile').onchange = function(){
+function registerConnectivityProfilesEventHandlers(customConnNameForNative) {
+    document.getElementById('connectivityProfile').onchange = function () {
         var selectedOption = this.options[this.selectedIndex];
-        if(selectedOption.text == "Custom"){
+        if (selectedOption.text == "Custom") {
 
             toggleCustomConnDetails(true)
             document.getElementById('noTrafficShapingAtAll').value = false;
             document.getElementById('customConnectivityProfile').value = true;
 
-        }else {
+        } else {
 
             toggleCustomConnDetails(false)
             document.getElementById('customConnectivityProfile').value = false;
-            if(selectedOption.text == customConnNameForNative){
+            if (selectedOption.text == customConnNameForNative) {
                 document.getElementById('noTrafficShapingAtAll').value = true;
-            }else {
+            } else {
                 document.getElementById('noTrafficShapingAtAll').value = false;
             }
 
@@ -211,12 +210,12 @@ function registerConnectivityProfilesEventHandlers(customConnNameForNative){
 
     addUpdateCustomNameEventListeners();
 
-    document.getElementById('setCustomConnNameManually').onchange = function(){
+    document.getElementById('setCustomConnNameManually').onchange = function () {
         var manualCustomConnName = this.checked;
-        if(manualCustomConnName){
+        if (manualCustomConnName) {
             document.getElementById('custom-connectivity-name').readOnly = false;
             removeUpdateCustomNameEventListeners();
-        }else{
+        } else {
             document.getElementById('custom-connectivity-name').readOnly = true;
             updateCustomConnName();
             addUpdateCustomNameEventListeners();
@@ -224,7 +223,7 @@ function registerConnectivityProfilesEventHandlers(customConnNameForNative){
     }
 
 }
-function addUpdateCustomNameEventListeners(){
+function addUpdateCustomNameEventListeners() {
     if (document.addEventListener) {
         addUpdateCustomNameEventListenersForAllMajorBrowsers();
     } else if (document.attachEvent) {
@@ -232,19 +231,19 @@ function addUpdateCustomNameEventListeners(){
     }
 
 }
-function addUpdateCustomNameEventListenersForAllMajorBrowsers(){
+function addUpdateCustomNameEventListenersForAllMajorBrowsers() {
     document.getElementById('custom-bandwidthDown').addEventListener("input", updateCustomConnName);
     document.getElementById('custom-bandwidthUp').addEventListener("input", updateCustomConnName);
     document.getElementById('custom-latency').addEventListener("input", updateCustomConnName);
     document.getElementById('custom-packetLoss').addEventListener("input", updateCustomConnName);
 }
-function addUpdateCustomNameEventListenersForIE8AndEarlier(){
+function addUpdateCustomNameEventListenersForIE8AndEarlier() {
     document.getElementById('custom-bandwidthDown').attachEvent("onchange", updateCustomConnName);
     document.getElementById('custom-bandwidthUp').attachEvent("onchange", updateCustomConnName);
     document.getElementById('custom-latency').attachEvent("onchange", updateCustomConnName);
     document.getElementById('custom-packetLoss').attachEvent("onchange", updateCustomConnName);
 }
-function removeUpdateCustomNameEventListeners(){
+function removeUpdateCustomNameEventListeners() {
     if (document.removeEventListener) {
         removeUpdateCustomNameEventListenersForAllMajorBrowsers();
     } else if (document.detachEvent) {
@@ -252,13 +251,13 @@ function removeUpdateCustomNameEventListeners(){
     }
 
 }
-function removeUpdateCustomNameEventListenersForAllMajorBrowsers(){
+function removeUpdateCustomNameEventListenersForAllMajorBrowsers() {
     document.getElementById('custom-bandwidthDown').removeEventListener("input", updateCustomConnName);
     document.getElementById('custom-bandwidthUp').removeEventListener("input", updateCustomConnName);
     document.getElementById('custom-latency').removeEventListener("input", updateCustomConnName);
     document.getElementById('custom-packetLoss').removeEventListener("input", updateCustomConnName);
 }
-function removeUpdateCustomNameEventListenersForIE8AndEarlier(){
+function removeUpdateCustomNameEventListenersForIE8AndEarlier() {
     document.getElementById('custom-bandwidthDown').detachEvent("onchange", updateCustomConnName);
     document.getElementById('custom-bandwidthUp').detachEvent("onchange", updateCustomConnName);
     document.getElementById('custom-latency').detachEvent("onchange", updateCustomConnName);
@@ -267,9 +266,9 @@ function removeUpdateCustomNameEventListenersForIE8AndEarlier(){
 function updateCustomConnName() {
     document.getElementById('custom-connectivity-name').value = getCustomConnNameFromDom();
 }
-function toggleCustomConnDetails(visibilityToSet){
+function toggleCustomConnDetails(visibilityToSet) {
     $('#connectivityProfileDetails').toggle(visibilityToSet);
-    if(!visibilityToSet){
+    if (!visibilityToSet) {
         document.getElementById('custom-connectivity-name').value = "";
         document.getElementById('custom-bandwidthDown').value = "";
         document.getElementById('custom-bandwidthUp').value = "";
@@ -277,26 +276,26 @@ function toggleCustomConnDetails(visibilityToSet){
         document.getElementById('custom-packetLoss').value = "";
     }
 }
-function getCustomConnNameFromDom(){
+function getCustomConnNameFromDom() {
 
     var bandwidthDownValue = document.getElementById('custom-bandwidthDown').value;
     var bandwidthUpValue = document.getElementById('custom-bandwidthUp').value;
     var latencyValue = document.getElementById('custom-latency').value;
     var packetLossValue = document.getElementById('custom-packetLoss').value;
 
-    var bwDownOrEmpty = bandwidthDownValue?bandwidthDownValue:"[bwDown]";
-    var bwUpOrEmpty = bandwidthUpValue?bandwidthUpValue:"[bwUp]";
-    var latencyOrEmpty = latencyValue?latencyValue:"[latency]";
-    var plrOrEmpty = packetLossValue?packetLossValue:"[plr]";
+    var bwDownOrEmpty = bandwidthDownValue ? bandwidthDownValue : "[bwDown]";
+    var bwUpOrEmpty = bandwidthUpValue ? bandwidthUpValue : "[bwUp]";
+    var latencyOrEmpty = latencyValue ? latencyValue : "[latency]";
+    var plrOrEmpty = packetLossValue ? packetLossValue : "[plr]";
 
     return "Custom (" + bwDownOrEmpty + "/" + bwUpOrEmpty + " Kbps, " + latencyOrEmpty + "ms, " + plrOrEmpty + "% PLR)";
 }
 
 
-function toggleCronInstructions(){
+function toggleCronInstructions() {
     var cronInstructions = document.querySelector('#cron-instructions');
-    cronInstructions.style.display=="none" ?
-    cronInstructions.style.display="inline" : cronInstructions.style.display="none";
+    cronInstructions.style.display == "none" ?
+        cronInstructions.style.display = "inline" : cronInstructions.style.display = "none";
 }
 function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {
     jQuery.ajax({
@@ -318,4 +317,47 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
         error: function (XMLHttpRequest, textStatus, errorThrown) {
         }
     });
+}
+
+function createJobGroup(createJobGroupUrl) {
+    var modalDialog = $("#jobGroupModal");
+    var name = modalDialog.find("#name").val();
+    var graphiteServerIds = modalDialog.find("#graphiteServers").val();
+    var csiConfiguration = modalDialog.find("#csiConfiguration").val();
+    var tags = modalDialog.find("#tags").tagit("assignedTags");
+    var persistDetailData = modalDialog.find("#persistDetailData").attr("checked") ? true : false;
+    var errorContainer = $("#jobGroupErrorContainer");
+
+    errorContainer.addClass("hidden");
+
+    $.ajax({
+        type: 'POST',
+        data: {
+            name: name,
+            graphiteServers: JSON.stringify(graphiteServerIds),
+            tags: JSON.stringify(tags),
+            csiConfiguration: csiConfiguration,
+            persistDetailData: persistDetailData
+        },
+        url: createJobGroupUrl,
+        success: function (data, textStatus) {
+            data = JSON.parse(data);
+            var newJobGroupOption = $("<option/>").val(data.jobGroupId).text(data.jobGroupName);
+            newJobGroupOption.appendTo("#jobgroup");
+            $('#jobgroup option').removeAttr('selected');
+            newJobGroupOption.attr("selected", true);
+            $('.chosen').trigger("chosen:updated");
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            errorContainer.text(XMLHttpRequest.responseText);
+            errorContainer.removeClass("hidden");
+        }
+    });
+}
+
+function selectAllGraphiteServer(select) {
+    var obj = $("#graphiteServers")[0];
+    for (var i=0; i<obj.options.length; i++) {
+        obj.options[i].selected = select;
+    }
 }
