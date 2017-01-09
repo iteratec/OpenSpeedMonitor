@@ -36,6 +36,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
     var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
     var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
+    var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var lastResultCount = 1;
 
     var init = function() {
@@ -105,6 +106,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var setQueryArgsFromMeasuredEventSelection = function (event, measuredEventSelection) {
+        hasMeasuredEventSelection = !!(measuredEventSelection && measuredEventSelection.ids && measuredEventSelection.ids.length > 0);
         currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
         updateCards("pages");
     };
@@ -151,14 +153,14 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var validateForm = function () {
-        warningNoPageSelected.toggle(!hasPageSelection && lastResultCount != 0);
+        warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!hasJobGroupSelection && lastResultCount != 0);
-        showButtons.prop("disabled", lastResultCount == 0 || !hasJobGroupSelection || !hasPageSelection);
+        showButtons.prop("disabled", lastResultCount == 0 || !hasJobGroupSelection || !(hasPageSelection || hasMeasuredEventSelection));
     };
 
     var updateResultCount = function (resultCount) {
         lastResultCount = resultCount;
-        warningLongProcessing.toggle(resultCount < 0 && hasPageSelection && hasJobGroupSelection);
+        warningLongProcessing.toggle(resultCount < 0 && (hasPageSelection || hasMeasuredEventSelection) && hasJobGroupSelection);
         warningNoData.toggle(resultCount == 0);
         validateForm();
     };
