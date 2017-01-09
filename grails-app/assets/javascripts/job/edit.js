@@ -24,6 +24,7 @@ function doOnDomReady(newJob,
                       noTrafficShapingAtAll,
                       tagsLink) {
 
+    $("ul[name='tags']").tagit({select: true, tagSource: tagsLink});
     $("ul[name='jobGroupTags']").tagit({select: true, tagSource: tagsLink});
 
     $("[rel=tooltip]").tooltip({html: true});
