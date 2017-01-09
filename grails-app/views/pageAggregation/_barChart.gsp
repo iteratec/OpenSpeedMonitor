@@ -17,15 +17,17 @@
                     default="Customer Journey"/></li>
         </ul>
     </div>
-    <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
-       class="hidden" onclick="initModalDialogValues()">
-        <i class="fa fa-sliders"></i>
-    </a>
-    <a href="#downloadAsPngModal" id="download-as-png-button"
-       class="hidden"
-       data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')">
-        <i class="fa fa-download"></i>
-    </a>
+    <div class="in-chart-buttons">
+        <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
+           class="hidden" onclick="initModalDialogValues()">
+            <i class="fa fa-sliders"></i>
+        </a>
+        <a href="#downloadAsPngModal" id="download-as-png-button"
+           class="hidden" data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
+           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
+            <i class="fa fa-download"></i>
+        </a>
+    </div>
 
     <div id="svg-container">
     </div>
