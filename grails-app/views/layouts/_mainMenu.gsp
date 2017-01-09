@@ -83,7 +83,7 @@
                 <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}" id="tabularResultMainMenu">
                     <g:link controller="tabularResultPresentation" action="listResults"><i
                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
-                                                                  default="Einzelergebnisse"/></g:link>
+                                                                  default="Result List"/></g:link>
                 </li>
             </g:elseif>
 

@@ -29,13 +29,17 @@
         %{--results --------------------------------------------------------}%
 
         <li class="controller">
-            <g:link controller="eventResultDashboard" action="showAll"><i class="fa fa-signal"></i>
-                <g:message code="eventResultDashboard.label" default="Result Dashboard"/></g:link>
+            <g:link controller="eventResultDashboard" action="showAll"><i class="fa fa-line-chart"></i>
+                <g:message code="eventResultDashboard.label" default="Time Series"/></g:link>
+        </li>
+        <li class="controller">
+            <g:link controller="pageAggregation" action="showAll"><i class="fa fa-bar-chart"></i>
+                <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/></g:link>
         </li>
         <li class="controller">
             <g:link controller="tabularResultPresentation" action="listResults"><i
                     class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
-                                                          default="Einzelergebnisse"/></g:link>
+                                                          default="Result List"/></g:link>
         </li>
         <li class="divider"></li>
 
