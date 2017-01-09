@@ -96,7 +96,8 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         $("#location_chosen").find("li").find { it.text() == location2Name }.click()
         createPage.nameText << job4Name
         createPage.cronString << "10/20 * * * ? *"
-        createPage.tags << job4Tag << Keys.ENTER
+        createPage.tags << job4Tag
+        createPage.tags << Keys.ENTER
         createPage.clickCreateButton()
 
         then: "There should be the new created job in the list and it should be highlighted"
