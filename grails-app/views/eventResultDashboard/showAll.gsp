@@ -99,8 +99,7 @@
                                       optimizeForExport            : 'false',
                                       openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
                                       annotations                  : annotations,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name'),
-                                      downloadCsvSubmitButton      : g.actionSubmit([value: g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV'), action: 'downloadCsv'])]"/>
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')]"/>
                 </div>
             </div>
         </g:if>
@@ -146,6 +145,10 @@
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
+                <li>
+                    <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                                    action="downloadCsv" />
+                </li>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                     <li>
                         <a id="createUserspecificDashboardButton" href="#CreateUserspecifiedDashboardModal"

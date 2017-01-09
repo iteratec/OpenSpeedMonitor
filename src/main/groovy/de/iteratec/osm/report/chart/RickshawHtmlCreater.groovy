@@ -19,9 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.RickshawTransformableCsMapping
-import de.iteratec.osm.result.CachedView
 import groovy.json.StringEscapeUtils
-
 
 class RickshawHtmlCreater {
 
@@ -54,7 +52,7 @@ class RickshawHtmlCreater {
      * to place its components. Additional a javascript function
      * will be called, which is responsible to draw the rickshaw graph.
      */
-    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax, String downloadPngLabel, String downloadCsvSubmitButton ->
+    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax, String downloadPngLabel ->
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
         def height = heightOfChart
@@ -74,20 +72,13 @@ class RickshawHtmlCreater {
                 <div id="rickshaw_chart_label_summary">${labelSummary}</div>
             </div>
 			<div id="rickshaw_main" style="height: ${height}">
-                <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
-                    <i class="fa fa-sliders"></i>
-                </a>
-                <div class="btn-group hidden" id="download-dropdown">
-                <div  type="button" id="download-dropdown-button"
-                   class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-download"></i>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-right">
-                        ${downloadPngLabel ? '<li><a href="#" id="dia-save-chart-as-png">'+downloadPngLabel+'</a></li>' : ''}
-                        <li>
-                            ${downloadCsvSubmitButton}
-                        </li>
-                </ul>
+                <div class="in-chart-buttons">
+                    <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
+                        <i class="fa fa-sliders"></i>
+                    </a>
+                    <a href="#" id="dia-save-chart-as-png" title="${downloadPngLabel}">
+                        <i class="fa fa-download"></i>
+                    </a>
                 </div>
                 
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>

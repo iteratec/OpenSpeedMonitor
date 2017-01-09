@@ -586,41 +586,4 @@
     margin-right: 40px;
 }
 
-#rickshaw_adjust_chart_link {
-    color: #333333;
-    opacity: 0.5;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border-radius: 4px;
-    z-index: 500;
-    font-size: 25px;
-    padding: 6px 12px;
-    cursor: pointer;
-}
 
-#rickshaw_adjust_chart_link:hover,
-#rickshaw_adjust_chart_link:focus {
-    background: #eeeeee;
-}
-
-#download-dropdown {
-    position: absolute;
-    top: 50px;
-    right: 10px;
-    border-radius: 4px;
-    z-index: 500;
-    padding: 6px 12px;
-}
-
-#download-dropdown-button {
-    cursor: pointer;
-    font-size: 25px;
-    color: #333333;
-    opacity: 0.5;
-}
-
-#download-dropdown-button:hover,
-#download-dropdown-button:focus {
-    background: #eeeeee;
-}

@@ -20,8 +20,7 @@
 		openDataPointLinksInNewWindow="${openDataPointLinksInNewWindow}"
 		exportUrl="${exportUrl}"
         annotations="${annotations}"
-		downloadPngLabel="${downloadPngLabel}"
-		downloadCsvSubmitButton="${downloadCsvSubmitButton}"/>
+		downloadPngLabel="${downloadPngLabel}" />
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart
@@ -45,7 +44,6 @@
 		heightOfChart="${initialChartHeight}"
 		width="${initialChartWidth}"
 		annotations="${annotations}"
-		downloadPngLabel="${downloadPngLabel}"
-		downloadCsvSubmitButton="${downloadCsvSubmitButton}"/>
+		downloadPngLabel="${downloadPngLabel}" />
 </g:else>
 <g:render template="/highchart/adjustChartModal" model="${model}" />

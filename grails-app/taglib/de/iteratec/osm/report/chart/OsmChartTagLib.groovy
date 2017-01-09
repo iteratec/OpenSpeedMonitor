@@ -18,7 +18,6 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.DefaultTimeToCsMapping
 
 class OsmChartTagLib {
 
@@ -48,7 +47,6 @@ class OsmChartTagLib {
         List annotations = attrs["annotations"]
         String heightOfChart = attrs["heightOfChart"]
         String downloadPngLabel = attrs["downloadPngLabel"]
-        String downloadCsvSubmitButton = attrs["downloadCsvSubmitButton"]
 
         data.each {
             it.measurandGroup = MeasurandGroup.PERCENTAGES
@@ -57,7 +55,7 @@ class OsmChartTagLib {
         highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "", 1, OsmChartAxis.LEFT_CHART_SIDE))
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, highChartLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel, downloadCsvSubmitButton)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, highChartLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel)
 
         return out.toString()
     }
@@ -86,7 +84,6 @@ class OsmChartTagLib {
                 Boolean openDatapointLinksInNewWindow = attrs['openDatapointLinksInNewWindow'] != null ? Boolean.valueOf(attrs['openDatapointLinksInNewWindow']) : true
                 List<OsmChartAxis> yAxesLabels = attrs['highChartLabels']
                 List annotations = attrs["annotations"]
-                String downloadCsvSubmitButton = attrs["downloadCsvSubmitButton"]
                 String downloadPngLabel = attrs["downloadPngLabel"]
 
                 if (title == null) {
@@ -96,7 +93,7 @@ class OsmChartTagLib {
                 String heightOfChart = attrs["heightOfChart"]
 
                 def htmlCreater = new RickshawHtmlCreater()
-                out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, yAxesLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel, downloadCsvSubmitButton)
+                out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, yAxesLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel)
 
                 return out.toString()
             }
