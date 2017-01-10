@@ -101,10 +101,12 @@
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });
 
+        // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
+        var spinner = OpenSpeedMonitor.Spinner("#chart-container");
+
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-            var spinner = OpenSpeedMonitor.Spinner("#chart-container");
             OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
             spinner.start();
             $.ajax({
