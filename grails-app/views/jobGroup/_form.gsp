@@ -33,12 +33,12 @@
 </div>
 
 <div class="form-group fieldcontain">
-    <label for="tags" class="control-label col-md-3">
+    <label for="jobGroupTags" class="control-label col-md-3">
         <g:message code="job.tags.label" default="tags"/>
     </label>
 
     <div class="col-md-6">
-        <ul name="tags" id="tags">
+        <ul name="jobGroupTags" id="jobGroupTags">
             <g:each in="${jobGroup?.tags}">
                 <li>${it}</li>
             </g:each>

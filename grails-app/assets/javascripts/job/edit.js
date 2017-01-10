@@ -25,6 +25,7 @@ function doOnDomReady(newJob,
                       tagsLink) {
 
     $("ul[name='tags']").tagit({select: true, tagSource: tagsLink});
+    $("ul[name='jobGroupTags']").tagit({select: true, tagSource: tagsLink});
 
     $("[rel=tooltip]").tooltip({html: true});
     $("[rel=popover]").popover();
@@ -324,7 +325,7 @@ function createJobGroup(createJobGroupUrl) {
     var name = modalDialog.find("#name").val();
     var graphiteServerIds = modalDialog.find("#graphiteServers").val();
     var csiConfiguration = modalDialog.find("#csiConfiguration").val();
-    var tags = modalDialog.find("#tags").tagit("assignedTags");
+    var tags = modalDialog.find("#jobGroupTags").tagit("assignedTags");
     var persistDetailData = modalDialog.find("#persistDetailData").attr("checked") ? true : false;
     var errorContainer = $("#jobGroupErrorContainer");
 
