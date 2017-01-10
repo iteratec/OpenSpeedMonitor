@@ -1,15 +1,19 @@
 /*
 *= require_tree bower_components/bootstrap/dist/css
-*= require_tree bower_components/bootstrap/dist/less
-*= require_tree bower_components/bootstrap/dist/less/mixins
 *= require_tree bower_components/components-font-awesome
 *= require_tree bower_components/dcjs
 *= require_tree bower_components/jQuery-contextMenu
-*= require_tree bower_components/bootstrap-chosen
+*= require bower_components/bootstrap-chosen/chosen-sprite
+*= require bower_components/bootstrap-chosen/chosen-sprite@2x
 *= require bootstrap-custom
 *= require bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css
 *= require_self
 */
+
+@import-once "bower_components/bootstrap/less/variables";
+@import-once "bower_components/bootstrap/less/mixins";
+@import-once "bower_components/bootstrap-chosen/bootstrap-chosen";
+
 .renderInvisible {
  display:none;
 }
