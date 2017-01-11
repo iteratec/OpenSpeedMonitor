@@ -241,7 +241,7 @@ class JobController {
      * Execute handler for each job selected using the checkboxes
      * @param handler A closure which gets the corresponding job as first parameter
      */
-    void handleSelectedJobs(Closure handler) {
+    void handleSelectedJobs(String actionName, Closure handler) {
         Map<Long, Object> massExecutionResults = [:]
         if (params.selected) {
             List<Long> selectedIds = params.selected.findAll { jobId -> jobId.key.isLong() && "on".equals(jobId.value) }
@@ -250,7 +250,7 @@ class JobController {
                 Job job = Job.get(it)
                 handler(job, massExecutionResults)
             }
-            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, filters: params.filters])
+            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, performedAction: actionName, filters: params.filters])
         } else {
             redirect(action: 'index', model: [filters: params.filters])
         }
@@ -266,7 +266,7 @@ class JobController {
                 render e.htmlResult
             }
         } else {
-            handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
+            handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
                 if (jobProcessingService.launchJobRun(job))
                     massExecutionResults[job.id] = [status: 'success']
                 else
@@ -275,8 +275,22 @@ class JobController {
         }
     }
 
+    def deleteSelectedJobs() {
+        handleSelectedJobs("deleteSelectedJobs") { Job job, Map<Long, Object> massExecutionResults ->
+            String jobName = job.label
+            try {
+                jobService.deleteJob(job)
+                massExecutionResults[job.id] = [status : 'success',
+                                                message: message(code: 'de.iteratec.isj.job.deleted.success', default: "Deleted", args: [jobName])]
+            } catch (Exception e) {
+                massExecutionResults[job.id] = [status : 'failure',
+                                                message: message(code: 'de.iteratec.isj.job.deleted.error', default: "Failed to delete", args: [jobName, e.getMessage()])]
+            }
+        }
+    }
+
     def toggleActive(boolean active) {
-        handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
+        handleSelectedJobs("toggleActive") { Job job, Map<Long, Object> massExecutionResults ->
             job.active = active
             if (job.save(flush: true)) {
                 massExecutionResults[job.id] = [status : 'success',
@@ -421,13 +435,13 @@ class JobController {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
     }
 
-    def showLastResultForJob(Long id){
+    def showLastResultForJob(Long id) {
         Job job = Job.get(id)
-        redirect (url:jobService.createResultLinkForJob(job))
+        redirect(url: jobService.createResultLinkForJob(job))
     }
 
-    def showLastPageAggregationForJob(Long id){
+    def showLastPageAggregationForJob(Long id) {
         Job job = Job.get(id)
-        redirect (url:jobService.createPageAggregationLinkForJob(job))
+        redirect(url: jobService.createPageAggregationLinkForJob(job))
     }
 }

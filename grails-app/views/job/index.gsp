@@ -57,6 +57,27 @@
             </div>
         </div>
     </g:if>
+    %{--Results of deleting selected jobs--}%
+    <g:if test="${performedAction == 'deleteSelectedJobs'}">
+        <g:if test="${massExecutionResults.values().any {it.status == 'success'}}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-success">
+                        <g:each in="${massExecutionResults.values().findAll {it.status == 'success'}}">${it.message}<br /></g:each>
+                    </div>
+                </div>
+            </div>
+        </g:if>
+        <g:if test="${massExecutionResults.values().any {it.status == 'error'}}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <g:each in="${massExecutionResults.values().findAll {it.status == 'error'}}">${it.message}<br /></g:each>
+                    </div>
+                </div>
+            </div>
+        </g:if>
+    </g:if>
     <div class="alert alert-warning" id="serverdown">
         <a class="close" data-dismiss="alert">×</a>
         <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
@@ -88,6 +109,16 @@
                         <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate" />
                     </button>
                 </li>
+                <sec:ifLoggedIn>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                        <li>
+                            <button type="submit" name="_action_deleteSelectedJobs">
+                                <i class="fa fa-trash-o"></i>
+                                <g:message code="de.iteratec.isj.job.delete" default="Delete" />
+                            </button>
+                        </li>
+                    </sec:ifAnyGranted>
+                </sec:ifLoggedIn>
                 <li role="separator" class="divider"></li>
                 <li>
                     <div id="add-tag-container" class="input-group input-group-sm">
