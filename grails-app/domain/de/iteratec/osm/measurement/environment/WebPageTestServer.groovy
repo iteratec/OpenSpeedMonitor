@@ -29,9 +29,9 @@ class WebPageTestServer {
     String label
     String proxyIdentifier
 
-    Date	dateCreated
-    Date	lastUpdated
-    Long	id
+    Date dateCreated
+    Date lastUpdated
+    Long id
 
     String baseUrl
     Boolean active
@@ -71,4 +71,20 @@ class WebPageTestServer {
         return "${this.label}";
     }
 
+    def afterInsert() {
+        updateLocations()
+    }
+
+    def afterUpdate() {
+        updateLocations()
+    }
+
+    private void updateLocations() {
+        if (!this.active) {
+            Location.findAllByWptServer(this).each {
+                it.active = false
+                it.save(failOnError: true)
+            }
+        }
+    }
 }

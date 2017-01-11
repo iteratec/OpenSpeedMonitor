@@ -221,6 +221,11 @@ class RestApiController {
      */
     public Map<String, Object> allLocations() {
         Collection<Location> locations = locationDaoService.findAll()
+        if(params.showInactive != 'true') {
+            locations = locations.findAll {
+                it.active && it.wptServer.active
+            }
+        }
         Set<LocationDto> locationsAsJson = LocationDto.create(locations)
         return sendObjectAsJSON(locationsAsJson, params.pretty && params.pretty == 'true');
     }
