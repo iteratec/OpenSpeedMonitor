@@ -1,4 +1,5 @@
 @import-once "bower_components/bootstrap/less/variables";
+@import-once "variables-corporate";
 
 // min-heights, margin, and positioning used to make the footer sticky
 html {
@@ -11,10 +12,9 @@ body {
 }
 
 .footer {
-  background: #eee;
-  color: #000;
+  background: @footer-bg;
+  color: @footer-color;
   clear: both;
-  font-size: 1.3rem;
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -156,6 +156,10 @@ label.sub {
 //bootstrap navbar
 // Brand: website or project name
 // -------------------------
+
+#Navbar {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+}
 
 // so "fork me on github" doesn't overlap navigation
 .navbar .container-fluid {
