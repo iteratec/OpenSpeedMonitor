@@ -48,8 +48,7 @@
                                                                   default="Globally Visible"/></label>
 
     <div class="col-md-6">
-        %{--<input type="checkBox" name="globallyVisible" value="${eventInstance?.globallyVisible}"/>--}%
-        <g:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
+        <bs:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}" class="form-control"/>
     </div>
 </div>
 
