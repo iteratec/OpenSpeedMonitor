@@ -9,7 +9,7 @@
             </button>
             <a class="navbar-brand" href="${createLink(uri: '/')}">
                 <img class="logo"
-                     src="${resource(dir: 'images', file: 'OpenSpeedMonitor-onblack-monitorWritingLight_39pxHeight.gif')}"
+                     src="${resource(dir: 'images', file: 'OpenSpeedMonitor_white.svg')}"
                      alt="${meta(name: 'app.name')}"/>
             </a>
         </div>

@@ -1,8 +1,8 @@
 /*
 *= require_self
 */
-@import "../bower_components/bootstrap/less/variables.less";
 @import "../bower_components/bootstrap/less/mixins/clearfix.less";
+@import "../variables-corporate";
 
 #filterRow {
   display: flex;
@@ -213,19 +213,19 @@ ul.tags li {
 }
 
 .job-status-good {
-  background-color: #5CB85C; /*botstrap success*/
+  background-color: @brand-success;
 }
 
 .job-status-warn {
-  background-color: #F0AD4E; /*botstrap warning*/
+  background-color: @brand-warning;
 }
 
 .job-status-error {
-  background-color: #D9534F; /*botstrap danger*/
+  background-color: @brand-danger;
 }
 
 .job-status-nodata {
-  background-color: #777; /*botstrap gray-light*/
+  background-color: @gray-light;
 }
 
 .dropdown-submenu {
