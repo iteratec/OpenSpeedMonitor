@@ -31,11 +31,8 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
 import org.apache.commons.lang.time.DateUtils
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito
+import spock.lang.Specification
 
 import static org.junit.Assert.*
 
@@ -45,14 +42,12 @@ import static org.junit.Assert.*
 @TestFor(ResultCsiAggregationService)
 @Mock([EventResult, Job, JobResult, JobGroup, CsiAggregation, MeasuredEvent, WebPageTestServer,
         Browser, Page, Location, AggregatorType, CsiAggregationInterval, Script, ConnectivityProfile])
-class ResultCsiAggregationServiceTests {
+class ResultCsiAggregationServiceTests  extends Specification{
 
     ResultCsiAggregationService serviceUnderTest
     BrowserDaoService browserDaoServiceMock
-    CsiAggregationUtilService csiAggregationUtilServiceMock
 
     List<EventResult> results = []
-
 
     MeasuredEvent measuredEvent
     Job job1, job2
@@ -66,25 +61,17 @@ class ResultCsiAggregationServiceTests {
 
     ConnectivityProfile connectivityProfile
 
-    def doWithSpring = {
-        csiAggregationUtilService(CsiAggregationUtilService)
-        eventResultDaoService(EventResultDaoService)
-    }
-
-    @Before
-    void setUp() {
+    void setup() {
         serviceUnderTest = service;
 
         /** DAO Services **/
-        browserDaoServiceMock = Mockito.mock(BrowserDaoService.class);
-        serviceUnderTest.browserDaoService = browserDaoServiceMock;
+        serviceUnderTest.browserDaoService = Stub(BrowserDaoService);
 
         //DB Call Find By should explicit be tested
-        serviceUnderTest.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
+        serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService)
 
         /** Functional Services **/
-        csiAggregationUtilServiceMock = grailsApplication.mainContext.getBean('csiAggregationUtilService')
-        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilServiceMock
+        serviceUnderTest.csiAggregationUtilService = Stub(CsiAggregationUtilService)
 
         // Init some data:
         initIteratecTestData();
@@ -436,8 +423,8 @@ class ResultCsiAggregationServiceTests {
         }
     }
 
-    @Test
     void testGetAggregatorTypeCachedViewType_CACHED() {
+        when:
         /* Set up types to check */
         List<String> cached = [
                 AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES,
@@ -459,7 +446,7 @@ class ResultCsiAggregationServiceTests {
         /* test */
 
         assertEquals(cached.size(), ResultCsiAggregationService.getAggregatorMap().get(CachedView.CACHED).size())
-
+then:
         cached.each { String aggregatorName ->
             AggregatorType aggregator = AggregatorType.findByName(aggregatorName);
             assertNotNull(serviceUnderTest)
@@ -471,8 +458,8 @@ class ResultCsiAggregationServiceTests {
         }
     }
 
-    @Test
     void testGetAggregatorTypeCachedViewType_UNCACHED() {
+        when:
         /* Set up types to check */
         List<AggregatorType> uncached = [
                 AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES,
@@ -495,32 +482,13 @@ class ResultCsiAggregationServiceTests {
 
         assertEquals(uncached.size(), ResultCsiAggregationService.getAggregatorMap().get(CachedView.UNCACHED).size())
 
+        then:
         uncached.each { String aggregatorName ->
             AggregatorType aggregator = AggregatorType.findByName(aggregatorName);
             assertEquals("failed for: " + aggregator.name, CachedView.UNCACHED, serviceUnderTest.getAggregatorTypeCachedViewType(aggregator));
         }
 
 
-    }
-
-    // mocks /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Mocks {@link CsiAggregationDaoService}.
-     * @param toReturn
-     * {@link CsiAggregation}s to return from mocked method getMvs().
-     */
-    private void mockCsiAggregationDaoService(List<CsiAggregation> toReturn) {
-        def csiAggregationDaoServiceMock = new MockFor(CsiAggregationDaoService, true)
-        csiAggregationDaoServiceMock.demand.getMvs(1..10000) {
-            Date fromDate,
-            Date toDate,
-            String rlikePattern,
-            CsiAggregationInterval interval,
-            AggregatorType aggregator ->
-                return toReturn
-        }
-        serviceUnderTest.csiAggregationDaoService = csiAggregationDaoServiceMock.proxyInstance()
     }
 
 }

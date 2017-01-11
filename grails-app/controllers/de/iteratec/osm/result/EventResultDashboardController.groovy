@@ -21,21 +21,16 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.LocationController
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -44,12 +39,10 @@ import grails.converters.JSON
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
-import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.servlet.FlashMap
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -62,14 +55,8 @@ class EventResultDashboardController {
 
     static final int RESULT_DASHBOARD_MAX_POINTS_PER_SERIES = 100000
 
-    AggregatorTypeDaoService aggregatorTypeDaoService
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    BrowserDaoService browserDaoService
-    LocationDaoService locationDaoService
-    CsiAggregationUtilService csiAggregationUtilService
     EventResultDashboardService eventResultDashboardService
-    PageService pageService
     I18nService i18nService
     EventService eventService
     def springSecurityService

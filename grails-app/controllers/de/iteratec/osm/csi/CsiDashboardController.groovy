@@ -18,7 +18,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
@@ -32,7 +31,6 @@ import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
@@ -66,7 +64,6 @@ import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
  */
 class CsiDashboardController {
 
-    AggregatorTypeDaoService aggregatorTypeDaoService
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     MeasuredEventDaoService measuredEventDaoService
@@ -80,7 +77,6 @@ class CsiDashboardController {
     EventService eventService
     SpringSecurityService springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
-    TimeToCsMappingService timeToCsMappingService
     ConfigService configService
     CustomDashboardService customDashboardService
     UserspecificDashboardService userspecificDashboardService
