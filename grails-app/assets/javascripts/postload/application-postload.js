@@ -43,5 +43,4 @@ OpenSpeedMonitor.postLoaded = (function() {
     };
 })();
 
-$('.dropdown-toggle').dropdown();
 fireWindowEvent('PostLoadedScriptArrived');

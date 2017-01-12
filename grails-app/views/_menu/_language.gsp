@@ -5,6 +5,8 @@
     <li class="dropdown js-language-dropdown">
         <a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="javascript:;">
             <img class="flag flag-${lang.toString()}"/>
+            Languages
+            <span class="caret"></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark" role="menu">
             <g:set var="allLocales" value="${grailsApplication.config.grails.i18n.locales}"/>

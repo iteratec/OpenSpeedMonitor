@@ -3,7 +3,10 @@
 		
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
     		<i class="fa fa-info-circle"></i>
-			<g:message code="default.info.label" locale="${lang}"/> <b class="caret"></b>
+            <span class="description">
+			    <g:message code="default.info.label" locale="${lang}"/>
+            </span>
+            <span class="caret"></span>
 		</a>
 
         <ul class="dropdown-menu">

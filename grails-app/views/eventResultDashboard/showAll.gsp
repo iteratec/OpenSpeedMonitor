@@ -15,7 +15,7 @@
 <body>
 
 <%-- main menu --%>
-<g:render template="/layouts/mainMenu" model="${['availableDashboards': availableDashboards]}"/>
+<h1><g:message code="eventResultDashboard.label" default="Time Series"/></h1>
 
 <div class="row">
     <div class="col-md-12">
@@ -81,7 +81,7 @@
             <div class="col-md-12">
                 <a name="chart-table"></a>
 
-                <div id="chartbox" class="section">
+                <div id="chartbox" class="card">
                     <g:render template="/highchart/chart"
                               model="[
                                       chartData                    : eventResultValues,

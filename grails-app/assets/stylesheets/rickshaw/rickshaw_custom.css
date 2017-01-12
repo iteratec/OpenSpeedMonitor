@@ -1,7 +1,10 @@
 /*################### self created html elements ###################*/
 
-#rickshaw_main {
+#chartbox {
     position: relative;
+}
+
+#rickshaw_main {
     width: 1110px;
 }
 
@@ -484,10 +487,8 @@
 }
 
 .rickshaw_legend {
-    font-family: Arial;
     font-size: 12px;
-    color: #4d4d4d;
-    background: #e5e5e5;
+    color: #333;
     display: inline-block;
     padding: 12px 5px;
     border-radius: 2px;

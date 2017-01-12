@@ -12,26 +12,7 @@
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unnknown"/></g:else>
-<div id="main-menu" class="row">
-
-    <%-- ---------------------------------------------------------------------------------------------- tabs --%>
-    <div class="col-md-12">
-        <ul class="nav nav-tabs col-md-12" data-role="listview" data-split-icon="gear" data-filter="true">
-            <li class="controller ${mainTab.equals('management') ? 'active' : ''}">
-                <g:link controller="job" action="index"><g:message code="de.iteratec.isr.managementDashboard"
-                                                                   default="Verwaltung"/></g:link>
-            </li>
-            <li class="controller ${mainTab.equals('results') ? 'active' : ''}">
-                <g:link controller="eventResultDashboard" action="showAll"><g:message
-                        code="de.iteratec.isr.measurementresults" default="Mess-Ergebnisse"/></g:link>
-            </li>
-            <li class="controller ${mainTab.equals('csi') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="showAll"><g:message code="de.iteratec.isocsi.csi"
-                                                                              default="CSI"/></g:link>
-            </li>
-        </ul>
-    </div>
-
+<div id="main-menu" class="row" style="display: none">
     <%-- ---------------------------------------------------------------------------------------------- links --%>
 
     <div class="col-md-8">
