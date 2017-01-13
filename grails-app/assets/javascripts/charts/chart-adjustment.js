@@ -1,4 +1,4 @@
-/* 
+/*
  * OpenSpeedMonitor (OSM)
  * Copyright 2014 iteratec GmbH
  *

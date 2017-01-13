@@ -36,22 +36,24 @@
                             default="height"/></label>
 
                     <div class="col-sm-10">
-                        <div class="input-group">
+                        <div class="input-group form-row">
                             <span class="input-group-addon">
                                 <g:message code="de.iteratec.chart.width.name"
                                            default="Width"/>
                             </span>
-                            <input type="number" class="form-control chartSizeInput" id="inputChartWidth" min="0" step="1"
+                            <input type="number" class="form-control chartSizeInput" id="inputChartWidth" min="0"
+                                   step="1"
                                    data-bind="value:replyNumber">
                             <span class="input-group-addon">px</span>
                         </div>
 
-                        <div class="input-group">
+                        <div class="input-group form-group">
                             <span class="input-group-addon">
                                 <g:message code="de.iteratec.chart.height.name"
                                            default="Height"/>
                             </span>
-                            <input type="number" class="form-control chartSizeInput" id="inputChartHeight" min="0" step="1"
+                            <input type="number" class="form-control chartSizeInput" id="inputChartHeight" min="0"
+                                   step="1"
                                    data-bind="value:replyNumber">
                             <span class="input-group-addon">px</span>
                         </div>
@@ -103,14 +105,14 @@
                 </div>
             </div>
 
-            <div class="row hidden" id="assign-color-clone">
-                <label class="col-sm-5 control-label">
-                </label>
-                <input class="col-sm-1" type="color" value="#FFFFFF" class="form-control">
+            <div class="hidden input-group colorpicker-component form-row" id="assign-color-clone">
+                <span class="colorLabel input-group-addon"></span>
+                <input type="text" value="#FFFFFF" class="form-control"/>
+                <span class="input-group-addon colorpicker-target"><i></i></span>
             </div>
 
             <div class="hidden" id="y-axis-alias-clone">
-                <input class="col-sm-10 labelInput form-control" type="text">
+                <input class="labelInput form-control form-row" type="text">
                 <input class="hidden unitInput" type="text">
             </div>
 
@@ -143,9 +145,10 @@
             clone.removeAttr("id");
             clone.removeClass("hidden");
             clone.appendTo($("#assign-color-container"));
-            clone.find("label").html(assignment.label);
+            clone.find(".colorLabel").html(assignment.label);
             clone.find("input").val(assignment.color);
         });
+        $('.colorpicker-component').colorpicker({component: '.colorpicker-target'});
         var yLabels = chart.getYLabels();
         yLabels.forEach(function(label) {
             var clone = $("#y-axis-alias-clone").clone();

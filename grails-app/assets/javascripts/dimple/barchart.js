@@ -126,7 +126,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         // assign colors
         var colorAssignments = [];
         $("#assign-color-container").children().each(function () {
-            colorAssignments.push({"label": $(this).find("label").html(), "color": $(this).find("input").val()});
+            colorAssignments.push({"label": $(this).find(".colorLabel").html(), "color": $(this).find("input").val()});
         });
         assignColor(colorAssignments);
 
