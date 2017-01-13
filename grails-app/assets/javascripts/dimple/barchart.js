@@ -131,7 +131,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         assignColor(colorAssignments);
 
         // Toggle gridlines
-        showGridlines = $("#inputShowGridlines").prop("checked");
+        showGridlines = $("#inputShowGridlines").parent().hasClass('active');
         if (showGridlines) {
             d3.select(".dimple-gridline").style("opacity", 1);
         } else {
@@ -139,7 +139,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle yAxis
-        showYAxis = $("#inputShowYAxis").prop("checked");
+        showYAxis = $("#inputShowYAxis").parent().hasClass('active');
         if (showYAxis) {
             d3.selectAll(".dimple-axis.dimple-axis-y").style("opacity", 1);
         } else {
@@ -147,7 +147,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle xAxis
-        showXAxis = $("#inputShowXAxis").prop("checked");
+        showXAxis = $("#inputShowXAxis").parent().hasClass('active');
         if (showXAxis) {
             d3.select(".domain.dimple-custom-axis-line").style("opacity", 1);
             d3.select(".dimple-axis-x").selectAll("line").style("opacity", 1);
@@ -157,7 +157,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle bar labels
-        showBarLabels = $("#inputShowBarLabels").prop("checked");
+        showBarLabels = $("#inputShowBarLabels").parent().hasClass('active');
         if (showYAxis) {
             d3.selectAll(".bar-label").style("opacity", 1);
         } else {

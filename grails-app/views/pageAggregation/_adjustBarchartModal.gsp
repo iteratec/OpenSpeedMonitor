@@ -47,7 +47,7 @@
                             <span class="input-group-addon">px</span>
                         </div>
 
-                        <div class="input-group form-group">
+                        <div class="input-group form-row">
                             <span class="input-group-addon">
                                 <g:message code="de.iteratec.chart.height.name"
                                            default="Height"/>
@@ -71,32 +71,26 @@
                 </div>
                 %{--toggle chart axes and gridlines--}%
                 <div class="form-group">
-                    <div class="checkbox col-sm-offset-2">
-                        <label>
+                    <div class="btn-group col-sm-offset-2 col-sm-10" data-toggle="buttons">
+                        <label class="btn btn-default">
                             <input type="checkbox" id="inputShowGridlines"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
                                 default="Show Gridlines"/>
                         </label>
-                    </div>
 
-                    <div class="checkbox col-sm-offset-2">
-                        <label>
+                        <label class="btn btn-default">
                             <input type="checkbox" id="inputShowYAxis"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
                                 default="Show y-Axis"/>
                         </label>
-                    </div>
 
-                    <div class="checkbox col-sm-offset-2">
-                        <label>
+                        <label class="btn btn-default">
                             <input type="checkbox" id="inputShowXAxis"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
                                 default="Show x-Axis"/>
                         </label>
-                    </div>
 
-                    <div class="checkbox col-sm-offset-2">
-                        <label>
+                        <label class="btn btn-default">
                             <input type="checkbox" id="inputShowBarLabels"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
                                 default="Show Barlabels"/>
@@ -133,10 +127,10 @@
         $("#x-axis-label").val(chart.getXLabel());
         $("#inputChartWidth").val(chart.getWidth());
         $("#inputChartHeight").val(chart.getHeight());
-        $("#inputShowXAxis").prop("checked", chart.getShowXAxis());
-        $("#inputShowYAxis").prop("checked", chart.getShowYAxis());
-        $("#inputShowGridlines").prop("checked", chart.getShowGridlines());
-        $("#inputShowBarLabels").prop("checked", chart.getShowBarLabels());
+        if (chart.getShowXAxis()) $("#inputShowXAxis").parent().addClass('active');
+        if (chart.getShowYAxis()) $("#inputShowYAxis").parent().addClass('active');
+        if (chart.getShowGridlines()) $("#inputShowGridlines").parent().addClass('active');
+        if (chart.getShowBarLabels()) $("#inputShowBarLabels").parent().addClass('active');
         $("#assign-color-container").empty();
         $("#y-axis-alias-container").empty();
         var colorAssignments = chart.getColorAssignments();
