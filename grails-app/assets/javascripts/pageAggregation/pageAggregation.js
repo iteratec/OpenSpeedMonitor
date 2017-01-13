@@ -35,6 +35,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
         return vars;
     };
+    
     var getTimeFrame = function (map) {
             map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
             map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
@@ -69,17 +70,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         map['measurand'] = measurands
     };
     var addHandler = function () {
-        $('#folderSelectHtmlId').on('change', updateUrl);
-        $('#pageSelectHtmlId').on('change', updateUrl);
-        $('#timeframeSelect').on('change', updateUrl);
-        $('#select-interval-timeframe-card').find('.form-control').on('change', updateUrl);
-        $(".firstMeasurandSelect").on('change', updateUrl);
-        $(".additionalMeasurand").on('change', updateUrl);
-        $(".stackedSelect").on('change', updateUrl);
-        $("#addMeasurandSeriesButton").on('click', updateUrl);
-        $(".removeMeasurandSeriesButton").on('click', updateUrl);
-        $(".removeMeasurandButton").on('click', updateUrl);
-        $(".addMeasurandButton").on('click', updateUrl);
+        $('#graphButtonHtmlId').on('click', updateUrl);
     };
 
     var updateUrl = function () {
@@ -99,7 +90,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             setJobGroups(params);
             setPages(params);
             setMeasurands(params);
-            if(!params.hideGraph){
+            if(params.selectedFolder != null && params.selectedPages != null){
                 clickShowButton();
             }
         }
@@ -183,7 +174,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var init = function () {
         setSelections();
         addHandler();
-        updateUrl();
     };
 
     var initWaitForPostload = function () {
