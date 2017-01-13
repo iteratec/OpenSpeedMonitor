@@ -10,65 +10,66 @@
 
             <div id="collapseAdjustment" class="modal-body form-horizontal">
                 <!-- x axis label -->
-                <div class="form-group row">
-                    <label class="col-sm-3 control-label" for="x-axis-label">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="x-axis-label">
                         <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
                     </label>
 
-                    <div class="col-sm-8">
+                    <div class="col-sm-10">
                         <input id="x-axis-label" class="form-control" type="text">
                     </div>
                 </div>
-                %{--y labels--}%
-                <div class="form-group row">
-                    <label class="col-sm-3 control-label"><g:message
+                %{-- y axis label --}%
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><g:message
                             code="de.iteratec.osm.dimple.yAxis.label"
                             default="y-axis label"/></label>
 
-                    <div class="col-sm-9" id="y-axis-alias-container">
+                    <div class="col-sm-10" id="y-axis-alias-container">
 
                     </div>
                 </div>
-                %{--chart width & height--}%
-                <div class="form-group row">
-                    <div class="row">
-                        <label class="col-sm-3 control-label"><g:message
-                                code="de.iteratec.osm.dimple.barchart.size.name"
-                                default="height"/></label>
+                %{-- chart width & height --}%
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><g:message
+                            code="de.iteratec.osm.dimple.barchart.size.name"
+                            default="height"/></label>
 
-                        <div class="col-sm-9">
-                            <div class="row">
-                                <label for="inputChartWidth" class="col-sm-5 control-label"><g:message
-                                        code="de.iteratec.chart.width.name"
-                                        default="width"/></label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <g:message code="de.iteratec.chart.width.name"
+                                           default="Width"/>
+                            </span>
+                            <input type="number" class="form-control chartSizeInput" id="inputChartWidth" min="0" step="1"
+                                   data-bind="value:replyNumber">
+                            <span class="input-group-addon">px</span>
+                        </div>
 
-                                <input class="col-sm-3" type="number" id="inputChartWidth" min="0" step="1"
-                                       data-bind="value:replyNumber"/>
-                            </div>
-
-                            <div class="row">
-                                <label for="inputChartHeight" class="control-label col-sm-5"><g:message
-                                        code="de.iteratec.chart.height.name"
-                                        default="height"/></label>
-                                <input class="col-sm-3" type="number" id="inputChartHeight" min="0" step="1"
-                                       data-bind="value:replyNumber"/>
-                            </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <g:message code="de.iteratec.chart.height.name"
+                                           default="Height"/>
+                            </span>
+                            <input type="number" class="form-control chartSizeInput" id="inputChartHeight" min="0" step="1"
+                                   data-bind="value:replyNumber">
+                            <span class="input-group-addon">px</span>
                         </div>
                     </div>
                 </div>
                 %{--assign colors--}%
-                <div class="form-group row">
-                    <label class="col-sm-3 control-label"><g:message
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><g:message
                             code="de.iteratec.osm.dimple.barchart.assignColors.name"
-                            default="assign Colors"/></label>
+                            default="Assign Colors"/></label>
 
-                    <div class="col-sm-9" id="assign-color-container">
+                    <div class="col-sm-10" id="assign-color-container">
 
                     </div>
                 </div>
                 %{--toggle chart axes and gridlines--}%
-                <div class="form-group row">
-                    <div class="checkbox col-sm-offset-3">
+                <div class="form-group">
+                    <div class="checkbox col-sm-offset-2">
                         <label>
                             <input type="checkbox" id="inputShowGridlines"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
@@ -76,7 +77,7 @@
                         </label>
                     </div>
 
-                    <div class="checkbox col-sm-offset-3">
+                    <div class="checkbox col-sm-offset-2">
                         <label>
                             <input type="checkbox" id="inputShowYAxis"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
@@ -84,7 +85,7 @@
                         </label>
                     </div>
 
-                    <div class="checkbox col-sm-offset-3">
+                    <div class="checkbox col-sm-offset-2">
                         <label>
                             <input type="checkbox" id="inputShowXAxis"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
@@ -92,7 +93,7 @@
                         </label>
                     </div>
 
-                    <div class="checkbox col-sm-offset-3">
+                    <div class="checkbox col-sm-offset-2">
                         <label>
                             <input type="checkbox" id="inputShowBarLabels"><g:message
                                 code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
@@ -108,11 +109,8 @@
                 <input class="col-sm-1" type="color" value="#FFFFFF" class="form-control">
             </div>
 
-            <div class="row hidden" id="y-axis-alias-clone">
-                <label class="col-sm-5 control-label">
-                </label>
-
-                <input class="col-sm-3 labelInput" type="text">
+            <div class="hidden" id="y-axis-alias-clone">
+                <input class="col-sm-10 labelInput form-control" type="text">
                 <input class="hidden unitInput" type="text">
             </div>
 
