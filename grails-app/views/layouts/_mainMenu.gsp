@@ -61,7 +61,8 @@
                             code="connectivityProfile.label.plural"/></g:link>
                 </li>
                 <li class="controller ${controllerName.equals('jobResult') ? 'active' : ''}">
-                    <g:link controller="jobResult" action="listFailed"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <g:message
+                    <g:link controller="jobResult" action="listFailed"><i class="fa fa-exclamation-circle"
+                                                                          aria-hidden="true"></i> <g:message
                             code="de.iteratec.osm.failedJobResults.buttonToPage" default="Failed JobResults"/></g:link>
                 </li>
             </g:if>
@@ -69,22 +70,33 @@
         <%-- Results --%>
 
             <g:elseif test="${mainTab.equals('results')}">
-                <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}" id="eventResultMainMenu">
+                <li class="controller ${controllerName.equals('eventResultDashboard') ? 'active' : ''}"
+                    id="eventResultMainMenu">
                     <g:render template="/layouts/dashboardButton" model="${[
                             'availableDashboards': availableDashboards,
                             'affectedController' : 'eventResultDashboard'
                     ]}"/>
                 </li>
-                <li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}" id="pageAggregationMainMenu">
+                <li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}"
+                    id="pageAggregationMainMenu">
                     <g:link controller="pageAggregation" action="show"><i
                             class="fa fa-bar-chart"></i> <g:message code="de.iteratec.pageAggregation.title"
-                                                                  default="Page Aggregation"/></g:link>
+                                                                    default="Page Aggregation"/></g:link>
                 </li>
-                <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}" id="tabularResultMainMenu">
+                <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}"
+                    id="tabularResultMainMenu">
                     <g:link controller="tabularResultPresentation" action="listResults"><i
                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                                   default="Result List"/></g:link>
                 </li>
+                <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')=='true'}">
+                    <li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}"
+                        id="detailAnalysisMainMenu">
+                        <g:link controller="detailAnalysis" action="show"><i
+                                class="fa fa-pie-chart"></i> <g:message code="de.iteratec.detailAnalysis.title"
+                                                                        default="Detail Analysis"/></g:link>
+                    </li>
+                </g:if>
             </g:elseif>
 
         <%-- CSI --%>
@@ -99,7 +111,7 @@
                 <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
                     <g:render template="/layouts/csiConfigurationButton" model="${[
                             'availableCsiConfigurations': csiConfigurations,
-                            'affectedController'     : 'csiConfiguration'
+                            'affectedController'        : 'csiConfiguration'
                     ]}"/>
                 </li>
             </g:elseif>
@@ -158,8 +170,10 @@
                         <i class="fa fa-files-o" aria-hidden="true"></i>
                         ${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Save a copy')}
                     </button>
-                    <a href="#" onclick="return validatedDeletion()" id="deleteCsiConfigurationHref" class="btn btn-danger">
-                        <i class="fa fa-trash-o" aria-hidden="true"></i> ${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', default: 'Delete')}
+                    <a href="#" onclick="return validatedDeletion()" id="deleteCsiConfigurationHref"
+                       class="btn btn-danger">
+                        <i class="fa fa-trash-o"
+                           aria-hidden="true"></i> ${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', default: 'Delete')}
                     </a>
                 </div>
             </sec:ifAnyGranted>

@@ -1,19 +1,19 @@
 /*
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* 	http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * OpenSpeedMonitor (OSM)
+ * Copyright 2014 iteratec GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 //= require_tree bower_components/jquery
 //= require_tree bower_components/jquery-ui
 //= require_tree bower_components/bootstrap
@@ -47,59 +47,52 @@ OpenSpeedMonitor.urls = OpenSpeedMonitor.i18n || {};
  * @type {Array}
  */
 OpenSpeedMonitor.postLoadUrls = OpenSpeedMonitor.postLoadUrls || [];
-OpenSpeedMonitor.postLoadUrls.forEach( function (scriptUrl) {
-    console.log("a");
-   $.getScript(scriptUrl, function( data, textStatus, jqxhr ) {
-        console.log( data ); // Data returned
-        console.log( textStatus ); // Success
-        console.log( jqxhr.status ); // 200
-        console.log( "Load was performed." );
-    });
+OpenSpeedMonitor.postLoadUrls.forEach(function (scriptUrl) {
+    $.getScript(scriptUrl);
 });
 
-OpenSpeedMonitor.postLoader = (function (){
+OpenSpeedMonitor.postLoader = (function () {
 
-  var head = document.getElementsByTagName("head")[0];
+    var head = document.getElementsByTagName("head")[0];
 
-  var loadJavascript = function(url, async, name){
-    async = async || true;
-    var script = document.createElement("script");
-      script.onload = script.onreadystatechange = function() {
-          //console.log( this.readyState ); //uncomment this line to see which ready states are called.
-          var r;
-          if ( !r && (!this.readyState || this.readyState == 'complete') )
-          {
-              r = true;
-              fireWindowEvent(""+name+"Loaded");
-          }
-      };
-    script.setAttribute("src",url);
-    script.setAttribute("type","text/javascript");
-    script.setAttribute("async",async);
-    //script.setAttribute("charset","ISO-8859-1");
-    head.appendChild(script);
-  }
-  var loadStylesheet = function(url){
-    var link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.type = "text/css";
-    link.href = url;
-    link.media = "all";
-    head.appendChild(link);
-  }
+    var loadJavascript = function (url, async, name) {
+        async = async || true;
+        var script = document.createElement("script");
+        script.onload = script.onreadystatechange = function () {
+            //console.log( this.readyState ); //uncomment this line to see which ready states are called.
+            var r;
+            if (!r && (!this.readyState || this.readyState == 'complete')) {
+                r = true;
+                fireWindowEvent("" + name + "Loaded");
+            }
+        };
+        script.setAttribute("src", url);
+        script.setAttribute("type", "text/javascript");
+        script.setAttribute("async", async);
+        //script.setAttribute("charset","ISO-8859-1");
+        head.appendChild(script);
+    };
+    var loadStylesheet = function (url) {
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.type = "text/css";
+        link.href = url;
+        link.media = "all";
+        head.appendChild(link);
+    };
 
-  return {
-    loadJavascript: loadJavascript,
-    loadStylesheet: loadStylesheet
-  }
+    return {
+        loadJavascript: loadJavascript,
+        loadStylesheet: loadStylesheet
+    }
 
 })();
 
 /**
  * Global string utilities module.
  */
-OpenSpeedMonitor.stringUtils = (function(){
-    var stringToBoolean = function(string) {
+OpenSpeedMonitor.stringUtils = (function () {
+    var stringToBoolean = function (string) {
         if (!string) {
             return false;
         }
@@ -141,32 +134,32 @@ OpenSpeedMonitor.stringUtils = (function(){
  *      getObjectFromLocalStorage: getObjectFromLocalStorage,
  *      setObjectToLocalStorage: setObjectToLocalStorage}}
  */
-OpenSpeedMonitor.clientSideStorageUtils = function(){
-    var setCookie = function(key, value, path, shouldExpireInMillisecsFromNow) {
+OpenSpeedMonitor.clientSideStorageUtils = function () {
+    var setCookie = function (key, value, path, shouldExpireInMillisecsFromNow) {
         var expires = new Date();
         expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
-        var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
+        var cookieToSet = key + '=' + btoa(value) + ';expires=' + expires.toUTCString() + ';path=' + path;
         console.log(cookieToSet);
         document.cookie = cookieToSet;
     };
 
-    var getCookie = function(key) {
+    var getCookie = function (key) {
         var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
         return keyValue ? atob(keyValue[2]) : null;
     };
 
-    var setToLocalStorage = function(key, value) {
-        try{
+    var setToLocalStorage = function (key, value) {
+        try {
             localStorage.setItem(key, value)
-        }catch(e){
+        } catch (e) {
             console.log('Can\'t write data to local storage: ' + e.message);
         }
     };
 
-    var getFromLocalStorage = function(key) {
-        try{
+    var getFromLocalStorage = function (key) {
+        try {
             return localStorage.getItem(key);
-        }catch(e){
+        } catch (e) {
             console.log('Can\'t read data from local storage: ' + e.message);
         }
         return null;
@@ -177,7 +170,7 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
      * @param keyObject An object with different properties whose values are the local storage keys.
      * @return object A new object with the same properties as keyObject and values from the local storage.
      */
-    var getObjectFromLocalStorage = function(keyObject) {
+    var getObjectFromLocalStorage = function (keyObject) {
         var hasValues = false;
         var values = {};
         for (var property in keyObject) {
@@ -195,7 +188,7 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
      * @param keyObject An object whose properties are the same as in value. The value of each property is the local storage key.
      * @param value The object to save with the same properties as in keyObject.
      */
-    var setObjectToLocalStorage = function(keyObject, value) {
+    var setObjectToLocalStorage = function (keyObject, value) {
         for (var property in keyObject) {
             if (keyObject.hasOwnProperty(property)) {
                 setToLocalStorage(keyObject[property], value[property]);
@@ -213,25 +206,24 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
     };
 };
 
-OpenSpeedMonitor.urlUtils = (function() {
-	var getAllVars = function() {
-		var vars = [];
-		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-		for(var i = 0; i < hashes.length; i++)
-		{
-			var hash = hashes[i].split('=');
-			var key = decodeURIComponent(hash[0]);
-			vars.push(key);
-			vars[key] = decodeURIComponent(hash[1]);
-		}
-		return vars;
-	};
+OpenSpeedMonitor.urlUtils = (function () {
+    var getAllVars = function () {
+        var vars = [];
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            var hash = hashes[i].split('=');
+            var key = decodeURIComponent(hash[0]);
+            vars.push(key);
+            vars[key] = decodeURIComponent(hash[1]);
+        }
+        return vars;
+    };
 
-	var getVar = function(name) {
-		return getAllVars()[name];
-	};
+    var getVar = function (name) {
+        return getAllVars()[name];
+    };
 
-	return {
+    return {
         getAllVars: getAllVars,
         getVar: getVar
     };
@@ -248,10 +240,10 @@ OpenSpeedMonitor.domUtils = (function () {
         if (!values) {
             return [];
         }
-        values.sort(function(a, b) {
+        values.sort(function (a, b) {
             return a.name.localeCompare(b.name);
         });
-        values.forEach(function(value) {
+        values.forEach(function (value) {
             if (value && value.id && value.name) {
                 options.push($("<option/>", {
                     value: value.id,
@@ -290,7 +282,7 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.empty();
         selectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(idAndNameList));
         if (!selectElement.children().length && noResultsText) {
-            selectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
+            selectElement.append($("<option/>", {disabled: "disabled", text: noResultsText}));
         }
         selectElement.val(selection);
     };
@@ -321,24 +313,25 @@ OpenSpeedMonitor.domUtils = (function () {
  * This method will just return the given message. We use it,
  * so you can override it for a specialised delete conformation for the given domain
  */
-function domainDeleteConfirmation(message,id,link){
-	var confirmMessage = "";
-	if(typeof link !== "undefined" && link !== null && link !== ""){
-		jQuery.ajax({
-			type : 'GET',
-			url : link,
-			data: {id:id},
-			async:   false,
-			success: function(result) {
-				confirmMessage = message + "<br>" + result;
-			},
-			error: function(result) {
-				confirmMessage = message;
-			}});
-		return confirmMessage;
-	} else{
-		return message;
-	}
+function domainDeleteConfirmation(message, id, link) {
+    var confirmMessage = "";
+    if (typeof link !== "undefined" && link !== null && link !== "") {
+        jQuery.ajax({
+            type: 'GET',
+            url: link,
+            data: {id: id},
+            async: false,
+            success: function (result) {
+                confirmMessage = message + "<br>" + result;
+            },
+            error: function (result) {
+                confirmMessage = message;
+            }
+        });
+        return confirmMessage;
+    } else {
+        return message;
+    }
 
 }
 
@@ -363,21 +356,29 @@ function fixChosen() {
     });
 }
 
-function fireWindowEvent(eventName){
+function fireWindowEvent(eventName) {
     var event = document.createEvent('Event');
     event.initEvent(eventName, true, true);
     window.dispatchEvent(event);
 }
 
-$( document ).ready( function(){
+$(document).ready(function () {
 
     $('ul.nav li.dropdown').hover(
-        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn(); },
-        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut(); }
+        function () {
+            $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn();
+        },
+        function () {
+            $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut();
+        }
     );
     $('li.dropdown-submenu').hover(
-        function() { $(this).children('ul').stop(true, true).delay(100).fadeIn(); },
-        function() { $(this).children('ul').stop(true, true).delay(100).fadeOut(); }
+        function () {
+            $(this).children('ul').stop(true, true).delay(100).fadeIn();
+        },
+        function () {
+            $(this).children('ul').stop(true, true).delay(100).fadeOut();
+        }
     );
 
 });

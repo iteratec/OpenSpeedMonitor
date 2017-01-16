@@ -35,24 +35,6 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <g:if test="${startedBatchActivity != null}">
-            <g:if test="${startedBatchActivity == true}">
-                <div class="alert alert-info">
-                    <g:message code="default.microService.osmDetailAnalysis.batchCreated"/>
-                    <g:link controller="batchActivity">Batch Activity</g:link>
-                </div>
-            </g:if>
-            <g:if test="${startedBatchActivity == false}">
-                <div class="alert alert-danger">
-                    <g:message code="default.microService.osmDetailAnalysis.batchNotCreated"/>
-                </div>
-            </g:if>
-        </g:if>
-    </div>
-</div>
-
-<div class="row">
     <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
         <div class="col-md-12">
             <div class="alert alert-danger">
@@ -146,8 +128,9 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
-                                    action="downloadCsv" />
+                    <g:actionSubmit
+                            value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                            action="downloadCsv"/>
                 </li>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                     <li>
@@ -168,23 +151,6 @@
                         </li>
                     </g:if>
                 </g:if>
-                <li role="separator" class="divider"></li>
-                <g:if test="${persistenceOfAssetRequestsEnabled}">
-                    <li>
-                        <g:actionSubmit
-                                value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
-                                action="showDetailData"/>
-                    </li>
-                </g:if>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                    <g:if test="${persistenceOfAssetRequestsEnabled}">
-                        <li>
-                            <g:actionSubmit
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
-                                    action="sendFetchAssetsAsBatchCommand"/>
-                        </li>
-                    </g:if>
-                </sec:ifAnyGranted>
             </ul>
         </div>
         <g:render template="/_resultSelection/hiddenWarnings"/>
