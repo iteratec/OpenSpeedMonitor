@@ -5,39 +5,39 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4><g:message code="de.iteratec.chart.adjustment.name" default="adjust chart"/></h4>
+                <h4><g:message code="de.iteratec.chart.adjustment.name" default="Adjust Chart"/></h4>
             </div>
 
             <div id="collapseAdjustment" class="modal-body form-horizontal">
                 <!-- x axis label -->
                 <div class="form-group">
-                    <label class="col-sm-2 control-label" for="x-axis-label">
+                    <label class="col-sm-3 control-label" for="x-axis-label">
                         <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
                     </label>
 
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input id="x-axis-label" class="form-control" type="text">
                     </div>
                 </div>
                 %{-- y axis label --}%
                 <div class="form-group">
-                    <label class="col-sm-2 control-label"><g:message
+                    <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.yAxis.label"
                             default="y-axis label"/></label>
 
-                    <div class="col-sm-10" id="y-axis-alias-container">
+                    <div class="col-sm-9" id="y-axis-alias-container">
 
                     </div>
                 </div>
                 %{-- chart width & height --}%
                 <div class="form-group">
-                    <label class="col-sm-2 control-label"><g:message
+                    <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.barchart.size.name"
                             default="height"/></label>
 
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <div class="input-group form-row">
-                            <span class="input-group-addon">
+                            <span class="input-group-addon adjustChartsizeAddon">
                                 <g:message code="de.iteratec.chart.width.name"
                                            default="Width"/>
                             </span>
@@ -48,7 +48,7 @@
                         </div>
 
                         <div class="input-group form-row">
-                            <span class="input-group-addon">
+                            <span class="input-group-addon adjustChartsizeAddon">
                                 <g:message code="de.iteratec.chart.height.name"
                                            default="Height"/>
                             </span>
@@ -61,40 +61,46 @@
                 </div>
                 %{--assign colors--}%
                 <div class="form-group">
-                    <label class="col-sm-2 control-label"><g:message
+                    <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.barchart.assignColors.name"
                             default="Assign Colors"/></label>
 
-                    <div class="col-sm-10" id="assign-color-container">
+                    <div class="col-sm-9" id="assign-color-container">
 
                     </div>
                 </div>
                 %{--toggle chart axes and gridlines--}%
                 <div class="form-group">
-                    <div class="btn-group col-sm-offset-2 col-sm-10" data-toggle="buttons">
-                        <label class="btn btn-default">
-                            <input type="checkbox" id="inputShowGridlines"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
-                                default="Show Gridlines"/>
-                        </label>
+                    <label class="col-sm-3 control-label">
+                        <g:message code="de.iteratec.osm.dimple.barchart.showElements.name"
+                                   default="Show"/>
+                    </label>
+                    <div class="col-sm-9" data-toggle="buttons">
+                        <div class="btn-group btn-group-justified">
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowGridlines"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
+                                    default="Show Gridlines"/>
+                            </label>
 
-                        <label class="btn btn-default">
-                            <input type="checkbox" id="inputShowYAxis"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
-                                default="Show y-Axis"/>
-                        </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowYAxis"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
+                                    default="Show y-Axis"/>
+                            </label>
 
-                        <label class="btn btn-default">
-                            <input type="checkbox" id="inputShowXAxis"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
-                                default="Show x-Axis"/>
-                        </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowXAxis"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
+                                    default="Show x-Axis"/>
+                            </label>
 
-                        <label class="btn btn-default">
-                            <input type="checkbox" id="inputShowBarLabels"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
-                                default="Show Barlabels"/>
-                        </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowBarLabels"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
+                                    default="Show Bar Labels"/>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,7 +145,8 @@
             clone.removeAttr("id");
             clone.removeClass("hidden");
             clone.appendTo($("#assign-color-container"));
-            clone.find(".colorLabel").html(assignment.label);
+            clone.find(".colorLabel").html(OpenSpeedMonitor.i18n.measurandLabels[assignment.label]);
+            clone.find(".colorLabel").data('label', assignment.label);
             clone.find("input").val(assignment.color);
         });
         $('.colorpicker-component').colorpicker({component: '.colorpicker-target'});
