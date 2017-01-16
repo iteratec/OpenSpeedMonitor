@@ -148,7 +148,7 @@ class EventResultDashboardController {
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
-        if (!params.hideGraph && !ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
+        if (!ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
             if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
