@@ -14,10 +14,9 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || (function(res
      */
     var initBatchActivity= function(updateTableUrlParameter, checkUrl, rowUpdateUrl,batchActivityCount, i18nParameter, columnToSortByParameter) {
         $('#filterBatchesByActiveCheckbox').change(function () {
-            responsiveTable.onlyActive =$('#filterBatchesByActiveCheckbox').is(":checked");
-            responsiveTable.updateElementTable(updateTableUrlParameter);
+            responsiveTable.setOnlyActive($('#filterBatchesByActiveCheckbox').is(":checked"));
         });
-        responsiveTable.init(updateTableUrlParameter, i18nParameter, columnToSortByParameter);
+        responsiveTable.init(updateTableUrlParameter, i18nParameter, columnToSortByParameter, $('#filterBatchesByActiveCheckbox').is(":checked"));
         updateIfNecessary(updateTableUrlParameter, checkUrl, rowUpdateUrl);
     };
 

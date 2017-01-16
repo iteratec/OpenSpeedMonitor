@@ -4,141 +4,142 @@
 
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
-OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function(){
+OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function () {
+        var onlyActive = false;
 
-    var  sortBy = function(columnToSortByParameter)
-    {
-        if (columnToSortBy == columnToSortByParameter) {
-            console.log(sortingDirection);
-            sortingDirection = sortingDirection == "asc" ? "desc" : "asc";
-            console.log(sortingDirection);
-        } else {
-            columnToSortBy = columnToSortByParameter;
-            sortingDirection = "asc";
-        }
-        updateElementTable();
-    };
-
-    
-
-    // Based on http://stackoverflow.com/questions/17390179/using-bootstrap-to-paginate-a-set-number-of-p-elements-on-a-webpage
-    var  createPagination= function(size) {
-        var perPage = max;
-        var numItems = size;
-        var numPages = Math.ceil(numItems / perPage);
-
-        var myNode = document.getElementById("elementPager");
-        myNode.innerHTML = '';
-        var i = 0;
-        if (numPages < 10) {
-            while (numPages > i) {
-                if (i == curr) {
-                    $('<li><a style="background-color: rgb(219,219,219);" href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
-                } else {
-                    $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
-                }
-                i++;
+        var sortBy = function (columnToSortByParameter) {
+            if (columnToSortBy == columnToSortByParameter) {
+                sortingDirection = sortingDirection == "asc" ? "desc" : "asc";
+            } else {
+                columnToSortBy = columnToSortByParameter;
+                sortingDirection = "asc";
             }
-        } else {
-            var max_i = 8 - curr;
-            if (curr >= 5) {
-                $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
-                if (curr >= 5) $('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#elementPager');
-                i = curr - 3;
-                max_i = 4
-            }
-            if (i + 7 >= numPages) i = numPages - 7;
-            while (curr + max_i > i && numPages > i) {
-                if (i == curr) {
-                    $('<li><a style="background-color: rgb(219,219,219);" href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
-                } else {
-                    $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
-                }
-                i++;
-            }
-            if (i != numPages) {
-                if (i + 1 != numPages)$('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#elementPager');
-                $('<li><a href="#" class="page_link">' + (numPages) + '</a></li>').appendTo('#elementPager');
-            }
-        }
+            updateElementTable();
+        };
 
-        $('#elementPager .page_link:first').addClass('active');
+        var setOnlyActive = function (onlyActiveParam) {
+            onlyActive = onlyActiveParam;
+            updateElementTable();
+        };
 
+        // Based on http://stackoverflow.com/questions/17390179/using-bootstrap-to-paginate-a-set-number-of-p-elements-on-a-webpage
+        var createPagination = function (size) {
+            var perPage = max;
+            var numItems = size;
+            var numPages = Math.ceil(numItems / perPage);
 
-        $('#elementPager li a').click(function () {
-            if ($.isNumeric($(this).html())) {
-                var clickedPage = $(this).html() - 1;
-                goTo(clickedPage, perPage);
-            }
-        });
-        $('<li><a href="#" class="prevLink">' + i18n["previous"] + '</a></li>').click(function () {
-            previous();
-        }).prependTo('#elementPager');
-        $('<li><a href="#" class="nextLink">' + i18n["next"] + '</a></li>').click(function () {
-            next();
-        }).appendTo('#elementPager');
-
-        function previous() {
-            var goToPage = curr - 1;
-            if (goToPage >= 0)
-                goTo(goToPage);
-        }
-
-        function next() {
-            goToPage = curr + 1;
-
-            if (goToPage < numPages)
-                goTo(goToPage);
-        }
-
-        function goTo(page) {
-            var startAt = page * perPage,
-                endOn = startAt + perPage;
-            offset = (page) * perPage;
-            curr = page;
-            updateElementTable()
-
-        }
-    };
-
-    /**
-     * updates the batchActivity table
-     * @param updateTableUrl url to updateTableMethod within BatchActivityController
-     */
-    var updateElementTable= function() {
-        if (updateInProgress) {
-            updateRequired = true;
-        } else {
-            updateInProgress = true;
-            jQuery.ajax({
-                type: 'GET',
-                url: updateTableUrl,
-                data: {
-                    filter: lastFilter,
-                    offset: offset,
-                    max: max,
-                    onlyActive: onlyActive,
-                    sort: columnToSortBy,
-                    order: sortingDirection,
-                },
-                success: function (content) {
-                    var jsonResponse = JSON.parse(content);
-                    $("#elementTable").html(jsonResponse.table);
-                    createPagination(jsonResponse.count)
-                    $('#elementFilter').focus();
-                    updateInProgress = false;
-                    if (updateRequired) {
-                        updateRequired = false;
-                        updateElementTable();
+            var myNode = document.getElementById("elementPager");
+            myNode.innerHTML = '';
+            var i = 0;
+            if (numPages < 10) {
+                while (numPages > i) {
+                    if (i == curr) {
+                        $('<li><a style="background-color: rgb(219,219,219);" href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
+                    } else {
+                        $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
                     }
-                },
-                error: function (content) {
+                    i++;
+                }
+            } else {
+                var max_i = 8 - curr;
+                if (curr >= 5) {
+                    $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
+                    if (curr >= 5) $('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#elementPager');
+                    i = curr - 3;
+                    max_i = 4
+                }
+                if (i + 7 >= numPages) i = numPages - 7;
+                while (curr + max_i > i && numPages > i) {
+                    if (i == curr) {
+                        $('<li><a style="background-color: rgb(219,219,219);" href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
+                    } else {
+                        $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#elementPager');
+                    }
+                    i++;
+                }
+                if (i != numPages) {
+                    if (i + 1 != numPages) $('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#elementPager');
+                    $('<li><a href="#" class="page_link">' + (numPages) + '</a></li>').appendTo('#elementPager');
+                }
+            }
+
+            $('#elementPager .page_link:first').addClass('active');
+
+
+            $('#elementPager li a').click(function () {
+                if ($.isNumeric($(this).html())) {
+                    var clickedPage = $(this).html() - 1;
+                    goTo(clickedPage, perPage);
                 }
             });
-        }
-    };
+            $('<li><a href="#" class="prevLink">' + i18n["previous"] + '</a></li>').click(function () {
+                previous();
+            }).prependTo('#elementPager');
+            $('<li><a href="#" class="nextLink">' + i18n["next"] + '</a></li>').click(function () {
+                next();
+            }).appendTo('#elementPager');
 
-        var init = function(updateTableUrlParameter, i18nParameter, columnToSortByParameter) {
+            function previous() {
+                var goToPage = curr - 1;
+                if (goToPage >= 0)
+                    goTo(goToPage);
+            }
+
+            function next() {
+                goToPage = curr + 1;
+
+                if (goToPage < numPages)
+                    goTo(goToPage);
+            }
+
+            function goTo(page) {
+                var startAt = page * perPage,
+                    endOn = startAt + perPage;
+                offset = (page) * perPage;
+                curr = page;
+                updateElementTable()
+
+            }
+        };
+
+        /**
+         * updates the batchActivity table
+         * @param updateTableUrl url to updateTableMethod within BatchActivityController
+         */
+        var updateElementTable = function () {
+            if (updateInProgress) {
+                updateRequired = true;
+            } else {
+                updateInProgress = true;
+                jQuery.ajax({
+                    type: 'GET',
+                    url: updateTableUrl,
+                    data: {
+                        filter: lastFilter,
+                        offset: offset,
+                        max: max,
+                        onlyActive: onlyActive,
+                        sort: columnToSortBy,
+                        order: sortingDirection,
+                    },
+                    success: function (content) {
+                        var jsonResponse = JSON.parse(content);
+                        $("#elementTable").html(jsonResponse.table);
+                        createPagination(jsonResponse.count)
+                        $('#elementFilter').focus();
+                        updateInProgress = false;
+                        if (updateRequired) {
+                            updateRequired = false;
+                            updateElementTable();
+                        }
+                    },
+                    error: function (content) {
+                    }
+                });
+            }
+        };
+
+        var init = function (updateTableUrlParameter, i18nParameter, columnToSortByParameter, onlyActiveParams) {
             updateInProgress = false;
             updateRequired = false;
             updateTableUrl = updateTableUrlParameter;
@@ -149,7 +150,7 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
             max = $('#elementsPerPage').val();
             lastFilter = $('#elementNameFilter').val();
             offset = 0;
-            onlyActive = false;
+            onlyActive = onlyActiveParams || false;
 
             $('#elementsPerPage').on("input", function (element) {
                 var max_temp = $('#elementsPerPage').val();
@@ -169,7 +170,9 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
 
             updateElementTable();
         };
-    return {
-        init:init
-    }
-})();
+        return {
+            init: init,
+            updateElementTable: updateElementTable,
+            setOnlyActive: setOnlyActive
+        }
+    })();
