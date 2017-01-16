@@ -109,7 +109,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         calcChartWidth();
         resize();
 
-        addBarLabels();
+        postDraw();
     };
 
     var adjustChart = function () {
@@ -166,7 +166,19 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         resize();
 
+        postDraw();
+    };
+
+    var postDraw = function () {
+        setLegendNames();
         addBarLabels();
+    };
+
+    var setLegendNames = function () {
+        chart.legends[0].shapes[0].forEach( function (entry) {
+            var legendI18N = entry.firstChild.textContent.replace(entry.textContent, OpenSpeedMonitor.i18n.measurandLabels[entry.textContent]);
+            entry.firstChild.textContent = legendI18N;
+        });
     };
 
     var assignColor = function (colorAssignments) {
