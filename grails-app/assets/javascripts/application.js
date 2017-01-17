@@ -367,3 +367,13 @@ function fireWindowEvent(eventName){
     event.initEvent(eventName, true, true);
     window.dispatchEvent(event);
 }
+
+$("#main-navbar .dropdown-toggle").click(function () {
+    var parent = $(this).parent();
+    var wasOpen = parent.hasClass("open");
+    $("#main-navbar .dropdown.open").removeClass("open").attr('aria-expanded', 'false');
+    if (!wasOpen) {
+        parent.addClass("open");
+        $(this).trigger('focus').attr('aria-expanded', 'true')
+    }
+});

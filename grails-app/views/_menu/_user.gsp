@@ -4,13 +4,13 @@
 	<g:if test="${grailsApplication.config.getProperty('grails.mail.disabled')?.toLowerCase() == "true"}">
 		<li>
 			<g:link controller="login" action="auth"><i class="fa fa-sign-in" aria-hidden="true"></i>
-				<span class="description"><g:message code="security.signin.label" default="Log in"/></span>
+				<g:message code="security.signin.label" default="Log in"/>
 			</g:link>
 		</li>
 	</g:if>
 	<g:else>
 		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+			<a class="dropdown-toggle" href="#">
 				<g:message code="security.signin.label" default="Log in" locale="${lang}"/>
 				<b class="caret"></b>
 			</a>
@@ -34,7 +34,7 @@
 </sec:ifNotLoggedIn>
 <sec:ifLoggedIn>
 	<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+			<a class="dropdown-toggle" href="#">
 				<i class="fa fa-user-circle-o"></i>
 				<sec:username/> <b class="caret"></b>
 			</a>

@@ -1,11 +1,9 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 	<li class="dropdown">
 		
-		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+		<a class="dropdown-toggle" href="#">
     		<i class="fa fa-info-circle"></i>
-            <span class="description">
-			    <g:message code="default.info.label" locale="${lang}"/>
-            </span>
+            <g:message code="default.info.label" locale="${lang}"/>
             <span class="caret"></span>
 		</a>
 

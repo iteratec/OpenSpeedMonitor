@@ -11,7 +11,7 @@
 <g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
-<g:else><g:set var="mainTab" value="unnknown"/></g:else>
+<g:else><g:set var="mainTab" value="unknown"/></g:else>
 <div id="main-menu" class="row" style="display: none">
     <%-- ---------------------------------------------------------------------------------------------- links --%>
 

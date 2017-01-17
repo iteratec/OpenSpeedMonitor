@@ -175,14 +175,14 @@ body {
   border-radius: 0;
   margin: 0;
   width: 50px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   transition: width 0.3s ease;
   display: flex;
   flex-direction: column;
   border: 0;
 
   &:hover {
+    overflow-y: auto;
     width: @nav-width-expanded;
 
     .navbar-brand .icon {
@@ -277,21 +277,34 @@ body {
       &:hover,
       &:focus {
         color: white;
-        background: @iteratec-blue;
+        background: lighten(@navbar-inverse-submenu-bg, 10%);
       }
     }
 
     > li.active a {
-      color: white;
-      background: @iteratec-blue;
+      &,
+      &:hover,
+      &:focus {
+        color: white;
+        background: @iteratec-blue;
+      }
     }
   }
 
   .navbar-nav .open > a {
-    color: @iteratec-blue;
+    color: white;
     background: transparent;
   }
 
+  .navbar-nav .dropdown.active > a {
+    border-left: 5px @iteratec-blue solid;
+    padding-left: 5px;
+    background: transparent;
+  }
+
+  .navbar-nav .dropdown.active > .dropdown-menu {
+    //display: block;
+  }
 
 }
 
