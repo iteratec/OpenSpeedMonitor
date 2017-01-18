@@ -8,9 +8,6 @@
 	
 </head>
 <body>
-    <%-- main menu --%>
-    <g:render template="/layouts/mainMenu"/>
-
     <h3><g:message code="de.iteratec.result.value.calculated.from.infomessage" /></h3>
 
     <p>

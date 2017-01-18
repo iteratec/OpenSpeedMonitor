@@ -1,5 +1,7 @@
 @import-once "bower_components/bootstrap/less/variables";
 @import-once "variables-corporate";
+@import-once "sidebar";
+@import-once "cards";
 
 // min-heights, margin, and positioning used to make the footer sticky
 html {
@@ -67,7 +69,7 @@ textarea {
 }
 
 select[multiple] {
-  min-height: 15em;
+  min-height: 13em;
 }
 
 select.chosen-select {
@@ -155,167 +157,11 @@ label.sub {
   }
 }
 
-//bootstrap navbar
-// Brand: website or project name
-// -------------------------
-
-body {
-  // required as the fixed navbar is not considered in normal page flow
-  padding-left: 50px;
-  box-sizing: border-box;
-}
-
-.navbar.sidebar-fixed {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 9000;
-  box-shadow: @default-drop-shadow;
-  border-radius: 0;
-  margin: 0;
-  width: 50px;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  border: 0;
-
-  &:hover {
-    overflow-y: auto;
-    width: @nav-width-expanded;
-
-    .navbar-brand .icon {
-      opacity: 0;
-    }
-    .navbar-brand .logo {
-      opacity: 1;
-    }
-  }
-
-  // reset bootstrap definitions
-  .navbar-brand, .navbar-header, .nav, .nav > li, .dropdown-menu {
-    float: none;
-    position: static;
-    margin: 0;
-    padding: 0;
-  }
-
-
-  @nav-width-expanded: @font-size-base * 17;
-  @nav-head-size: 70px;
-  @nav-entry-size: 50px;
-  @nav-logo-icon-size: 36px;
-  //@nav-logo-logo-width: 166px;
-  @nav-entry-padding: 10px;
-  @nav-icon-margin-left: ((@nav-entry-size - 2 * @nav-entry-padding) - (@sidebar-icon-size * 1.5)) / 2;
-  .navbar-collapse {
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-    display: flex !important;
-    flex-direction: column;
-  }
-
-  .navbar-header {
-    position: relative;
-    height: @nav-head-size;
-
-    .icon {
-      top: ((@nav-head-size - @nav-logo-icon-size) / 2);
-      left: ((@nav-entry-size - @nav-logo-icon-size) / 2);
-      transition: all 0.3s ease;
-      opacity: 1;
-      position: absolute;
-    }
-
-    .logo {
-      opacity: 0;
-      transition: all 0.3s ease;
-      position: absolute;
-      height: @nav-head-size;
-    }
-  }
-
-
-  .navbar-nav, .navbar-nav .dropdown-menu {
-    flex-grow: 1;
-    > li > a {
-      width: @nav-width-expanded;
-      padding: @nav-entry-padding;
-      line-height: (@nav-entry-size - 2 * @nav-entry-padding);
-      .fa {
-        float: left;
-        padding: ((@nav-entry-size - 2 * @nav-entry-padding - @sidebar-icon-size) / 2) 0;
-        width: @sidebar-icon-size * 1.5;
-        margin: 0 (-@nav-icon-margin-left + @nav-entry-padding) 0 @nav-icon-margin-left;
-        text-align: center;
-        font-size: @sidebar-icon-size;
-      }
-    }
-  }
-
-  .flag {
-    width: 16px;
-    height: 11px;
-    margin: 0 17px 4px 7px;
-  }
-
-  .navbar-nav.bottom {
-    margin-top: auto;
-    flex-grow: 0;
-  }
-
-  .dropdown .dropdown-menu {
-    background: @navbar-inverse-submenu-bg;
-    border-radius: 0;
-    border: 0;
-
-    > li > a {
-      color: @iteratec-gray-blue;
-
-      &:hover,
-      &:focus {
-        color: white;
-        background: lighten(@navbar-inverse-submenu-bg, 10%);
-      }
-    }
-
-    > li.active a {
-      &,
-      &:hover,
-      &:focus {
-        color: white;
-        background: @iteratec-blue;
-      }
-    }
-  }
-
-  .navbar-nav .open > a {
-    color: white;
-    background: transparent;
-  }
-
-  .navbar-nav .dropdown.active > a {
-    border-left: 5px @iteratec-blue solid;
-    padding-left: 5px;
-    background: transparent;
-  }
-
-  .navbar-nav .dropdown.active > .dropdown-menu {
-    //display: block;
-  }
-
-}
-
 h1 {
-  margin-top: 10px;
+  margin: 20px 0 (@sidebar-head-size - 20px - (@font-size-h1 * @headings-line-height)) 0;
 }
 
 
-
-//bootstrap variables
-@navbar-default-bg: #AB0C0C; /*ffffff;*/
 
 //bootstrap responsive-utilities
 // Required for Windows 8 Metro split-screen snapping with IE10
@@ -368,72 +214,6 @@ h1 {
 
 .iteratec-tab-content > .active {
   display: block;
-}
-
-// card style
-
-.card-well {
-  color: @card-well-color;
-  background-color: @card-well-bg;
-  border-radius: 4px;
-  padding: 0 7.5px 15px 7.5px;
-  margin: 0 -15px;
-
-  .card {
-    margin: 15px -7.5px 0 -7.5px;
-  }
-}
-
-.card-well .row, .card-well.row {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.card {
-  box-shadow: @default-drop-shadow;
-  padding: 15px;
-  background: @card-bg;
-  margin: 0 0 15px 0;
-}
-
-.card-1 {
-  height: 30vh;
-}
-
-.card-2 {
-  height: 60vh;
-}
-
-.card-3 {
-  height: 90vh;
-}
-
-.card > .nav {
-  margin-bottom: 20px;
-}
-
-.card > .nav li a {
-  margin-top: -1px;
-  padding: 5px 12px;
-}
-
-.card-well-tabs {
-  margin: 0 -15px;
-  padding: 0 15px;
-}
-
-.card-well-tabs li.active a,
-.card-well-tabs li.active a:hover,
-.card-well-tabs li.active a:focus {
-  color: #333;
-  background-color: @card-well-bg;;
-  border-color: #ddd;
-  border-bottom-color: transparent;
-}
-
-.card-well.tab-content {
-  border-top-color: transparent;
-  border-radius: 0 0 4px 4px;
 }
 
 // Dashboard selection summary

@@ -18,9 +18,6 @@
         </style>
     </head>
     <body>
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu" />
-
         <div class="alert alert-warning" id="serverdown">
           <a class="close" data-dismiss="alert">×</a>
           <g:message code="queue.noconnection.label"/>

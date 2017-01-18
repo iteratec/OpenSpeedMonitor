@@ -51,9 +51,6 @@
 </head>
 
 <body>
-<%-- main menu --%>
-<g:render template="/layouts/mainMenu" model="${['availableDashboards': availableDashboards]}"/>
-
 <%-- Überschrift --%>
 <div class="row">
     <div class="col-md-12">

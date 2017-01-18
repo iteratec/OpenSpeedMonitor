@@ -7,9 +7,6 @@
 </head>
 
 <body>
-
-<%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
 <div class="row">
     <div class="col-md-12">
         <g:if test="${errorList && !errorList.empty}">

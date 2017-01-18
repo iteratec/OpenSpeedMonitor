@@ -1,17 +1,5 @@
 @import-once "bower_components/bootstrap/less/variables";
 
-
-@font-face {
-  font-family: Montserrat;
-  src: url('../fonts/Montserrat-Regular.ttf');
-}
-
-@font-face {
-  font-family: Montserrat;
-  src: url('../fonts/Montserrat-Bold.ttf');
-  font-weight: bold;
-}
-
 /* Corporate colors */
 @iteratec-blue: #008cd2;
 @iteratec-blue-light: #91c3e6;
@@ -43,9 +31,16 @@
 @navbar-inverse-submenu-bg: lighten(@navbar-inverse-bg, 10%);
 @navbar-inverse-submenu-link-color: lighten(@navbar-inverse-link-color, 10%);
 
+@sidebar-width-expanded: @font-size-base * 17;
+@sidebar-head-size: 70px;
+@sidebar-entry-size: 50px;
+@sidebar-logo-icon-size: 36px;
+@sidebar-entry-padding: 10px;
+@sidebar-icon-margin-left: ((@sidebar-entry-size - 2 * @sidebar-entry-padding) - (@sidebar-icon-size * 1.5)) / 2;
+
+
 @sidebar-icon-size: 24px;
 
-//@headings-font-family:'Montserrat', Arial, Helvetica, sans-serif;
 @headings-font-weight: normal;
 @font-size-h1 : @font-size-h2;
 

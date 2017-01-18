@@ -15,9 +15,9 @@
 <nav class="navbar navbar-inverse sidebar-fixed">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
-            <span class="icon-bar">
-            <span class="icon-bar">
-            <span class="icon-bar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">
             <img class="icon" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_Icon_36px.png')}"
@@ -28,8 +28,8 @@
     </div>
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
-            <li class="${controllerName.equals('landing') ? 'active' : ''}">
-                <g:link controller="landing" action="index">
+            <li class="${!controllerName ? 'active' : ''}">
+                <g:link mapping="home">
                     <i class="fa fa-home"></i> Home
                 </g:link>
             </li>

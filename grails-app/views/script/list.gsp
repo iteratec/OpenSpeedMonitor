@@ -6,9 +6,6 @@
     <title><g:message code="de.iteratec.iss.scripts" /></title>
 </head>
 <body>
-	<%-- main menu --%>
-	<g:render template="/layouts/mainMenu"/>
-
 	<div class="row table-filter">
 		<div class="col-md-8">
 			<input type="text" id="filterByLabel" onkeyup="filterScriptList()" class="form-control"

@@ -149,10 +149,6 @@
 </head>
 
 <body>
-<%-- main menu ---------------------------------------------------------------------------%>
-<g:render template="/layouts/mainMenu"/>
-
-
 %{-- container for errors --}%
 <div class="row">
     <div class="col-md-12">

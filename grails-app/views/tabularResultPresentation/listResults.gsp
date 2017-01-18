@@ -8,9 +8,6 @@
     </head>
     <body>
 
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
-
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-danger">

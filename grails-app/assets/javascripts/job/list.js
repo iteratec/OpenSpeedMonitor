@@ -221,8 +221,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
         5000
     );
 
-    var offsetFixedHeader = $('.navbar-header').height();
-    $("#jobtable").stickyTableHeaders({fixedOffset: offsetFixedHeader});
+    $("#jobtable").stickyTableHeaders(0);
 
     initEventHandlers();
 
