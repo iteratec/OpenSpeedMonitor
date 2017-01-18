@@ -18,7 +18,8 @@
     </label>
 
     <div class="col-md-6">
-        <g:select id="graphiteServers" name="graphiteServers" from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
+        <g:select id="graphiteServers" name="graphiteServers"
+                  from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
                   keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
                   multiple="true" optionKey="id" size="5" value="${jobGroup?.graphiteServers*.id}"
                   class="many-to-many form-control"/>
@@ -27,7 +28,7 @@
     <div class="col-md-3">
         <a href="#" id="deselectAllGraphiteServer" onclick="selectAllGraphiteServer(false)">
             <i class="fa fa-undo" aria-hidden="true"></i>
-            <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all" />
+            <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
         </a>
     </div>
 </div>
@@ -60,14 +61,13 @@
     </div>
 </div>
 
-<div>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
-        <label for="persistDetailData" class="control-label"><g:message code="job.jobGroup.persistHar.label"
-                                                                       default="Persist Detaildata"/></label>
+<g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+    <div class="form-group fieldcontain">
+        <label for="persistDetailData" class="control-label col-md-3"><g:message code="job.jobGroup.persistHar.label"
+                                                                        default="Persist Detaildata"/></label>
 
         <div>
-            <bs:checkBox name="persistDetailData" value="${jobGroup?.persistDetailData}"/>
+            <bs:checkBox name="persistDetailData" value="${jobGroup?.persistDetailData}" class="col-md-6"/>
         </div>
-    </g:if>
-
-</div>
+    </div>
+</g:if>
