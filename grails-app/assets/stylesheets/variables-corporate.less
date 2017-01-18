@@ -39,8 +39,8 @@
 @sidebar-entry-size: 50px;
 @sidebar-logo-icon-size: 36px;
 @sidebar-entry-padding: 10px;
-@sidebar-icon-margin-left: ((@sidebar-entry-size - 2 * @sidebar-entry-padding) - (@sidebar-icon-size * 1.5)) / 2;
-
+@sidebar-dropdown-icon-size: @sidebar-icon-size * 0.75;
+@sidebar-dropdown-entry-height: ceil(@sidebar-entry-size * 0.75);
 
 @sidebar-icon-size: 24px;
 
@@ -49,8 +49,6 @@
 
 
 /* Additional variables */
-//@footer-bg: @iteratec-gray-blue;
-//@footer-color: @iteratec-blue;
 @footer-bg: @body-bg;
 @footer-color: @gray-light;
 
