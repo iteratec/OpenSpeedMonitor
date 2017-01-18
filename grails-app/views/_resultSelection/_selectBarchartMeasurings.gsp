@@ -1,7 +1,7 @@
 <div class="card form-horizontal" id="barchartMeasuringCard">
-    <legend for="selectAggregatorUncachedHtmlId"><g:message
+    <h2 for="selectAggregatorUncachedHtmlId"><g:message
             code="de.iteratec.osm.selectMeasurings"
-            default="Measurings"/></legend>
+            default="Measurings"/></h2>
 
     <div id="measurandSeries-clone" class="hidden">
         <g:if test="${selectedAggrGroupValuesUnCached.size() == 0}">

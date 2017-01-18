@@ -5,12 +5,12 @@ A card to select page & measured step, browser & location, and the connectivity
 
 <div class="card-5" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
     <g:if test="${showOnlyPage}">
-        <legend>
+        <h2>
             <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
             <g:if test="${!hideMeasuredEventForm}">
                 &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
             </g:if>
-        </legend>
+        </h2>
     </g:if>
     <g:else>
     <ul class="nav nav-tabs">

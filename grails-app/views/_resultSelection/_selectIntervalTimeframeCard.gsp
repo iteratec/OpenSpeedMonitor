@@ -4,14 +4,14 @@ A card with controls to select a time frame (manual, or presets like 'last 12 ho
 a control to select an aggregation interval (if csiAggregationIntervals is set)
 --%>
 <div class="card-5 form-horizontal" id="select-interval-timeframe-card">
-    <legend>
+    <h2>
 		<g:if test="${csiAggregationIntervals}">
 			<g:message code="de.iteratec.isocsi.csi.aggreator.heading"
 					   default="Aggregation"/>
 			&amp;
 		</g:if>
 		<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
-	</legend>
+	</h2>
 
 	<g:if test="${csiAggregationIntervals}">
 		<div class="form-group">

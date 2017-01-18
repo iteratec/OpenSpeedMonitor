@@ -1,7 +1,7 @@
 <div class="card">
-    <legend><g:message
+    <h2><g:message
             code="de.iteratec.isr.wptrd.labels.filterRepeatedView"
-            default="Repeated View"/></legend>
+            default="Repeated View"/></h2>
     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                dataMap="${aggrGroupValuesCached}"
                                multiple="true" id="selectAggregatorCachedHtmlId"

@@ -261,10 +261,10 @@
                 <div class="col-md-4">
                     <div class="card">
                         <fieldset>
-                            <legend>
+                            <h2>
                                 <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                            default="Aggregator"/>
-                            </legend>
+                            </h2>
 
                             <div id="aggregationRadioButtons">
                                 <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
@@ -284,9 +284,9 @@
 
                 <div class="col-md-3">
                     <div class="card" id="filter-navtab-csiSystem">
-                        <legend>
+                        <h2>
                             <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>
-                        </legend>
+                        </h2>
                         <g:select id="folderSelectCsiSystem" class="form-control"
                                   name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
                                   optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
@@ -299,9 +299,9 @@
                     </div>
 
                     <div class="card">
-                        <legend>
+                        <h2>
                             <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
-                        </legend>
+                        </h2>
 
                         <div class="checkbox">
                             <label for="csiTypeDocComplete">

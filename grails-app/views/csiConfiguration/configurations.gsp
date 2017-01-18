@@ -222,7 +222,7 @@
                 </ul>
             </div>
         </g:if>
-        <legend id="headerCsiConfLabel">${selectedCsiConfiguration.label}</legend>
+        <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
             <a href="#updateCsiConfModal" class="fa fa-edit"
                style="text-decoration:none;color: #3a87ad;" data-toggle="modal"></a>
