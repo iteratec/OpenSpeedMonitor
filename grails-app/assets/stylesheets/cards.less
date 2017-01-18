@@ -2,17 +2,21 @@
 
 .card-well {
   color: @card-well-color;
-  background-color: @card-well-bg;
+  background-color: transparent;
   border-radius: 4px;
   padding: 0 7.5px 15px 7.5px;
   margin: 0 -15px;
+
+  &.row {
+
+  }
 
   .card, .card-1, .card-2, .card-3, .card-4, .card-5, .card-6, .card-7, .card-8, .card-9, .card-10 {
     margin: 15px -7.5px 0 -7.5px;
   }
 }
 
-.card-well .row, .card-well.row {
+.card-well .row {
   margin-left: 0;
   margin-right: 0;
 }
@@ -82,8 +86,8 @@
 .card-well-tabs li.active a,
 .card-well-tabs li.active a:hover,
 .card-well-tabs li.active a:focus {
-  color: #333;
-  background-color: @card-well-bg;;
+  color: #ffffff;
+  background-color: @brand-primary;
   border-color: #ddd;
   border-bottom-color: transparent;
 }

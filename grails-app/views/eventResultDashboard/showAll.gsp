@@ -53,11 +53,10 @@
 </div>
 
 <div class="row">
-    <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
+    <g:if test="${request.queryString && (command && !command.hasErrors() || !command) && !eventResultValues}">
         <div class="col-md-12">
             <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.ism.no.data.on.current.selection.heading"/></strong>
-                <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
+               <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
             </div>
         </div>
     </g:if>
@@ -135,21 +134,17 @@
 
 <div class="row">
     <div class="col-md-12">
-        <!-- Split button to show/download/detail analysis, etc -->
         <div class="btn-group pull-right" id="show-button-group">
             <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                            action="showAll" id="graphButtonHtmlId" class="btn btn-primary"/>
+                            action="showAll" id="graphButtonHtmlId" class="btn btn-primary show-button"/>
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-                <li>
-                    <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
-                                    action="downloadCsv" />
-                </li>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                    <g:set var="dropdownHasEntries" value="true"/>
                     <li>
                         <a id="createUserspecificDashboardButton" href="#CreateUserspecifiedDashboardModal"
                            data-toggle="modal" role="button">
@@ -159,6 +154,7 @@
                 </sec:ifAnyGranted>
                 <g:if test="${params.dashboardID}">
                     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                        <g:set var="dropdownHasEntries" value="true"/>
                         <li>
                             <a href="#" role="button"
                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
@@ -168,25 +164,25 @@
                         </li>
                     </g:if>
                 </g:if>
-                <li role="separator" class="divider"></li>
-                <g:if test="${persistenceOfAssetRequestsEnabled}">
-                    <li>
-                        <g:actionSubmit
-                                value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
-                                action="showDetailData"/>
-                    </li>
-                </g:if>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                    <g:if test="${persistenceOfAssetRequestsEnabled}">
-                        <li>
-                            <g:actionSubmit
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
-                                    action="sendFetchAssetsAsBatchCommand"/>
-                        </li>
+                <g:if test="${availableDashboards}">
+                    <g:if test="${dropdownHasEntries}">
+                        <li class="divider"></li>
                     </g:if>
-                </sec:ifAnyGranted>
+                    <li class="dropdown-header">
+                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                   default="View a custom time series"/>
+                    </li>
+                    <g:each in="${availableDashboards}" var="availableDashboard">
+                        <li><g:link action="showAll"
+                                    params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
+                    </g:each>
+                </g:if>
             </ul>
         </div>
+        <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                        action="downloadCsv" class="btn btn-primary pull-right space-right show-button" />
+
+
         <g:render template="/_resultSelection/hiddenWarnings"/>
         <!-- Actual tabs -->
         <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">

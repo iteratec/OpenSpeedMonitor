@@ -51,16 +51,15 @@
 </head>
 
 <body>
-<%-- Überschrift --%>
+<h1>
+    <g:message code="de.iteratec.isocsi.csi.heading" default="Customer Satisfaction Index (CSI)" />
+</h1>
+<p>
+    <g:message code="de.iteratec.isocsi.csi.dashboard.measuring.description.short"
+               default="Den dargestellten, aggregierten Messwerten liegen jeweils die Webpagetest-Rohdaten des folgenden Intervals zugrunde."/>
+</p>
 <div class="row">
     <div class="col-md-12">
-        <h3><g:message code="de.iteratec.isocsi.csi.heading" default="Kundenzufriedenheit (CSI)"/></h3>
-
-        <p>
-            <g:message code="de.iteratec.isocsi.csi.dashboard.measuring.description.short"
-                       default="Den dargestellten, aggregierten Messwerten liegen jeweils die Webpagetest-Rohdaten des folgenden Intervals zugrunde."/>
-        </p>
-
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-danger">
@@ -74,7 +73,6 @@
             </g:hasErrors>
         </g:if>
     </div>
-</div>
 
 <form method="get" action="" id="dashBoardParamsForm">
     <g:if test="${wptCustomerSatisfactionValues}">
@@ -209,15 +207,15 @@
                         <g:actionSubmit id="chart-submit"
                                         value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                                         action="showAll" class="btn btn-primary"/>
-                        <sec:ifLoggedIn>
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <sec:ifLoggedIn>
                                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                    <li class="separator"></li>
+                                    <g:set var="dropdownHasEntries" value="true"/>
                                     <li>
                                         <a href="#CreateUserspecifiedDashboardModal" role="button" data-toggle="modal">
                                             ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
@@ -226,10 +224,11 @@
                                 </sec:ifAnyGranted>
                                 <g:if test="${params.dashboardID}">
                                     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                                        <g:set var="dropdownHasEntries" value="true"/>
                                         <li>
                                             <a href="#" role="button"
                                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
-                                                ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
+               ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
                                             </a>
                                             <a href="#DeleteModal" role="button" data-toggle="modal">
                                                 ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
@@ -237,8 +236,21 @@
                                         </li>
                                     </g:if>
                                 </g:if>
-                            </ul>
-                        </sec:ifLoggedIn>
+                            </sec:ifLoggedIn>
+                            <g:if test="${availableDashboards}">
+                                <g:if test="${dropdownHasEntries}">
+                                    <li class="divider"></li>
+                                </g:if>
+                                <li class="dropdown-header">
+                                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                               default="View a custom time series"/>
+                                </li>
+                                <g:each in="${availableDashboards}" var="availableDashboard">
+                                    <li><g:link controller="${affectedController}" action="showAll"
+                                                params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
+                                </g:each>
+                            </g:if>
+                        </ul>
                     </div>
                 </div>
             </div>

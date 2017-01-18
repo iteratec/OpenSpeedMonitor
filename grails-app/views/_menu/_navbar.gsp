@@ -28,11 +28,11 @@
     </div>
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
-            <li class="${!controllerName ? 'active' : ''}">
-                <g:link mapping="home">
-                    <i class="fa fa-home"></i> Home
-                </g:link>
-            </li>
+            %{--<li class="${!controllerName ? 'active' : ''}">--}%
+                %{--<g:link mapping="home">--}%
+                    %{--<i class="fa fa-home"></i> Home--}%
+                %{--</g:link>--}%
+            %{--</li>--}%
             <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}">
                 <a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-tachometer"></i>
@@ -120,10 +120,9 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li class="${controllerName.equals('csiDashboard') ? 'active' : ''}">
-                        <g:link controller="csiDashboard" action="showAll"
-                                title="CSI">
+                        <g:link controller="csiDashboard" action="showAll">
                             <i class="fa fa-line-chart"></i>
-                                CSI
+                            <g:message code="csiDashboard.label" default="CSI"/>
                         </g:link>
                     </li>
                     <li class="${controllerName.equals('csiConfiguration') ? 'active' : ''}">
