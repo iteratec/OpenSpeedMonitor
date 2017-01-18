@@ -4,20 +4,11 @@
         <meta name="layout" content="kickstart_osm" />
         <title><g:message code="queue.status.label" /></title>
         <asset:stylesheet src="queueStatus/list.css"/>
-        <style>
-            .running {
-                background: center left no-repeat url('<asset:image src="spinner.gif" absolute="true"/>');
-                padding-left: 20px;
-            }
-            .new-col-sec {
-                border-left: 3px #ccc solid;
-            }
-            label {
-                display: inline;
-            }
-        </style>
     </head>
     <body>
+        <h1>
+            <g:message code="queue.status.label"/>
+        </h1>
         <div class="alert alert-warning" id="serverdown">
           <a class="close" data-dismiss="alert">×</a>
           <g:message code="queue.noconnection.label"/>
