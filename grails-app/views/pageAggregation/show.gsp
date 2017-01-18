@@ -11,9 +11,6 @@
 
 <body>
 
-<%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
-
 <div class="row">
     <div class="col-md-12">
         <%-- heading --%>
@@ -25,7 +22,7 @@
         </p>
 
         %{-- error messages --}%
-        <div id="error-div" class="col-md-12 hidden">
+        <div id="error-div" class="hidden">
             <div class="alert alert-danger">
                 <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 
@@ -46,7 +43,7 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary">
+                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary show-button">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings" />

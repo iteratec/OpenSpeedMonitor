@@ -12,11 +12,9 @@
     </head>
 
     <body>
-    <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
+        <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
+        <section id="${mode}-script" class="first card">
 
-        <section id="${mode}-script" class="first">
-            <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>
             <p><g:message code="default.form.asterisk"/></p>
             <g:form method="post" role="form" class="form-horizontal">

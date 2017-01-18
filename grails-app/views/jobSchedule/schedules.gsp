@@ -92,9 +92,6 @@
 </head>
 
 <body>
-    <%-- main menu --%>
-    <g:render template="/layouts/mainMenu"/>
-
     <div class="form-group">
         <input type="text" class="form-control" id="schedule-filter" placeholder="<g:message code="de.iteratec.osm.ui.filter.location" default="Filter by location"/>" />
         %{--TODO: Add toggle buttons for selecting what to filter by--}%

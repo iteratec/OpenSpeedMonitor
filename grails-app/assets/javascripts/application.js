@@ -362,23 +362,12 @@ function fireWindowEvent(eventName) {
     window.dispatchEvent(event);
 }
 
-$(document).ready(function () {
-
-    $('ul.nav li.dropdown').hover(
-        function () {
-            $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn();
-        },
-        function () {
-            $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut();
-        }
-    );
-    $('li.dropdown-submenu').hover(
-        function () {
-            $(this).children('ul').stop(true, true).delay(100).fadeIn();
-        },
-        function () {
-            $(this).children('ul').stop(true, true).delay(100).fadeOut();
-        }
-    );
-
+$("#main-navbar .dropdown-toggle").click(function () {
+    var parent = $(this).parent();
+    var wasOpen = parent.hasClass("open");
+    $("#main-navbar .dropdown.open").removeClass("open").attr('aria-expanded', 'false');
+    if (!wasOpen) {
+        parent.addClass("open");
+        $(this).trigger('focus').attr('aria-expanded', 'true')
+    }
 });

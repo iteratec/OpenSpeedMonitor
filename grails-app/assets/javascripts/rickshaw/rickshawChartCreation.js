@@ -139,7 +139,7 @@ function RickshawGraphBuilder(args) {
         }
 
         if (args.width == "auto" || args.width == -1) {
-            args.width = $(window).width() - 95;
+            args.width = $(window).width() - 145;
         } else {
             args.width = parseInt(args.width);
         }
@@ -161,7 +161,6 @@ function RickshawGraphBuilder(args) {
         $("#rickshaw_range_slider_preview").width(args.width - 70);
         $("#rickshaw_x-axis").width(args.width - 60);
         $(".x_axis_d3").attr("width", args.width);
-        $(".graph").width(args.width + 60);
 
         self.graph.configure({
             width: widthOfChartSvg,

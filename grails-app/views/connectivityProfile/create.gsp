@@ -10,7 +10,6 @@
     </head>
 
     <body>
-        <g:render template="/layouts/mainMenu" />
         <section id="create-connectivityProfile" class="first">
 
             <g:hasErrors bean="${connectivityProfileInstance}">

@@ -11,9 +11,6 @@
     </head>
 
     <body>
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
-
         <section id="${mode}-job" class="first">
             <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>

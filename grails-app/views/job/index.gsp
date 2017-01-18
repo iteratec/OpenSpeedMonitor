@@ -15,7 +15,8 @@
 
 <body>
 <%-- main menu --%>
-<g:render template="/layouts/mainMenu" model="${[help: render(template: "updateHints")]}"/>
+<h1><g:message code="de.iteratec.isocsi.csi.jobs.heading" default="Jobs" /></h1>
+<div class="card">
 <g:form>
     <g:if test="${!measurementsEnabled}">
         <div class="alert alert-warning">
@@ -236,8 +237,8 @@
         </thead>
         <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
     </table>
-    </div>
 </g:form>
+</div>
 <content tag="include.bottom">
     <asset:javascript src="prettycron/prettycronManifest.js"/>
     <asset:javascript src="job/jobList.js"/>

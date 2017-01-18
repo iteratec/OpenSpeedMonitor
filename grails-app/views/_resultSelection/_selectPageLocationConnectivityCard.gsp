@@ -3,7 +3,7 @@
 A card to select page & measured step, browser & location, and the connectivity
 --%>
 
-<div class="card" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
+<div class="card-5" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
     <g:if test="${showOnlyPage}">
         <legend>
             <g:message code="de.iteratec.osm.result.page.label" default="Page"/>

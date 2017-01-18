@@ -2,7 +2,7 @@
 <%--
 A card with controls to select a job group
 --%>
-<div class="card" id="select-jobgroup-card" data-no-auto-update="${(boolean) noAutoUpdate}"
+<div class="card-5" id="select-jobgroup-card" data-no-auto-update="${(boolean) noAutoUpdate}"
      data-tag-to-job-group-name-map='${tagToJobGroupNameMap as grails.converters.JSON}'>
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>

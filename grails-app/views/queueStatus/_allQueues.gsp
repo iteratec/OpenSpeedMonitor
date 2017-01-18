@@ -1,11 +1,12 @@
 <g:each var="wptServer" in="${servers}">
-	<h3>${wptServer.key}</h3>
+	<div class="card">
+	<h2>${wptServer.key}</h2>
 	
 	<g:if test="${wptServer.value instanceof String}">
 		<p>Error: ${wptServer.value}</p>
 	</g:if>
 	<g:else>
-		<table class="table-striped">
+		<table class="table table-striped">
 		<thead>
 			<tr>
 				<th rowspan="2"><g:message code="queue.id.label" /></th>
@@ -110,4 +111,5 @@
 		</tbody>
 	</table>
 	</g:else>
+</div>
 </g:each>

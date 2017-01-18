@@ -1,0 +1,64 @@
+@import-once "bower_components/bootstrap/less/variables";
+
+/* Corporate colors */
+@iteratec-blue: #008cd2;
+@iteratec-blue-light: #91c3e6;
+@iteratec-blue-lighter: #cde6f5;
+@iteratec-gray-blue: #d7e1eb;
+@iteratec-magenta-dark: #731964;
+@iteratec-magenta: #a92183;
+@iteratec-magenta-light: #e6bedc;
+@iteratec-magenta-lighter: #faf3f8;
+@iteratec-gray: #484848;
+@iteratec-gray-lighter: #ededed;
+
+/* Overwrite bootstrap variables */
+@brand-primary: @iteratec-blue;
+@brand-danger: #EB5E55;
+@brand-info: @iteratec-blue-light;
+@brand-warning: #FFC762;
+@brand-success: #2ECC71;
+
+@body-bg: @iteratec-gray-lighter;
+
+@navbar-inverse-bg: #2f323a;
+@navbar-inverse-border: transparent;
+
+@navbar-inverse-link-color: #989dad;
+@navbar-inverse-link-active-bg: @iteratec-blue;
+@navbar-inverse-link-active-color: @navbar-inverse-link-hover-color;
+
+@navbar-inverse-submenu-bg: lighten(@navbar-inverse-bg, 10%);
+@navbar-inverse-submenu-link-color: lighten(@navbar-inverse-link-color, 10%);
+
+@nav-tabs-active-link-hover-bg: @card-bg;
+
+/* Sidebar */
+@sidebar-width-expanded: @font-size-base * 17;
+@sidebar-head-size: 70px;
+@sidebar-entry-size: 50px;
+@sidebar-logo-icon-size: 36px;
+@sidebar-entry-padding: 10px;
+@sidebar-icon-margin-left: ((@sidebar-entry-size - 2 * @sidebar-entry-padding) - (@sidebar-icon-size * 1.5)) / 2;
+
+
+@sidebar-icon-size: 24px;
+
+@headings-font-weight: normal;
+@font-size-h1 : @font-size-h2;
+
+
+/* Additional variables */
+//@footer-bg: @iteratec-gray-blue;
+//@footer-color: @iteratec-blue;
+@footer-bg: @body-bg;
+@footer-color: @gray-light;
+
+@default-drop-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+
+@text-highlight-shadow: 1px 1px #ffffff;
+
+@card-bg: #ffffff;
+
+@card-well-bg: #f5f5f5;
+@card-well-color: @text-color;

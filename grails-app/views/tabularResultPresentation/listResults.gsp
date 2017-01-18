@@ -8,9 +8,6 @@
     </head>
     <body>
 
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
-
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-danger">
@@ -39,7 +36,7 @@
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
-                    <g:actionSubmit class="btn btn-primary pull-right" id="show-button"
+                    <g:actionSubmit class="btn btn-primary pull-right show-button" id="show-button"
                                     value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
                                     action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" />
                     <g:render template="/_resultSelection/hiddenWarnings" />
