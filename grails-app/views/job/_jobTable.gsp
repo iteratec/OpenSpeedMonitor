@@ -9,7 +9,7 @@
         <td><g:checkBox name="selected.${job.id}" value="on"
                         checked="${selectedIds?.contains(job.id)}"
                         class="jobCheckbox"/></td>
-        <td>
+        <td class="summary">
             <div class="show-chart-buttons">
                 <g:if test="${job.lastRun}">
                     <a href="${createLink(action: 'showLastResultForJob', id: job.id, absolute: true)}" class="show-chart"><i

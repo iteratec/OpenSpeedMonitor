@@ -96,6 +96,10 @@
   display: block;
 }
 
+#jobtable td.summary {
+  padding-right: (@font-size-base * 1.5 + 2 * 8px) + 8px; // button size + normal padding
+}
+
 table#jobtable tr.success td {
   background: rgb(171, 248, 171) !important;
 }
@@ -166,6 +170,7 @@ ul.tags li {
 .show-chart-buttons {
   float: right;
   display: block;
+  margin-right: -(@font-size-base * 1.5 + 2 * 8px);
 }
 
 .show-chart-buttons a {
