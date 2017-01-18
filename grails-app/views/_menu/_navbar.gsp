@@ -116,7 +116,7 @@
             <li class="dropdown ${mainTab.equals('csi') ? 'active open' : ''}">
                 <a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-users"></i>
-                    <g:message code="csiDashboard.label" default="Customer Satisfaction"/><span class="caret"></span>
+                    <g:message code="customerSatisfation.label" default="Customer Satisfaction"/><span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
                     <li class="${controllerName.equals('csiDashboard') ? 'active' : ''}">

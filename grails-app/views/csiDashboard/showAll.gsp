@@ -73,7 +73,7 @@
             </g:hasErrors>
         </g:if>
     </div>
-
+</div>
 <form method="get" action="" id="dashBoardParamsForm">
     <g:if test="${wptCustomerSatisfactionValues}">
         <div class="row">
