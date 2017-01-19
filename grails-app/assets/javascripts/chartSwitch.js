@@ -4,7 +4,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
-OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDashboardLink, pageAggregationLink, tabularResultLink) {
+OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDashboardLink, pageAggregationLink, tabularResultLink, pageFetchLink, detailLink) {
 
     var oldParameter = {};
     var getUrlParameter = function () {
@@ -105,7 +105,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
             getConnectivity(updatedMap);
             getStep(updatedMap);
         }
-        console.log(updatedMap);
         if(updatedMap["selectedFolder"] == null){
             updatedMap = {};
         } else{
@@ -119,6 +118,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         updateUrl("#pageAggregationMainMenu",pageAggregationLink+"?"+$.param(updatedMap, true));
         updateUrl("#eventResultMainMenu",eventResultDashboardLink+"?"+$.param(updatedMap, true));
         updateUrl("#tabularResultMainMenu",tabularResultLink+"?"+$.param(updatedMap, true));
+        updateUrl("#detailAnalysisMainMenu",detailLink+"?"+$.param(updatedMap, true));
     };
 
 
@@ -158,7 +158,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
 
     var fetchPages = function(measuredEvents){
         $.ajax( {
-            url:"http://localhost:8080/page/getPagesForMeasuredEvents",
+            url: pageFetchLink,
             data: {"measuredEventList": measuredEvents},
             success: function( data ) {
                 oldParameter["selectedPages"] = JSON.parse(data);

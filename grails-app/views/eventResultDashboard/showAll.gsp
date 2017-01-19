@@ -307,7 +307,9 @@
         });
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
             "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}").init();
+            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
+            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
+            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
 
     </asset:script>
 </content>

@@ -4,6 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.detailAnalysis"/></title>
+    <asset:javascript src="chartSwitch"/>
 </head>
 
 <body>
@@ -122,6 +123,11 @@
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
         });
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
+            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
+            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
+            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
+            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
     </asset:script>
 </content>
 
