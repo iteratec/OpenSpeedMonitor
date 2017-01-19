@@ -6,7 +6,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 
 OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDashboardLink, pageAggregationLink, tabularResultLink) {
 
-    var oldParameter;
+    var oldParameter = {};
     var getUrlParameter = function () {
         var vars = [], hash;
         var currentUrl = window.location.href;
@@ -75,6 +75,14 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         if(pages) map["selectedPages"] = pages;
     };
 
+    var getStep = function (map) {
+        var selectedSteps = $("#selectedMeasuredEventsHtmlId");
+        if(selectedSteps != null){
+            var values = selectedSteps.val();
+            if(values) map["selectedMeasuredEventIds"] = values
+        }
+    };
+
     var getTimeFrame = function (map) {
         map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
         map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
@@ -95,7 +103,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
             getBrowser(updatedMap);
             getLocation(updatedMap);
             getConnectivity(updatedMap);
+            getStep(updatedMap);
         }
+        console.log(updatedMap);
         if(updatedMap["selectedFolder"] == null){
             updatedMap = {};
         } else{
@@ -117,7 +127,17 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
     };
 
     var init = function () {
-        oldParameter = {};
+        var oldParameter = getOldParameter();
+
+        if(oldParameter["selectedPages"] == null && oldParameter["selectedMeasuredEventIds"] != null){
+            fetchPages(oldParameter["selectedMeasuredEventIds"]);
+        } else{
+            updateUrls(false);
+        }
+        $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
+    };
+
+    var getOldParameter = function () {
         var urlParameter = getUrlParameter();
         oldParameter["selectedFolder"] = urlParameter["selectedFolder"];
         oldParameter["selectedBrowsers"] = urlParameter["selectedBrowsers"];
@@ -126,15 +146,29 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         oldParameter["selectedConnectivityProfiles"] = urlParameter["selectedConnectivityProfiles"];
         oldParameter["selectedAllConnectivityProfiles"] = urlParameter["selectedAllConnectivityProfiles"];
         oldParameter["selectedPages"] = urlParameter["selectedPages"];
+        oldParameter["selectedMeasuredEventIds"] = urlParameter["selectedMeasuredEventIds"];
         oldParameter["setFromHour"] = urlParameter["setFromHour"];
         oldParameter["setToHour"] = urlParameter["setToHour"];
         oldParameter["from"] = urlParameter["from"];
         oldParameter["fromHour"] = decodeURIComponent(urlParameter["fromHour"]);
         oldParameter["to"] = urlParameter["to"];
         oldParameter["toHour"] = decodeURIComponent(urlParameter["toHour"]);
-        $('#graphButtonHtmlId').on('click', updateUrls(true));
-        updateUrls(false);
+        return oldParameter;
     };
+
+    var fetchPages = function(measuredEvents){
+        $.ajax( {
+            url:"http://localhost:8080/page/getPagesForMeasuredEvents",
+            data: {"measuredEventList": measuredEvents},
+            success: function( data ) {
+                oldParameter["selectedPages"] = JSON.parse(data);
+                $("#pageSelectHtmlId").val(oldParameter["selectedPages"]);
+                updateUrls(false);
+            },
+            traditional: true
+        });
+    };
+
 
     return {
         getJobGroup: getJobGroup,

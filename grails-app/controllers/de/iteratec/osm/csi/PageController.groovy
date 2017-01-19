@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
@@ -128,5 +129,17 @@ class PageController {
                 table: templateAsPlainText,
                 count: result.totalCount
         ])
+    }
+
+    def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command){
+        render command.measuredEventList*.testedPageId as Set
+    }
+}
+
+class GetPagesForMeasuredEventsCommand {
+    List<MeasuredEvent> measuredEventList
+
+    static constraints = {
+        measuredEventList(nullable: false)
     }
 }
