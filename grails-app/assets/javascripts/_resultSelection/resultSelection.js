@@ -155,7 +155,9 @@ OpenSpeedMonitor.resultSelection = (function(){
     var validateForm = function () {
         warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!hasJobGroupSelection && lastResultCount != 0);
-        showButtons.prop("disabled", lastResultCount == 0 || !hasJobGroupSelection || !(hasPageSelection || hasMeasuredEventSelection));
+        var doDisable = lastResultCount == 0 || !hasJobGroupSelection || !(hasPageSelection || hasMeasuredEventSelection);
+        showButtons.prop("disabled", doDisable);
+        showButtons.toggleClass("disabled", doDisable)
     };
 
     var updateResultCount = function (resultCount) {

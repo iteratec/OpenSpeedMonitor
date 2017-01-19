@@ -368,7 +368,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         when: "User loads CustomDashboard"
         customDashboardSelectionDropdown.click()
         waitFor { customDashboardSelectionList.displayed }
-        customDashboardSelectionList.find("a").click()
+        customDashboardSelectionList.find("a.custom-dashboard").click()
         then: "The old dashboard is loaded again"
         at CsiDashboardPage
 

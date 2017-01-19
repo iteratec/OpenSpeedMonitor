@@ -52,8 +52,8 @@ class CsiDashboardPage extends I18nGebPage{
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
-        customDashboardSelectionList { $("#customDashBoardSelection") }
+        customDashboardSelectionDropdown { $("#chart-action-dropdown") }
+        customDashboardSelectionList { $(".chart-action-dropdown-menu") }
         pageTab{$("a",href:"#page-tab")}
         browserTab{$("a",href:"#browser-tab")}
         connectivityTab{$("a",href:"#connectivity-tab")}

@@ -214,7 +214,7 @@
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu chart-action-dropdown-menu">
                             <sec:ifLoggedIn>
                                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                     <g:set var="dropdownHasEntries" value="true"/>
@@ -228,7 +228,7 @@
                                     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                                         <g:set var="dropdownHasEntries" value="true"/>
                                         <li>
-                                            <a href="#" role="button"
+                                            <a href="#" role="button" class="custom-dashboard"
                                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
                ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
                                             </a>
