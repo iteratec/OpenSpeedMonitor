@@ -39,28 +39,28 @@
                     <g:message code="de.iteratec.isr.measurementresults" default="Results"/> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li class="${controllerName.equals('eventResultDashboard') ? 'active' : ''}">
+                    <li class="${controllerName.equals('eventResultDashboard') ? 'active' : ''}" id="eventResultMainMenu">
                         <g:link controller="eventResultDashboard" action="showAll"
                                 title="${message(code:'eventResultDashboard.label', default:'Time Series')}">
                             <i class="fa fa-line-chart"></i>
                                 <g:message code="eventResultDashboard.label" default="Time Series"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('pageAggregation') ? 'active' : ''}">
+                    <li class="${controllerName.equals('pageAggregation') ? 'active' : ''}" id="pageAggregationMainMenu">
                         <g:link controller="pageAggregation" action="show"
                                 title="${message(code:'de.iteratec.pageAggregation.title', default:'Page Aggregation')}">
                             <i class="fa fa-bar-chart"></i>
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}">
+                    <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
                         <g:link controller="detailAnalysis" action="show"
                                 title="Detail Analysis">
                             <i class="fa fa-pie-chart"></i>
                                 Detail Analysis
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('tabularResultPresentation') ? 'active' : ''}">
+                    <li class="${controllerName.equals('tabularResultPresentation') ? 'active' : ''}" id="tabularResultMainMenu">
                         <g:link controller="tabularResultPresentation" action="listResults"
                                 title="${message(code:'de.iteratec.result.title', default:'Result List')}">
                             <i class="fa fa-th-list"></i>
