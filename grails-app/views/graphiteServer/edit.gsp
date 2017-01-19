@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <g:set var="entityName" value="${message(code: 'graphiteServer.label', default: 'GraphiteServer')}" scope="request"/>
         <meta name="layout" content="kickstart" />
-        <g:set var="entityName" value="${message(code: 'graphiteServer.label', default: 'GraphiteServer')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>

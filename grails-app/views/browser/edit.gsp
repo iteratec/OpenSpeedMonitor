@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <g:set var="entityName" value="${message(code: 'browser.label', default: 'Browser')}" scope="request"/>
     <meta name="layout" content="kickstart_osm"/>
-    <g:set var="entityName" value="${message(code: 'browser.label', default: 'Browser')}"/>
     <title><g:message code="default.edit.label" args="[entityName]"/></title>
 </head>
 

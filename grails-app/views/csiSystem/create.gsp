@@ -3,9 +3,9 @@
 <html>
 
 <head>
+    <g:set var="entityName" value="${message(code: 'csiSystem.label', default: 'CsiSystem')}" scope="request"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart"/>
-    <g:set var="entityName" value="${message(code: 'csiSystem.label', default: 'CsiSystem')}"/>
     <title><g:message code="default.create.label" args="[entityName]"/></title>
 </head>
 

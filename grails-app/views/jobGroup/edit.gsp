@@ -4,12 +4,12 @@
 <html>
 
 <head>
+    <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" scope="request"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="default.edit.label" args="[jobGroup.name]"/></title>
 
     <asset:stylesheet src="tagit.css"/>
-    <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}"/>
 </head>
 
 <body>

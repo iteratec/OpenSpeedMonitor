@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <g:set var="entityName" value="${message(code: 'graphiteEventSourcePath.label', default: 'GraphiteEventSourcePath')}" scope="request"/>
         <meta name="layout" content="kickstart" />
-        <g:set var="entityName" value="${message(code: 'graphiteEventSourcePath.label', default: 'GraphiteEventSourcePath')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
     </head>
     <body>

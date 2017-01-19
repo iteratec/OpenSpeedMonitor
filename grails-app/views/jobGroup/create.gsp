@@ -3,9 +3,9 @@
 <html>
 
     <head>
+        <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" scope="request"/>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="kickstart"/>
-        <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}"/>
         <title><g:message code="default.create.label" args="[entityName]"/></title>
         <asset:stylesheet src="tagit.css"/>
     </head>

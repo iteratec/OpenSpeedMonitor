@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <g:set var="entityName" value="${message(code: 'measuredEvent.label', default: 'MeasuredEvent')}" scope="request"/>
     <meta name="layout" content="kickstart_osm"/>
-    <g:set var="entityName" value="${message(code: 'measuredEvent.label', default: 'MeasuredEvent')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
 </head>
 

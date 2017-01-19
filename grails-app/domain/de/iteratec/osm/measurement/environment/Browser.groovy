@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.csi.BrowserConnectivityWeight
 import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode(includes = 'name')

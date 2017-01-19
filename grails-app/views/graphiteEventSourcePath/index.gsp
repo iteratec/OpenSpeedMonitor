@@ -2,9 +2,9 @@
 <!doctype html>
 <html>
 <head>
+    <g:set var="entityName" value="${message(code: 'graphiteEventSourcePath.label', default: 'GraphiteEventSourcePath')}" scope="request"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart"/>
-    <g:set var="entityName" value="${message(code: 'graphiteEventSourcePath.label', default: 'GraphiteEventSourcePath')}"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
