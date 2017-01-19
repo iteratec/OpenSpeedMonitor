@@ -11,8 +11,8 @@
 
   }
 
-  .card, .card-1, .card-2, .card-3, .card-4, .card-5, .card-6, .card-7, .card-8, .card-9, .card-10 {
-    margin: 15px -7.5px 0 -7.5px;
+  .card {
+    margin: 0px -7.5px 15px -7.5px;
   }
 }
 
@@ -40,49 +40,8 @@
   }
 }
 
-.card-1 {
-  height: 5em;
-  .card;
-}
-.card-2 {
-  height: 10em;
-  .card;
-}
-.card-3 {
-  height: 15em;
-  .card;
-}
-.card-4 {
-  height: 20em;
-  .card;
-}
-.card-5 {
-  height: 25em;
-  .card;
-}
-.card-6 {
-  height: 30em;
-  .card;
-}
-.card-7 {
-  height: 35em;
-  .card;
-}
-.card-8 {
-  height: 40em;
-  .card;
-}
-.card-9 {
-  height: 45em;
-  .card;
-}
-.card-10 {
-  height: 50em;
-  .card;
-}
-
 .card > .nav {
-  margin-bottom: 20px;
+  margin-bottom: @line-height-computed;
 }
 
 .card > .nav li a {
@@ -91,17 +50,29 @@
 }
 
 .card-well-tabs {
-  margin: 0 -15px;
+  margin: 0 -15px 0px -15px;
   padding: 0 15px;
+  border: 0;
+}
+
+.card-well-tabs > li > a {
+  &, &:hover, &:focus {
+    border-color: transparent;
+  }
+
+  &:hover, &:focus {
+    background: darken(@card-bg, 10%);
+  }
 }
 
 .card-well-tabs li.active a,
 .card-well-tabs li.active a:hover,
 .card-well-tabs li.active a:focus {
-  color: #ffffff;
-  background-color: @brand-primary;
-  border-color: #ddd;
-  border-bottom-color: transparent;
+  background: @card-bg;
+  color: @text-color;
+  border: 0;
+  box-shadow: 0 10px 0 0 white, @default-drop-shadow;
+  z-index: 1;
 }
 
 .card-well.tab-content {
