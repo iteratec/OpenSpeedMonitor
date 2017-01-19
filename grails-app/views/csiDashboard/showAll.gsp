@@ -122,7 +122,7 @@
                 </g:elseif>
             </g:if>
             <div class="col-md-12 section">
-                <div id="chartbox">
+                <div id="chartbox" class="card">
                     <g:render template="/highchart/chart"
                               model="[
                                       singleYAxis                  : 'false',
@@ -228,7 +228,7 @@
                                     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                                         <g:set var="dropdownHasEntries" value="true"/>
                                         <li>
-                                            <a href="#" role="button" class="custom-dashboard"
+                                            <a href="#" role="button"
                                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
                ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
                                             </a>
@@ -248,7 +248,7 @@
                                                default="View a custom time series"/>
                                 </li>
                                 <g:each in="${availableDashboards}" var="availableDashboard">
-                                    <li><g:link controller="${affectedController}" action="showAll"
+                                    <li><g:link controller="${affectedController}" action="showAll" class="custom-dashboard"
                                                 params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                                 </g:each>
                             </g:if>

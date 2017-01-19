@@ -8,7 +8,7 @@ class JobListPage extends I18nGebPage {
 
     static at = {
         title == "Jobs"
-        $(".navbar-nav .dropdown-menu li", class:"active").text() == getI18nMessage("de.iteratec.isr.managementDashboard")
+        $(".navbar-nav .dropdown-menu li", class:"active").text() == getI18nMessage("de.iteratec.isj.jobs")
     }
 
 

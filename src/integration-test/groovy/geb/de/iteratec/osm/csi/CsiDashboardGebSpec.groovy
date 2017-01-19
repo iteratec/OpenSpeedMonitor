@@ -214,7 +214,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         given: "User selects NotUsedLocation"
         browserTab.click()
         selectLocationField.click()
-        selectLocationList[0].click()
+        selectLocationList[1].click()
 
         when: "User clicks on \"Show\" button"
         waitFor { showButton.displayed }
