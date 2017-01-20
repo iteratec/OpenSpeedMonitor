@@ -76,22 +76,19 @@
 </div>
 <form method="get" action="" id="dashBoardParamsForm">
     <g:if test="${wptCustomerSatisfactionValues}">
-        <div class="row">
-
-
-            <div class="col-md-12">
-                <div id="chart-table-toggle" class="btn-group" data-toggle="buttons" id="job-filter-toggle">
-                    <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
-                            code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
-                    <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message
-                            code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/></button>
-                </div>
-            </div>
-        </div>
-
-        <a name="chart-table"></a>
-
-        <div class="row">
+        <ul class="nav nav-tabs card-well-tabs">
+            <li class="active">
+                <a data-toggle="tab" href="#chart-graph" id="chart-toggle">
+                    <g:message code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/>
+                </a>
+            </li>
+            <li>
+                <a data-toggle="tab" href="#csi-table" id="tabVariableSelectionElement" id="table-toggle">
+                    <g:message code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content card">
             <%-- chart --%>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>
             <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
@@ -121,8 +118,8 @@
                            value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
                 </g:elseif>
             </g:if>
-            <div class="col-md-12 section">
-                <div id="chartbox" class="card">
+            <div class="tab-pane in active" id="chart-graph">
+                <div id="chartbox">
                     <g:render template="/highchart/chart"
                               model="[
                                       singleYAxis                  : 'false',
@@ -148,14 +145,14 @@
                 </div>
             </div>
             <%-- table --%>
-            <div id="csi-table" class="col-md-12" style="display: none;">
+            <div id="csi-table" class="tab-pane">
                 <g:if test="${flash.tableDataError}">
                     <div class="alert alert-danger">
                         <g:message error="${flash.tableDataError}"/>
                     </div>
                 </g:if>
                 <g:if test="${wptCustomerSatisfactionValuesForTable != null}">
-                    <table class="table table-bordered">
+                    <table class="table table-striped">
                         <tbody>
                         <tr>
                             <td class="text-info">
