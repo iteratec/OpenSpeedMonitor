@@ -7,7 +7,7 @@
         <asset:stylesheet src="tabularResultPresentation/listResults.css"/>
     </head>
     <body>
-
+        <h1><g:message code="de.iteratec.result.title" default="Result List"/></h1>
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-danger">
@@ -23,14 +23,14 @@
             </g:hasErrors>
         </g:if>
 
-        <g:if test="showEventResultsListing">
+        <g:if test="${showEventResultsListing}">
+            <div class="card">
+                <g:render template="listResults"
+                          model="${[model: eventResultsListing]}" />
 
-            <g:render template="listResults"
-                      model="${[model: eventResultsListing]}" />
-
-            <g:render template="pagination"
-                      model="${[model: paginationListing] }" />
-
+                <g:render template="pagination"
+                          model="${[model: paginationListing] }" />
+            </div>
         </g:if>
 
         <form method="get" action="">
