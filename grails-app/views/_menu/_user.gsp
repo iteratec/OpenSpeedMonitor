@@ -11,6 +11,7 @@
 	<g:else>
 		<li class="dropdown">
 			<a class="dropdown-toggle" href="#">
+				<i class="fa fa-sign-in" aria-hidden="true"></i>
 				<g:message code="security.signin.label" default="Log in" locale="${lang}"/>
 				<b class="caret"></b>
 			</a>
