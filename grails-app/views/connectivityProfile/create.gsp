@@ -10,7 +10,8 @@
     </head>
 
     <body>
-        <section id="create-connectivityProfile" class="first">
+        <h1><g:message code="default.create.label" args="[entityName]" /></h1>
+        <section id="create-connectivityProfile" class="card">
 
             <g:hasErrors bean="${connectivityProfileInstance}">
             <div class="alert alert-danger">
