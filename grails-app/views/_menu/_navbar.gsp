@@ -19,12 +19,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">
+        <g:link absolute="true" class="navbar-brand" uri="/">
             <img class="icon" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_Icon_36px.png')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
                  alt="${meta(name: 'app.name')}"/>
-        </a>
+        </g:link>
     </div>
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
