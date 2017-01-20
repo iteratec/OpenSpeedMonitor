@@ -1,38 +1,47 @@
 <html>
 
 <head>
-<title>Manual of REST API</title>
+<title>REST API</title>
     <meta name="layout" content="kickstart_osm" />
+    <style>
+        #spied-nav > .affix {
+            right: 75%;
+        }
+    </style>
 </head>
+
 <body data-spy="scroll" data-target="#spied-nav">
 %{--<body data-spy="scroll" data-target="#spied-nav">--}%
-
-    <div class="row">
+    <h1 id="rest_base_path">Manual of REST API</h1>
+    <div class="row" id="main-row">
 
         <div class="col-md-3" id="spied-nav">
-            <ul class="nav nav-pills nav-stacked affix text-right">
-                <li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
-                <li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
-                <li><a href="#system-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;JobGroup CSI</a></li>
-                <li><a href="#page-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;Page CSI</a></li>
-                <li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;CsiConfiguration as JSON</a></li>
-                <li><a href="#getNamesForIds">&raquo;&nbsp;<strong>GET</strong>&nbsp;names for Ids for several domains</a></li>
-                <li><a href="#getIdsForNames">&raquo;&nbsp;<strong>GET</strong>&nbsp;ids for names for several domains</a></li>
-                <li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
-                <li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
-                <li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
-                <li><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
-                <li><a href="#job-set-schedule">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Set execution schedule</a></li>
-                <li><a href="#create-event">&raquo;&nbsp;<strong>POST</strong>&nbsp;Create event</a></li>
-                <li><a href="#measurement-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement activation</a></li>
-                <li><a href="#measurement-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement deactivation</a></li>
-                <li><a href="#nightlyDatabaseCleanup-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup activation</a></li>
-                <li><a href="#nightlyDatabaseCleanup-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup deactivation</a></li>
-            </ul>
+            <div class="affix card">
+                <h2>Table of Contents</h2>
+                <ul class="nav nav-pills nav-stacked text-right">
+                    <li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
+                    <li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
+                    <li><a href="#system-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;JobGroup CSI</a></li>
+                    <li><a href="#page-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;Page CSI</a></li>
+                    <li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;CsiConfiguration as JSON</a></li>
+                    <li><a href="#getNamesForIds">&raquo;&nbsp;<strong>GET</strong>&nbsp;names for Ids for several domains</a></li>
+                    <li><a href="#getIdsForNames">&raquo;&nbsp;<strong>GET</strong>&nbsp;ids for names for several domains</a></li>
+                    <li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
+                    <li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
+                    <li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
+                    <li><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
+                    <li><a href="#job-set-schedule">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Set execution schedule</a></li>
+                    <li><a href="#create-event">&raquo;&nbsp;<strong>POST</strong>&nbsp;Create event</a></li>
+                    <li><a href="#measurement-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement activation</a></li>
+                    <li><a href="#measurement-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement deactivation</a></li>
+                    <li><a href="#nightlyDatabaseCleanup-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup activation</a></li>
+                    <li><a href="#nightlyDatabaseCleanup-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup deactivation</a></li>
+                </ul>
+            </div>
         </div>
         <div class="col-md-9 content">
-
-            <h1 id="rest_base_path">Manual of REST API</h1>
+            <div class="card">
+            <h2>Manual of REST API</h2>
             <p>(English version only)</p>
             <p>Any request URL of the REST-API of the openSpeedMonitor starts with the application path followed by the keyword <code>/rest</code>.
             <br>In the following manual we call this <strong>REST-base-path</strong>.
@@ -1021,6 +1030,7 @@
 
             </div>
 
+        </div>
         </div>
 
     </div>
