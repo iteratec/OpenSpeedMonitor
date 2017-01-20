@@ -6,7 +6,7 @@ _The timings you have to keep track of - always on expressive, well arranged das
 
 You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][17].
 
-![Einstieg OSM](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_entry.jpg)
+![Einstieg OSM](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_result_dashboard.jpg)
 
 OpenSpeedMonitor is published under [Apache License 2.0][12], so feel free to use, adapt and do whatever you want with the code. If you extend functionality we would appreciate contributions. Technically, OpenSpeedMonitor is based on [grails][3], a jvm based web framework leveraged by the programming language [groovy][2].
 
