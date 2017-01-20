@@ -12,7 +12,7 @@ OpenSpeedMonitor.jobResult = (function (url) {
 
     var init = function () {
         $(".chosen-select").chosen({ search_contains: true });
-        spinner = OpenSpeedMonitor.Spinner("#jobResultTable");
+        spinner = OpenSpeedMonitor.Spinner("#failedMeasurementsOverview");
 
         // add on change listener to select element
         $("#selectedJob").change(function () {

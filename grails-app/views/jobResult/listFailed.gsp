@@ -3,12 +3,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.osm.failedJobResults.title" default="Failed JobResults"/></title>
-    <style>
-    .row-spacing {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    </style>
 </head>
 
 <body>
@@ -24,7 +18,7 @@
     </div>
 </div>
 
-<div class="card form-horizontal">
+<div class="card form-horizontal panel-body" id="failedMeasurementsOverview">
     <div class="form-group">
         <div class="col-md-3">
             <g:select id="selectedJob" class="form-control chosen-select" name="selectedJob"
@@ -50,7 +44,7 @@
         </tbody>
     </table>
 
-    <div id="no-failed-results-hint" class="panel-body hidden">
+    <div id="no-failed-results-hint" class="hidden">
         <g:message code="de.iteratec.osm.failedJobResults.noData" default="No data"/>
     </div>
 </div>
