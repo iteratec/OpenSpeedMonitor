@@ -9,15 +9,12 @@
 </head>
 
 <body>
-	<content tag="header">
-		<!-- Empty Header -->
-	</content>
+<h1><g:message code="springSecurity.denied.title" locale="${lang}"/>!</h1>
 
-  	<section id="Error">
+  	<section id="Error" class="card">
 		<div class="big-message">
 			<div class="container">
-				<h1><g:message code="springSecurity.denied.title" locale="${lang}"/>!</h1>
-		    	<h2><g:message code="springSecurity.denied.message" locale="${lang}"/></h2> 
+		    	<h2><g:message code="springSecurity.denied.message" locale="${lang}"/></h2>
 				
 				<div class="actions margin-top-large">
 					<a href="${createLink(uri: '/')}" class="btn btn-lg btn-primary">
