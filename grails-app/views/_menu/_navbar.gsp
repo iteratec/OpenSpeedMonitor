@@ -53,13 +53,15 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
-                        <g:link controller="detailAnalysis" action="show"
-                                title="Detail Analysis">
-                            <i class="fa fa-pie-chart"></i>
-                                Detail Analysis
-                        </g:link>
-                    </li>
+                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests') == true}">
+                        <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
+                            <g:link controller="detailAnalysis" action="show"
+                                    title="Detail Analysis">
+                                <i class="fa fa-pie-chart"></i>
+                                    Detail Analysis
+                            </g:link>
+                        </li>
+                    </g:if>
                     <li class="${controllerName.equals('tabularResultPresentation') ? 'active' : ''}" id="tabularResultMainMenu">
                         <g:link controller="tabularResultPresentation" action="listResults"
                                 title="${message(code:'de.iteratec.result.title', default:'Result List')}">
