@@ -8,6 +8,8 @@
 </head>
 
 <body>
+<h1><g:message code="de.iteratec.isocsi.detailAnalysis"/></h1>
+
 <div class="row">
     <div class="col-md-12">
         <g:if test="${errorList && !errorList.empty}">
@@ -46,14 +48,14 @@
 </g:if>
 
 <form method="get">
-    <div class="row">
+    %{--show button--}%
+    <div class="action-row">
         <div class="col-md-12">
-            %{--show button--}%
             <div class="btn-group pull-right" id="show-button-group">
                 <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                action="show" id="showDetailDashboardButton" class="btn btn-primary"/>
+                                action="show" id="showDetailDashboardButton" class="btn btn-primary show-button"/>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                    <button type="button" class="btn btn-primary show-button dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
                         <span class="sr-only">Toggle Dropdown</span>
@@ -62,66 +64,54 @@
                         <li>
                             <g:actionSubmit
                                     value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
-                                    action="sendFetchAssetsAsBatchCommand"/>
+                                    action="sendFetchAssetsAsBatchCommand"
+                                    class="show-button"/>
                         </li>
                     </ul>
                 </sec:ifAnyGranted>
             </div>
-            <!-- Actual tabs -->
-            <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">
-                <li class="active">
-                    <a data-toggle="tab" href="#tabJobSelection" id="tabJobSelectionElement">
-                        <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
-                                   default="Zeitraum ausw&auml;hlen"/>
-                        &amp;
-                        <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading"
-                                   default="Jobs filtern"/>
-                    </a>
-                </li>
-            </ul>
-
-            <div class="tab-content card-well">
-                <div class="tab-pane in active" id="tabJobSelection">
-                    <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
-                              model="${['from'                           : from,
-                                        'fromHour'                       : fromHour,
-                                        'to'                             : to,
-                                        'toHour'                         : toHour,
-                                        'dateFormat'                     : dateFormat,
-                                        'weekStart'                      : weekStart,
-                                        'locationsOfBrowsers'            : locationsOfBrowsers,
-                                        'eventsOfPages'                  : eventsOfPages,
-                                        'folders'                        : folders,
-                                        'selectedFolder'                 : selectedFolder,
-                                        'pages'                          : pages,
-                                        'selectedPage'                   : selectedPage,
-                                        'measuredEvents'                 : measuredEvents,
-                                        'selectedAllMeasuredEvents'      : selectedAllMeasuredEvents,
-                                        'selectedMeasuredEvents'         : selectedMeasuredEvents,
-                                        'browsers'                       : browsers,
-                                        'selectedBrowsers'               : selectedBrowsers,
-                                        'selectedAllBrowsers'            : selectedAllBrowsers,
-                                        'locations'                      : locations,
-                                        'selectedLocations'              : selectedLocations,
-                                        'selectedAllLocations'           : selectedAllLocations,
-                                        'connectivityProfiles'           : connectivityProfiles,
-                                        'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
-                                        'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles]}"/>
-                </div>
-            </div>
+            <g:render template="/_resultSelection/hiddenWarnings" />
         </div>
     </div>
+
+    <div class="row card-well">
+        <div class="col-md-4">
+            <g:render template="/_resultSelection/selectIntervalTimeframeCard"
+                      model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
+                                'includeInterval'          : includeInterval]}"/>
+        </div>
+
+        <div class="col-md-4">
+
+            <div id="filter-navtab-jobGroup">
+                <g:render template="/_resultSelection/selectJobGroupCard"
+                          model="['folders'             : folders, 'selectedFolder': selectedFolder,
+                                  'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
+            </div>
+        </div>
+        %{--the rest----------------------------------------------------------------------------------------------}%
+        <div id="filter-complete-tabbable" class="col-md-4">
+            <g:render template="/_resultSelection/selectPageLocationConnectivityCard" model="[
+                    'showOnlyPage'         : true,
+                    'hideMeasuredEventForm': true,
+                    'pages'                : pages,
+                    'selectedPages'        : selectedPages
+            ]"/>
+        </div>
+    </div>
+    <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+        <i class="fa fa-undo"></i> Reset
+    </button>
 </form>
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/showAll.js"/>
 
     <asset:script type="text/javascript">
-        $(document).ready(function () {
-
-            doOnDomReady(
-                    '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
-            );
+        $(window).load(function() {
+          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
+                                                                   absolute="true"/>')
         });
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
             "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
