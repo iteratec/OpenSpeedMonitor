@@ -24,35 +24,36 @@
     </div>
 </div>
 
-<div class="row row-spacing">
-    <label class="control-label col-md-1" for="selectedJob">Job:</label>
+<div class="card form-horizontal">
+    <div class="form-group">
+        <div class="col-md-3">
+            <g:select id="selectedJob" class="form-control chosen-select" name="selectedJob"
+                      from="${allJobs}"
+                      optionValue="value"
+                      optionKey="key"
+                      noSelection="['': '- Choose a Job -']"></g:select>
+        </div>
+    </div>
 
-    <div class="col-md-3">
-        <g:select id="selectedJob" class="form-control input-sm chosen-select chosen" name="selectedJob" from="${allJobs}"
-                  optionValue="value"
-                  optionKey="key"
-                  noSelection="['': '-choose a job-']"></g:select>
+    <table class="table table-striped hidden" id="jobResultTable">
+        <thead>
+        <tr>
+            <th class="sortable"><g:message code="de.iteratec.osm.failedJobResults.thead.testId"
+                                            default="Test ID"/></th>
+            <th><g:message code="de.iteratec.osm.failedJobResults.thead.date" default="Date"/></th>
+            <th><g:message code="de.iteratec.osm.failedJobResults.thead.httpStatus" default="HTTP Status"/></th>
+            <th><g:message code="de.iteratec.osm.failedJobResults.thead.wptStatus" default="WPT Status"/></th>
+            <th><g:message code="de.iteratec.osm.failedJobResults.thead.description" default="Description"/></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div id="no-failed-results-hint" class="panel-body hidden">
+        <g:message code="de.iteratec.osm.failedJobResults.noData" default="No data"/>
     </div>
 </div>
-
-<table class="table table-striped hidden" id="jobResultTable">
-    <thead>
-    <tr>
-        <th class="sortable"><g:message code="de.iteratec.osm.failedJobResults.thead.testId" default="Test ID"/></th>
-        <th><g:message code="de.iteratec.osm.failedJobResults.thead.date" default="Date"/></th>
-        <th><g:message code="de.iteratec.osm.failedJobResults.thead.httpStatus" default="HTTP Status"/></th>
-        <th><g:message code="de.iteratec.osm.failedJobResults.thead.wptStatus" default="WPT Status"/></th>
-        <th><g:message code="de.iteratec.osm.failedJobResults.thead.description" default="Description"/></th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
-<div id="no-failed-results-hint" class="panel-body hidden">
-    <g:message code="de.iteratec.osm.failedJobResults.noData" default="No data"/>
-</div>
-
 
 <content tag="include.bottom">
     <asset:javascript src="jobResult/failedJobResultList.js"/>
