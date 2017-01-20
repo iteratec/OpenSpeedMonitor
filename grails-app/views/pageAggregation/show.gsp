@@ -10,30 +10,22 @@
 </head>
 
 <body>
+<h1><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></h1>
 
-<div class="row">
-    <div class="col-md-12">
-        <%-- heading --%>
-        <h3><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></h3>
+<p>
+    <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
+               default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
+</p>
+<div class="card hidden" id="chart-card">
+    <div id="error-div" class="hidden">
+        <div class="alert alert-danger">
+            <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 
-        <p>
-            <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
-                       default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
-        </p>
-
-        %{-- error messages --}%
-        <div id="error-div" class="hidden">
-            <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
-
-                <div id="error-message"></div>
-            </div>
+            <div id="error-message"></div>
         </div>
     </div>
+    <g:render template="barChart"/>
 </div>
-
-
-<g:render template="barChart"/>
 
 <div class="row">
     <div class="col-md-12">
