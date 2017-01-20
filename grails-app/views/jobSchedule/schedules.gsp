@@ -92,6 +92,7 @@
 </head>
 
 <body>
+    <h1><g:message code="queue.status.label"/></h1>
     <div class="form-group">
         <input type="text" class="form-control" id="schedule-filter" placeholder="<g:message code="de.iteratec.osm.ui.filter.location" default="Filter by location"/>" />
         %{--TODO: Add toggle buttons for selecting what to filter by--}%
@@ -99,27 +100,22 @@
 
     <g:each in="${chartMap}" var="server" status="i">
         <div id="${server.key}" class="server-div">
-            <h3>
+            <h1>
                 <span class="text-muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
-            </h3>
-            <hr />
+            </h1>
             <g:each in="${server.value}" var="location" status="j">
-                <div id="${location.name}" class="location-div">
-                    <h4>
+                <div id="${location.name}" class="location-div card">
+                    <h2>
                         <span class="text-muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
-                    </h4>
+                    </h2>
                     <g:if test="${location.jobs.size() > 0}">
                         <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
                     </g:if>
                     <g:else>
                         <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="no jobs within the next 24 hours"/>
                     </g:else>
-                    <br/>
-                    <br/>
                 </div>
             </g:each>
-            <br/>
-            <br/>
         </div>
     </g:each>
 
