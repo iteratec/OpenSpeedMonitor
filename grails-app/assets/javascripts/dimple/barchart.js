@@ -244,9 +244,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li class='filterRule'><a href='#'>" + filterRuleKey + "</a></li>");
+                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
                 link.click(function (e) {
                     filterCustomerJourney(e.target.innerText);
+                    toogleFilterCheckmarks(e.target);
                 });
                 link.insertAfter($customerJourneyHeader);
             }
@@ -254,9 +255,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         $filterDropdownGroup.find("#all-bars-desc").click(function (e) {
             filterCustomerJourney(null, true);
+            toogleFilterCheckmarks(e.target);
         });
         $filterDropdownGroup.find("#all-bars-asc").click(function (e) {
             filterCustomerJourney(null, false);
+            toogleFilterCheckmarks(e.target);
         })
     };
 
@@ -304,7 +307,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         draw(false);
         resize();
 
-        addBarLabels();
+        postDraw();
+    };
+
+    var toogleFilterCheckmarks = function (item) {
+        $('.filterActive').toggleClass("filterActive filterInactive");
+        var itemCheckmark = item.querySelector(".filterInactive");
+        itemCheckmark.classList.remove("filterInactive");
+        itemCheckmark.classList.add("filterActive");
     };
 
     var resize = function () {

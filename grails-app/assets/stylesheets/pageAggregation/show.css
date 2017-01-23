@@ -28,3 +28,11 @@
     min-width: 17em;
     text-align: left;
 }
+
+.filterActive {
+    visibility: visible;
+}
+
+.filterInactive {
+    visibility: hidden;
+}
