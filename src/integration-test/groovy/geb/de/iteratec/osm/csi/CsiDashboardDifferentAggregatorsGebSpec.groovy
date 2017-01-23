@@ -27,6 +27,7 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -77,6 +78,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Daily mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         to CsiDashboardPage
@@ -114,6 +116,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Weekly mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_page"
@@ -138,6 +141,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Daily mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "daily_shop"
@@ -164,6 +168,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Weekly mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_shop"
@@ -188,6 +193,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Daily mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         waitFor { aggregationRadioButtons.displayed }
@@ -216,6 +222,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Weekly mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_system"
@@ -240,6 +247,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
         adjustChartButton.click()
@@ -256,7 +264,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         waitFor { chartTitle == "CustomTitle" }
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Size"() {
         given: "User edits chart size"
         adjustChartButton.click()
@@ -291,7 +299,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Section"() {
         given: "User edits chart size"
         adjustChartButton.click()
@@ -311,6 +319,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         graphYGridLastTick == "80"
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Markers"() {
 
         when: "User clicks \"Show data-marker\""
@@ -327,6 +336,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         waitFor { dataMarker.attr("style").contains("top: 600px; left: 270px;") }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Labels"() {
 
         when: "User clicks \"Show data-marker\""
@@ -344,7 +354,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         }
     }
 
-
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Save custom dashboard"() {
         given: "User clicked on \"Save as dashboard\"-button"
         clickSaveAsDashboardButton()
@@ -362,6 +372,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load custom dashboard"() {
         given: "User visits the CsiDashboardPage"
         to CsiDashboardPage

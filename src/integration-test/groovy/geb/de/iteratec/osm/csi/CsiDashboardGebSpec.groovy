@@ -95,6 +95,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Hourly mean per measured step\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         timeFrameSelect.click()
@@ -142,6 +143,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Browser"() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -167,6 +169,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Browsers\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -210,6 +213,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Location"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -236,6 +240,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Locations\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -304,6 +309,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Connectivity Profiles\""() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
