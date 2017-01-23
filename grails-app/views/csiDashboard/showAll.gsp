@@ -391,7 +391,6 @@
             var loadTimeMaximum = "${loadTimeMaximum}";
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
-            var optimizeForWideScreen = "${showDataLabels}";
             var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors};
             $("#dia-title").val(chartTitle);

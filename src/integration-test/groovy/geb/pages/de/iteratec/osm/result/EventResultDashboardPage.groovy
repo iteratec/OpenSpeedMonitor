@@ -36,7 +36,6 @@ class EventResultDashboardPage extends I18nGebPage {
         diaChangeYAxisButton { $(".dia-change-yaxis") }
         showDataMarkersCheckBox { $("#to-enable-marker") }
         showDataLabelsCheckBox { $("#to-enable-label") }
-        optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }
         addAliasButton { $("#addAliasButton") }
         aliasInputField { $(".input-alias")[0] }
         graphName { $("span.label").attr("innerHTML") }
