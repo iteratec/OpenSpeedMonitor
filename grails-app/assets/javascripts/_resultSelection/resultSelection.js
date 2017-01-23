@@ -27,7 +27,8 @@ OpenSpeedMonitor.resultSelection = (function(){
         locationIds: null,
         connectivityIds: null,
         nativeConnectivity: null,
-        customConnectivities: null
+        customConnectivities: null,
+        caller: $("#dashBoardParamsForm").data("caller")
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = false;
@@ -147,7 +148,7 @@ OpenSpeedMonitor.resultSelection = (function(){
                 updateStarted = true;
             }
         }
-        if (updateStarted) {
+        if (updateStarted && currentQueryArgs.caller === "EventResult") {
             updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
         }
     };

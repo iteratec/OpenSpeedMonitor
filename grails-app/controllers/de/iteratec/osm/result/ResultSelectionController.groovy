@@ -70,14 +70,22 @@ class ResultSelectionController {
                 if (existing) {
                     not { 'in'('jobGroup', existing) }
                 }
+                // On CsiAggregationDashboad return only jobGroups containing a csiConfiguration
+                if (command.caller == ResultSelectionCommand.Caller.CsiAggregation) {
+                    jobGroup {
+                        'isNotNull'("csiConfiguration")
+                    }
+                }
                 projections {
                     distinct('jobGroup')
                 }
             })
-            return jobGroups.collect {[
-                id: it.id,
-                name: it.name
-            ]}
+            return jobGroups.collect {
+                [
+                        id  : it.id,
+                        name: it.name
+                ]
+            }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
@@ -101,11 +109,13 @@ class ResultSelectionController {
                     property('page')
                 }
             })
-            return measuredEvents.collect {[
-                id: it[0].id,
-                name: it[0].name,
-                parent: [id: it[1].id, name: it[1].name]
-            ]}
+            return measuredEvents.collect {
+                [
+                        id    : it[0].id,
+                        name  : it[0].name,
+                        parent: [id: it[1].id, name: it[1].name]
+                ]
+            }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
@@ -129,11 +139,13 @@ class ResultSelectionController {
                     property('browser')
                 }
             })
-            return locations.collect {[
-                id    : it[0].id,
-                name  : it[0].toString(),
-                parent: [id: it[1].id, name: it[1].name]
-            ]}
+            return locations.collect {
+                [
+                        id    : it[0].id,
+                        name  : it[0].toString(),
+                        parent: [id: it[1].id, name: it[1].name]
+                ]
+            }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
@@ -165,10 +177,12 @@ class ResultSelectionController {
                     distinct('connectivityProfile')
                 }
             })
-            return connectivityProfiles.collect {[
-                id  : it.id,
-                name: it.toString()
-            ]}
+            return connectivityProfiles.collect {
+                [
+                        id  : it.id,
+                        name: it.toString()
+                ]
+            }
         })
     }
 
@@ -185,10 +199,12 @@ class ResultSelectionController {
                     distinct('customConnectivityName')
                 }
             })
-            return customProfiles.collect {[
-                id  : MetaConnectivityProfileId.Custom.value,
-                name: it
-            ]}
+            return customProfiles.collect {
+                [
+                        id  : MetaConnectivityProfileId.Custom.value,
+                        name: it
+                ]
+            }
         })
     }
 
@@ -207,10 +223,11 @@ class ResultSelectionController {
 
     private def sendError(ResultSelectionCommand command) {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
-            "Invalid parameters: " + command.getErrors().fieldErrors.each{it.field}.join(", "))
+                "Invalid parameters: " + command.getErrors().fieldErrors.each { it.field }.join(", "))
     }
 
     private def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {
+
         boolean isStartOfDay = isStartOfDay(command.from)
         def fromFullDay = command.from.withTimeAtStartOfDay()
         if (!isStartOfDay) {
@@ -239,7 +256,8 @@ class ResultSelectionController {
         return results
     }
 
-    private def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
+    private
+    def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return EventResult.createCriteria().list {
             applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
@@ -247,7 +265,8 @@ class ResultSelectionController {
         }
     }
 
-    private def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
+    private
+    def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return ResultSelectionInformation.createCriteria().list {
             applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
@@ -329,6 +348,11 @@ class ResultSelectionController {
 }
 
 class ResultSelectionCommand {
+    enum Caller {
+        CsiAggregation,
+        EventResult
+    }
+
     DateTime from
     DateTime to
     List<Long> jobGroupIds
@@ -339,12 +363,13 @@ class ResultSelectionCommand {
     List<Long> connectivityIds
     Boolean nativeConnectivity
     List<String> customConnectivities
+    Caller caller
 
     static constraints = {
         from(blank: false, nullable: false)
         to(blank: false, nullable: false, validator: { val, obj ->
             if (!val.isAfter(obj.from)) {
-               return ['datePriorTo', val.toString(), obj.from.toString()]
+                return ['datePriorTo', val.toString(), obj.from.toString()]
             }
         })
         nativeConnectivity(blank: true, nullable: true)

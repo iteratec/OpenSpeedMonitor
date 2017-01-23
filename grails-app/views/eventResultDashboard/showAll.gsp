@@ -38,7 +38,7 @@
     <g:if test="${request.queryString && (command && !command.hasErrors() || !command) && !eventResultValues}">
         <div class="col-md-12">
             <div class="alert alert-danger">
-               <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
+                <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
             </div>
         </div>
     </g:if>
@@ -57,7 +57,7 @@
         </div>
     </g:if>
 
-    <form method="get" action="" id="dashBoardParamsForm">
+    <form method="get" action="" id="dashBoardParamsForm" data-caller="EventResult">
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
                 <a name="chart-table"></a>
@@ -162,7 +162,7 @@
             </ul>
         </div>
         <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
-                        action="downloadCsv" class="btn btn-primary pull-right space-right show-button" />
+                        action="downloadCsv" class="btn btn-primary pull-right space-right show-button"/>
 
 
         <g:render template="/_resultSelection/hiddenWarnings"/>
