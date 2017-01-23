@@ -12,14 +12,14 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4><g:message code="de.iteratec.chart.adjustment.name" default="Diagramm anpassen"/></h4>
+                <h4><g:message code="de.iteratec.chart.adjustment.name" default="Adjust Chart"/></h4>
             </div>
 
             <div id="collapseAdjustment" class="modal-body form-horizontal">
                 <!-- Diagram-title -->
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="dia-title">
-                        <g:message code="de.iteratec.chart.title.name"/>
+                        <g:message code="de.iteratec.chart.title.name" default="Title"/>
                     </label>
                     <div class="col-md-8">
                         <input id="dia-title" class="form-control" type="text" value="${chartTitle}">
@@ -28,20 +28,25 @@
                 <!-- diagram-size -->
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="dia-width">
-                        <g:message code="de.iteratec.chart.size.name"/>
+                        <g:message code="de.iteratec.chart.size.name" default="Size"/>
                     </label>
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <span class="input-group-addon"><g:message code="de.iteratec.chart.width.name"/></span>
-                            <input class="form-control" id="dia-width" type="text" value="${initialChartWidth}"/>
-                            <span class="input-group-addon">px</span>
+                    <div class="col-md-8">
+                        <div class="input-group form-row">
+                            <span class="input-group-addon adjustChartsizeAddon">
+                                <g:message code="de.iteratec.chart.width.name"
+                                           default="Width"/>
+                            </span>
+                            <input class="form-control adjustChartInput" id="dia-width" type="text" value="${initialChartWidth}"/>
+                            <span class="input-group-addon adjustChartUnitAddon">px</span>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <span class="input-group-addon"><g:message code="de.iteratec.chart.height.name"/></span>
-                            <input class="form-control" id="dia-height" type="text" value="${initialChartHeight}"/>
-                            <span class="input-group-addon">px</span>
+
+                        <div class="input-group form-row">
+                            <span class="input-group-addon adjustChartsizeAddon">
+                                <g:message code="de.iteratec.chart.height.name"
+                                           default="Height"/>
+                            </span>
+                            <input class="form-control adjustChartInput" id="dia-height" type="text" value="${initialChartHeight}"/>
+                            <span class="input-group-addon adjustChartUnitAddon">px</span>
                         </div>
                     </div>
                 </div>
@@ -49,21 +54,26 @@
                 <!-- rickshaw -->
                 <div id="adjust_chart_y_axis_container">
                     <div class="adjust_chart_y_axis form-group">
-                        <label class="col-md-3 control-label"><g:message code="de.iteratec.chart.axis.y.name"/></label>
-                        <div class="col-md-3">
-                            <div class="input-group ">
-                                <span class="input-group-addon"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
-                                <input class="form-control dia-y-axis-min" type="text"
-                                       value="${yAxisMin ?: ''}">
-                                <span class="input-group-addon minimumUnit"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <span class="input-group-addon"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
-                                <input class="form-control dia-y-axis-max" type="text"
+                        <label class="col-md-3 control-label">
+                            <g:message code="de.iteratec.chart.axis.y.name" default="y-Axis Range"/>
+                        </label>
+                        <div class="col-md-8">
+                            <div class="input-group form-row">
+                                <span class="input-group-addon adjustRangeAddon">
+                                    <g:message code="de.iteratec.chart.axis.y.maximum.name" default="Maximum"/>
+                                </span>
+                                <input class="form-control dia-y-axis-max adjustChartInput" type="text"
                                        value="${yAxisMax ?: ''}">
-                                <span class="input-group-addon maximumUnit"></span>
+                                <span class="input-group-addon maximumUnit adjustChartUnitAddon"></span>
+                            </div>
+
+                            <div class="input-group form-row">
+                                <span class="input-group-addon adjustRangeAddon">
+                                    <g:message code="de.iteratec.chart.axis.y.minimum.name" default="Minimum"/>
+                                </span>
+                                <input class="form-control dia-y-axis-min adjustChartInput" type="text"
+                                       value="${yAxisMin ?: ''}">
+                                <span class="input-group-addon minimumUnit adjustChartUnitAddon"></span>
                             </div>
                         </div>
                         <input type="hidden" class="dia-y-axis-name" value="" />

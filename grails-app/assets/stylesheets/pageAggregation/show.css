@@ -16,19 +16,6 @@
     margin: 0;
 }
 
-.chartSizeInput {
-    text-align: right;
-}
-
-.adjustChartsizeAddon {
-    min-width: 5em;
-}
-
-.colorLabel {
-    min-width: 17em;
-    text-align: left;
-}
-
 .filterActive {
     visibility: visible;
 }
