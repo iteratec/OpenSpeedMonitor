@@ -171,6 +171,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var postDraw = function () {
+        toogleFilterCheckmarks();
         setLegendNames();
         addBarLabels();
     };
@@ -310,11 +311,16 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         postDraw();
     };
 
-    var toogleFilterCheckmarks = function (item) {
-        $('.filterActive').toggleClass("filterActive filterInactive");
-        var itemCheckmark = item.querySelector(".filterInactive");
-        itemCheckmark.classList.remove("filterInactive");
-        itemCheckmark.classList.add("filterActive");
+    var toogleFilterCheckmarks = function (listItem) {
+        $('.filterActive').toggleClass("filterInactive filterActive");
+
+        // reset checkmark to 'descending' if 'Show' gets clicked
+        // otherwise set checkmark to the list item one has clicked on
+        if (typeof listItem == 'undefined') {
+            $('#all-bars-desc > .filterInactive').toggleClass("filterActive filterInactive");
+        } else {
+            $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
+        }
     };
 
     var resize = function () {
