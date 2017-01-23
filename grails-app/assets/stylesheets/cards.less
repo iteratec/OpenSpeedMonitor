@@ -4,7 +4,7 @@
   color: @card-well-color;
   background-color: transparent;
   border-radius: 4px;
-  padding: 0 7.5px 15px 7.5px;
+  padding: 15px 7.5px 15px 7.5px;
   margin: 0 -15px;
 
   &.row {
@@ -52,7 +52,6 @@
 .card-well-tabs {
   margin: 0 -15px 0px -15px;
   padding: 0 15px;
-  border: 0;
 }
 
 .card-well-tabs > li > a {
@@ -68,10 +67,9 @@
 .card-well-tabs li.active a,
 .card-well-tabs li.active a:hover,
 .card-well-tabs li.active a:focus {
-  background: @card-bg;
   color: @text-color;
-  border: 0;
-  box-shadow: 0 10px 0 0 white, @default-drop-shadow;
+  background-color: @iteratec-gray-lighter;
+  box-shadow: @default-active-tab-shadow;
   z-index: 1;
 }
 
