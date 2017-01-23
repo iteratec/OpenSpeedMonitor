@@ -92,7 +92,7 @@
                     <g:message code="de.iteratec.chart.adjustment.aliases" default="Aliases"/>
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
-                    <g:message code="de.iteratec.ism.ui.button.close" default="Close">
+                    <g:message code="de.iteratec.ism.ui.button.close" default="Close" />
                 </button>
                 <button type="button" class="btn btn-primary" id="adjustChartApply">
                     <g:message code="de.iteratec.ism.ui.button.apply.name" default="Apply"/>
