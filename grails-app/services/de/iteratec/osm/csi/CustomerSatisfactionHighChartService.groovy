@@ -166,7 +166,7 @@ class CustomerSatisfactionHighChartService {
         CsiAggregation.withNewSession {
 
             for (CsiAggregation currentCsiAggregation : csiValues) {
-                if (getValue(currentCsiAggregation)) {
+                if (getValue(currentCsiAggregation) != null && getValue(currentCsiAggregation) >= 0) {
 
                     String valueTagToGraph = getCsiAggregationIdentifierForChart(currentCsiAggregation)
 
@@ -184,8 +184,7 @@ class CustomerSatisfactionHighChartService {
                             sourceURL: getLinkFor(currentCsiAggregation, csiType),
                             testingAgent: null
                     )
-                    if (chartPoint.isValid())
-                        tagToGraph[valueTagToGraph].getPoints().add(chartPoint)
+                    tagToGraph[valueTagToGraph].getPoints().add(chartPoint)
                 }
             }
 
@@ -256,24 +255,24 @@ class CustomerSatisfactionHighChartService {
     private URL getLinkFor(CsiAggregation csiValue, CsiType csiType) {
         URL linkForPoint
 
-            String aggregatorName = csiValue.aggregator.name
+        String aggregatorName = csiValue.aggregator.name
 
-            if (aggregatorName.equals(AggregatorType.PAGE) ||
-                    aggregatorName.equals(AggregatorType.SHOP) ||
-                    aggregatorName.equals(AggregatorType.CSI_SYSTEM)
-            ) {
-                Map paramsToSend = getParamsForLink(csiValue)
-                paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
-                String testsDetailURLAsString = grailsLinkGenerator.link([
-                        'controller': 'csiDashboard',
-                        'action'    : 'showAll',
-                        'absolute'  : true,
-                        'params'    : paramsToSend
-                ]);
-                linkForPoint = testsDetailURLAsString ? new URL(testsDetailURLAsString) : null;
-            } else if (aggregatorName.equals(AggregatorType.MEASURED_EVENT)) {
-                linkForPoint = this.eventResultDashboardService.tryToBuildTestsDetailsURL(csiValue)
-            }
+        if (aggregatorName.equals(AggregatorType.PAGE) ||
+                aggregatorName.equals(AggregatorType.SHOP) ||
+                aggregatorName.equals(AggregatorType.CSI_SYSTEM)
+        ) {
+            Map paramsToSend = getParamsForLink(csiValue)
+            paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
+            String testsDetailURLAsString = grailsLinkGenerator.link([
+                    'controller': 'csiDashboard',
+                    'action'    : 'showAll',
+                    'absolute'  : true,
+                    'params'    : paramsToSend
+            ]);
+            linkForPoint = testsDetailURLAsString ? new URL(testsDetailURLAsString) : null;
+        } else if (aggregatorName.equals(AggregatorType.MEASURED_EVENT)) {
+            linkForPoint = this.eventResultDashboardService.tryToBuildTestsDetailsURL(csiValue)
+        }
         return linkForPoint
     }
 

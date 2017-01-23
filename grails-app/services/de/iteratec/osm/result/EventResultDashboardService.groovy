@@ -263,7 +263,7 @@ public class EventResultDashboardService {
                 Integer numberOfWptRun = eventResult.numberOfWptRun
                 CachedView cachedView = eventResult.cachedView
                 Integer oneBaseStepIndexInJourney = eventResult.oneBasedStepIndexInJourney
-                WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
+                WptEventResultInfo chartP   ointWptInfo = new WptEventResultInfo(
                         serverBaseUrl: serverBaseUrl,
                         testId: testId,
                         numberOfWptRun: numberOfWptRun,
@@ -284,7 +284,8 @@ public class EventResultDashboardService {
                                 testingAgent: eventResult.testAgent,
                                 chartPointWptInfo: chartPointWptInfo
                         )
-                        if (chartPoint.isValid())
+                        // customer satisfaction can be 0.
+                        if (chartPoint.isValid() || (aggregator.measurandGroup == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }
                 }
