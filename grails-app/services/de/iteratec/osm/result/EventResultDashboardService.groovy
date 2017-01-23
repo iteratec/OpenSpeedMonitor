@@ -263,7 +263,7 @@ public class EventResultDashboardService {
                 Integer numberOfWptRun = eventResult.numberOfWptRun
                 CachedView cachedView = eventResult.cachedView
                 Integer oneBaseStepIndexInJourney = eventResult.oneBasedStepIndexInJourney
-                WptEventResultInfo chartP   ointWptInfo = new WptEventResultInfo(
+                WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
                         serverBaseUrl: serverBaseUrl,
                         testId: testId,
                         numberOfWptRun: numberOfWptRun,
