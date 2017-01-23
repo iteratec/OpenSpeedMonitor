@@ -14,40 +14,49 @@
         <section id="${mode}-job" class="first">
             <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>
-
-            <p><g:message code="default.form.asterisk"/></p>
-
+            %{--<p>--}%
+                %{--<g:message code="default.form.asterisk"/>--}%
+            %{--</p>--}%
             <g:form resource="${entity}" method="post" role="form" class="form-horizontal">
+
                 <g:hiddenField name="id" value="${entity?.id}"/>
                 <g:hiddenField name="version" value="${entity?.version}"/>
-                <fieldset class="form">
-                    <g:render template="form"/>
-                </fieldset>
 
-                <div>
-                    <g:if test="${mode == 'edit'}">
-                        <g:actionSubmit class="btn btn-primary" action="update"
-                                        value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
-                        <g:actionSubmit class="btn btn-primary" action="save"
-                                        value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
-                                        onclick="return promptForDuplicateName();"/>
-                    </g:if>
-                    <g:elseif test="${mode == 'create'}">
-                        <g:actionSubmit class="btn btn-primary" action="save"
-                                        value="${message(code: 'default.button.create.label', default: 'Create')}"/>
-                    </g:elseif>
+                <div class="card">
+                    <fieldset class="form">
+                        <g:render template="form"/>
+                    </fieldset>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <g:if test="${mode == 'edit'}">
+                                <g:actionSubmit class="btn btn-primary" action="update"
+                                                value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
+                                <g:actionSubmit class="btn btn-primary" action="save"
+                                                value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
+                                                onclick="return promptForDuplicateName();"/>
+                            </g:if>
+                            <g:elseif test="${mode == 'create'}">
+                                <g:actionSubmit class="btn btn-primary" action="save"
+                                                value="${message(code: 'default.button.create.label', default: 'Create')}"/>
+                            </g:elseif>
 
-                    <a href="<g:createLink action="list"/>" class="btn btn-warning"
-                       onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
-                        <g:message code="default.button.cancel.label" default="Abbrechen"/>
-                    </a>
+                            <a href="<g:createLink action="list"/>" class="btn btn-warning"
+                               onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
+                                <g:message code="default.button.cancel.label" default="Abbrechen"/>
+                            </a>
 
-                    <g:if test="${mode == 'edit'}">
-                        <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink: controllerLink]"/>
-                        <g:actionSubmit class="btn btn-info" action="execute"
-                                        value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}"
-                                        onclick="this.form.target='_blank';return true;"/>
-                    </g:if>
+                            <g:if test="${mode == 'edit'}">
+                                <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink: controllerLink]"/>
+                                <g:actionSubmit class="btn btn-info" action="execute"
+                                                value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}"
+                                                onclick="this.form.target='_blank';return true;"/>
+                            </g:if>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <g:message code="default.form.asterisk"/>
+                        <div>
+                    </div>
                 </div>
             </g:form>
         </section>

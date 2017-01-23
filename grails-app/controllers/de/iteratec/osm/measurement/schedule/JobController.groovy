@@ -114,6 +114,8 @@ class JobController {
     def create() {
         Job job = new Job(params)
         job.maxDownloadTimeInMinutes = configService.getDefaultMaxDownloadTimeInMinutes()
+        job.firstViewOnly = true
+        job.persistNonMedianResults = false
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
 
