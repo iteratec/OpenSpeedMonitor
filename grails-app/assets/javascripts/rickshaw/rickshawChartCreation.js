@@ -62,10 +62,10 @@ function RickshawGraphBuilder(args) {
         new ChartAdjuster(self, args);
         new ChartExporter(args);
         self.updateBorders({
-                measurandGroupName: this.measurandGroup,
-                bottom: args.bottom,
-                top: args.top
-            });
+            measurandGroupName: this.measurandGroup,
+            bottom: args.bottom,
+            top: args.top
+        });
         self.initializeEventListeners();
     };
 
@@ -156,7 +156,7 @@ function RickshawGraphBuilder(args) {
         $("#rickshaw_addons").width(args.width - 70);
         $("#rickshaw_addons ul").width(args.width - 70);
         $("#rickshaw_timeline").width(args.width - 60);
-        $("#rickshaw_slider").width(args.width- 70);
+        $("#rickshaw_slider").width(args.width - 70);
         $("#rickshaw_range_slider_preview_container").width(args.width - 70);
         $("#rickshaw_range_slider_preview").width(args.width - 70);
         $("#rickshaw_x-axis").width(args.width - 60);
@@ -292,7 +292,7 @@ function RickshawGraphBuilder(args) {
         hoverDetail.formatter = function (activePoint, pointsAtSameTimepoint, formattedX, testingAgent) {
             // create html content for the hover detail table
             var pointData = "";
-            pointsAtSameTimepoint.forEach( function (point) {
+            pointsAtSameTimepoint.forEach(function (point) {
                 // get the correct scale depending on the yAxis
                 var scale = $.grep(self.yAxes, function (e) {
                     return e.measurandGroup == point.series.measurandGroup;
@@ -414,7 +414,7 @@ function RickshawGraphBuilder(args) {
         //Data has to be ordered to ensure that the colors are not random
         var dataTupleList = [];
         for (var key in data) dataTupleList.push([key, data[key]]);
-        dataTupleList.sort(function(a, b) {
+        dataTupleList.sort(function (a, b) {
             a = a[1].name;
             b = b[1].name;
 
@@ -441,8 +441,8 @@ function RickshawGraphBuilder(args) {
         return series;
     };
 
-    this.initializeEventListeners = function() {
-        $(window).resize(function() {
+    this.initializeEventListeners = function () {
+        $(window).resize(function () {
             if (!self.autoResize) {
                 return;
             }
@@ -1092,7 +1092,7 @@ function HtmlProvider(args) {
 function ChartAdjuster(graphBuilder, args) {
     var self = this;
 
-    this.initialize = function(graphBuilder, args) {
+    this.initialize = function (graphBuilder, args) {
         self.graphBuilder = graphBuilder;
         self.registerEventHandlers();
         self.createYAxisAdjuster(args);
@@ -1180,13 +1180,13 @@ function ChartAdjuster(graphBuilder, args) {
 
     this.updateAllYAxis = function () {
         var success = true;
-        $("div.adjust_chart_y_axis").each(function(i, el) {
+        $("div.adjust_chart_y_axis").each(function (i, el) {
             success = self.updateOneYAxis(el) && success
         });
         return success;
     };
 
-    this.updateOneYAxis = function(container) {
+    this.updateOneYAxis = function (container) {
         container = $(container);
         var diaYAxisMin = container.find('.dia-y-axis-min').val();
         var diaYAxisMax = container.find('.dia-y-axis-max').val();
@@ -1438,8 +1438,7 @@ function ChartExporter(args) {
                 });
                 //convert to image
                 try {
-                    downloadCanvas(canvas, "jpeg");
-//        downloadCanvas(canvas, "png");
+                    downloadCanvas(canvas, "png");
                     if (window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
                         deferrerCollection.push($.Deferred());
                         self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
