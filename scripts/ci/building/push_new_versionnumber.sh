@@ -1,13 +1,17 @@
 #!/bin/bash
+
+# Exit  immediately  if  a pipeline (which may consist of a single simple command), a list, or a compound command
+# (see SHELL GRAMMAR above),  exits with a non-zero status.
 set -e
+# After expanding each simple command, for command, case command, select command, or arithmetic for command,
+# display the expanded value of PS4, followed by the command and its expanded  arguments  or  associated word list.
+#set -x
 
 echo "prepare some variables"
 echo "########################################'"
 echo "bamboo_jira_version=$bamboo_jira_version"
 echo "bamboo_jira_version_manually=$bamboo_jira_version_manually"
 echo "bamboo_planRepository_branchName=$bamboo_planRepository_branchName"
-
-touch ./push_new_versionnumber_out
 
 if [ -z $bamboo_jira_version ] && [ -z $bamboo_jira_version_manually ]; then
     echo 'No new version to commit and push since we are not pushing the build numbers anymore'
@@ -30,11 +34,11 @@ else
       remote=origin
 
       echo "git remote remove $remote"
-      git remote remove $remote > ./push_new_versionnumber_out
+      git remote remove $remote
 
       remote_url=https://$bamboo_git_USER_NAME:$bamboo_git_PASSWORD@github.com/iteratec/OpenSpeedMonitor.git
       echo "set remote $remote to '$remote_url'"
-      git remote add -f $remote $remote_url >> ./push_new_versionnumber_out
+      git remote add -f $remote $remote_url
 
       git config user.email 'osm@iteratec.de'
       git config user.name 'bamboo iteratec'
@@ -43,29 +47,27 @@ else
       # while picking up changes (configured in bamboo repositories advanced settings)
       echo "git commit -am '[${jira_version}] version update'"
       git status
-      git commit -am "[${jira_version}] version update" > ./push_new_versionnumber_out
+      git commit -am "[${jira_version}] version update"
 
       echo "pull --rebase $remote release"
-      git pull --rebase $remote release >> ./push_new_versionnumber_out
+      git pull --rebase $remote release
 
       echo "git tag 'v${jira_version}'"
-      git tag "v${jira_version}" >> ./push_new_versionnumber_out
+      git tag "v${jira_version}"
       echo "git push --tags $remote HEAD:refs/heads/release"
-      git push --tags $remote HEAD:refs/heads/release >> ./push_new_versionnumber_out
+      git push --tags $remote HEAD:refs/heads/release
 
       echo "merge version update commit from release to develop branch and push that"
       echo "########################################'"
       echo "git checkout -b develop --track ${remote}/develop"
-      git checkout -b develop --track ${remote}/develop >> ./push_new_versionnumber_out
+      git checkout -b develop --track ${remote}/develop
       echo "git merge release"
-      git merge release >> ./push_new_versionnumber_out
+      git merge release
       echo "git pull --rebase $remote develop"
-      git pull --rebase $remote develop >> ./push_new_versionnumber_out
+      git pull --rebase $remote develop
       echo "git push $remote HEAD:refs/heads/develop"
-      git push $remote HEAD:refs/heads/develop >> ./push_new_versionnumber_out
+      git push $remote HEAD:refs/heads/develop
 
-      echo "push_new_versionnumber_out:"
-      cat ./push_new_versionnumber_out
     else
       echo 'Wrong branch. Committing only into the release branch.'
     fi
