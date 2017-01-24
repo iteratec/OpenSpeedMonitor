@@ -1661,6 +1661,6 @@ function ChartExporter(args) {
 // escapes special characters
 //
 function makeValidSelector(identifier) {
-    return identifier.replace(/(\^|\!|\"|\$|\&|\(|\)|\{|\}|\?|\\|\`|\=|\¸|\,|\*|\+|\~|\'|\#|\-|\_|\.|\:|\,|\;|\<|\>|\/|:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
+    return identifier.replace(/(\^|\!|\"|\$|\&|\(|\)|\{|\}|\?|\\|\`|\=|\¸|\,|\*|\+|\~|\'|\#|\-|\_|\.|\:|\,|\;|\<|\>|\/|:|\.|\[|\]|,|\||\ |\%)/g, "\\$1").slice(1);
 
 }
