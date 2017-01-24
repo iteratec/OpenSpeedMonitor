@@ -33,7 +33,7 @@ class GradleBuildFile {
     public void setVersion(String versionNumber) {
         String writeToFile = 'version "' + versionNumber + '"\n'
         def text = buildFile.text
-        def pattern = ~/version "\d\.\d\.\d\"\n/
+        def pattern = ~/^version "\d\.\d\.\d\[_beta]*"\n/
         buildFile.withWriter { w ->
             w << text.replaceAll(pattern, writeToFile)
         }
