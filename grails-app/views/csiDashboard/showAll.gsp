@@ -206,7 +206,7 @@
                     <div class="btn-group pull-right">
                         <g:actionSubmit id="chart-submit"
                                         value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                        action="showAll" class="btn btn-primary"/>
+                                        action="showAll" class="btn btn-primary show-button"/>
                             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
                                 <span class="caret"></span>
@@ -217,7 +217,7 @@
                                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                     <g:set var="dropdownHasEntries" value="true"/>
                                     <li>
-                                        <a href="#CreateUserspecifiedDashboardModal" role="button" data-toggle="modal">
+                                        <a href="#CreateUserspecifiedDashboardModal" role="button" data-toggle="modal" class="show-button">
                                             ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
                                         </a>
                                     </li>
@@ -226,7 +226,7 @@
                                     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                                         <g:set var="dropdownHasEntries" value="true"/>
                                         <li>
-                                            <a href="#" role="button"
+                                            <a href="#" role="button" class="show-button"
                                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
                                                 ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
                                             </a>
@@ -252,6 +252,7 @@
                             </g:if>
                             </ul>
                     </div>
+                    <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
 
