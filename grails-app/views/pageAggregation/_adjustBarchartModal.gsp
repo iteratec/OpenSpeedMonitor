@@ -107,8 +107,8 @@
 
             <div class="hidden input-group colorpicker-component form-row" id="assign-color-clone">
                 <span class="colorLabel input-group-addon"></span>
-                <input type="text" value="#FFFFFF" class="form-control"/>
-                <span class="input-group-addon adjustChartUnitAddon colorpicker-target"><i></i></span>
+                <input type="text" value="#FFFFFF" class="form-control adjustChartInput"/>
+                <span class="input-group-addon adjustChartColorpickerAddon colorpicker-target"><i></i></span>
             </div>
 
             <div class="hidden" id="y-axis-alias-clone">

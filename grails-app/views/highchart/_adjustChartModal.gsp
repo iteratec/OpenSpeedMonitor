@@ -91,6 +91,24 @@
                         </label>
                     </div>
                 </div>
+                %{--TODO: Kind of works, but the markers/labels are preselected--}%
+                %{--<div class="form-group">--}%
+                    %{--<label class="col-md-3 control-label">--}%
+                        %{--<g:message code="de.iteratec.chart.showElements.name" default="Show"/>--}%
+                    %{--</label>--}%
+                    %{--<div class="col-md-4" data-toggle="buttons">--}%
+                        %{--<div class="btn-group btn-group-justified">--}%
+                            %{--<label class="btn btn-default">--}%
+                                %{--<input type="checkbox" id="to-enable-label" checked="${labelShouldBeEnabled}">--}%
+                                %{--<g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Data Labels"/>--}%
+                            %{--</label>--}%
+                            %{--<label class="btn btn-default">--}%
+                                %{--<input type="checkbox" id="to-enable-marker" checked="${markerShouldBeEnabled}">--}%
+                                %{--<g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Data Points"/>--}%
+                            %{--</label>--}%
+                        %{--</div>--}%
+                    %{--</div>--}%
+                %{--</div>--}%
                 <!-- Add Alias -->
                 <div class="form-group">
                     <div class="col-md-8 col-md-offset-3" id="graphAliasChildlist"></div>
@@ -113,26 +131,52 @@
 </div>
 
 
+%{--<div id="graphAlias_clone" class="graphAlias-div" style="display:none;">--}%
+    %{--<hr />--}%
+    %{--<div class="form-group">--}%
+        %{--<div class="col-md-9">--}%
+            %{--<g:select name="graphName" from="${chartData*.label}" class="form-control"/>--}%
+        %{--</div>--}%
+        %{--<div class="col-md-2">--}%
+            %{--HTML5 color picker, not supported in IE--}%
+            %{--<input type="color" id="color" value="#FFFFFF" class="form-control">--}%
+        %{--</div>--}%
+        %{--<div class="col-md-1">--}%
+            %{--<button type="button" class="close" id="removeButton" aria-label="Remove">--}%
+                %{--<span aria-hidden="true">&times;</span>--}%
+            %{--</button>--}%
+        %{--</div>--}%
+    %{--</div>--}%
+    %{--<div class="form-group">--}%
+        %{--<div class="col-md-12">--}%
+            %{--<g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "enter alias" )}"--}%
+                         %{--name='alias' class="input-alias form-control"/>--}%
+        %{--</div>--}%
+    %{--</div>--}%
+%{--</div>--}%
 <div id="graphAlias_clone" class="graphAlias-div" style="display:none;">
     <hr />
     <div class="form-group">
-        <div class="col-md-9">
-            <g:select name="graphName" from="${chartData*.label}" class="form-control"/>
+        <div class="col-md-10">
+            <g:select name="graphName" class="form-control chosen-select"
+                      from="${chartData*.label}" noSelection="${['':"${message(code: 'de.iteratec.chart.adjustment.chooseGraph', default: 'Choose a Graph')}"]}"/>
         </div>
         <div class="col-md-2">
-            %{--HTML5 color picker, not supported in IE--}%
-            <input type="color" id="color" value="#FFFFFF" class="form-control">
-        </div>
-        <div class="col-md-1">
-            <button type="button" class="close" id="removeButton" aria-label="Remove">
+            <button type="button" class="form-control close" id="removeButton" aria-label="Remove">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "enter alias" )}"
+        <div class="col-md-6">
+            <g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "Enter Alias" )}"
                          name='alias' class="input-alias form-control"/>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group colorpicker-component" id="assign-color-clone">
+                <input type="text" id="color" value="#FFFFFF" class="form-control adjustChartInput"/>
+                <span class="input-group-addon colorpicker-target adjustChartColorpickerAddon"><i></i></span>
+            </div>
         </div>
     </div>
 </div>
