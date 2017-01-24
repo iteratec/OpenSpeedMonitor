@@ -38,6 +38,14 @@ class JobCreatePage extends I18nGebPage {
         }
     }
 
+    public void setLocation(String locationToSet) {
+        location.click() //Open the dropdown to choose location, otherwise the options won't be visible
+        waitFor {
+            location.isDisplayed()
+        }
+        $("#location_chosen").find("li").find { it.text() == locationToSet }.click()
+    }
+
     static content = {
         nameText{$("input",name:"label")}
         location{$("#location_chosen")}
