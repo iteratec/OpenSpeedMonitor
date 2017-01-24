@@ -77,7 +77,7 @@
 
 <form method="get" action="" id="dashBoardParamsForm" data-caller="CsiAggregation">
     <g:if test="${wptCustomerSatisfactionValues}">
-        <ul class="nav nav-tabs card-well-tabs">
+        <ul class="nav nav-tabs card-tabs">
             <li class="active">
                 <a data-toggle="tab" href="#chart-graph" id="chart-toggle">
                     <g:message code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/>
