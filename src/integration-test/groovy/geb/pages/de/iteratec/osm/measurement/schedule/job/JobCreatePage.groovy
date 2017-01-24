@@ -54,8 +54,8 @@ class JobCreatePage extends I18nGebPage {
         jobGroup{$("#jobgroup_chosen")}
         connection{$("#connectivityProfile_chosen")}
         createButton{$("input",name:"_action_save")}
-        jobSettingsTab{$("div.card ul.nav.nav-tabs > li", 0)}
-        scriptTab{$("div.card ul.nav.nav-tabs > li", 1)}
-        advancedSettingsTab{$("div.card ul.nav.nav-tabs > li", 2)}
+        jobSettingsTab{$("#jobSettingsLink")}
+        scriptTab{$("#scriptTabLink")}
+        advancedSettingsTab{$("#advancedSettingsTabLink")}
     }
 }

@@ -57,6 +57,8 @@ class CsiDashboardPage extends I18nGebPage{
         pageTab{$("a",href:"#page-tab")}
         browserTab{$("a",href:"#browser-tab")}
         connectivityTab{$("a",href:"#connectivity-tab")}
+        warningNoJobGroupSelected{$("#warning-no-job-group")}
+        warningNoPageSelected{$("#warning-no-page")}
     }
 
     public void clickSaveAsDashboardButton() {
