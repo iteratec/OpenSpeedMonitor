@@ -10,8 +10,8 @@
     </head>
 
     <body>
-        <g:render template="/layouts/mainMenu"/>
-        <section id="edit-connectivityProfile" class="first">
+        <h1><g:message code="default.edit.label" args="[entityName]"/></h1>
+        <section id="edit-connectivityProfile" class="card">
 
             <g:hasErrors bean="${connectivityProfileInstance}">
                 <div class="alert alert-danger">

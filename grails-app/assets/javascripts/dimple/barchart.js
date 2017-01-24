@@ -1,5 +1,5 @@
 //= require /bower_components/d3/d3.min.js
-//= require /bower_components/dimple/dist/dimple.latest.min.js
+//= require /bower_components/dimple/dist/dimple.v2.2.0.js
 
 "use strict";
 
@@ -8,6 +8,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     var chart = null,
+        chartData = null,
         width = 600,
         height = 600,
         legendPosition = {x: 200, y: 10, width: 100, height: 100},
@@ -33,12 +34,18 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
     };
 
     var drawChart = function (barchartData) {
+        chartData = barchartData;
+
         // Delete old chart in same container
         d3.select("#" + chartIdentifier).selectAll("svg").remove();
+        $("#chart-card").removeClass("hidden");
         var $adjustBarchartButton = $("#adjust-barchart-modal");
+        var $downloadAsPngButton = $("#download-as-png-button");
         if ($adjustBarchartButton.hasClass("hidden"))
             $adjustBarchartButton.removeClass("hidden");
-        initFilterDropdown(barchartData.filterRules);
+        if ($downloadAsPngButton.hasClass("hidden"))
+            $downloadAsPngButton.removeClass("hidden");
+        initFilterDropdown(chartData.filterRules);
 
         // Reset fields
         allMeasurandSeries = {};
@@ -51,17 +58,17 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         chart = new dimple.chart(svg, null);
         chart.setMargins(margins.left, margins.right, margins.top, margins.bottom);
         svg = svg.node();
-        seriesCount = Object.keys(barchartData['series']).length;
+        seriesCount = Object.keys(chartData['series']).length;
 
         // Add x axis
         xAxis = chart.addCategoryAxis("x", "grouping");
-        xAxis.title = barchartData['groupingLabel'];
-        filterRules = barchartData.filterRules;
+        xAxis.title = chartData['groupingLabel'];
+        filterRules = chartData.filterRules;
 
         // Add series
         var seriesId = 0;
-        for (var currentSeriesId in barchartData.series) {
-            var currentSeries = barchartData.series[currentSeriesId];
+        for (var currentSeriesId in chartData.series) {
+            var currentSeries = chartData.series[currentSeriesId];
 
             // get correct y axis
             var yAxis = yAxes[currentSeries['dimensionalUnit']];
@@ -103,7 +110,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         calcChartWidth();
         resize();
 
-        addBarLabels(barchartData);
+        postDraw();
     };
 
     var adjustChart = function () {
@@ -120,12 +127,12 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         // assign colors
         var colorAssignments = [];
         $("#assign-color-container").children().each(function () {
-            colorAssignments.push({"label": $(this).find("label").html(), "color": $(this).find("input").val()});
+            colorAssignments.push({"label": $(this).find(".colorLabel").data('label'), "color": $(this).find("input").val()});
         });
         assignColor(colorAssignments);
 
         // Toggle gridlines
-        showGridlines = $("#inputShowGridlines").prop("checked");
+        showGridlines = $("#inputShowGridlines").parent().hasClass('active');
         if (showGridlines) {
             d3.select(".dimple-gridline").style("opacity", 1);
         } else {
@@ -133,7 +140,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle yAxis
-        showYAxis = $("#inputShowYAxis").prop("checked");
+        showYAxis = $("#inputShowYAxis").parent().hasClass('active');
         if (showYAxis) {
             d3.selectAll(".dimple-axis.dimple-axis-y").style("opacity", 1);
         } else {
@@ -141,7 +148,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle xAxis
-        showXAxis = $("#inputShowXAxis").prop("checked");
+        showXAxis = $("#inputShowXAxis").parent().hasClass('active');
         if (showXAxis) {
             d3.select(".domain.dimple-custom-axis-line").style("opacity", 1);
             d3.select(".dimple-axis-x").selectAll("line").style("opacity", 1);
@@ -151,7 +158,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         // Toggle bar labels
-        showBarLabels = $("#inputShowBarLabels").prop("checked");
+        showBarLabels = $("#inputShowBarLabels").parent().hasClass('active');
         if (showYAxis) {
             d3.selectAll(".bar-label").style("opacity", 1);
         } else {
@@ -159,6 +166,21 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
 
         resize();
+
+        postDraw();
+    };
+
+    var postDraw = function () {
+        toogleFilterCheckmarks();
+        setLegendNames();
+        addBarLabels();
+    };
+
+    var setLegendNames = function () {
+        chart.legends[0].shapes[0].forEach( function (entry) {
+            var legendI18N = entry.firstChild.textContent.replace(entry.textContent, OpenSpeedMonitor.i18n.measurandLabels[entry.textContent]);
+            entry.firstChild.textContent = legendI18N;
+        });
     };
 
     var assignColor = function (colorAssignments) {
@@ -215,14 +237,18 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         var $filterDropdownGroup = $("#filter-dropdown-group");
         var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
 
+        // remove old filter
+        $filterDropdownGroup.find('.filterRule').remove();
+
         if ($filterDropdownGroup.hasClass("hidden"))
             $filterDropdownGroup.removeClass("hidden");
 
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li><a href='#'>" + filterRuleKey + "</a></li>");
+                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
                 link.click(function (e) {
                     filterCustomerJourney(e.target.innerText);
+                    toogleFilterCheckmarks(e.target);
                 });
                 link.insertAfter($customerJourneyHeader);
             }
@@ -230,9 +256,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         $filterDropdownGroup.find("#all-bars-desc").click(function (e) {
             filterCustomerJourney(null, true);
+            toogleFilterCheckmarks(e.target);
         });
         $filterDropdownGroup.find("#all-bars-asc").click(function (e) {
             filterCustomerJourney(null, false);
+            toogleFilterCheckmarks(e.target);
         })
     };
 
@@ -279,6 +307,20 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
         draw(false);
         resize();
+
+        postDraw();
+    };
+
+    var toogleFilterCheckmarks = function (listItem) {
+        $('.filterActive').toggleClass("filterInactive filterActive");
+
+        // reset checkmark to 'descending' if 'Show' gets clicked
+        // otherwise set checkmark to the list item one has clicked on
+        if (typeof listItem == 'undefined') {
+            $('#all-bars-desc > .filterInactive').toggleClass("filterActive filterInactive");
+        } else {
+            $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
+        }
     };
 
     var resize = function () {
@@ -292,21 +334,30 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
         }
     };
 
-    var addBarLabels = function (barchartData) {
+    var addBarLabels = function () {
+        // save width of rectangles for comparison with label width
+        var rectangleWidth = null;
+
         for (var barIndex in allMeasurandSeries) {
-            allMeasurandSeries[barIndex].forEach( function (seriesID, seriesIndex) {
-                // create labels group container
+            allMeasurandSeries[barIndex].forEach(function (seriesID, seriesIndex) {
                 var currentSeriesLabelClass = "dimple-series-group-" + seriesID.toString() + "-labels";
+
+                // remove labels if they exist and replot them afterwards
+                d3.selectAll("." + currentSeriesLabelClass).remove();
+
+                // create labels group container
                 chart.svg.append("g").attr("class", currentSeriesLabelClass);
 
                 var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesID).selectAll("rect");
-                currentSeriesRects[0].forEach( function (rectangle, rectangleIndex) {
+                currentSeriesRects[0].forEach(function (rectangle, rectangleIndex) {
+                    rectangleWidth = rectangle.width.baseVal.value;
+
                     // get the unit
                     // stacked/overlayed bars can only be of the same dimensional unit, therefore accessing the first is sufficient
-                    var unit = barchartData.series[barIndex].dimensionalUnit;
+                    var unit = chartData.series[barIndex].dimensionalUnit;
                     // get the measurand value and format it
                     var barchartSeriesDataIndex = seriesIndex * currentSeriesRects[0].length + rectangleIndex;
-                    var value = barchartData.series[barIndex].data[barchartSeriesDataIndex].indexValue.toString();
+                    var value = chartData.series[barIndex].data[barchartSeriesDataIndex].indexValue.toString();
                     value = (unit == "%") ? parseFloat(value).toFixed(1) : Math.round(value);
 
                     // set the label
@@ -331,6 +382,35 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
                     currentSeriesLabels.style("opacity", 0);
             });
         }
+
+        // check if labels need to be rotated
+        var rotate = false;
+        d3.selectAll(".bar-label").each(function () {
+            if (d3.select(this).node().getComputedTextLength() > rectangleWidth) {
+                rotate = true;
+            }
+        });
+
+        if (rotate)
+            rotateLabels();
+    };
+
+    var rotateLabels = function () {
+        d3.selectAll(".bar-label")
+            .style("text-anchor", "start")
+            .each(function () {
+                var x = d3.select(this).attr("x");
+                var y = d3.select(this).attr("y");
+                // get the translate value
+                var t = d3.transform(d3.select(this).attr("transform"));
+                var translateX = t.translate[0];
+                var translateY = t.translate[1];
+                // calculate the x value for rotation
+                var rotateX = parseFloat(x) + translateX;
+                console.log(rotateX);
+                d3.select(this)
+                    .attr("transform", "translate(" + translateX + "," + translateY + ")rotate(" + -45 + ", " + x + ", " + y + ")");
+            });
     };
 
     var getXLabel = function () {

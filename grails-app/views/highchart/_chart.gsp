@@ -19,7 +19,8 @@
 		optimizeForExport="${optimizeForExport}"
 		openDataPointLinksInNewWindow="${openDataPointLinksInNewWindow}"
 		exportUrl="${exportUrl}"
-        annotations="${annotations}"/>
+        annotations="${annotations}"
+		downloadPngLabel="${downloadPngLabel}" />
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart
@@ -42,6 +43,7 @@
 		exportUrl="${exportUrl}"
 		heightOfChart="${initialChartHeight}"
 		width="${initialChartWidth}"
-		annotations="${annotations}"/>
+		annotations="${annotations}"
+		downloadPngLabel="${downloadPngLabel}" />
 </g:else>
 <g:render template="/highchart/adjustChartModal" model="${model}" />

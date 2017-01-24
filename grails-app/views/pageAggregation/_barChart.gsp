@@ -6,21 +6,40 @@
                 class="caret"></span>
         </button>
         <ul class="dropdown-menu pull-right">
-            <li id="all-bars-header" class="dropdown-header"><g:message
-                    code="de.iteratec.osm.dimple.barchart.filter.noFilterHeader" default="no filter"/></li>
-            <li><a id="all-bars-desc" href="#"><g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterDesc"
-                                                          default="no filter, sorting desc"/></a></li>
-            <li><a id="all-bars-asc" href="#"><g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterAsc"
-                                                         default="no filter, sorting asc"/></a></li>
-            <li id="customer-journey-header" class="dropdown-header"><g:message
-                    code="de.iteratec.osm.dimple.barchart.filter.customerJourneyHeader"
-                    default="Customer Journey"/></li>
+            <li id="all-bars-header" class="dropdown-header">
+                <g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterHeader" default="no filter"/>
+            </li>
+            <li>
+                <a id="all-bars-desc" href="#">
+                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                    <g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterDesc"
+                               default="no filter, sorting desc"/>
+                </a>
+            </li>
+            <li>
+                <a id="all-bars-asc" href="#">
+                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                    <g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterAsc"
+                               default="no filter, sorting asc"/>
+                </a>
+            </li>
+            <li id="customer-journey-header" class="dropdown-header">
+                <g:message code="de.iteratec.osm.dimple.barchart.filter.customerJourneyHeader"
+                           default="Customer Journey"/>
+            </li>
         </ul>
     </div>
-    <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
-       class="hidden" onclick="initModalDialogValues()">
-        <i class="fa fa-sliders"></i>
-    </a>
+    <div class="in-chart-buttons">
+        <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
+           class="hidden" onclick="initModalDialogValues()">
+            <i class="fa fa-sliders"></i>
+        </a>
+        <a href="#downloadAsPngModal" id="download-as-png-button"
+           class="hidden" data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
+           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
+            <i class="fa fa-download"></i>
+        </a>
+    </div>
 
     <div id="svg-container">
     </div>

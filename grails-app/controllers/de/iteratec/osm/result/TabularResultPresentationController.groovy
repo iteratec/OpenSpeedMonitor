@@ -25,8 +25,6 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.persistence.OsmDataSourceService
-import de.iteratec.osm.report.UserspecificCsiDashboardController
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
@@ -34,7 +32,6 @@ import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.PerformanceLoggingService
 import org.joda.time.DateTime
 import org.joda.time.Interval
 
@@ -59,7 +56,6 @@ class TabularResultPresentationController {
     MeasuredEventDaoService measuredEventDaoService
     BrowserDaoService browserDaoService
     LocationDaoService locationDaoService
-    PerformanceLoggingService performanceLoggingService
 
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
@@ -74,9 +70,8 @@ class TabularResultPresentationController {
 
         EventResultListing eventResultsListing = new EventResultListing();
         PaginationListing paginationListing = new PaginationListing();
-
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
-        if( !ControllerUtils.isEmptyRequest(params) ) {
+        if( !ControllerUtils.isEmptyRequest(params)) {
             if(!cmd.validate() )
             {
                 modelToRender.put('command', cmd)

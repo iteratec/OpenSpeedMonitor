@@ -19,14 +19,12 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.RickshawTransformableCsMapping
-import de.iteratec.osm.result.CachedView
 import groovy.json.StringEscapeUtils
-
 
 class RickshawHtmlCreater {
 
-    def generateCsiMappingsChartHtml = {chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
-                                        chartBottomOffset, yAxisTopOffset, bottomOffsetLegend ->
+    def generateCsiMappingsChartHtml = { chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
+                                         chartBottomOffset, yAxisTopOffset, bottomOffsetLegend ->
 
         def sw = new StringWriter()
 
@@ -35,7 +33,9 @@ class RickshawHtmlCreater {
 
         sw << """
         <div id="chart_container_${chartIdentifier} style="position: relative;margin-left: 25px;">
-            <div id="y_axis_${chartIdentifier}" style="position:relative;right:${yAxisRightOffset}px;top:${yAxisTopOffset}px"></div>
+            <div id="y_axis_${chartIdentifier}" style="position:relative;right:${yAxisRightOffset}px;top:${
+            yAxisTopOffset
+        }px"></div>
             <div id="chart_${chartIdentifier}" style="position:relative;bottom:${chartBottomOffset}px;"></div>
             <div id="legend_container_${chartIdentifier}">
                 <div id="smoother_${chartIdentifier}" title="Smoothing"></div>
@@ -52,7 +52,7 @@ class RickshawHtmlCreater {
      * to place its components. Additional a javascript function
      * will be called, which is responsible to draw the rickshaw graph.
      */
-    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax ->
+    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax, String downloadPngLabel ->
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
         def height = heightOfChart
@@ -65,16 +65,22 @@ class RickshawHtmlCreater {
             title = "";
         }
 
-        sw <<"""
+        sw << """
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title"></div>
 			<div id="rickshaw_label_summary_box">
                 <div id="rickshaw_chart_label_summary">${labelSummary}</div>
             </div>
 			<div id="rickshaw_main" style="height: ${height}">
-                <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
-                    <i class="fa fa-sliders"></i>
-                </a>
+                <div class="in-chart-buttons">
+                    <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
+                        <i class="fa fa-sliders"></i>
+                    </a>
+                    <a href="#" id="dia-save-chart-as-png" title="${downloadPngLabel}">
+                        <i class="fa fa-download"></i>
+                    </a>
+                </div>
+                
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
 				<div id="rickshaw_chart"></div>
@@ -133,7 +139,7 @@ class RickshawHtmlCreater {
         graphs.each { graph ->
             def label = ""
             yAxesLabels.each { eachLabel ->
-                if( eachLabel.group == graph.measurandGroup) {
+                if (eachLabel.group == graph.measurandGroup) {
                     label = eachLabel.labelI18NIdentifier
                 }
             }
@@ -159,17 +165,17 @@ class RickshawHtmlCreater {
         String testingAgent
 
         sw << """[ """
-		graph.getPoints().each {eachPoint ->
+        graph.getPoints().each { eachPoint ->
 
             def url = "undefined"
-			def csiAggregation = eachPoint.csiAggregation
+            def csiAggregation = eachPoint.csiAggregation
 
-            if(measurandGroup == "REQUEST_SIZES" ) {
+            if (measurandGroup == "REQUEST_SIZES") {
                 csiAggregation = csiAggregation / 1000;
             }
 
-			if (eachPoint.sourceURL != null) {
-				url = eachPoint.sourceURL.toString();
+            if (eachPoint.sourceURL != null) {
+                url = eachPoint.sourceURL.toString();
             }
 
             def wptResultInfo = null
@@ -179,12 +185,18 @@ class RickshawHtmlCreater {
 
                 // json object containing all relevant infos to create a url to jump to wpt
                 def pointInfo = eachPoint.chartPointWptInfo
-                wptResultInfo =  """{ wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}", testId: "${pointInfo.testId.toString()}", numberOfWptRun: "${pointInfo.numberOfWptRun.toString()}", oneBaseStepIndexInJourney: "${pointInfo.oneBaseStepIndexInJourney.toString()}", cachedView: ${cached} }""";
+                wptResultInfo = """{ wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}", testId: "${
+                    pointInfo.testId.toString()
+                }", numberOfWptRun: "${pointInfo.numberOfWptRun.toString()}", oneBaseStepIndexInJourney: "${
+                    pointInfo.oneBaseStepIndexInJourney.toString()
+                }", cachedView: ${cached} }""";
             }
 
 
-            testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-            sw << prefix +"""{ x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${testingAgent}, wptResultInfo: ${wptResultInfo} }"""
+            testingAgent = eachPoint.testingAgent != null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
+            sw << prefix + """{ x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${
+                testingAgent
+            }, wptResultInfo: ${wptResultInfo} }"""
             prefix = ", "
         }
         sw << """ ]"""
@@ -199,16 +211,16 @@ class RickshawHtmlCreater {
         def sw = new StringWriter()
         sw << "["
 
-        Map seriesData = [:].withDefault{key -> new HashMap<Integer, Double>()}
-        transformableMappings.each {mapping ->
-            seriesData[mapping.retrieveGroupingCriteria()][mapping.retrieveLoadTimeInMilliSecs()]=mapping.retrieveCustomerSatisfactionInPercent()
+        Map seriesData = [:].withDefault { key -> new HashMap<Integer, Double>() }
+        transformableMappings.each { mapping ->
+            seriesData[mapping.retrieveGroupingCriteria()][mapping.retrieveLoadTimeInMilliSecs()] = mapping.retrieveCustomerSatisfactionInPercent()
         }
-        seriesData.each {String name, Map loadTimeToCsMap ->
+        seriesData.each { String name, Map loadTimeToCsMap ->
             sw << " { "
             sw << " name: '${name}', "
             sw << " color: palette.color(), "
             sw << " data: [ "
-            loadTimeToCsMap.keySet().sort().each{loadTime ->
+            loadTimeToCsMap.keySet().sort().each { loadTime ->
                 sw << " {x: ${loadTime}, y: ${loadTimeToCsMap[loadTime]}}, "
             }
             sw << " ]}, "

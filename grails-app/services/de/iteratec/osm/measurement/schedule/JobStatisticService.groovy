@@ -39,7 +39,7 @@ class JobStatisticService {
         return jobStatistic
     }
 
-    private List<JobResult> getLast150CompletedJobResultsFor(Job job){
+    List<JobResult> getLast150CompletedJobResultsFor(Job job){
         return  JobResult.createCriteria().list{
             eq("job", job)
             order("date", "desc")

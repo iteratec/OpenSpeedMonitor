@@ -15,210 +15,230 @@
 
 <body>
 <%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
-        <g:form>
-            <g:if test="${!measurementsEnabled}">
-                <div class="alert alert-warning">
-                    <h4><g:message code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.header"
-                                   default="Warning!"/></h4>
-                    <g:message
-                            code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.content"
-                            default="Measurements are generally disabled! Even active jobs won't get started until measurements are generally enabled again. Ask your administrator for activation."/>
-                    <br>
-                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-                        <g:actionSubmit class="btn btn-sm btn-warning" action="activateMeasurementsGenerally"
-                                        value="${message(code: 'de.iteratec.osm.measurement.schedule.general.activation.label', default: 'Activate measurements')}"/>
-                    </sec:ifAnyGranted>
-                </div>
-            <%--
-            here should be a link for enabling measurements generally
-            <g:createLink absolute="true" ... />
-            --%>
-            </g:if>
-            <g:else>
-            <%--
-            here should be a link for disabling measurements generally
-            <g:createLink absolute="true" ... />
-            --%>
-            </g:else>
-            <g:if test="${saveError}">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="alert alert-danger">
-                            <g:message error="${saveError}"/>
-                        </div>
-                    </div>
-                </div>
-            </g:if>
-            <g:if test="${saveSuccess}">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="alert alert-success">${saveSuccess}</div>
-                    </div>
-                </div>
-            </g:if>
-            <legend><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" class="control-label"/></legend>
-            <div class="row">
-                <div class="col-md-3">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
-                           placeholder="<g:message code="Job.list.filter" default="Jobs filtern"/>"
-                           name="filters.filterByLabel" value="${filters?.filterByLabel}"/>
-                </div>
-                <div class="col-md-3">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                           id="filterByJobGroup"
-                           placeholder="<g:message code="Job.list.filterByGroup" default="Job-Gruppen filtern"/>"
-                           name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}"/>
-                </div>
-                <div class="col-md-3">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                           id="filterByLocation"
-                           placeholder="<g:message code="Job.list.filterByLocation" default="Locations filtern"/>"
-                           name="filters.filterByLocation" value="${filters?.filterByLocation}"/>
-                </div>
-                <div class="col-md-3">
-                    <select id="filterTags" multiple data-placeholder="${message(code: 'job.filter.filterTags')}"
-                            class="chosen-select form-control"
-                            name="filters.filterTags">
-                        <g:each in="${Job.allTags}">
-                            <option ${filters && it in filters.filterTags ? 'selected' : ''}>${it}</option>
-                        </g:each>
-                    </select>
+<h1><g:message code="de.iteratec.isocsi.csi.jobs.heading" default="Jobs" /></h1>
+<div class="card">
+<g:form>
+    <g:if test="${!measurementsEnabled}">
+        <div class="alert alert-warning">
+            <h4><g:message code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.header"
+                           default="Warning!"/></h4>
+            <g:message
+                    code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.content"
+                    default="Measurements are generally disabled! Even active jobs won't get started until measurements are generally enabled again. Ask your administrator for activation."/>
+            <br>
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+                <g:actionSubmit class="btn btn-sm btn-warning" action="activateMeasurementsGenerally"
+                                value="${message(code: 'de.iteratec.osm.measurement.schedule.general.activation.label', default: 'Activate measurements')}"/>
+            </sec:ifAnyGranted>
+        </div>
+    <%--
+    here should be a link for enabling measurements generally
+    <g:createLink absolute="true" ... />
+    --%>
+    </g:if>
+    <g:else>
+    <%--
+    here should be a link for disabling measurements generally
+    <g:createLink absolute="true" ... />
+    --%>
+    </g:else>
+    <g:if test="${saveError}">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">
+                    <g:message error="${saveError}"/>
                 </div>
             </div>
-
+        </div>
+    </g:if>
+    <g:if test="${saveSuccess}">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success">${saveSuccess}</div>
+            </div>
+        </div>
+    </g:if>
+    %{--Results of deleting selected jobs--}%
+    <g:if test="${performedAction == 'deleteSelectedJobs'}">
+        <g:if test="${massExecutionResults.values().any {it.status == 'success'}}">
             <div class="row">
-                <div class="col-md-3">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterBySkript"
-                           placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern"/>"
-                           name="filters.filterBySkript" value="${filters?.filterBySkript}"/>
+                <div class="col-md-12">
+                    <div class="alert alert-success">
+                        <g:each in="${massExecutionResults.values().findAll {it.status == 'success'}}">${it.message}<br /></g:each>
+                    </div>
                 </div>
-                <div class="col-md-3 col-md-offset-3">
-                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                           id="filterByBrowser"
-                           placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern"/>"
-                           name="filters.filterByBrowser" value="${filters?.filterByBrowser}"/>
+            </div>
+        </g:if>
+        <g:if test="${massExecutionResults.values().any {it.status == 'error'}}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <g:each in="${massExecutionResults.values().findAll {it.status == 'error'}}">${it.message}<br /></g:each>
+                    </div>
                 </div>
-                %{--Filter by JobSet--}%
-                <div class="col-md-3">
-                    <div class="btn-group">
-                        <div class="btn-group">
-                            <button id="jobSetButton" class="btn-default btn btn-sm dropdown-toggle"
-                                    type="button" data-toggle="dropdown">
-                                <g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet"/>
-                                <span class="caret"></span>
+            </div>
+        </g:if>
+    </g:if>
+    <div class="alert alert-warning" id="serverdown">
+        <a class="close" data-dismiss="alert">×</a>
+        <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
+    </div>
+
+    <div id="filterRow">
+        <div class="btn-group" id="actionForSelectedContainer">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                    id="actionForSelected">
+                <span class="caret"></span>
+                <g:message code="job.list.actionForSelected" default="Action"/>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button type="submit" name="_action_execute">
+                        <i class="fa fa-play"></i>
+                        <g:message code="de.iteratec.isj.job.runonce" default="Run now" />
+                    </button>
+                </li>
+                <li>
+                    <button type="submit" name="_action_activate">
+                        <i class="fa fa-toggle-on"></i>
+                        <g:message code="de.iteratec.isj.job.activate" default="Activate" />
+                    </button>
+                </li>
+                <li>
+                    <button type="submit" name="_action_deactivate">
+                        <i class="fa fa-toggle-off"></i>
+                        <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate" />
+                    </button>
+                </li>
+                <sec:ifLoggedIn>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                        <li>
+                            <button type="submit" name="_action_deleteSelectedJobs">
+                                <i class="fa fa-trash-o"></i>
+                                <g:message code="de.iteratec.isj.job.delete" default="Delete" />
                             </button>
-                            <ul class="dropdown-menu">
-                                <g:if test="${jobSets.size > 0}">
-                                    <g:each in="${jobSets}" var="jobSet">
-                                        <li><a id="${jobSet.name}" href="#"
-                                               onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>
-                                        </li>
-                                    </g:each>
-                                </g:if>
-                                <g:else>
-                                    <li><g:message code="de.iteratec.osm.job.filterNoJobSet" default="Kein JobSet"/> </li>
-                                </g:else>
-                            </ul>
-                        </div>
-                        <button type="button" class="btn-default btn btn-sm"
-                                onclick="clearFilterJobSet('<g:message code="de.iteratec.osm.job.filterHeadline"
-                                default="Filter by JobSet" />')">&#160;&times;</button>
+                        </li>
+                    </sec:ifAnyGranted>
+                </sec:ifLoggedIn>
+                <li role="separator" class="divider"></li>
+                <li>
+                    <div id="add-tag-container" class="input-group input-group-sm">
+                        <input id="add-tag-input" class="form-control" placeholder="tag">
+                        <a href="#" id="add-tag-confirm-button"
+                           class="btn btn-primary btn-sm input-group-addon">${message(code: "de.iteratec.isj.job.addTag", default: "add Tag")}
+                        </a>
                     </div>
-                </div>
-            </div>
-            <div class="section-xl">
-                <div class="checkbox-inline">
-                    <g:checkBox onchange="filterJobList()" id="filterCheckedJobs" class="checkbox-inline"
-                                name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
-                    <label for="filterCheckedJobs"><g:message code="job.filter.filterCheckedJobs"/></label>
-                </div>
-                <div class="checkbox-inline">
-                    <g:checkBox onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox-inline"
-                                name="filters.filterHighlightedJobs" value="${filters?.filterHighlightedJobs}"/>
-                    <label for="filterHighlightedJobs"><g:message code="job.filter.filterHighlightedJobs"/></label>
-                </div>
-                <div class="checkbox-inline">
-                    <g:checkBox onchange="filterJobList()" id="filterRunningJobs" class="checkbox-inline"
-                                name="filters.filterRunningJobs" value="${filters?.filterRunningJobs}"/>
-                    <label for="filterRunningJobs"><g:message code="job.filter.filterRunningJobs"/></label>
-                </div>
-                <div class="checkbox-inline">
-                    <g:checkBox onchange="filterJobList()" id="filterInactiveJobs" class="checkbox-inline"
-                                name="filters.filterInactiveJobs" value="${filters?.filterInactiveJobs}"/>
-                    <label for="filterInactiveJobs"><g:message code="job.filter.filterInactiveJobs"/></label>
-                </div>
-            </div>
-            <div class="row table-filter">
-                <div class="col-md-6">
-                    <i class="fa fa-arrow-down"></i>
-                    <g:message code="de.iteratec.isj.job.selected"
-                               default="Markierte Jobs"/>:&nbsp;
-                    <div class="btn-group">
-                        <g:actionSubmit action="activate" class="btn btn-default"
-                                        value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
-
-
-                        <g:actionSubmit action="deactivate" class="btn btn-default"
-                                        value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
-                        <g:actionSubmit class="btn btn-info" action="execute"
-                                        value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
+                </li>
+                <li>
+                    <div id="remove-tag-container">
+                    <select id="remove-tag-select" class="input-sm chosen-select chosen">
+                        <option value="0" disabled selected>${message(code: "de.iteratec.isj.job.removeTag", default: "remove Tag")}</option>
+                    </select>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <g:field type="text" name="jobSetName" class="form-control"
-                                 placeholder="${message(code: 'de.iteratec.osm.job.savePlaceholder', default: 'placeholder')}"/>
-                        <span class="input-group-btn">
-                            <g:actionSubmit action="saveJobSet" class="btn btn-default"
-                                            value="${message(code: 'de.iteratec.osm.job.jobSetSaveButton', default: 'save jobSet')}"/>
-                        </span>
-                    </div>
-                </div>
+                </li>
+            </ul>
+        </div>
 
-                <div class="col-md-3">
-                    <a href="<g:createLink action="create"/>" class="btn btn-primary">
-                        <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
-                    </a>
-                    <a href="#" id="updateHints" class="fa fa-question-circle fa-lg pull-right" data-toggle="popover"
-                        title="${g.message(code: 'de.iteratec.osm.joblist.activeruns.title', default: 'Active job runs')}"
-                       data-placement="bottom" data-content="${render(template: "updateHints")}" data-trigger="hover" data-html="true"></a>
-                </div>
-            </div>
+        <div id="filterInputContainer">
+            <input class="form-control" type="text" id="filterInput"
+                   placeholder="<g:message code="job.list.filter" default="Jobs filtern"/>"
+                   name="filter" value="${filters?.filter}"/>
+            <span class="fa fa-times-circle" id="clearFilter"></span>
+        </div>
 
+        <div class="filterButtonsContainer">
+            <span class="description">
+                <g:message code="job.list.filter.by" default="by"/>
+            </span>
+            <span class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByName" name="filters.filterByName"/>
+                    <g:message code="job.list.filter.by.name" default="Name"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByScript" name="filters.filterByScript"/>
+                    <g:message code="job.list.filter.by.script" default="Script"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByJobGroup" name="filters.filterByJobGroup"/>
+                    <g:message code="job.list.filter.by.group" default="Job Group"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByLocation" name="filters.filterByLocation"/>
+                    <g:message code="job.list.filter.by.location" default="Location"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByBrowser" name="filters.filterByBrowser"/>
+                    <g:message code="job.list.filter.by.browser" default="Browser"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterByTags" name="filters.filterByTags"/>
+                    <g:message code="job.list.filter.by.tags" default="Tags"/>
+                </label>
+            </span>
+        </div>
 
-            <div class="alert alert-warning" id="serverdown">
-                <a class="close" data-dismiss="alert">×</a>
-                <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
+        <div class="filterButtonsContainer" id="filterShowOnly">
+            <span class="description"><g:message code="job.list.filter.showOnly" default="Show only"/></span>
+
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default active">
+                    <input type="checkbox" id="filterActiveJobs" name="filters.filterActiveJobs" checked/>
+                    <g:message code="job.list.filter.activeJobs"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterCheckedJobs" name="filters.filterCheckedJobs"/>
+                    <g:message code="job.list.filter.checkedJobs"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterHighlightedJobs" name="filters.filterHighlightedJobs"/>
+                    <g:message code="job.list.filter.highlightedJobs"/>
+                </label>
+                <label class="btn btn-default">
+                    <input type="checkbox" id="filterRunningJobs" name="filters.filterRunningJobs"/>
+                    <g:message code="job.list.filter.runningJobs"/>
+                </label>
             </div>
-            <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <table class="table table-striped" id="jobtable">
-                <thead class="header">
-                <tr>
-                    <th><input type="checkbox" id="checkAll"/></th>
-                    <g:set var="titleHeader"><g:message code="de.iteratec.isj.job" default="Job"/><br/>
-                        <span style="font-weight: normal"><g:message
-                                code="de.iteratec.iss.script" default="Skript"/>
-                        </span>
-                    </g:set>
-                    <g:set var="executionScheduleLabel">
-                        <g:message code="job.executionSchedule.label" default="Execution Schedule"/>
-                    </g:set>
-                    <g:sortableColumn property="label" title="${titleHeader}"/>
-                    <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>
-                    <g:sortableColumn property="location.uniqueIdentifierForServer" titleKey="job.location.label"/>
-                    <g:sortableColumn property="location.browser.name" titleKey="browser.label"/>
-                    <g:sortableColumn property="lastRun" titleKey="job.lastRun.label" title="Zuletzt ausgeführt"/>
-                    <g:sortableColumn property="nextExecutionTime" titleKey="job.nextRun.label"/>
-                    <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
-                    <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
-                    <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
-                </tr>
-                </thead>
-                <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
-            </table>
-            </div>
-        </g:form>
+        </div>
+
+        <div id="createJobContainer">
+            <a href="<g:createLink action="create"/>" class="btn btn-primary pull-right">
+                <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
+            </a>
+        </div>
+    </div>
+
+    <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
+    <table class="table" id="jobtable">
+        <thead class="header">
+        <tr>
+            <th><input type="checkbox" id="checkAll"/></th>
+            <g:set var="titleHeader">
+                <g:message code="de.iteratec.isj.job" default="Job"/><br/>
+                <span class="script"><g:message
+                        code="de.iteratec.iss.script" default="Skript"/>
+                </span>
+            </g:set>
+            <g:set var="executionScheduleLabel">
+                <abbr title="<g:message code="job.executionSchedule.hint" default="Cron String"/>">
+                    <g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                </abbr>
+            </g:set>
+            <g:sortableColumn property="label" title="${titleHeader}"/>
+            <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>
+            <g:sortableColumn property="location.uniqueIdentifierForServer" titleKey="job.location.label"/>
+            <g:sortableColumn property="location.browser.name" titleKey="browser.label"/>
+            <g:sortableColumn property="lastRun" titleKey="job.lastRun.label" title="Zuletzt ausgeführt"/>
+            <g:sortableColumn property="nextExecutionTime" titleKey="job.nextRun.label"/>
+            <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
+            <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
+            <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
+        </tr>
+        </thead>
+        <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
+    </table>
+</g:form>
+</div>
 <content tag="include.bottom">
     <asset:javascript src="prettycron/prettycronManifest.js"/>
     <asset:javascript src="job/jobList.js"/>

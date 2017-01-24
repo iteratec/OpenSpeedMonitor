@@ -11,46 +11,52 @@
     </head>
 
     <body>
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
-
         <section id="${mode}-job" class="first">
             <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
             <g:render template="messages"/>
-
-            <p><g:message code="default.form.asterisk"/></p>
-
+            %{--<p>--}%
+                %{--<g:message code="default.form.asterisk"/>--}%
+            %{--</p>--}%
             <g:form resource="${entity}" method="post" role="form" class="form-horizontal">
+
                 <g:hiddenField name="id" value="${entity?.id}"/>
                 <g:hiddenField name="version" value="${entity?.version}"/>
-                <fieldset class="form">
-                    <g:render template="form"/>
-                </fieldset>
 
-                <div>
-                    <g:if test="${mode == 'edit'}">
-                        <g:actionSubmit class="btn btn-primary" action="update"
-                                        value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
-                        <g:actionSubmit class="btn btn-primary" action="save"
-                                        value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
-                                        onclick="return promptForDuplicateName();"/>
-                    </g:if>
-                    <g:elseif test="${mode == 'create'}">
-                        <g:actionSubmit class="btn btn-primary" action="save"
-                                        value="${message(code: 'default.button.create.label', default: 'Create')}"/>
-                    </g:elseif>
+                <div class="card">
+                    <fieldset class="form">
+                        <g:render template="form"/>
+                    </fieldset>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <g:if test="${mode == 'edit'}">
+                                <g:actionSubmit class="btn btn-primary" action="update"
+                                                value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
+                                <g:actionSubmit class="btn btn-primary" action="save"
+                                                value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
+                                                onclick="return promptForDuplicateName();"/>
+                            </g:if>
+                            <g:elseif test="${mode == 'create'}">
+                                <g:actionSubmit class="btn btn-primary" action="save"
+                                                value="${message(code: 'default.button.create.label', default: 'Create')}"/>
+                            </g:elseif>
 
-                    <a href="<g:createLink action="list"/>" class="btn btn-warning"
-                       onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
-                        <g:message code="default.button.cancel.label" default="Abbrechen"/>
-                    </a>
+                            <a href="<g:createLink action="list"/>" class="btn btn-warning"
+                               onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
+                                <g:message code="default.button.cancel.label" default="Abbrechen"/>
+                            </a>
 
-                    <g:if test="${mode == 'edit'}">
-                        <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink: controllerLink]"/>
-                        <g:actionSubmit class="btn btn-info" action="execute"
-                                        value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}"
-                                        onclick="this.form.target='_blank';return true;"/>
-                    </g:if>
+                            <g:if test="${mode == 'edit'}">
+                                <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink: controllerLink]"/>
+                                <g:actionSubmit class="btn btn-info" action="execute"
+                                                value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}"
+                                                onclick="this.form.target='_blank';return true;"/>
+                            </g:if>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <g:message code="default.form.asterisk"/>
+                        <div>
+                    </div>
                 </div>
             </g:form>
         </section>
@@ -104,12 +110,16 @@
                     }
 
                     window.addEventListener("CodeMirrorManifestArrived",function(){
-                        var editor = new CodemirrorEditor({
+                        var editor = OpenSpeedMonitor.script.codemirrorEditor.init({
                             idCodemirrorElement: "navigationScript",
                             i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
                             i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',
                             i18nMessage_DANGLING_SETEVENTNAME_STATEMENT: '${message(code: 'script.DANGLING_SETEVENTNAME_STATEMENT.warning')}',
                             i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
+                            i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
+                            i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
+                            i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
+                            i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
                             measuredEvents: [],
                             linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                             linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',

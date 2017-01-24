@@ -87,13 +87,15 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-default" id="addAliasButton" onclick="addAlias();">
+                <button type="button" class="btn btn-default" id="addAliasButton" onclick="addAlias();">
                     <i class="fa fa-plus"></i>
-                    <g:message code="de.iteratec.chart.adjustment.aliases" default="aliases"/>
+                    <g:message code="de.iteratec.chart.adjustment.aliases" default="Aliases"/>
                 </button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <g:message code="de.iteratec.ism.ui.button.close" default="Close" />
+                </button>
                 <button type="button" class="btn btn-primary" id="adjustChartApply">
-                    <g:message code="de.iteratec.ism.ui.button.apply.name"/>
+                    <g:message code="de.iteratec.ism.ui.button.apply.name" default="Apply"/>
                 </button>
             </div>
         </div>

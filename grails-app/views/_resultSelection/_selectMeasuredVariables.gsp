@@ -17,7 +17,7 @@ A row with 3 cards to select the measured variables for first view, repeat view,
         ]"/>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <g:render template="/_resultSelection/trimValuesCard" model="[
                 trimBelowLoadTimes    : trimBelowLoadTimes,
                 trimAboveLoadTimes    : trimAboveLoadTimes,

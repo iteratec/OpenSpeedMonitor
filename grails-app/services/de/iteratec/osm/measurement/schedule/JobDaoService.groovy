@@ -17,7 +17,7 @@ class JobDaoService {
 
     public Job getJobById(Long jobId) {
         Job job = Job.get(jobId)
-        if(!job || job.deleted) {
+        if (!job || job.deleted) {
             return null
         }
         return job
@@ -40,7 +40,7 @@ class JobDaoService {
     }
 
     public List<Job> getJobs(Map listParams) {
-        return Job.list(listParams).findAll {it.deleted == false}
+        return Job.list(listParams).findAll { it.deleted == false }
     }
 
     public List<Job> getJobs(JobGroup jobGroup) {
@@ -54,5 +54,21 @@ class JobDaoService {
 
     public List<String> getTags(String term, int max) {
         return Job.findAllTagsWithCriteria([max: max]) { ilike('name', "${term}%") }
+    }
+
+    /**
+     * Returns a map <JobID, JobLabel>
+     */
+    Map<Long, String> getJobLabels() {
+        Job.createCriteria().list {
+            eq('deleted', false)
+            order('label')
+            projections {
+                property('id')
+                property('label')
+            }
+        }.collectEntries {
+            b -> [b[0] as long, b[1]]
+        }
     }
 }

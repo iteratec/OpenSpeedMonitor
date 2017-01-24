@@ -40,7 +40,6 @@ class Location {
     Date	lastUpdated
 
     Boolean active
-    int valid
     /**
      * <h1>While fetching locations from server:</h1>
      * Fits location-tag in location-xml.
@@ -60,7 +59,6 @@ class Location {
         label(maxSize: 150)
         uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: ['wptServer', 'browser'])
         active(nullable: false)
-        valid(range: 0 .. 1)
         wptServer(nullable: false)
         location(maxSize: 100)
         browser(maxSize: 20)

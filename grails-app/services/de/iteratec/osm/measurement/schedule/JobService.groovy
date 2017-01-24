@@ -102,40 +102,18 @@ class JobService {
      */
     void deleteJob(Job job) {
         Job.withSession {
-            removeJobFromJobSet(job)
             markAsDeleted(job)
         }
     }
 
     private void markAsDeleted(Job job) {
-        job.label = job.label + "_deleted_id_" + job.id
-        job.active = false
-        job.deleted = true
-        job.save(failOnError: true, flush: true)
-    }
-
-    /**
-     * Removes deleted Job from JobSets.
-     * If it was the last job in JobSet, the jobSet gets deleted
-     */
-    private void removeJobFromJobSet(Job job) {
-        List<JobSet> jobSets = JobSet.createCriteria().list {
-            'jobs' {
-                idEq(job.id)
-            }
+        if (!job.deleted) {
+            job.label = job.label + "_deleted_id_" + job.id
+            job.active = false
+            job.deleted = true
+            job.script = null
+            job.save(failOnError: true, flush: true)
         }
-
-        List<JobSet> jobSetsToRemove = []
-        jobSets.each {
-            if (it.jobs.size() == 1) {
-                jobSetsToRemove << it
-            } else {
-                it.jobs.remove(job)
-                it.save(flush: true)
-            }
-        }
-
-        jobSetsToRemove*.delete(flush: true)
     }
 
     /**
@@ -167,8 +145,8 @@ class JobService {
         return executionDates
     }
 
-    String createResultLinkForJob(Job job){
-        Map<String,Object> params = createCommonParams(job)
+    String createResultLinkForJob(Job job) {
+        Map<String, Object> params = createCommonParams(job)
         params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
         params["_overwriteWarningAboutLongProcessingTime"] = ""
         params["&overwriteWarningAboutLongProcessingTime"] = "on"
@@ -183,19 +161,20 @@ class JobService {
         params["_selectedAllConnectivityProfiles"] = ""
         params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
-        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll',absolute: true, params: params)
+        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll', absolute: true, params: params)
     }
 
-    Map createCommonParams(Job job){
+    Map createCommonParams(Job job) {
         Map params = [:]
         params["selectedInterval"] = "-1"
         params["selectedTimeFrameInterval"] = "0"
-        Date fromDate = job.lastRun-7
+        Date fromDate = job.lastRun - 7
         params["from"] = fromDate.format('dd.MM.yyyy')
         params["fromHour"] = fromDate.format('HH:mm')
         Date toDate
         use(TimeCategory) {
-            toDate = job.lastRun + 1.minute // We add one minute because our time selection doesn't count seconds, so otherwise we could miss the last run
+            toDate = job.lastRun + 1.minute
+            // We add one minute because our time selection doesn't count seconds, so otherwise we could miss the last run
         }
         params["to"] = toDate.format('dd.MM.yyyy')
         params["toHour"] = toDate.format('HH:mm')
@@ -203,17 +182,16 @@ class JobService {
         return params
     }
 
-    String createPageAggregationLinkForJob(Job job){
+    String createPageAggregationLinkForJob(Job job) {
         Map params = createCommonParams(job)
         Set<Long> pageIds = []
         new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
-           pageIds << pageService.getPageByStepName(it).id
+            pageIds << pageService.getPageByStepName(it).id
         }
         params["selectedPages"] = pageIds
-        params["measurand"]= "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
-        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show',absolute: true, params: params)
+        params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
+        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', absolute: true, params: params)
     }
-
 
 
 }

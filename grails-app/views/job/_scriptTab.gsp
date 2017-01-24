@@ -24,5 +24,5 @@
 </p>
 <g:render template="/script/codemirror" model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}" />
 <g:if test="${mode == 'edit'}">
-<button class="btn btn-default" type="button" id="copyToClipboard"><g:message code="job.script.copyToClipboard" default="Copy to Clipboard"/></button>
+    <button class="btn btn-default" type="button" id="copyToClipboard"><g:message code="job.script.copyToClipboard" default="Copy to Clipboard"/></button>
 </g:if>

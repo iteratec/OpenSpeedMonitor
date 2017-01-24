@@ -33,7 +33,7 @@ buildscript {
     }
 }
 
-version "4.1.0_beta"
+version "4.1.0"
 group "OpenSpeedMonitor"
 
 apply plugin: "eclipse"
@@ -125,7 +125,6 @@ dependencies {
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
-    testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile('com.codeborne:phantomjsdriver:1.2.1') {
         transitive = false
     }
@@ -139,7 +138,7 @@ assets {
     minifyJs = true
     minifyCss = true
     configOptions = [:]
-    includes = ['bootstrap-custom.less', 'job/list.less']
+    includes = ['bootstrap-custom.less', 'bootstrap-chosen-custom.less', 'job/list.less', 'application.less']
     excludes = ['**/*.less']
 }
 
@@ -206,9 +205,10 @@ task bowerSyncJavascript(type: Sync) {
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
-    include 'dimple/dist/dimple.latest.min.js'
+    include 'dimple/dist/dimple.v2.2.0.js'
     include 'StickyTableHeaders/js/jquery.stickytableheaders.js'
     include 'file-saver/FileSaver.min.js'
+    include 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
     dependsOn bowerInstall
 }
 
@@ -221,9 +221,10 @@ task bowerSyncStylesheets(type: Sync) {
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
     include 'jQuery-contextMenu/dist/jquery.contextMenu.min.css'
-    include 'chosen/chosen.css'
-    include 'chosen/chosen-sprite.png'
-    include 'chosen/chosen-sprite@2x.png'
+    include 'bootstrap-chosen/bootstrap-chosen.less'
+    include 'bootstrap-chosen/bootstrap-chosen-variables.less'
+    include 'bootstrap-chosen/chosen-sprite.png'
+    include 'bootstrap-chosen/chosen-sprite@2x.png'
     include 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'
     include 'codemirror/lib/codemirror.css'
     include 'codemirror/addon/hint/show-hint.css'
@@ -231,6 +232,8 @@ task bowerSyncStylesheets(type: Sync) {
     include 'jquery-ui/themes/smoothness/jquery-ui.min.css'
     include 'jquery-ui/themes/smoothness/images/'
     include 'bootstrap-timepicker/css/timepicker.less'
+    include 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'
+    include 'bootstrap-colorpicker/dist/img/bootstrap-colorpicker/*'
     dependsOn bowerInstall
 }
 

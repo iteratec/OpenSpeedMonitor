@@ -178,7 +178,7 @@ class Job implements Taggable {
 
     static constraints = {
         label(maxSize: 255, blank: false, unique: true)
-        script(nullable: false)
+        script(nullable: true, blank:false)
         location(nullable: false)
         lastRun(nullable: true)
         jobGroup(nullable: false)

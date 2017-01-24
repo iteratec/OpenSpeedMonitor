@@ -35,18 +35,52 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
         return vars;
     };
+    
+    var getTimeFrame = function (map) {
+            map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
+            map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
+            map["from"] = $("#fromDatepicker").val();
+            map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
+            map["to"] = $("#toDatepicker").val();
+            map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
+          };
 
+    var getJobGroup = function (map) {
+        map["selectedFolder"] = $("#folderSelectHtmlId").val();
+    };
+
+    var getPage = function (map) {
+        map["selectedPages"] = $("#pageSelectHtmlId").val();
+    };
+
+    var getMeasurands = function (map) {
+        var measurands = [];
+        var measurandObjects = $('.measurandSeries');
+        $.each(measurandObjects, function (_, currentSeries) {
+            var currentMeasurands = [$(currentSeries).find(".firstMeasurandSelect").val()];
+            $(currentSeries).find(".additionalMeasurand").each(function (_, additionalMeasurand) {
+                currentMeasurands.push($(additionalMeasurand).val());
+            });
+            var json = JSON.stringify({
+                "stacked": $(currentSeries).find(".stackedSelect").val(),
+                "values": currentMeasurands
+            });
+            measurands.push(json);
+        });
+        map['measurand'] = measurands
+    };
     var addHandler = function () {
-        $('#selectedBrowsersHtmlId').on('change', updateSelectionConstraintBrowser);
+        $('#graphButtonHtmlId').on('click', updateUrl);
     };
 
     var updateUrl = function () {
-        var url = window.location.href;
-        //get url after/
-        var value = url.substring(url.lastIndexOf('/') + 1);
-        //get the part after before ?
-        value = value.split("?")[0];
-        return value;
+        var map = {};
+        getTimeFrame(map);
+        getJobGroup(map);
+        getPage(map);
+        getMeasurands(map);
+        var path = "show?" + $.param(map, true);
+        window.history.pushState("object or string", "Title", path);
     };
 
     var setSelections = function () {
@@ -56,7 +90,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             setJobGroups(params);
             setPages(params);
             setMeasurands(params);
-            clickShowButton();
+            if(params.selectedFolder != null && params.selectedPages != null){
+                clickShowButton();
+            }
         }
 
     };
@@ -117,28 +153,18 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
 
     };
 
-    var setTrim = function (params) {
-        // $("#appendedInputBelowLoadTimes").val(params["trimAboveLoadTimes"]);
-        // $("#appendedInputAboveLoadTimes").val(params["trimAboveLoadTimes"]);
-        // $("#appendedInputBelowRequestCounts").val(params["trimBelowRequestCounts"]);
-        // $("#appendedInputAboveRequestCounts").val(params["trimAboveRequestCounts"]);
-        // $("#appendedInputBelowRequestSizes").val(params["trimBelowRequestSizes"]);
-        // $("#appendedInputAboveRequestSizes").val(params["trimAboveRequestSizes"]);
-    };
-
-
     var timecardResolved = false;
     var barChartResolved = false;
     var markTimeCardAsResolved = function () {
         timecardResolved = true;
         if (allLoaded()) {
-            setSelections();
+           init()
         }
     };
     var markBarChartAsResolved = function () {
         barChartResolved = true;
         if (allLoaded()) {
-            setSelections();
+            init()
         }
     };
     var allLoaded = function () {
@@ -146,6 +172,11 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var init = function () {
+        setSelections();
+        addHandler();
+    };
+
+    var initWaitForPostload = function () {
         $(window).on("selectIntervalTimeframeCardLoaded", function () {
             markTimeCardAsResolved();
         });
@@ -156,6 +187,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
 
     return {
         setSelections: setSelections,
-        init: init
+        init: initWaitForPostload
     };
 });

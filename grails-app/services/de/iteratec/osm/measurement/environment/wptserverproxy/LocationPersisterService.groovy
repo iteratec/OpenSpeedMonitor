@@ -17,15 +17,12 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
-import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
 
 /**
@@ -36,10 +33,7 @@ import groovy.util.slurpersupport.GPathResult
 class LocationPersisterService implements iLocationListener {
 
     BrowserService browserService
-    TimeToCsMappingService timeToCsMappingService
-    PageService pageService
     PerformanceLoggingService performanceLoggingService
-    LinkGenerator grailsLinkGenerator
 
     /**
      * Persisting non-existent locations.
@@ -51,73 +45,60 @@ class LocationPersisterService implements iLocationListener {
 
     @Override
     @Transactional
-    public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserverForLocation) {
+    List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserverForLocation) {
         List<Location> addedLocations = []
 
         log.info("Location.count before creating non-existent= ${Location.count()}")
-        def query
+        List<String> locationIdentifiersForWptServer = []
         result.data.location.each { locationTagInXml ->
             List<Location> locations
-            if(locationTagInXml.Browsers.size()!= 0){
-                List<String> browserNames = locationTagInXml.Browsers.toString().split(",")
-                List<Browser> browsersOfLocation = []
-                browserNames.each{
-                    browsersOfLocation.add(browserService.findByNameOrAlias(it))
-                }
-                locations = Location.findAllByWptServerAndBrowserInListAndUniqueIdentifierForServer(wptserverForLocation, browsersOfLocation,locationTagInXml.id.toString())
-                if (locations.size() == 0) {
-                    browsersOfLocation.each {Browser browser ->
-                        Location newLocation = new Location(
-                                active: true,
-                                valid: 1,
-                                uniqueIdentifierForServer: locationTagInXml.id.toString()+":"+browser.name, // z.B. Agent1-wptdriver:Chrome
-                                location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
-                                label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
-                                browser: browser,//z.B. Firefox
-                                wptServer: wptserverForLocation,
-                                dateCreated: new Date(),
-                                lastUpdated: new Date()
-                        ).save(failOnError: true);
-                        addedLocations << newLocation
-                        log.info("new location written while fetching locations: ${newLocation}")
-                    }
-
-                } else if (locations.size() > 1) {
-                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
-                }
-            }
-
-            else{ // only maintained for compatibility with WPT 2.18 //TODO: throw out when WPT 2.18 is not supported anymore
-                println(locationTagInXml.Browser.toString())
-                Browser browserOfLocation = browserService.findByNameOrAlias(locationTagInXml.Browser.toString())
-                query = Location.where {
-                    wptServer == wptserverForLocation && browser == browserOfLocation && uniqueIdentifierForServer == locationTagInXml.id.toString()
-                }
-
-                locations = query.list();
-
-                if (locations.size() == 0) {
+            // for wpt versions above 2.18 there is a Browsers-Attribute
+            List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
+            List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
+            browsersForLocation.each { currentBrowser ->
+                String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
+                locationIdentifiersForWptServer << uniqueIdentfierForServer
+                List<Location> locationsForCurrentBrowserAndWptServer = Location.findAllByWptServerAndUniqueIdentifierForServerAndBrowser(wptserverForLocation, uniqueIdentfierForServer, currentBrowser)
+                if (!locationsForCurrentBrowserAndWptServer) {
                     Location newLocation = new Location(
                             active: true,
-                            valid: 1,
-                            uniqueIdentifierForServer: locationTagInXml.id.toString(), // z.B. Agent1-wptdriver:Chrome
+                            uniqueIdentifierForServer: uniqueIdentfierForServer, // z.B. Agent1-wptdriver:Firefox
                             location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
                             label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
-                            browser: browserOfLocation,//z.B. Firefox
+                            browser: currentBrowser,//z.B. Firefox
                             wptServer: wptserverForLocation,
                             dateCreated: new Date(),
                             lastUpdated: new Date()
                     ).save(failOnError: true);
                     addedLocations << newLocation
                     log.info("new location written while fetching locations: ${newLocation}")
-                } else if (locations.size() > 1) {
-                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
+                } else if (locationsForCurrentBrowserAndWptServer.size() > 1) {
+                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${currentBrowser}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
                 }
             }
-
         }
+
+        deactivateLocations(wptserverForLocation, locationIdentifiersForWptServer)
+
         log.info("Location.count after creating non-existent= ${Location.count()}")
 
         return addedLocations
+    }
+
+    /**
+     * Deactivates all stored locations which no longer exist for given webPageTestServer
+     * @param webPageTestServer the webPageTestServer
+     * @param uniqueIdentifiersForServer the locationIdentifiers for the webPageTestServer
+     */
+    void deactivateLocations(WebPageTestServer webPageTestServer, List<String> uniqueIdentifiersForServer) {
+        List<Location> locationsToDeactivate = Location.createCriteria().list {
+            eq('wptServer', webPageTestServer)
+            not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersForServer) }
+            eq('active', true)
+        }
+        locationsToDeactivate.each { currentLocation ->
+            currentLocation.active = false
+            currentLocation.save(failOnError: true)
+        }
     }
 }

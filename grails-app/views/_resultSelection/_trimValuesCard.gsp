@@ -1,7 +1,7 @@
 <div class="card">
-    <legend><g:message
+    <h2><g:message
             code="de.iteratec.isr.wptrd.labels.trimValues"
-            default="Trim Values"/></legend>
+            default="Trim Values"/></h2>
 
     <label><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES" default="Ladezeiten [ms]"/></label>
     <div class="row">

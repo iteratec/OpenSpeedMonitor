@@ -113,7 +113,6 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 		Location location = new Location(
 				label: 'location',
 				active: true,
-				valid: 1,
 				wptServer: server,
 				location: 'location',
 				browser: browser,

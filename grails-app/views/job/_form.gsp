@@ -30,13 +30,13 @@
 <div class="tabbable" style="margin-top: 1em;">
   <ul class="nav nav-tabs">
     <li class="active">
-      <a href="#1" data-toggle="tab"><g:message code="job.form.testSettings.label" default="Test Settings" /></a>
+      <a id="jobSettingsLink" href="#1" data-toggle="tab"><g:message code="job.form.testSettings.label" default="Test Settings" /></a>
     </li>
     <li>
       <a id="scriptTabLink" href="#2" data-toggle="tab"><g:message code="job.form.script.label" default="Script" /></a>
-    </li>            
+    </li>
     <li>
-      <a href="#3" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
+      <a id="advancedSettingsTabLink" href="#3" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
     </li>            
   </ul>
   <div class="iteratec-tab-content">
@@ -45,7 +45,7 @@
     </div>
     <div class="tab-pane" id="2">
       <g:render template="scriptTab" model="${['job': job]}" />
-    </div>            
+    </div>
     <div class="tab-pane" id="3">
       <g:render template="advancedTab" model="${['job': job]}" />
     </div>

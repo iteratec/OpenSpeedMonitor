@@ -18,6 +18,9 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
@@ -679,7 +682,6 @@ class TestDataUtil implements OsmTestLogin {
         Location ffAgent1, ieAgent1
         ffAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'ffLocationLocation',
                 label: 'ffLocationLabel',
                 browser: browserFF,
@@ -689,7 +691,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
         ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'ieLocationLocation',
                 label: 'ieLocationLabel',
                 browser: browserIE,
@@ -703,7 +704,6 @@ class TestDataUtil implements OsmTestLogin {
     static Location createLocation(WebPageTestServer server, String uniqueIdentifierForServer, Browser browser, Boolean active) {
         return new Location(
                 active: active,
-                valid: 1,
                 uniqueIdentifierForServer: uniqueIdentifierForServer,
                 location: uniqueIdentifierForServer,
                 label: uniqueIdentifierForServer,
@@ -1371,5 +1371,11 @@ class TestDataUtil implements OsmTestLogin {
             new UserRole(user: user, role: adminRole).save(failOnError: true)
         }
         return user
+    }
+
+    static BatchActivity createBatchActivity(String name, Status status) {
+        new BatchActivity(name: name, domain: "irrelevant domain", activity: Activity.UPDATE,
+                status: status, maximumStages: 1, startDate: new Date(),
+                lastUpdate: new Date()).save(flush: true, failOnError: true)
     }
 }

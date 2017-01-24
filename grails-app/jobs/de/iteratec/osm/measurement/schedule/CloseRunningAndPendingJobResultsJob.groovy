@@ -16,39 +16,25 @@
 */
 
 package de.iteratec.osm.measurement.schedule
-
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import spock.lang.Specification
-
 /**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
+ * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
+ * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
  */
-@TestFor(JobSet)
-@Mock([Job, JobSet])
-class JobSetSpec extends Specification{
+class CloseRunningAndPendingJobResultsJob {
 
+    JobProcessingService jobProcessingService
 
-    void "setup" (){
+    static triggers = {
+        /**
+         * Each Day at 1:30 am.
+         */
+        cron(name: 'CloseRunningAndPendingJobResults', cronExpression: '0 30 1 ? * *')
     }
 
-    void "test nullable not valid" () {
-        when:
-        JobSet toTest = new JobSet()
-
-        then:
-        !toTest.validate()
-    }
-
-    void "test add job and validate" () {
-        given:
-        JobSet toTest = new JobSet(name: "JobSet")
-
-        when:
-        toTest.addToJobs(new Job())
-
-        then:
-        toTest.jobs.size() == 1
-        toTest.validate()
+    /**
+     * Entrypoint for all the dynamically scheduled and unscheduled quartz triggers
+     */
+    def execute() {
+        jobProcessingService.closeRunningAndPengingJobResults()
     }
 }

@@ -3,9 +3,9 @@
 <html>
 
 <head>
+	<g:set var="entityName" value="${message(code: 'webPageTestServer.label', default: 'WebPageTestServer')}" scope="request"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="kickstart" />
-	<g:set var="entityName" value="${message(code: 'webPageTestServer.label', default: 'WebPageTestServer')}" />
 	<title><g:message code="default.create.label" args="[entityName]" /></title>
 </head>
 

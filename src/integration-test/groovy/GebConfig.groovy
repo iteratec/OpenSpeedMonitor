@@ -36,7 +36,7 @@ environments {
             driverInstance
         }
     }
-
+sud
     // ./gradlew -Dgeb.env=firefox integrationTest
     firefox {
         driver = {

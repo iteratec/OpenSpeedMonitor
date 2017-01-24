@@ -4,9 +4,9 @@
 <html>
 
 <head>
+    <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" scope="request"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
-    <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
     <style>
     %{--Styles for MatrixView--}%

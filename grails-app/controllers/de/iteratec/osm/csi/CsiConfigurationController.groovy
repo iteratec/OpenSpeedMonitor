@@ -43,6 +43,9 @@ class CsiConfigurationController {
 
     def configurations() {
         CsiConfiguration config
+
+
+        params.errors = ""
         if (params.id) {
             config = CsiConfiguration.findById(params.id)
         } else {//There was no id defined
@@ -114,8 +117,12 @@ class CsiConfigurationController {
 
         List csi_configurations = []
         CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
-
-        [errorMessagesCsi        : params.list('errorMessagesCsi'),
+        List errors = params.list('errorMessagesCsi')
+        if(session.errorMessagesCsiValidation) { //add errors from previous attempt to upload csv
+            errors+= session.errorMessagesCsiValidation
+            session.errorMessagesCsiValidation = null
+        }
+        [errorMessagesCsi        : errors,
          mappingsToOverwrite     : params.list('mappingsToOverwrite'),
          csiConfigurations       : csi_configurations,
          selectedCsiConfiguration: config,

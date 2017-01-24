@@ -27,7 +27,8 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 
 import java.util.concurrent.locks.ReentrantLock
-import static grails.async.Promises.*
+
+import static grails.async.Promises.task
 
 interface iResultListener {
     public String getListenerName()
@@ -124,8 +125,6 @@ class ProxyService {
         return addedLocations
     }
 
-
-
     /**
      * Gets result from given wptserver via REST-call.
      * @param wptserverOfResult
@@ -134,30 +133,24 @@ class ProxyService {
      * 			Must contain resultId.
      * @return
      */
-    int fetchResult(WebPageTestServer wptserverOfResult, Map params) {
+    WptResultXml fetchResult(WebPageTestServer wptserverOfResult, Map params) {
+        log.info("Start Saving result ${wptserverOfResult.baseUrl}result/${params.resultId}")
 
-        if (log.infoEnabled) {
-            log.info("Start Saving result ${wptserverOfResult.baseUrl}result/${params.resultId}")
-        }
         GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, params)
-        Integer statusCode = xmlResultResponse.statusCode.toInteger()
-        def state = [0: 'Failure!', 100: 'Test Pending', 101: 'Test Started', 200: 'Test Finished']
-        if (log.infoEnabled) {
-            log.info("Result-Status: ${statusCode} (${state[statusCode]})")
-        }
-        final String jobLabel = xmlResultResponse.data.label.toString()
-
-        if (log.infoEnabled) {
-            def bolIsInteger = xmlResultResponse.data.runs.toString().isInteger()
-            def sizeRuns = xmlResultResponse.data.runs.size()
-
-            log.info("xmlResultResponse.data.runs.sizeRuns=${sizeRuns}|")
-            log.info("xmlResultResponse.data.runs.toString().isInteger()=${bolIsInteger}|")
-        }
-
         WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
+        Integer statusCode = resultXml.statusCodeOfWholeTest
+        def state = [0: 'Failure!', 100: 'Test Pending', 101: 'Test Started', 200: 'Test Finished']
+        log.info("Result-Status of ${params.resultId}: ${statusCode} (${state[statusCode]})")
 
-        if (jobLabel.length() > 0 && statusCode >= 200 && xmlResultResponse.data.runs.toString().isInteger()) {
+        final String jobLabel = resultXml.getLabel()
+        boolean resultXmlHasRuns = resultXml.hasRuns()
+        Integer runCount = resultXmlHasRuns ? resultXml.runCount : null
+
+        log.info("xmlResultResponse.data.runs.toString().isInteger()=${resultXmlHasRuns}|")
+        log.info("xmlResultResponse.data.runs.sizeRuns=${runCount}")
+
+
+        if (jobLabel.length() > 0 && statusCode >= 200 && resultXmlHasRuns) {
             try {
 
                 lock.lockInterruptibly();
@@ -181,7 +174,7 @@ class ProxyService {
 
         }
 
-        return statusCode
+        return resultXml
 
     }
 
@@ -190,7 +183,7 @@ class ProxyService {
         return resultXml
     }
 
-    private GPathResult  getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
+    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
         return httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserverOfResult, 'xmlResult.php',
                 ['f': 'xml', 'test': params.resultId, 'r': params.resultId, 'multistepFormat': '1'], ContentType.TEXT, [Accept: 'application/xml'])
     }

@@ -27,14 +27,27 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     var additionalBarClone = barchartMeasuringCard.find("#measurandSeries-clone");
 
     var init = function () {
+        addCloneChangeListener();
         addBar();
         barchartMeasuringCard.find("#addMeasurandSeriesButton").click(addBar);
+    };
+
+    var addCloneChangeListener = function () {
+        //We already add the listener to the clones to make sure that they
+        //are the first events to be fired, even if there will be additional listeners be added in the future
+        additionalBarClone.find(".firstMeasurandSelect").change(selectionChangeListener);
+        additionalBarClone.find(".addMeasurandButton").click(addMeasurand);
+        additionalBarClone.find(".removeMeasurandButton").click(removeMeasurand);
+        additionalBarClone.find(".removeMeasurandSeriesButton").click(removeSeries);
+
+        additionalMeasurandClone.find(".addMeasurandButton").click(addMeasurand);
+        additionalMeasurandClone.find(".removeMeasurandButton").click(removeMeasurand);
     };
 
     var selectionChangeListener = function (e) {
         var $selectElement = $(e.target);
         var selectedOptionGroupLabel = $selectElement.find(":selected").parent().attr('label');
-        var additionalMeasurands = $selectElement.closest(".panel").find(".additionalMeasurand");
+        var additionalMeasurands = $selectElement.closest(".measurandSeries").find(".additionalMeasurand");
         additionalMeasurands.each(function (index, currentMeasurand) {
             enableDisableSelectionGroup(currentMeasurand, selectedOptionGroupLabel);
         })
@@ -58,30 +71,24 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     };
 
     var addBar = function () {
-        var clone = additionalBarClone.clone();
+        var clone = additionalBarClone.clone(true, true);
         clone.removeClass("hidden");
         clone.removeAttr("id");
         clone.addClass("measurandSeries");
-        clone.find(".firstMeasurandSelect").change(selectionChangeListener);
         clone.insertBefore(additionalBarClone);
-        clone.find(".addMeasurandButton").click(addMeasurand);
-        clone.find(".removeMeasurandButton").click(removeMeasurand);
-        clone.find(".removeMeasurandSeriesButton").click(removeSeries);
     };
 
     var addMeasurand = function (e) {
-        var clone = additionalMeasurandClone.clone();
+        var clone = additionalMeasurandClone.clone(true, true);
         clone.removeClass("hidden");
         clone.removeAttr("id");
-        clone.find(".addMeasurandButton").click(addMeasurand);
-        clone.find(".removeMeasurandButton").click(removeMeasurand);
         clone.insertAfter($(e.target).closest(".addMeasurandRow"));
 
-        var selectedOptGroupLabel = clone.closest(".panel").find(".firstMeasurandSelect :selected").parent().attr("label");
+        var selectedOptGroupLabel = clone.closest(".measurandSeries").find(".firstMeasurandSelect :selected").parent().attr("label");
         enableDisableSelectionGroup(clone.find("select"), selectedOptGroupLabel);
 
         // Make stacked selection visible
-        var stackedSelectContainer = $(e.target).closest(".panel").find(".stackedSelectContainer");
+        var stackedSelectContainer = $(e.target).closest(".measurandSeries").find(".stackedSelectContainer");
         if (stackedSelectContainer.hasClass("hidden")) {
             stackedSelectContainer.removeClass("hidden")
         }
@@ -89,15 +96,15 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
 
     var removeMeasurand = function (e) {
         var $element = $(e.target);
-        if ($element.closest(".panel").find(".addMeasurandRow").length <= 2) {
-            $element.closest(".panel").find(".stackedSelectContainer").addClass("hidden");
+        if ($element.closest(".measurandSeries").find(".addMeasurandRow").length <= 2) {
+            $element.closest(".measurandSeries").find(".stackedSelectContainer").addClass("hidden");
         }
         $element.closest(".addMeasurandRow").remove();
     };
 
     var removeSeries = function (e) {
         var $element = $(e.target);
-        $element.closest(".panel").remove();
+        $element.closest(".measurandSeries").remove();
     };
 
     var getValues = function () {
@@ -112,7 +119,14 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
             });
 
             currentSeries['measurands'] = measurands;
-            currentSeries['stacked'] = $(this).find(".stackedSelect").val() === "stacked";
+
+            var stackedOptions = Array.from($(this).find('.stackedSelectContainer .stackedOptions .stackedOption'));
+            stackedOptions.forEach(function (opt) {
+                if (opt.checked)
+                    currentSeries['stacked'] = (opt.value == "stacked");
+            });
+
+
             result.push(currentSeries);
         });
 

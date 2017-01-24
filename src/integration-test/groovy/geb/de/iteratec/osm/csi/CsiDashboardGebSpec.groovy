@@ -84,17 +84,15 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         then: "Error message is displayed"
         waitFor { at CsiDashboardPage }
         waitFor {
-            $("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
-        } //check that the error box appears
+            warningNoJobGroupSelected.displayed
+        }
         waitFor {
-            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one folder.")
-        } //check that the correct error message is displayed
-        waitFor {
-            $("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page.")
-        } //check that the correct error message is displayed
+            warningNoPageSelected.displayed
+        }
 
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Hourly mean per measured step\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         timeFrameSelect.click()
@@ -142,6 +140,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Browser"() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -167,6 +166,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Browsers\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -210,11 +210,12 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Location"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
         selectLocationField.click()
-        selectLocationList[0].click()
+        selectLocationList[1].click()
 
         when: "User clicks on \"Show\" button"
         waitFor { showButton.displayed }
@@ -236,6 +237,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Locations\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -304,6 +306,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
+    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Connectivity Profiles\""() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()

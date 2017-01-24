@@ -13,7 +13,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var browserTabElement = $('#browser-tab');
     var connectivityTabElement = $('#connectivity-tab');
     var warningNoData = $('#warning-no-data');
-    var showButtons = $('#show-button, #show-button-group input, #show-button-group button');
+    var showButtons = $('.show-button');
     var warningLongProcessing = $('#warning-long-processing');
     var warningNoJobGroupSelected = $('#warning-no-job-group');
     var warningNoPageSelected = $('#warning-no-page');
@@ -27,7 +27,8 @@ OpenSpeedMonitor.resultSelection = (function(){
         locationIds: null,
         connectivityIds: null,
         nativeConnectivity: null,
-        customConnectivities: null
+        customConnectivities: null,
+        caller: $("#dashBoardParamsForm").data("caller")
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = false;
@@ -36,6 +37,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
     var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
     var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
+    var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var lastResultCount = 1;
 
     var init = function() {
@@ -105,6 +107,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var setQueryArgsFromMeasuredEventSelection = function (event, measuredEventSelection) {
+        hasMeasuredEventSelection = !!(measuredEventSelection && measuredEventSelection.ids && measuredEventSelection.ids.length > 0);
         currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
         updateCards("pages");
     };
@@ -145,20 +148,22 @@ OpenSpeedMonitor.resultSelection = (function(){
                 updateStarted = true;
             }
         }
-        if (updateStarted) {
+        if (updateStarted && currentQueryArgs.caller === "EventResult") {
             updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
         }
     };
 
     var validateForm = function () {
-        warningNoPageSelected.toggle(!hasPageSelection && lastResultCount != 0);
+        warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!hasJobGroupSelection && lastResultCount != 0);
-        showButtons.prop("disabled", lastResultCount == 0 || !hasJobGroupSelection || !hasPageSelection);
+        var doDisable = lastResultCount == 0 || !hasJobGroupSelection || !(hasPageSelection || hasMeasuredEventSelection);
+        showButtons.prop("disabled", doDisable);
+        showButtons.toggleClass("disabled", doDisable)
     };
 
     var updateResultCount = function (resultCount) {
         lastResultCount = resultCount;
-        warningLongProcessing.toggle(resultCount < 0 && hasPageSelection && hasJobGroupSelection);
+        warningLongProcessing.toggle(resultCount < 0 && (hasPageSelection || hasMeasuredEventSelection) && hasJobGroupSelection);
         warningNoData.toggle(resultCount == 0);
         validateForm();
     };

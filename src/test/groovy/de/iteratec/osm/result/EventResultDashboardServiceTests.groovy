@@ -35,10 +35,7 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Before
-import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
+import spock.lang.Specification
 
 import static org.junit.Assert.*
 
@@ -48,7 +45,7 @@ import static org.junit.Assert.*
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
 @Mock([Job, JobResult, MeasuredEvent, CsiAggregation, CsiAggregationInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script])
-class EventResultDashboardServiceTests {
+class EventResultDashboardServiceTests extends Specification {
 
     EventResultDashboardService serviceUnderTest
 
@@ -95,8 +92,8 @@ class EventResultDashboardServiceTests {
         i18nService(I18nService)
         defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
     }
-    @Before
-    void setUp() {
+
+    void setup() {
 
         serviceUnderTest = service;
         runDate = new DateTime(2013, 5, 29, 10, 13, 2, 564, DateTimeZone.UTC)
@@ -107,9 +104,8 @@ class EventResultDashboardServiceTests {
 
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_RAW_DATA_CACHED() {
-
+        given:
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
@@ -126,23 +122,22 @@ class EventResultDashboardServiceTests {
 
         Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
         Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
-
+        when:
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-        assertEquals(1, resultGraphs.size())
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
+        then:
+        assertEquals(1, resultGraphs.size())
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED() {
-
+        given:
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
@@ -165,12 +160,9 @@ class EventResultDashboardServiceTests {
         aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
 
         assertEquals(2, aggregatorTypes.size());
-
+        when:
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-                assertEquals(2, resultGraphs.size())
-
         /**
          * IT-643
          *
@@ -179,21 +171,23 @@ class EventResultDashboardServiceTests {
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
         }
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+        }
+        then:
+        assertEquals(2, resultGraphs.size())
+
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
-        }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MIN() {
-
+        given:
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
@@ -217,28 +211,27 @@ class EventResultDashboardServiceTests {
         aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
 
         assertEquals(1, aggregatorTypes.size());
-
+        when:
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-        assertEquals(1, resultGraphs.size())
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
-        assertEquals(0, resultsCsi1.size())
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
+        then:
+        assertEquals(1, resultGraphs.size())
+        assertEquals(0, resultsCsi1.size())
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MAX() {
-
+        given:
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
@@ -261,28 +254,27 @@ class EventResultDashboardServiceTests {
         aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
 
         assertEquals(1, aggregatorTypes.size());
-
+        when:
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-        assertEquals(1, resultGraphs.size())
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
-        assertEquals(1, resultsCsi1.size())
-        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
+        then:
+        assertEquals(1, resultGraphs.size())
+        assertEquals(1, resultsCsi1.size())
+        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
         assertEquals(0, resultsCsi2.size())
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED() {
-
+        given:
         //mocks
         mockEventResultDaoService()
         mockPerformanceLoggingService()
@@ -306,23 +298,22 @@ class EventResultDashboardServiceTests {
 
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
 
-        //test-execution
+        when:
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-        //assertions
-        assertEquals(1, resultGraphs.size())
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
+
+        then:
+        assertEquals(1, resultGraphs.size())
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
     }
 
-    @Test
     void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED_AND_UNCACHED() {
-
+        given:
         //mocks
         mockEventResultDaoService()
         mockPerformanceLoggingService()
@@ -349,37 +340,30 @@ class EventResultDashboardServiceTests {
         aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
         assertEquals(2, aggregatorTypes.size());
 
-        //test-execution
+        when:
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
-
-                //assertions
-        assertEquals(2, resultGraphs.size())
-
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
         }
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+        }
+
+        then:
+        assertEquals(2, resultGraphs.size())
+
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
-        }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
-    public void testTryToBuildTestsDetailsURL_OneSingleResult() {
-        tryToBuildTestsDetailsURL('1', 1, new URL('http://wptserver.example.com/result/testTryToBuildTestsDetailsURL_OneSingleResult'));
-    }
-
-    public void testTryToBuildTestsDetailsURL_TwoResults() {
-        tryToBuildTestsDetailsURL('1,2', 2, new URL('http://wptserver.example.com/testTryToBuildTestsDetailsURL_TwoResults'));
-    }
-
-    private void tryToBuildTestsDetailsURL(String resultIDs, Integer resultIDsCount, final URL expectedURL) {
+    void tryToBuildTestsDetailsURL() {
+        given:
         // Create some data:
         final CsiAggregation csiAggregation = new CsiAggregation(
                 underlyingEventResultsByWptDocComplete: resultIDs
@@ -390,60 +374,56 @@ class EventResultDashboardServiceTests {
         };
         assertEquals(resultIDsCount, csiAggregation.countUnderlyingEventResultsByWptDocComplete());
 
-        // Simulate GrailsLinkGenerator
-        LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);
-        Mockito.when(grailsLinkGeneratorMock.link(Mockito.any(Map.class))).thenReturn(expectedURL.toString());
+        def linkGeneratorMock = Mock(LinkGenerator)
+        serviceUnderTest.grailsLinkGenerator = linkGeneratorMock
 
-        // Inject relevant services
-        serviceUnderTest.grailsLinkGenerator = grailsLinkGeneratorMock;
-
+        when:
         // Run the (whitebox-)test:
         URL result = serviceUnderTest.tryToBuildTestsDetailsURL(csiAggregation);
 
+        then:
         // Verify result:
         // - is the URL the expected one?
+        1 * linkGeneratorMock.link({
+            it['controller'] == 'highchartPointDetails' &&
+                    it['action'] == 'listAggregatedResults' &&
+                    it['absolute'] == true &&
+                    (it['params'] as Map)['csiAggregationId'] == '4' &&
+                    (it['params'] as Map)['lastKnownCountOfAggregatedResultsOrNull'] == String.valueOf(resultIDsCount)
+        }) >> expectedURL
         assertEquals(expectedURL, result)
 
-        // - was the link requested properly?
-        ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
-        Mockito.verify(grailsLinkGeneratorMock).link(argument.capture());
-        Map linkRequest = argument.getValue();
-
-        assertEquals('highchartPointDetails', linkRequest.get('controller'));
-        assertEquals('listAggregatedResults', linkRequest.get('action'));
-        assertEquals(true, linkRequest.get('absolute'));
-
-        Object paramsEntry = linkRequest.get('params')
-        assertNotNull(paramsEntry);
-        assertTrue(paramsEntry instanceof Map);
-
-        Map paramsMap = (Map) paramsEntry;
-        assertEquals('4', paramsMap.get('csiAggregationId'));
-        assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
+        where:
+        resultIDs | expectedURL                                                                                  || resultIDsCount
+        '1,2'     | new URL('http://wptserver.example.com/testTryToBuildTestsDetailsURL_TwoResults')             || 2
+        '1'       | new URL('http://wptserver.example.com/result/testTryToBuildTestsDetailsURL_OneSingleResult') || 1
     }
 
 
-    private void mocksCommonToAllTests(){
+    private void mocksCommonToAllTests() {
         serviceUnderTest.resultCsiAggregationService = grailsApplication.mainContext.getBean('resultCsiAggregationService')
         serviceUnderTest.resultCsiAggregationService.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
-        serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
         serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
-        mockI18nService()
-        serviceUnderTest.osmChartProcessingService.i18nService = [
-                msg: {String msgKey, String defaultMessage = null, List objs = null ->
-                    Map i18nKeysToValues = [
-                            'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
-                            'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
-                            'job.location.label':I18N_LABEL_LOCATION,
-                            'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
-                            'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
-                    ]
-                    return i18nKeysToValues[msgKey]
-                }
-        ] as I18nService
+        serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator)
+        serviceUnderTest.osmChartProcessingService.i18nService = Stub(I18nService) {
+            msg(_, _, _) >> { String msgKey, String defaultMessage = null, List objs = null ->
+                return [
+                        'job.jobGroup.label'                         : I18N_LABEL_JOB_GROUP,
+                        'de.iteratec.osm.result.measured-event.label': I18N_LABEL_MEASURED_EVENT,
+                        'job.location.label'                         : I18N_LABEL_LOCATION,
+                        'de.iteratec.result.measurand.label'         : I18N_LABEL_MEASURAND,
+                        'de.iteratec.osm.result.connectivity.label'  : I18N_LABEL_CONNECTIVITY
+                ].get(msgKey)
+            }
+        }
+        serviceUnderTest.i18nService = Stub(I18nService) {
+            msg(_, _, _) >> { String msgKey, String defaultMessage = null, List objs = null ->
+                return defaultMessage
+            }
+        }
     }
 
-    private void createTestdataCommonForAllTests(){
+    private void createTestdataCommonForAllTests() {
         createCsiAggregationInterval();
         createBrowser();
         createLocations();
@@ -494,7 +474,6 @@ class EventResultDashboardServiceTests {
 
         location = new Location(
                 active: true,
-                valid: 1,
                 location: location1Location,
                 label: location1Label,
                 browser: browser,
@@ -508,7 +487,6 @@ class EventResultDashboardServiceTests {
 
         Location ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: location2Location,
                 label: location2Label,
                 browser: browser2,
@@ -651,7 +629,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockEventResultDaoService() {
         def eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
-        eventResultDaoService.metaClass.getLimitedMedianEventResultsBy= {
+        eventResultDaoService.metaClass.getLimitedMedianEventResultsBy = {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
@@ -686,7 +664,7 @@ class EventResultDashboardServiceTests {
                 }
                 return results
         }
-        eventResultDaoService.metaClass.tryToFindById= {
+        eventResultDaoService.metaClass.tryToFindById = {
             long databaseId ->
                 return databaseId == 1 ?
                         eventResultCached :
@@ -699,7 +677,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockPerformanceLoggingService() {
         def performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
-        performanceLoggingService.metaClass.logExecutionTime= {
+        performanceLoggingService.metaClass.logExecutionTime = {
             LogLevel level, String description, IndentationDepth indentation, Closure toMeasure ->
                 toMeasure.call()
         }
@@ -711,7 +689,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockCsiAggregationUtilService() {
         def csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
-        csiAggregationUtilService.metaClass.resetToStartOfActualInterval= {
+        csiAggregationUtilService.metaClass.resetToStartOfActualInterval = {
             DateTime dateWithinInterval, Integer intervalInMinutes ->
                 return runDateHourlyStart
         }
@@ -722,7 +700,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockJobGroupDaoService() {
         def jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
-        jobGroupDaoService.metaClass.getIdToObjectMap= { ->
+        jobGroupDaoService.metaClass.getIdToObjectMap = { ->
             return [1: JobGroup.get(1), 2: JobGroup.get(2)]
         }
         serviceUnderTest.jobGroupDaoService = jobGroupDaoService
@@ -732,7 +710,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockPageDaoService() {
         def pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
-        pageDaoService.metaClass.getIdToObjectMap= { ->
+        pageDaoService.metaClass.getIdToObjectMap = { ->
             return [1: Page.get(1), 2: Page.get(2)]
         }
         serviceUnderTest.pageDaoService = pageDaoService
@@ -742,7 +720,7 @@ class EventResultDashboardServiceTests {
      */
     private void mockBrowserDaoService() {
         def browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
-        browserDaoService.metaClass.getIdToObjectMap= { ->
+        browserDaoService.metaClass.getIdToObjectMap = { ->
             return [1: Browser.get(1), 2: Browser.get(2)]
         }
         serviceUnderTest.browserDaoService = browserDaoService
@@ -752,23 +730,15 @@ class EventResultDashboardServiceTests {
      */
     private void mockLocationDaoService() {
         def locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
-        locationDaoService.metaClass.getIdToObjectMap= { ->
+        locationDaoService.metaClass.getIdToObjectMap = { ->
             return [1: Location.get(1), 2: Location.get(2)]
         }
         serviceUnderTest.locationDaoService = locationDaoService
     }
-    private void mockI18nService() {
-        def i18nService = grailsApplication.mainContext.getBean('i18nService')
-        i18nService.metaClass.msg= {
-            String msgKey, String defaultMessage, List objs ->
-                return defaultMessage
-        }
-        serviceUnderTest.i18nService = i18nService
-    }
 
     private mockAggregatorTypeDaoService() {
         def aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
-        aggregatorTypeDaoService.metaClass.getNameToObjectMap= { ->
+        aggregatorTypeDaoService.metaClass.getNameToObjectMap = { ->
             Map<String, AggregatorType> map = [
                     (AggregatorType.RESULT_CACHED_DOM_TIME)  : AggregatorType.findByName(AggregatorType.RESULT_CACHED_DOM_TIME),
                     (AggregatorType.RESULT_UNCACHED_DOM_TIME): AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOM_TIME)

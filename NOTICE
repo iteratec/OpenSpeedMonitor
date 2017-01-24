@@ -84,9 +84,6 @@ This project includes:
    Less CSS Resources Plugin created by Paul Fairless, Apache License 2.0,
    available at http://grails.org/plugin/lesscss-resources
 
-   Mockito Mocking Framework created by Szczepan Faber and friends, MIT	License,
-   available at https://code.google.com/p/mockito/
-
    PrettyCron created by dunse, LGPL version 3,
    available at https://github.com/azza-bazoo/prettycron
 

@@ -284,7 +284,8 @@ public class EventResultDashboardService {
                                 testingAgent: eventResult.testAgent,
                                 chartPointWptInfo: chartPointWptInfo
                         )
-                        if (chartPoint.isValid())
+                        // customer satisfaction can be 0.
+                        if (chartPoint.isValid() || (aggregator.measurandGroup == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }
                 }

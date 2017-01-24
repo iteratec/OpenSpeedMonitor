@@ -40,7 +40,7 @@ import static org.junit.Assert.*
  * Test-suite of {@link JobService}.
  */
 @TestFor(JobService)
-@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay, JobSet])
+@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay])
 class JobServiceTests extends Specification {
 
     WebPageTestServer server1
@@ -156,23 +156,15 @@ class JobServiceTests extends Specification {
     }
 
     void "test deleteJob"() {
-        given: "a job to delete and a jobSet which contains this job"
+        given: "a job to delete"
         Job deleteJob = job1
-        Job unusedJob = job2
-        new JobSet(name: "jobSet", jobs: [deleteJob, unusedJob]).save(failOnError: true, flush: true)
 
         when: "user deletes job"
         service.deleteJob(deleteJob)
-        JobSet resultJobSet = JobSet.findByName("jobSet")
 
         then: "job as marked as deleted"
         deleteJob.deleted
         deleteJob.label.contains("_deleted_")
-
-        and: "jobSet does not contain deleted job"
-        resultJobSet.jobs.size() == 1
-        resultJobSet.jobs.contains(unusedJob)
-        !resultJobSet.jobs.contains(deleteJob)
     }
 
     private void createTestDataCommonForAllTests() {
@@ -206,7 +198,6 @@ class JobServiceTests extends Specification {
 
         ffAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'physNetLabAgent01-FF',
                 label: 'physNetLabAgent01 - FF up to date',
                 browser: browserFF,
@@ -217,7 +208,6 @@ class JobServiceTests extends Specification {
 
         ieAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'physNetLabAgent01-IE8',
                 label: 'physNetLabAgent01 - IE 8',
                 browser: browserIE,
@@ -228,7 +218,6 @@ class JobServiceTests extends Specification {
 
         ieHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-IE8',
                 label: 'hetznerAgent01 - IE 8',
                 browser: browserIE,
@@ -239,7 +228,6 @@ class JobServiceTests extends Specification {
 
         i8eHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-IE8',
                 label: 'hetznerAgent01 - IE 8',
                 browser: browserIE,
@@ -250,7 +238,6 @@ class JobServiceTests extends Specification {
 
         ffHetznerAgent1 = new Location(
                 active: true,
-                valid: 1,
                 location: 'hetznerAgent01-FF',
                 label: 'hetznerAgent01 - FF up to date',
                 browser: browserFF,

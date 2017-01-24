@@ -21,21 +21,13 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.LocationController
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -44,12 +36,10 @@ import grails.converters.JSON
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
-import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.servlet.FlashMap
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -62,21 +52,14 @@ class EventResultDashboardController {
 
     static final int RESULT_DASHBOARD_MAX_POINTS_PER_SERIES = 100000
 
-    AggregatorTypeDaoService aggregatorTypeDaoService
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    BrowserDaoService browserDaoService
-    LocationDaoService locationDaoService
-    CsiAggregationUtilService csiAggregationUtilService
     EventResultDashboardService eventResultDashboardService
-    PageService pageService
     I18nService i18nService
     EventService eventService
     def springSecurityService
     ConfigService configService
     CustomDashboardService customDashboardService
     UserspecificDashboardService userspecificDashboardService
-    AssetRequestPersisterService assetRequestPersisterService
 
     /**
      * The Grails engine to generate links.
@@ -85,7 +68,6 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
     public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
@@ -97,8 +79,6 @@ class EventResultDashboardController {
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
     public final static int MONDAY_WEEKSTART = 1
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
-    //def timeFrames = [0, 900, 1800, 3600, 10800, 21600, 43200, 86400, 604800, 1209600, 2419200]
-    //	def intervals = ['auto', 'max', '5min', '15min', '30min', '1h', '3h', '6h', '12h', 'daily', 'weekly']
 
     def intervals = ['not', 'hourly', 'daily', 'weekly']
 
@@ -832,8 +812,6 @@ class EventResultDashboardController {
 
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
-        result.put('persistenceOfAssetRequestsEnabled', grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')=='true')
-
         // Done! :)
         return result;
     }
@@ -850,74 +828,5 @@ class EventResultDashboardController {
         }
 
         render answer as JSON
-    }
-
-    public def showDetailData(EventResultDashboardShowAllCommand cmd) {
-        if (!ControllerUtils.isEmptyRequest(params)) {
-            if (!cmd.validate()) {
-                Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-                cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
-                cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-                cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1
-
-                cmd.copyRequestDataToViewModelMap(modelToRender);
-                modelToRender.put('command', cmd)
-                fillWithI18N(modelToRender)
-                render(view: "showAll", model: modelToRender)
-            } else {
-                params.remove("action")
-                params.remove("_action_showDetailData")
-                redirect(controller: "detailAnalysis", action: "show", params: params)
-            }
-        }
-    }
-
-    public def sendFetchAssetsAsBatchCommand(EventResultDashboardShowAllCommand cmd){
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-
-        cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
-        cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1
-
-        cmd.copyRequestDataToViewModelMap(modelToRender);
-
-        def connectivityProfiles
-        if (cmd.selectedConnectivityProfiles){
-            connectivityProfiles=ConnectivityProfile.findAllByIdInList(cmd.selectedConnectivityProfiles)
-        }
-
-        List<Job> jobs = Job.createCriteria().list {
-            if(cmd.includeCustomConnectivity)inList("customConnectivityName",[cmd.customConnectivityName,null]) // if custom connectivity is included
-            else eq("customConnectivityProfile",cmd.includeCustomConnectivity)
-            if(!cmd.includeNativeConnectivity)eq("noTrafficShapingAtAll", cmd.includeNativeConnectivity)
-            if(!cmd.selectedAllConnectivityProfiles)inList("connectivityProfile", connectivityProfiles)
-        }
-        Interval timeFrame = cmd.getSelectedTimeFrame();
-        def jobGroupList = []
-        cmd.selectedFolder.each{
-            jobGroupList.add(JobGroup.findById(it).name)
-        }
-        def selectedBrowsersList = []
-        cmd.selectedBrowsers.each{
-            selectedBrowsersList.add(Browser.findById(it).name)
-        }
-        def selectedLocationsList = []
-        cmd.selectedLocations.each {
-            selectedLocationsList.add(Location.findById(it).location)
-        }
-        List<JobResult> jobResults =[]
-        if(jobs) {
-            jobResults = JobResult.createCriteria().list {
-                inList("job", jobs)
-                if (cmd.selectedFolder) inList("jobGroupName", jobGroupList)
-                if (!cmd.selectedAllBrowsers) inList("locationBrowser", selectedBrowsersList)
-                if (!cmd.selectedAllLocations) inList("locationLocation", selectedLocationsList)
-                between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
-            }
-        }
-        def batchIsQueued = assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
-        modelToRender.put("startedBatchActivity",batchIsQueued)
-        fillWithI18N(modelToRender)
-        render(view: "showAll", model: modelToRender)
     }
 }

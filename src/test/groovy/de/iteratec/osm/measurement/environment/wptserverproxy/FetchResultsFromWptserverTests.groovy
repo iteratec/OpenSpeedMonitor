@@ -172,11 +172,11 @@ class FetchResultsFromWptserverTests extends Specification {
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_Q1_AR'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_Q1_AR'])
 
         then:
         // Verify results
-        assertThat(statusCode, is(200))
+        assertThat(resultXml.statusCodeOfWholeTest, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -201,11 +201,11 @@ class FetchResultsFromWptserverTests extends Specification {
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_TN_D8'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_TN_D8'])
 
         then:
         // Verify results
-        assertThat(statusCode, is(200))
+        assertThat(resultXml.statusCodeOfWholeTest, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -231,11 +231,11 @@ class FetchResultsFromWptserverTests extends Specification {
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_A9_EF'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_A9_EF'])
 
         then:
         // Verify results
-        assertThat(statusCode, is(200))
+        assertThat(resultXml.statusCodeOfWholeTest, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -256,11 +256,11 @@ class FetchResultsFromWptserverTests extends Specification {
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-        Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_VP_ZMG'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_VP_ZMG'])
 
         then:
         // Verify results
-        assertThat(statusCode, is(200))
+        assertThat(resultXml.statusCodeOfWholeTest, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -281,11 +281,11 @@ class FetchResultsFromWptserverTests extends Specification {
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-        Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_5E_ZFW'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_5E_ZFW'])
 
         then:
         // Verify results
-        assertThat(statusCode, is(200))
+        assertThat(resultXml.statusCodeOfWholeTest, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data

@@ -21,6 +21,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -147,7 +148,7 @@ class JobProcessingService {
         }
 
         String apiKey = job.location.wptServer.apiKey
-        if (apiKey){
+        if (apiKey) {
             parameters.k = apiKey
         }
 
@@ -174,7 +175,7 @@ class JobProcessingService {
      * test execution.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null) {
+    private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null, String description = '') {
         // If no testId was provided some error occurred and needs to be logged
         Job job = Job.get(jobId)
         JobResult result
@@ -184,21 +185,21 @@ class JobProcessingService {
 
         if (!result) {
 
-            return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus)
+            return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus, description)
 
         } else {
 
-            updateStatusAndPersist(result, job, testId, statusCode, wptStatus)
+            updateStatusAndPersist(result, job, testId, statusCode, wptStatus, description)
             return result
         }
 
     }
 
-    private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus) {
+    private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus, String description) {
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
         if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)) {
 
-            updateStatus(result, statusCode, wptStatus)
+            updateStatus(result, statusCode, wptStatus, description)
 
             try {
                 result.save(failOnError: true, flush: true)
@@ -213,22 +214,23 @@ class JobProcessingService {
         }
     }
 
-    private void updateStatus(JobResult result, int statusCode, String wptStatus) {
+    private void updateStatus(JobResult result, int statusCode, String wptStatus, String description) {
         log.debug("Updating status of existing JobResult: httpStatusCode: ${result.httpStatusCode}->${statusCode}")
         result.httpStatusCode = statusCode
+        result.description = description
         if (wptStatus != null) {
             log.debug("Updating status of existing JobResult: wptStatus: ${result.wptStatus}->${wptStatus}")
             result.wptStatus = wptStatus
         }
     }
 
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus) {
+    private JobResult persistNewUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus, String description) {
         JobResult result = new JobResult(
                 job: job,
                 date: new Date(),
                 testId: testId ?: UUID.randomUUID() as String,
                 har: null,
-                description: '',
+                description: description,
                 jobConfigLabel: job.label,
                 jobConfigRuns: job.runs,
                 wptServerLabel: job.location.wptServer.label,
@@ -374,29 +376,32 @@ class JobProcessingService {
      * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
      * every pollDelaySeconds seconds is removed
      */
-    public int pollJobRun(Job job, String testId, String wptStatus = null) {
-        int statusCode
+    WptResultXml pollJobRun(Job job, String testId, String wptStatus = null) {
+        WptResultXml resultXml
         try {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO) {
-                statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
+                resultXml = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO) {
-                if (statusCode < 200) {
-                    persistUnfinishedJobResult(job.id, testId, statusCode, wptStatus)
+                if (resultXml.statusCodeOfWholeTest < 200) {
+                    persistUnfinishedJobResult(job.id, testId, resultXml.statusCodeOfWholeTest, wptStatus)
                 }
             }
         } catch (Exception e) {
-            statusCode = 400
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
+            persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
         } finally {
-            if (statusCode >= 200) {
-                JobProcessingQuartzHandlerJob.removePollingLock(job, testId)
-                JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
-                JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
+            if (resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+                unscheduleTest(job, testId)
             }
         }
-        return statusCode
+        return resultXml
+    }
+
+    private void unscheduleTest(Job job, String testId) {
+        JobProcessingQuartzHandlerJob.removePollingLock(job, testId)
+        JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
+        JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
     }
 
     /**
@@ -409,9 +414,15 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
         if (!result)
             return
-        if (result.httpStatusCode < 200 && pollJobRun(job, testId) < 200) {
-            persistUnfinishedJobResult(job.id, testId, 504, '')
-            proxyService.cancelTest(job.location.wptServer, [test: testId])
+        if (result.httpStatusCode < 200) {
+            // poll a last time
+            WptResultXml lastResult = pollJobRun(job, testId)
+            if (lastResult.statusCodeOfWholeTest < 200 || (lastResult.statusCodeOfWholeTest >= 200 && !lastResult.hasRuns())) {
+                unscheduleTest(job, testId)
+                String description = lastResult.statusCodeOfWholeTest < 200 ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
+                persistUnfinishedJobResult(job.id, testId, 504, '', description)
+                proxyService.cancelTest(job.location.wptServer, [test: testId])
+            }
         }
     }
 
@@ -534,5 +545,25 @@ class JobProcessingService {
         }
         log.info("handleOldJobResults() OSM ends")
         return ["JobResultsToDeleteCount": jobResultsToDeleteCount, "JobResultsToRescheduleCount": jobResultsToRescheduleCount]
+    }
+
+    /**
+     * Setting the http status code of running and pending jobResults older than maxDate
+     */
+    void closeRunningAndPengingJobResults() {
+        DateTime currentDate = new DateTime()
+        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(200)
+        jobResults = jobResults.findAll {
+            // Close the jobResult, if its job timeout is exceeded by twice the amount
+            currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
+        }
+        if (jobResults) {
+            jobResults.each {
+                it.httpStatusCode = 900
+                it.description = "closed due to nightly cleanup of job results"
+                it.save(failOnError: true)
+            }
+            log.info("Quartz controlled cleanup of running and pending jobResults: Chanaged status of ${jobResults.size()} jobResults.")
+        }
     }
 }

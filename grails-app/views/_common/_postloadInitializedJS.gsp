@@ -32,17 +32,38 @@
             browsers: "${createLink(absolute: true, controller: 'resultSelection', action: 'getLocations')}",
             connectivity: "${createLink(absolute: true, controller: 'resultSelection', action: 'getConnectivityProfiles')}",
             resultCount: "${createLink(absolute: true, controller: 'resultSelection', action: 'getResultCount')}"
+        },
+        jobTags: {
+            getTagsForJobs: "${createLink(absolute: true, controller: 'job', action: 'getTagsForJobs')}",
+            removeTag: "${createLink(absolute: true, controller: 'job', action: 'removeTag')}",
+            addTagToJobs: "${createLink(absolute: true, controller: 'job', action: 'addTagToJobs')}"
         }
     };
-    $( window ).load(function() {
-        window.addEventListener("PostLoadedScriptArrived",function() {
+    OpenSpeedMonitor.i18n.measurandLabels = {
+        docCompleteTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteTimeInMillisecs')}',
+        domTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.domTimeInMillisecs')}',
+        firstByteInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.firstByteInMillisecs')}',
+        fullyLoadedRequestCount: '${message(code: 'de.iteratec.isr.measurand.short.fullyLoadedRequestCount')}',
+        fullyLoadedTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.fullyLoadedTimeInMillisecs')}',
+        loadTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.loadTimeInMillisecs')}',
+        startRenderInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.startRenderInMillisecs')}',
+        docCompleteIncomingBytes: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteIncomingBytes')}',
+        docCompleteRequests: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteRequests')}',
+        fullyLoadedIncomingBytes: '${message(code: 'de.iteratec.isr.measurand.short.fullyLoadedIncomingBytes')}',
+        csByWptDocCompleteInPercent: '${message(code: 'de.iteratec.isr.measurand.short.csByWptDocCompleteInPercent')}',
+        speedIndex: '${message(code: 'de.iteratec.isr.measurand.short.speedIndex')}',
+        visuallyCompleteInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.visuallyCompleteInMillisecs')}',
+        csByWptVisuallyCompleteInPercent: '${message(code: 'de.iteratec.isr.measurand.short.csByWptVisuallyCompleteInPercent')}'
+    };
+    $(window).load(function () {
+        window.addEventListener("PostLoadedScriptArrived", function () {
             OpenSpeedMonitor.postLoaded.idOfItemToDelete = ${item ? item.id : params.id ?: 'null'};
         });
 
         OpenSpeedMonitor.postLoader.loadJavascript(
             '<g:assetPath src="postload/application-postload.js" absolute="true"/>',
             true,
-                "postload"
+            "postload"
         )
 
     });

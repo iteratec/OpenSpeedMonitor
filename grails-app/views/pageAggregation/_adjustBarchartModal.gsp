@@ -5,22 +5,22 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4><g:message code="de.iteratec.chart.adjustment.name" default="adjust chart"/></h4>
+                <h4><g:message code="de.iteratec.chart.adjustment.name" default="Adjust Chart"/></h4>
             </div>
 
             <div id="collapseAdjustment" class="modal-body form-horizontal">
                 <!-- x axis label -->
-                <div class="form-group row">
+                <div class="form-group">
                     <label class="col-sm-3 control-label" for="x-axis-label">
                         <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
                     </label>
 
-                    <div class="col-sm-8">
+                    <div class="col-sm-9">
                         <input id="x-axis-label" class="form-control" type="text">
                     </div>
                 </div>
-                %{--y labels--}%
-                <div class="form-group row">
+                %{-- y axis label --}%
+                <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.yAxis.label"
                             default="y-axis label"/></label>
@@ -29,90 +29,90 @@
 
                     </div>
                 </div>
-                %{--chart width & height--}%
-                <div class="form-group row">
-                    <div class="row">
-                        <label class="col-sm-3 control-label"><g:message
-                                code="de.iteratec.osm.dimple.barchart.size.name"
-                                default="height"/></label>
+                %{-- chart width & height --}%
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><g:message
+                            code="de.iteratec.osm.dimple.barchart.size.name"
+                            default="height"/></label>
 
-                        <div class="col-sm-9">
-                            <div class="row">
-                                <label for="inputChartWidth" class="col-sm-5 control-label"><g:message
-                                        code="de.iteratec.chart.width.name"
-                                        default="width"/></label>
+                    <div class="col-sm-9">
+                        <div class="input-group form-row">
+                            <span class="input-group-addon adjustChartsizeAddon">
+                                <g:message code="de.iteratec.chart.width.name"
+                                           default="Width"/>
+                            </span>
+                            <input type="number" class="form-control chartSizeInput" id="inputChartWidth" min="0"
+                                   step="1"
+                                   data-bind="value:replyNumber">
+                            <span class="input-group-addon">px</span>
+                        </div>
 
-                                <input class="col-sm-3" type="number" id="inputChartWidth" min="0" step="1"
-                                       data-bind="value:replyNumber"/>
-                            </div>
-
-                            <div class="row">
-                                <label for="inputChartHeight" class="control-label col-sm-5"><g:message
-                                        code="de.iteratec.chart.height.name"
-                                        default="height"/></label>
-                                <input class="col-sm-3" type="number" id="inputChartHeight" min="0" step="1"
-                                       data-bind="value:replyNumber"/>
-                            </div>
+                        <div class="input-group form-row">
+                            <span class="input-group-addon adjustChartsizeAddon">
+                                <g:message code="de.iteratec.chart.height.name"
+                                           default="Height"/>
+                            </span>
+                            <input type="number" class="form-control chartSizeInput" id="inputChartHeight" min="0"
+                                   step="1"
+                                   data-bind="value:replyNumber">
+                            <span class="input-group-addon">px</span>
                         </div>
                     </div>
                 </div>
                 %{--assign colors--}%
-                <div class="form-group row">
+                <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.barchart.assignColors.name"
-                            default="assign Colors"/></label>
+                            default="Assign Colors"/></label>
 
                     <div class="col-sm-9" id="assign-color-container">
 
                     </div>
                 </div>
                 %{--toggle chart axes and gridlines--}%
-                <div class="form-group row">
-                    <div class="checkbox col-sm-offset-3">
-                        <label>
-                            <input type="checkbox" id="inputShowGridlines"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
-                                default="Show Gridlines"/>
-                        </label>
-                    </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <g:message code="de.iteratec.osm.dimple.barchart.showElements.name"
+                                   default="Show"/>
+                    </label>
+                    <div class="col-sm-9" data-toggle="buttons">
+                        <div class="btn-group btn-group-justified">
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowGridlines"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
+                                    default="Show Gridlines"/>
+                            </label>
 
-                    <div class="checkbox col-sm-offset-3">
-                        <label>
-                            <input type="checkbox" id="inputShowYAxis"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
-                                default="Show y-Axis"/>
-                        </label>
-                    </div>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowYAxis"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
+                                    default="Show y-Axis"/>
+                            </label>
 
-                    <div class="checkbox col-sm-offset-3">
-                        <label>
-                            <input type="checkbox" id="inputShowXAxis"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
-                                default="Show x-Axis"/>
-                        </label>
-                    </div>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowXAxis"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
+                                    default="Show x-Axis"/>
+                            </label>
 
-                    <div class="checkbox col-sm-offset-3">
-                        <label>
-                            <input type="checkbox" id="inputShowBarLabels"><g:message
-                                code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
-                                default="Show Barlabels"/>
-                        </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="inputShowBarLabels"><g:message
+                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
+                                    default="Show Bar Labels"/>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row hidden" id="assign-color-clone">
-                <label class="col-sm-5 control-label">
-                </label>
-                <input class="col-sm-1" type="color" value="#FFFFFF" class="form-control">
+            <div class="hidden input-group colorpicker-component form-row" id="assign-color-clone">
+                <span class="colorLabel input-group-addon"></span>
+                <input type="text" value="#FFFFFF" class="form-control"/>
+                <span class="input-group-addon colorpicker-target"><i></i></span>
             </div>
 
-            <div class="row hidden" id="y-axis-alias-clone">
-                <label class="col-sm-5 control-label">
-                </label>
-
-                <input class="col-sm-3 labelInput" type="text">
+            <div class="hidden" id="y-axis-alias-clone">
+                <input class="labelInput form-control form-row" type="text">
                 <input class="hidden unitInput" type="text">
             </div>
 
@@ -133,10 +133,10 @@
         $("#x-axis-label").val(chart.getXLabel());
         $("#inputChartWidth").val(chart.getWidth());
         $("#inputChartHeight").val(chart.getHeight());
-        $("#inputShowXAxis").prop("checked", chart.getShowXAxis());
-        $("#inputShowYAxis").prop("checked", chart.getShowYAxis());
-        $("#inputShowGridlines").prop("checked", chart.getShowGridlines());
-        $("#inputShowBarLabels").prop("checked", chart.getShowBarLabels());
+        if (chart.getShowXAxis()) $("#inputShowXAxis").parent().addClass('active');
+        if (chart.getShowYAxis()) $("#inputShowYAxis").parent().addClass('active');
+        if (chart.getShowGridlines()) $("#inputShowGridlines").parent().addClass('active');
+        if (chart.getShowBarLabels()) $("#inputShowBarLabels").parent().addClass('active');
         $("#assign-color-container").empty();
         $("#y-axis-alias-container").empty();
         var colorAssignments = chart.getColorAssignments();
@@ -145,9 +145,11 @@
             clone.removeAttr("id");
             clone.removeClass("hidden");
             clone.appendTo($("#assign-color-container"));
-            clone.find("label").html(assignment.label);
+            clone.find(".colorLabel").html(OpenSpeedMonitor.i18n.measurandLabels[assignment.label]);
+            clone.find(".colorLabel").data('label', assignment.label);
             clone.find("input").val(assignment.color);
         });
+        $('.colorpicker-component').colorpicker({component: '.colorpicker-target'});
         var yLabels = chart.getYLabels();
         yLabels.forEach(function(label) {
             var clone = $("#y-axis-alias-clone").clone();

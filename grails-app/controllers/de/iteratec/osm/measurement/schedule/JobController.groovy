@@ -87,7 +87,6 @@ class JobController {
         def model = [
                 jobs                                           : jobs,
                 jobsWithTags                                   : jobService.listJobsWithTags(),
-                jobSets                                        : JobSet.findAll(),
                 filters                                        : params.filters,
                 measurementsEnabled                            : inMemoryConfigService.areMeasurementsGenerallyEnabled(),
                 lastNMinutesToShowSuccessfulResultsInJoblist   : LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,
@@ -115,6 +114,9 @@ class JobController {
     def create() {
         Job job = new Job(params)
         job.maxDownloadTimeInMinutes = configService.getDefaultMaxDownloadTimeInMinutes()
+        job.firstViewOnly = true
+        job.persistNonMedianResults = false
+        job.captureVideo = true
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
 
@@ -242,7 +244,7 @@ class JobController {
      * Execute handler for each job selected using the checkboxes
      * @param handler A closure which gets the corresponding job as first parameter
      */
-    void handleSelectedJobs(Closure handler) {
+    void handleSelectedJobs(String actionName, Closure handler) {
         Map<Long, Object> massExecutionResults = [:]
         if (params.selected) {
             List<Long> selectedIds = params.selected.findAll { jobId -> jobId.key.isLong() && "on".equals(jobId.value) }
@@ -251,7 +253,7 @@ class JobController {
                 Job job = Job.get(it)
                 handler(job, massExecutionResults)
             }
-            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, filters: params.filters])
+            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, performedAction: actionName, filters: params.filters])
         } else {
             redirect(action: 'index', model: [filters: params.filters])
         }
@@ -267,7 +269,7 @@ class JobController {
                 render e.htmlResult
             }
         } else {
-            handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
+            handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
                 if (jobProcessingService.launchJobRun(job))
                     massExecutionResults[job.id] = [status: 'success']
                 else
@@ -276,8 +278,22 @@ class JobController {
         }
     }
 
+    def deleteSelectedJobs() {
+        handleSelectedJobs("deleteSelectedJobs") { Job job, Map<Long, Object> massExecutionResults ->
+            String jobName = job.label
+            try {
+                jobService.deleteJob(job)
+                massExecutionResults[job.id] = [status : 'success',
+                                                message: message(code: 'de.iteratec.isj.job.deleted.success', default: "Deleted", args: [jobName])]
+            } catch (Exception e) {
+                massExecutionResults[job.id] = [status : 'failure',
+                                                message: message(code: 'de.iteratec.isj.job.deleted.error', default: "Failed to delete", args: [jobName, e.getMessage()])]
+            }
+        }
+    }
+
     def toggleActive(boolean active) {
-        handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
+        handleSelectedJobs("toggleActive") { Job job, Map<Long, Object> massExecutionResults ->
             job.active = active
             if (job.save(flush: true)) {
                 massExecutionResults[job.id] = [status : 'success',
@@ -397,26 +413,38 @@ class JobController {
         ]
     }
 
-    def saveJobSet() {
-        if (params.selected) {
+    def getTagsForJobs() {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+        List<String> tagNames = Job.getAll(jobIds)*.tags.flatten().unique(false).sort()
+        ControllerUtils.sendObjectAsJSON(response, ["tags": tagNames])
+    }
 
-            List<Long> selectedIds = params.selected.findAll { jobId -> jobId.key.isLong() && "on".equals(jobId.value) }
-                    .collect { jobId -> jobId.key.toLong() }
-
-            if (selectedIds.size() > 0) {
-
-                JobSet jobSet = new JobSet(name: params.jobSetName)
-                selectedIds.each {
-                    jobSet.addToJobs(Job.get(it))
-                }
-                if (!jobSet.save(flush: true)) {
-                    render(view: 'index', model: getListModel() << [selectedIds: selectedIds, filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetUniqueError", "unique")])
-                    return
-                }
-                render(view: 'index', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobSetSuccess", "success")])
-                return
-            }
+    def removeTag(String tag) {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+        Job.getAll(jobIds).each { job ->
+            job.removeTag(tag)
+            job.save(failOnError: true)
         }
-        render(view: 'index', model: getListModel() << [filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetEmptyJobList", "empty list")])
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+    }
+
+    def addTagToJobs(String tag) {
+        List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()
+
+        Job.getAll(jobIds).each { job ->
+            job.addTag(tag)
+            job.save(failOnError: true)
+        }
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+    }
+
+    def showLastResultForJob(Long id) {
+        Job job = Job.get(id)
+        redirect(url: jobService.createResultLinkForJob(job))
+    }
+
+    def showLastPageAggregationForJob(Long id) {
+        Job job = Job.get(id)
+        redirect(url: jobService.createPageAggregationLinkForJob(job))
     }
 }

@@ -34,9 +34,7 @@ function filterScriptList() {
     });
 }
 $(document).ready(function(){
-  var offsetFixedHeader = $('.navbar-header').height();
   $("#script-table").stickyTableHeaders({
-    fixedOffset: offsetFixedHeader,
     cacheHeaderHeight: true
   });
 });

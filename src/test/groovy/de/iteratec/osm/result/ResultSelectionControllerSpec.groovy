@@ -12,11 +12,12 @@ import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
+
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ResultSelectionController)
-@Mock([Location, Script, JobGroup, Job, JobResult, WebPageTestServer, Browser])
+@Mock([JobGroup])
 class ResultSelectionControllerSpec extends Specification {
     JobGroup jobGroup1
     JobGroup jobGroup2
@@ -36,6 +37,7 @@ class ResultSelectionControllerSpec extends Specification {
         def command = new ResultSelectionCommand()
 
         when:
+        params.caller = "EventResult"
         params.from = from
         params.to = to
         controller.bindData(command, params)
@@ -57,6 +59,7 @@ class ResultSelectionControllerSpec extends Specification {
         when:
         params.from = "2016-11-15T08:30:00Z"
         params.to = "2016-11-15T08:30:02Z"
+        params.caller = "EventResult"
         controller.bindData(command, params)
 
         then:
@@ -68,6 +71,7 @@ class ResultSelectionControllerSpec extends Specification {
         given:
         params.from = "2016-11-14T08:30:00.23Z"
         params.to = "2016-11-15" // local time zone
+        params.caller = "EventResult"
         def command = new ResultSelectionCommand()
 
         when:
@@ -76,6 +80,6 @@ class ResultSelectionControllerSpec extends Specification {
         then:
         command.validate()
         command.from == new DateTime(2016, 11, 14, 8, 30, 0, 230, DateTimeZone.UTC)
-        command.to== new DateTime(2016, 11, 15, 0, 0) // local time zone
+        command.to == new DateTime(2016, 11, 15, 0, 0) // local time zone
     }
 }

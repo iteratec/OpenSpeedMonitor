@@ -63,7 +63,6 @@ class LocationTests {
         String testStringValide = "*".padLeft(150,"*")
         String testStringInvalide = "*".padLeft(151,"*")
         Location testLocation = new Location(active: true,
-                valid: 1,
                 uniqueIdentifierForServer: "Test",
                 location: "Test",
                 label: testStringValide,

@@ -4,64 +4,39 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
+    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="/pageAggregation/show.css"/>
 
 </head>
 
 <body>
+<h1><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></h1>
 
-<%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
+<p>
+    <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
+               default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
+</p>
+<div class="card hidden" id="chart-card">
+    <div id="error-div" class="hidden">
+        <div class="alert alert-danger">
+            <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 
-<div class="row">
-    <div class="col-md-12">
-        <%-- heading --%>
-        <h3><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></h3>
-
-        <p>
-            <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
-                       default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
-        </p>
-
-        %{-- error messages --}%
-        <div id="error-div" class="col-md-12 hidden">
-            <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
-
-                <div id="error-message"></div>
-            </div>
+            <div id="error-message"></div>
         </div>
     </div>
+    <g:render template="barChart"/>
 </div>
-
-
-<g:render template="barChart"/>
 
 <div class="row">
     <div class="col-md-12">
         <form id="dashBoardParamsForm">
-            <!-- Split button to show/download -->
+            <!-- show button -->
             <div class="action-row">
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <button type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary">
-                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="#downloadAsPngModal" id="dia-save-chart-as-png"
-                                   class="btn btn-primary btn-sm disabled"
-                                   data-toggle="modal" role="button"
-                                   style="vertical-align: top;" onclick="setDefaultValues('svg-container')">
-                                    <g:message code="de.iteratec.ism.ui.button.save.name"/>
-                                </a>
-                            </li>
-                        </ul>
+                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary show-button">
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings" />
                 </div>
@@ -115,10 +90,12 @@
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });
 
+        // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
+        var spinner = OpenSpeedMonitor.Spinner("#chart-container");
+
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-            var spinner = OpenSpeedMonitor.Spinner("#chart-container");
             OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
             spinner.start();
             $.ajax({
@@ -156,6 +133,12 @@
                 }
             });
         }
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
+            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
+            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
+            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
+            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
+
     </asset:script>
 </content>
 

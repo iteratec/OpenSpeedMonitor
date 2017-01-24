@@ -1,7 +1,7 @@
 <div class="card">
-    <legend for="selectAggregatorUncachedHtmlId"><g:message
+    <h2 for="selectAggregatorUncachedHtmlId"><g:message
             code="de.iteratec.isr.wptrd.labels.filterFirstView"
-            default="First View"/></legend>
+            default="First View"/></h2>
     <g:if test="${selectedAggrGroupValuesUnCached.size() == 0}"><g:set
             var="selectedAggrGroupValuesUnCached"
             value="${['docCompleteTimeInMillisecsUncached']}"/></g:if>

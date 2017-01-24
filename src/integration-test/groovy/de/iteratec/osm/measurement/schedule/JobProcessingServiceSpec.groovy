@@ -33,6 +33,8 @@ import grails.transaction.Rollback
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.http.HttpVersion
 import org.apache.http.message.BasicHttpResponse
+import org.joda.time.DateTime
+import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
@@ -123,7 +125,6 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 label: 'Unnamed location',
                 dateCreated: new Date(),
                 active: true,
-                valid: 1,
                 wptServer: wptServer,
                 location: 'location',
                 browser: browser
@@ -195,6 +196,35 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         jobProcessingService.unscheduleJob(activeJob2)
     }
 
+    void "closeRunningAndPengingJobs test"() {
+        given:
+        // fix current date for test purposes
+        DateTimeUtils.setCurrentMillisFixed(1482395596904);
+        DateTime currentDate = new DateTime()
+        Job jobWithMaxDownloadTime = createJob(false)
+        jobWithMaxDownloadTime.maxDownloadTimeInMinutes = 60
+
+        TestDataUtil.createJobResult("running test", currentDate.toDate(), jobWithMaxDownloadTime, location, 100)
+        TestDataUtil.createJobResult("pending test", currentDate.toDate(), jobWithMaxDownloadTime, location, 101)
+        TestDataUtil.createJobResult("barely running test", currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), jobWithMaxDownloadTime, location, 100)
+        TestDataUtil.createJobResult("outdated running test", currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), jobWithMaxDownloadTime, location, 100)
+        TestDataUtil.createJobResult("outdated pending test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 101)
+        TestDataUtil.createJobResult("finished test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 200)
+        TestDataUtil.createJobResult("failed test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 504)
+
+        when: "closing running and pending job results"
+        jobProcessingService.closeRunningAndPengingJobResults()
+
+        then:
+        JobResult.findByTestId("running test").httpStatusCode == 100
+        JobResult.findByTestId("pending test").httpStatusCode == 101
+        JobResult.findByTestId("barely running test").httpStatusCode == 100
+        JobResult.findByTestId("outdated running test").httpStatusCode == 900
+        JobResult.findByTestId("outdated pending test").httpStatusCode == 900
+        JobResult.findByTestId("finished test").httpStatusCode == 200
+        JobResult.findByTestId("failed test").httpStatusCode == 504
+    }
+
     /**
      * Tests the following methods of JobProcessingService:
      * 	getCurrentlyRunningJobs
@@ -221,13 +251,13 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         // cause quartz scheduling doesn't seem to work trustable in tests
         Job.withNewTransaction {
             job = jobDaoService.getJobById(jobId)
-        jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
+            jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
         }
         TriggerKey subtriggerKey
 
         Job.withNewTransaction {
             // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
-             subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
+            subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         }
         Trigger subtrigger
         // no Job in  JobStore, because no Triger was created --> returns null

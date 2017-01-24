@@ -6,9 +6,10 @@
     <title><g:message code="de.iteratec.iss.scripts" /></title>
 </head>
 <body>
-	<%-- main menu --%>
-	<g:render template="/layouts/mainMenu"/>
-
+	<h1>
+		<g:message code="de.iteratec.iss.scripts" default="Scripts"/>
+	</h1>
+<div class="card">
 	<div class="row table-filter">
 		<div class="col-md-8">
 			<input type="text" id="filterByLabel" onkeyup="filterScriptList()" class="form-control"
@@ -54,5 +55,6 @@
     <content tag="include.bottom">
         <asset:javascript src="script/list.js"/>
     </content>
+</div>
 </body>
 </html>

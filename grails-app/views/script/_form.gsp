@@ -12,14 +12,14 @@
 		<g:message code="script.description.label" default="Beschreibung" />
 	</label>
 	<div class="col-md-10">
-    	<textarea class="form-control" name="description" id="description" rows="3">${script?.description}</textarea>
+		<textarea class="form-control" name="description" id="description" rows="3">${script?.description}</textarea>
 	</div>
 </div>
 <div class="fieldcontain ${hasErrors(bean: script, field: 'navigationScript', 'error')}">
-    <div class="text-right"><a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
-        <g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text" default="Documentation WebPagetest DSL" /></a></div>
+	<div class="text-right"><a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
+		<g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text" default="Documentation WebPagetest DSL" /></a></div>
 	<g:render template="codemirror" model="${['code': script?.navigationScript, 'measuredEvents': measuredEvents, 'autoload': true]}" />
-	<p style="margin-top: 1em;"><g:message code="script.autoComplete.label" default="Drücken Sie Strg + Leertaste zum Vervollständigen von Event-Namen." /></p>	
+	<p style="margin-top: 1em;"><g:message code="script.autoComplete.label" default="Drücken Sie Strg + Leertaste zum Vervollständigen von Event-Namen." /></p>
 </div>
 
 

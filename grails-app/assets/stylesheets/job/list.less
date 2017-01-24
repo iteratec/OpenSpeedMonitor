@@ -1,8 +1,104 @@
 /*
 *= require_self
 */
-@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins/clearfix.less";
+@import "../variables-corporate";
 
+#filterRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+#filterRow > div {
+  flex: 0 1 auto;
+  margin-bottom: 10px;
+}
+
+#filterRow #actionForSelectedContainer {
+  margin-right: 15px;
+}
+
+#filterRow #filterInputContainer {
+  flex-grow: 1;
+  position: relative;
+  input {
+    min-width: 5em;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+#filterRow #clearFilter {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  height: @font-size-large;
+  margin: auto;
+  font-size: @font-size-large;
+  cursor: pointer;
+  color: @gray;
+}
+
+#filterRow .filterButtonsContainer {
+
+  .description {
+    padding: @padding-base-vertical @padding-base-horizontal;
+    border: 1px @btn-default-border solid;
+    border-right: 0;
+    display: block;
+    float: left;
+    position: relative;
+    vertical-align: middle;
+    margin-left: -1px;
+    background: @input-group-addon-bg;
+  }
+
+  .btn-group .btn:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+#filterRow #filterShowOnly {
+  margin-left: 15px;
+  .description {
+    border-top-left-radius: @border-radius-base;
+    border-bottom-left-radius: @border-radius-base;
+  }
+}
+
+#filterRow #createJobContainer {
+  margin-left: 15px;
+}
+
+#jobtable tr.stripe {
+  background-color: @table-bg-accent;
+}
+
+#jobtable .jobName {
+  font-weight: bold;
+}
+
+#jobtable .script {
+  font-style: italic;
+  font-weight: normal;
+}
+
+#jobtable td ul.tags {
+  margin-top: 5px;
+}
+
+#jobtable td .jobStatusBar {
+  display: block;
+}
+
+#jobtable td.summary {
+  padding-right: (@font-size-base * 1.5 + 2 * 8px) + 8px; // button size + normal padding
+}
 
 table#jobtable tr.success td {
   background: rgb(171, 248, 171) !important;
@@ -20,9 +116,11 @@ table#jobtable tr.failure td {
 
 }
 
-label {
-  display: inline !important;
-  margin-right: 1em;
+#actionForSelected {
+  padding-left: 9px;
+  .caret {
+    margin-right: 15px;
+  }
 }
 
 .cronExpression {
@@ -33,37 +131,29 @@ label {
   display: none;
 }
 
+#jobtable th {
+  vertical-align: top;
+}
+
 ul.tags {
-  display: inline-block;
+  display: block;
   margin: 0;
   padding: 0;
   list-style-type: none;
+  .clearfix();
 }
 
-ul.tags li { /*display: inline;*/
+ul.tags li {
   display: block;
   float: left;
   margin: 0 3px 0 0;
   border: 1px #ccc solid;
-  padding: 1px 2px 1px 2px;
-  border-radius: 5px;
-  background: #ddd;
-}
-
-.chosen-container {
-  width: 100%;
+  padding: 1px 3px 1px 3px;
   border-radius: 4px;
-  border: 1px solid #cccccc;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  color: #555555;
+  background: rgba(255, 255, 255, 1);
 }
 
-.chosen-container .search-field {
-  height: 32px;
-}
-
-.inactiveJob {
+#jobtable .inactiveJob {
   font-weight: normal;
 }
 
@@ -79,15 +169,16 @@ ul.tags li { /*display: inline;*/
 
 .show-chart-buttons {
   float: right;
-	display: block;
+  display: block;
+  margin-right: -(@font-size-base * 1.5 + 2 * 8px);
 }
 
 .show-chart-buttons a {
   padding: 5px 8px;
   border-radius: 4px;
-	display: inline-block;
+  display: block;
   &:hover, &:focus {
-		background-color: rgba(0, 0, 0, 0.07);
+    background-color: rgba(0, 0, 0, 0.07);
   }
 }
 
@@ -127,17 +218,40 @@ ul.tags li { /*display: inline;*/
 }
 
 .job-status-good {
-  background-color: #5CB85C; /*botstrap success*/
+  background-color: @brand-success;
 }
 
 .job-status-warn {
-  background-color: #F0AD4E; /*botstrap warning*/
+  background-color: @brand-warning;
 }
 
 .job-status-error {
-  background-color: #D9534F; /*botstrap danger*/
+  background-color: @brand-danger;
 }
 
 .job-status-nodata {
-  background-color: #777; /*botstrap gray-light*/
+  background-color: @gray-light;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+  top: 100%;
+  left: 0;
+  margin-top: -1px;
+}
+
+#add-tag-container,
+#remove-tag-container {
+  margin: 5px 10px 5px 20px;
+}
+
+#actionForSelectedContainer .dropdown-menu {
+  min-width: 250px;
+}
+
+#remove-tag-select {
+  width: 100%;
 }

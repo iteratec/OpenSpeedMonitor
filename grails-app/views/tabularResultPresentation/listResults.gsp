@@ -3,13 +3,11 @@
     <head>
         <meta name="layout" content="kickstart_osm" />
         <title><g:message code="de.iteratec.isocsi.eventResult"/></title>
+        <asset:javascript src="chartSwitch"/>
         <asset:stylesheet src="tabularResultPresentation/listResults.css"/>
     </head>
     <body>
-
-        <%-- main menu --%>
-        <g:render template="/layouts/mainMenu"/>
-
+        <h1><g:message code="de.iteratec.result.title" default="Result List"/></h1>
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-danger">
@@ -25,20 +23,20 @@
             </g:hasErrors>
         </g:if>
 
-        <g:if test="showEventResultsListing">
+        <g:if test="${showEventResultsListing}">
+            <div class="card">
+                <g:render template="listResults"
+                          model="${[model: eventResultsListing]}" />
 
-            <g:render template="listResults"
-                      model="${[model: eventResultsListing]}" />
-
-            <g:render template="pagination"
-                      model="${[model: paginationListing] }" />
-
+                <g:render template="pagination"
+                          model="${[model: paginationListing] }" />
+            </div>
         </g:if>
 
         <form method="get" action="">
             <div class="action-row">
                 <div class="col-md-12">
-                    <g:actionSubmit class="btn btn-primary pull-right" id="show-button"
+                    <g:actionSubmit class="btn btn-primary pull-right show-button" id="show-button"
                                     value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
                                     action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" />
                     <g:render template="/_resultSelection/hiddenWarnings" />
@@ -93,6 +91,11 @@
                 $(window).load(function() {
                    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
                 });
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
+                "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
+                "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
+                "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
+                "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
             </asset:script>
         </content>
     </body>
