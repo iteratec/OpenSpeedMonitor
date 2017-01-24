@@ -8,7 +8,13 @@
   margin: 0 -15px;
 
   .card {
-    margin: 0px -7.5px 15px -7.5px;
+    margin: 0 -7.5px 15px -7.5px;
+  }
+
+  .tab-content {
+    border-top-color: transparent;
+    border-radius: 0 0 4px 4px;
+    margin: 15px 0 15px 0;
   }
 }
 
@@ -33,6 +39,10 @@
     color: @legend-color;
     border: 0;
     border-bottom: 1px solid @legend-border-color;
+  }
+
+  .tab-content {
+    margin: 0 0 15px 0;
   }
 }
 
@@ -98,9 +108,3 @@
   box-shadow: @card-well-tab-active-shadow;
   z-index: 1;
 }
-
-.card-well.tab-content {
-  border-top-color: transparent;
-  border-radius: 0 0 4px 4px;
-}
-
