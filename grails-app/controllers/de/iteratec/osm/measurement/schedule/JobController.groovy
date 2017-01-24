@@ -116,6 +116,7 @@ class JobController {
         job.maxDownloadTimeInMinutes = configService.getDefaultMaxDownloadTimeInMinutes()
         job.firstViewOnly = true
         job.persistNonMedianResults = false
+        job.captureVideo = true
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
 
