@@ -4,6 +4,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
+import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
@@ -363,6 +364,10 @@ class ResultSelectionCommand {
     List<Long> connectivityIds
     Boolean nativeConnectivity
     List<String> customConnectivities
+    @BindUsing({object, source ->
+        // set default to EventResult
+        source['caller'] ?: Caller.EventResult
+    })
     Caller caller
 
     static constraints = {

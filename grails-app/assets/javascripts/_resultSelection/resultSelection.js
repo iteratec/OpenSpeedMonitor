@@ -5,7 +5,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 /**
  * Requires OpenSpeedMonitor.urls.resultSelection.getJobGroups to be defined
  */
-OpenSpeedMonitor.resultSelection = (function(){
+OpenSpeedMonitor.resultSelection = (function () {
     var selectIntervalTimeframeCard = $("#select-interval-timeframe-card");
     var selectJobGroupCard = $("#select-jobgroup-card");
     var selectPageLocationConnectivityCard = $('#select-page-location-connectivity');
@@ -27,8 +27,7 @@ OpenSpeedMonitor.resultSelection = (function(){
         locationIds: null,
         connectivityIds: null,
         nativeConnectivity: null,
-        customConnectivities: null,
-        caller: $("#dashBoardParamsForm").data("caller")
+        customConnectivities: null
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = false;
@@ -40,8 +39,11 @@ OpenSpeedMonitor.resultSelection = (function(){
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var lastResultCount = 1;
 
-    var init = function() {
+    var init = function () {
         registerEvents();
+
+        // add caller to QueryArgs if caller is set. If not, set a default value
+        currentQueryArgs['caller'] = $("#dashBoardParamsForm").data("caller") ? $("#dashBoardParamsForm").data("caller") : "EventResult";
 
         // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
@@ -61,7 +63,7 @@ OpenSpeedMonitor.resultSelection = (function(){
         updateCards();
     };
 
-    var registerEvents = function() {
+    var registerEvents = function () {
         selectIntervalTimeframeCard.on("timeFrameChanged", setQueryArgsFromTimeFrame);
         selectJobGroupCard.on("jobGroupSelectionChanged", setQueryArgsFromJobGroupSelection);
         selectPageLocationConnectivityCard.on("pageSelectionChanged", setQueryArgsFromPageSelection);
@@ -95,7 +97,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var setQueryArgsFromLocationSelection = function (ev, locationSelection) {
-        currentQueryArgs.locationIds =  locationSelection.hasAllSelected ? null : locationSelection.ids;
+        currentQueryArgs.locationIds = locationSelection.hasAllSelected ? null : locationSelection.ids;
         updateCards("browsers");
     };
 
@@ -108,7 +110,7 @@ OpenSpeedMonitor.resultSelection = (function(){
 
     var setQueryArgsFromMeasuredEventSelection = function (event, measuredEventSelection) {
         hasMeasuredEventSelection = !!(measuredEventSelection && measuredEventSelection.ids && measuredEventSelection.ids.length > 0);
-        currentQueryArgs.measuredEventIds =  measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
+        currentQueryArgs.measuredEventIds = measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
         updateCards("pages");
     };
 
@@ -168,7 +170,7 @@ OpenSpeedMonitor.resultSelection = (function(){
         validateForm();
     };
 
-    var updateCard = function(url, handler, spinner) {
+    var updateCard = function (url, handler, spinner) {
         if (ajaxRequests[url]) {
             ajaxRequests[url].abort();
         }
@@ -204,6 +206,5 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     init();
-    return {
-    };
+    return {};
 })();
