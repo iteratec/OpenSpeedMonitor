@@ -276,8 +276,6 @@ grails:
                             {pattern: '/job/nextExecution',                             access: ["permitAll"]},
                             {pattern: '/job/getLastRun',                                access: ["permitAll"]},
                             {pattern: '/job/getTagsForJobs',                            access: ["permitAll"]},
-                            {pattern: '/job/removeTag',                                 access: ["permitAll"]},
-                            {pattern: '/job/addTagToJobs',                              access: ["permitAll"]},
                             {pattern: '/job/showLastResultForJob/**',                   access: ["permitAll"]},
                             {pattern: '/job/showLastPageAggregationForJob/**',          access: ["permitAll"]},
                             {pattern: '/jobResult/**',                                  access: ["permitAll"]},
