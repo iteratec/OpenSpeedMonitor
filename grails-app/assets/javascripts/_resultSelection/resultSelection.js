@@ -81,36 +81,36 @@ OpenSpeedMonitor.resultSelection = (function () {
 
     var setQueryArgsFromJobGroupSelection = function (event, jobGroupSelection) {
         hasJobGroupSelection = !!(jobGroupSelection && jobGroupSelection.ids && jobGroupSelection.ids.length > 0);
-        currentQueryArgs.jobGroupIds = jobGroupSelection.hasAllSelected ? null : jobGroupSelection.ids;
+        currentQueryArgs.jobGroupIds = jobGroupSelection.ids;
         updateCards("jobGroups");
     };
 
     var setQueryArgsFromPageSelection = function (event, pageSelection) {
         hasPageSelection = !!(pageSelection && pageSelection.ids && pageSelection.ids.length > 0);
-        currentQueryArgs.pageIds = pageSelection.hasAllSelected ? null : pageSelection.ids;
+        currentQueryArgs.pageIds = pageSelection.ids;
         updateCards("pages");
     };
 
     var setQueryArgsFromBrowserSelection = function (event, browserSelection) {
-        currentQueryArgs.browserIds = browserSelection.hasAllSelected ? null : browserSelection.ids;
+        currentQueryArgs.browserIds = browserSelection.ids;
         updateCards("browsers");
     };
 
     var setQueryArgsFromLocationSelection = function (ev, locationSelection) {
-        currentQueryArgs.locationIds = locationSelection.hasAllSelected ? null : locationSelection.ids;
+        currentQueryArgs.locationIds = locationSelection.ids;
         updateCards("browsers");
     };
 
     var setQueryArgsFromConnectivitySelection = function (event, connectivitySelection) {
-        currentQueryArgs.connectivityIds = connectivitySelection.hasAllSelected ? null : connectivitySelection.ids;
-        currentQueryArgs.nativeConnectivity = connectivitySelection.hasAllSelected ? null : connectivitySelection.native;
-        currentQueryArgs.customConnectivities = connectivitySelection.hasAllSelected ? null : connectivitySelection.customNames;
+        currentQueryArgs.connectivityIds = connectivitySelection.ids;
+        currentQueryArgs.nativeConnectivity = connectivitySelection.native;
+        currentQueryArgs.customConnectivities = connectivitySelection.customNames;
         updateCards("connectivity");
     };
 
     var setQueryArgsFromMeasuredEventSelection = function (event, measuredEventSelection) {
         hasMeasuredEventSelection = !!(measuredEventSelection && measuredEventSelection.ids && measuredEventSelection.ids.length > 0);
-        currentQueryArgs.measuredEventIds = measuredEventSelection.hasAllSelected ? null : measuredEventSelection.ids;
+        currentQueryArgs.measuredEventIds = measuredEventSelection.ids;
         updateCards("pages");
     };
 
