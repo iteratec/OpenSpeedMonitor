@@ -17,7 +17,7 @@
 <%-- main menu --%>
 <h1><g:message code="de.iteratec.isocsi.csi.jobs.heading" default="Jobs" /></h1>
 <div class="card">
-<g:form>
+<g:form action="action">
     <g:if test="${!measurementsEnabled}">
         <div class="alert alert-warning">
             <h4><g:message code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.header"
@@ -86,57 +86,61 @@
 
     <div id="filterRow">
         <div class="btn-group" id="actionForSelectedContainer">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+            <sec:ifNotGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+                <g:set var="actionDisabled" value="disabled" />
+            </sec:ifNotGranted>
+            <button class="btn btn-default dropdown-toggle ${actionDisabled}" type="button" data-toggle="dropdown"
                     id="actionForSelected">
                 <span class="caret"></span>
                 <g:message code="job.list.actionForSelected" default="Action"/>
             </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <button type="submit" name="_action_execute">
-                        <i class="fa fa-play"></i>
-                        <g:message code="de.iteratec.isj.job.runonce" default="Run now" />
-                    </button>
-                </li>
-                <li>
-                    <button type="submit" name="_action_activate">
-                        <i class="fa fa-toggle-on"></i>
-                        <g:message code="de.iteratec.isj.job.activate" default="Activate" />
-                    </button>
-                </li>
-                <li>
-                    <button type="submit" name="_action_deactivate">
-                        <i class="fa fa-toggle-off"></i>
-                        <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate" />
-                    </button>
-                </li>
-                <sec:ifLoggedIn>
-                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+            <sec:ifLoggedIn>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button type="submit" name="_action_execute">
+                                <i class="fa fa-play"></i>
+                                <g:message code="de.iteratec.isj.job.runonce" default="Run now" />
+                            </button>
+                        </li>
+                        <li>
+                            <button type="submit" name="_action_activate">
+                                <i class="fa fa-toggle-on"></i>
+                                <g:message code="de.iteratec.isj.job.activate" default="Activate" />
+                            </button>
+                        </li>
+                        <li>
+                            <button type="submit" name="_action_deactivate">
+                                <i class="fa fa-toggle-off"></i>
+                                <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate" />
+                            </button>
+                        </li>
                         <li>
                             <button type="submit" name="_action_deleteSelectedJobs">
                                 <i class="fa fa-trash-o"></i>
                                 <g:message code="de.iteratec.isj.job.delete" default="Delete" />
                             </button>
                         </li>
-                    </sec:ifAnyGranted>
-                </sec:ifLoggedIn>
-                <li role="separator" class="divider"></li>
-                <li>
-                    <div id="add-tag-container" class="input-group input-group-sm">
-                        <input id="add-tag-input" class="form-control" placeholder="tag">
-                        <a href="#" id="add-tag-confirm-button"
-                           class="btn btn-primary btn-sm input-group-addon">${message(code: "de.iteratec.isj.job.addTag", default: "add Tag")}
-                        </a>
-                    </div>
-                </li>
-                <li>
-                    <div id="remove-tag-container">
-                    <select id="remove-tag-select" class="input-sm chosen-select chosen">
-                        <option value="0" disabled selected>${message(code: "de.iteratec.isj.job.removeTag", default: "remove Tag")}</option>
-                    </select>
-                    </div>
-                </li>
-            </ul>
+
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <div id="add-tag-container" class="input-group input-group-sm">
+                                <input id="add-tag-input" class="form-control" placeholder="tag">
+                                <a href="#" id="add-tag-confirm-button"
+                                   class="btn btn-primary btn-sm input-group-addon">${message(code: "de.iteratec.isj.job.addTag", default: "add Tag")}
+                                </a>
+                            </div>
+                        </li>
+                        <li>
+                            <div id="remove-tag-container">
+                            <select id="remove-tag-select" class="input-sm chosen-select chosen">
+                                <option value="0" disabled selected>${message(code: "de.iteratec.isj.job.removeTag", default: "remove Tag")}</option>
+                            </select>
+                            </div>
+                        </li>
+                    </ul>
+                </sec:ifAnyGranted>
+            </sec:ifLoggedIn>
         </div>
 
         <div id="filterInputContainer">

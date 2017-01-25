@@ -61,8 +61,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
             selectedValues = OpenSpeedMonitor.domUtils.getAllOptionValues(jobGroupSelectElement);
         }
         return {
-            ids: selectedValues,
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(jobGroupSelectElement) && !selectedTag
+            ids: selectedValues
         };
     };
 
