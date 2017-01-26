@@ -1,17 +1,26 @@
-osm:
-  image: iteratec/openspeedmonitor
-  entrypoint: dockerize -wait tcp://osm_mysql:3306 -timeout 240s /entrypoint.sh
-  ports:
-   - "8080:8080"
-  links:
-   - osm_mysql
-  environment:
-    MYSQL_HOST: osm_mysql
+version: '2'
 
-osm_mysql:
-  image: mysql
-  environment:
-    MYSQL_ROOT_PASSWORD: anything
-    MYSQL_DATABASE: osm
-    MYSQL_USER: osm
-    MYSQL_PASSWORD: osm123
+services:
+
+  osm:
+    image: iteratec/openspeedmonitor:latest
+    container_name: osm_service
+    entrypoint: dockerize -wait tcp://osm_mysql:3306 -timeout 240s /entrypoint.sh
+    ports:
+     - "8080:8080"
+    links:
+     - osm_mysql
+    env_file:
+      - .env_osm
+
+  osm_mysql:
+    image: mysql
+    container_name: osm_mysql
+    volumes:
+      - osm_mysql_data:/var/lib/mysql
+    env_file:
+      - .env_osm_mysql
+
+volumes:
+  osm_mysql_data:
+    driver: local
