@@ -20,7 +20,7 @@
             <span class="icon-bar"></span>
         </button>
         <g:link absolute="true" class="navbar-brand" uri="/">
-            <img class="icon" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_Icon_36px.png')}"
+            <img class="icon osm-icon-small" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_small.svg')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
                  alt="${meta(name: 'app.name')}"/>
