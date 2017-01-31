@@ -702,7 +702,7 @@
                     The body of the PUT request must consist of a json containing the execution schedule to set.<br>
                     Example body to let respective job run every two minutes:<br>
                     <pre>{"executionSchedule": "* */2 * * * ? *"}</pre>
-                    See <a  href="http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger" target="_blank">Quartz documentation</a> for cron syntax of schedule.
+                    See <a  href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html" target="_blank">Quartz documentation</a> for cron syntax of schedule.
                 </p>
                 <h4>Parameters</h4>
                 <dl>

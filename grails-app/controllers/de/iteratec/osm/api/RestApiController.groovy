@@ -677,7 +677,7 @@ class RestApiController {
      * Updates execution schedule of Job with submitted id. Schedule must be a valid quartz schedule.
      * This function can't be called without a valid apiKey as parameter.
      * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
-     * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
+     * @see http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html
      */
     public Map<String, Object> securedViaApiKeySetExecutionSchedule() {
 
@@ -701,7 +701,7 @@ class RestApiController {
 
         if (!CronExpression.isValidExpression(schedule)) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "The execution schedule you submitted in the body is invalid! " +
-                    "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
+                    "(see http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html for details).")
             return
         }
 
