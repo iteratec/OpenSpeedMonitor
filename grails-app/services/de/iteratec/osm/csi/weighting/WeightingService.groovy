@@ -45,7 +45,11 @@ class WeightingService {
      * @return
      */
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
-        List<CsiValue> csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
+
+        List<CsiValue> csiRelevantValues
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] filter csiValues by relevance', 3) {
+            csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
+        }
 
         return getWeightedAndFlattenedCsiValues(csiRelevantValues, weightFactors, csiConfiguration, { CsiValue value -> value.retrieveCsByWptDocCompleteInPercent() }, { CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete() })
     }
@@ -104,21 +108,27 @@ class WeightingService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValuesByVisuallyComplete] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', 3) {
             csiValues.each { CsiValue csiValue ->
-                value = getCsiValueClosure(csiValue)
-                weight = getWeight(csiValue, weightFactors, csiConfiguration)
-                underlyingResultIds = getUnderlyingEventResultsClosure(csiValue)
-
-                if (value != null && weight != null && weight > 0) {
-                    addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get value', 4) {
+                    value = getCsiValueClosure(csiValue)
                 }
-
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get weight', 4) {
+                    weight = getWeight(csiValue, weightFactors, csiConfiguration)
+                }
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get underlying event results', 4) {
+                    underlyingResultIds = getUnderlyingEventResultsClosure(csiValue)
+                }
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] create new weighted value and add it to list', 4) {
+                    if (value != null && weight != null && weight > 0) {
+                        addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
+                    }
+                }
             }
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValuesByVisuallyComplete] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', 1) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 
@@ -139,7 +149,7 @@ class WeightingService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', 1) {
             csiValues.each { CsiValue csiValue ->
                 value = getCsiValueClosure(csiValue)
                 JobGroup jobGroupOfCsiValue = csiValue.retrieveJobGroup()
@@ -157,7 +167,7 @@ class WeightingService {
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', 1) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 
@@ -220,9 +230,8 @@ class WeightingService {
         Contract.requiresArgumentNotNull("weightFactors", weightFactors)
 
         Double weight = 1
-
         if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.THREE) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] HOUROFDAY', 5) {
                 weight *= getHourOfDayWeight(csiValue)
             }
             if (weight == 0d) {
@@ -231,7 +240,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.THREE) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', 5) {
                 weight *= getBrowserConnectivityWeight(csiValue, csiConfiguration.browserConnectivityWeights)
             }
             if (weight == 0d) {
@@ -240,7 +249,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.PAGE)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.THREE) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] PAGE', 5) {
                 weight *= getPageWeightFrom(csiValue, csiConfiguration.pageWeights)
             }
             if (weight == 0d) {
@@ -270,22 +279,22 @@ class WeightingService {
      * @param browserConnectivityWeights
      * @return
      */
-    private getBrowserConnectivityWeight = { CsiValue csiValue, List<BrowserConnectivityWeight> browserConnectivityWeights ->
+    private double getBrowserConnectivityWeight(CsiValue csiValue, List<BrowserConnectivityWeight> browserConnectivityWeights){
 
         double browserConnectivityWeight
 
         Browser browser
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser', 6) {
             browser = csiValue.retrieveBrowser()
         }
         ConnectivityProfile connectivityProfile
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get connectivity profile', 6) {
             connectivityProfile = csiValue.retrieveConnectivityProfile()
         }
         if (browser == null || connectivityProfile == null) {
             browserConnectivityWeight = 0
         } else {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.FOUR) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser connectivity weight', 6) {
                 Double browserConnectivityWeightFromDb = browserConnectivityWeights.find {
                     it.browser == browser && it.connectivity == connectivityProfile
                 }?.weight

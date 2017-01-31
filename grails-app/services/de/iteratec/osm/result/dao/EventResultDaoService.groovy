@@ -24,8 +24,8 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.hibernate.sql.JoinType
 
@@ -138,7 +138,7 @@ public class EventResultDaoService {
     ) {
 
         List<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', 1) {
             eventResults = getLimitedMedianEventResultsBy(
                     fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [max: max, offset: offset], sorting
             )

@@ -25,8 +25,8 @@ import org.quartz.JobExecutionContext
 
 import java.util.concurrent.locks.ReentrantLock
 
+import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-import static de.iteratec.osm.util.Constants.*
 
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
@@ -88,7 +88,7 @@ class JobProcessingQuartzHandlerJob {
     }
 
     private void handleLaunching(Job job) {
-        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
             jobProcessingService.launchJobRun(job)
         }
     }
@@ -100,7 +100,7 @@ class JobProcessingQuartzHandlerJob {
         }
         if (pollingLocks[lockKey].tryLock()) {
             try{
-                performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", 1) {
                     jobProcessingService.pollJobRun(job, testId)
                 }
             }finally{
@@ -110,7 +110,7 @@ class JobProcessingQuartzHandlerJob {
     }
 
     private void handleTimeout(Job job, String testId) {
-        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Handle Job run timeout for job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Handle Job run timeout for job ${job.label}", 1) {
             removePollingLock(job, testId)
             jobProcessingService.handleJobRunTimeout(job, testId)
         }

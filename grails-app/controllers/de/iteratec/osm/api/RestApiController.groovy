@@ -19,8 +19,6 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.dto.*
-import de.iteratec.osm.batch.Activity
-import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.CsiConfiguration
@@ -31,11 +29,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobDaoService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
-import de.iteratec.osm.measurement.schedule.JobService
+import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
@@ -47,7 +41,6 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.databinding.BindUsing
@@ -321,7 +314,7 @@ class RestApiController {
 
         List<EventResultDto> results = new LinkedList<EventResultDto>();
 
-        performanceLoggingService.logExecutionTime(LogLevel.INFO, 'assembling results for json', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.INFO, 'assembling results for json', 1) {
             Collection<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams)
             eventResults.each { eachEventResult ->
                 results.add(new EventResultDto(eachEventResult));
@@ -332,36 +325,55 @@ class RestApiController {
 
     public Map<String, Object> getEventResultBasedCsi(ResultsRequestCommand cmd) {
 
+        boolean requestIsValid = true
+
         DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
 
-        if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')
-            return
+        performanceLoggingService.resetExecutionTimeLoggingSession()
+        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "cmd validation", 1){
+
+            startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
+            endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
+
+            if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
+                ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')
+                requestIsValid = false
+                return
+            }
+
+            Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
+
+            if (requestedDuration.getStandardDays() > MAX_TIME_FRAME_DURATION_IN_DAYS_CSI) {
+                ControllerUtils.sendSimpleResponseAsStream(
+                        response,
+                        413,
+                        'The requested time-frame is wider than ' +
+                                MAX_TIME_FRAME_DURATION_IN_DAYS_CSI +
+                                ' days. This is too large to process. Please choose a smaler time-frame.'
+                )
+                requestIsValid = false
+                return
+            }
+
+            JobGroup csiSystem = JobGroup.findByName(cmd.system)
+            if (csiSystem?.csiConfiguration == null) {
+                ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "The JobGroup ${csiSystem} has no csi configuration.")
+                requestIsValid = false
+                return
+            }
+
         }
 
-        Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
-
-        if (requestedDuration.getStandardDays() > MAX_TIME_FRAME_DURATION_IN_DAYS_CSI) {
-            ControllerUtils.sendSimpleResponseAsStream(
-                    response,
-                    413,
-                    'The requested time-frame is wider than ' +
-                            MAX_TIME_FRAME_DURATION_IN_DAYS_CSI +
-                            ' days. This is too large to process. Please choose a smaler time-frame.'
-            )
-            return
-        }
-
-        JobGroup csiSystem = JobGroup.findByName(cmd.system)
-        if (csiSystem?.csiConfiguration == null) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "The JobGroup ${csiSystem} has no csi configuration.")
+        if (!requestIsValid){
             return
         }
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "construct query params", 1){
+                queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+            }
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguements could not be found: ' + nre.getMessage())
             return
@@ -370,23 +382,29 @@ class RestApiController {
         CsiByEventResultsDto csiDtoToReturn
         try {
             if (cmd.system && cmd.page) {
-                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "calculate page csi", 1){
+                    csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                         startDateTimeInclusive,
                         endDateTimeInclusive,
                         queryParams,
-                        [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+                        [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set
+                    )
+                }
             } else if (cmd.system) {
-                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
-                        startDateTimeInclusive,
-                        endDateTimeInclusive,
-                        queryParams,
-                        [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "calculate shop csi", 1){
+                    csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                            startDateTimeInclusive,
+                            endDateTimeInclusive,
+                            queryParams,
+                            [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set
+                    )
+                }
             }
         } catch (IllegalArgumentException e) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, e.getMessage())
             return
         }
-
+        log.debug("performance logdata getResults:\n" + performanceLoggingService.getExecutionTimeLoggingSessionData(LogLevel.DEBUG))
         return sendObjectAsJSON(csiDtoToReturn, params.pretty && params.pretty == 'true');
 
     }

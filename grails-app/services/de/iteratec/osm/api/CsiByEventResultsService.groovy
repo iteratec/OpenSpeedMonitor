@@ -18,23 +18,21 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.api.dto.CsiByEventResultsDto
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
-
-import org.joda.time.DateTime
-
 import de.iteratec.osm.csi.CsTargetGraph
 import de.iteratec.osm.csi.CsTargetGraphDaoService
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.MeanCalcService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
+import org.joda.time.DateTime
 
 @Transactional
 class CsiByEventResultsService {
@@ -59,25 +57,30 @@ class CsiByEventResultsService {
     public CsiByEventResultsDto retrieveCsi(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
 
         List<EventResult> eventResults
-		performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get event results', PerformanceLoggingService.IndentationDepth.ONE){
+		performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get event results', 2){
             eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(start.toDate(), end.toDate(), [CachedView.UNCACHED], queryParams)
         }
 
-        if (log.infoEnabled) {log.info("retrieveCsi: ${eventResults.size()} EventResults building database for calculation.")}
+        log.info("retrieveCsi: ${eventResults.size()} EventResults building database for calculation.")
         List<WeightedCsiValue> weightedCsiValues = []
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] weight event results', PerformanceLoggingService.IndentationDepth.ONE){
-            if (eventResults.size() > 0) {
-                JobGroup jobGroup = JobGroup.get(queryParams.jobGroupIds[0])
-                CsiConfiguration csiConfiguration = jobGroup ? jobGroup.csiConfiguration : null
+
+        if (eventResults.size() > 0) {
+            JobGroup jobGroup
+            CsiConfiguration csiConfiguration
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get JobGroup and CsiConfiguration', 2){
+                jobGroup = JobGroup.get(queryParams.jobGroupIds[0])
+                csiConfiguration = jobGroup ? jobGroup.csiConfiguration : null
                 if(!csiConfiguration) {
                     throw new IllegalArgumentException("there is no csi configuratin for jobGroup with id ${queryParams.jobGroupIds[0]}")
                 }
+            }
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] weight event results', 2){
                 weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors, csiConfiguration)
             }
         }
 
         CsiByEventResultsDto csiDto
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.ONE){
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', 2){
             if (log.infoEnabled) {log.info("retrieveCsi: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
             if (weightedCsiValues.size()>0) {
                 double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)

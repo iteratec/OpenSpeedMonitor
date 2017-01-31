@@ -147,7 +147,7 @@ class CsiConfigurationController {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "Getting source CSI Configuration",
-                PerformanceLoggingService.IndentationDepth.ONE
+                1
         ) {
             if (CsiConfiguration.findByLabel(params.label)) {
                 throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
@@ -164,7 +164,7 @@ class CsiConfigurationController {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "copy CSI Configuration",
-                PerformanceLoggingService.IndentationDepth.ONE
+                1
         ) {
             newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
         }
@@ -172,7 +172,7 @@ class CsiConfigurationController {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "save copied CSI Configuration",
-                PerformanceLoggingService.IndentationDepth.ONE
+                1
         ) {
             newCsiConfig.label = params.label
             newCsiConfig.save(failOnError: true, flush: true)
@@ -181,7 +181,7 @@ class CsiConfigurationController {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "redirect",
-                PerformanceLoggingService.IndentationDepth.ONE
+                1
         ) {
             List csi_configurations = []
             CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
@@ -370,7 +370,7 @@ class CsiConfigurationController {
                 "Removed ${toDelete.size()} Mappings of page ${pageToRemoveMappingFrom.name} from CsiConfiguration ${csiConfigurationToRemovePageMappingFrom.label}.",
                 [toDelete.size(), pageToRemoveMappingFrom.name, csiConfigurationToRemovePageMappingFrom.label]
         )
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", 1) {
             render successMessage
         }
 

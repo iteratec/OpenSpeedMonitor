@@ -20,8 +20,6 @@ package de.iteratec.osm.result
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 import de.iteratec.osm.report.chart.CsiAggregation
-import grails.transaction.Transactional
-
 
 class CsiValueService {
 
@@ -48,8 +46,7 @@ class CsiValueService {
     public boolean isCsiRelevant(EventResult eventResult) {
         return eventResult.csByWptDocCompleteInPercent && eventResult.docCompleteTimeInMillisecs &&
                 (eventResult.docCompleteTimeInMillisecs >= osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-                        eventResult.docCompleteTimeInMillisecs <= osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
-                eventResult.jobResult.job.jobGroup.csiConfiguration != null
+                        eventResult.docCompleteTimeInMillisecs <= osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
     }
 
     public boolean isCsiRelevant(CsiAggregation csiAggregation) {

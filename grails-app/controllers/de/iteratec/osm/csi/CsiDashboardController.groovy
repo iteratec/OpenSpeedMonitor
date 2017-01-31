@@ -521,7 +521,7 @@ class CsiDashboardController {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, CsiAggregationInterval.HOURLY)
 
         OsmRickshawChart chart
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'CsiDashboardController: getHourlies', PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'CsiDashboardController: getHourlies', 1) {
 
             chart = customerSatisfactionHighChartService.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
                     fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType
