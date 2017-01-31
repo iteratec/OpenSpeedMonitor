@@ -27,7 +27,6 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
 class ScriptController {
-	def messageSource
 	PageService pageService
 
 	private String getScriptI18n() {
