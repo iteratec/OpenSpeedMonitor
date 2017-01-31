@@ -20,8 +20,10 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.persistence.OsmDataSourceService
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.ErQueryParams
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -36,7 +38,6 @@ import org.hibernate.sql.JoinType
  */
 public class EventResultDaoService {
 
-    OsmDataSourceService osmDataSourceService
     PerformanceLoggingService performanceLoggingService
 
     /**
@@ -54,12 +55,10 @@ public class EventResultDaoService {
     }
 
     /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
+     * Gets {@link EventResult}s matching given params from db.
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, Long jobGroupId, Long measuredEventId, Long pageId, Long browserId, Long locationId) {
@@ -92,7 +91,6 @@ public class EventResultDaoService {
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, Collection<Long> jobGroupIds, Collection<Long> measuredEventIds, Collection<Long> pageIds, Collection<Long> browserIds, Collection<Long> locationIds) {
@@ -150,12 +148,10 @@ public class EventResultDaoService {
     }
 
     /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
+     * Gets {@link EventResult}s matching given params from db.
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getLimitedMedianEventResultsBy(
@@ -254,8 +250,6 @@ public class EventResultDaoService {
     /**
      * Gets a Collection of {@link EventResult}s for specified time frame, {@link MvQueryParams} and {@link CachedView}s.
      *
-     * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
-     * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
      * @param fromDate
      *         The first relevant date (inclusive), not <code>null</code>.
      * @param toDate

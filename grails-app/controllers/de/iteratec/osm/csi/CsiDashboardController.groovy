@@ -365,7 +365,6 @@ class CsiDashboardController {
             wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
 
             selectedConnectivities = dashboard.selectedConnectivities ?: []
-            println selectedConnectivities
             selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles as boolean
 
             if (dashboard.graphNameAliases.size() > 0) {
@@ -849,7 +848,6 @@ class CsiDashboardController {
         Collection<String> selectedConnectivities = []
         // String or List<String>
         def valuesConnectivities = dashboardValues.selectedConnectivities
-        println "### ${valuesConnectivities}"
         if (valuesConnectivities) {
             if (valuesConnectivities.class == String) {
                 selectedConnectivities.add(valuesConnectivities)

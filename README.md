@@ -155,7 +155,7 @@ Prerequisites
 
 * [optional, but recommended] Relational data base managing system (DBMS).
 
-    Tested with MySQL. Should run with Oracle out of the box. OpenSpeedMonitor uses regular expressions via `rlike` command in grails object relational mapper gorm. `rlike` is supported for MySQL and Oracle. Other DBMS supporting regular expressions in sql queries would necessitate slight modifications to run performant.
+    Tested with MySQL. Should run with Oracle out of the box.
 
 * Operating system (OS) to run OpenSpeedMonitor can be any server OS for which JRE 8 and the servlet container and dbms of choice are available.
 

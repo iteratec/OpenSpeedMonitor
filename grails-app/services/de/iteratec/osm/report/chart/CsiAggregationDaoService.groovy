@@ -24,7 +24,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -34,18 +33,12 @@ import org.joda.time.DateTime
  * Contains only methods that query {@link CsiAggregation}s from database. Doesn't contain any dependencies to other domains or
  * service-logic.
  *
- * <p>
- * <strong>Important:</strong> If you add a query method with an rlike statement make sure to replace the rlike statement
- * with a manual regex in test environments.
- * </p>
- *
  * @author nkuhn
  *
  */
 class CsiAggregationDaoService {
 
     CsiAggregationUtilService csiAggregationUtilService
-    OsmDataSourceService osmDataSourceService = new OsmDataSourceService()
     PerformanceLoggingService performanceLoggingService
 
     /**
@@ -66,11 +59,8 @@ class CsiAggregationDaoService {
     /**
      * Gets all {@link CsiAggregation}s from db respective given arguments.
      *
-     * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
-     * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
      * @param fromDate
      * @param toDate
-     * @param rlikePattern
      * @param interval
      * @param aggregator
      * @param connectivityProfiles
@@ -84,9 +74,6 @@ class CsiAggregationDaoService {
             List<CsiSystem> csiSystems
     ) {
         toDate = fromDate == toDate ? toDate + interval.intervalInMinutes : toDate
-        //TODO: optimize query to something like:
-        //findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
-        //... which works in running App, but NOT in unit-tests!
         List<CsiAggregation> result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
         result.findAll {
             csiSystems.contains(it.csiSystem)
@@ -220,7 +207,6 @@ class CsiAggregationDaoService {
      * *mze-2013-08-15 - Design-Note zu IT-60*
      *
      * Für die Anfrage aus der UI ggf. hier eine findAllBy(MvQueryParams) hinzufügen.
-     * Diese benutzt dann den MVTS um eine Tag für die rlike-Anfrage zu bauen.
      *
      * Dies ist zwar "etwas zu viel" Logik für diesen DAO, aber die Schnittstelle
      * belibt dann verständlicher. Der Kommentar der Klasse müsste dann angepasst

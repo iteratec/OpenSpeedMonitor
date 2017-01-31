@@ -82,11 +82,11 @@ class TimeToCsMappingServiceTests {
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, [], [100])
 
         //test executions and assertions
-        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_MAPPING)
+        mocker.mockConfigService(serviceUnderTest, 60, CsiTransformation.BY_MAPPING)
         Double csCalculatedByMapping = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: "new"))
         assertThat(csCalculatedByMapping, is(null))
 
-        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
+        mocker.mockConfigService(serviceUnderTest, 60, CsiTransformation.BY_RANK)
         Double csCalculatedByRank = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: 'HP'))
         assertThat(csCalculatedByRank, is(null))
     }

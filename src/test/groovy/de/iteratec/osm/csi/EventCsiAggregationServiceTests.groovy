@@ -218,7 +218,7 @@ class EventCsiAggregationServiceTests {
 
     /**
      * Mocks {@linkplain EventCsiAggregationService#csiAggregationDaoService}.
-     * Method getMvs(Date fromDate, Date toDate, String rlikePattern, CsiAggregationInterval interval, AggregatorType aggregator) will return all {@link CsiAggregation}s from db.
+     * Method getMvs(Date fromDate, Date toDate, CsiAggregationInterval interval, AggregatorType aggregator) will return all {@link CsiAggregation}s from db.
      * @param csiGroups
      * @param pages
      */
