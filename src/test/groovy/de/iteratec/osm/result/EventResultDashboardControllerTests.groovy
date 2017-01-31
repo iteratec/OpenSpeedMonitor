@@ -45,6 +45,7 @@ import static org.junit.Assert.*
 @Mock([ConnectivityProfile])
 class EventResultDashboardControllerTests extends Specification {
 
+    public static final String CUSTOM_CONNECTIVITY_NAME = 'Custom (6.000/512 Kbps, 50ms)'
     EventResultDashboardController controllerUnderTest
     static EventResultDashboardShowAllCommand command
 
@@ -874,12 +875,8 @@ class EventResultDashboardControllerTests extends Specification {
         command.debug = false
         command.setFromHour = false
         command.setToHour = false
-        command.includeNativeConnectivity = false
-        command.selectedConnectivityProfiles = []
+        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
         command.selectedAllConnectivityProfiles = true
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
-        command.customConnectivityName = 'Custom (6000.*'
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -908,7 +905,7 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         // Verification:
-        assertEquals(43, dataUnderTest.size());
+        assertEquals(40, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -925,10 +922,8 @@ class EventResultDashboardControllerTests extends Specification {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivities', [CUSTOM_CONNECTIVITY_NAME]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
     }
 
     /**
@@ -957,9 +952,7 @@ class EventResultDashboardControllerTests extends Specification {
         command.debug = false
         command.setFromHour = false
         command.setToHour = false
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
-        command.customConnectivityName = 'Custom (6000.*'
+        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -984,7 +977,7 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         // Verification:
-        assertEquals(41, dataUnderTest.size());
+        assertEquals(38, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -1028,13 +1021,8 @@ class EventResultDashboardControllerTests extends Specification {
         command.debug = true
         command.setFromHour = false
         command.setToHour = false
-        command.includeNativeConnectivity = false
-        command.customConnectivityName = 'Custom (6000/.*'
-        command.selectedConnectivityProfiles = []
+        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
         command.selectedAllConnectivityProfiles = true
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
-        command.customConnectivityName = 'Custom (6000.*'
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -1062,7 +1050,7 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         // Verification:
-        assertEquals(43, dataUnderTest.size());
+        assertEquals(40, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -1079,9 +1067,8 @@ class EventResultDashboardControllerTests extends Specification {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', "13:00");
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivities', [CUSTOM_CONNECTIVITY_NAME]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
     }
 
     /**
@@ -1106,8 +1093,6 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAllBrowsers = false
         command.selectedAllLocations = false
         command.selectedTimeFrameInterval = 0
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = false
         command.showDataMarkers = false
         command.showDataLabels = false
         command.selectedInterval = 0
@@ -1163,8 +1148,6 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAllBrowsers = false
         command.selectedAllLocations = false
         command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -1220,8 +1203,6 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAllLocations = false
         command.selectedAllMeasuredEvents = false
         command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -1278,8 +1259,6 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAllBrowsers = false
         command.selectedAllMeasuredEvents = false
         command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.includeNativeConnectivity = false
-        command.includeCustomConnectivity = true
         command.showDataMarkers = false
 
         command.showDataLabels = false
@@ -1336,9 +1315,7 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAllBrowsers = false
         command.selectedAllLocations = false
         command.selectedTimeFrameInterval = 0
-        command.selectedAllConnectivityProfiles = []
-        command.includeNativeConnectivity = true
-        command.includeCustomConnectivity = false
+        command.selectedAllConnectivityProfiles = true
         command.showDataMarkers = false
 
         command.showDataLabels = false

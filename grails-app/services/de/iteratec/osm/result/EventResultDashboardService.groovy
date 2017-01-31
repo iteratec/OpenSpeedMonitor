@@ -106,7 +106,30 @@ public class EventResultDashboardService {
      * @return all {@link ConnectivityProfile} ordered by their toString() representation.
      */
     public List<ConnectivityProfile> getAllConnectivityProfiles() {
-        return connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        return ConnectivityProfile.findAllByActive(true).sort(false, { it.name.toLowerCase() });
+    }
+
+    /**
+     * Collects all available connectivities.
+     * This includes all ConnectivityProfiles, all CustomConnectivityNames from EventResult and "native" if EventResults with native measurement exist
+     * @param includeNative if set to true and eventResults exists with noTrafficShapingAtAll "native" is added to the list
+     * @return
+     */
+    List<Map<String, String>> getAllConnectivities(boolean includeNative = true) {
+        List<Map<String, String>> result = [].withDefault { [:] }
+        result.addAll(getAllConnectivityProfiles().collect { ["id": it.id, "name": it.toString()] })
+        result.addAll(EventResult.createCriteria().list {
+            isNotNull('customConnectivityName')
+            projections {
+                distinct('customConnectivityName')
+            }
+        }.collect { ["id": it, "name": it] })
+
+        if(includeNative && EventResult.findAllByNoTrafficShapingAtAll(true))  {
+            result.add(["id": ResultSelectionController.MetaConnectivityProfileId.Native.value, "name": ResultSelectionController.MetaConnectivityProfileId.Native.value])
+        }
+
+        return result
     }
 
     /**
@@ -273,7 +296,7 @@ public class EventResultDashboardService {
 
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary,ltBoundary)) {
+                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
                         OsmChartPoint chartPoint = new OsmChartPoint(
@@ -530,11 +553,11 @@ public class EventResultDashboardService {
                     'params'    : [
                             'from'                                   : String.valueOf(millisFrom),
                             'to'                                     : String.valueOf(millisFrom + intervalInMinutes * 60 * 1000),
-                            'jobGroupId'                               : jobGroupId,
-                            'measuredEventId'                          : measuredEventId,
-                            'pageId'                                   : pageId,
-                            'browserId'                                : browserId,
-                            'locationId'                               : locationId,
+                            'jobGroupId'                             : jobGroupId,
+                            'measuredEventId'                        : measuredEventId,
+                            'pageId'                                 : pageId,
+                            'browserId'                              : browserId,
+                            'locationId'                             : locationId,
                             'aggregatorTypeNameOrNull'               : aggregatorType.isCachedCriteriaApplicable() ? aggregatorType.getName() : '',
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(lastKnownCountOfAggregatedResults)
                     ]

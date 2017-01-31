@@ -36,9 +36,6 @@ function addInfoHandlers() {
 
     $('#selectedConnectivityProfilesHtmlId').on('chosen:updated', updateSelectionConstraintConnectivity);
     $('#selectedAllConnectivityProfiles').on('change', updateSelectionConstraintConnectivity);
-    $('#customConnectivityName').on('input', updateSelectionConstraintConnectivity);
-    $('#includeNativeConnectivity').on('change', updateSelectionConstraintConnectivity);
-    $('#includeCustomConnectivity').on('change', updateSelectionConstraintConnectivity);
 
     $('#selectAggregatorUncachedHtmlId').on('change', updateSelectionConstraintFirstView);
     $('#selectAggregatorCachedHtmlId').on('change', updateSelectionConstraintRepeatView);
@@ -82,16 +79,6 @@ function updateSelectionConstraintBrowser() {
 function updateSelectionConstraintConnectivity() {
     var selectedConnectivities = $('#selectedAllConnectivityProfiles').is(':checked')?
         'all predefined' : getTextList('#selectedConnectivityProfilesHtmlId option:selected', 50);
-    if(document.getElementById('includeNativeConnectivity').checked){
-        selectedConnectivities += ", NATIVE"
-    }
-    if(document.getElementById('includeCustomConnectivity').checked){
-        selectedConnectivities += ", CUSTOM";
-        var customConnNameRegex = document.getElementById('customConnectivityName').value;
-        if(customConnNameRegex){
-            selectedConnectivities += ": '" + customConnNameRegex + "'"
-        }
-    }
     if (selectedConnectivities != 'all predefined') {
         showSummaryRow('#selectionConstraintConnectivity', selectedConnectivities);
     } else {

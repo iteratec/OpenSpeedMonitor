@@ -22,7 +22,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -31,6 +30,7 @@ import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
@@ -76,11 +76,11 @@ class CsiDashboardController {
     CsiAggregationUtilService csiAggregationUtilService
     EventService eventService
     SpringSecurityService springSecurityService
-    ConnectivityProfileDaoService connectivityProfileDaoService
     ConfigService configService
     CustomDashboardService customDashboardService
     UserspecificDashboardService userspecificDashboardService
     PerformanceLoggingService performanceLoggingService
+    EventResultDashboardService eventResultDashboardService
 
     /**
      * The Grails engine to generate links.
@@ -363,6 +363,10 @@ class CsiDashboardController {
             csiTypeDocComplete = dashboard.csiTypeDocComplete
             csiTypeVisuallyComplete = dashboard.csiTypeVisuallyComplete
             wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
+
+            selectedConnectivities = dashboard.selectedConnectivities ?: []
+            println selectedConnectivities
+            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles as boolean
 
             if (dashboard.graphNameAliases.size() > 0) {
                 graphNameAliases = dashboard.graphNameAliases
@@ -841,6 +845,20 @@ class CsiDashboardController {
                 }
             }
         }
+
+        Collection<String> selectedConnectivities = []
+        // String or List<String>
+        def valuesConnectivities = dashboardValues.selectedConnectivities
+        println "### ${valuesConnectivities}"
+        if (valuesConnectivities) {
+            if (valuesConnectivities.class == String) {
+                selectedConnectivities.add(valuesConnectivities)
+            } else {
+                valuesConnectivities.each { l -> selectedConnectivities.add(l) }
+            }
+        }
+
+
         // Create command for validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
                 toHour: dashboardValues.toHour, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
@@ -851,7 +869,8 @@ class CsiDashboardController {
                 chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
                 showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
                 csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete,
-                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
+                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors,
+                selectedConnectivities: selectedConnectivities, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) {
@@ -1041,7 +1060,7 @@ class CsiDashboardController {
         result.put('locations', locations)
 
         // ConnectivityProfiles
-        result['connectivityProfiles'] = connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(false)
 
         // CsiSystems
         List<CsiSystem> csiSystems = CsiSystem.findAll().sort(false, { it.label })

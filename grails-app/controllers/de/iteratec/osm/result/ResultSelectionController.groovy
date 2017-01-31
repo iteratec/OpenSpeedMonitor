@@ -159,8 +159,10 @@ class ResultSelectionController {
 
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", IndentationDepth.NULL, {
             def dtos = getPredefinedConnectivityProfiles(command)
-            dtos += getCustomConnectivity(command)
-            dtos += getNativeConnectivity(command)
+            if (command.caller == ResultSelectionCommand.Caller.EventResult) {
+                dtos += getCustomConnectivity(command)
+                dtos += getNativeConnectivity(command)
+            }
             return dtos
         })
 
@@ -171,6 +173,9 @@ class ResultSelectionController {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", IndentationDepth.ONE, {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
+                connectivityProfile {
+                    eq ('active', true)
+                }
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
                 }
@@ -202,7 +207,7 @@ class ResultSelectionController {
             })
             return customProfiles.collect {
                 [
-                        id  : MetaConnectivityProfileId.Custom.value,
+                        id  : it,
                         name: it
                 ]
             }
@@ -218,7 +223,7 @@ class ResultSelectionController {
                     distinct('noTrafficShapingAtAll')
                 }
             })
-            return nativeConnectivity ? [[id: MetaConnectivityProfileId.Native.value, name: "Native"]] : []
+            return nativeConnectivity ? [[id: MetaConnectivityProfileId.Native.value, name: MetaConnectivityProfileId.Native.value]] : []
         })
     }
 
@@ -364,7 +369,7 @@ class ResultSelectionCommand {
     List<Long> connectivityIds
     Boolean nativeConnectivity
     List<String> customConnectivities
-    @BindUsing({object, source ->
+    @BindUsing({ object, source ->
         // set default to EventResult
         source['caller'] ?: Caller.EventResult
     })

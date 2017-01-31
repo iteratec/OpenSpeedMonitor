@@ -353,7 +353,7 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-        viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
+        viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivityProfiles)
         viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
         viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
         viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)

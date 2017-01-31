@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
+import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
@@ -71,6 +72,7 @@ class CsiDashboardControllerTests extends Specification {
         controllerUnderTest.measuredEventDaoService = Stub(MeasuredEventDaoService)
         controllerUnderTest.browserDaoService = Stub(BrowserDaoService)
         controllerUnderTest.locationDaoService = Stub(LocationDaoService)
+        controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
         controllerUnderTest.userspecificDashboardService = Stub(UserspecificDashboardService) {
             getListOfAvailableCsiDashboards() >> []
         };

@@ -31,20 +31,20 @@ GSP-Template Mappings:
 %{--the rest----------------------------------------------------------------------------------------------}%
 <div id="filter-complete-tabbable" class="col-md-5">
     <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
-              model="['locationsOfBrowsers'             : locationsOfBrowsers,
-                      'eventsOfPages'                   : eventsOfPages,
-                      'pages'                           : pages,
-                      'selectedPages'                   : selectedPages,
-                      'measuredEvents'                  : measuredEvents,
-                      'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                      'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                      'browsers'                        : browsers,
-                      'selectedBrowsers'                : selectedBrowsers,
-                      'selectedAllBrowsers'             : selectedAllBrowsers,
-                      'locations'                       : locations,
-                      'selectedLocations'               : selectedLocations,
-                      'selectedAllLocations'            : selectedAllLocations,
-                      'connectivityProfiles'            : connectivityProfiles,
-                      'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]"/>
+              model="['locationsOfBrowsers'            : locationsOfBrowsers,
+                      'eventsOfPages'                  : eventsOfPages,
+                      'pages'                          : pages,
+                      'selectedPages'                  : selectedPages,
+                      'measuredEvents'                 : measuredEvents,
+                      'selectedAllMeasuredEvents'      : selectedAllMeasuredEvents,
+                      'selectedMeasuredEvents'         : selectedMeasuredEvents,
+                      'browsers'                       : browsers,
+                      'selectedBrowsers'               : selectedBrowsers,
+                      'selectedAllBrowsers'            : selectedAllBrowsers,
+                      'locations'                      : locations,
+                      'selectedLocations'              : selectedLocations,
+                      'selectedAllLocations'           : selectedAllLocations,
+                      avaiableConnectivities           : avaiableConnectivities,
+                      'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
+                      'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles]"/>
 </div>

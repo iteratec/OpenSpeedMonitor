@@ -18,9 +18,6 @@
 package de.iteratec.osm.report
 
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
-import grails.plugin.springsecurity.SpringSecurityUtils
-
-import java.text.SimpleDateFormat
 
 /**
  * UserspecificEventResultDashboard
@@ -75,16 +72,6 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
      */
     Integer trimAboveRequestSizes
 
-
-    Boolean includeNativeConnectivity
-    Boolean selectedAllConnectivityProfiles
-    String customConnectivityName
-    String selectedConnectivityProfiles
-    Boolean includeCustomConnectivity
-
-    static mapping = {
-    }
-
     static constraints = {
         selectedAggrGroupValuesCached(nullable: true)
         selectedInterval(nullable: true)
@@ -95,11 +82,6 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         trimAboveRequestCounts(nullable: true)
         trimBelowRequestSizes(nullable: true)
         trimAboveRequestSizes(nullable: true)
-        includeNativeConnectivity(nullable: true)
-        selectedAllConnectivityProfiles(nullable: true)
-        customConnectivityName(nullable: true)
-        selectedConnectivityProfiles(nullable: true)
-        includeCustomConnectivity(nullable: true)
     }
 
     /**
@@ -137,10 +119,8 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         debug = cmd.debug
         setFromHour = cmd.setFromHour
         setToHour = cmd.setToHour
-        includeCustomConnectivity = cmd.includeCustomConnectivity
-        includeNativeConnectivity = cmd.includeNativeConnectivity
-        customConnectivityName = cmd.customConnectivityName
         selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
+        selectedConnectivities = cmd.selectedConnectivities
         chartTitle = cmd.chartTitle
         chartWidth = cmd.chartWidth
         chartHeight = cmd.chartHeight
@@ -159,7 +139,6 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         String selectedLocationsString = ""
         String selectedAggrGroupValuesCachedString = ""
         String selectedAggrGroupValuesUnCachedString = ""
-        String selectedConnectivityProfilesString = ""
 
         // generate Strings for db
         cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
@@ -177,8 +156,6 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         if(selectedAggrGroupValuesCachedString.length() > 0) selectedAggrGroupValuesCachedString = selectedAggrGroupValuesCachedString.substring(0, selectedAggrGroupValuesCachedString.length()-1)
         cmd.selectedAggrGroupValuesUnCached.each {a -> selectedAggrGroupValuesUnCachedString += a + ","}
         if(selectedAggrGroupValuesUnCachedString.length() > 0) selectedAggrGroupValuesUnCachedString = selectedAggrGroupValuesUnCachedString.substring(0, selectedAggrGroupValuesUnCachedString.length()-1)
-        cmd.selectedConnectivityProfiles.each {p -> selectedConnectivityProfilesString += p + ","}
-        if(selectedConnectivityProfilesString.length() > 0) selectedConnectivityProfilesString = selectedConnectivityProfilesString.substring(0, selectedConnectivityProfilesString.length()-1)
 
         selectedFolder = selectedFolderString
         selectedPages = selectedPagesString
@@ -187,6 +164,5 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         selectedLocations = selectedLocationsString
         selectedAggrGroupValuesCached = selectedAggrGroupValuesCachedString
         selectedAggrGroupValuesUnCached = selectedAggrGroupValuesUnCachedString
-        selectedConnectivityProfiles = selectedConnectivityProfilesString
     }
 }
