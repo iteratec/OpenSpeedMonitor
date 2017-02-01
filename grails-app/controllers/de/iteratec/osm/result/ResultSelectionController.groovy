@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
@@ -173,7 +174,7 @@ class ResultSelectionController {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
                 connectivityProfile {
-                    eq ('active', true)
+                    eq('active', true)
                 }
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
@@ -360,14 +361,12 @@ class ResultSelectionCommand {
 
     DateTime from
     DateTime to
-    List<Long> jobGroupIds
-    List<Long> pageIds
-    List<Long> measuredEventIds
-    List<Long> browserIds
-    List<Long> locationIds
-    List<Long> connectivityIds
-    Boolean nativeConnectivity
-    List<String> customConnectivities
+    List<Long> jobGroupIds = []
+    List<Long> pageIds = []
+    List<Long> measuredEventIds = []
+    List<Long> browserIds = []
+    List<Long> locationIds = []
+    List<String> selectedConnectivities = []
     @BindUsing({ object, source ->
         // set default to EventResult
         source['caller'] ?: Caller.EventResult
@@ -382,5 +381,32 @@ class ResultSelectionCommand {
             }
         })
         nativeConnectivity(blank: true, nullable: true)
+    }
+
+    /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    boolean getNativeConnectivity() {
+        return selectedConnectivities?.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
+    }
+
+    /**
+     * returns the selected customConnectivityNames by filtering all selected connectivities.
+     */
+    Collection<String> getCustomConnectivities() {
+        return selectedConnectivities ? selectedConnectivities.findAll {
+            (!it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value) || (it.isLong() && !ConnectivityProfile.exists(it as Long))
+        } : []
+    }
+
+    /**
+     * returns the selected connectivityProfiles by filtering all selected connectivities.
+     */
+    Collection<Long> getConnectivityIds() {
+        return selectedConnectivities ? selectedConnectivities.findAll {
+            it.isLong() && ConnectivityProfile.exists(it as Long)
+        }.collect {
+            Long.parseLong(it)
+        } : []
     }
 }

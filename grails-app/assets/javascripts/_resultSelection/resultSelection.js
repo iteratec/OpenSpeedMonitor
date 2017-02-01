@@ -25,9 +25,7 @@ OpenSpeedMonitor.resultSelection = (function () {
         measuredEventIds: null,
         browserIds: null,
         locationIds: null,
-        connectivityIds: null,
-        nativeConnectivity: null,
-        customConnectivities: null
+        selectedConnectivities: null
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = false;
@@ -102,9 +100,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var setQueryArgsFromConnectivitySelection = function (event, connectivitySelection) {
-        currentQueryArgs.connectivityIds = connectivitySelection.ids;
-        currentQueryArgs.nativeConnectivity = connectivitySelection.native;
-        currentQueryArgs.customConnectivities = connectivitySelection.customNames;
+        currentQueryArgs.selectedConnectivities = connectivitySelection.selectedConnectivities;
         updateCards("connectivity");
     };
 
