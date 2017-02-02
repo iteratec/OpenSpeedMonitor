@@ -54,9 +54,8 @@
                 <!-- rickshaw -->
                 <div id="adjust_chart_y_axis_container">
                     <div class="adjust_chart_y_axis form-group">
-                        <label class="col-md-3 control-label">
-                            <g:message code="de.iteratec.chart.axis.y.name" default="y-Axis Range"/>
-                        </label>
+                        %{-- This label gets filled via JavaScript function 'createYAxisAdjuster' in rickshawChartCreation.js --}%
+                        <label class="col-md-3 control-label"></label>
                         <div class="col-md-8">
                             <div class="input-group form-row">
                                 <span class="input-group-addon adjustRangeAddon">
@@ -113,12 +112,16 @@
                 <div class="form-group">
                     <div class="col-md-8 col-md-offset-3" id="graphAliasChildlist"></div>
                 </div>
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-8">
+                        <a href="#" id="addAliasButton" onclick="addAlias();">
+                            <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
+                            <g:message code="de.iteratec.chart.adjustment.aliases" default="Add Graph Alias"/>
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="addAliasButton" onclick="addAlias();">
-                    <i class="fa fa-plus"></i>
-                    <g:message code="de.iteratec.chart.adjustment.aliases" default="Aliases"/>
-                </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
                     <g:message code="de.iteratec.ism.ui.button.close" default="Close" />
                 </button>
@@ -131,29 +134,6 @@
 </div>
 
 
-%{--<div id="graphAlias_clone" class="graphAlias-div" style="display:none;">--}%
-    %{--<hr />--}%
-    %{--<div class="form-group">--}%
-        %{--<div class="col-md-9">--}%
-            %{--<g:select name="graphName" from="${chartData*.label}" class="form-control"/>--}%
-        %{--</div>--}%
-        %{--<div class="col-md-2">--}%
-            %{--HTML5 color picker, not supported in IE--}%
-            %{--<input type="color" id="color" value="#FFFFFF" class="form-control">--}%
-        %{--</div>--}%
-        %{--<div class="col-md-1">--}%
-            %{--<button type="button" class="close" id="removeButton" aria-label="Remove">--}%
-                %{--<span aria-hidden="true">&times;</span>--}%
-            %{--</button>--}%
-        %{--</div>--}%
-    %{--</div>--}%
-    %{--<div class="form-group">--}%
-        %{--<div class="col-md-12">--}%
-            %{--<g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "enter alias" )}"--}%
-                         %{--name='alias' class="input-alias form-control"/>--}%
-        %{--</div>--}%
-    %{--</div>--}%
-%{--</div>--}%
 <div id="graphAlias_clone" class="graphAlias-div" style="display:none;">
     <hr />
     <div class="form-group">
@@ -172,7 +152,7 @@
             <g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "Enter Alias" )}"
                          name='alias' class="input-alias form-control"/>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="input-group colorpicker-component" id="assign-color-clone">
                 <input type="text" id="color" value="#FFFFFF" class="form-control adjustChartInput"/>
                 <span class="input-group-addon colorpicker-target adjustChartColorpickerAddon"><i></i></span>
