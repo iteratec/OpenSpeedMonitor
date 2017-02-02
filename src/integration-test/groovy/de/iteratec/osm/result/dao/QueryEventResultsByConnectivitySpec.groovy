@@ -17,8 +17,6 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-import java.util.regex.Pattern
-
 /**
  *
  */
@@ -28,10 +26,8 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
 
     EventResultDaoService eventResultDaoService
 
-    public static final Pattern REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS = ~/Custom \(6000.*/
-    public static final Pattern REGEX_MATCHING_ALL_CUSTOM_CONNS = ~/Custom \(.*/
-    public static final String CUSTOM_CONN_NAME_SHOULD_MATCH = 'Custom (6000/512 Kbps, 100ms, 0% PLR)'
-    public static final String CUSTOM_CONN_NAME_SHOULD_NOT_MATCH = 'Custom (50000/6000 Kbps, 100ms, 0% PLR)'
+    public static final String CUSTOM_CONN_NAME_1 = 'Custom (6000/512 Kbps, 100ms, 0% PLR)'
+    public static final String CUSTOM_CONN_NAME_2 = 'Custom (50000/6000 Kbps, 100ms, 0% PLR)'
 
     DateTime runDate
     private Job jobWithPredefinedConnectivity
@@ -64,7 +60,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         EventResult.withNewSession {
 
             MvQueryParams queryParams = new ErQueryParams()
-            queryParams.includeCustomConnectivity = false
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
             queryParams.measuredEventIds.add(measuredEvent.id)
@@ -99,7 +94,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams()
-            queryParams.includeCustomConnectivity = false
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
             queryParams.measuredEventIds.add(measuredEvent.id)
@@ -136,13 +130,12 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
 
         when:
         MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = true
+        queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
         queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
         queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
         queryParams.measuredEventIds.add(measuredEvent.id)
         queryParams.pageIds.add(measuredEvent.testedPage.id)
         queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
-        queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
 
         results = eventResultDaoService.getLimitedMedianEventResultsBy(
                 runDate.toDate(),
@@ -159,7 +152,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         then:
         results.size() == 1
         results[0].connectivityProfile == null
-        results[0].customConnectivityName == CUSTOM_CONN_NAME_SHOULD_MATCH
+        results[0].customConnectivityName == CUSTOM_CONN_NAME_1
     }
 
     void "select by custom conn name regex: matching all"() {
@@ -170,13 +163,13 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams();
-            queryParams.includeCustomConnectivity = true
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
             queryParams.measuredEventIds.add(measuredEvent.id);
             queryParams.pageIds.add(measuredEvent.testedPage.id);
             queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
+            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
+            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_2)
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
@@ -208,7 +201,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams();
-            queryParams.includeCustomConnectivity = false
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
             queryParams.measuredEventIds.add(measuredEvent.id);
@@ -243,13 +235,12 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams();
-            queryParams.includeCustomConnectivity = true
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
             queryParams.measuredEventIds.add(measuredEvent.id);
             queryParams.pageIds.add(measuredEvent.testedPage.id);
             queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
+            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
             queryParams.includeNativeConnectivity = true
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -268,7 +259,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         then:
         results.size() == 2
         results.findAll { it.connectivityProfile }.size() == 0
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH) }.size() == 1
+        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
     }
 
     void "select by custom conn name regex AND predefined conn"() {
@@ -279,13 +270,13 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams();
-            queryParams.includeCustomConnectivity = true
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
             queryParams.measuredEventIds.add(measuredEvent.id);
             queryParams.pageIds.add(measuredEvent.testedPage.id);
             queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
+            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
+            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_2)
             queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident()])
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -304,8 +295,8 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         then:
         results.size() == 3
         results.findAll { it.connectivityProfile }.size() == 1
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH) }.size() == 1
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_NOT_MATCH) }.size() == 1
+        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
+        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_2) }.size() == 1
     }
 
     void "select by native conn AND predefined conn"() {
@@ -316,7 +307,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         when:
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams();
-            queryParams.includeCustomConnectivity = false
             queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
             queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
             queryParams.measuredEventIds.add(measuredEvent.id);
@@ -347,7 +337,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         setup:
         setupTest()
         MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = true
         queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
         queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
@@ -355,7 +344,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
         queryParams.includeNativeConnectivity = true
-        queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
+        queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
         Collection<EventResult> results
 
         when:
@@ -378,7 +367,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         ArrayList<EventResult> resultsWithPredefinedProfiles = results.findAll { it.connectivityProfile }
         resultsWithPredefinedProfiles.size() == 1
         resultsWithPredefinedProfiles[0].connectivityProfile.ident() == predefinedProfile2.ident()
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH) }.size() == 1
+        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
     }
 
 
@@ -421,13 +410,13 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser)
         withCustomConnectivityMatchingRegex.connectivityProfile = null
         withCustomConnectivityMatchingRegex.noTrafficShapingAtAll = false
-        withCustomConnectivityMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_MATCH
+        withCustomConnectivityMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_1
         withCustomConnectivityMatchingRegex.save(failOnError: true)
 
         withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser)
         withCustomConnectivityNotMatchingRegex.connectivityProfile = null
         withCustomConnectivityNotMatchingRegex.noTrafficShapingAtAll = false
-        withCustomConnectivityNotMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_NOT_MATCH
+        withCustomConnectivityNotMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_2
         withCustomConnectivityNotMatchingRegex.save(failOnError: true)
 
     }

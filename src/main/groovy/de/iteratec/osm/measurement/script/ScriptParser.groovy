@@ -17,15 +17,15 @@
 
 package de.iteratec.osm.measurement.script
 
+import ch.qos.logback.classic.Logger
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import org.slf4j.LoggerFactory
-import ch.qos.logback.classic.Logger
 
 /**
  * Represents a one-line statement in a script
- * 
+ *
  * @author dri
  */
 class ScriptStatement {
@@ -44,7 +44,7 @@ class ScriptStatement {
 	 * Line this statement was found in the parsed script
 	 */
 	int lineNumber
-	
+
 	public String toString() {
 		"$lineNumber: $keyword $parameter ($isPageViewCmd)"
 	}
@@ -53,7 +53,7 @@ class ScriptStatement {
 /**
  * Possible cases of misplacing setEventName statements.
  * Needed by ScriptEventNameCmdWarning
- * 
+ *
  * @author dri
  */
 enum ScriptEventNameCmdWarningType {
@@ -100,7 +100,12 @@ enum ScriptErrorEnum {
 	/**
 	 * Urls have to start with http(s)://
 	 */
-	WRONG_URL_FORMAT
+	WRONG_URL_FORMAT,
+
+    /**
+     * Pages can not be defined by using variables
+     */
+    VARIABLE_NOT_SUPPORTED
 }
 
 
@@ -141,7 +146,7 @@ class CorrectPageForMeasuredEvent{
  * A parser for WPTServer scripts respecting only logData, setEventName,
  * navigate and execAndWait statements.
  * Registered as Spring Bean.
- *  
+ *
  * @author dri
  */
 class ScriptParser {
@@ -154,9 +159,9 @@ class ScriptParser {
 	final int DELAY_PER_SCRIPT = 60
 
 	// Keywords and pattern used for parsing
-	final static String logDataCmd = 'logData'  
-	final static String setEventNameCmd = 'setEventName'  
-	final static String navigateCmd = 'navigate'  
+	final static String logDataCmd = 'logData'
+	final static String setEventNameCmd = 'setEventName'
+	final static String navigateCmd = 'navigate'
 	final static String execAndWaitCmd = 'execAndWait'
     static Logger log = LoggerFactory.getLogger(ScriptParser.class)
 
@@ -165,22 +170,22 @@ class ScriptParser {
 	 * After any leading whitespace, a string of alphanumeric characters is expected (the keyword)
 	 * After the keyword, if a parameter is given at least one whitespace character (space or tab)
 	 * is expected, followed by the parameter.
-	 * 
+	 *
 	 * The inner group (the parameter) must be matched non-greedily so it does not
 	 * match trailing whitespace appearing after the parameter at the end of the line: (.+?)
-	 * 
+	 *
 	 * The second outer group uses a special Groovy syntax (?: at the beginning of the group)
 	 * so it is matched but ignored. This results in the first group yielding the keyword
-	 * and the second group yielding the parameter. 
+	 * and the second group yielding the parameter.
 	 */
 	final static def parsePattern = ~/^\s*(\w+)(?:[ \t]+(.+?))?\s*$/
-			
+
 	/**
-	 * All event names (arguments of setEventName statements found in the parsed script)  
+	 * All event names (arguments of setEventName statements found in the parsed script)
 	 */
 	public List<String> eventNames
 	/**
-	 * The number of measuredEvents found in the parsed script 
+	 * The number of measuredEvents found in the parsed script
 	 */
 	public int measuredEventsCount
 	/**
@@ -210,14 +215,14 @@ class ScriptParser {
 
 	private PageService pageService
 
-		
+
 	/**
 	 * Parse the given navigationScript
 	 * @param navigationScript Must be not null
 	 */
 	private List<ScriptStatement> parse(String navigationScript) {
 		List<ScriptStatement> statements = []
-		
+
 		navigationScript.eachLine { String line, int lineNumber ->
 			line.find(parsePattern) { match ->
 				ScriptStatement stmt = new ScriptStatement(
@@ -226,15 +231,15 @@ class ScriptParser {
 					parameter: match.size() == 3 ? match[2] : null
 				)
 				if (stmt.keyword == navigateCmd || stmt.keyword == execAndWaitCmd) {
-					stmt.isPageViewCmd = true					
+					stmt.isPageViewCmd = true
 				}
 				statements << stmt
 			}
 		}
-		
+
 		return statements
 	}
-	
+
 	/**
 	 * Reports a DANGLING_SETEVENTNAME_STATEMENT warning at the line of the last setEventName
 	 * statement found before the lookBackFromth statement.
@@ -245,7 +250,7 @@ class ScriptParser {
 			lineNumber: statements.take(lookBackFrom+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber
 		)
 	}
-	
+
 	/**
 	 * Reports a MISSING_SETEVENTNAME_STATEMENT for the given page view statement.
 	 * @param statement
@@ -257,26 +262,26 @@ class ScriptParser {
 			lineNumber: statement.lineNumber
 		)
 	}
-	
+
 	private void reportNoStepsFound() {
 		warnings << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.NO_STEPS_FOUND,
 			lineNumber: 0
 		)
 	}
-	
+
 	private void reportStepNotRecorded(ScriptStatement statement) {
 		warnings << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.STEP_NOT_RECORDED,
 			lineNumber: statement.lineNumber
 		)
 	}
-	
+
 	private void recordStepFromTo(int start, int end) {
 		steps.push(start)
 		steps.push(end)
 	}
-	
+
 	/**
 	 * Parse and interpret the given script.
 	 * Updates measuredEventCount, eventNames and warnings.
@@ -295,21 +300,21 @@ class ScriptParser {
 		warnings = []
 		errors = []
 		steps = []
-		
+
 		if (!navigationScript)
 		return null
-		
+
 		Integer stepBegin = null
 		List<ScriptStatement> statements = parse(navigationScript)
-		
+
 		// if there is no logData statement in the script, logData defaults to true.
 		// Else it is false until enabled by "logData 1"
 		boolean logData = true
 		boolean inMeasuredEvent = logData
 		boolean setEventNameStmtFound = false
-		
+
 		List possibleUnrecordedSteps = []
-		
+
 		statements.eachWithIndex { ScriptStatement stmt, int i ->
 			// logData command
 			if (stmt.keyword == logDataCmd && (stmt.parameter == '0' || stmt.parameter == '1')) {
@@ -333,6 +338,11 @@ class ScriptParser {
 					MeasuredEvent measuredEvent
 					if (stmt.parameter.split(":::").length ==2) {
 						pageName = stmt.parameter.split(":::")[0]
+                        if(pageName.contains('${')) {
+                            errors << new ScriptEventNameCmdError(
+                                    type: ScriptErrorEnum.VARIABLE_NOT_SUPPORTED,
+                                    lineNumber: statements.take(i+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber)
+                        }
 						measuredEventName = stmt.parameter.split(":::")[1]
 						page = Page.findByName(pageName)
 					} else if(stmt.parameter.split(":::").length >2){
@@ -418,24 +428,24 @@ class ScriptParser {
 					setEventNameStmtFound = false
 				}
 			}
-			
+
 			log.info("$stmt : logData $logData, inMV $inMeasuredEvent (${eventNames.size() > 0 ? eventNames.last() : ''}), num $measuredEventsCount")
 		}
-				
-		if (setEventNameStmtFound && logData) 
+
+		if (setEventNameStmtFound && logData)
 			reportDanglingSetEventNameCommand(statements, statements.size())
-		
+
 		if (measuredEventsCount == 0)
 			reportNoStepsFound()
-			
+
 		// convert statement number of step start/end to corresponding line numbers:
 		for (int i = 0; i < steps.size(); i++)
 			steps[i] = statements[steps[i]].lineNumber
-				
+
 		// force eventNames to list even if it only contains one item:
 		eventNames = [eventNames].flatten()
 		steps = [steps].flatten()
-		return statements 
+		return statements
 	}
 
 	public List<Page> getTestedPages(){
@@ -454,7 +464,7 @@ class ScriptParser {
 		}
 		return events
 	}
-	
+
 	/**
 	 * Initialize parser and interpret the given script.
 	 */

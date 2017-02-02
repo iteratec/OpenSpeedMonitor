@@ -20,6 +20,8 @@ grails:
           initialOsmRootUser:
             username: [username-of-superadmin-user-to-be-bootsrapped]
             password: [password-of-superadmin-user-to-be-bootsrapped]
+          initialApiKey: '[api key that has to exist in DetailAnalysisService instance]'
+          initialMicroServiceName: OsmDetailAnalysis
       report:
         chart:
           chartTagLib: RICKSHAW
@@ -39,12 +41,9 @@ environments:
         host: 'localhost'
         port: 3025       # port 3025 is used by greenmail
       serverURL: "http://localhost:8080" #the server needs to know its URL to communicate with the microservice
-      de:
-        iteratec:
-          osm:
-            assetRequests:
-              enablePersistenceOfAssetRequests: false
-              #microserviceUrl: "http://localhost:8081"
+      de.iteratec.osm.assetRequests:
+        enablePersistenceOfAssetRequests: false
+        microserviceUrl: "[url to your DetailAnalysisService instance]"
     dataSource:
       # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
       # So you can see all prepared sql statements hibernate creates and fires against your data
@@ -71,6 +70,9 @@ environments:
   production:
     grails:
       serverURL: 'https://[base-url-of-your-prod-osm-instance]'
+      de.iteratec.osm.assetRequests:
+        enablePersistenceOfAssetRequests: false
+        microserviceUrl: "[url to your DetailAnalysisService instance]"
       mail:
         disabled: true # set this to true if you want to enable user registration and forgot passwort function
         #host: '[smtp.your.domain.com]'

@@ -177,7 +177,7 @@ function RickshawGraphBuilder(args) {
     this.updateAliases = function () {
         $(".label").each(function () {
             var originName = $(this).attr("data-origin-name");
-            var graphNameAlias = $(makeValidSelector("#graphAlias_" + originName));
+            var graphNameAlias = $("#graphAlias_" + makeValidSelector(originName));
             if (graphNameAlias != undefined && graphNameAlias.length > 0) {
                 var alias = graphNameAlias.find("#alias").val();
                 $(this).html(alias);
@@ -240,6 +240,7 @@ function RickshawGraphBuilder(args) {
                         $(this).closest(".line").find(".swatch").css("background-color", newColor);
                     }
                 });
+
             }
         });
 

@@ -24,6 +24,7 @@ import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
@@ -61,13 +62,18 @@ class BootStrap {
     HealthReportService healthReportService
     def grailsApplication
 
+    /**
+     * Will be created on first start of application without any WebPagetest servers.
+     */
+    WebPageTestServer initiallyCreatedWptServer
+
     def init = { servletContext ->
 
         switch (Environment.getCurrent()) {
             case Environment.DEVELOPMENT:
                 initApplicationData(true)
                 registerProxyListener()
-
+                fetchLocationsOfWebpagetestOnFirstStart()
                 break
             case Environment.TEST:
                 // no creation of test-data, cause each test will create its own data
@@ -76,7 +82,7 @@ class BootStrap {
             case Environment.PRODUCTION:
                 initApplicationData(false)
                 registerProxyListener()
-
+                fetchLocationsOfWebpagetestOnFirstStart()
                 break
         }
 
@@ -127,12 +133,12 @@ class BootStrap {
             it.delete()
         }
         new OsmConfiguration(
-                detailDataStorageTimeInWeeks: 12,
-                defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000,
-                maxDataStorageTimeInMonths: 13,
-                csiTransformation: CsiTransformation.BY_MAPPING
+            detailDataStorageTimeInWeeks: 12,
+            defaultMaxDownloadTimeInMinutes: 60,
+            minDocCompleteTimeInMillisecs: 250,
+            maxDocCompleteTimeInMillisecs: 180000,
+            maxDataStorageTimeInMonths: 13,
+            csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
     }
 
@@ -419,6 +425,16 @@ class BootStrap {
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 
+        List<WebPageTestServer> webPageTestServers = WebPageTestServer.list()
+        if (webPageTestServers.size() == 0){
+            initiallyCreatedWptServer = new WebPageTestServer(
+                label: "www.webpagetest.org",
+                proxyIdentifier: "https://www.webpagetest.org",
+                baseUrl: "https://www.webpagetest.org",
+                active: true
+            ).save(failOnError: true)
+        }
+
         log.info "init measurement infrastructure OSM ends"
 
     }
@@ -482,6 +498,12 @@ class BootStrap {
         Iterator iterator = propertiesToRepresent.keySet().iterator()
         while (iterator.hasNext()) {
             if (iterator.next().endsWith('Service')) iterator.remove()
+        }
+    }
+
+    void fetchLocationsOfWebpagetestOnFirstStart(){
+        if (initiallyCreatedWptServer){
+            proxyService.fetchLocations(initiallyCreatedWptServer)
         }
     }
 

@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
 import org.joda.time.DateTime
@@ -123,7 +122,7 @@ class EventCsiAggregationService {
 
     private getAllCalculatedHourlyCas(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval) {
         def result = []
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - getAllCalculatedHourlyCas - getMvs', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - getAllCalculatedHourlyCas - getMvs', 1) {
                 result = csiAggregationDaoService.getMvs(
                         fromDateTime.toDate(),
                         toDateTimeEndOfInterval.toDate(),
@@ -136,7 +135,7 @@ class EventCsiAggregationService {
 
     private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, JobGroup jobGroup, MeasuredEvent measuredEvent, Page page, Browser browser, Location location, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
         CsiAggregation toCreateAndOrCalculate
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "EventCsiAggregationService: ensurePresence.findByStarted", IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "EventCsiAggregationService: ensurePresence.findByStarted", 4) {
             toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile(
                     startDate.toDate(), interval, eventAggregator, jobGroup, measuredEvent, page, browser, location, connectivityProfile)
             log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")

@@ -17,12 +17,14 @@
 
 package de.iteratec.osm.util
 
+import grails.util.Environment
 import org.joda.time.DateTime
 
 
 class PerformanceLoggingService {
 
     ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>()
+    public final static INDENTATION_CHAR = "-"
 
 	enum LogLevel{
 		FATAL(5),
@@ -40,59 +42,50 @@ class PerformanceLoggingService {
             return this.value
         }
 	}
-	enum IndentationDepth {
-		singleIndentationChar('-', -1),
-		NULL ('', 0),
-	    ONE (" ${singleIndentationChar.prefix*1}", 1),
-	    TWO (" ${singleIndentationChar.prefix*2}", 2),
-	    THREE (" ${singleIndentationChar.prefix*3}", 3),
-		FOUR (" ${singleIndentationChar.prefix*4}", 4),
-		FIVE (" ${singleIndentationChar.prefix*5}", 5)
-	
-	    private final String prefix
-        private final Integer value
-	    IndentationDepth(String prefix, Integer value) {
-	        this.prefix = prefix
-            this.value = value
-	    }
-        Integer getValue(){
-            return this.value
-        }
-	}
 
-    def logExecutionTime(LogLevel level, String description, IndentationDepth indentation, Closure toMeasure) {
+    def logExecutionTime(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
 		DateTime started = new DateTime()
 		def returnValue = toMeasure.call()
 		if (level==LogLevel.FATAL && log.fatalEnabled) {
-			log.fatal(getMessage(started, description, indentation))
+			log.fatal(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.ERROR && log.errorEnabled) {
-			log.error(getMessage(started, description, indentation))
+			log.error(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.WARN && log.warnEnabled) {
-			log.warn(getMessage(started, description, indentation))
+			log.warn(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.INFO && log.infoEnabled) {
-			log.info(getMessage(started, description, indentation))
+			log.info(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.DEBUG && log.debugEnabled) {
-			log.debug(getMessage(started, description, indentation))
+			log.debug(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.TRACE && log.traceEnabled) {
-			log.trace(getMessage(started, description, indentation))
+			log.trace(getMessage(started, description, indentationDepth))
 		}
 		return returnValue
     }
     void resetExecutionTimeLoggingSession(){
-        loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
+        if (Environment.current != Environment.TEST){
+            loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
+        }else {
+            log.error("Silent performance logging not supported in tests.")
+        }
     }
-    void logExecutionTimeSilently(LogLevel level, String description, IndentationDepth indentation, Closure toMeasure) {
-        DateTime started = new DateTime()
-        toMeasure.call()
-        loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentation, level, getElapsedSeconds(started))
+    void logExecutionTimeSilently(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
+        if (Environment.current == Environment.TEST){
+            toMeasure.call()
+        }else {
+            DateTime started = new DateTime()
+            toMeasure.call()
+            loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentationDepth, level, getElapsedSeconds(started))
+        }
     }
     String getExecutionTimeLoggingSessionData(LogLevel level){
-        return loggedExecutionTimesThreadLocal.get().getRepresentation(level)
+        return Environment.current == Environment.TEST ?
+            "Silent performance logging not supported in tests." :
+            loggedExecutionTimesThreadLocal.get().getRepresentation(level)
     }
 
-	private String getMessage(DateTime started, String description, IndentationDepth indentation){
+	private String getMessage(DateTime started, String description, Integer indentationDepth){
         Double eleapsedInSeconds = getElapsedSeconds(started)
-		return "${indentation.prefix}${description}  -> Elapsed Sec: ${eleapsedInSeconds}"
+		return "${INDENTATION_CHAR*indentationDepth}${description}  -> Elapsed Sec: ${eleapsedInSeconds}"
 	}
 
     private Double getElapsedSeconds(DateTime started) {

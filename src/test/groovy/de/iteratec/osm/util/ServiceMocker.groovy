@@ -280,11 +280,8 @@ class ServiceMocker {
 	 * @param toReturnFromGetDatabaseDriverClassName
 	 * 		To be returned from method {@link de.iteratec.osm.ConfigService#getDatabaseDriverClassName()}.
 	 */
-	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes, CsiTransformation toReturnFromGetCsiTransformation){
+	void mockConfigService(serviceToMockIn, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes, CsiTransformation toReturnFromGetCsiTransformation){
 		ConfigService configServiceMock = new ConfigService()
-		configServiceMock.metaClass.getDatabaseDriverClassName = { ->
-			return toReturnFromGetDatabaseDriverClassName
-		}
 		configServiceMock.metaClass.getDefaultMaxDownloadTimeInMinutes = { ->
 			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
 		}
@@ -389,7 +386,7 @@ class ServiceMocker {
     void mockPerformanceLoggingService(serviceToMockIn) {
 		PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
         performanceLoggingService.metaClass.logExecutionTime = {
-            PerformanceLoggingService.LogLevel level, String description, PerformanceLoggingService.IndentationDepth indentation, Closure toMeasure ->
+            PerformanceLoggingService.LogLevel level, String description, Integer indentationDepth, Closure toMeasure ->
                 toMeasure.call()
         }
         serviceToMockIn.performanceLoggingService = performanceLoggingService

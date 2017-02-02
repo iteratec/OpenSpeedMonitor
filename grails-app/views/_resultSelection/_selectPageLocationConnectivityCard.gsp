@@ -87,9 +87,9 @@ A card to select page & measured step, browser & location, and the connectivity
                 <div id="filter-connectivityprofile">
                     <g:select id="selectedConnectivityProfilesHtmlId"
                               class="form-control"
-                              name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
+                              name="selectedConnectivities" from="${avaiableConnectivities}" optionKey="id" optionValue="name"
                               multiple="true"
-                              value="${selectedConnectivityProfiles}"
+                              value="${avaiableConnectivities.findAll {selectedConnectivities*.toString().contains(it.id.toString())}}"
                               title="${message(code:'de.iteratec.isr.wptrd.labels.filterConnectivityProfile')}" />
                     <label class="checkbox-inline">
                         <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
@@ -97,12 +97,6 @@ A card to select page & measured step, browser & location, and the connectivity
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
                                    default="Select all Connectivity Profiles"/>
                     </label>
-                    <input type="hidden" name="includeNativeConnectivity" id="includeNativeConnectivity"
-                           value="${includeCustomConnectivity ? true : false}" />
-                    <input type="hidden" name="includeCustomConnectivity" id="includeCustomConnectivity"
-                           value="${includeCustomConnectivity ? true : false}" />
-                    <input type="hidden" name="customConnectivityName" id="customConnectivityName"
-                           value="${customConnectivityName}" />
                 </div>
             </div>
         </g:if>

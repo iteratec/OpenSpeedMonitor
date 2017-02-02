@@ -68,9 +68,11 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    public final
+    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
+    public final
+    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
 
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
@@ -121,7 +123,6 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
-
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         boolean requestedAllowedDashboard = true;
@@ -145,18 +146,6 @@ class EventResultDashboardController {
             if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
-                // For validation errors if there is a request and it is not valid:
-
-                boolean warnAboutLongProcessingTimeInsteadOfShowingData = false;
-                if (!cmd.overwriteWarningAboutLongProcessingTime) {
-
-                    int countOfSelectedBrowser = cmd.selectedBrowsers.size();
-                    if (countOfSelectedBrowser < 1) {
-                        countOfSelectedBrowser = ((List) modelToRender.get('browsers')).size();
-                    }
-
-                    int countOfSelectedAggregators = cmd.selectedAggrGroupValuesCached.size() + cmd.selectedAggrGroupValuesUnCached.size();
-                }
                 fillWithCsiAggregationData(modelToRender, cmd);
             }
         }
@@ -221,11 +210,6 @@ class EventResultDashboardController {
                     selectedLocations.add(Long.parseLong(item))
                 }
             }
-            if (dashboard.selectedConnectivityProfiles) {
-                for (item in dashboard.selectedConnectivityProfiles.tokenize(',')) {
-                    selectedConnectivityProfiles.add(Long.parseLong(item))
-                }
-            }
             if (dashboard.selectedAggrGroupValuesCached) {
                 for (item in dashboard.selectedAggrGroupValuesCached.tokenize(',')) {
                     selectedAggrGroupValuesCached.add(item)
@@ -237,11 +221,10 @@ class EventResultDashboardController {
                 }
             }
 
-
             selectedAllMeasuredEvents = dashboard.selectedAllMeasuredEvents
             selectedAllBrowsers = dashboard.selectedAllBrowsers
             selectedAllLocations = dashboard.selectedAllLocations
-            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles
+            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles as boolean
 
             overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
             debug = dashboard.debug
@@ -253,9 +236,7 @@ class EventResultDashboardController {
             trimBelowRequestSizes = dashboard.trimBelowRequestSizes
             trimAboveRequestSizes = dashboard.trimAboveRequestSizes
 
-            includeNativeConnectivity = dashboard.includeNativeConnectivity
-            customConnectivityName = dashboard.customConnectivityName
-            includeCustomConnectivity = dashboard.includeCustomConnectivity
+            selectedConnectivities = dashboard.selectedConnectivities ?: []
 
             chartTitle = dashboard.chartTitle
             chartWidth = dashboard.chartWidth
@@ -327,8 +308,16 @@ class EventResultDashboardController {
             }
         }
 
-        Collection<Long> selectedConnectivityProfiles = []
-        dashboardValues.selectedConnectivityProfiles.each { l -> selectedConnectivityProfiles.add(Long.parseLong(l)) }
+        Collection<String> selectedConnectivities = []
+        // String or List<String>
+        def valuesConnectivities = dashboardValues.selectedConnectivities
+        if (valuesConnectivities) {
+            if (valuesConnectivities.class == String) {
+                selectedConnectivities.add(valuesConnectivities)
+            } else {
+                valuesConnectivities.each { l -> selectedConnectivities.add(l) }
+            }
+        }
 
         // Create cmd for validation
         EventResultDashboardShowAllCommand cmd = new EventResultDashboardShowAllCommand(
@@ -351,9 +340,7 @@ class EventResultDashboardController {
                 debug: dashboardValues.debug,
                 setFromHour: dashboardValues.setFromHour,
                 setToHour: dashboardValues.setToHour,
-                includeCustomConnectivity: dashboardValues.includeCustomConnectivity,
-                includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
-                selectedConnectivityProfiles: selectedConnectivityProfiles,
+                selectedConnectivities: selectedConnectivities,
                 selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles,
                 chartTitle: dashboardValues.chartTitle ?: "",
                 loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
@@ -398,7 +385,7 @@ class EventResultDashboardController {
                 response.sendError(500, 'save error')
             }
             response.setStatus(200)
-            ControllerUtils.sendObjectAsJSON(response, ["path":"/eventResultDashboard/", "dashboardId":newCustomDashboard.id], false)
+            ControllerUtils.sendObjectAsJSON(response, ["path": "/eventResultDashboard/", "dashboardId": newCustomDashboard.id], false)
         }
     }
 
@@ -471,7 +458,6 @@ class EventResultDashboardController {
 
     }
 
-
     // fill the context menu with i18n
     private void fillWithI18N(Map<String, Object> modelToRender) {
         Map<String, String> i18n = [:]
@@ -490,7 +476,6 @@ class EventResultDashboardController {
 
         modelToRender.put('i18n', i18n as JSON)
     }
-
 
     /**
      * <p>
@@ -769,7 +754,7 @@ class EventResultDashboardController {
         result.put('locations', locations)
 
         // ConnectivityProfiles
-        result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
+        result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(true)
 
         // JavaScript-Utility-Stuff:
         result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)

@@ -157,7 +157,7 @@ class JobService {
         params["_selectedAllBrowsers"] = ""
         params["selectedLocations"] = "$job.location.id"
         params["_selectedAllLocations"] = ""
-        params["selectedConnectivityProfiles"] = "$job.connectivityProfileId"
+        params["selectedConnectivities"] = "$job.connectivityProfileId"
         params["_selectedAllConnectivityProfiles"] = ""
         params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"

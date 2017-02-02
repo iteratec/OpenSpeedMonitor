@@ -26,7 +26,6 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.gsp.PageRenderer
@@ -68,17 +67,17 @@ class JobController {
         // custom sort for nextExecutionTime necessary due to it being neither persisted in the
         // database nor derived. Thus it cannot be passed to database layer sorting
         if (params.sort == 'nextExecutionTime') {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: query jobs from db', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: query jobs from db', 1) {
                 jobs = jobDaoService.getAllJobs()
             }
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: sorting', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: sorting', 1) {
                 jobs.sort { if (it.active) it.getNextExecutionTime() }
             }
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: reversing', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: reversing', 1) {
                 if (params.order == 'desc') jobs.reverse(true)
             }
         } else if (params.sort || request.xhr || forceShowAllJobs) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'NOT sorting via nextExecutionTime: query jobs from db', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'NOT sorting via nextExecutionTime: query jobs from db', 1) {
                 jobs = jobDaoService.getJobs(params)
             }
         } else {
@@ -114,6 +113,9 @@ class JobController {
     def create() {
         Job job = new Job(params)
         job.maxDownloadTimeInMinutes = configService.getDefaultMaxDownloadTimeInMinutes()
+        job.firstViewOnly = true
+        job.persistNonMedianResults = false
+        job.captureVideo = true
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
 

@@ -43,7 +43,6 @@ class CsiDashboardPage extends I18nGebPage{
         diaYAxisMaxInputField { $(".dia-y-axis-max") }
         showDataMarkersCheckBox { $("#to-enable-marker") }
         showDataLabelsCheckBox { $("#to-enable-label") }
-        optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }
         addAliasButton { $("#addAliasButton") }
         aliasInputField { $(".input-alias")[0] }
         graphName { $("span.label").attr("innerHTML") }
@@ -58,6 +57,8 @@ class CsiDashboardPage extends I18nGebPage{
         pageTab{$("a",href:"#page-tab")}
         browserTab{$("a",href:"#browser-tab")}
         connectivityTab{$("a",href:"#connectivity-tab")}
+        warningNoJobGroupSelected{$("#warning-no-job-group")}
+        warningNoPageSelected{$("#warning-no-page")}
     }
 
     public void clickSaveAsDashboardButton() {

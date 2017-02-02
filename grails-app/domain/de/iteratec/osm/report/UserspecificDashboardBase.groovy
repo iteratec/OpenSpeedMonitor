@@ -199,8 +199,13 @@ class UserspecificDashboardBase {
      * toggle formatting rickshaw export to wide screen format
      */
     Boolean wideScreenDiagramMontage = false
-    
-	static constraints = {
+
+    Boolean selectedAllConnectivityProfiles
+    Collection<String> selectedConnectivities
+
+    static hasMany = [selectedConnectivities:String]
+
+    static constraints = {
         dashboardName(nullable: false, blank: false)
         username(nullable: true)
         publiclyVisible(nullable: true)
@@ -224,5 +229,7 @@ class UserspecificDashboardBase {
         wideScreenDiagramMontage(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
+        selectedConnectivities(nullable: true)
+        selectedAllConnectivityProfiles(nullable: true)
     }
 }

@@ -91,39 +91,19 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
     Boolean selectedAllLocations = true
 
     /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllConnectivityProfiles} is evaluated to
-     * <code>false</code>.
+     * The selected connectivities. Could include connectivityProfile ids, customConnectivityNames or 'native'
      */
-    Collection<Long> selectedConnectivityProfiles = []
+    Collection<String> selectedConnectivities = []
 
     /**
      * User enforced the selection of all ConnectivityProfiles.
      * This selection <em>is not</em> reflected in
-     * {@link #selectedConnectivityProfiles} cause of URL length
+     * {@link #selectedConnectivities} cause of URL length
      * restrictions. If this flag is evaluated to
      * <code>true</code>, the selections in
-     * {@link #selectedConnectivityProfiles} should be ignored.
+     * {@link #selectedConnectivities} should be ignored.
      */
     Boolean selectedAllConnectivityProfiles = true
-
-    /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    Boolean includeNativeConnectivity
-
-    /**
-     * Wheter or not EventResult measured with custom connectivity should get included.
-     */
-    Boolean includeCustomConnectivity;
-
-    /**
-     * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
-     * connectivity name matches this regex.
-     */
-    String customConnectivityName
 
     /**
      * Constraints needs to fit.
@@ -153,11 +133,31 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
 
         selectedAllConnectivityProfiles(nullable: true)
 
-        includeNativeConnectivity(nullable: false)
+    }
 
-        includeCustomConnectivity(nullable: false)
+    /**
+     * returns the selected connectivityProfiles by filtering all selected connectivities.
+     */
+    Collection<Long> getSelectedConnectivityProfiles() {
+        return selectedConnectivities.findAll { it.isLong() && ConnectivityProfile.exists(it as Long) }.collect {
+            Long.parseLong(it)
+        }
+    }
 
-        customConnectivityName(nullable: true)
+    /**
+     * returns the selected customConnectivityNames by filtering all selected connectivities.
+     */
+    Collection<String> getSelectedCustomConnectivityNames() {
+        return selectedConnectivities.findAll {
+            (!it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value) || (it.isLong() && !ConnectivityProfile.exists(it as Long))
+        }
+    }
+
+    /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    boolean getIncludeNativeConnectivity() {
+        return selectedAllConnectivityProfiles || selectedConnectivities.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
     }
 
     /**
@@ -192,23 +192,11 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-        viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
-        viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
-        viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
-        viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
+        viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
 
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
     }
 
-
-    /**
-     * <p>
-     * Returns a boolean to include custom connectivity in selected connetivities
-     * </p>
-     */
-    public boolean includeCustomConnectivity() {
-        return includeCustomConnectivity;
-    }
 
     /**
      * <p>
@@ -249,14 +237,11 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
             result.locationIds.addAll(this.selectedLocations);
         }
 
-        result.includeNativeConnectivity = this.includeNativeConnectivity
-        result.includeCustomConnectivity = this.includeCustomConnectivity
-        if (this.includeCustomConnectivity){
-            result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
-        }
-        if (this.selectedAllConnectivityProfiles){
-            result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-        }else if (this.selectedConnectivityProfiles.size() > 0){
+        result.includeNativeConnectivity = this.getIncludeNativeConnectivity()
+        result.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
+
+        result.includeAllConnectivities = this.selectedAllConnectivityProfiles
+        if (this.selectedConnectivityProfiles.size() > 0) {
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
         }
 

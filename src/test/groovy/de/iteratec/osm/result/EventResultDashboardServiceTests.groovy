@@ -26,7 +26,6 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -678,7 +677,7 @@ class EventResultDashboardServiceTests extends Specification {
     private void mockPerformanceLoggingService() {
         def performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         performanceLoggingService.metaClass.logExecutionTime = {
-            LogLevel level, String description, IndentationDepth indentation, Closure toMeasure ->
+            LogLevel level, String description, Integer indentationDepth, Closure toMeasure ->
                 toMeasure.call()
         }
         serviceUnderTest.performanceLoggingService = performanceLoggingService

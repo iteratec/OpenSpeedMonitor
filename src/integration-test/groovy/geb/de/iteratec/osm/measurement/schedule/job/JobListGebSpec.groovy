@@ -89,15 +89,11 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         waitFor { at JobCreatePage }
 
         when: "The user fills out all necessary data and submits"
-        createPage.location.click() //Open the dropdown to choose location, otherwise the options won't be visible
-        waitFor {
-            createPage.location.isDisplayed()
-        }
-        $("#location_chosen").find("li").find { it.text() == location2Name }.click()
+        createPage.setLocation(location2Name)
         createPage.nameText << job4Name
         createPage.cronString << "10/20 * * * ? *"
-        createPage.tags << job4Tag
-        createPage.tags << Keys.ENTER
+        createPage.addTag(job4Tag)
+
         createPage.clickCreateButton()
 
         then: "There should be the new created job in the list and it should be highlighted"

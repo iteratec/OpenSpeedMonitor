@@ -54,6 +54,7 @@ function initColorPicker(colorPickerComponent, selectedValue) {
 
     var selectedSeries = window.rickshawGraphBuilder.graph.series.find(function(el) { return el.name == selectedValue });
     var selectedSeriesColor = '#FFFFFF';
+
     if (selectedSeries) {
         selectedSeriesColor = selectedSeries.color;
     }
@@ -62,7 +63,10 @@ function initColorPicker(colorPickerComponent, selectedValue) {
 }
 
 function initGraphNameAliases(graphNameAliases) {
-    var keys = Object.keys(graphNameAliases);
+    var filteredGraphNameAliases = filterAliases(graphNameAliases);
+    if (filteredGraphNameAliases.length == 0)
+        return;
+    var keys = Object.keys(filteredGraphNameAliases);
     if (keys.length > 0) {
         for (var i = 0; i < keys.length; i++) {
             addAlias();
@@ -72,7 +76,7 @@ function initGraphNameAliases(graphNameAliases) {
             var id = $(this).attr("id");
             if (id != "graphAlias_clone") {
                 var name = keys[counter];
-                var alias = graphNameAliases[name];
+                var alias = filteredGraphNameAliases[name];
                 $(this).find("#alias").val(alias);
                 $(this).find("#graphName option[value='" + name + "']").attr('selected', true);
                 $(this).attr('id', 'graphAlias_' + name);
@@ -85,17 +89,34 @@ function initGraphNameAliases(graphNameAliases) {
 }
 
 function initGraphColors(graphColors) {
-    var keys = Object.keys(graphColors);
+    var filteredGraphColors = filterAliases(graphColors);
+    if (filteredGraphColors.length == 0)
+        return;
+    var keys = Object.keys(filteredGraphColors);
     for (var i = 0; i < keys.length; i++) {
         var name = keys[i];
-        var color = graphColors[name];
-        var container = $(makeValidSelector("#graphAlias_" + name));
+        var color = filteredGraphColors[name];
+        var container = $("#graphAlias_" + makeValidSelector(name));
         if (container) {
             container.find("#color").val(color);
-            container.find("#color").css("background-color", color);
             var argument = {};
             argument[name] = color;
             $("#graphAliasChildlist").trigger("graphAliasColorChanged", argument);
         }
     }
+}
+
+/**
+ * removes graphNameAliases for which no graph exists
+ */
+function filterAliases(graphNameAliases) {
+    var result = {};
+
+    for (var key in graphNameAliases) {
+        if ($('*[data-origin-name=\"' + key + '\"]').length > 0) {
+            result[key] = graphNameAliases[key];
+        }
+    }
+
+    return result;
 }

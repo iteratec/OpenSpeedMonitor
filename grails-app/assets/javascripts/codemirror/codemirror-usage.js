@@ -25,6 +25,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
     var WRONG_PAGE;
     var WRONG_URL_FORMAT;
     var MEASUREDEVENT_NOT_UNIQUE;
+    var VARIABLE_NOT_SUPPORTED;
     var TOO_MANY_SEPARATORS;
     var linkParseScriptAction;
     var linkMergeDefinedAndUsedPlaceholders;
@@ -46,6 +47,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         WRONG_PAGE = data.i18nMessage_WRONG_PAGE;
         WRONG_URL_FORMAT = data.i18nMessage_WRONG_URL_FORMAT;
         MEASUREDEVENT_NOT_UNIQUE = data.i18nMessage_MEASUREDEVENT_NOT_UNIQUE;
+        VARIABLE_NOT_SUPPORTED = data.i18nMessage_VARIABLE_NOT_SUPPORTED;
         TOO_MANY_SEPARATORS = data.i18nMessage_TOO_MANY_SEPARATORS;
         linkParseScriptAction = data.linkParseScriptAction;
         linkMergeDefinedAndUsedPlaceholders = data.linkMergeDefinedAndUsedPlaceholders;
@@ -99,6 +101,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
             case "WRONG_URL_FORMAT" :                   return WRONG_URL_FORMAT;
             case "TOO_MANY_SEPARATORS" :                return TOO_MANY_SEPARATORS;
             case "MEASUREDEVENT_NOT_UNIQUE" :           return MEASUREDEVENT_NOT_UNIQUE;
+            case "VARIABLE_NOT_SUPPORTED" :             return VARIABLE_NOT_SUPPORTED;
         }
     };
     var update = function() {

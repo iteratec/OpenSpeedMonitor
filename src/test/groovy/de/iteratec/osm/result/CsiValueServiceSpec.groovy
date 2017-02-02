@@ -113,12 +113,6 @@ class CsiValueServiceSpec extends Specification{
         !serviceUnderTest.isCsiRelevant(eventResult)
     }
 
-    void "EventResults without csi configuration are irrelevant"(){
-        when:
-        eventResult.jobResult.job.jobGroup.csiConfiguration = null
-        then:
-        !serviceUnderTest.isCsiRelevant(eventResult)
-    }
     void "CsiAggregations not calculated are irrelevant"(){
         when:
         csiAggregation.metaClass.isCalculated = {return false}
@@ -150,6 +144,8 @@ class CsiValueServiceSpec extends Specification{
         eventResult.jobResult = new JobResult()
         eventResult.jobResult.job = new Job()
         eventResult.jobResult.job.jobGroup = new JobGroup()
+        eventResult.jobGroup = new JobGroup()
+        eventResult.jobGroup.csiConfiguration = new CsiConfiguration()
         eventResult.jobResult.job.jobGroup.csiConfiguration = new CsiConfiguration()
         csiAggregation = new CsiAggregation()
         csiAggregation.csByWptDocCompleteInPercent = 50.0

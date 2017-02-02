@@ -64,7 +64,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         var selectedConnectivities = $("#selectedConnectivityProfilesHtmlId");
         if(selectedConnectivities != null){
             var connectivities = selectedConnectivities.val();
-            if (connectivities != null) map["selectedConnectivityProfiles"] = connectivities;
+            if (connectivities != null) map["selectedConnectivities"] = connectivities;
             var allConnectivies = $("#selectedAllConnectivityProfiles").prop("checked");
             if (allConnectivies) map["selectedAllConnectivityProfiles"] = allConnectivies;
         }
@@ -111,9 +111,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
             if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = 60;
             if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
             if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
-            if (updatedMap["includeNativeConnectivity"] == null) updatedMap["includeNativeConnectivity"] = "false";
-            if (updatedMap["includeCustomConnectivity"] == null) updatedMap["includeCustomConnectivity"] = "false";
-            if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
         }
         updateUrl("#pageAggregationMainMenu",pageAggregationLink+"?"+$.param(updatedMap, true));
         updateUrl("#eventResultMainMenu",eventResultDashboardLink+"?"+$.param(updatedMap, true));
@@ -135,6 +132,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
             updateUrls(false);
         }
         $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
+        $('#show-button').on('click', function(){updateUrls(true)});
     };
 
     var getOldParameter = function () {
@@ -143,10 +141,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         oldParameter["selectedBrowsers"] = urlParameter["selectedBrowsers"];
         oldParameter["selectedAllBrowsers"] = urlParameter["selectedAllBrowsers"];
         oldParameter["selectedAllLocations"] = urlParameter["selectedAllLocations"];
-        oldParameter["selectedConnectivityProfiles"] = urlParameter["selectedConnectivityProfiles"];
+        oldParameter["selectedConnectivities"] = urlParameter["selectedConnectivities"];
         oldParameter["selectedAllConnectivityProfiles"] = urlParameter["selectedAllConnectivityProfiles"];
         oldParameter["selectedPages"] = urlParameter["selectedPages"];
         oldParameter["selectedMeasuredEventIds"] = urlParameter["selectedMeasuredEventIds"];
+        oldParameter["selectedInterval"] = urlParameter["selectedInterval"];
+        oldParameter["selectedTimeFrameInterval"] = urlParameter["selectedTimeFrameInterval"];
         oldParameter["setFromHour"] = urlParameter["setFromHour"];
         oldParameter["setToHour"] = urlParameter["setToHour"];
         oldParameter["from"] = urlParameter["from"];

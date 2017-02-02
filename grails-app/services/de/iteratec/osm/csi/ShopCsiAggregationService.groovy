@@ -26,7 +26,6 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.joda.time.DateTime
 
@@ -59,7 +58,7 @@ class ShopCsiAggregationService {
         if (csiGroups.size() == 0) {
             return result
         }
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', 1) {
             result = csiAggregationDaoService.getShopCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
         }
         return result

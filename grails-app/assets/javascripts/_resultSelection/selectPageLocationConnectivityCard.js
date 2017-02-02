@@ -70,40 +70,31 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var getMeasuredEventSelection = function () {
         return {
-            ids: measuredEventsSelectElement.val(),
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement)
+            ids: measuredEventsSelectElement.val()
         };
     };
 
     var getPageSelection = function () {
         return {
-            ids: pageSelectElement.val(),
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement)
+            ids: pageSelectElement.val()
         };
     };
 
     var getLocationSelection = function() {
         return {
-            ids: locationsSelectElement.val(),
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+            ids: locationsSelectElement.val()
         };
     };
 
     var getBrowserSelection = function() {
         return {
-            ids: browserSelectElement.val(),
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement)
+            ids: browserSelectElement.val()
         };
     };
 
     var getConnectivitySelection = function () {
         return {
-            ids: (connectivitySelectElement.val() || []).filter(OpenSpeedMonitor.stringUtils.isNumeric),
-            customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
-                return option.text;
-            }),
-            native: connectivitySelectElement.find('option[value="native"]:selected').length > 0,
-            hasAllSelected: OpenSpeedMonitor.domUtils.hasAllOptionsSelected(connectivitySelectElement)
+            selectedConnectivities: connectivitySelectElement.val() || []
         }
     };
 

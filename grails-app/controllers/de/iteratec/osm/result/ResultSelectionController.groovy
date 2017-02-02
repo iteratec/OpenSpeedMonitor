@@ -1,9 +1,10 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
+import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
@@ -40,7 +41,7 @@ class ResultSelectionController {
             sendError(command)
             return
         }
-        def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", IndentationDepth.NULL, {
+        def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", 0, {
             // we select static '1' for up to MAX_RESULT_COUNT records and count them afterwards
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
             try {
@@ -65,7 +66,7 @@ class ResultSelectionController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", IndentationDepth.NULL, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", 0, {
             def jobGroups = query(command, ResultSelectionType.JobGroups, { existing ->
                 if (existing) {
                     not { 'in'('jobGroup', existing) }
@@ -96,7 +97,7 @@ class ResultSelectionController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", IndentationDepth.NULL, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", 0, {
             def measuredEvents = query(command, ResultSelectionType.MeasuredEvents, { existing ->
                 if (existing) {
                     or {
@@ -126,7 +127,7 @@ class ResultSelectionController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", IndentationDepth.NULL, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", 0, {
             def locations = query(command, ResultSelectionType.Locations, { existing ->
                 if (existing) {
                     or {
@@ -156,10 +157,12 @@ class ResultSelectionController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", IndentationDepth.NULL, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", 0, {
             def dtos = getPredefinedConnectivityProfiles(command)
-            dtos += getCustomConnectivity(command)
-            dtos += getNativeConnectivity(command)
+            if (command.caller == ResultSelectionCommand.Caller.EventResult) {
+                dtos += getCustomConnectivity(command)
+                dtos += getNativeConnectivity(command)
+            }
             return dtos
         })
 
@@ -167,9 +170,12 @@ class ResultSelectionController {
     }
 
     private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", IndentationDepth.ONE, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
+                connectivityProfile {
+                    eq('active', true)
+                }
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
                 }
@@ -187,7 +193,7 @@ class ResultSelectionController {
     }
 
     private getCustomConnectivity(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", IndentationDepth.ONE, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", 1, {
             def customProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('customConnectivityName')
 
@@ -201,7 +207,7 @@ class ResultSelectionController {
             })
             return customProfiles.collect {
                 [
-                        id  : MetaConnectivityProfileId.Custom.value,
+                        id  : it,
                         name: it
                 ]
             }
@@ -209,7 +215,7 @@ class ResultSelectionController {
     }
 
     private getNativeConnectivity(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", IndentationDepth.ONE, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", 1, {
             def nativeConnectivity = query(command, ResultSelectionType.ConnectivityProfiles, {
                 eq('noTrafficShapingAtAll', true)
                 maxResults 1
@@ -217,7 +223,7 @@ class ResultSelectionController {
                     distinct('noTrafficShapingAtAll')
                 }
             })
-            return nativeConnectivity ? [[id: MetaConnectivityProfileId.Native.value, name: "Native"]] : []
+            return nativeConnectivity ? [[id: MetaConnectivityProfileId.Native.value, name: MetaConnectivityProfileId.Native.value]] : []
         })
     }
 
@@ -355,14 +361,16 @@ class ResultSelectionCommand {
 
     DateTime from
     DateTime to
-    List<Long> jobGroupIds
-    List<Long> pageIds
-    List<Long> measuredEventIds
-    List<Long> browserIds
-    List<Long> locationIds
-    List<Long> connectivityIds
-    Boolean nativeConnectivity
-    List<String> customConnectivities
+    List<Long> jobGroupIds = []
+    List<Long> pageIds = []
+    List<Long> measuredEventIds = []
+    List<Long> browserIds = []
+    List<Long> locationIds = []
+    List<String> selectedConnectivities = []
+    @BindUsing({ object, source ->
+        // set default to EventResult
+        source['caller'] ?: Caller.EventResult
+    })
     Caller caller
 
     static constraints = {
@@ -373,5 +381,32 @@ class ResultSelectionCommand {
             }
         })
         nativeConnectivity(blank: true, nullable: true)
+    }
+
+    /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    boolean getNativeConnectivity() {
+        return selectedConnectivities?.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
+    }
+
+    /**
+     * returns the selected customConnectivityNames by filtering all selected connectivities.
+     */
+    Collection<String> getCustomConnectivities() {
+        return selectedConnectivities ? selectedConnectivities.findAll {
+            (!it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value) || (it.isLong() && !ConnectivityProfile.exists(it as Long))
+        } : []
+    }
+
+    /**
+     * returns the selected connectivityProfiles by filtering all selected connectivities.
+     */
+    Collection<Long> getConnectivityIds() {
+        return selectedConnectivities ? selectedConnectivities.findAll {
+            it.isLong() && ConnectivityProfile.exists(it as Long)
+        }.collect {
+            Long.parseLong(it)
+        } : []
     }
 }

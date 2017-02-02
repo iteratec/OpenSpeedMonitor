@@ -24,7 +24,6 @@ import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -373,7 +372,7 @@ class HighchartPointDetailsController {
 
         // Load relevant data:
         List<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - listAggregatedResultsByQueryParams - getMedianEventResultsBy', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - listAggregatedResultsByQueryParams - getMedianEventResultsBy', 1) {
             eventResults = eventResultDaoService.getMedianEventResultsBy(
                     fromDate.toDate(), toDate.toDate(), relevantCachedViews, jobGroupId, measuredEventId, pageId, browserId, locationId)
         }

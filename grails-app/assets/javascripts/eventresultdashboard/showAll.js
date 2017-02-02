@@ -1,49 +1,53 @@
 /* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
+ * OpenSpeedMonitor (OSM)
+ * Copyright 2014 iteratec GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
  * Called on jquerys DOM-ready.
  * Initializes DOM-nodes and registers events.
  */
-function doOnDomReady(noResultsTextForChosenSelects){
+function doOnDomReady(noResultsTextForChosenSelects) {
+
+    $('[data-toggle="popover"]').popover();
 
     updateSelectionConstraints();
+    showOrHideWarningRibbon();
     addInfoHandlers();
 
-    if($("#chartbox").length > 0){
+    if ($("#chartbox").length > 0) {
         createGraph();
     }
 }
 
 function addInfoHandlers() {
-    $('#selectedBrowsersHtmlId').on('change', updateSelectionConstraintBrowser);
-    $('#selectedLocationsHtmlId').on('chosen:updated', updateSelectionConstraintBrowser);
-    $('#selectedAllBrowsers').on('change', updateSelectionConstraintBrowser);
+    $('#selectedBrowsersHtmlId').on('change', showOrHideWarningRibbon);
+    $('#selectedLocationsHtmlId').on('chosen:updated', showOrHideWarningRibbon);
+    $('#selectedAllBrowsers').on('change', showOrHideWarningRibbon);
 
-    $('#selectedConnectivityProfilesHtmlId').on('chosen:updated', updateSelectionConstraintConnectivity);
-    $('#selectedAllConnectivityProfiles').on('change', updateSelectionConstraintConnectivity);
-    $('#customConnectivityName').on('input', updateSelectionConstraintConnectivity);
-    $('#includeNativeConnectivity').on('change', updateSelectionConstraintConnectivity);
-    $('#includeCustomConnectivity').on('change', updateSelectionConstraintConnectivity);
+    $('#selectedConnectivityProfilesHtmlId').on('chosen:updated', showOrHideWarningRibbon);
+    $('#selectedAllConnectivityProfiles').on('change', showOrHideWarningRibbon);
 
-    $('#selectAggregatorUncachedHtmlId').on('change', updateSelectionConstraintFirstView);
-    $('#selectAggregatorCachedHtmlId').on('change', updateSelectionConstraintRepeatView);
+    $('#selectAggregatorUncachedHtmlId').on('change', showOrHideWarningRibbon);
+    $('#selectAggregatorCachedHtmlId').on('change', showOrHideWarningRibbon);
 
-    $('input.trim-selection').on('change', updateSelectionConstraintTrim);
+    $('input.trim-selection').on('change', showOrHideWarningRibbon);
+
+    $('#dataTableId').on('inserted.bs.popover', function () {
+        updateSelectionConstraints();
+    });
 }
 
 /**
@@ -57,76 +61,99 @@ function updateSelectionConstraints() {
     updateSelectionConstraintTrim();
 }
 
-function showSummaryRow(row, text) {
-    row = $(row);
-    row.find('td').html(text);
-    row.css("display", "table-row");
-}
-
-function hideSummaryRow(row) {
-    $(row).css("display", "none");
-}
-
-function updateSelectionConstraintBrowser() {
-    var selectedBrowsers = $('#selectedAllBrowsers').is(':checked') ?
-        'all' : getTextList('#selectedBrowsersHtmlId option:selected', 50);
-    var selectedLocations = $('#selectedAllLocations').is(':checked') ?
-        'all' : getTextList('#selectedLocationsHtmlId option:selected', 50);
-    if (selectedBrowsers != 'all' || selectedLocations != 'all') {
-        showSummaryRow('#selectionConstraintBrowser', selectedBrowsers + " | " + selectedLocations);
+function showOrHideWarningRibbon() {
+    if (browserOrLocationSelectionIsCustom() || connectivitySelectionIsCustom() || firstViewSelectionIsCustom() || repeatedViewSelectionIsCustom() || trimValuesAreDefined()) {
+        $("#dataTableId").attr("hidden", false)
     } else {
-        hideSummaryRow('#selectionConstraintBrowser')
+        $("#dataTableId").attr("hidden", true)
     }
 }
 
-function updateSelectionConstraintConnectivity() {
-    var selectedConnectivities = $('#selectedAllConnectivityProfiles').is(':checked')?
-        'all predefined' : getTextList('#selectedConnectivityProfilesHtmlId option:selected', 50);
-    if(document.getElementById('includeNativeConnectivity').checked){
-        selectedConnectivities += ", NATIVE"
-    }
-    if(document.getElementById('includeCustomConnectivity').checked){
-        selectedConnectivities += ", CUSTOM";
-        var customConnNameRegex = document.getElementById('customConnectivityName').value;
-        if(customConnNameRegex){
-            selectedConnectivities += ": '" + customConnNameRegex + "'"
-        }
-    }
-    if (selectedConnectivities != 'all predefined') {
-        showSummaryRow('#selectionConstraintConnectivity', selectedConnectivities);
-    } else {
-        hideSummaryRow('#selectionConstraintConnectivity');
-    }
+function browserOrLocationSelectionIsCustom() {
+    return !$('#selectedAllBrowsers').is(':checked') || !$('#selectedAllLocations').is(':checked')
 }
 
-function updateSelectionConstraintFirstView() {
+function connectivitySelectionIsCustom() {
+    return !$('#selectedAllConnectivityProfiles').is(':checked')
+}
+
+function firstViewSelectionIsCustom() {
     var selectedFirstView = getTextList('#selectAggregatorUncachedHtmlId option:selected', 100);
-    if (selectedFirstView != 'doc complete time') {
-        showSummaryRow('#selectionConstraintFirstView', selectedFirstView ? selectedFirstView : '\u2205');
-    } else {
-        hideSummaryRow('#selectionConstraintFirstView');
-    }
+    return selectedFirstView != 'doc complete time'
 }
 
-function updateSelectionConstraintRepeatView() {
-    var selectedRepeatView = getTextList('#selectAggregatorCachedHtmlId option:selected', 100);
-    if (selectedRepeatView) {
-        showSummaryRow('#selectionConstraintRepeatView', selectedRepeatView ? selectedRepeatView : '\u2205');
-    } else {
-        hideSummaryRow('#selectionConstraintRepeatView');
-    }
+function repeatedViewSelectionIsCustom() {
+    return getTextList('#selectAggregatorCachedHtmlId option:selected', 100) ? true : false
 }
 
-function updateSelectionConstraintTrim() {
+function trimValuesAreDefined() {
     var trims = [
         getTrimSelection("#appendedInputBelowLoadTimes", "#appendedInputAboveLoadTimes", "ms"),
         getTrimSelection("#appendedInputBelowRequestCounts", "#appendedInputAboveRequestCounts", "c"),
         getTrimSelection("#appendedInputBelowRequestSizes", "#appendedInputAboveRequestSizes", "kb")
     ].filter(String);
-    if (trims.length) {
-        showSummaryRow("#selectionConstraintTrim", trims.join(" | "));
+    return trims.length ? true : false
+}
+
+function showSummaryRow(row, text) {
+    var $row = $(row);
+    $row.find('td').html(text);
+    $row.attr("hidden", false);
+}
+
+function hideSummaryRow(row) {
+    $(row).attr("hidden", true);
+}
+
+function updateSelectionConstraintBrowser() {
+    if (!browserOrLocationSelectionIsCustom()) {
+        hideSummaryRow('#selectionConstraintBrowser')
     } else {
+        var selectedBrowsers = $('#selectedAllBrowsers').is(':checked') ?
+            'all' : getTextList('#selectedBrowsersHtmlId option:selected', 50);
+        var selectedLocations = $('#selectedAllLocations').is(':checked') ?
+            'all' : getTextList('#selectedLocationsHtmlId option:selected', 50);
+        showSummaryRow('#selectionConstraintBrowser', selectedBrowsers + " | " + selectedLocations);
+    }
+}
+
+function updateSelectionConstraintConnectivity() {
+    if (!connectivitySelectionIsCustom()) {
+        hideSummaryRow('#selectionConstraintConnectivity');
+    } else {
+        var selectedConnectivities = getTextList('#selectedConnectivityProfilesHtmlId option:selected', 50);
+        showSummaryRow('#selectionConstraintConnectivity', selectedConnectivities);
+    }
+}
+
+function updateSelectionConstraintFirstView() {
+    if (!firstViewSelectionIsCustom()) {
+        hideSummaryRow('#selectionConstraintFirstView');
+    } else {
+        var selectedFirstView = getTextList('#selectAggregatorUncachedHtmlId option:selected', 100);
+        showSummaryRow('#selectionConstraintFirstView', selectedFirstView ? selectedFirstView : '\u2205');
+    }
+}
+
+function updateSelectionConstraintRepeatView() {
+    if (!repeatedViewSelectionIsCustom()) {
+        hideSummaryRow('#selectionConstraintRepeatView');
+    } else {
+        var selectedRepeatView = getTextList('#selectAggregatorCachedHtmlId option:selected', 100);
+        showSummaryRow('#selectionConstraintRepeatView', selectedRepeatView ? selectedRepeatView : '\u2205');
+    }
+}
+
+function updateSelectionConstraintTrim() {
+    if (!trimValuesAreDefined()) {
         hideSummaryRow("#selectionConstraintTrim");
+    } else {
+        var trims = [
+            getTrimSelection("#appendedInputBelowLoadTimes", "#appendedInputAboveLoadTimes", "ms"),
+            getTrimSelection("#appendedInputBelowRequestCounts", "#appendedInputAboveRequestCounts", "c"),
+            getTrimSelection("#appendedInputBelowRequestSizes", "#appendedInputAboveRequestSizes", "kb")
+        ].filter(String);
+        showSummaryRow("#selectionConstraintTrim", trims.join(" | "));
     }
 }
 
@@ -139,12 +166,12 @@ function getTrimSelection(trimBelowInput, trimAboveInput, trimUnit) {
     return text
 }
 
-function getTextList(selectedOptions, max){
-	var groupsTextList = [];
-	$(selectedOptions).each(function(){
-		groupsTextList.push($(this).text());
-	});	
-	var text = groupsTextList.join(", ");
-    return text.length > max ? (text.substring(0, max-3) + '...') : text;
+function getTextList(selectedOptions, max) {
+    var groupsTextList = [];
+    $(selectedOptions).each(function () {
+        groupsTextList.push($(this).text());
+    });
+    var text = groupsTextList.join(", ");
+    return text.length > max ? (text.substring(0, max - 3) + '...') : text;
 }
 

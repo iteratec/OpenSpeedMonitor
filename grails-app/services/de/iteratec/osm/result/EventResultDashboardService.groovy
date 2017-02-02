@@ -33,7 +33,6 @@ import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
@@ -106,7 +105,30 @@ public class EventResultDashboardService {
      * @return all {@link ConnectivityProfile} ordered by their toString() representation.
      */
     public List<ConnectivityProfile> getAllConnectivityProfiles() {
-        return connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        return ConnectivityProfile.findAllByActive(true).sort(false, { it.name.toLowerCase() });
+    }
+
+    /**
+     * Collects all available connectivities.
+     * This includes all ConnectivityProfiles, all CustomConnectivityNames from EventResult and "native" if EventResults with native measurement exist
+     * @param includeNative if set to true and eventResults exists with noTrafficShapingAtAll "native" is added to the list
+     * @return
+     */
+    List<Map<String, String>> getAllConnectivities(boolean includeNative = true) {
+        List<Map<String, String>> result = [].withDefault { [:] }
+        result.addAll(getAllConnectivityProfiles().collect { ["id": it.id, "name": it.toString()] })
+        result.addAll(EventResult.createCriteria().list {
+            isNotNull('customConnectivityName')
+            projections {
+                distinct('customConnectivityName')
+            }
+        }.collect { ["id": it, "name": it] })
+
+        if(includeNative && EventResult.findAllByNoTrafficShapingAtAll(true))  {
+            result.add(["id": ResultSelectionController.MetaConnectivityProfileId.Native.value, "name": ResultSelectionController.MetaConnectivityProfileId.Native.value])
+        }
+
+        return result
     }
 
     /**
@@ -197,7 +219,7 @@ public class EventResultDashboardService {
         }
 
         Collection<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getEventResultDashboardHighchartGraphs - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getEventResultDashboardHighchartGraphs - getLimitedMedianEventResultsBy', 1) {
             eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
                     startDate,
                     endDate,
@@ -223,7 +245,7 @@ public class EventResultDashboardService {
      */
     private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
         Map<String, List<OsmChartPoint>> calculatedResultMap
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
             if (interval == CsiAggregationInterval.RAW) {
                 calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults, gtBoundary, ltBoundary)
             } else {
@@ -232,11 +254,11 @@ public class EventResultDashboardService {
         }
         List<OsmChartGraph> graphs = []
         OsmRickshawChart chart
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', IndentationDepth.ONE) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', 1) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', 2) {
                 graphs = setSpeakingGraphLabelsAndSort(calculatedResultMap)
             }
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', IndentationDepth.TWO) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', 2) {
                 chart = osmChartProcessingService.summarizeEventResultGraphs(graphs)
             }
         }
@@ -273,7 +295,7 @@ public class EventResultDashboardService {
 
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary,ltBoundary)) {
+                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
                         OsmChartPoint chartPoint = new OsmChartPoint(
@@ -284,7 +306,8 @@ public class EventResultDashboardService {
                                 testingAgent: eventResult.testAgent,
                                 chartPointWptInfo: chartPointWptInfo
                         )
-                        if (chartPoint.isValid())
+                        // customer satisfaction can be 0.
+                        if (chartPoint.isValid() || (aggregator.measurandGroup == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }
                 }
@@ -310,7 +333,7 @@ public class EventResultDashboardService {
         Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
         Map<String, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
             eventResults.each { EventResult eventResult ->
                 aggregators.each { AggregatorType aggregator ->
                     if (isCachedViewEqualToAggregatorTypesView(eventResult, resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator))) {
@@ -327,11 +350,11 @@ public class EventResultDashboardService {
         }
 
         Map<String, AggregatorType> aggregatorTypeMap
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'get aggr-type-lookup-map', IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'get aggr-type-lookup-map', 2) {
             aggregatorTypeMap = aggregatorTypeDaoService.getNameToObjectMap()
         }
 
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', IndentationDepth.TWO) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', 2) {
             URL testsDetailsURL
             Double sum = 0
             Integer countValues = 0
@@ -341,23 +364,23 @@ public class EventResultDashboardService {
                 Long millisStartOfInterval
                 AggregatorType aggregator
 
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'tokenize', IndentationDepth.THREE) {
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'inner tokenize', IndentationDepth.FOUR) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'tokenize', 3) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'inner tokenize', 4) {
                         tokenized = key.split(UNIQUE_STRING_DELIMITTER)
                     }
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'Long.valueOf()', IndentationDepth.FOUR) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'Long.valueOf()', 4) {
                         millisStartOfInterval = Long.valueOf(tokenized[2])
                     }
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'getting Aggregator from db', IndentationDepth.FOUR) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'getting Aggregator from db', 4) {
                         aggregator = aggregatorTypeMap[tokenized[0]]
                     }
                 }
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'buildTestsDetailsURL', IndentationDepth.THREE) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'buildTestsDetailsURL', 3) {
                     String[] tagSegments = ((String) tokenized[1]).split(";")
                     testsDetailsURL = buildTestsDetailsURL(tagSegments[0], tagSegments[1], tagSegments[2], tagSegments[3], tagSegments[4], aggregator, millisStartOfInterval, interval, value.size())
                 }
 
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', IndentationDepth.THREE) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
 
                     String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[3]}";
                     countValues = value.size()
@@ -386,13 +409,13 @@ public class EventResultDashboardService {
         Map<Serializable, Location> locationMap = [:]
         def aggregatorTypes = [:]
         highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', 1) {
                 List<String> tokenizedGraphLabel = graphLabel.split(UNIQUE_STRING_DELIMITTER)
                 if (tokenizedGraphLabel.size() != 3) {
                     throw new IllegalArgumentException("The graph-label should consist of three parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
                 }
                 def aggregatorName = tokenizedGraphLabel[0]
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Aggregator', IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Aggregator', 1) {
                     if (!aggregatorTypes[aggregatorName]) {
                         aggregatorTypes[aggregatorName] = AggregatorType.findByName(aggregatorName)
                     }
@@ -529,11 +552,11 @@ public class EventResultDashboardService {
                     'params'    : [
                             'from'                                   : String.valueOf(millisFrom),
                             'to'                                     : String.valueOf(millisFrom + intervalInMinutes * 60 * 1000),
-                            'jobGroupId'                               : jobGroupId,
-                            'measuredEventId'                          : measuredEventId,
-                            'pageId'                                   : pageId,
-                            'browserId'                                : browserId,
-                            'locationId'                               : locationId,
+                            'jobGroupId'                             : jobGroupId,
+                            'measuredEventId'                        : measuredEventId,
+                            'pageId'                                 : pageId,
+                            'browserId'                              : browserId,
+                            'locationId'                             : locationId,
                             'aggregatorTypeNameOrNull'               : aggregatorType.isCachedCriteriaApplicable() ? aggregatorType.getName() : '',
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(lastKnownCountOfAggregatedResults)
                     ]

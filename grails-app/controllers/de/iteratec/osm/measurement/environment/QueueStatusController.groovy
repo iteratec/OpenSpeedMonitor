@@ -22,7 +22,6 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
@@ -41,11 +40,11 @@ class QueueStatusController {
             // Request getTesters.php and getLocations.php and iterate over returned locations:
             try {
                 GPathResult agentsResponse
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getAgentsHttpResponse", IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getAgentsHttpResponse", 1) {
                     agentsResponse = queueAndJobStatusService.getAgentsHttpResponse(wptServer)
                 }
                 List<Map<Location, Object>> filteredLocations
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFilteredLocations", IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFilteredLocations", 1) {
                     filteredLocations = queueAndJobStatusService.getFilteredLocations(wptServer)
                 }
                 filteredLocations.each {
@@ -53,39 +52,39 @@ class QueueStatusController {
                     Object locationTagInXml = it.tag
 
                     List<JobResult> executingJobResults
-                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "getExecutingJobResults", IndentationDepth.TWO) {
+                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "getExecutingJobResults", 2) {
                         executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
                     }
                     Map<Job, List<JobResult>> executingJobs
-                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "aggregateJobs", IndentationDepth.TWO) {
+                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "aggregateJobs", 2) {
                         executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
                     }
 
                     use(TimeCategory) {
                         Date now = new Date()
                         Map nextHour
-                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfJobsAndEventsDueToRunFromNowUntil", IndentationDepth.TWO) {
+                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfJobsAndEventsDueToRunFromNowUntil", 2) {
                             nextHour = queueAndJobStatusService.getNumberOfJobsAndEventsDueToRunFromNowUntil(location, now + 1.hour)
                         }
-                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "build map", IndentationDepth.TWO) {
+                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "build map", 2) {
                             Integer numberOfAgents
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfAgents", IndentationDepth.THREE) {
+                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfAgents", 3) {
                                 numberOfAgents = queueAndJobStatusService.getNumberOfAgents(locationTagInXml, agentsResponse)
                             }
                             Integer numberOfPendingJobs
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfPendingJobsFromWptServer", IndentationDepth.THREE) {
+                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfPendingJobsFromWptServer", 3) {
                                 numberOfPendingJobs = queueAndJobStatusService.getNumberOfPendingJobsFromWptServer(locationTagInXml)
                             }
                             int eventResultCount
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getEventResultCountSince", IndentationDepth.THREE) {
+                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getEventResultCountSince", 3) {
                                 eventResultCount = queueAndJobStatusService.getEventResultCountBetween(location, now - 1.hour, now)
                             }
                             int finishedJobResultCountSince
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFinishedJobResultCountSince", IndentationDepth.THREE) {
+                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFinishedJobResultCountSince", 3) {
                                 finishedJobResultCountSince = queueAndJobStatusService.getFinishedJobResultCountSince(location, now - 1.hour)
                             }
                             int erroneousJobResultCountSince
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getErroneousJobResultCountSince", IndentationDepth.THREE) {
+                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getErroneousJobResultCountSince", 3) {
                                 erroneousJobResultCountSince = queueAndJobStatusService.getErroneousJobResultCountSince(location, now - 1.hour)
                             }
                             Map output = [

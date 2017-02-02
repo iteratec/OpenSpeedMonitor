@@ -66,7 +66,7 @@
         </table>
         <em><g:message code="job.cronInstructions.note.header"/>:</em> <g:message code="job.cronInstructions.note.text"/><br>
         <a
-            href="http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger"
+            href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html"
             target="_blank"><g:message code="job.cronInstructions.moreInformation" />
         </a>
     </p>

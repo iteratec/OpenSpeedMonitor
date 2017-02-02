@@ -9,6 +9,7 @@
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
+    <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
 
 </head>
 
@@ -60,9 +61,11 @@
     <form method="get" action="" id="dashBoardParamsForm" data-caller="EventResult">
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
-                <a name="chart-table"></a>
-
                 <div id="chartbox" class="card">
+                    <div id="dataTableId" class="warning-ribbon" hidden="true" data-toggle="popover" aria-hidden="true"
+                         title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
+                         data-placement="right" data-trigger="hover"
+                         data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
                     <g:render template="/highchart/chart"
                               model="[
                                       chartData                    : eventResultValues,
@@ -268,7 +271,6 @@
             var loadTimeMaximum = "${loadTimeMaximum}";
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
-            var optimizeForWideScreen = "${showDataLabels}"
             var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors}
         $("#dia-title").val(chartTitle);

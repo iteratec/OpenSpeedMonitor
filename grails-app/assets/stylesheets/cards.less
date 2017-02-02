@@ -7,12 +7,14 @@
   padding: 0 7.5px 15px 7.5px;
   margin: 0 -15px;
 
-  &.row {
-
+  .card {
+    margin: 0 -7.5px 15px -7.5px;
   }
 
-  .card {
-    margin: 0px -7.5px 15px -7.5px;
+  .tab-content {
+    border-top-color: transparent;
+    border-radius: 0 0 4px 4px;
+    margin: 15px 0 15px 0;
   }
 }
 
@@ -38,6 +40,10 @@
     border: 0;
     border-bottom: 1px solid @legend-border-color;
   }
+
+  .tab-content {
+    margin: 0 0 15px 0;
+  }
 }
 
 .card > .nav {
@@ -49,34 +55,56 @@
   padding: 5px 12px;
 }
 
+.card-tabs,
 .card-well-tabs {
   margin: 0 -15px 0px -15px;
   padding: 0 15px;
+}
+
+.card-tabs {
   border: 0;
 }
 
+.card-well-tabs {
+  margin-bottom: 15px;
+}
+
+.card-tabs > li > a,
 .card-well-tabs > li > a {
   &, &:hover, &:focus {
     border-color: transparent;
   }
 
   &:hover, &:focus {
+    background: darken(@body-bg, 10%);
+  }
+}
+
+.card-tabs > li > a {
+  &:hover, &:focus {
     background: darken(@card-bg, 10%);
   }
+}
+
+.card-tabs li.active a,
+.card-tabs li.active a:hover,
+.card-tabs li.active a:focus {
+  background: @card-bg;
+  color: @text-color;
+  border: 0;
+  box-shadow: @card-tab-active-shadow;
+  z-index: 1;
+}
+
+.card-well-tabs li.active a {
+  margin-top: -1px;
 }
 
 .card-well-tabs li.active a,
 .card-well-tabs li.active a:hover,
 .card-well-tabs li.active a:focus {
-  background: @card-bg;
   color: @text-color;
-  border: 0;
-  box-shadow: 0 10px 0 0 white, @default-drop-shadow;
+  background-color: @card-well-bg;
+  box-shadow: @card-well-tab-active-shadow;
   z-index: 1;
 }
-
-.card-well.tab-content {
-  border-top-color: transparent;
-  border-radius: 0 0 4px 4px;
-}
-

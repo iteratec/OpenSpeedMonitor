@@ -207,7 +207,7 @@ class ResultCsiAggregationService {
 
             case AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT:
             case AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT:
-                returnVal = result.getCsByWptDocCompleteInPercent() ? Double.valueOf(result.getCsByWptDocCompleteInPercent()) : null
+                    returnVal = result.getCsByWptDocCompleteInPercent() ? Double.valueOf(result.getCsByWptDocCompleteInPercent()) : null
                 break;
             case AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT:
             case AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT:

@@ -19,14 +19,15 @@ package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.dao.CriteriaSorting
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.persistence.OsmDataSourceService
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.ErQueryParams
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 
 /**
  * Contains only methods that query {@link EventResult}s from database. Doesn't contain any dependencies to other domains or
@@ -37,7 +38,6 @@ import org.hibernate.criterion.CriteriaSpecification
  */
 public class EventResultDaoService {
 
-    OsmDataSourceService osmDataSourceService
     PerformanceLoggingService performanceLoggingService
 
     /**
@@ -55,12 +55,10 @@ public class EventResultDaoService {
     }
 
     /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
+     * Gets {@link EventResult}s matching given params from db.
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, Long jobGroupId, Long measuredEventId, Long pageId, Long browserId, Long locationId) {
@@ -93,7 +91,6 @@ public class EventResultDaoService {
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, Collection<Long> jobGroupIds, Collection<Long> measuredEventIds, Collection<Long> pageIds, Collection<Long> browserIds, Collection<Long> locationIds) {
@@ -141,7 +138,7 @@ public class EventResultDaoService {
     ) {
 
         List<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', 1) {
             eventResults = getLimitedMedianEventResultsBy(
                     fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [max: max, offset: offset], sorting
             )
@@ -151,12 +148,10 @@ public class EventResultDaoService {
     }
 
     /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
+     * Gets {@link EventResult}s matching given params from db.
      * @param fromDate
      * @param toDate
      * @param cachedViews
-     * @param rlikePattern
      * @return
      */
     public List<EventResult> getLimitedMedianEventResultsBy(
@@ -172,13 +167,7 @@ public class EventResultDaoService {
         )
 
         List<EventResult> eventResults = eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap)
-        if (osmDataSourceService.getRLikeSupport()) {
-            return eventResults
-        } else {
-            //FIXME: rlike isn't supported in H2-db used in unit-tests. The following Environment-switch should be replaced with metaclass-method-replacement in tests.
-            return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
-        }
-
+        return eventResults
     }
 
     private CriteriaAggregator getAggregatedCriteriasFor(
@@ -194,45 +183,35 @@ public class EventResultDaoService {
             between('jobResultDate', fromDate, toDate)
             eq('medianValue', true)
             'in'('cachedView', cachedViews)
-        }
 
-        if (queryParams.jobGroupIds) {
-            eventResultQueryAggregator.addCriteria {
+            if (queryParams.jobGroupIds) {
                 jobGroup {
                     'in'('id', queryParams.jobGroupIds)
                 }
             }
-        }
-        if (queryParams.measuredEventIds) {
-            eventResultQueryAggregator.addCriteria {
+            if (queryParams.measuredEventIds) {
                 measuredEvent {
                     'in'('id', queryParams.measuredEventIds)
                 }
             }
-        }
-        if (queryParams.pageIds) {
-            eventResultQueryAggregator.addCriteria {
+            if (queryParams.pageIds) {
                 page {
                     'in'('id', queryParams.pageIds)
                 }
             }
-        }
-        if (queryParams.browserIds) {
-            eventResultQueryAggregator.addCriteria {
+            if (queryParams.browserIds) {
                 browser {
                     'in'('id', queryParams.browserIds)
                 }
             }
-        }
-        if (queryParams.locationIds) {
-            eventResultQueryAggregator.addCriteria {
+            if (queryParams.locationIds) {
                 location {
                     'in'('id', queryParams.locationIds)
                 }
             }
         }
 
-        if (queryParams instanceof ErQueryParams && osmDataSourceService.getRLikeSupport()) {
+        if (queryParams instanceof ErQueryParams) {
             addConnectivityRelatedCriteria((ErQueryParams) queryParams, eventResultQueryAggregator)
         }
 
@@ -245,147 +224,32 @@ public class EventResultDaoService {
     }
 
     private void addConnectivityRelatedCriteria(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator) {
-        if (queryParams.connectivityProfileIds.size() > 0) {
 
-            addConnectivityRelatedCriteriaWithPredefinedConnectivities(queryParams, eventResultQueryAggregator)
-
-        } else {
-
-            addConnectivityRelatedCriteriaWithoutPredefinedConnectivities(queryParams, eventResultQueryAggregator)
-
-        }
-    }
-
-    private void addConnectivityRelatedCriteriaWithPredefinedConnectivities(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator) {
-        List<ConnectivityProfile> predefinedProfiles = queryParams.connectivityProfileIds.collect {
-            ConnectivityProfile.get(it)
+        if (queryParams.includeAllConnectivities) {
+            // don't add criteria if all connectivies selected
+            return
         }
 
-        boolean justPredefined = queryParams.includeCustomConnectivity == false && queryParams.includeNativeConnectivity == false
-        boolean predefinedAndCustomAndNative = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
-        boolean predefinedAndCustom = queryParams.includeCustomConnectivity == true
-        boolean predefinedAndNative = queryParams.includeNativeConnectivity == true
-
-        if (justPredefined) {
-            eventResultQueryAggregator.addCriteria {
-                connectivityProfile {
-                    'in'('id', predefinedProfiles*.ident())
+        // outer join necessary for nested domains
+        eventResultQueryAggregator.addCriteria {
+            createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
+            or {
+                if (queryParams.connectivityProfileIds.size() > 0) {
+                    'in'('connectivityProfile.id', queryParams.connectivityProfileIds)
                 }
-            }
-        } else if (predefinedAndCustomAndNative) {
-            eventResultQueryAggregator.addCriteria {
-                or {
-                    connectivityProfile(CriteriaSpecification.LEFT_JOIN) {
-                        'in'('id', predefinedProfiles*.ident())
-                    }
-                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                if (queryParams.customConnectivityNames.size() > 0) {
+                    'in'('customConnectivityName', queryParams.customConnectivityNames)
+                }
+                if (queryParams.includeNativeConnectivity) {
                     eq('noTrafficShapingAtAll', true)
                 }
             }
-        } else if (predefinedAndCustom) {
-            eventResultQueryAggregator.addCriteria {
-                or {
-                    connectivityProfile(CriteriaSpecification.LEFT_JOIN) {
-                        'in'('id', predefinedProfiles*.ident())
-                    }
-                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                }
-            }
-        } else if (predefinedAndNative) {
-            eventResultQueryAggregator.addCriteria {
-                or {
-                    connectivityProfile(CriteriaSpecification.LEFT_JOIN) {
-                        'in'('id', predefinedProfiles*.ident())
-                    }
-                    eq('noTrafficShapingAtAll', true)
-                }
-            }
-
         }
-    }
-
-    private void addConnectivityRelatedCriteriaWithoutPredefinedConnectivities(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator) {
-
-        boolean nativeAndCustom = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
-        boolean justCustom = queryParams.includeCustomConnectivity == true
-        boolean justNative = queryParams.includeNativeConnectivity == true
-
-        if (nativeAndCustom) {
-            eventResultQueryAggregator.addCriteria {
-                or {
-                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                    eq('noTrafficShapingAtAll', true)
-                }
-            }
-        } else if (justCustom) {
-            eventResultQueryAggregator.addCriteria {
-                rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-            }
-        } else if (justNative) {
-            eventResultQueryAggregator.addCriteria {
-                eq('noTrafficShapingAtAll', true)
-            }
-        }
-    }
-
-    private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
-
-        if (queryParams.connectivityProfileIds.size() > 0){
-            boolean predefinedAndCustom = queryParams.includeCustomConnectivity
-            boolean predefinedAndNative = queryParams.includeNativeConnectivity
-            boolean justPredefined = !predefinedAndCustom && !predefinedAndNative
-            boolean predefinedAndCustomAndNative = predefinedAndCustom && predefinedAndNative
-
-
-            if (justPredefined){
-                eventResults = eventResults.findAll {
-                    it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())
-                }
-            }else if (predefinedAndCustomAndNative){
-                eventResults = eventResults.findAll {
-                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
-                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
-                            (it.noTrafficShapingAtAll == true)
-                }
-            } else if (predefinedAndCustom){
-                eventResults = eventResults.findAll {
-                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
-                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
-                }
-            } else if (predefinedAndNative){
-                eventResults = eventResults.findAll {
-                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
-                            (it.noTrafficShapingAtAll == true)
-                }
-            }
-        }else{
-            boolean justCustom = queryParams.includeCustomConnectivity
-            boolean justNative = queryParams.includeNativeConnectivity
-            boolean nativeAndCustom = justCustom && justNative
-
-            if (nativeAndCustom){
-                eventResults = eventResults.findAll {
-                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
-                            (it.noTrafficShapingAtAll == true)
-                }
-            }else if (justCustom){
-                eventResults = eventResults.findAll {
-                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
-                }
-            }else if (justNative){
-                eventResults = eventResults.findAll {
-                    (it.noTrafficShapingAtAll == true)
-                }
-            }
-        }
-        return eventResults
     }
 
     /**
      * Gets a Collection of {@link EventResult}s for specified time frame, {@link MvQueryParams} and {@link CachedView}s.
      *
-     * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
-     * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
      * @param fromDate
      *         The first relevant date (inclusive), not <code>null</code>.
      * @param toDate
