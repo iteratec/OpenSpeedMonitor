@@ -79,35 +79,22 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-md-8 col-md-offset-3">
-                        <label class="checkbox-inline">
-                            <g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}"/>
-                            <g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/>
-                        </label>
-                        <label class="checkbox-inline">
-                            <g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}"/>
-                            <g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/>
-                        </label>
+                    <label class="col-md-3 control-label">
+                        <g:message code="de.iteratec.chart.showElements.name" default="Show"/>
+                    </label>
+                    <div class="col-md-4" data-toggle="buttons">
+                        <div class="btn-group btn-group-justified">
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="to-enable-label">
+                                <g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Data Labels"/>
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" id="to-enable-marker">
+                                <g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Data Points"/>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                %{--TODO: Kind of works, but the markers/labels are preselected--}%
-                %{--<div class="form-group">--}%
-                    %{--<label class="col-md-3 control-label">--}%
-                        %{--<g:message code="de.iteratec.chart.showElements.name" default="Show"/>--}%
-                    %{--</label>--}%
-                    %{--<div class="col-md-4" data-toggle="buttons">--}%
-                        %{--<div class="btn-group btn-group-justified">--}%
-                            %{--<label class="btn btn-default">--}%
-                                %{--<input type="checkbox" id="to-enable-label" checked="${labelShouldBeEnabled}">--}%
-                                %{--<g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Data Labels"/>--}%
-                            %{--</label>--}%
-                            %{--<label class="btn btn-default">--}%
-                                %{--<input type="checkbox" id="to-enable-marker" checked="${markerShouldBeEnabled}">--}%
-                                %{--<g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Data Points"/>--}%
-                            %{--</label>--}%
-                        %{--</div>--}%
-                    %{--</div>--}%
-                %{--</div>--}%
                 <!-- Add Alias -->
                 <div class="form-group">
                     <div class="col-md-8 col-md-offset-3" id="graphAliasChildlist"></div>
@@ -135,7 +122,6 @@
 
 
 <div id="graphAlias_clone" class="graphAlias-div" style="display:none;">
-    <hr />
     <div class="form-group">
         <div class="col-md-10">
             <g:select name="graphName" class="form-control chosen-select"
