@@ -123,7 +123,7 @@ class ProxyService {
      *          Query parameters to send to getLocations.php of webpagetest server.
      * @return List of fetched locations.
      */
-    List<Location> fetchLocations(WebPageTestServer wptServer, Map queryParams){
+    List<Location> fetchLocations(WebPageTestServer wptserver, Map queryParams){
         List<Location> addedLocations = []
 
         def locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserver, 'getLocations.php', queryParams, ContentType.TEXT, [Accept: 'application/xml'])
