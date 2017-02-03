@@ -6,8 +6,6 @@ services:
     image: iteratec/openspeedmonitor:latest
     container_name: osm_service
     entrypoint: dockerize -wait tcp://osm_mysql:3306 -timeout 240s /entrypoint.sh
-    ports:
-     - "8080:8080"
     env_file:
       - .env_osm
 
@@ -19,22 +17,11 @@ services:
     env_file:
       - .env_osm_mysql
 
-  osmda:
-    image: iteratec/osm-detail-analysis:latest
-    container_name: osmda_service
-    ports:
-     - "8088:8081"
-    env_file:
-       - .env_osmda
-
-  osmda_mongodb:
-    image:  mongo:3.2
-    container_name: osmda_mongodb
-    volumes:
-      - osmda_mongodb_data:/data/db
+networks:
+  default:
+    external:
+      name: reverse_proxy_net
 
 volumes:
   osm_mysql_data:
-    driver: local
-  osmda_mongodb_data:
     driver: local
