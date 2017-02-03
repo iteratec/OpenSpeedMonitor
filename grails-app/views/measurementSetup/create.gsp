@@ -44,220 +44,25 @@
             <form>
 
                 <div class="tab-content">
-
-                    <div class="tab-pane active" id="createJobGroup">
-
-                        <h2>Set name for your Job Group</h2>
-
-                        <div class="row form-horizontal">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="inputJobGroup" class="col-sm-2 control-label">Job Group</label>
-
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="inputJobGroup" placeholder="Name" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <div class="col-sm-6 text-right">
-                                    <button class="btn btn-default" disabled>
-                                        <i class="fa fa-caret-left" aria-hidden="true"></i>
-                                        Previous
-                                    </button>
-                                    <button class="btn btn-primary">
-                                        Next
-                                        <i class="fa fa-caret-right" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div> %{-- tab-pane --}%
-
+                    <div class="tab-pane active" id="setJobGroup">
+                        <g:render template="/measurementSetup/setJobGroup" />
+                    </div>
                     <div class="tab-pane" id="createScript">
-
-                        <h2>Write your measurement script</h2>
-
-                        <div class="form-horizontal">
-
-                            <div class="row">
-
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="inputScriptName" class="col-sm-2 control-label">Name</label>
-
-                                        <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="inputScriptName" placeholder="Name" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="inputScriptDescription"
-                                               class="col-sm-2 control-label">Description</label>
-
-                                        <div class="col-sm-10">
-                                            <textarea class="form-control" id="inputScriptDescription"
-                                                      rows="3"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                        Est excepturi officiis placeat qui quibusdam?
-                                        Aliquid commodi delectus deleniti dolorem eaque error,
-                                        et id impedit maxime neque qui velit voluptas voluptatem!
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                        Est excepturi officiis placeat qui quibusdam?
-                                        Aliquid commodi delectus deleniti dolorem eaque error,
-                                        et id impedit maxime neque qui velit voluptas voluptatem!
-
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                        Est excepturi officiis placeat qui quibusdam?
-                                        Aliquid commodi delectus deleniti dolorem eaque error,
-                                        et id impedit maxime neque qui velit voluptas voluptatem!
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                        Est excepturi officiis placeat qui quibusdam?
-                                        Aliquid commodi delectus deleniti dolorem eaque error,
-                                        et id impedit maxime neque qui velit voluptas voluptatem!
-                                    </p>
-                                </div>
-
-                            </div> %{-- row --}%
-
-                            <div class="row">
-
-                                <div class="col-sm-6">
-                                    <p class="col-sm-offset-2"><g:message code="script.autoComplete.label" default="Press Ctrl + Space to get a list of keywords or valid event names, respectively." /></p>
-                                    <div class="form-group">
-                                        <label for="navigationScript" class="col-sm-2 control-label">Code</label>
-
-                                        <div class="col-sm-10">
-                                            <textarea id="navigationScript" class="form-control" style="display: none;">${code}</textarea>
-                                            <span id="setEventName-warning-clone" class="setEventName-warning-icon" style="display: none;" rel="tooltip" data-html="true"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <div class="form-group">
-                                            <input type="checkbox" id="lineBreakToggle" checked />
-                                            <label for="lineBreakToggle" style="display: inline">
-                                                <g:message code="script.wrapLines.label" />
-                                            </label>
-                                        </div>
-                                        <p id="usedVariables"
-                                           data-instructions="${HtmlUtils.htmlEscape(message(code: 'script.placeholdersInstructions.label'))}"
-                                           data-usedvars="${HtmlUtils.htmlEscape(message(code: 'codemirror.usedVariables.label'))}">
-                                        </p>
-                                    </div>
-                                </div>
-
-                            </div> %{-- row --}%
-
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <div class="col-sm-6 text-right">
-                                    <button class="btn btn-default">
-                                        <i class="fa fa-caret-left" aria-hidden="true"></i>
-                                        Previous
-                                    </button>
-                                    <button class="btn btn-primary" onclick="promptForDuplicateName()">
-                                        Next
-                                        <i class="fa fa-caret-right" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div> %{-- tab-pane --}%
-
+                        <g:render template="/measurementSetup/createScript" />
+                    </div>
+                    <div class="tab-pane" id="selectLocationAndConnectivity">
+                        <g:render template="/measurementSetup/selectLocationAndConnectivity" />
+                    </div>
                     <div class="tab-pane" id="createJob">
-
-                        <h2>Set name for your job and start the measurement</h2>
-
-                        <div class="row form-horizontal">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="inputJob" class="col-sm-2 control-label">Job</label>
-
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="inputJob" placeholder="Name"
-                                               required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Est excepturi officiis placeat qui quibusdam?
-                                    Aliquid commodi delectus deleniti dolorem eaque error,
-                                    et id impedit maxime neque qui velit voluptas voluptatem!
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group">
-                                <div class="col-sm-6 text-right">
-                                    <button class="btn btn-default">
-                                        <i class="fa fa-caret-left" aria-hidden="true"></i>
-                                        Previous
-                                    </button>
-                                    <button class="btn btn-primary" disabled>
-                                        Next
-                                        <i class="fa fa-caret-right" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div> %{-- tab-pane --}%
+                        <g:render template="/measurementSetup/createJob" />
+                    </div>
 
                 </div> %{-- tab-content --}%
 
                 <div>
                     <button class="btn btn-default" type="reset">
                         <i class="fa fa-times" aria-hidden="true"></i>
-                        Cancel
+                        <g:message code="script.versionControl.cancel.button" default="Cancel"/>
                     </button>
                 </div>
             </form>
@@ -267,6 +72,7 @@
     </div> %{-- col-md-12 --}%
 
 </div> %{-- row --}%
+
 <content tag="include.bottom">
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
     <asset:javascript src="prettycron/prettycronManifest.js"/>
