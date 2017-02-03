@@ -69,6 +69,8 @@ class BootStrap {
 
     def init = { servletContext ->
 
+        log.info("Environment in Bootstrap: ${Environment.current}")
+
         switch (Environment.getCurrent()) {
             case Environment.DEVELOPMENT:
                 initApplicationData(true)
@@ -92,7 +94,8 @@ class BootStrap {
     }
 
     def initApplicationData = { boolean createDefaultUsers ->
-        log.info "initApplicationData() OSM starts"
+
+        log.info "initApplicationData() OSM starts with createDefaultUsers=${createDefaultUsers}"
 
         initConfig()
         initUserData(createDefaultUsers)
@@ -105,6 +108,7 @@ class BootStrap {
         initHealthReporting()
 
         log.info "initApplicationData() OSM ends"
+
     }
 
 
@@ -503,7 +507,8 @@ class BootStrap {
 
     void fetchLocationsOfWebpagetestOnFirstStart(){
         if (initiallyCreatedWptServer){
-            proxyService.fetchLocations(initiallyCreatedWptServer)
+            Map retrievsLocationsUsableForPublicApiKeys = [k: "A"]
+            proxyService.fetchLocations(initiallyCreatedWptServer, retrievsLocationsUsableForPublicApiKeys)
         }
     }
 
