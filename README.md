@@ -1,6 +1,6 @@
 OpenSpeedMonitor
 ================
-Open Source Performance Monitoring of Web Applications.
+Open Source Web Performance Monitoring.
 
 Summary
 =====================
