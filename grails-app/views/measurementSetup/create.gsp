@@ -4,13 +4,14 @@
 <html>
 <head>
     <meta name="layout" content="kickstart_osm"/>
-    <title><g:message code="de.iteratec.osm.setupMeasurement" default="Setup Measurement"/></title>
+    <title><g:message code="de.iteratec.osm.setupMeasurementWizard.title" default="Setup Measurement"/></title>
 
     <asset:stylesheet src="script/scriptManifest.css"/>
+    <asset:stylesheet src="setupWizard/setupWizard.less"/>
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.osm.setupMeasurement" default="Setup Measurement"/></h1>
+<h1><g:message code="de.iteratec.osm.setupMeasurementWizard.title" default="Setup Measurement"/></h1>
 
 <p>
     Steht hier ein sinnvoller Text?
@@ -22,21 +23,26 @@
 
         <div class="card">
 
-            %{-- realize breadcrumbs with nav-tabs --}%
+            %{-- realize breadcrumbs with bootstrap nav-tabs underneath --}%
             <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
                 <li class="active">
-                    <a data-toggle="tab" href="#createJobGroup">
-                        Step 1
+                    <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
                     </a>
                 </li>
                 <li>
-                    <a data-toggle="tab" href="#createScript">
-                        Step 2
+                    <a data-toggle="tab" href="#createScript" id="createScriptTab">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
                     </a>
                 </li>
                 <li>
-                    <a data-toggle="tab" href="#createJob">
-                        Step 3
+                    <a data-toggle="tab" href="#selectLocationAndConnectivity" id="selectLocationAndConnectivityTab">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectLocationAndConnectivity" default="Select Location and Connectivity"/>
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#createJob" id="createJobTab">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob" default="Create Job"/>
                     </a>
                 </li>
             </ul>
