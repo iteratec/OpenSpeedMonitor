@@ -116,9 +116,66 @@
                         return false;
                     }
                 }
+                function presetScriptName() {
+                    var jobGroubTabNextButton = document.querySelector("#setJobGroubTabNextButton");
+                    var inputScriptName = document.querySelector("#inputScriptName");
+
+                    jobGroubTabNextButton.addEventListener("click", function () {
+                        // if the user changed the script name, don't set the value
+                        if (inputScriptName.value == "")
+                            inputScriptName.value = document.querySelector("#inputJobGroup").value;
+                    });
+                }
+
+                function presetJobName() {
+                    var jobGroubTabNextButton = document.querySelector("#selectLocationAndConnectivityTabNextButton");
+                    var inputJobName = document.querySelector("#inputJobName");
+
+                    jobGroubTabNextButton.addEventListener("click", function () {
+                        if (inputJobName.value == "") {
+                            var jobGroup = document.querySelector("#inputJobGroup").value;
+                            var location = document.querySelector("#inputLocation").value;
+                            var connectivity = document.querySelector("#inputConnectivity").value;
+
+                            inputJobName.value = jobGroup + "_" + location + "_" + connectivity;
+                        }
+                    });
+                }
+
+                function moveThroughWizard() {
+                    document.querySelector("#setJobGroubTabNextButton").addEventListener("click", function () {
+                        document.querySelector("#setJobGroupTab").parentElement.classList.toggle("active");
+                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
+                    });
+                    document.querySelector("#createScriptTabNextButton").addEventListener("click", function () {
+                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
+                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
+                    });
+                    document.querySelector("#selectLocationAndConnectivityTabNextButton").addEventListener("click", function () {
+                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
+                        document.querySelector("#createJobTab").parentElement.classList.toggle("active");
+                    });
+
+                    document.querySelector("#createScriptTabPreviousButton").addEventListener("click", function () {
+                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
+                        document.querySelector("#setJobGroupTab").parentElement.classList.toggle("active");
+                    });
+                    document.querySelector("#selectLocationAndConnectivityTabPreviousButton").addEventListener("click", function () {
+                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
+                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
+                    });
+                    document.querySelector("#createJobTabPreviousButton").addEventListener("click", function () {
+                        document.querySelector("#createJobTab").parentElement.classList.toggle("active");
+                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
+                    });
+                }
+
                 createCodeMirror("navigationScript", false);
                 window.onload = function() {
                     OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
+                    presetScriptName();
+                    presetJobName();
+                    moveThroughWizard();
                 }
     </asset:script>
 </content>
