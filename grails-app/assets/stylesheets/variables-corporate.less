@@ -11,6 +11,7 @@
 @iteratec-magenta-lighter: #faf3f8;
 @iteratec-gray: #484848;
 @iteratec-gray-lighter: #ededed;
+@osm-gray: #2f323a;
 
 /* Overwrite bootstrap variables */
 @brand-primary: @iteratec-blue;
@@ -21,7 +22,7 @@
 
 @body-bg: @iteratec-gray-lighter;
 
-@navbar-inverse-bg: #2f323a;
+@navbar-inverse-bg: @osm-gray;
 @navbar-inverse-border: transparent;
 
 @navbar-inverse-link-color: #989dad;
@@ -32,6 +33,9 @@
 @navbar-inverse-submenu-link-color: lighten(@navbar-inverse-link-color, 10%);
 
 @nav-tabs-active-link-hover-bg: @card-bg;
+
+@jumbotron-heading-font-size: ceil((@font-size-base * 3));
+@a: @jumbotron-heading-font-size;
 
 /* Sidebar */
 @sidebar-width-expanded: @font-size-base * 17;

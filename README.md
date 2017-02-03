@@ -1,3 +1,7 @@
+OpenSpeedMonitor
+================
+Open Source Performance Monitoring of Web Applications.
+
 Summary
 =====================
 OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1]. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.

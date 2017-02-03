@@ -28,11 +28,11 @@
     </div>
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
-            %{--<li class="${!controllerName ? 'active' : ''}">--}%
-                %{--<g:link mapping="home">--}%
-                    %{--<i class="fa fa-home"></i> Home--}%
-                %{--</g:link>--}%
-            %{--</li>--}%
+            <li class="${controllerName.equals("landing") ? 'active' : ''}">
+                <g:link absolute="true" uri="/"><i class="fa fa-home"></i>
+                    <g:message code="navbar.home" default="Home"/>
+                </g:link>
+            </li>
             <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}">
                 <a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-tachometer"></i>
