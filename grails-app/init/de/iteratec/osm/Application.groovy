@@ -64,7 +64,7 @@ trait ExternalConfig implements EnvironmentAware {
                 }
                 Resource resource = defaultResourceLoader.getResource(finalLocation)
                 if(resource.exists()) {
-                    println "resource exists: $resource.filename"
+                    println "resource exists: ${resource.getFile().absolutePath}"
 
                     if(finalLocation.endsWith('.groovy')) {
                         properties = loadGroovyConfig(resource, encoding)
