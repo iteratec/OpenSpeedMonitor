@@ -15,7 +15,7 @@
 
     <div class="col-sm-6">
         <p>
-            %{-- TODO JOHANNES: Define help text Job Group Creation --}%
+            %{--JOHANNES2DO: Define help text Job Group Creation--}%
             You will find the results of your measurement under the here created Job Group.
         </p>
     </div>

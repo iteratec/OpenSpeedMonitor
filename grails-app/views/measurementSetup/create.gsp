@@ -14,6 +14,7 @@
 <h1><g:message code="de.iteratec.osm.setupMeasurementWizard.title" default="Setup Measurement"/></h1>
 
 <p>
+    %{--JOHANNES2DO: Write description for the wizard--}%
     Steht hier ein sinnvoller Text?
 </p>
 

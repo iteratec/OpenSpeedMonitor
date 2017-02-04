@@ -16,8 +16,9 @@
             </div>
 
             <div class="form-group">
-                <label for="inputScriptDescription"
-                       class="col-sm-2 control-label">Description</label>
+                <label for="inputScriptDescription" class="col-sm-2 control-label">
+                    <g:message code="script.description.label" default="Description"/>
+                </label>
 
                 <div class="col-sm-10">
                     <textarea class="form-control" id="inputScriptDescription"
@@ -33,7 +34,9 @@
             </div>
 
             <div class="form-group">
-                <label for="navigationScript" class="col-sm-2 control-label">Code</label>
+                <label for="navigationScript" class="col-sm-2 control-label">
+                    <g:message code="script.navigationScript.label" default="Code"/>
+                </label>
 
                 <div class="col-sm-10">
                     <div class="fieldcontain ${hasErrors(bean: script, field: 'navigationScript', 'error')}">
@@ -49,7 +52,7 @@
                     <div class="col-sm-12">
                         <input type="checkbox" id="lineBreakToggle" checked/>
                         <label for="lineBreakToggle" style="display: inline">
-                            <g:message code="script.wrapLines.label"/>
+                            <g:message code="script.wrapLines.label" default="Wrap long lines"/>
                         </label>
                     </div>
                 </div>
@@ -82,8 +85,8 @@
             </a>
 
             <p>
+                %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
                 The script defines the steps of your measurement.
-
             </p>
             <img class="img-thumbnail" id="exampleScriptImg" src="${resource(dir: 'images', file: 'exampleScript.png')}"
                  alt="Example Script"/>
@@ -98,10 +101,10 @@
         <div class="col-sm-6 text-right">
             <a data-toggle="tab" class="btn btn-default" id="createScriptTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
-                Previous
+                <g:message code="default.paginate.prev" default="Previous"/>
             </a>
             <a data-toggle="tab" class="btn btn-primary" id="createScriptTabNextButton">
-                Next
+                <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>
         </div>
