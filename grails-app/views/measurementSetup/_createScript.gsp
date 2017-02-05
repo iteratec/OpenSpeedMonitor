@@ -1,5 +1,3 @@
-<h2>Write your measurement script</h2>
-
 <div class="form-horizontal">
 
     <div class="row">

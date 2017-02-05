@@ -1,5 +1,3 @@
-<h2>Create your job and start the measurement</h2>
-
 <div class="row form-horizontal">
     <div class="col-sm-6">
         <div class="form-group">
@@ -18,7 +16,7 @@
             </label>
 
             <div class="col-sm-5">
-                <select class="form-control chosen chosen-select" id="selectExecutionSchedule">
+                <select class="form-control chosen-select" id="selectExecutionSchedule">
                     <option value="0/30 * * * ? *">Every half an hour</option>
                     <option value="0 * * * ? *">Hourly</option>
                     <option value="">...</option>

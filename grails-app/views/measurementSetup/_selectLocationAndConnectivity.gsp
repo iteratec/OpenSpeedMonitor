@@ -2,8 +2,6 @@
 <%@ page import="de.iteratec.osm.measurement.environment.Location" %>
 <%@ page import="de.iteratec.osm.measurement.schedule.ConnectivityProfile" %>
 
-<h2>Choose Location and Connectivity</h2>
-
 <div class="row form-horizontal">
     <div class="col-sm-6">
         <div class="form-group">

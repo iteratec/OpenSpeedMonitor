@@ -1,5 +1,3 @@
-<h2>Set name for your Job Group</h2>
-
 <div class="row form-horizontal">
     <div class="col-sm-6">
         <div class="form-group">
@@ -8,7 +6,8 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputJobGroup" name="inputJobGroup" required>
+                <input type="text" class="form-control" id="inputJobGroup" name="inputJobGroup"
+                       placeholder="Set name for job group" required>
             </div>
         </div>
     </div>

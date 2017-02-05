@@ -18,67 +18,63 @@
     Steht hier ein sinnvoller Text?
 </p>
 
-<div class="row">
+<div class="card" style="min-height: 700px;">
 
-    <div class="col-md-12">
+    %{-- realize breadcrumbs with bootstrap nav-tabs underneath --}%
+    <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
+        <li class="wizardStep active">
+            <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
+            </a>
+        </li>
+        <li class="wizardStep">
+            <a data-toggle="tab" href="#createScript" id="createScriptTab">
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
+            </a>
+        </li>
+        <li class="wizardStep">
+            <a data-toggle="tab" href="#selectLocationAndConnectivity" id="selectLocationAndConnectivityTab">
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.selectLocationAndConnectivity"
+                           default="Select Location and Connectivity"/>
+            </a>
+        </li>
+        <li class="wizardStep">
+            <a data-toggle="tab" href="#createJob" id="createJobTab">
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob" default="Create Job"/>
+            </a>
+        </li>
+    </ul>
 
-        <div class="card" style="min-height: 700px;">
+    <form>
 
-            %{-- realize breadcrumbs with bootstrap nav-tabs underneath --}%
-            <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
-                <li class="active">
-                    <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
-                    </a>
-                </li>
-                <li>
-                    <a data-toggle="tab" href="#createScript" id="createScriptTab">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
-                    </a>
-                </li>
-                <li>
-                    <a data-toggle="tab" href="#selectLocationAndConnectivity" id="selectLocationAndConnectivityTab">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectLocationAndConnectivity" default="Select Location and Connectivity"/>
-                    </a>
-                </li>
-                <li>
-                    <a data-toggle="tab" href="#createJob" id="createJobTab">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob" default="Create Job"/>
-                    </a>
-                </li>
-            </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="setJobGroup">
+                <g:render template="/measurementSetup/setJobGroup"/>
+            </div>
 
-            <form>
+            <div class="tab-pane" id="createScript">
+                <g:render template="/measurementSetup/createScript"/>
+            </div>
 
-                <div class="tab-content">
-                    <div class="tab-pane active" id="setJobGroup">
-                        <g:render template="/measurementSetup/setJobGroup" />
-                    </div>
-                    <div class="tab-pane" id="createScript">
-                        <g:render template="/measurementSetup/createScript" />
-                    </div>
-                    <div class="tab-pane" id="selectLocationAndConnectivity">
-                        <g:render template="/measurementSetup/selectLocationAndConnectivity" />
-                    </div>
-                    <div class="tab-pane" id="createJob">
-                        <g:render template="/measurementSetup/createJob" />
-                    </div>
+            <div class="tab-pane" id="selectLocationAndConnectivity">
+                <g:render template="/measurementSetup/selectLocationAndConnectivity"/>
+            </div>
 
-                </div> %{-- tab-content --}%
+            <div class="tab-pane" id="createJob">
+                <g:render template="/measurementSetup/createJob"/>
+            </div>
 
-                <div>
-                    <button class="btn btn-default" type="reset" href="/">
-                        <i class="fa fa-times" aria-hidden="true"></i>
-                        <g:message code="script.versionControl.cancel.button" default="Cancel"/>
-                    </button>
-                </div>
-            </form>
+        </div> %{-- tab-content --}%
 
-        </div> %{-- card --}%
+        <div>
+            <button class="btn btn-default" type="reset" href="/">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <g:message code="script.versionControl.cancel.button" default="Cancel"/>
+            </button>
+        </div>
+    </form>
 
-    </div> %{-- col-md-12 --}%
-
-</div> %{-- row --}%
+</div> %{-- card --}%
 
 <content tag="include.bottom">
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
