@@ -133,6 +133,7 @@
                     var inputJobName = document.querySelector("#inputJobName");
 
                     jobGroubTabNextButton.addEventListener("click", function () {
+                        // if the user changed the script name, don't set the value
                         if (inputJobName.value == "") {
                             var jobGroup = document.querySelector("#inputJobGroup").value;
                             var location = document.querySelector("#inputLocation").value;

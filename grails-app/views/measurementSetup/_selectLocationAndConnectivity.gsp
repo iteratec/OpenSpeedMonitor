@@ -41,11 +41,13 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
-            <a data-toggle="tab" class="btn btn-default" id="selectLocationAndConnectivityTabPreviousButton">
+            <a data-toggle="tab" href="#createScript"
+               class="btn btn-default" id="selectLocationAndConnectivityTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
             </a>
-            <a data-toggle="tab" class="btn btn-primary" id="selectLocationAndConnectivityTabNextButton">
+            <a data-toggle="tab" href="#createJob"
+               class="btn btn-primary" id="selectLocationAndConnectivityTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>

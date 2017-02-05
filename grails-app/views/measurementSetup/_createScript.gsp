@@ -99,11 +99,13 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
-            <a data-toggle="tab" class="btn btn-default" id="createScriptTabPreviousButton">
+            <a data-toggle="tab" href="#setJobGroup"
+               class="btn btn-default" id="createScriptTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
             </a>
-            <a data-toggle="tab" class="btn btn-primary" id="createScriptTabNextButton">
+            <a data-toggle="tab" href="#selectLocationAndConnectivity"
+               class="btn btn-primary" id="createScriptTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>
