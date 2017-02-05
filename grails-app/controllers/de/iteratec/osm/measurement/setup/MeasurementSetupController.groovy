@@ -16,14 +16,6 @@ class MeasurementSetupController {
     }
 
     def save() {
-        Script s = new Script(params)
-        if (!s.save(flush: true)) {
-            render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
-            return
-        }
-        createNewPagesAndMeasuredEvents(s)
-        def flashMessageArgs = [getScriptI18n(), s.label]
-        flash.message = message(code: 'default.created.message', args: flashMessageArgs)
-        redirect(action: "list", id: s.id)
+        redirect(action: "/")
     }
 }
