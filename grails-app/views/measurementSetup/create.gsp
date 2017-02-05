@@ -136,7 +136,11 @@
                         // if the user changed the script name, don't set the value
                         if (inputJobName.value == "") {
                             var jobGroup = document.querySelector("#inputJobGroup").value;
-                            var location = document.querySelector("#inputLocation").value;
+
+                            var locationOptions = document.querySelector("#inputLocation").options;
+                            var selectedLocationIndex = locationOptions.selectedIndex;
+                            var location = locationOptions[selectedLocationIndex].text;
+
                             var connectivity = document.querySelector("#inputConnectivity").value;
 
                             inputJobName.value = jobGroup + "_" + location + "_" + connectivity;

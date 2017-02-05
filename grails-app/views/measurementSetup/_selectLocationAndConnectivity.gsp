@@ -1,3 +1,7 @@
+<%@ page import="de.iteratec.osm.measurement.environment.WebPageTestServer" %>
+<%@ page import="de.iteratec.osm.measurement.environment.Location" %>
+<%@ page import="de.iteratec.osm.measurement.schedule.ConnectivityProfile" %>
+
 <h2>Choose Location and Connectivity</h2>
 
 <div class="row form-horizontal">
@@ -8,7 +12,18 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputLocation" required>
+                %{--<input type="text" class="form-control" id="inputLocation" required>--}%
+                <select id="inputLocation" class="form-control chosen-select" required>
+                    <g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
+                        <optgroup label="${server.label}">
+                        <g:each in="${Location.findAllByWptServerAndActive(server, true)}" var="loc">
+                            <option value="${loc.id}" <g:if test="${job?.location?.id == loc.id}"> selected </g:if>>
+                                ${loc.uniqueIdentifierForServer ?: loc.location}
+                            </option>
+                        </g:each>
+                        </optgroup>
+                    </g:each>
+                </select>
             </div>
         </div>
 
@@ -18,7 +33,14 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputConnectivity" required>
+                %{--<input type="text" class="form-control" id="inputConnectivity" required>--}%
+                <select type="text" class="form-control" id="inputConnectivity" required>
+                    <g:each in="${ConnectivityProfile.findAllByActive(true)}" var="connectivity">
+                        <option value="${connectivity.name}">
+                            ${connectivity.name}
+                        </option>
+                    </g:each>
+                </select>
             </div>
         </div>
     </div>
@@ -29,6 +51,7 @@
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
+
             <div class="panel-body">
                 <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
                     <g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text"
