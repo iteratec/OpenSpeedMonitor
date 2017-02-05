@@ -13,11 +13,20 @@
         </div>
     </div>
 
-    <div class="col-sm-6">
-        <p>
-            %{--JOHANNES2DO: Define help text Job Group Creation--}%
-            You will find the results of your measurement under the here created Job Group.
-        </p>
+    <div class="col-sm-offset-1 col-sm-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <g:message code="default.info.title" default="Information"/>
+            </div>
+            <div class="panel-body">
+                %{--JOHANNES2DO: Define help text Job Group Creation--}%
+                You will find the results of your measurement under the here created Job Group.
+                <img class="infoImage thumbnail" id="jobGroupSelectionImg"
+                     src="${resource(dir: 'images', file: 'jobGroupSelection.png')}"
+                     alt="Job Group Selection"/>
+            </div>
+        </div>
     </div>
 </div>
 

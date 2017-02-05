@@ -23,18 +23,31 @@
         </div>
     </div>
 
-    <div class="col-sm-6">
-        <p>
-            %{--JOHANNES2DO: Write help text for location and connectivity tab in wizard--}%
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Est excepturi officiis placeat qui quibusdam?
-            Aliquid commodi delectus deleniti dolorem eaque error,
-            et id impedit maxime neque qui velit voluptas voluptatem!
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Est excepturi officiis placeat qui quibusdam?
-            Aliquid commodi delectus deleniti dolorem eaque error,
-            et id impedit maxime neque qui velit voluptas voluptatem!
-        </p>
+    <div class="col-sm-offset-1 col-sm-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <g:message code="default.info.title" default="Information"/>
+            </div>
+            <div class="panel-body">
+                <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
+                    <g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text"
+                               default="Documentation WebPagetest DSL"/>
+                </a>
+
+                <p>
+                    %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Est excepturi officiis placeat qui quibusdam?
+                    Aliquid commodi delectus deleniti dolorem eaque error,
+                    et id impedit maxime neque qui velit voluptas voluptatem!
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Est excepturi officiis placeat qui quibusdam?
+                    Aliquid commodi delectus deleniti dolorem eaque error,
+                    et id impedit maxime neque qui velit voluptas voluptatem!
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 

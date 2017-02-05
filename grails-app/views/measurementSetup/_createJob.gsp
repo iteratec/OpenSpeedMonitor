@@ -13,18 +13,26 @@
         </div>
     </div>
 
-    <div class="col-sm-6">
-        <p>
-            %{--JOHANNES2DO: Write help text for Job tab in wizard--}%
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Est excepturi officiis placeat qui quibusdam?
-            Aliquid commodi delectus deleniti dolorem eaque error,
-            et id impedit maxime neque qui velit voluptas voluptatem!
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Est excepturi officiis placeat qui quibusdam?
-            Aliquid commodi delectus deleniti dolorem eaque error,
-            et id impedit maxime neque qui velit voluptas voluptatem!
-        </p>
+    <div class="col-sm-offset-1 col-sm-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <g:message code="default.info.title" default="Information"/>
+            </div>
+            <div class="panel-body">
+                %{--JOHANNES2DO: Write help text for Job tab in wizard--}%
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Est excepturi officiis placeat qui quibusdam?
+                    Aliquid commodi delectus deleniti dolorem eaque error,
+                    et id impedit maxime neque qui velit voluptas voluptatem!
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Est excepturi officiis placeat qui quibusdam?
+                    Aliquid commodi delectus deleniti dolorem eaque error,
+                    et id impedit maxime neque qui velit voluptas voluptatem!
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 

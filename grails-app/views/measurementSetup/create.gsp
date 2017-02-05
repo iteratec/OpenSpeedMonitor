@@ -22,7 +22,7 @@
 
     <div class="col-md-12">
 
-        <div class="card">
+        <div class="card" style="min-height: 700px;">
 
             %{-- realize breadcrumbs with bootstrap nav-tabs underneath --}%
             <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
@@ -67,7 +67,7 @@
                 </div> %{-- tab-content --}%
 
                 <div>
-                    <button class="btn btn-default" type="reset">
+                    <button class="btn btn-default" type="reset" href="/">
                         <i class="fa fa-times" aria-hidden="true"></i>
                         <g:message code="script.versionControl.cancel.button" default="Cancel"/>
                     </button>
