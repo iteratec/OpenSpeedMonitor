@@ -2,6 +2,10 @@ OpenSpeedMonitor
 ================
 Open Source Web Performance Monitoring.
 
+Run it with [docker-compose][20]:
+
+    wget https://raw.githubusercontent.com/iteratec/OpenSpeedMonitor/master/docker/docker-compose.yml && docker-compose up
+
 Summary
 =====================
 OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1]. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.
@@ -252,3 +256,4 @@ Although it works with an H2 in memory database out of the box it's highly recom
 [17]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
 [18]: https://github.com/iteratec/OsmDetailAnalysis
 [19]: https://dc-js.github.io/dc.js/
+[20]: https://https://docs.docker.com/compose/install/
