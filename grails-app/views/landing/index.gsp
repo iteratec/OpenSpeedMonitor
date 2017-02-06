@@ -24,14 +24,15 @@
             <img src="${resource(dir: 'images', file: 'results.png')}"
                  alt="Page Aggregation Chart" class="intro-img img-rounded"/>
             <p class="intro-text">
-                Review and analyze the results of your measurements.
-                Show <g:link controller="pageAggregation" action="show">aggregated results</g:link> by page,
-                the <g:link controller="eventResultDashboard" action="showAll">development over time</g:link>
-                or
-                <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.equals("true")}">
-                    dive into the <g:link controller="detailAnalysis" action="show">request details</g:link>.
-                </g:if>
-                <g:else>dive into the request details.</g:else>
+                <g:message code="landing.results.text"
+                           default="Review and analyze the results of your measurements. Show {0} by page, the {1} or dive into the {2}."
+                           encodeAs="raw" args="[
+                        link(controller: 'pageAggregation', action: 'show') { message(code:'landing.results.link.pageAggregation', default:'aggregated results')},
+                        link(controller: 'eventResultDashboard', action: 'showAll') { message(code:'landing.results.link.timeSeries', default:'development over time')},
+                        (grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests') == 'true' ?
+                                link(controller: 'detailAnalysis', action: 'show') { message(code:'landing.results.link.detailAnalysis', default:'request details')}
+                                : message(code:'landing.results.link.detailAnalysis', default:'request details'))
+                ]"/>
             </p>
         </div>
     </div>
@@ -42,9 +43,11 @@
                  alt="CSI Graph" class="intro-img img-rounded"/>
             <div class="intro-text">
                 <p>
-                    Show how satisfied customers would be with the performance of your web application. Compare the
-                    <g:link controller="csiDashboard" action="showAll"><g:message code="landing.csi.linkText" default="Customer Satisfaction Index" /></g:link> (CSI) of your
-                    application with others.
+                    <g:message code="landing.csi.text"
+                       default="Show how satisfied customers would be with the performance of your web application. Compare the {0} (CSI) of your application with others."
+                       encodeAs="raw" args="[
+                            link(controller: 'csiDashboard', action: 'showAll') { message(code:'landing.csi.linkText', default:'Customer Satisfaction Index')}
+                        ]"/>
                 </p>
             </div>
         </div>
@@ -57,8 +60,11 @@
             <div class="intro-text">
                 <p>
                     <g:message code="landing.measurement.text"
-                        default="Set up and control your measurements. Configure what, how and when you want to measure your web application." />
-                    </p>
+                               default="Set up and control {0}. Configure what, how and when you want to measure your web application."
+                               encodeAs="raw" args="[
+                            link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
+                    ]"/>
+                </p>
                 <a href="#" class="btn btn-primary">
                     <g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>
             </div>
