@@ -24,7 +24,7 @@ class UrlMappings {
 
 	static mappings = {
 
-		/* EventResultDashboard as homepage */
+		/* Landing page */
 		'/' (controller: 'landing')
 
 		/*
