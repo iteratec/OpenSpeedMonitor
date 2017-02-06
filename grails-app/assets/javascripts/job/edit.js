@@ -67,6 +67,11 @@ function doOnDomReady(newJob,
         }
     });
 
+    // trigger change event if user input received
+    $("#execution-schedule-shown").keyup(function () {
+        $("#execution-schedule-shown").change();
+    });
+
 };
 
 function initializeSelects() {
@@ -192,13 +197,13 @@ function registerConnectivityProfilesEventHandlers(customConnNameForNative) {
         var selectedOption = this.options[this.selectedIndex];
         if (selectedOption.text == "Custom") {
 
-            toggleCustomConnDetails(true)
+            toggleCustomConnDetails(true);
             document.getElementById('noTrafficShapingAtAll').value = false;
             document.getElementById('customConnectivityProfile').value = true;
 
         } else {
 
-            toggleCustomConnDetails(false)
+            toggleCustomConnDetails(false);
             document.getElementById('customConnectivityProfile').value = false;
             if (selectedOption.text == customConnNameForNative) {
                 document.getElementById('noTrafficShapingAtAll').value = true;
