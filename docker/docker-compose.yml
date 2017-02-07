@@ -21,7 +21,7 @@ services:
       ENABLE_DETAIL_ANALYSIS: 'true'
 
   osm_mysql:
-    image: mysql
+    image: mysql:latest
     container_name: osm_mysql
     volumes:
       - osm_mysql_data:/var/lib/mysql
