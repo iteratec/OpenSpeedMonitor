@@ -78,7 +78,7 @@ String getNewVersion(GradleBuildFile buildFile){
 
 }
 
-public void appendBuildNumber(newVersion) {
+public String appendBuildNumber(String newVersion) {
 
     def bamboo_build_number = System.getenv("bamboo_buildNumber")
     println "... and adding build-number ${bamboo_build_number} to version-number"
@@ -87,6 +87,7 @@ public void appendBuildNumber(newVersion) {
     if (!System.getenv("bamboo_planRepository_branchName").equals("release")) {
         newVersion += "-SNAPSHOT"
     }
+    return newVersion
 
 }
 
@@ -114,7 +115,7 @@ versionProperties.appendLine("app.version.minor=${getMajorVersionFrom(newVersion
 versionProperties.appendLine("app.version.patch=${getMajorVersionFrom(newVersion)}.${getMinorVersionFrom(newVersion)}.${getPatchVersionFrom(newVersion)}")
 
 String oldVersion = buildFile.getVersion()
-appendBuildNumber(newVersion)
+newVersion = appendBuildNumber(newVersion)
 versionProperties.appendLine("app.version=${newVersion}")
 
 buildFile.setVersion(newVersion)
