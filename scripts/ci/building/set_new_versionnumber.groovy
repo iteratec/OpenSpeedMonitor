@@ -110,8 +110,8 @@ VersionProperties versionProperties = new VersionProperties()
 String newVersion = getNewVersion(buildFile)
 
 versionProperties.appendLine("app.version.major=${getMajorVersionFrom(newVersion)}")
-versionProperties.appendLine("app.version.minor=${getMinorVersionFrom(newVersion)}")
-versionProperties.appendLine("app.version.patch=${getPatchVersionFrom(newVersion)}")
+versionProperties.appendLine("app.version.minor=${getMajorVersionFrom(newVersion)}.${getMinorVersionFrom(newVersion)}")
+versionProperties.appendLine("app.version.patch=${getMajorVersionFrom(newVersion)}.${getMinorVersionFrom(newVersion)}.${getPatchVersionFrom(newVersion)}")
 
 String oldVersion = buildFile.getVersion()
 appendBuildNumber(newVersion)
