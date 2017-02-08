@@ -97,84 +97,6 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
      */
     Collection<Long> selectedPages = []
 
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
-     * measured events} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllMeasuredEvents} is evaluated to
-     * <code>false</code>.
-     */
-    Collection<Long> selectedMeasuredEventIds = []
-
-    /**
-     * User enforced the selection of all measured events.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedMeasuredEventIds} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedMeasuredEventIds} should be ignored.
-     */
-    Boolean selectedAllMeasuredEvents = true
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
-     * browsers} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllBrowsers} is evaluated to
-     * <code>false</code>.
-     */
-    Collection<Long> selectedBrowsers = []
-
-    /**
-     * User enforced the selection of all browsers.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedBrowsers} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedBrowsers} should be ignored.
-     */
-    Boolean selectedAllBrowsers = true
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
-     * locations} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllLocations} is evaluated to
-     * <code>false</code>.
-     */
-    Collection<Long> selectedLocations = []
-
-    /**
-     * User enforced the selection of all locations.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedLocations} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedLocations} should be ignored.
-     */
-    Boolean selectedAllLocations = true
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllConnectivityProfiles} is evaluated to
-     * <code>false</code>.
-     */
-    Collection<Long> selectedConnectivityProfiles = []
-
-    /**
-     * User enforced the selection of all ConnectivityProfiles.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedConnectivityProfiles} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedConnectivityProfiles} should be ignored.
-     */
-    Boolean selectedAllConnectivityProfiles = true
 
     /**
      * Whether or not the time of the start-date should be selected manually.
@@ -184,22 +106,6 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
      * Whether or not the time of the start-date should be selected manually.
      */
     Boolean setToHour
-
-    /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    Boolean includeNativeConnectivity
-
-    /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    Boolean includeCustomConnectivity
-
-    /**
-     * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
-     * connectivity name matches this regex.
-     */
-    String customConnectivityName
 
     /**
      * Constraints needs to fit.
@@ -228,30 +134,11 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
                 if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
             }
         })
-        selectedAllMeasuredEvents(nullable: true)
-        selectedAllBrowsers(nullable: true)
-        selectedAllLocations(nullable: true)
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardShowCommand cmd ->
             if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
         selectedPages(nullable: true)
-        selectedBrowsers(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardShowCommand cmd ->
-            if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedBrowsers.error.validator.error.selectedBrowsers']
-        })
-        selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardShowCommand cmd ->
-            if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectMeasurings.error.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
-        })
-        selectedLocations(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardShowCommand cmd ->
-            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedLocations.error.validator.error.selectedLocations']
-        })
-        selectedAllConnectivityProfiles(nullable: true)
-
-        includeNativeConnectivity(nullable: true)
-
-        includeCustomConnectivity(nullable: true)
-
-        customConnectivityName(nullable: true)
 
         setToHour(nullable: true)
         setFromHour(nullable: true)
@@ -342,21 +229,6 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
 
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
         viewModelToCopyTo.put('selectedPages', this.selectedPages)
-
-        viewModelToCopyTo.put('selectedAllMeasuredEvents', this.selectedAllMeasuredEvents)
-        viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
-
-        viewModelToCopyTo.put('selectedAllBrowsers', this.selectedAllBrowsers)
-        viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
-
-        viewModelToCopyTo.put('selectedAllLocations', this.selectedAllLocations)
-        viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
-
-        viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-        viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivityProfiles)
-        viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
-        viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
-        viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
 
         viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
         if (!this.fromHour.is(null)) {

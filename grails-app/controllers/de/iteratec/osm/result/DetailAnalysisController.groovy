@@ -85,21 +85,6 @@ class DetailAnalysisController {
         List<Page> pages = eventResultDashboardService.getAllPages()
         result.put('pages', pages)
 
-        // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
-        result.put('measuredEvents', measuredEvents)
-
-        // Browsers
-        List<Browser> browsers = eventResultDashboardService.getAllBrowser()
-        result.put('browsers', browsers)
-
-        // Locations
-        List<Location> locations = eventResultDashboardService.getAllLocations()
-        result.put('locations', locations)
-
-        // ConnectivityProfiles
-        result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
-
         // JavaScript-Utility-Stuff:
         result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         result.put("weekStart", MONDAY_WEEKSTART)
@@ -115,47 +100,24 @@ class DetailAnalysisController {
         return result;
     }
 
-    def sendFetchAssetsAsBatchCommand(DetailAnalysisDashboardShowCommand cmd){
+    def sendFetchAssetsAsBatchCommand(DetailAnalysisDashboardShowCommand cmd) {
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
-        def connectivityProfiles
-        if (cmd.selectedConnectivityProfiles){
-            connectivityProfiles=ConnectivityProfile.findAllByIdInList(cmd.selectedConnectivityProfiles)
-        }
-
-        List<Job> jobs = Job.createCriteria().list {
-            if(cmd.includeCustomConnectivity)inList("customConnectivityName",[cmd.customConnectivityName,null]) // if custom connectivity is included
-            else eq("customConnectivityProfile",cmd.includeCustomConnectivity)
-            if(!cmd.includeNativeConnectivity)eq("noTrafficShapingAtAll", cmd.includeNativeConnectivity)
-            if(!cmd.selectedAllConnectivityProfiles)inList("connectivityProfile", connectivityProfiles)
-        }
         Interval timeFrame = cmd.getSelectedTimeFrame();
         def jobGroupList = []
-        cmd.selectedFolder.each{
+        cmd.selectedFolder.each {
             jobGroupList.add(JobGroup.findById(it).name)
         }
-        def selectedBrowsersList = []
-        cmd.selectedBrowsers.each{
-            selectedBrowsersList.add(Browser.findById(it).name)
-        }
-        def selectedLocationsList = []
-        cmd.selectedLocations.each {
-            selectedLocationsList.add(Location.findById(it).location)
-        }
-        List<JobResult> jobResults =[]
-        if(jobs) {
-            jobResults = JobResult.createCriteria().list {
-                inList("job", jobs)
-                if (cmd.selectedFolder) inList("jobGroupName", jobGroupList)
-                if (!cmd.selectedAllBrowsers) inList("locationBrowser", selectedBrowsersList)
-                if (!cmd.selectedAllLocations) inList("locationLocation", selectedLocationsList)
-                between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
-            }
+
+        List<JobResult> jobResults = []
+        jobResults = JobResult.createCriteria().list {
+            if (cmd.selectedFolder) inList("jobGroupName", jobGroupList)
+            between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
         }
         def batchIsQueued = assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
-        modelToRender.put("startedBatchActivity",batchIsQueued)
+        modelToRender.put("startedBatchActivity", batchIsQueued)
         render(view: "show", model: modelToRender)
     }
 
