@@ -106,15 +106,22 @@ class AssetRequestPersisterService implements iResultListener {
         Long jobId = job.id
         Long jobGroupId = job.jobGroup.id
 
+        // If persisting of detail data is not activated for jobGroup do nothing
         if(!JobGroup.get(jobGroupId).persistDetailData)
             return
+
+        // persistence of detail data is only available for wpt-server > 2.19
+        if(resultXml.version.toString() != WptXmlResultVersion.MULTISTEP.toString()) {
+            log.debug("Persisctence of detail data not available for wpt-server with version ${wptVersion}")
+            return
+        }
 
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
         String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
-        String wptVersion = getWptVersion(resultXml)
         List<String> wptTestIds = [resultXml.getTestId()]
+        String wptVersion = getWptVersion(resultXml)
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
         def resp
