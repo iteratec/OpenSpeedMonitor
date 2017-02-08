@@ -33,10 +33,10 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
-            <button class="btn btn-default pull-left" href="/">
+            <a class="btn btn-default pull-left" data-toggle="modal" data-target="#cancelJobCreationDialog">
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
-            </button>
+            </a>
             <a data-toggle="tab" href="#createScript" class="btn btn-primary" id="setJobGroubTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>

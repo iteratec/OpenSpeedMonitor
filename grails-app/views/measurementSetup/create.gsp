@@ -70,6 +70,9 @@
 
 </div> %{-- card --}%
 
+%{-- initially invisible modal dialog to ask if user wants to cancel the job creation --}%
+<g:render template="cancelJobCreationDialog"/>
+
 <content tag="include.bottom">
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
     <asset:javascript src="prettycron/prettycronManifest.js"/>
