@@ -12,7 +12,7 @@
     <title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <asset:stylesheet src="csiDashboard/csiDashboard.less" />
+    <asset:stylesheet src="csiDashboard/csiDashboard.less"/>
 </head>
 
 <body>
@@ -209,11 +209,11 @@
                             <g:if test="${dropdownHasEntries}">
                                 <li class="divider"></li>
                             </g:if>
-                            <li class="dropdown-header">
-                                <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                           default="View a custom time series"/>
-                            </li>
                             <g:if test="${availableDashboards}">
+                                <li class="dropdown-header">
+                                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                               default="View a custom time series"/>
+                                </li>
                                 <g:each in="${availableDashboards}" var="availableDashboard">
                                     <li><g:link controller="${affectedController}" action="showAll"
                                                 class="custom-dashboard"
@@ -221,7 +221,7 @@
                                 </g:each>
                             </g:if>
                             <g:else>
-                                <li><g:message
+                                <li class="dropdown-header"><g:message
                                         code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
                                         default="None available"/></li>
                             </g:else>

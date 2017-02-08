@@ -152,19 +152,20 @@
                 <g:if test="${dropdownHasEntries}">
                     <li class="divider"></li>
                 </g:if>
-                <li class="dropdown-header">
-                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                               default="View a custom time series"/>
-                </li>
                 <g:if test="${availableDashboards}">
+                    <li class="dropdown-header">
+                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                   default="View a custom time series"/>
+                    </li>
                     <g:each in="${availableDashboards}" var="availableDashboard">
                         <li><g:link action="showAll"
                                     params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
                 <g:else>
-                    <li><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                   default="None available"/></li>
+                    <li class="dropdown-header"><g:message
+                            code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                            default="None available"/></li>
                 </g:else>
             </ul>
         </div>
