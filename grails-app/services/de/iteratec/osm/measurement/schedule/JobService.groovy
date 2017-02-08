@@ -145,7 +145,7 @@ class JobService {
         return executionDates
     }
 
-    String createResultLinkForJob(Job job) {
+    public Map<String, Object> createTimeSeriesParamsFor(Job job) {
         Map<String, Object> params = createCommonParams(job)
         params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
         params["_overwriteWarningAboutLongProcessingTime"] = ""
@@ -161,7 +161,23 @@ class JobService {
         params["_selectedAllConnectivityProfiles"] = ""
         params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
-        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll', params: params)
+        return params
+    }
+
+    String createPageAggregationLinkForJob(Job job) {
+        Map params = createPageAggregationParamsFor(job)
+        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', params: params)
+    }
+
+    public Map createPageAggregationParamsFor(Job job) {
+        Map params = createCommonParams(job)
+        Set<Long> pageIds = []
+        new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
+            pageIds << pageService.getPageByStepName(it).id
+        }
+        params["selectedPages"] = pageIds
+        params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
+        return params
     }
 
     Map createCommonParams(Job job) {
@@ -181,17 +197,5 @@ class JobService {
         params["selectedFolder"] = "$job.jobGroupId"
         return params
     }
-
-    String createPageAggregationLinkForJob(Job job) {
-        Map params = createCommonParams(job)
-        Set<Long> pageIds = []
-        new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
-            pageIds << pageService.getPageByStepName(it).id
-        }
-        params["selectedPages"] = pageIds
-        params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
-        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', params: params)
-    }
-
 
 }
