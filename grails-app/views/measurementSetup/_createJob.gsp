@@ -63,14 +63,19 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
+            <button class="btn btn-default pull-left" href="/">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <g:message code="script.versionControl.cancel.button" default="Cancel"/>
+            </button>
             <a data-toggle="tab" href="#selectLocationAndConnectivity"
                class="btn btn-default" id="createJobTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
             </a>
-            %{--JOHANNES2DO: Insert "<i class='fa fa-plus' aria-hidden='true'></i>" into button value--}%
-            <g:actionSubmit class="btn btn-primary" action="save"
-                            value="${message(code: 'de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement', default: 'Create Job and Start Measurement')}"/>
+            <button type="submit" name="_action_save" class="btn btn-primary" id="createJobTabCreationButton">
+                <i class='fa fa-plus' aria-hidden='true'></i>
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement" default="Create Job and Start Measurement"/>
+            </button>
         </div>
     </div>
 </div>

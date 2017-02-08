@@ -7,7 +7,7 @@
     <title><g:message code="de.iteratec.osm.setupMeasurementWizard.title" default="Setup Measurement"/></title>
 
     <asset:stylesheet src="script/scriptManifest.css"/>
-    <asset:stylesheet src="setupWizard/setupWizard.less"/>
+    <asset:stylesheet src="setupWizard/setupWizard.css"/>
 </head>
 
 <body>
@@ -66,12 +66,6 @@
 
         </div> %{-- tab-content --}%
 
-        <div>
-            <button class="btn btn-default" type="reset" href="/">
-                <i class="fa fa-times" aria-hidden="true"></i>
-                <g:message code="script.versionControl.cancel.button" default="Cancel"/>
-            </button>
-        </div>
     </form>
 
 </div> %{-- card --}%

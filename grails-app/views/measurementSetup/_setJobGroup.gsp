@@ -18,6 +18,7 @@
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
+
             <div class="panel-body">
                 %{--JOHANNES2DO: Define help text Job Group Creation--}%
                 You will find the results of your measurement under the here created Job Group.
@@ -32,6 +33,10 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
+            <button class="btn btn-default pull-left" href="/">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <g:message code="script.versionControl.cancel.button" default="Cancel"/>
+            </button>
             <a data-toggle="tab" href="#createScript" class="btn btn-primary" id="setJobGroubTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>

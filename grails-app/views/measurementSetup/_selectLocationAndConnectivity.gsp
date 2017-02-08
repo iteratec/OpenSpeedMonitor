@@ -75,6 +75,10 @@
 <div class="row">
     <div class="form-group">
         <div class="col-sm-6 text-right">
+            <button class="btn btn-default pull-left" href="/">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <g:message code="script.versionControl.cancel.button" default="Cancel"/>
+            </button>
             <a data-toggle="tab" href="#createScript"
                class="btn btn-default" id="selectLocationAndConnectivityTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
