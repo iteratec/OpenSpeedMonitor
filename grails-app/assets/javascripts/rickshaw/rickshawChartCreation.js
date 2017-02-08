@@ -845,7 +845,7 @@ function XAxis(args) {
 
         if (month == 2) {
             if (date.getFullYear() % 4 == 0) {
-                increase(date, 27);
+                increase(date, 29);
             } else {
                 increase(date, 28);
             }

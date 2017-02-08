@@ -48,9 +48,6 @@
 
                             <g:if test="${mode == 'edit'}">
                                 <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink: controllerLink]"/>
-                                <g:actionSubmit class="btn btn-info" action="execute"
-                                                value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}"
-                                                onclick="this.form.target='_blank';return true;"/>
                             </g:if>
                         </div>
                         <div class="col-md-6 text-right">

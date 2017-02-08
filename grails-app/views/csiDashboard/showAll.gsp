@@ -12,42 +12,7 @@
     <title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <style>
-    /* css for timepicker */
-    .ui-timepicker-div .ui-widget-header {
-        margin-bottom: 8px;
-    }
-
-    .ui-timepicker-div dl {
-        text-align: left;
-    }
-
-    .ui-timepicker-div dl dt {
-        height: 25px;
-        margin-bottom: -25px;
-    }
-
-    .ui-timepicker-div dl dd {
-        margin: 0 10px 10px 65px;
-    }
-
-    .ui-timepicker-div td {
-        font-size: 90%;
-    }
-
-    .ui-tpicker-grid-label {
-        background: none;
-        border: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    #csiTypeSelect {
-        height: 20px;
-    }
-
-
-    </style>
+    <asset:stylesheet src="csiDashboard/csiDashboard.less" />
 </head>
 
 <body>
@@ -215,7 +180,7 @@
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu chart-action-dropdown-menu">
+                        <ul class="dropdown-menu chart-action-dropdown-menu" id="show-button-dropdown">
                             <sec:ifLoggedIn>
                                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                     <g:set var="dropdownHasEntries" value="true"/>
@@ -241,20 +206,25 @@
                                     </g:if>
                                 </g:if>
                             </sec:ifLoggedIn>
+                            <g:if test="${dropdownHasEntries}">
+                                <li class="divider"></li>
+                            </g:if>
+                            <li class="dropdown-header">
+                                <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                           default="View a custom time series"/>
+                            </li>
                             <g:if test="${availableDashboards}">
-                                <g:if test="${dropdownHasEntries}">
-                                    <li class="divider"></li>
-                                </g:if>
-                                <li class="dropdown-header">
-                                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                               default="View a custom time series"/>
-                                </li>
                                 <g:each in="${availableDashboards}" var="availableDashboard">
                                     <li><g:link controller="${affectedController}" action="showAll"
                                                 class="custom-dashboard"
                                                 params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                                 </g:each>
                             </g:if>
+                            <g:else>
+                                <li><g:message
+                                        code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                                        default="None available"/></li>
+                            </g:else>
                         </ul>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings"/>

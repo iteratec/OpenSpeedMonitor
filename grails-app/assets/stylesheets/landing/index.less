@@ -1,0 +1,35 @@
+@import "../variables-corporate";
+
+.intro-card h2 .fa {
+  float: right;
+}
+
+.intro-text {
+  display: block;
+  text-align: center;
+  padding: 15px;
+  min-height: 190px;
+
+  > p {
+    margin-bottom: 2em;
+
+    &:before {
+      // fix for min width next to float
+      content: "";
+      width: 7em;
+      display: block;
+      overflow: hidden;
+    }
+  }
+}
+
+.intro-button {
+  margin: 5px 0;
+}
+
+.intro-img {
+  float: right;
+  display: block;
+  padding: 15px 0 15px 15px;
+}
+

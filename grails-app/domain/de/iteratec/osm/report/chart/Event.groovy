@@ -38,7 +38,7 @@ class Event {
     /**
      * The {@link JobGroup} this event is assigned to
      */
-    Collection<JobGroup> jobGroups
+    Collection<JobGroup> jobGroups = []
     static hasMany = [jobGroups: JobGroup]
 
     static mapping = {
@@ -69,8 +69,10 @@ class Event {
         shortName(maxSize: 255)
         description(nullable: true, widget: 'textarea')
         globallyVisible(nullable: false)
-        jobGroups(nullable: false, validator: {val, obj->
-            return obj.globallyVisible || val.size() > 0
+        jobGroups(nullable: true, validator: {val, obj->
+            if (!obj.globallyVisible && !(val && val.size() > 0)) {
+                return 'event.jobGroup.notValid'
+            }
         })
     }
 }

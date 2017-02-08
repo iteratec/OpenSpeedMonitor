@@ -127,7 +127,7 @@
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="show-button-dropdown">
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                     <g:set var="dropdownHasEntries" value="true"/>
                     <li>
@@ -149,19 +149,23 @@
                         </li>
                     </g:if>
                 </g:if>
+                <g:if test="${dropdownHasEntries}">
+                    <li class="divider"></li>
+                </g:if>
+                <li class="dropdown-header">
+                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                               default="View a custom time series"/>
+                </li>
                 <g:if test="${availableDashboards}">
-                    <g:if test="${dropdownHasEntries}">
-                        <li class="divider"></li>
-                    </g:if>
-                    <li class="dropdown-header">
-                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                   default="View a custom time series"/>
-                    </li>
                     <g:each in="${availableDashboards}" var="availableDashboard">
                         <li><g:link action="showAll"
                                     params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
+                <g:else>
+                    <li><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                                   default="None available"/></li>
+                </g:else>
             </ul>
         </div>
         <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"

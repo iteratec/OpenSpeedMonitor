@@ -21,7 +21,6 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.csi.CsiDashboardPage
-import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -30,7 +29,6 @@ import org.openqa.selenium.Keys
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Created by sburnicki on 04.11.16.
  */
@@ -71,8 +69,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         when: "User is logged in"
         doLogin()
+        to CsiDashboardPage
+
         then: "Button is visible"
-        at EventResultDashboardPage
         saveAsDashboardButton.present
 
 
