@@ -19,7 +19,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <g:link absolute="true" class="navbar-brand" uri="/">
+        <g:link  class="navbar-brand" uri="/">
             <img class="icon osm-icon-small" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_small.svg')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
@@ -29,7 +29,7 @@
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
             <li class="${controllerName.equals("landing") ? 'active' : ''}">
-                <g:link absolute="true" uri="/"><i class="fa fa-home"></i>
+                <g:link  uri="/"><i class="fa fa-home"></i>
                     <g:message code="navbar.home" default="Home"/>
                 </g:link>
             </li>

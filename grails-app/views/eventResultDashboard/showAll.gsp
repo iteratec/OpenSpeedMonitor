@@ -307,15 +307,15 @@
 
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"
-                                                                    absolute="true"/>')
+                                                                    />')
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    absolute="true"/>')
+                                                                    />')
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
-            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
-            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
+            "${createLink(action: 'show', controller: 'pageAggregation')}",
+            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
+            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
+            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
 
     </asset:script>
 </content>

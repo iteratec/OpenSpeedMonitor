@@ -86,7 +86,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '${createLink(action: 'checkDashboardNameUnique', absolute: true)}',
+            url: '${createLink(action: 'checkDashboardNameUnique')}',
             data: {values: json_data},
             success: function (data) {
                 if (data['result'] == 'true') {
@@ -198,7 +198,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
+                url: '${createLink(action: 'validateAndSaveDashboardValues')}',
                 data: {values: json_data},
                 statusCode: {
                     200: function (response) {

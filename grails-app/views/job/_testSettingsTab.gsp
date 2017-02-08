@@ -13,7 +13,7 @@
         <div class="form-inline">
             <input type="text" id="execution-schedule-shown" class="form-control"
                    value="${job.executionSchedule ? job.executionSchedule.substring(job.executionSchedule.indexOf(' ') + 1, job.executionSchedule.size()) : ''}"
-                   onchange="updateExecScheduleInformations('0 ' + this.value, '${createLink(action: 'nextExecution', absolute: true)}')">
+                   onchange="updateExecScheduleInformations('0 ' + this.value, '${createLink(action: 'nextExecution')}')">
             <i class="fa fa-question-circle fa-lg clickable-icon" onclick="toggleCronInstructions()"></i>
         </div>
         <input type="text" id="execution-schedule" name="executionSchedule" value="${job?.executionSchedule}" style="display: none">

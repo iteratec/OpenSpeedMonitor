@@ -161,7 +161,7 @@ class JobService {
         params["_selectedAllConnectivityProfiles"] = ""
         params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
-        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll', absolute: true, params: params)
+        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll', params: params)
     }
 
     Map createCommonParams(Job job) {
@@ -190,7 +190,7 @@ class JobService {
         }
         params["selectedPages"] = pageIds
         params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
-        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', absolute: true, params: params)
+        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', params: params)
     }
 
 

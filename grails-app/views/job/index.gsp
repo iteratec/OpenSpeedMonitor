@@ -33,13 +33,13 @@
         </div>
     <%--
     here should be a link for enabling measurements generally
-    <g:createLink absolute="true" ... />
+    <g:createLink  ... />
     --%>
     </g:if>
     <g:else>
     <%--
     here should be a link for disabling measurements generally
-    <g:createLink absolute="true" ... />
+    <g:createLink  ... />
     --%>
     </g:else>
     <g:if test="${saveError}">
@@ -253,16 +253,16 @@
     <asset:script type="text/javascript">
         $(document).ready(
             doOnDomReady(
-                '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
-                '${createLink(action: 'cancelJobRun', absolute: true)}',
-                '${createLink(action: 'getLastRun', absolute: true)}',
-                "${createLink(action: 'nextExecution', absolute: true)}"
+                '${createLink(action: 'getRunningAndRecentlyFinishedJobs')}',
+                '${createLink(action: 'cancelJobRun')}',
+                '${createLink(action: 'getLastRun')}',
+                "${createLink(action: 'nextExecution')}"
             )
         );
         $(window).load(function() {
             doOnWindowLoad(
-                '${createLink(action: 'list', absolute: true)}',
-                "${createLink(action: 'nextExecution', absolute: true)}"
+                '${createLink(action: 'list')}',
+                "${createLink(action: 'nextExecution')}"
             );
         });
     </asset:script>

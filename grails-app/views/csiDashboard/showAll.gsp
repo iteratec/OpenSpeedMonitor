@@ -398,7 +398,7 @@
         });
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    absolute="true"/>')
+                                                                    />')
         });
 
     </asset:script>

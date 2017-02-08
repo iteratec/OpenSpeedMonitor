@@ -73,10 +73,10 @@ This is a dialog to choose from different default csi mappings.
             var pageId = select.find(":selected").val()
             jQuery.ajax({
                 type: 'GET',
-                url: "<g:createLink action="applyNewMappingToPage" absolute="true"/>",
+                url: "<g:createLink action="applyNewMappingToPage" />",
                 data:{'defaultMappingName':newLine, 'csiConfigurationId':actualCsiConfigurationId, 'pageId':pageId},
                 success: function (content) {
-                    window.location.href="<g:createLink action="configurations" absolute="true"/>/"+actualCsiConfigurationId;
+                    window.location.href="<g:createLink action="configurations" />/"+actualCsiConfigurationId;
                 }
          });
     }
