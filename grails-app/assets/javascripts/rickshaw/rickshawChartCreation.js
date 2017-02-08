@@ -484,7 +484,6 @@ function XAxis(args) {
     this.setNumberOfTicks = function () {
         var width = self.graph.width;
         self.NUMBER_OF_TICKS = Math.floor(width / 80);
-        console.log(self.NUMBER_OF_TICKS);
     };
 
     this.setTickValueLabels = function () {
@@ -674,7 +673,6 @@ function XAxis(args) {
 
         // set number of ticks
         var tickValuesResult = [];
-        console.log(tickValues);
         var step = Math.ceil(tickValues.length / self.NUMBER_OF_TICKS);
         var index = 0;
         while (index <= tickValues.length) {
@@ -688,10 +686,6 @@ function XAxis(args) {
     };
 
     this.getYearsInRange = function (minDate, maxDate) {
-        console.log("### getYearsInRange")
-        console.log(minDate)
-        console.log(maxDate)
-        console.log("###")
         var years = [];
         var date = new Date(minDate.getTime());
         date.setMilliseconds(0);
@@ -714,10 +708,6 @@ function XAxis(args) {
     };
 
     this.getMonthsInRange = function (minDate, maxDate) {
-        console.log("### getMonthsInRange")
-        console.log(minDate)
-        console.log(maxDate)
-        console.log("###")
         var months = [];
         var date = new Date(minDate.getTime());
         date.setMilliseconds(0);
@@ -737,10 +727,6 @@ function XAxis(args) {
     };
 
     this.getDaysInRange = function (minDate, maxDate) {
-        console.log("### getDaysInRange")
-        console.log(minDate)
-        console.log(maxDate)
-        console.log("###")
         var days = [];
         var date = new Date(minDate.getTime());
         var maxDateAsTime = new Date(maxDate.getTime());
@@ -760,9 +746,6 @@ function XAxis(args) {
     };
 
     this.getHoursInRange = function (minDate, maxDate) {
-        console.log("### getHoursInRange")
-        console.log(minDate)
-        console.log(maxDate)
         var hours = [];
         var date = new Date(minDate.getTime());
         date.setMilliseconds(0);
@@ -776,16 +759,10 @@ function XAxis(args) {
                 hours.push(date.getTime() / 1000);
             }
         }
-        console.log(hours);
-        console.log("###")
         return hours;
     };
 
     this.getMinutesInRange = function (minDate, maxDate) {
-        console.log("### getMinutesInRange")
-        console.log(minDate)
-        console.log(maxDate)
-        console.log("###")
         var minutes = [];
         var date = new Date(minDate.getTime());
         date.setMilliseconds(0);
@@ -802,10 +779,6 @@ function XAxis(args) {
     };
 
     this.getDefaultTickValues = function (minDate, maxDate) {
-        console.log("### getDefaultTickValues")
-        console.log(minDate)
-        console.log(maxDate)
-        console.log("###")
         var dif = maxDate.getTime() - minDate.getTime();
         var tickValue = Math.floor(dif / self.NUMBER_OF_TICKS);
         var tickValues = [];
