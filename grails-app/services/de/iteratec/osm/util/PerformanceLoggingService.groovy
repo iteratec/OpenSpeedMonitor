@@ -17,14 +17,17 @@
 
 package de.iteratec.osm.util
 
-import grails.util.Environment
 import org.joda.time.DateTime
-
 
 class PerformanceLoggingService {
 
-    ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>()
-    public final static INDENTATION_CHAR = "-"
+    static final ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>(){
+        @Override
+        protected LoggedExecutionTimes initialValue(){
+            return new LoggedExecutionTimes()
+        }
+    }
+    static final INDENTATION_CHAR = "-"
 
 	enum LogLevel{
 		FATAL(5),
@@ -62,25 +65,16 @@ class PerformanceLoggingService {
 		return returnValue
     }
     void resetExecutionTimeLoggingSession(){
-        if (Environment.current != Environment.TEST){
-            loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
-        }else {
-            log.error("Silent performance logging not supported in tests.")
-        }
+        loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
     }
     void logExecutionTimeSilently(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
-        if (Environment.current == Environment.TEST){
-            toMeasure.call()
-        }else {
-            DateTime started = new DateTime()
-            toMeasure.call()
-            loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentationDepth, level, getElapsedSeconds(started))
-        }
+        DateTime started = new DateTime()
+        toMeasure.call()
+        loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentationDepth, level, getElapsedSeconds(started))
     }
     String getExecutionTimeLoggingSessionData(LogLevel level){
-        return Environment.current == Environment.TEST ?
-            "Silent performance logging not supported in tests." :
-            loggedExecutionTimesThreadLocal.get().getRepresentation(level)
+        return loggedExecutionTimesThreadLocal.get().getRepresentation(level)
+
     }
 
 	private String getMessage(DateTime started, String description, Integer indentationDepth){
