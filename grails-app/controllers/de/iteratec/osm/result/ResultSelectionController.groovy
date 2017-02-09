@@ -2,6 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import grails.databinding.BindUsing
@@ -10,10 +11,11 @@ import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
+import de.iteratec.osm.annotations.RestAction
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
-class ResultSelectionController {
+class ResultSelectionController extends ExceptionHandlerController {
     private final static MAX_RESULT_COUNT = 50000
     private final static RESULT_COUNT_MAX_SECONDS = 1
 
@@ -61,6 +63,7 @@ class ResultSelectionController {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
     }
 
+    @RestAction
     def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -91,6 +94,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getMeasuredEvents(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -121,6 +125,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getLocations(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -151,6 +156,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getConnectivityProfiles(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)

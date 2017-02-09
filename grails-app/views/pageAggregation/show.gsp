@@ -19,8 +19,6 @@
 <div class="card hidden" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
-            <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
-
             <div id="error-message"></div>
         </div>
     </div>
@@ -129,6 +127,7 @@
                 error: function (e) {
                     spinner.stop();
                     $("#error-div").removeClass("hidden");
+                    $("#chart-card").removeClass("hidden");
                     $("#error-message").html(e.responseText);
                 }
             });

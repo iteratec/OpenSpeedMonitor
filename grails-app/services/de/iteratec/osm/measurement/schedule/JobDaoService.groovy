@@ -47,6 +47,9 @@ class JobDaoService {
         return Job.findAllByDeletedAndJobGroup(false, jobGroup)
     }
 
+    public List<Job> getJobs(List<JobGroup> jobGroups) {
+        return Job.findAllByDeletedAndJobGroupInList(false, jobGroups)
+    }
 
     public List<Job> getJobs(boolean active, Location location) {
         return Job.findAllByDeletedAndActiveAndLocation(false, active, location)
