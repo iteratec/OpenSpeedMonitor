@@ -11,4 +11,7 @@
     <p class="bg-danger" id="warning-no-page">
         <g:message code="de.iteratec.isocsi.CsiDashboardController.noPageSelected"/>
     </p>
+    <p class="bg-danger" id="warning-no-measurand">
+        <g:message code="de.iteratec.isocsi.CsiDashboardController.noMeasurandSelected"/>
+    </p>
 </div>

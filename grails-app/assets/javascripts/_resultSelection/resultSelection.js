@@ -16,6 +16,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     var showButtons = $('.show-button');
     var warningLongProcessing = $('#warning-long-processing');
     var warningNoJobGroupSelected = $('#warning-no-job-group');
+    var warningNoMeasurandSelected = $('#warning-no-measurand');
     var warningNoPageSelected = $('#warning-no-page');
     var currentQueryArgs = {
         from: null,
@@ -54,6 +55,14 @@ OpenSpeedMonitor.resultSelection = (function () {
                 validateForm();
             });
         }
+
+        // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
+        $(".removeMeasurandSeriesButton").click(function () {
+            validateForm();
+        });
+        $("#addMeasurandSeriesButton").click(function () {
+            validateForm();
+        });
 
         // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
@@ -164,9 +173,11 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var validateForm = function () {
+        var hasMeasurandSeries = OpenSpeedMonitor.BarchartMeasurings ? OpenSpeedMonitor.BarchartMeasurings.hasMeasurandSeries() : true;
         warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
-        var doDisable = lastResultCount == 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation);
+        warningNoMeasurandSelected.toggle(hasMeasurandSeries);
+        var doDisable = lastResultCount == 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)
     };
