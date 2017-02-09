@@ -133,9 +133,20 @@ class ResultPersisterService implements iResultListener {
 
         deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
 
-        return JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId) ?:
-                persistNewJobRun(job, resultXml).save(failOnError: true);
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)
+        if (!jobResult) {
+            persistNewJobRun(job, resultXml)
+        } else {
+            updateJobResult(jobResult, resultXml)
+        }
 
+        return jobResult;
+    }
+
+    private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
+        jobResult.testAgent = resultXml.getTestAgent()
+        jobResult.wptVersion = resultXml.version.toString()
+        jobResult.save(failOnError: true)
     }
 
     /**
@@ -194,11 +205,13 @@ class ResultPersisterService implements iResultListener {
                 locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
                 locationBrowser: jobConfig.location.browser.name,
                 jobGroupName: jobConfig.jobGroup.name,
-                testAgent: resultXml.getTestAgent()
+                testAgent: resultXml.getTestAgent(),
+                wptVersion: resultXml.version.toString()
         )
 
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
         result.setDescription('')
+        result.save(failOnError: true)
 
         return result
     }

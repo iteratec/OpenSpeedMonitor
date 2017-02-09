@@ -171,6 +171,15 @@ class AssetRequestPersisterService implements iResultListener {
             log.debug("Can not sendFetchAssetsAsBatchCommand since jobResultsList is emtpy")
             return false
         }
+        // get all jobResults with wpt-version >= 2.19 or where wpt-version is not defined
+        jobResults = jobResults.findAll {
+            !it.wptVersion || it.wptVersion == WptXmlResultVersion.MULTISTEP.toString()
+        }
+        if(!jobResults) {
+            log.debug("Can not sendFetchAssetsAsBatchCommand since wpt-version of all jobResults < 2.19")
+            return false
+        }
+
         def returnValue = false
         def persistanceJobList = []
         jobResults.each { JobResult jobResult ->

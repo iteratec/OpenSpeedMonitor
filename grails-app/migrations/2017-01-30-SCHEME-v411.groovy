@@ -54,4 +54,19 @@ databaseChangeLog = {
     changeSet(author: "mmi (generated)", id: "1485425536551-7") {
         dropColumn(columnName: "include_native_connectivity", tableName: "userspecific_dashboard_base")
     }
+
+    changeSet(author: "marcus (generated)", id: "1486570637625-3") {
+        dropColumn(columnName: "include_custom_connectivity", tableName: "userspecific_dashboard_base")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1486570637625-1") {
+        addColumn(tableName: "job_result") {
+            column(name: "wpt_version", type: "varchar(255)")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1486570637625-2") {
+        dropColumn(columnName: "event_result_id_from_sqlite", tableName: "job_result")
+    }
+
 }
