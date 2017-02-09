@@ -278,8 +278,10 @@ class EventResultDashboardController {
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse JSON Data for Command
-        Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
-        Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        Date fromDate = dashboardValues.from ? SIMPLE_DATE_FORMAT.parse(dashboardValues.from) : null
+        Date toDate = dashboardValues.to ? SIMPLE_DATE_FORMAT.parse(dashboardValues.to) : null
+
+
         Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
         Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
         Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")

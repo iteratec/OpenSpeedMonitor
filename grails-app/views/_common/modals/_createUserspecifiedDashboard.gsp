@@ -129,7 +129,7 @@
         hideMessages();
 
         var dashboardName = document.getElementById("dashboardNameFromModal").value;
-        dashboardName = dashboardName ? dashboardName : name
+        dashboardName = dashboardName ? dashboardName : name;
         if (dashboardName.trim() !== "") {
 
             var spinner = new OpenSpeedMonitor.Spinner();
@@ -211,7 +211,7 @@
                         a.appendChild(linkText);
                         li.appendChild(a);
                         a.setAttribute("href", jsonResponse.path+"showAll?dashboardID="+jsonResponse.dashboardId);
-                        var customDashBoardSelection = document.getElementById("customDashBoardSelection");
+                        var customDashBoardSelection = document.getElementById("show-button-dropdown");
                         customDashBoardSelection.appendChild(li);
 
                         return false;

@@ -825,8 +825,8 @@ class CsiDashboardController {
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse data for command
-        Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
-        Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        Date fromDate = dashboardValues.from ? SIMPLE_DATE_FORMAT.parse(dashboardValues.from) : null
+        Date toDate = dashboardValues.to ? SIMPLE_DATE_FORMAT.parse(dashboardValues.to) : null
         Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
         Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
         Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")
@@ -895,11 +895,9 @@ class CsiDashboardController {
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
-                return null
-            } else {
-                response.sendError(200, 'OK')
-                return null
             }
+            response.setStatus(200)
+            ControllerUtils.sendObjectAsJSON(response, ["path": "/eventResultDashboard/", "dashboardId": newCustomDashboard.id], false)
         }
     }
 
