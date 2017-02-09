@@ -1,18 +1,85 @@
 @import "../variables-corporate";
 
 
-.infoImage {
-  width: 100%;
-}
+@inactiveProgressColor: @iteratec-blue-lighter;
+@activeProgressColor: @brand-primary;
+@progressBarHeightheight: 10px;
 
-// Reset the nav-tabs styles to apply the new wizard step indicator layout
+
+/* Restyle the nav-tabs to apply the new wizard step indicator layout */
+
+.card {
+  min-height: 685px;
+  position: relative;
+}
 
 .wizardStep > a {
   border: none !important;
+  background: transparent !important;
+  pointer-events: none;
+  color: @inactiveProgressColor;
+  > i {
+    display: block;
+    padding: 0.5em;
+    background: @inactiveProgressColor;
+    color: white !important;
+    width: 2em;
+    height: 2em;
+    margin: 0 auto 5px auto;
+    border-radius: 1em;
+  }
+}
+
+.wizardStep.active > a {
+  color: @activeProgressColor !important;
+}
+
+.wizardStep.wasActive > a {
+  pointer-events: auto;
+  > i {
+    background: @activeProgressColor;
+    pointer-events: auto;
+    color: @activeProgressColor;
+  }
+}
+
+#setupWizardProgressBarContainer {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  z-index: 0;
+  height: @progressBarHeightheight;
+  top: ~"calc(15px + 5px + 2em)";
+  margin-top: -(@progressBarHeightheight / 2);
+  background-color: @inactiveProgressColor;
+  box-shadow: none;
+}
+
+#setupWizardProgressBar {
+  width: 12.5%; // initial progress
+}
+
+#measurementSetupSteps {
+  margin-bottom: 30px;
+}
+
+/* --- End of wizard step indicator layout */
+
+
+/* Move navigation buttons to the bottom */
+.navigationColumn {
+  position: absolute;
+  bottom: 0px;
+  margin-bottom: 15px;
 }
 
 
 #createJobTabCreationButton {
   background-color: @iteratec-magenta;
   border-color: @iteratec-magenta-dark;
+}
+
+
+.infoImage {
+  width: 100%;
 }

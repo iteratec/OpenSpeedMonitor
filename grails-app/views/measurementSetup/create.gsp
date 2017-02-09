@@ -18,28 +18,35 @@
     Steht hier ein sinnvoller Text?
 </p>
 
-<div class="card" style="min-height: 700px;">
+<div class="card">
+    <div class="progress" id="setupWizardProgressBarContainer">
+        <div class="progress-bar" id="setupWizardProgressBar" role="progressbar"></div>
+    </div>
 
     %{-- realize breadcrumbs with bootstrap nav-tabs underneath --}%
     <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
-        <li class="wizardStep active">
+        <li class="wizardStep active wasActive">
             <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
+                <i class="fa fa-folder-open-o fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#createScript" id="createScriptTab">
+                <i class="fa fa-file-text-o fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#selectLocationAndConnectivity" id="selectLocationAndConnectivityTab">
+                <i class="fa fa-signal fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.selectLocationAndConnectivity"
                            default="Select Location and Connectivity"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#createJob" id="createJobTab">
+                <i class="fa fa-check fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob" default="Create Job"/>
             </a>
         </li>
@@ -142,17 +149,34 @@
                 }
 
                 function moveThroughWizard() {
+                    var progressBar = document.querySelector("#setupWizardProgressBar");
+
                     document.querySelector("#setJobGroubTabNextButton").addEventListener("click", function () {
                         document.querySelector("#setJobGroupTab").parentElement.classList.toggle("active");
                         document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
+
+                        if (!document.querySelector("#createScriptTab").parentElement.classList.contains("wasActive"))
+                            progressBar.style.width = "37.5%";
+
+                        document.querySelector("#createScriptTab").parentElement.classList.add("wasActive");
                     });
                     document.querySelector("#createScriptTabNextButton").addEventListener("click", function () {
                         document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
                         document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
+
+                        if (!document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.contains("wasActive"))
+                            progressBar.style.width = "62.5%";
+
+                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.add("wasActive");
                     });
                     document.querySelector("#selectLocationAndConnectivityTabNextButton").addEventListener("click", function () {
                         document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
                         document.querySelector("#createJobTab").parentElement.classList.toggle("active");
+
+                        if (!document.querySelector("#createJobTab").parentElement.classList.contains("wasActive"))
+                            progressBar.style.width = "100%";
+
+                        document.querySelector("#createJobTab").parentElement.classList.add("wasActive");
                     });
 
                     document.querySelector("#createScriptTabPreviousButton").addEventListener("click", function () {

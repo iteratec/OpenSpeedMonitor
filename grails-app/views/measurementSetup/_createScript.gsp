@@ -105,7 +105,7 @@
 
 <div class="row">
     <div class="form-group">
-        <div class="col-sm-6 text-right">
+        <div class="col-sm-6 text-right navigationColumn">
             <a class="btn btn-default pull-left" data-toggle="modal" data-target="#cancelJobCreationDialog">
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
