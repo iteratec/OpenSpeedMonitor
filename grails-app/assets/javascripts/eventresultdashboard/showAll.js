@@ -56,13 +56,11 @@ function addInfoHandlers() {
 function updateSelectionConstraints() {
     updateSelectionConstraintBrowser();
     updateSelectionConstraintConnectivity();
-    updateSelectionConstraintFirstView();
-    updateSelectionConstraintRepeatView();
     updateSelectionConstraintTrim();
 }
 
 function showOrHideWarningRibbon() {
-    if (browserOrLocationSelectionIsCustom() || connectivitySelectionIsCustom() || firstViewSelectionIsCustom() || repeatedViewSelectionIsCustom() || trimValuesAreDefined()) {
+    if (browserOrLocationSelectionIsCustom() || connectivitySelectionIsCustom() || trimValuesAreDefined()) {
         $("#dataTableId").attr("hidden", false)
     } else {
         $("#dataTableId").attr("hidden", true)
@@ -75,15 +73,6 @@ function browserOrLocationSelectionIsCustom() {
 
 function connectivitySelectionIsCustom() {
     return !$('#selectedAllConnectivityProfiles').is(':checked')
-}
-
-function firstViewSelectionIsCustom() {
-    var selectedFirstView = getTextList('#selectAggregatorUncachedHtmlId option:selected', 100);
-    return selectedFirstView != 'doc complete time'
-}
-
-function repeatedViewSelectionIsCustom() {
-    return getTextList('#selectAggregatorCachedHtmlId option:selected', 100) ? true : false
 }
 
 function trimValuesAreDefined() {
@@ -123,24 +112,6 @@ function updateSelectionConstraintConnectivity() {
     } else {
         var selectedConnectivities = getTextList('#selectedConnectivityProfilesHtmlId option:selected', 50);
         showSummaryRow('#selectionConstraintConnectivity', selectedConnectivities);
-    }
-}
-
-function updateSelectionConstraintFirstView() {
-    if (!firstViewSelectionIsCustom()) {
-        hideSummaryRow('#selectionConstraintFirstView');
-    } else {
-        var selectedFirstView = getTextList('#selectAggregatorUncachedHtmlId option:selected', 100);
-        showSummaryRow('#selectionConstraintFirstView', selectedFirstView ? selectedFirstView : '\u2205');
-    }
-}
-
-function updateSelectionConstraintRepeatView() {
-    if (!repeatedViewSelectionIsCustom()) {
-        hideSummaryRow('#selectionConstraintRepeatView');
-    } else {
-        var selectedRepeatView = getTextList('#selectAggregatorCachedHtmlId option:selected', 100);
-        showSummaryRow('#selectionConstraintRepeatView', selectedRepeatView ? selectedRepeatView : '\u2205');
     }
 }
 
