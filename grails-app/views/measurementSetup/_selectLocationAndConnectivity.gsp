@@ -32,7 +32,7 @@
 
             <div class="col-sm-10">
                 %{--<input type="text" class="form-control" id="inputConnectivity" required>--}%
-                <select type="text" class="form-control" id="inputConnectivity" required>
+                <select type="text" class="form-control chosen-select" id="inputConnectivity" required>
                     <g:each in="${ConnectivityProfile.findAllByActive(true)}" var="connectivity">
                         <option value="${connectivity.name}">
                             ${connectivity.name}

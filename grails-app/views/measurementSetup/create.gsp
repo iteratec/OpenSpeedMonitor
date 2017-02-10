@@ -196,6 +196,7 @@
                 createCodeMirror("navigationScript", false);
                 window.onload = function() {
                     OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
+                    $(".chosen-select").chosen({ search_contains: true });
                     presetScriptName();
                     presetJobName();
                     moveThroughWizard();

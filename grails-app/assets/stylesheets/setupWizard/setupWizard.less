@@ -9,7 +9,7 @@
 /* Restyle the nav-tabs to apply the new wizard step indicator layout */
 
 .card {
-  min-height: 685px;
+  min-height: 690px;
   position: relative;
 }
 
@@ -30,8 +30,19 @@
   }
 }
 
+@wizardStepActiveTransitionDuration: .5s;
+@wizardStepActiveTransitionTimingFunction: ease-in;
 .wizardStep.active > a {
+  transition-property: color;
+  transition-duration: @wizardStepActiveTransitionDuration;
+  transition-timing-function: @wizardStepActiveTransitionTimingFunction;
   color: @activeProgressColor !important;
+  > i {
+    transition-property: background-color;
+    transition-duration: @wizardStepActiveTransitionDuration;
+    transition-timing-function: @wizardStepActiveTransitionTimingFunction;
+    background-color: @activeProgressColor !important;
+  }
 }
 
 .wizardStep.wasActive > a {
@@ -57,6 +68,8 @@
 
 #setupWizardProgressBar {
   width: 12.5%; // initial progress
+  box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 #measurementSetupSteps {
@@ -82,4 +95,9 @@
 
 .infoImage {
   width: 100%;
+  max-height: 200px;
+}
+
+.chosen-container.chosen-container-single {
+  width: 100% !important; // for some reason the chosen-select element gets initialized with a width 0px
 }
