@@ -72,9 +72,9 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row navigationRow">
     <div class="form-group">
-        <div class="col-sm-6 text-right navigationColumn">
+        <div class="col-sm-6 text-right">
             <a class="btn btn-default pull-left" data-toggle="modal" data-target="#cancelJobCreationDialog">
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
