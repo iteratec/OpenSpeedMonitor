@@ -125,15 +125,18 @@ OpenSpeedMonitor.jobListFilter = (function(){
     };
 
     var filter = function () {
-        saveState();
         var filterTerms = getFilterTerms();
         clearFilterButton.toggle(filterTerms.length > 0);
         jobTableRows.each(function(idx, row) {
             row = $(row);
             var showRow = filterMatchesRow(filterTerms, row);
             row.toggleClass("hidden", !showRow);
+            if(!showRow) {
+                row.find(".jobCheckbox").attr("checked", false)
+            }
         });
         applyStriping();
+        saveState();
     };
 
     var getFilterTerms = function () {
