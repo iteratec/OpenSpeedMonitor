@@ -2798,29 +2798,30 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 	},
 
 	adjustLegendEntrys: function() {
-		var self = this;
-		var columns = $(".rickshaw_legend > ul").css("column-count");
-		var widthOfRow = self.getWidthOfEntrysInARow(columns);
-		if (widthOfRow > $("#rickshaw_addons").width()) {
-			if (columns > 1) {
-				// reduce number of columns
-				columns = columns - 1;
-				$(".rickshaw_legend > ul").css({"column-count": ""+columns, "-moz-column-count": ""+columns, "-webkit-column-count": ""+columns});
-				self.render();
-			} else if (columns == 1) {
-				// insert newLines
-				var separatedLines = 1;
-				self.saveLegendEntrys();
-				while(widthOfRow > $("#rickshaw_addons").width()) {
-					separatedLines += 1;
-					self.insertNewLines(separatedLines);
-					widthOfRow = self.getWidthOfEntrysInARow(columns);
-					if (separatedLines == 5) {
-						break;
-					}
-				}
-			}
-		}
+		// $(".rickshaw_legend > ul").css("column-width: "+widthOfRow+"px");
+		// var self = this;
+		// var columns = $(".rickshaw_legend > ul").css("column-count");
+		// var widthOfRow = self.getWidthOfEntrysInARow(columns);
+		// if (widthOfRow > $("#rickshaw_addons").width()) {
+		// 	if (columns > 1) {
+		// 		// reduce number of columns
+		// 		columns = columns - 1;
+		// 		$(".rickshaw_legend > ul").css({"column-count": ""+columns, "-moz-column-count": ""+columns, "-webkit-column-count": ""+columns});
+		// 		self.render();
+		// 	} else if (columns == 1) {
+		// 		// insert newLines
+		// 		var separatedLines = 1;
+		// 		self.saveLegendEntrys();
+		// 		while(widthOfRow > $("#rickshaw_addons").width()) {
+		// 			separatedLines += 1;
+		// 			self.insertNewLines(separatedLines);
+		// 			widthOfRow = self.getWidthOfEntrysInARow(columns);
+		// 			if (separatedLines == 5) {
+		// 				break;
+		// 			}
+		// 		}
+		// 	}
+		// }
 	},
 	
 	saveLegendEntrys: function() {
@@ -2910,6 +2911,11 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 			this.highlighter.addHighlightEvents(_line);
 		}
 		this.lines.push(_line);
+
+		var width = $(label).width()+$(swatch).width();
+		if($(".rickshaw_legend > ul").css("column-width")=="auto" || width > $(".rickshaw_legend > ul").css("column-width")+12){
+			$(".rickshaw_legend > ul").css({"column-width":  width+12+"px"});
+		}
 		return line;
 	}
 } );
