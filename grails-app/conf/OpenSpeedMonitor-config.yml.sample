@@ -12,6 +12,7 @@ grails:
     iteratec:
       osm:
         security:
+          # if key contains special characters it must be quoted with single quotes, e.g. 'key$%/'. It must NOT be quoted with ""!
           initialApiKey: [apikey-for-communication-with-microservice]
           initialMicroServiceName: [name-of-microservice] #e.g. OsmDetailAnalysis
           initialOsmAdminUser:
