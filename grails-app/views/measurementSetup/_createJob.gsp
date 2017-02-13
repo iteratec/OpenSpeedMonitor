@@ -2,7 +2,7 @@
     <div class="col-sm-6">
         <div class="form-group">
             <label for="inputJobName" class="col-sm-2 control-label">
-                <g:message code="de.iteratec.osm.setupMeasurementWizard.inputJobLabel" default="Job"/>
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.inputJobLabel" default="Job Name"/>
             </label>
 
             <div class="col-sm-10">
@@ -17,8 +17,13 @@
 
             <div class="col-sm-5">
                 <select class="form-control chosen-select" id="selectExecutionSchedule">
-                    <option value="0/30 * * * ? *">Every half an hour</option>
-                    <option value="0 * * * ? *">Hourly</option>
+                    <option value="0/30 * * * ? *">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly" default="Every half an hour"/>
+                    </option>
+                    <option value="0 * * * ? *">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly" default="Every hour"/>
+                    </option>
+                    %{--JOHANNES2DO: More than these options for default Cron Strings?--}%
                     <option value="">...</option>
                 </select>
             </div>
@@ -27,7 +32,8 @@
                 <div class="input-group">
                     <span class="input-group-btn" data-toggle="buttons">
                         <label class="btn btn-default">
-                            <input type="checkbox" id="inputCustomCronString">Change Cron String
+                            <input type="checkbox" id="inputCustomCronString">
+                            <g:message code="de.iteratec.osm.setupMeasurementWizard.toggleCustomCronString" default="Change Cron String"/>
                         </label>
                     </span>
                     <input type="text" class="form-control" id="inputCronString" disabled required
