@@ -125,6 +125,7 @@ OpenSpeedMonitor.jobListFilter = (function(){
     };
 
     var filter = function () {
+        saveState();
         var filterTerms = getFilterTerms();
         clearFilterButton.toggle(filterTerms.length > 0);
         jobTableRows.each(function(idx, row) {
