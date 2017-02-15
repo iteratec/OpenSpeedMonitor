@@ -156,7 +156,7 @@
 
             <td valign="top" class="value">${fieldValue(bean: jobGroup, field: "name")}</td>
         </tr>
-        <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+        <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.toLowerCase() == "true"}">
             <tr class="prop">
                 <td valign="top" class="name"><g:message code="job.jobGroup.persistHar.label" default="Persist Detaildata"/></td>
 

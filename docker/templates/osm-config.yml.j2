@@ -31,9 +31,9 @@ environments:
   production:
     grails:
       serverURL: '{{ default .Env.OSM_URL "http://localhost:8080"}}'
-      de.iteratec.osm.assetRequests:
-        enablePersistenceOfAssetRequests: {{ default .Env.ENABLE_DETAIL_ANALYSIS false }}
-        microserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
+      de.iteratec.osm.detailAnalysis:
+        enablePersistenceOfDetailAnalysisData: {{ default .Env.ENABLE_DETAIL_ANALYSIS false }}
+        detailAnalysisMicroserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
     dataSource:
       url: 'jdbc:mysql://{{ default .Env.MYSQL_HOST "osm-mysql" }}/{{ default .Env.MYSQL_DATABASE "osm" }}'
       username: '{{ default .Env.MYSQL_USER "osm" }}'

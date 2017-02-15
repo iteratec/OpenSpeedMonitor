@@ -63,7 +63,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <g:actionSubmit
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadDetailAnalysisData', 'default': 'Load Assets')}"
                                     action="sendFetchAssetsAsBatchCommand"
                                     class="show-button"/>
                         </li>

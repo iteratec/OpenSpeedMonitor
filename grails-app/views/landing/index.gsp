@@ -29,7 +29,7 @@
                            encodeAs="raw" args="[
                         link(controller: 'pageAggregation', action: 'show') { message(code:'landing.results.link.pageAggregation', default:'aggregated results')},
                         link(controller: 'eventResultDashboard', action: 'showAll') { message(code:'landing.results.link.timeSeries', default:'development over time')},
-                        (grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests') == 'true' ?
+                        (grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true' ?
                                 link(controller: 'detailAnalysis', action: 'show') { message(code:'landing.results.link.detailAnalysis', default:'request details')}
                                 : message(code:'landing.results.link.detailAnalysis', default:'request details'))
                 ]"/>

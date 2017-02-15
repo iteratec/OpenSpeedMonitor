@@ -69,4 +69,9 @@ databaseChangeLog = {
         dropColumn(columnName: "event_result_id_from_sqlite", tableName: "job_result")
     }
 
+//  until this changeSet the only microservice used by osm is the detailAnalysisMicroservice
+    changeSet(author: "marcus", id: "1487160065000-1") {
+        sql('''UPDATE micro_service_api_key 
+                SET micro_service = 'DETAIL_ANALYSIS' ''')
+    }
 }

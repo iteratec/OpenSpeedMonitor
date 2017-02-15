@@ -53,7 +53,7 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
-                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.equals("true")}">
+                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
                         <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
                             <g:link controller="detailAnalysis" action="show"
                                     title="Detail Analysis">
