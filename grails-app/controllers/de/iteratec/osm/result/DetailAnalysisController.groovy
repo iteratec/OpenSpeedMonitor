@@ -11,6 +11,7 @@ import grails.web.mapping.LinkGenerator
 import groovyx.net.http.RESTClient
 import org.joda.time.Interval
 
+import javax.xml.ws.http.HTTPException
 import java.lang.reflect.InvocationTargetException
 
 class DetailAnalysisController {
@@ -58,8 +59,21 @@ class DetailAnalysisController {
                 if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
                 def timeFrame = cmd.getSelectedTimeFrame()
                 String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&toDate=${timeFrame.endMillis}&fromDate=${timeFrame.startMillis}&" + request.queryString
-                String detailDataWebPageAsString = new URL(microServiceUrl + "detailAnalysisDashboard/show" + queryString).getText()
+                def detailDataWebPageAsString = (microServiceUrl + "detailAnalysisDashboard/show" + queryString).toURL().openConnection().with { conn ->
+                    if (responseCode != 200) {
+                        throw new HTTPException(responseCode)
+                    }
+                    conn.content.withReader { r ->
+                        r.text
+                    }
+                }
                 modelToRender.put("osmDetailAnalysisRequest", detailDataWebPageAsString)
+            } catch (HTTPException ex) {
+                if (ex.statusCode == 403) {
+                    errorList << message(code: 'de.iteratec.detailAnalysis.notAllowed', default: 'not allowed.')
+                } else {
+                    errorList << ex.statusCode
+                }
             } catch (InvocationTargetException ex) {
                 errorList << message(code: 'default.microService.osmDetailAnalysis.unreachable', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
             } catch (ConnectException ex) {
