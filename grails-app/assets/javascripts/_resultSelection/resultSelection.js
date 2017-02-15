@@ -176,7 +176,7 @@ OpenSpeedMonitor.resultSelection = (function () {
         var hasMeasurandSeries = OpenSpeedMonitor.BarchartMeasurings ? OpenSpeedMonitor.BarchartMeasurings.hasMeasurandSeries() : true;
         warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
-        warningNoMeasurandSelected.toggle(hasMeasurandSeries);
+        warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
         var doDisable = lastResultCount == 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)
