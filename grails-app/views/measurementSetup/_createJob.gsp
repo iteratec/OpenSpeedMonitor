@@ -52,14 +52,7 @@
             <div class="panel-body">
                 %{--JOHANNES2DO: Write help text for Job tab in wizard--}%
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Est excepturi officiis placeat qui quibusdam?
-                    Aliquid commodi delectus deleniti dolorem eaque error,
-                    et id impedit maxime neque qui velit voluptas voluptatem!
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Est excepturi officiis placeat qui quibusdam?
-                    Aliquid commodi delectus deleniti dolorem eaque error,
-                    et id impedit maxime neque qui velit voluptas voluptatem!
+                    With the execution plan you can define when and how often your job will be started.
                 </p>
             </div>
         </div>

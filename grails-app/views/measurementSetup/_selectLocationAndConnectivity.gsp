@@ -51,21 +51,9 @@
             </div>
 
             <div class="panel-body">
-                <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
-                    <g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text"
-                               default="Documentation WebPagetest DSL"/>
-                </a>
-
+                %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
                 <p>
-                    %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Est excepturi officiis placeat qui quibusdam?
-                    Aliquid commodi delectus deleniti dolorem eaque error,
-                    et id impedit maxime neque qui velit voluptas voluptatem!
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Est excepturi officiis placeat qui quibusdam?
-                    Aliquid commodi delectus deleniti dolorem eaque error,
-                    et id impedit maxime neque qui velit voluptas voluptatem!
+                    Choosing a combination of location and browser as well as setting a constant connectivity ensures that the measurements will be comparable.
                 </p>
             </div>
         </div>

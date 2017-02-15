@@ -79,6 +79,19 @@
 /* --- End of wizard step indicator layout */
 
 
+.panel.panel-info {
+  border: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  .panel-heading {
+    text-align: center;
+    color: darken(@iteratec-gray-lighter, 60%);
+    background-color: @iteratec-gray-lighter;
+    border: none;
+  }
+}
+
+
 /* Move navigation buttons to the bottom */
 .navigationRow {
   position: absolute;
@@ -95,9 +108,11 @@
 
 
 .infoImage {
-  width: 100%;
+  margin: 0 auto;
   max-height: 200px;
+  max-width: 100%;
 }
+
 
 .chosen-container.chosen-container-single {
   width: 100% !important; // for some reason the chosen-select element gets initialized with a width 0px

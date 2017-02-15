@@ -21,7 +21,8 @@
 
             <div class="panel-body">
                 %{--JOHANNES2DO: Define help text Job Group Creation--}%
-                You will find the results of your measurement under the here created Job Group.
+                <p>You will find the results of your measurement under the here created Job Group.</p>
+                <p>The job group can be selected in the result views via a select box you can see below:</p>
                 <img class="infoImage thumbnail" id="jobGroupSelectionImg"
                      src="${resource(dir: 'images', file: 'jobGroupSelection.png')}"
                      alt="Job Group Selection"/>
