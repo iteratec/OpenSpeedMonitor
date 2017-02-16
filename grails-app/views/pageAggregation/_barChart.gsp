@@ -47,6 +47,7 @@
 <g:render template="/pageAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/dimple/barchart.js" />',true,'barchart')
+      // OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/dimple/barchart.js" />',true,'barchart');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/d3/barchartHorizontal.js" />',true,'barchartHorizontal');
     });
 </asset:script>

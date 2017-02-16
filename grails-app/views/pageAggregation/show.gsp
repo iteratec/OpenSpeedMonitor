@@ -92,9 +92,11 @@
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
         function drawGraph() {
+
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
+
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
             spinner.start();
             $.ajax({
                 type: 'POST',

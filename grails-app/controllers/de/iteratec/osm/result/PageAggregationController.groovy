@@ -62,6 +62,10 @@ class PageAggregationController extends ExceptionHandlerController {
         return modelToRender;
     }
 
+    def entryAndFollow(){
+        return [:]
+    }
+
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
@@ -116,6 +120,22 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+    }
+
+    @RestAction
+    def getEntryAndFollowBarchartData(){
+
+        JobGroup jobGroup = JobGroup.findByName('develop_Desktop')
+        List<Job> jobs = jobDaoService.getJobs(jobGroup)
+        Set<Page> uniqueTestedPages = [] as Set
+
+        jobs*.script*.navigationScript.each {String navigationScript ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+            uniqueTestedPages.addAll(pagesOfThisScript)
+        }
+        uniqueTestedPages.each {
+
+        }
     }
 
     /**

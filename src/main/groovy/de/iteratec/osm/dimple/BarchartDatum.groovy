@@ -2,6 +2,6 @@ package de.iteratec.osm.dimple
 
 class BarchartDatum {
     String index = ""
-    String indexValue = ""
+    Double indexValue = null
     String grouping = "grouping"
 }
