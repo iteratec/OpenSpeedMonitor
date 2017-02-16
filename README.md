@@ -131,6 +131,13 @@ These sort of analysis can be of great benefit detecting thirdparty libraries th
 
 OsmDetailAnalysis is open source and licensed under same licence as OpenSpeedMonitor.
 
+Compatibility with OpenSpeedMonitor:
+
+| Version OpenSpeedMonitor  | Compatible version OsmDetailAnalysis |
+| ------------------------- |:------------------------------------:|
+| 4.1.1                     | 1.0.0                                |
+| \>=4.1.2                  | 1.1.0                                |
+
 Customer satisfaction index (CSI)
 ---------------------
 
