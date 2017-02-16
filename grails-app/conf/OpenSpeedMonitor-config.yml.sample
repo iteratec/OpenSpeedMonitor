@@ -21,8 +21,6 @@ grails:
           initialOsmRootUser:
             username: [username-of-superadmin-user-to-be-bootsrapped]
             password: [password-of-superadmin-user-to-be-bootsrapped]
-          initialApiKey: '[api key that has to exist in DetailAnalysisService instance]'
-          initialMicroServiceName: OsmDetailAnalysis
       report:
         chart:
           chartTagLib: RICKSHAW

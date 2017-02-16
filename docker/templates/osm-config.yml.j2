@@ -19,8 +19,7 @@ grails:
           initialOsmRootUser:
             username: '{{ default .Env.OSM_ROOT_USER "root" }}'
             password: '{{ default .Env.OSM_ROOT_PASSWORD "muchMoreSecret!123" }}'
-          initialApiKey: '{{ default .Env.OSM_ROOT_PASSWORD "apiKeyForDetailAnalysisService" }}'
-          initialMicroServiceName: OsmDetailAnalysis
+          initialDetailAnalysisApiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
       report:
         chart:
           chartTagLib: RICKSHAW

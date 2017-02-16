@@ -194,12 +194,12 @@ class BootStrap {
         Boolean enablePersistenceOfDetailAnalysisData = grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData
         if (enablePersistenceOfDetailAnalysisData) {
             if (MicroServiceApiKey.findAllByMicroService(MicroserviceType.DETAIL_ANALYSIS).isEmpty()) {
-                String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey.isEmpty() ?
+                String initialApiKeyDetailAnalysis = grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey.isEmpty() ?
                         null : grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey
-                if (!initialApiKey) {
+                if (!initialApiKeyDetailAnalysis) {
                     log.warn("initial apiKey for detailAnalysisMicroservice missing")
                 } else {
-                    new MicroServiceApiKey([secretKey: initialApiKey, microService: MicroserviceType.DETAIL_ANALYSIS, valid: true]).save(failOnError: true)
+                    new MicroServiceApiKey([secretKey: initialApiKeyDetailAnalysis, microService: MicroserviceType.DETAIL_ANALYSIS, valid: true]).save(failOnError: true)
                 }
             }
         }
