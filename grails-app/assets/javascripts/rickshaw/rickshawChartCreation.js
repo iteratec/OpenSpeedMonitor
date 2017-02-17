@@ -845,7 +845,7 @@ function XAxis(args) {
 
         if (month == 2) {
             if (date.getFullYear() % 4 == 0) {
-                increase(date, 27);
+                increase(date, 29);
             } else {
                 increase(date, 28);
             }
@@ -1164,7 +1164,7 @@ function ChartAdjuster(graphBuilder, args) {
             var yAxisAdjuster = blankYAxisAdjuster.clone();
             parentContainer.append(yAxisAdjuster);
             var yAxisAdjusterLabel = yAxisAdjuster.find("label");
-            yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + ": " + mg.label.replace("[" + unit + "]", ""));
+            yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + mg.label.replace("[" + unit + "]", ""));
 
             yAxisAdjuster.find(".dia-y-axis-name").val(mg.name);
 

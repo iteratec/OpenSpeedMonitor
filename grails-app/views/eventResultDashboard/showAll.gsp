@@ -9,6 +9,7 @@
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
+    <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
 
 </head>
 
@@ -60,9 +61,11 @@
     <form method="get" action="" id="dashBoardParamsForm" data-caller="EventResult">
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
-                <a name="chart-table"></a>
-
                 <div id="chartbox" class="card">
+                    <div id="dataTableId" class="warning-ribbon" hidden="true" data-toggle="popover" aria-hidden="true"
+                         title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
+                         data-placement="right" data-trigger="hover"
+                         data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
                     <g:render template="/highchart/chart"
                               model="[
                                       chartData                    : eventResultValues,
@@ -124,7 +127,7 @@
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="show-button-dropdown">
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                     <g:set var="dropdownHasEntries" value="true"/>
                     <li>
@@ -146,10 +149,10 @@
                         </li>
                     </g:if>
                 </g:if>
+                <g:if test="${dropdownHasEntries}">
+                    <li class="divider"></li>
+                </g:if>
                 <g:if test="${availableDashboards}">
-                    <g:if test="${dropdownHasEntries}">
-                        <li class="divider"></li>
-                    </g:if>
                     <li class="dropdown-header">
                         <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
                                    default="View a custom time series"/>
@@ -159,6 +162,11 @@
                                     params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
+                <g:else>
+                    <li class="dropdown-header"><g:message
+                            code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                            default="None available"/></li>
+                </g:else>
             </ul>
         </div>
         <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
@@ -300,15 +308,15 @@
 
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"
-                                                                    absolute="true"/>')
+                                                                    />')
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    absolute="true"/>')
+                                                                    />')
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
-            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
-            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
+            "${createLink(action: 'show', controller: 'pageAggregation')}",
+            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
+            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
+            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
 
     </asset:script>
 </content>

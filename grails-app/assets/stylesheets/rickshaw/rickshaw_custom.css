@@ -92,10 +92,10 @@
 }
 
 .rickshaw_legend ul {
-    column-count: 2;
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    display: inline-block;
+    /*column-count: 2;*/
+    /*-webkit-column-count: 2;*/
+    /*-moz-column-count: 2;*/
+    /*display: inline-block;*/
 }
 
 .action {
@@ -509,6 +509,7 @@
     clear: both;
     line-height: 140%;
     padding-right: 15px;
+    text-align: left;
 }
 
 .rickshaw_legend .line .swatch {
@@ -521,7 +522,6 @@
 .rickshaw_legend .label {
     margin: 0;
     white-space: nowrap;
-    display: block;
     font-size: inherit;
     background-color: transparent;
     color: inherit;

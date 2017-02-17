@@ -19,8 +19,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <g:link absolute="true" class="navbar-brand" uri="/">
-            <img class="icon" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_Icon_36px.png')}"
+        <g:link  class="navbar-brand" uri="/">
+            <img class="icon osm-icon-small" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_small.svg')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
                  alt="${meta(name: 'app.name')}"/>
@@ -28,11 +28,11 @@
     </div>
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
-            %{--<li class="${!controllerName ? 'active' : ''}">--}%
-                %{--<g:link mapping="home">--}%
-                    %{--<i class="fa fa-home"></i> Home--}%
-                %{--</g:link>--}%
-            %{--</li>--}%
+            <li class="${controllerName.equals("landing") ? 'active' : ''}">
+                <g:link  uri="/"><i class="fa fa-home"></i>
+                    <g:message code="navbar.home" default="Home"/>
+                </g:link>
+            </li>
             <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}">
                 <a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-tachometer"></i>
@@ -53,7 +53,7 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
-                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.equals("true")}">
+                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
                         <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
                             <g:link controller="detailAnalysis" action="show"
                                     title="Detail Analysis">

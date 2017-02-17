@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+<g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.toLowerCase() == "true"}">
     <div class="form-group fieldcontain">
         <label for="persistDetailData" class="control-label col-md-3"><g:message code="job.jobGroup.persistHar.label"
                                                                         default="Persist Detaildata"/></label>

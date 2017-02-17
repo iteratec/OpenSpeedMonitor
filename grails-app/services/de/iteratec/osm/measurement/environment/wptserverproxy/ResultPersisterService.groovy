@@ -97,12 +97,12 @@ class ResultPersisterService implements iResultListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult) throws OsmResultPersistanceException {
         Job job
-        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
             String jobLabel = resultXml.getLabel()
             job = jobDaoService.getJob(jobLabel)
             if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for label from result xml: ${jobLabel}")
         }
-        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", 4) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
         }
     }
@@ -110,7 +110,7 @@ class ResultPersisterService implements iResultListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void persistJobResult(WptResultXml resultXml) throws OsmResultPersistanceException {
 
-        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
             String testId = resultXml.getTestId()
             log.debug("test-ID for which results should get persisted now=${testId}")
 
@@ -133,9 +133,20 @@ class ResultPersisterService implements iResultListener {
 
         deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
 
-        return JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId) ?:
-                persistNewJobRun(job, resultXml).save(failOnError: true);
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)
+        if (!jobResult) {
+            persistNewJobRun(job, resultXml)
+        } else {
+            updateJobResult(jobResult, resultXml)
+        }
 
+        return jobResult;
+    }
+
+    private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
+        jobResult.testAgent = resultXml.getTestAgent()
+        jobResult.wptVersion = resultXml.version.toString()
+        jobResult.save(failOnError: true)
     }
 
     /**
@@ -194,11 +205,13 @@ class ResultPersisterService implements iResultListener {
                 locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
                 locationBrowser: jobConfig.location.browser.name,
                 jobGroupName: jobConfig.jobGroup.name,
-                testAgent: resultXml.getTestAgent()
+                testAgent: resultXml.getTestAgent(),
+                wptVersion: resultXml.version.toString()
         )
 
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
         result.setDescription('')
+        result.save(failOnError: true)
 
         return result
     }
@@ -392,7 +405,7 @@ class ResultPersisterService implements iResultListener {
         try {
             log.debug("step=${step}")
             log.debug("step.testedPage=${step.testedPage}")
-            CsiConfiguration csiConfigurationOfResult = result.jobResult.job.jobGroup.csiConfiguration
+            CsiConfiguration csiConfigurationOfResult = result.jobGroup.csiConfiguration
             log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
             result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage, csiConfigurationOfResult)
             if (result.visuallyCompleteInMillisecs) {

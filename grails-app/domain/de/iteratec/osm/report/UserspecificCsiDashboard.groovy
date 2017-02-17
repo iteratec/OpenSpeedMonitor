@@ -80,6 +80,8 @@ class UserspecificCsiDashboard extends UserspecificDashboardBase{
         selectedAllLocations = cmd.selectedAllLocations
         graphNameAliases = cmd.graphNameAliases
         graphColors = cmd.graphColors
+        selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
+        selectedConnectivities = cmd.selectedConnectivities
 
         // Create strings for db
         String selectedFolderString = ""

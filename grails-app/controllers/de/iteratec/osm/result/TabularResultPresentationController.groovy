@@ -278,7 +278,8 @@ class TabularResultPresentationController {
         result.put("dateFormat", JAVASCRIPT_DATE_FORMAT_STRING)
         result.put("weekStart", MONDAY_WEEKSTART)
 
-        result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
+        // ConnectivityProfiles
+        result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(true)
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)

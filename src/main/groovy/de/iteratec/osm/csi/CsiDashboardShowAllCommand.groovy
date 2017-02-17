@@ -215,21 +215,17 @@ public class CsiDashboardShowAllCommand implements Validateable {
     Boolean includeInterval
 
     /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllConnectivityProfiles} is evaluated to
-     * <code>false</code>.
+     * The selected connectivities. Could include connectivityProfile ids, customConnectivityNames or 'native'
      */
-    Collection<Long> selectedConnectivityProfiles = []
+    Collection<Long> selectedConnectivities = []
 
     /**
      * User enforced the selection of all ConnectivityProfiles.
      * This selection <em>is not</em> reflected in
-     * {@link #selectedConnectivityProfiles} cause of URL length
+     * {@link #selectedConnectivities} cause of URL length
      * restrictions. If this flag is evaluated to
      * <code>true</code>, the selections in
-     * {@link #selectedConnectivityProfiles} should be ignored.
+     * {@link #selectedConnectivities} should be ignored.
      */
     Boolean selectedAllConnectivityProfiles = true
 
@@ -404,7 +400,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
         loadTimeMaximum(nullable: true)
         dashboardName(nullable: true)
         debug(nullable: true)
-
+        selectedAllConnectivityProfiles(nullable: true)
     }
 
     static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType']
@@ -524,7 +520,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations))
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-        viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
+        viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
         viewModelToCopyTo.put('selectedCsiSystems', this.selectedCsiSystems)
 
         viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
@@ -593,8 +589,8 @@ public class CsiDashboardShowAllCommand implements Validateable {
         }
         if (this.selectedAllConnectivityProfiles) {
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-        } else if (this.selectedConnectivityProfiles.size() > 0) {
-            result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
+        } else if (this.selectedConnectivities.size() > 0) {
+            result.connectivityProfileIds.addAll(this.selectedConnectivities.collect {it as Long})
         }
 
         return result

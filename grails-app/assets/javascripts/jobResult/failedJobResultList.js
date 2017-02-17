@@ -61,7 +61,6 @@ OpenSpeedMonitor.jobResult = (function (url) {
             data: {jobId: jobId}
         }).done(function (result) {
             spinner.stop();
-            console.log(result);
             fillTable(result);
         });
     };

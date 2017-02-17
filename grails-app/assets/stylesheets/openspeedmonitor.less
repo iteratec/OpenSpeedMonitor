@@ -1,7 +1,7 @@
-@import-once "bower_components/bootstrap/less/variables";
-@import-once "variables-corporate";
-@import-once "sidebar";
-@import-once "cards";
+@import "bower_components/bootstrap/less/bootstrap.less";
+@import "variables-corporate";
+@import "sidebar";
+@import "cards";
 
 // min-heights, margin, and positioning used to make the footer sticky
 html {
@@ -408,6 +408,12 @@ a.control-label {
   }
 }
 
+.container, .container-fluid {
+  .jumbotron {
+    border-radius: inherit;
+  }
+}
+
 .github-corner svg {
   fill: @navbar-inverse-bg;
   color: @body-bg;
@@ -458,4 +464,34 @@ a.control-label {
 
 #Menu {
   margin: 5px 0 15px 0;
+}
+
+.renderInvisible {
+  display:none;
+}
+
+// --- modal dialogs --------------------
+.adjustChartsizeAddon {
+  min-width: 7em; // to be aligned with the adjust range addons (see .adjustRangeAddon)
+}
+
+.adjustChartInput {
+  text-align: right;
+}
+
+.adjustRangeAddon {
+  min-width: 7em;
+}
+
+.adjustChartColorpickerAddon, .adjustChartUnitAddon {
+  min-width: 4em;
+}
+
+.colorLabel {
+  min-width: 17em;
+  text-align: left;
+}
+
+a.btn.disabled {
+  pointer-events: inherit;
 }

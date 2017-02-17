@@ -1,3 +1,11 @@
+OpenSpeedMonitor
+================
+Open Source Web Performance Monitoring.
+
+Run it with [docker-compose][20]:
+
+    wget https://raw.githubusercontent.com/iteratec/OpenSpeedMonitor/master/docker/docker-compose.yml && docker-compose up
+
 Summary
 =====================
 OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1]. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.
@@ -123,6 +131,13 @@ These sort of analysis can be of great benefit detecting thirdparty libraries th
 
 OsmDetailAnalysis is open source and licensed under same licence as OpenSpeedMonitor.
 
+Compatibility with OpenSpeedMonitor:
+
+| Version OpenSpeedMonitor  | Compatible version OsmDetailAnalysis |
+| ------------------------- |:------------------------------------:|
+| 4.1.1                     | 1.0.0                                |
+| \>=4.1.2                  | 1.1.0                                |
+
 Customer satisfaction index (CSI)
 ---------------------
 
@@ -155,7 +170,7 @@ Prerequisites
 
 * [optional, but recommended] Relational data base managing system (DBMS).
 
-    Tested with MySQL. Should run with Oracle out of the box. OpenSpeedMonitor uses regular expressions via `rlike` command in grails object relational mapper gorm. `rlike` is supported for MySQL and Oracle. Other DBMS supporting regular expressions in sql queries would necessitate slight modifications to run performant.
+    Tested with MySQL. Should run with Oracle out of the box.
 
 * Operating system (OS) to run OpenSpeedMonitor can be any server OS for which JRE 8 and the servlet container and dbms of choice are available.
 
@@ -248,3 +263,4 @@ Although it works with an H2 in memory database out of the box it's highly recom
 [17]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
 [18]: https://github.com/iteratec/OsmDetailAnalysis
 [19]: https://dc-js.github.io/dc.js/
+[20]: https://https://docs.docker.com/compose/install/

@@ -4,12 +4,11 @@ import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
+import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.LoginPage
-import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Stepwise
-
 /**
  * See http://www.gebish.org/manual/current/ for more instructions
  */
@@ -49,8 +48,8 @@ class LoginRedirectGebSpec extends CustomUrlGebReportingSpec implements OsmTestL
         password  << configuredPassword
         submitButton.click()
 
-        then: "User gets to dashboard page"
-        at EventResultDashboardPage
+        then: "User gets to landing page"
+        at LandingPage
     }
 
     void cleanupSpec() {

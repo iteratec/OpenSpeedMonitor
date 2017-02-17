@@ -86,7 +86,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '${createLink(action: 'checkDashboardNameUnique', absolute: true)}',
+            url: '${createLink(action: 'checkDashboardNameUnique')}',
             data: {values: json_data},
             success: function (data) {
                 if (data['result'] == 'true') {
@@ -129,7 +129,7 @@
         hideMessages();
 
         var dashboardName = document.getElementById("dashboardNameFromModal").value;
-        dashboardName = dashboardName ? dashboardName : name
+        dashboardName = dashboardName ? dashboardName : name;
         if (dashboardName.trim() !== "") {
 
             var spinner = new OpenSpeedMonitor.Spinner();
@@ -198,7 +198,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
+                url: '${createLink(action: 'validateAndSaveDashboardValues')}',
                 data: {values: json_data},
                 statusCode: {
                     200: function (response) {
@@ -211,7 +211,7 @@
                         a.appendChild(linkText);
                         li.appendChild(a);
                         a.setAttribute("href", jsonResponse.path+"showAll?dashboardID="+jsonResponse.dashboardId);
-                        var customDashBoardSelection = document.getElementById("customDashBoardSelection");
+                        var customDashBoardSelection = document.getElementById("show-button-dropdown");
                         customDashBoardSelection.appendChild(li);
 
                         return false;

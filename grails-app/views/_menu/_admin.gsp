@@ -21,7 +21,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${createLink(controller: 'batchActivity')}">
+                    <a href="<g:createLink controller="batchActivity" action="list"/>">
                         <i class="fa fa-database"></i>
                         <g:message code="de.iteratec.osm.batch.batchactivity.list.heading" locale="${lang}"/>
                     </a>

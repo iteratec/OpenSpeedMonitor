@@ -16,6 +16,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     var showButtons = $('.show-button');
     var warningLongProcessing = $('#warning-long-processing');
     var warningNoJobGroupSelected = $('#warning-no-job-group');
+    var warningNoMeasurandSelected = $('#warning-no-measurand');
     var warningNoPageSelected = $('#warning-no-page');
     var currentQueryArgs = {
         from: null,
@@ -25,9 +26,7 @@ OpenSpeedMonitor.resultSelection = (function () {
         measuredEventIds: null,
         browserIds: null,
         locationIds: null,
-        connectivityIds: null,
-        nativeConnectivity: null,
-        customConnectivities: null
+        selectedConnectivities: null
     };
     var lastUpdateJSON = JSON.stringify(currentQueryArgs);
     var updatesEnabled = false;
@@ -37,6 +36,9 @@ OpenSpeedMonitor.resultSelection = (function () {
     var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
     var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
+    var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
+    var needsNoPageSelectionDueToCsiAggregation = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
+    var csiSystemSelected = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && ($("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system");
     var lastResultCount = 1;
 
     var init = function () {
@@ -44,6 +46,23 @@ OpenSpeedMonitor.resultSelection = (function () {
 
         // add caller to QueryArgs if caller is set. If not, set a default value
         currentQueryArgs['caller'] = $("#dashBoardParamsForm").data("caller") ? $("#dashBoardParamsForm").data("caller") : "EventResult";
+
+        // if caller is CsiDashboard there is a need for a changeListener on aggregation card
+        if (currentQueryArgs['caller'] == "CsiAggregation") {
+            $("input[name='aggrGroupAndInterval']").change(function () {
+                needsNoPageSelectionDueToCsiAggregation = aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
+                csiSystemSelected = $("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system";
+                validateForm();
+            });
+        }
+
+        // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
+        $(".removeMeasurandSeriesButton").click(function () {
+            validateForm();
+        });
+        $("#addMeasurandSeriesButton").click(function () {
+            validateForm();
+        });
 
         // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
@@ -102,9 +121,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var setQueryArgsFromConnectivitySelection = function (event, connectivitySelection) {
-        currentQueryArgs.connectivityIds = connectivitySelection.ids;
-        currentQueryArgs.nativeConnectivity = connectivitySelection.native;
-        currentQueryArgs.customConnectivities = connectivitySelection.customNames;
+        currentQueryArgs.selectedConnectivities = connectivitySelection.selectedConnectivities;
         updateCards("connectivity");
     };
 
@@ -156,9 +173,11 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var validateForm = function () {
-        warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection) && lastResultCount != 0);
-        warningNoJobGroupSelected.toggle(!hasJobGroupSelection && lastResultCount != 0);
-        var doDisable = lastResultCount == 0 || !hasJobGroupSelection || !(hasPageSelection || hasMeasuredEventSelection);
+        var hasMeasurandSeries = OpenSpeedMonitor.BarchartMeasurings ? OpenSpeedMonitor.BarchartMeasurings.hasMeasurandSeries() : true;
+        warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
+        warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
+        warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
+        var doDisable = lastResultCount == 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)
     };

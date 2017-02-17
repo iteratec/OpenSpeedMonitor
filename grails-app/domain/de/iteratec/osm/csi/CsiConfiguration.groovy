@@ -55,7 +55,7 @@ class CsiConfiguration {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "creating CsiConfiguration with hour of day weights",
-                PerformanceLoggingService.IndentationDepth.TWO
+                1
         ){
             configToReturn.with {
                 label = source.label
@@ -66,7 +66,7 @@ class CsiConfiguration {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "copy browser weights",
-                PerformanceLoggingService.IndentationDepth.TWO
+                1
         ){
             source.browserConnectivityWeights.each {
                 configToReturn.addToBrowserConnectivityWeights(BrowserConnectivityWeight.copyBrowserConnectivityWeight(it))
@@ -76,7 +76,7 @@ class CsiConfiguration {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "copy page weights",
-                PerformanceLoggingService.IndentationDepth.TWO
+                1
         ){
             source.pageWeights.each {
                 configToReturn.addToPageWeights(PageWeight.copyPageWeight(it))
@@ -88,7 +88,7 @@ class CsiConfiguration {
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "copy time to cs mappings",
-                PerformanceLoggingService.IndentationDepth.TWO
+                1
         ){
 
 //            TimeToCsMapping.executeUpdate(

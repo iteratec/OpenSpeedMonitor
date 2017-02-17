@@ -70,8 +70,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         when: "User is logged in"
         doLogin()
+        to EventResultDashboardPage
+
         then: "Button is visible"
-        at EventResultDashboardPage
         saveAsDashboardButton.present
 
     }

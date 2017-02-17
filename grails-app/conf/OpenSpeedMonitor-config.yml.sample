@@ -12,8 +12,9 @@ grails:
     iteratec:
       osm:
         security:
-          initialApiKey: [apikey-for-communication-with-microservice]
-          initialMicroServiceName: [name-of-microservice] #e.g. OsmDetailAnalysis
+          # if key contains special characters it must be quoted with single quotes, e.g. 'key-123'. It must NOT be quoted with ""!
+          # apiKey should only have alphanumerical characters and dashes [a-zA-Z0-9\-]+
+          initialDetailAnalysisApiKey: [apikey-for-communication-with-detailAnalysis-microservice]
           initialOsmAdminUser:
             username: [username-of-admin-user-to-be-bootsrapped]
             password: [password-of-admin-user-to-be-bootsrapped]
@@ -39,12 +40,9 @@ environments:
         host: 'localhost'
         port: 3025       # port 3025 is used by greenmail
       serverURL: "http://localhost:8080" #the server needs to know its URL to communicate with the microservice
-      de:
-        iteratec:
-          osm:
-            assetRequests:
-              enablePersistenceOfAssetRequests: false
-              #microserviceUrl: "http://localhost:8081"
+      de.iteratec.osm.detailAnalysis:
+        enablePersistenceOfDetailAnalysisData: false
+        detailAnalysisMicroserviceUrl: "[url to your DetailAnalysisService instance]"
     dataSource:
       # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
       # So you can see all prepared sql statements hibernate creates and fires against your data
@@ -71,6 +69,9 @@ environments:
   production:
     grails:
       serverURL: 'https://[base-url-of-your-prod-osm-instance]'
+      de.iteratec.osm.detailAnalysis:
+        enablePersistenceOfDetailAnalysisData: false
+        detailAnalysisMicroserviceUrl: "[url to your DetailAnalysisService instance]"
       mail:
         disabled: true # set this to true if you want to enable user registration and forgot passwort function
         #host: '[smtp.your.domain.com]'

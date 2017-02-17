@@ -15,7 +15,7 @@
                         <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
                     </label>
 
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                         <input id="x-axis-label" class="form-control" type="text">
                     </div>
                 </div>
@@ -25,7 +25,7 @@
                             code="de.iteratec.osm.dimple.yAxis.label"
                             default="y-axis label"/></label>
 
-                    <div class="col-sm-9" id="y-axis-alias-container">
+                    <div class="col-sm-8" id="y-axis-alias-container">
 
                     </div>
                 </div>
@@ -33,18 +33,18 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
                             code="de.iteratec.osm.dimple.barchart.size.name"
-                            default="height"/></label>
+                            default="Size"/></label>
 
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                         <div class="input-group form-row">
                             <span class="input-group-addon adjustChartsizeAddon">
                                 <g:message code="de.iteratec.chart.width.name"
                                            default="Width"/>
                             </span>
-                            <input type="number" class="form-control chartSizeInput" id="inputChartWidth" min="0"
+                            <input type="number" class="form-control adjustChartInput" id="inputChartWidth" min="0"
                                    step="1"
                                    data-bind="value:replyNumber">
-                            <span class="input-group-addon">px</span>
+                            <span class="input-group-addon adjustChartUnitAddon">px</span>
                         </div>
 
                         <div class="input-group form-row">
@@ -52,10 +52,10 @@
                                 <g:message code="de.iteratec.chart.height.name"
                                            default="Height"/>
                             </span>
-                            <input type="number" class="form-control chartSizeInput" id="inputChartHeight" min="0"
+                            <input type="number" class="form-control adjustChartInput" id="inputChartHeight" min="0"
                                    step="1"
                                    data-bind="value:replyNumber">
-                            <span class="input-group-addon">px</span>
+                            <span class="input-group-addon adjustChartUnitAddon">px</span>
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                             code="de.iteratec.osm.dimple.barchart.assignColors.name"
                             default="Assign Colors"/></label>
 
-                    <div class="col-sm-9" id="assign-color-container">
+                    <div class="col-sm-8" id="assign-color-container">
 
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                         <g:message code="de.iteratec.osm.dimple.barchart.showElements.name"
                                    default="Show"/>
                     </label>
-                    <div class="col-sm-9" data-toggle="buttons">
+                    <div class="col-sm-8" data-toggle="buttons">
                         <div class="btn-group btn-group-justified">
                             <label class="btn btn-default">
                                 <input type="checkbox" id="inputShowGridlines"><g:message
@@ -107,8 +107,8 @@
 
             <div class="hidden input-group colorpicker-component form-row" id="assign-color-clone">
                 <span class="colorLabel input-group-addon"></span>
-                <input type="text" value="#FFFFFF" class="form-control"/>
-                <span class="input-group-addon colorpicker-target"><i></i></span>
+                <input type="text" value="#FFFFFF" class="form-control adjustChartInput"/>
+                <span class="input-group-addon adjustChartColorpickerAddon colorpicker-target"><i></i></span>
             </div>
 
             <div class="hidden" id="y-axis-alias-clone">

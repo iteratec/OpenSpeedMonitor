@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.result
 
-
 /**
  * <p>
  * Assembles params which are used to query {@link EventResults}s via tag and further params.
@@ -27,45 +26,44 @@ package de.iteratec.osm.result
  * @see MvQueryParams
  */
 class ErQueryParams extends MvQueryParams {
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with load-time-values greater than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer maxLoadTimeInMillisecs
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with load-time-values smaller than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer minLoadTimeInMillisecs
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-count-values greater than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer maxRequestCount
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-count-values smaller than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer minRequestCount
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-size-values greater than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer maxRequestSizeInBytes
-	/**
-	 * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-size-values smaller than this get excluded.
-	 * @see MeasurandGroup
-	 */
-	Integer minRequestSizeInBytes
     /**
-     * Whether or not custom connectivites should be included by regex.
-      */
-    Boolean includeCustomConnectivity
-    /**
-     * For querying of {@link de.iteratec.osm.result.EventResult}s.
-     * Results which attribute customConnectivityName matches this regex get included.
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with load-time-values greater than this get excluded.
+     * @see MeasurandGroup
      */
-    String customConnectivityNameRegex
+    Integer maxLoadTimeInMillisecs
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with load-time-values smaller than this get excluded.
+     * @see MeasurandGroup
+     */
+    Integer minLoadTimeInMillisecs
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-count-values greater than this get excluded.
+     * @see MeasurandGroup
+     */
+    Integer maxRequestCount
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-count-values smaller than this get excluded.
+     * @see MeasurandGroup
+     */
+    Integer minRequestCount
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-size-values greater than this get excluded.
+     * @see MeasurandGroup
+     */
+    Integer maxRequestSizeInBytes
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s. Results with request-size-values smaller than this get excluded.
+     * @see MeasurandGroup
+     */
+    Integer minRequestSizeInBytes
+
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s
+     * .
+     * If customConnectivityNmes.size()>0 results only contains objects whose customConnectivityName is in given list.
+     */
+    final Set<String> customConnectivityNames = []
+
     /**
      * For querying of {@link de.iteratec.osm.result.EventResult}s.
      * If true, Results of which customConnectivityName equals {@link ConnectivityProfileService#CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE}

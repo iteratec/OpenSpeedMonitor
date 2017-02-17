@@ -1,11 +1,13 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.BarchartDTO
 import de.iteratec.osm.dimple.BarchartDatum
 import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.dimple.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
@@ -13,10 +15,11 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import org.springframework.http.HttpStatus
 
-class PageAggregationController {
+class PageAggregationController extends ExceptionHandlerController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
@@ -24,9 +27,14 @@ class PageAggregationController {
     public final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
+    JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
+
+    def index() {
+        redirect(action: 'show')
+    }
 
     def show() {
         Map<String, Object> modelToRender = [:]
@@ -59,6 +67,7 @@ class PageAggregationController {
      * @param cmd The requested data.
      * @return BarchartDTO as JSON or string message if an error occurred
      */
+    @RestAction
     def getBarchartData(GetBarchartCommand cmd) {
         String errorMessages = getErrorMessages(cmd)
         if (errorMessages) {
@@ -118,7 +127,7 @@ class PageAggregationController {
         Map<String, List<String>> result = [:].withDefault { [] }
 
         // Get all scripts
-        List<Job> jobList = Job.findAllByJobGroupInList(jobGroups)
+        List<Job> jobList = jobDaoService.getJobs(jobGroups)
         List<Script> allScripts = jobList*.script.unique()
 
         allScripts.each { currentScript ->

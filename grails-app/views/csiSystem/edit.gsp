@@ -36,7 +36,7 @@
             <g:actionSubmit class="btn btn-primary" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"
                             onclick="return validateInput()"/>
-            <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink:createLink([controller: 'csiSystem', action: 'createDeleteConfirmationText', absolute: true])]"/>
+            <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink:createLink([controller: 'csiSystem', action: 'createDeleteConfirmationText'])]"/>
             <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
     </g:form>

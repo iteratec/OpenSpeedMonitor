@@ -112,9 +112,21 @@ class ProxyService {
      * 			Instance of PHP-application webpagetest (see http://webpagetest.org).
      */
     List<Location> fetchLocations(WebPageTestServer wptserver) {
+        return fetchLocations(wptserver, [:])
+    }
+
+    /**
+     * Gets locations from given wptserver.
+     * @param wptServer
+     *          Instance of PHP-application webpagetest (see http://webpagetest.org).
+     * @param queryParams
+     *          Query parameters to send to getLocations.php of webpagetest server.
+     * @return List of fetched locations.
+     */
+    List<Location> fetchLocations(WebPageTestServer wptserver, Map queryParams){
         List<Location> addedLocations = []
 
-        def locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserver, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
+        def locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserver, 'getLocations.php', queryParams, ContentType.TEXT, [Accept: 'application/xml'])
 
         log.info("${this.locationListeners.size} iResultListener(s) listen to the fetching of locations")
         this.locationListeners.each {

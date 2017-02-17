@@ -149,10 +149,9 @@ class PaginationService {
 						'_selectedAllLocations': cmd.getSelectedLocations(),
 						'selectedAllLocations': cmd.getSelectedAllLocations(),
                         'selectedAllConnectivityProfiles': cmd.getSelectedAllConnectivityProfiles(),
-                        'selectedConnectivityProfiles': cmd.getSelectedConnectivityProfiles(),
+                        'selectedConnectivities': cmd.getSelectedConnectivityProfiles(),
                         'includeNativeConnectivity': cmd.getIncludeNativeConnectivity(),
-						'includeCustomConnectivity':cmd.getIncludeCustomConnectivity(),
-                        'customConnectivityName': cmd.getCustomConnectivityName(),
+                        'customConnectivityName': cmd.getSelectedCustomConnectivityNames(),
 						'max': cmd.getMax(),
 						'offset': offset
 					]

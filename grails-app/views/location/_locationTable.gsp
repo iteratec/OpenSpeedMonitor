@@ -9,8 +9,6 @@
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('active'); return false;" >${message(code: 'location.active.label', default: 'Active')}</g:link></th>
 
-        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('valid'); return false;" >${message(code: 'location.valid.label', default: 'Valid')}</g:link></th>
-
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('wptServer'); return false;" >${message(code: 'location.wptServer.label', default: 'WptServer')}</g:link></th>
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('location'); return false;" >${message(code: 'location.location.label', default: 'Location')}</g:link></th>
@@ -28,8 +26,6 @@
             <td>${fieldValue(bean: locationInstance, field: "uniqueIdentifierForServer")}</td>
 
             <td><g:formatBoolean boolean="${locationInstance.active}" /></td>
-
-            <td>${fieldValue(bean: locationInstance, field: "valid")}</td>
 
             <td><g:link controller="WptServer" action="show" id="${locationInstance.wptServer.id}">${fieldValue(bean: locationInstance, field: "wptServer")}</g:link></td>
 

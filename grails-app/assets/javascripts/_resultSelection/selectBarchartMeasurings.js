@@ -133,8 +133,14 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         return result;
     };
 
+    var hasMeasurandSeries = function () {
+        var measurandSeries = $('#barchartMeasuringCard > .measurandSeries');
+        return measurandSeries.length
+    };
+
     init();
     return {
-        getValues: getValues
+        getValues: getValues,
+        hasMeasurandSeries: hasMeasurandSeries
     };
 })();

@@ -17,13 +17,11 @@
 
 package de.iteratec.osm.result
 
-
-
 /**
  * <p>
  * Assembles params which are used to query {@link CsiAggregation}s via tag.
  * </p>
- * 
+ *
  * <p>
  * TODO mze-2013-08-06 (architecture): A note on collections usage: 
  * Mostly the best way to deal with collections is to modify them by 
@@ -33,55 +31,60 @@ package de.iteratec.osm.result
  * to make the setter private and fill the collections instead of 
  * setting them! :)
  * </p>
- * 
+ *
  * @author nkuhn
  * @author mze
  */
 class MvQueryParams {
 
-	/**
-	 * Database-Ids of {@link JobGroup}s to find, 
-	 * never <code>null</code>.
-	 */
-	final SortedSet<Long> jobGroupIds = new TreeSet<Long>()
+    /**
+     * Database-Ids of {@link JobGroup}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> jobGroupIds = new TreeSet<Long>()
 
-	/**
-	 * Database-Ids of {@link de.iteratec.osm.result.MeasuredEvent}s to find,
-	 * never <code>null</code>.
-	 */
-	final SortedSet<Long> measuredEventIds = new TreeSet<Long>()
+    /**
+     * Database-Ids of {@link de.iteratec.osm.result.MeasuredEvent}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> measuredEventIds = new TreeSet<Long>()
 
-	/**
-	 * Database-Ids of {@link Page}s to find, 
-	 * never <code>null</code>.
-	 */
-	final SortedSet<Long> pageIds = new TreeSet<Long>()
+    /**
+     * Database-Ids of {@link Page}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> pageIds = new TreeSet<Long>()
 
-	/**
-	 * Database-Ids of {@link Browser}s to find, 
-	 * never <code>null</code>.
-	 */
-	final SortedSet<Long> browserIds = new TreeSet<Long>()
+    /**
+     * Database-Ids of {@link Browser}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> browserIds = new TreeSet<Long>()
 
-	/**
-	 * Database-Ids of {@link Location}s to find, 
-	 * never <code>null</code>.
-	 */
-	final SortedSet<Long> locationIds = new TreeSet<Long>()
+    /**
+     * Database-Ids of {@link Location}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> locationIds = new TreeSet<Long>()
 
     /**
      * Database-Ids of {@link ConnectivityProfile}s to find,
      * never <code>null</code>.
      */
     final SortedSet<Long> connectivityProfileIds = new TreeSet<Long>()
-	
-	@Override
-	public String toString(){
-		return "jobGroupIds=${jobGroupIds*.toString()}, " +
+
+    /**
+     * if true, results no filtered by connectivity
+     */
+    protected boolean includeAllConnectivities = false
+
+    @Override
+    public String toString() {
+        return "jobGroupIds=${jobGroupIds*.toString()}, " +
                 "pageIds=${pageIds*.toString()}, " +
                 "measuredEventIds=${measuredEventIds*.toString()}, " +
                 "browserIds${browserIds*.toString()}, " +
                 "locationIds=${locationIds*.toString()}, " +
                 "connectivityProfileIds=${connectivityProfileIds*.toString()}"
-	}
+    }
 }

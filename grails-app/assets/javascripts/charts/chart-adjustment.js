@@ -29,7 +29,7 @@ function addAlias() {
         var selectedValue = $(this).val();
         $(this).closest(".graphAlias-div").attr('id', 'graphAlias_' + selectedValue);
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
-        initColorPicker($(this).parent().parent().find("#color"), selectedValue);
+        initColorPicker($(this).parent().parent().siblings().find(".colorpicker-component"), selectedValue);
     });
     clone.find("#alias").on('input', function () {
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
@@ -38,10 +38,10 @@ function addAlias() {
         $(this).closest(".graphAlias-div").remove();
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
     });
-    var colorPicker = clone.find("#color");
-    initColorPicker(colorPicker, selectedValue);
-    colorPicker.change(function () {
-        var currentColor = $(this).val();
+    var colorPickerComponent = clone.find(".colorpicker-component");
+    initColorPicker(colorPickerComponent, selectedValue);
+    $(colorPickerComponent).colorpicker().on('changeColor', function (e) {
+        var currentColor = e.color.toString();
         var name = $(this).closest(".graphAlias-div").find("#graphName").val();
         var argument = {};
         argument[name] = currentColor;
@@ -49,13 +49,17 @@ function addAlias() {
     });
 }
 
-function initColorPicker(colorPicker, selectedValue) {
-    var selectedSeries = window.rickshawGraphBuilder.graph.series.find(function (el) {
-        return el.name == selectedValue
-    });
+function initColorPicker(colorPickerComponent, selectedValue) {
+    $(colorPickerComponent).colorpicker({component: '.colorpicker-target'});
+
+    var selectedSeries = window.rickshawGraphBuilder.graph.series.find(function(el) { return el.name == selectedValue });
+    var selectedSeriesColor = '#FFFFFF';
+
     if (selectedSeries) {
-        colorPicker.val(selectedSeries.color);
+        selectedSeriesColor = selectedSeries.color;
     }
+
+    $(colorPickerComponent).colorpicker('setValue', selectedSeriesColor);
 }
 
 function initGraphNameAliases(graphNameAliases) {

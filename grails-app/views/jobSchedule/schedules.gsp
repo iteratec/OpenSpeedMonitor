@@ -134,7 +134,7 @@
                             "${"ScheduleChart" + i + j}",
                             "${"duration-to-show" + i + j}",
                             "${"show-overused-queues" + i + j}",
-                            "${createLink(controller: 'job', action: 'edit', absolute: true)}"
+                            "${createLink(controller: 'job', action: 'edit')}"
                         )
                     </g:if>
                 </g:each>

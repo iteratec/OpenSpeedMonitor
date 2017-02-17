@@ -82,11 +82,12 @@
                         i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
                         i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
                         i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
+                        i18nMessage_VARIABLE_NOT_SUPPORTED: '${message(code: 'script.VARIABLE_NOT_SUPPORTED.error')}',
                         i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
                         measuredEvents: ${measuredEvents},
-                        linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
-                        linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
-                        linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
+                        linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript')}',
+                        linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders')}',
+                        linkGetScriptSource: '${createLink(action: 'getScriptSource')}',
                         readonly: readonly
                     });
                 }
@@ -105,7 +106,7 @@
                 }
                 createCodeMirror("navigationScript",false);
                 window.onload = function() {
-                    OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
+                    OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript')}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl')}');
                 }
             </asset:script>
         </content>

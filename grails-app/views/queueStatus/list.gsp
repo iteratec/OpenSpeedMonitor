@@ -30,7 +30,7 @@
                         var rowVisible = []
                         jQuery.ajax({
                             type : 'POST',
-                            url : '${createLink(action: 'refresh', absolute: true)}',
+                            url : '${createLink(action: 'refresh')}',
                         success: function(template) {
                             $('#serverdown').hide();
                             $('.datarows > tr.jobsRow').map(function (index, tr) { rowVisible[$(tr).attr('data-queue')] = $(tr).is(":visible"); });

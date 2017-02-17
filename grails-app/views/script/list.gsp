@@ -41,7 +41,7 @@
 		<tbody>
 		<g:each var="script" in="${scripts}">
 			<tr>
-				<td><strong><a class="scriptLabel" href="${createLink(action: 'edit', id: script.id, absolute: true)}">${script.label}</a></strong></td>
+				<td><strong><a class="scriptLabel" href="${createLink(action: 'edit', id: script.id)}">${script.label}</a></strong></td>
 				<td>${script.description}</td>
 				<td>${script.measuredEventsCount}</td>
 				<td>${script.testedPages?.collect { it.name }.join(', ')}</td>

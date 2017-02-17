@@ -17,17 +17,17 @@
 
 package de.iteratec.osm.util
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.AppenderBase
-import grails.test.mixin.*
-import ch.qos.logback.classic.Level
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import grails.test.mixin.TestFor
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
+import static de.iteratec.osm.util.PerformanceLoggingService.INDENTATION_CHAR
 
 /**
  * Test-suite for {@link PerformanceLoggingService}.
@@ -54,7 +54,7 @@ class PerformanceLoggingServiceTests extends Specification {
 
         when: "We set the log level to Info and execute a operation which logs on Fatal"
         serviceLogger.setLevel(Level.INFO)
-        serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, IndentationDepth.NULL) {
+        serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, 0) {
             Thread.sleep(1100)
         }
 
@@ -82,7 +82,7 @@ class PerformanceLoggingServiceTests extends Specification {
 
         when: "We set the log level to Error and execute a operation which logs on Info"
         serviceLogger.setLevel(Level.ERROR)
-        serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, IndentationDepth.NULL) {
+        serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, 0) {
             Thread.sleep(1)
         }
 
@@ -106,28 +106,28 @@ class PerformanceLoggingServiceTests extends Specification {
         serviceUnderTest.resetExecutionTimeLoggingSession()
 
         when: "We log execution times of nested code blocks"
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, 1) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
             Thread.sleep(10)
         }
         List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
 
         then: "We should receive sensible logging session data"
         loggingSessionDataLines.size() == 3
-        loggingSessionDataLines[0].startsWith(" - ${descriptionLevel_1_1}: 2 call(s) -> took")
-        loggingSessionDataLines[1].startsWith(" - ${descriptionLevel_1_2}: 2 call(s) -> took")
-        loggingSessionDataLines[2].startsWith(" - ${descriptionLevel_1_3}: 1 call(s) -> took")
+        loggingSessionDataLines[0].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_1}: 2 call(s) -> took")
+        loggingSessionDataLines[1].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_2}: 2 call(s) -> took")
+        loggingSessionDataLines[2].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_3}: 1 call(s) -> took")
 
         cleanup: "Remove the Appender"
         serviceLogger.detachAppender(appender)
@@ -147,20 +147,20 @@ class PerformanceLoggingServiceTests extends Specification {
         serviceUnderTest.resetExecutionTimeLoggingSession()
 
         when: "We log execution times of nested code blocks"
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
             Thread.sleep(10)
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, IndentationDepth.TWO) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, 2) {
                     Thread.sleep(10)
                 }
             }
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, IndentationDepth.TWO) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, 2) {
                     Thread.sleep(10)
                 }
             }
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, IndentationDepth.TWO) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, 2) {
                     Thread.sleep(10)
                 }
             }
@@ -169,10 +169,10 @@ class PerformanceLoggingServiceTests extends Specification {
 
         then: "We should receive sensible logging session data"
         loggingSessionDataLines.size() == 4
-        loggingSessionDataLines[0].startsWith(" -- ${descriptionLevel_2_1}: 10 call(s) -> took")
-        loggingSessionDataLines[1].startsWith(" -- ${descriptionLevel_2_2}: 10 call(s) -> took")
-        loggingSessionDataLines[2].startsWith(" -- ${descriptionLevel_2_3}: 10 call(s) -> took")
-        loggingSessionDataLines[3].startsWith(" - ${descriptionLevel_1_1}: 1 call(s) -> took")
+        loggingSessionDataLines[0].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_1}: 10 call(s) -> took")
+        loggingSessionDataLines[1].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_2}: 10 call(s) -> took")
+        loggingSessionDataLines[2].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_3}: 10 call(s) -> took")
+        loggingSessionDataLines[3].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_1}: 1 call(s) -> took")
 
         cleanup: "Remove the Appender"
         serviceLogger.detachAppender(appender)

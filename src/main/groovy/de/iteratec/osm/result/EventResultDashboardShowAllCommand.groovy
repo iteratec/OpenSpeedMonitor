@@ -13,6 +13,7 @@ import org.joda.time.format.DateTimeFormatter
 
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
+
 /**
  * <p>
  * Command of {@link EventResultDashboardController#showAll(EventResultDashboardShowAllCommand)
@@ -29,7 +30,8 @@ import java.util.regex.Pattern
  * @since IT-6
  */
 public class EventResultDashboardShowAllCommand implements Validateable {
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING);
+    private final
+    static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING);
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -182,21 +184,17 @@ public class EventResultDashboardShowAllCommand implements Validateable {
     Boolean selectedAllLocations = true
 
     /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllConnectivityProfiles} is evaluated to
-     * <code>false</code>.
+     * The selected connectivities. Could include connectivityProfile ids, customConnectivityNames or 'native'
      */
-    Collection<Long> selectedConnectivityProfiles = []
+    Collection<String> selectedConnectivities = []
 
     /**
      * User enforced the selection of all ConnectivityProfiles.
      * This selection <em>is not</em> reflected in
-     * {@link #selectedConnectivityProfiles} cause of URL length
+     * {@link #selectedConnectivities} cause of URL length
      * restrictions. If this flag is evaluated to
      * <code>true</code>, the selections in
-     * {@link #selectedConnectivityProfiles} should be ignored.
+     * {@link #selectedConnectivities} should be ignored.
      */
     Boolean selectedAllConnectivityProfiles = true
 
@@ -267,22 +265,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      * Whether or not the time of the start-date should be selected manually.
      */
     Boolean setToHour
-
-    /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    Boolean includeNativeConnectivity
-
-    /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    Boolean includeCustomConnectivity
-
-    /**
-     * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
-     * connectivity name matches this regex.
-     */
-    String customConnectivityName
 
     String chartTitle
     int chartWidth
@@ -355,17 +337,11 @@ public class EventResultDashboardShowAllCommand implements Validateable {
             if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectMeasurings.error.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
         })
         selectedLocations(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedLocations.error.validator.error.selectedLocations']
+            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedConnectivities.error.validator.error.selectedConnectivites']
         })
         selectedAllConnectivityProfiles(nullable: true)
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
-
-        includeNativeConnectivity(nullable: true)
-
-        includeCustomConnectivity(nullable: true)
-
-        customConnectivityName(nullable: true)
 
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
@@ -380,6 +356,34 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         setFromHour(nullable: true)
         selectChartType(nullable: true)
         aggrGroup(nullable: true)
+        selectedConnectivities(validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
+            if (currentCollection.size() <= 0 && !cmd.selectedAllConnectivityProfiles) return ['de.iteratec.osm.gui.selectedConnectivities.error.validator.error.selectedConnectivites']
+        })
+    }
+
+    /**
+     * returns the selected connectivityProfiles by filtering all selected connectivities.
+     */
+    Collection<Long> getSelectedConnectivityProfiles() {
+        return selectedConnectivities.findAll { it.isLong() && ConnectivityProfile.exists(it as Long) }.collect {
+            Long.parseLong(it)
+        }
+    }
+
+    /**
+     * returns the selected customConnectivityNames by filtering all selected connectivities.
+     */
+    Collection<String> getSelectedCustomConnectivityNames() {
+        return selectedConnectivities.findAll {
+            (!it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value) || (it.isLong() && !ConnectivityProfile.exists(it as Long))
+        }
+    }
+
+    /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    boolean getIncludeNativeConnectivity() {
+        return selectedAllConnectivityProfiles || selectedConnectivities.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
     }
 
     /**
@@ -479,10 +483,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-        viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
-        viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
-        viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
-        viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
+        viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
 
         viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
         if (!this.fromHour.is(null)) {
@@ -572,14 +573,11 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         if (this.trimAboveRequestSizes) {
             result.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
         }
-        result.includeNativeConnectivity = this.includeNativeConnectivity
-        result.includeCustomConnectivity = this.includeCustomConnectivity
-        if (this.includeCustomConnectivity) {
-            result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
-        }
-        if (this.selectedAllConnectivityProfiles) {
-            result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-        } else if (this.selectedConnectivityProfiles.size() > 0) {
+        result.includeNativeConnectivity = this.getIncludeNativeConnectivity()
+        result.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
+
+        result.includeAllConnectivities = this.selectedAllConnectivityProfiles
+        if (this.selectedConnectivityProfiles.size() > 0) {
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
         }
 

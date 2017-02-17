@@ -22,6 +22,8 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -31,9 +33,9 @@ import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
-import org.hibernate.StaleObjectStateException
 import org.springframework.transaction.annotation.Propagation
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
@@ -184,11 +186,8 @@ class JobProcessingService {
         }
 
         if (!result) {
-
             return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus, description)
-
         } else {
-
             updateStatusAndPersist(result, job, testId, statusCode, wptStatus, description)
             return result
         }
@@ -318,7 +317,7 @@ class JobProcessingService {
             }
 
             HttpResponseDecorator result
-            performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", PerformanceLoggingService.IndentationDepth.TWO) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
                 result = proxyService.runtest(wptserver, parameters);
             }
             statusCode = result.getStatus()
@@ -379,10 +378,10 @@ class JobProcessingService {
     WptResultXml pollJobRun(Job job, String testId, String wptStatus = null) {
         WptResultXml resultXml
         try {
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", 1) {
                 resultXml = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
             }
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", 1) {
                 if (resultXml.statusCodeOfWholeTest < 200) {
                     persistUnfinishedJobResult(job.id, testId, resultXml.statusCodeOfWholeTest, wptStatus)
                 }

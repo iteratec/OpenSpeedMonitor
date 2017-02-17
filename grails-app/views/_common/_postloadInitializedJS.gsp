@@ -20,23 +20,23 @@
         noResultsMsg: '${message(code: 'de.iteratec.osm.resultSelection.noResults', default: 'No Results in selected time frame')}'
     };
     OpenSpeedMonitor.urls = {
-        getNamesOfDefaultMappings: '${createLink(controller: 'csiConfigIO', action: 'getNamesOfDefaultCsiMappings', absolute: true)}',
-        validateDeletionOfCsiConfiguration: '${createLink(controller: 'csiConfiguration', action: 'validateDeletion', absolute: true)}',
-        getJobGroupsUsingCsiConfiguration: '${createLink(controller: 'csiConfiguration', action: 'getJobGroupsUsingCsiConfiguration', absolute: true)}',
-        CsiConfigurationSaveCopy: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}',
-        CsiConfigurationConfigurations: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'configurations')}',
-        CsiConfigurationDeletion: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration')}',
+        getNamesOfDefaultMappings: '${createLink(controller: 'csiConfigIO', action: 'getNamesOfDefaultCsiMappings')}',
+        validateDeletionOfCsiConfiguration: '${createLink(controller: 'csiConfiguration', action: 'validateDeletion')}',
+        getJobGroupsUsingCsiConfiguration: '${createLink(controller: 'csiConfiguration', action: 'getJobGroupsUsingCsiConfiguration')}',
+        CsiConfigurationSaveCopy: '${createLink(controller: 'csiConfiguration', action: 'saveCopy')}',
+        CsiConfigurationConfigurations: '${createLink(controller: 'csiConfiguration', action: 'configurations')}',
+        CsiConfigurationDeletion: '${createLink(controller: 'csiConfiguration', action: 'deleteCsiConfiguration')}',
         resultSelection: {
-            jobGroups: "${createLink(absolute: true, controller: 'resultSelection', action: 'getJobGroups')}",
-            pages: "${createLink(absolute: true, controller: 'resultSelection', action: 'getMeasuredEvents')}",
-            browsers: "${createLink(absolute: true, controller: 'resultSelection', action: 'getLocations')}",
-            connectivity: "${createLink(absolute: true, controller: 'resultSelection', action: 'getConnectivityProfiles')}",
-            resultCount: "${createLink(absolute: true, controller: 'resultSelection', action: 'getResultCount')}"
+            jobGroups: "${createLink(controller: 'resultSelection', action: 'getJobGroups')}",
+            pages: "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}",
+            browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
+            connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
+            resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}"
         },
         jobTags: {
-            getTagsForJobs: "${createLink(absolute: true, controller: 'job', action: 'getTagsForJobs')}",
-            removeTag: "${createLink(absolute: true, controller: 'job', action: 'removeTag')}",
-            addTagToJobs: "${createLink(absolute: true, controller: 'job', action: 'addTagToJobs')}"
+            getTagsForJobs: "${createLink(controller: 'job', action: 'getTagsForJobs')}",
+            removeTag: "${createLink(controller: 'job', action: 'removeTag')}",
+            addTagToJobs: "${createLink(controller: 'job', action: 'addTagToJobs')}"
         }
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
@@ -61,7 +61,7 @@
         });
 
         OpenSpeedMonitor.postLoader.loadJavascript(
-            '<g:assetPath src="postload/application-postload.js" absolute="true"/>',
+            '<g:assetPath src="postload/application-postload.js"/>',
             true,
             "postload"
         )

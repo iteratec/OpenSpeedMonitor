@@ -5,7 +5,7 @@
 	</label>	
 	<div class="col-md-9">
 		<g:select class="form-control chosen" name="script.id" id="script" from="${Script.list()}"
-			value="${job?.script?.id}" optionValue="label" optionKey="id" onchange="updateScriptEditHref('${ createLink(controller: 'script', action: 'edit', absolute: true) }', \$(this).val());" />
+			value="${job?.script?.id}" optionValue="label" optionKey="id" onchange="updateScriptEditHref('${ createLink(controller: 'script', action: 'edit') }', \$(this).val());" />
 		</div>
 </div>
 

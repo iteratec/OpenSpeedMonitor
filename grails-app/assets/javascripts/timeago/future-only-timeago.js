@@ -35,7 +35,7 @@ FutureOnlyTimeago = function() {
 		$(elem).timeago();
 	}
 	
-	// ${createLink(action: 'nextExecution', absolute: true)}
+	// ${createLink(action: 'nextExecution')}
 	function initializeTimeagos(timeagos, nextExecutionServerUrl) {
 		this.nextExecutionServerUrl = nextExecutionServerUrl;
 		this.timeouts = [];

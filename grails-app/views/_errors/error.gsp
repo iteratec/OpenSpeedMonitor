@@ -24,7 +24,7 @@
 			</g:if>
  	   </div>
 	</section>
-		
+
 	<section id="details">
 	    <h2>Error Details</h2>
 	  	<div class="message">

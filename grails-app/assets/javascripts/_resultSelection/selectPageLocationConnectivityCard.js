@@ -94,11 +94,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var getConnectivitySelection = function () {
         return {
-            ids: (connectivitySelectElement.val() || []).filter(OpenSpeedMonitor.stringUtils.isNumeric),
-            customNames: $.map(connectivitySelectElement.find('option[value="custom"]:selected'), function (option) {
-                return option.text;
-            }),
-            native: connectivitySelectElement.find('option[value="native"]:selected').length > 0
+            selectedConnectivities: connectivitySelectElement.val() || []
         }
     };
 
