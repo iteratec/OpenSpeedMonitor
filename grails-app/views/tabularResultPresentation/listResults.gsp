@@ -40,6 +40,9 @@
             <g:actionSubmit class="btn btn-primary pull-right show-button" id="show-button"
                             value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                             action="${showSpecificJob ? 'listResultsForJob' : 'listResults'}"/>
+
+            <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                            action="downloadCsv" class="btn btn-primary pull-right space-right show-button"/>
             <g:render template="/_resultSelection/hiddenWarnings"/>
         </div>
     </div>
