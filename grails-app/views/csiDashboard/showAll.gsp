@@ -227,6 +227,9 @@
                             </g:else>
                         </ul>
                     </div>
+                    <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                                    action="csiValuesCsv" class="btn btn-primary pull-right space-right show-button"/>
+
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
