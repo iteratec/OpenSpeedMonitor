@@ -43,6 +43,22 @@ class DistributionChartController extends ExceptionHandlerController {
         return modelToRender
     }
 
+    /**
+     * Rest Method for ajax call.
+     * @param cmd The requested data.
+     * @return DistributionChartDTO as JSON or string message if an error occurred
+     */
+    @RestAction
+    def getDistributionChartData(GetDistributionCommand cmd) {
+        String errorMessages = getErrorMessages(cmd)
+        if (errorMessages) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, errorMessages)
+            return
+        }
+
+        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
+        List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
+    }
 
     /**
      * Validates the command and creates an error message string if necessary.

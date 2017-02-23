@@ -91,6 +91,45 @@
 
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
+        function drawGraph() {
+            var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+
+            spinner.start();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    from: selectedTimeFrame[0].toISOString(),
+                    to: selectedTimeFrame[1].toISOString(),
+                    selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
+                        return $(e).text()
+                    })),
+                    selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
+                        return $(e).text()
+                    }))
+                },
+                url: "${createLink(controller: 'distributionChart', action: 'getDistributionChartData')}",
+                dataType: "json",
+                success: function (data) {
+                    spinner.stop();
+                    if (!$("#error-div").hasClass("hidden"))
+                        $("#error-div").addClass("hidden");
+
+                    if (!$.isEmptyObject(data)) {
+                        $('#warning-no-data').hide();
+                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
+                        $("#dia-save-chart-as-png").removeClass("disabled");
+                    } else {
+                        $('#warning-no-data').show();
+                    }
+                },
+                error: function (e) {
+                    spinner.stop();
+                    $("#error-div").removeClass("hidden");
+                    $("#chart-card").removeClass("hidden");
+                    $("#error-message").html(e.responseText);
+                }
+            });
+        }
     </asset:script>
 </content>
 
