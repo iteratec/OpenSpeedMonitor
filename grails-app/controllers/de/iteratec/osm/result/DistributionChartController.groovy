@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.GetBarchartCommand
 import de.iteratec.osm.distributionData.GetDistributionCommand
@@ -58,6 +59,24 @@ class DistributionChartController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
+
+        List allEventResults = EventResult.createCriteria().list {
+            'in'('page', allPages)
+            'in'('jobGroup', allJobGroups)
+            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+        }
+
+        // return if no data is available
+        if (!allEventResults) {
+            ControllerUtils.sendObjectAsJSON(response, [:])
+            return
+        }
+
+        List<EventResultDto> eventResultDTOs = allEventResults.collect { result ->
+            new EventResultDto(result)
+        }
+
+        ControllerUtils.sendObjectAsJSON(response, eventResultDTOs)
     }
 
     /**
@@ -65,9 +84,9 @@ class DistributionChartController extends ExceptionHandlerController {
      * @param cmd
      * @return a string containing the error messages in html format or an empty string if the command is valid
      */
-    private String getErrorMessages(GetBarchartCommand cmd) {
+    private String getErrorMessages(GetDistributionCommand cmd) {
         String result = ""
-//        JOHANNES2DO: create error message if no measurand is selected
+//        JOHANNES2DO: create error message if no measurand (or whatever I need here) is selected
 //        if (!cmd.selectedSeries) {
 //            result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
 //            result += "<br />"

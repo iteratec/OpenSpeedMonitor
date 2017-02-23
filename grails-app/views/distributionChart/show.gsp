@@ -116,7 +116,7 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.distributionChart.drawChart(data);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $('#warning-no-data').show();

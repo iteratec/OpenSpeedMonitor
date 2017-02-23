@@ -5,15 +5,21 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.DistributionChart = (function () {
+OpenSpeedMonitor.ChartModules.distributionChart = (function () {
+    var chart = null,
+        chartData = null;
 
     var init = function () {
         var chartContainer = document.querySelector("#chart-container")
     };
 
+    var drawChart = function (distributionChartData) {
+        var chartData = distributionChartData;
+    };
+
     init();
 
     return {
-        init: init
+        drawChart: drawChart
     };
-});
+})();
