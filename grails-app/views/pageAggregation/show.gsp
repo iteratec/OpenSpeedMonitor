@@ -83,7 +83,9 @@
     <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:script type="text/javascript">
+
         OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
+
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
         });
@@ -96,7 +98,9 @@
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
+              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+
             spinner.start();
             $.ajax({
                 type: 'POST',

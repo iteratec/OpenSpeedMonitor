@@ -110,7 +110,12 @@ class PageAggregationController extends ExceptionHandlerController {
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
-                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], grouping: "${datum[0]} / ${datum[1]?.name}"))
+                        new BarchartDatum(
+                            index: currentMeasurand.replace("Uncached", ""),
+                            indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
+                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                        )
+                    )
                 }
             }
 

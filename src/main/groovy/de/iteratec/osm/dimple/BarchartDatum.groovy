@@ -4,4 +4,5 @@ class BarchartDatum {
     String index = ""
     Double indexValue = null
     String grouping = "grouping"
+
 }
