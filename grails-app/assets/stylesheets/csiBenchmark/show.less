@@ -1,0 +1,60 @@
+/*
+*= require /_resultSelection/selectBarchartMeasurings.css
+*= require_self
+*/
+.card-well {
+  position: relative;
+}
+
+.card-well .reset-result-selection {
+  float: none;
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  margin: 0;
+}
+
+.filterActive {
+  visibility: visible;
+}
+
+.filterInactive {
+  visibility: hidden;
+}
+
+#chart-container {
+  position: relative;
+}
+
+// BarChart styles
+.bar {
+  fill: #44994b;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+.tick line{
+  visibility:hidden;
+}
+.barLabel {
+  font: 18px sans-serif;
+  color: white;
+  fill: white;
+}
+.xAxisText {
+  font: 11px sans-serif;
+  color: grey;
+  fill: grey;
+}

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import groovy.transform.EqualsAndHashCode
+
 /**
  * To group {@link AggregatorType}s which are measureands.
  * 
@@ -51,6 +53,7 @@ public enum MeasurandGroup {
  * TODO mze-2013-07-15: Why this is not an enum?
  * </p>
  */
+@EqualsAndHashCode
 class AggregatorType {
 	
 	/*Types for CSI*/
