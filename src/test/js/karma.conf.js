@@ -21,6 +21,7 @@ module.exports = function (config) {
             {pattern: ASSET_PATH + '/javascripts/bower_components/jquery/jquery*.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/application.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true},
+          {pattern: ASSET_PATH + '/javascripts/d3/chartLabelUtil.js', watched: true},
             {pattern: TEST_PATH + '/specs/**/*.js', watched: true}
         ],
 
@@ -70,7 +71,7 @@ module.exports = function (config) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: true,
+        singleRun: false,
 
         // Concurrency level
         // how many browser should be started simultanous
