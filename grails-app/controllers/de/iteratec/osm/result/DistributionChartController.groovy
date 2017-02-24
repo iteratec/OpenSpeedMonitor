@@ -4,6 +4,7 @@ import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.GetBarchartCommand
+import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.GetDistributionCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -72,11 +73,16 @@ class DistributionChartController extends ExceptionHandlerController {
             return
         }
 
-        List<EventResultDto> eventResultDTOs = allEventResults.collect { result ->
-            new EventResultDto(result)
+        DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
+
+        allEventResults.each { result ->
+            if (distributionChartDTO.series.get(result.page) == null) {
+                distributionChartDTO.series.put(result.page, new ArrayList<>())
+            }
+            distributionChartDTO.series.get(result.page).add(result.docCompleteTimeInMillisecs)
         }
 
-        ControllerUtils.sendObjectAsJSON(response, eventResultDTOs)
+        ControllerUtils.sendObjectAsJSON(response, distributionChartDTO)
     }
 
     /**
