@@ -1,0 +1,21 @@
+.area {
+    shape-rendering: geometricPrecision;
+    fill: #2961A6 !important;
+}
+
+.violin {
+    shape-rendering: geometricPrecision;
+    fill: none !important;
+    stroke: #777;
+    stroke-width: 1px;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+    color-rendering: optimizeQuality !important;
+    shape-rendering: crispEdges !important;
+    text-rendering: geometricPrecision !important;
+
+}

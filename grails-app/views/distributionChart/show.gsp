@@ -8,8 +8,7 @@
     </title>
     %{--JOHANNES2DO: enable chart switch functionality--}%
     %{--<asset:javascript src="chartSwitch"/>--}%
-    %{--JOHANNES2DO: create stylesheet for distribution chart--}%
-    %{--<asset:stylesheet src="/pageAggregation/show.css"/>--}%
+    <asset:stylesheet src="/distributionChart/distributionChart.css"/>
 </head>
 
 <body>
@@ -87,6 +86,7 @@
     <asset:script type="text/javascript">
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/distributionChart/distributionChart.js" />', true, 'distributionChart')
         });
 
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
