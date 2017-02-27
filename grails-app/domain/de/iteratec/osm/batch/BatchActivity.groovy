@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.batch
 
-import org.joda.time.DateTime
-
 import java.text.DecimalFormat
 
 /**
@@ -43,6 +41,7 @@ class BatchActivity {
     int maximumStepsInStage
     int failures
     Date endDate
+    String comment
 
     static mapping = {
     }
@@ -62,6 +61,7 @@ class BatchActivity {
         maximumStepsInStage(nullable: true)
         failures(nullable: true)
         endDate(nullable: true)
+        comment(nullable: true)
     }
 
     /**
@@ -71,44 +71,54 @@ class BatchActivity {
     public String calculateProgressInStage() {
         DecimalFormat df = new DecimalFormat("#.##");
         String returnValue
-        if (maximumStepsInStage == 0){
-            if(this.status == Status.DONE){
-                returnValue =  df.format(100) + " %"
-            } else{
-                returnValue =  df.format(0) + " %"
+        if (maximumStepsInStage == 0) {
+            if (this.status == Status.DONE) {
+                returnValue = df.format(100) + " %"
+            } else {
+                returnValue = df.format(0) + " %"
             }
-        } else{
+        } else {
             returnValue = df.format(100.0 / maximumStepsInStage * stepInStage) + " %"
         }
         return returnValue
     }
 
-    public String calculateRemainingTime(){
-        if(status != Status.ACTIVE || stepInStage <= 0) return "" // we can only predict the remaining time for active jobs, that already made progress
+    public String calculateRemainingTime() {
+        if (status != Status.ACTIVE || stepInStage <= 0) return ""
+        // we can only predict the remaining time for active jobs, that already made progress
         def currentTime = new Date()
         def lastUpdateTime = lastUpdate
-        def timeSinceLastUpdate= currentTime.time - lastUpdateTime.time
+        def timeSinceLastUpdate = currentTime.time - lastUpdateTime.time
         def msSinceBatchStart = lastUpdateTime.time - startDate.time
         def howManyTimesStepInStageIsMaximumStepsInStage = maximumStepsInStage / stepInStage
-        def predictedRemainingTimeInS = (msSinceBatchStart*howManyTimesStepInStageIsMaximumStepsInStage-msSinceBatchStart - timeSinceLastUpdate)/1000
-        def result =""
-        predictedRemainingTimeInS = predictedRemainingTimeInS>0?predictedRemainingTimeInS:0
-        if(predictedRemainingTimeInS / 86400 > 1){
-            result += String.valueOf((int)((int)predictedRemainingTimeInS/86400)) + "d "
-            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 86400
+        double predictedRemainingTimeInS = (msSinceBatchStart * howManyTimesStepInStageIsMaximumStepsInStage - msSinceBatchStart - timeSinceLastUpdate) / 1000
+        def result = ""
+        predictedRemainingTimeInS = predictedRemainingTimeInS > 0 ? predictedRemainingTimeInS : 0
+        if (predictedRemainingTimeInS / 86400 > 1) {
+            result += String.valueOf((int) ((int) predictedRemainingTimeInS / 86400)) + "d "
+            predictedRemainingTimeInS = ((int) predictedRemainingTimeInS) % 86400
         }
 
-        if(predictedRemainingTimeInS / 3600 > 1){
-            result += String.valueOf((int)((int)predictedRemainingTimeInS/3600)) + "h "
-            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 3600
+        if (predictedRemainingTimeInS / 3600 > 1) {
+            result += String.valueOf((int) ((int) predictedRemainingTimeInS / 3600)) + "h "
+            predictedRemainingTimeInS = ((int) predictedRemainingTimeInS) % 3600
         }
-        if(predictedRemainingTimeInS / 60 > 1){
-            result += String.valueOf((int)((int) predictedRemainingTimeInS/60)) + "m "
-            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 60
+        if (predictedRemainingTimeInS / 60 > 1) {
+            result += String.valueOf((int) ((int) predictedRemainingTimeInS / 60)) + "m "
+            predictedRemainingTimeInS = ((int) predictedRemainingTimeInS) % 60
         }
-        result += String.valueOf(predictedRemainingTimeInS) +"s"
+        result += String.valueOf(predictedRemainingTimeInS.round(2)) + "s"
         return result
     }
+
+    void addComment(String commentToAdd) {
+        if (comment) {
+            comment = comment + "\n" + commentToAdd
+        } else {
+            comment = commentToAdd
+        }
+    }
+
     @Override
     public String toString() {
         return "Domain: $domain, Name: $name ,Stage: $actualStage/$maximumStages, Step: $stepInStage/$maximumStepsInStage";

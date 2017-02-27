@@ -55,6 +55,12 @@ class BatchActivityUpdater {
         return this
     }
 
+    BatchActivityUpdater addComment(String comment) {
+        batchActivity.addComment(comment)
+        saveUpdate(true)
+        return this
+    }
+
     public BatchActivityUpdater addProgressToStage(int amount = 1){
         if (amount <= 0){
             throw new Exception("Amount must be > 0")

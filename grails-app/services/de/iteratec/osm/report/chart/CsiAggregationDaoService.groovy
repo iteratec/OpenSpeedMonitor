@@ -143,9 +143,8 @@ class CsiAggregationDaoService {
      * @param toFindBefore
      * @return All open {@link CsiAggregation}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
      */
-    public List<CsiAggregation> getOpenCsiAggregationsEqualsOrBefore(Date toFindBefore) {
-        def criteria = CsiAggregation.createCriteria()
-        return criteria.list {
+    List<CsiAggregation> getOpenCsiAggregationsEqualsOrBefore(Date toFindBefore) {
+        return CsiAggregation.createCriteria().list {
             le("started", toFindBefore)
             eq("closedAndCalculated", false)
         }
