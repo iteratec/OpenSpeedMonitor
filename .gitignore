@@ -69,3 +69,6 @@ scripts/local/
 
 # bower build files
 bower_components/
+
+# local docker tests
+docker/local_*
