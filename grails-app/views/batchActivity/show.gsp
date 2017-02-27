@@ -115,6 +115,13 @@
 
         </tr>
 
+        <tr class="prop">
+            <td valign="top" class="name"><g:message code="batchActivity.comment.label" default="Comment" /></td>
+
+            <td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "comment")}</td>
+
+        </tr>
+
         </tbody>
     </table>
 

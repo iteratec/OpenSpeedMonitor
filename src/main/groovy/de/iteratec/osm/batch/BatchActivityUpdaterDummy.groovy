@@ -48,4 +48,9 @@ class BatchActivityUpdaterDummy extends BatchActivityUpdater {
     @Override
     protected void setStatus(Status status) {
     }
+
+    @Override
+    BatchActivityUpdater addComment(String comment) {
+        return this
+    }
 }

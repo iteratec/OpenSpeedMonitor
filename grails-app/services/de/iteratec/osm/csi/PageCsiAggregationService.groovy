@@ -21,10 +21,8 @@ import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.joda.time.DateTime
@@ -32,10 +30,8 @@ import org.joda.time.DateTime
 class PageCsiAggregationService {
 
     EventCsiAggregationService eventCsiAggregationService
-    JobService jobService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
-    MeasuredEventDaoService measuredEventDaoService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService
@@ -122,8 +118,6 @@ class PageCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
 
-        CsiAggregation.withNewSession { session ->
-
             while (!currentDateTime.isAfter(toDateTime)) {
                 List<Long> pageCsiAggregationIds
                 List<Long> pageCsiAggregationIdsToCalculate
@@ -136,11 +130,6 @@ class PageCsiAggregationService {
                 allCsiAggregationIds.addAll(pageCsiAggregationIds)
 
                 currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
-
-                session.flush()
-                session.clear()
-
-            }
 
         }
         return CsiAggregation.getAll(allCsiAggregationIds)
@@ -254,7 +243,7 @@ class PageCsiAggregationService {
                 csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
             }
 
-            toBeCalculated.save(failOnError: true)
+            toBeCalculated.save(failOnError: true, flush: true)
         }
     }
 
