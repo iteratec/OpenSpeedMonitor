@@ -302,10 +302,6 @@ grails:
     de:
         iteratec:
             osm:
-                report:
-                    chart:
-                        chartTagLib: RICKSHAW
-                        availableChartTagLibs: RICKSHAW
                 test:
                     geb:
                         login: admin

@@ -20,11 +20,6 @@ grails:
             username: '{{ default .Env.OSM_ROOT_USER "root" }}'
             password: '{{ default .Env.OSM_ROOT_PASSWORD "muchMoreSecret!123" }}'
           initialDetailAnalysisApiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
-      report:
-        chart:
-          chartTagLib: RICKSHAW
-          availableChartTagLibs:
-            - RICKSHAW
 
 environments:
   production:
