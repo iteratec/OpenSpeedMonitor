@@ -18,7 +18,7 @@ def targetDir = BuildSettings.TARGET_DIR
 if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     def catalinaBase = System.properties.getProperty('catalina.base')
     if (!catalinaBase) catalinaBase = '.'   // just in case
-    def logFolder = "${catalinaBase}/logs/"
+    def logFolder = "${catalinaBase}/logs"
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
             pattern = "%logger %m%n"
