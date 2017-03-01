@@ -14,7 +14,7 @@ class CustomUrlGebReportingSpec extends GebReportingSpec implements OsmTestLogin
     SpringSecurityService springSecurityService
 
     def setup(){
-        String customBaseUrl = Holders.applicationContext.getBean("grailsApplication")?.config?.grails?.de?.iteratec?.test?.geb?.customBaseUrl
+        String customBaseUrl = Holders.applicationContext.getBean("grailsApplication")?.config?.grails?.de?.iteratec?.osm?.test?.geb?.baseUrl
         if(customBaseUrl){
             println "Set custom base url: $customBaseUrl"
             browser.setBaseUrl(customBaseUrl)
@@ -30,6 +30,5 @@ class CustomUrlGebReportingSpec extends GebReportingSpec implements OsmTestLogin
 
     protected void doLogout() {
         go "/logout/index"
-
     }
 }

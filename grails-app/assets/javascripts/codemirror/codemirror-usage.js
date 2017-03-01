@@ -149,10 +149,10 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
                 'scriptId': $('#script').val()
             },
             success : function(result) {
-                loadNewContent(result);
+                setNewContent(result);
             },
             error : function(XMLHttpRequest, textStatus, errorThrown) {
-                loadNewContent('Error');
+                setNewContent('Error');
             }
         });
 
@@ -259,7 +259,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         });
     };
 
-    var loadNewContent = function(content) {
+    var setNewContent = function(content) {
         clearGutterAndLines();
         editor.getDoc().setValue(content);
     };
@@ -282,7 +282,8 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
 
     return {
         init:init,
-        update:update
+        update:update,
+        setNewContent: setNewContent
     };
 
 
