@@ -194,7 +194,7 @@ class CsiSystemCsiAggregationService {
      * calculates all csiAggregations with given ids
      * @param csiAggregationIdsToCalc a list of csiAggregationIds to calculate
      */
-    public void calcCsiAggregations(List<Long> csiAggregationIdsToCalc) {
+    public List<CsiAggregation> calcCsiAggregations(List<Long> csiAggregationIdsToCalc) {
         Contract.requiresArgumentNotNull("toBeCalculated", csiAggregationIdsToCalc);
 
         List<CsiAggregation> csiAggregationsToCalculate = CsiAggregation.getAll(csiAggregationIdsToCalc)
@@ -223,5 +223,6 @@ class CsiSystemCsiAggregationService {
             csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
             toBeCalculated.save(failOnError: true, flush: true)
         }
+        return csiAggregationsToCalculate
     }
 }

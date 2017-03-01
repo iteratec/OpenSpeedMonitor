@@ -194,7 +194,7 @@ class PageCsiAggregationService {
      * calculates all csiAggregations with given ids
      * @param csiAggregationIdsToCalc a list of csiAggregationIds to calculate
      */
-    public void calcCsiAggregations(List<Long> allCsiAggregationIds) {
+    public List<CsiAggregation> calcCsiAggregations(List<Long> allCsiAggregationIds) {
         assert allCsiAggregationIds
 
         List<CsiAggregation> csiAggregationsToCalculate = CsiAggregation.getAll(allCsiAggregationIds)
@@ -245,6 +245,7 @@ class PageCsiAggregationService {
 
             toBeCalculated.save(failOnError: true, flush: true)
         }
+        return csiAggregationsToCalculate
     }
 
     /**

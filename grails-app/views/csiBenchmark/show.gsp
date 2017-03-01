@@ -137,7 +137,6 @@
                 }
             });
         }
-        // TODOMARCUS necessary?
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
             "${createLink(action: 'show', controller: 'pageAggregation')}",
             "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
