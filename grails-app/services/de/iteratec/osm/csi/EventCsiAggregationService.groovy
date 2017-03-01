@@ -123,12 +123,12 @@ class EventCsiAggregationService {
     private getAllCalculatedHourlyCas(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval) {
         def result = []
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - getAllCalculatedHourlyCas - getMvs', 1) {
-                result = csiAggregationDaoService.getMvs(
-                        fromDateTime.toDate(),
-                        toDateTimeEndOfInterval.toDate(),
-                        mvQueryParams,
-                        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
-                        AggregatorType.findByName(AggregatorType.MEASURED_EVENT))
+            result = csiAggregationDaoService.getMvs(
+                    fromDateTime.toDate(),
+                    toDateTimeEndOfInterval.toDate(),
+                    mvQueryParams,
+                    CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
+                    AggregatorType.findByName(AggregatorType.MEASURED_EVENT))
         }
         return result
     }
@@ -234,10 +234,17 @@ class EventCsiAggregationService {
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 
-        return CsiAggregation.findAllByAggregatorAndIntervalAndJobGroupInListAndPageInList(
-                aggregatorType, interval, jobGroups, pages
-        )
+        return CsiAggregation.createCriteria().list {
+            eq('interval', interval)
+            eq('aggregator', aggregatorType)
+            between('started', fromDate, toDate)
+            jobGroup {
+                'in'('id', jobGroups*.id)
+            }
+            page {
+                'in'('id', pages*.id)
+            }
+        }
+
     }
-
-
 }

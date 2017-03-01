@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageWeight
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
@@ -16,7 +15,6 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Tests the CRUD View of @link{de.iteratec.osm.measurement.environment.Page}*/
 @Integration
@@ -24,7 +22,6 @@ import spock.lang.Stepwise
 @Stepwise
 class PageGebSpec extends CustomUrlGebReportingSpec {
 
-    public static final pageWeight = "2.0"
     public static final pageName = "a geb test page"
 
     @Shared
@@ -170,7 +167,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         }
     }
 
-    void cleanupSpec() {
+    def cleanupSpec() {
         doLogout()
     }
 }

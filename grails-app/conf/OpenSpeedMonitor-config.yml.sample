@@ -21,17 +21,12 @@ grails:
           initialOsmRootUser:
             username: [username-of-superadmin-user-to-be-bootsrapped]
             password: [password-of-superadmin-user-to-be-bootsrapped]
-      report:
-        chart:
-          chartTagLib: RICKSHAW
-          availableChartTagLibs:
-            - RICKSHAW
-      test:
-        geb:
-          login: admin
-          password: password
-          #You can run the tets against a different osm instance. Only uncomment this if you want to run the tests against another instance
-          #baseUrl: [your-osm-instance]
+          test:
+            geb:
+              login: admin
+              password: password
+              #You can run the tets against a different osm instance. Only uncomment this if you want to run the tests against another instance
+              #baseUrl: [your-osm-instance]
 environments:
   development:
     grails:

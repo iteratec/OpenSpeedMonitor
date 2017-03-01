@@ -71,7 +71,7 @@ class ScriptController {
 		createNewPagesAndMeasuredEvents(s)
 		def flashMessageArgs = [getScriptI18n(), s.label]
 		flash.message = message(code: 'default.created.message', args: flashMessageArgs)
-		redirect(action: "list", id: s.id)
+		redirect(action: "list")
 	}
 
 	def edit() {

@@ -345,6 +345,9 @@
         </div>
     </div>
 </form>
+<button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+    <i class="fa fa-undo"></i> Reset
+</button>
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 <g:if test="${params.dashboardID}">
     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">

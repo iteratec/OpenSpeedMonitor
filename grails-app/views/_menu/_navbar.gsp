@@ -4,6 +4,7 @@
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
+<g:elseif test="${controllerName.equals('csiBenchmark')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -87,6 +88,12 @@
                         <g:link controller="csiConfiguration" action="configurations">
                             <i class="fa fa-gears"></i>
                             <g:message code="de.iteratec.isocsi.csiConfiguration" default="Configuration"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('csiBenchmark') ? 'active' : ''}">
+                        <g:link controller="csiBenchmark" action="show">
+                            <i class="fa fa-bar-chart"></i>
+                            <g:message code="de.iteratec.isocsi.csiBenchmark.title" default="Csi Benchmark"/>
                         </g:link>
                     </li>
                 </ul>

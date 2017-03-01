@@ -44,7 +44,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 1
             assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
