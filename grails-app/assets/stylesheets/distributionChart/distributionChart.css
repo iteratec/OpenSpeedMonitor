@@ -6,7 +6,7 @@
 .violin {
     shape-rendering: geometricPrecision;
     fill: none !important;
-    stroke: #777;
+    stroke: #265997 !important;
     stroke-width: 1px;
 }
 
@@ -17,5 +17,4 @@
     color-rendering: optimizeQuality !important;
     shape-rendering: crispEdges !important;
     text-rendering: geometricPrecision !important;
-
 }

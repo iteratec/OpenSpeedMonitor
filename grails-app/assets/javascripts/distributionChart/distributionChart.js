@@ -11,8 +11,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         chartData = null,
         width = 600,
         height = 600,
-        margin = {top: 10, right: 30, bottom: 10, left: 100},
-        violinWidth = 100,
+        margin = {top: 10, right: 30, bottom: 50, left: 100},
+        violinWidth = 150,
         resolution = 20,
         interpolation = 'basis';
 
@@ -37,15 +37,23 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         var domain = getDomain();
 
-        // create the domain for the y axis
+        // create the scales for both axis
         var y = d3.scale.linear()
-                  .range([height-margin.bottom, margin.top])
+                  .range([height - margin.bottom, margin.top])
                   .domain(domain);
 
-        // create the yAxis
+        var x = d3.scale.ordinal()
+                  .range(xRange())
+                  .domain(Object.keys(chartData.series));
+
+        // create both axis
         var yAxis = d3.svg.axis()
                       .scale(y)
                       .orient("left");
+
+        var xAxis = d3.svg.axis()
+                      .scale(x)
+                      .orient("bottom");
 
         // add the violins
         Object.keys(chartData.series).forEach( function (trace, i) {
@@ -54,13 +62,29 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var g = svg.append("g")
                        .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
-            addViolin(g, traceData, height, violinWidth, domain, 0.25, "#0000FF");
+            addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
 
         svg.append("g")
-           .attr('class', 'axis')
-           .attr("transform", "translate(" + margin.left + ",0)")
+           .attr("class", "axis yAxis")
+           .attr("transform", "translate(" + margin.left + ", 0)")
            .call(yAxis);
+
+        svg.append("g")
+           .attr("class", "axis xAxis")
+           .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")")
+           .call(xAxis);
+
+        chartStyling();
+    };
+
+    var xRange = function () {
+        var range = [];
+        Object.keys(chartData.series).forEach( function (trace, i) {
+            range.push(i * violinWidth + violinWidth/2);
+        });
+
+        return range;
     };
 
     var getDomain = function () {
@@ -71,21 +95,21 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             minValues.push(Math.min.apply(null, chartData.series[trace]).toString());
         });
 
-        return [Math.min.apply(null, minValues), Math.max.apply(null, maxValues)]
+        return [Math.min.apply(null, minValues), Math.max.apply(null, maxValues)];
     };
 
-    var addViolin = function (svg, traceData, height, violinWidth, domain, violinColor) {
+    var addViolin = function (svg, traceData, height, violinWidth, domain) {
         var data = d3.layout.histogram()
                      .bins(resolution)
                      .frequency(0)
                      (traceData);
 
-        // y is now the horizontal axis because of the violin beeing a 90 degree rotated histogram
+        // y is now the horizontal axis because of the violin being a 90 degree rotated histogram
         var y = d3.scale.linear()
                   .range([violinWidth/2, 0])
                   .domain([0, d3.max(data, function(d) { return d.y; })]);
 
-        // x is now the vertical axis because of the violin beeing a 90 degree rotated histogram
+        // x is now the vertical axis because of the violin being a 90 degree rotated histogram
         var x = d3.scale.linear()
                   .range([height, 0])
                   .domain(domain)
@@ -104,6 +128,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         var gPlus = svg.append("g");
         var gMinus = svg.append("g");
+
+        var violinColor = "#808080";
 
         gPlus.append("path")
              .datum(data)
@@ -131,6 +157,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         gPlus.attr("transform", "rotate(90, 0, 0)  translate(0, -" + violinWidth + ")");
         gMinus.attr("transform", "rotate(90, 0, 0) scale(1, -1)");
+    };
+
+    var chartStyling = function () {
+        // remove the xAxis lines
+        d3.select(".axis.xAxis path.domain").remove();
+        d3.selectAll(".axis.xAxis g > line").remove();
     };
 
     init();
