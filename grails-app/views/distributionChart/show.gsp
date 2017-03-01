@@ -53,6 +53,10 @@
                                         'toHour'                   : toHour,
                                         'showIncludeInterval'      : false,
                                         'includeInterval'          : includeInterval]}"/>
+
+                    <g:render template="/_resultSelection/selectDistributionChartMeasurings" model="[
+                            measurandsUncached: measurandsUncached
+                    ]"/>
                 </div>
 
                 <div class="col-md-3">
@@ -105,6 +109,9 @@
                     })),
                     selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
                         return $(e).text()
+                    })),
+                    selectedMeasurand: JSON.stringify($.map($("#measurandSelection option:selected"), function (e) {
+                        return $(e).val()
                     }))
                 },
                 url: "${createLink(controller: 'distributionChart', action: 'getDistributionChartData')}",

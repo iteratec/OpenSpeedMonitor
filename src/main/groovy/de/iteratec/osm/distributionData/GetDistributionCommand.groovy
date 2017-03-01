@@ -19,8 +19,8 @@ class GetDistributionCommand implements Validateable {
     })
     List<String> selectedJobGroups
 
-//    @BindUsing({ obj, source ->
-//        return new JsonSlurper().parseText(source['selectedSeries'])
-//    })
-//    List selectedSeries
+    @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['selectedMeasurand'])
+    })
+    String selectedMeasurand
 }
