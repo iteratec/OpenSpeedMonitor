@@ -48,7 +48,9 @@
                                         'includeInterval'          : includeInterval]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
-                            aggrGroupValuesUnCached: aggrGroupValuesUnCached
+                            aggrGroupValuesUnCached: aggrGroupValuesUnCached,
+                            multipleMeasurands: false,
+                            multipleSeries: false
                     ]"/>
                 </div>
 

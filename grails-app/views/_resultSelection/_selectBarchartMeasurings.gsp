@@ -1,20 +1,23 @@
 <div class="card form-horizontal" id="barchartMeasuringCard">
-    <h2 for="selectAggregatorUncachedHtmlId"><g:message
-            code="de.iteratec.osm.selectMeasurings"
-            default="Measurings"/></h2>
+    <h2 for="selectAggregatorUncachedHtmlId">
+        <g:message
+            code="${multipleSeries ? 'de.iteratec.osm.selectMeasurings' : 'de.iteratec.osm.selectMeasurings.MeasurandLabel'}"
+            default="Measurand Series"/>
+    </h2>
 
     <div id="measurandSeries-clone" class="hidden">
         <g:if test="${selectedAggrGroupValuesUnCached.size() == 0}">
             <g:set var="selectedAggrGroupValuesUnCached"
-                   value="${['docCompleteTimeInMillisecsUncached']}"/>
+            value="${['docCompleteTimeInMillisecsUncached']}"/>
         </g:if>
 
-
-        <div class="removeMeasurandSeriesContainer">
-            <a href="#/" class="removeMeasurandSeriesButton">
-                <i class="fa fa-times" aria-hidden="true"></i>
-            </a>
-        </div>
+        <g:if test="${multipleSeries}">
+            <div class="removeMeasurandSeriesContainer">
+                <a href="#/" class="removeMeasurandSeriesButton">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </a>
+            </div>
+        </g:if>
 
         <div class="row form-group addMeasurandRow">
             <label class="col-sm-3 control-label" for="selectedAggrGroupValuesUnCached">
@@ -30,11 +33,14 @@
                                            value="${selectedAggrGroupValuesUnCached}"/>
             </div>
 
-            <div class="col-sm-2 control-label removeAddMeasurands">
-                <a href="#/" class="addMeasurandButton">
-                    <i class="fa fa-lg fa-plus-circle"></i>
-                </a>
-            </div>
+            <g:if test="${multipleMeasurands}">
+                <div class="col-sm-2 control-label removeAddMeasurands">
+                    <a href="#/" class="addMeasurandButton">
+                        <i class="fa fa-lg fa-plus-circle"></i>
+                    </a>
+                </div>
+            </g:if>
+
         </div>
 
         <div class="row form-group stackedSelectContainer hidden">
@@ -73,13 +79,15 @@
         </div>
     </div>
 
-    <div class="row">
-        <a href="#/" id="addMeasurandSeriesButton">
-            <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
-            <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
-                       default="Add Measurand Series"/>
-        </a>
-    </div>
+    <g:if test="${multipleSeries}">
+        <div class="row">
+            <a href="#/" id="addMeasurandSeriesButton">
+                <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
+                <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
+                           default="Add Measurand Series"/>
+            </a>
+        </div>
+    </g:if>
 </div>
 
 <asset:script type="text/javascript">

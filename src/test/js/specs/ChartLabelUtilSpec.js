@@ -2,65 +2,164 @@
  * Created by nkuhn on 23.02.17.
  */
 describe("BarchartUtil function buildShortestUniqueLabel", function () {
-  beforeEach(function () {
 
+  beforeEach(function () {
+    //nothing to do here
   });
-  it("provides just page as label and correct header if jobGroups and measurands are equal in all seriesData entries", function () {
+
+  it("provides just page as label and correct header if jobGroups are equal in all seriesData entries", function () {
     var seriesDataJustPageDiffers = [
       {
-        identifier: "MES | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "MES | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 909.413
       },
       {
-        identifier: "ADS | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "ADS | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 1040.8115
       },
       {
-        identifier: "HP | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "HP | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 1351.7468
       },
       {
-        identifier: "ADS_entry | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "ADS_entry | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 2693.3905
       }
     ];
     var expectedSeriesData = [
       {
-        identifier: "MES | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "MES | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 909.413,
-        label: "MES"
+        label: "MES",
+        page: "MES",
+        jobGroup: "develop_Desktop"
       },
       {
-        identifier: "ADS | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "ADS | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 1040.8115,
-        label: "ADS"
+        label: "ADS",
+        page: "ADS",
+        jobGroup: "develop_Desktop"
       },
       {
-        identifier: "HP | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "HP | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 1351.7468,
-        label: "HP"
+        label: "HP",
+        page: "HP",
+        jobGroup: "develop_Desktop"
       },
       {
-        identifier: "ADS_entry | develop_Desktop | docCompleteTimeInMillisecs",
+        grouping: "ADS_entry | develop_Desktop",
         measurand: "docCompleteTimeInMillisecs",
         value: 2693.3905,
-        label: "ADS_entry"
+        label: "ADS_entry",
+        page: "ADS_entry",
+        jobGroup: "develop_Desktop"
       }
     ];
+    var expectedCommonLabelParts = "Measurand: docCompleteTimeInMillisecs | Job Group: develop_Desktop";
 
-    OpenSpeedMonitor.ChartModules.LabelUtils.buildShortestUniqueLabel(seriesDataJustPageDiffers);
-    expect(seriesDataJustPageDiffers).toBeDefined();
-    expect(expectedSeriesData).toBeDefined();
-    expect(
-      seriesDataJustPageDiffers.toEqual(expectedSeriesData)
-    )
+    var seriesLabels = OpenSpeedMonitor.ChartModules.SeriesLabels(seriesDataJustPageDiffers);
+    expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
+    expect(seriesLabels.getCommonLabelParts()).toEqual(expectedCommonLabelParts)
+
+  });
+
+  it("provides just jobGroups as label and correct header if pages are equal in all seriesData entries", function () {
+    var seriesDataJustJobGroupDiffers = [
+      {
+        grouping: "ADS | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413
+      },
+      {
+        grouping: "ADS | develop_Smartphone",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115
+      },
+      {
+        grouping: "ADS | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468
+      },
+      {
+        grouping: "ADS | live_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413
+      },
+      {
+        grouping: "ADS | live_Smartphone",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115
+      },
+      {
+        grouping: "ADS | live_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468
+      }
+    ];
+    var expectedSeriesData = [
+      {
+        grouping: "ADS | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413,
+        label: "develop_Desktop",
+        page: "ADS",
+        jobGroup: "develop_Desktop"
+      },
+      {
+        grouping: "ADS | develop_Smartphone",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115,
+        label: "develop_Smartphone",
+        page: "ADS",
+        jobGroup: "develop_Smartphone"
+      },
+      {
+        grouping: "ADS | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468,
+        label: "develop_Tablet",
+        page: "ADS",
+        jobGroup: "develop_Tablet"
+      },
+      {
+        grouping: "ADS | live_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413,
+        label: "live_Desktop",
+        page: "ADS",
+        jobGroup: "live_Desktop"
+      },
+      {
+        grouping: "ADS | live_Smartphone",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115,
+        label: "live_Smartphone",
+        page: "ADS",
+        jobGroup: "live_Smartphone"
+      },
+      {
+        grouping: "ADS | live_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468,
+        label: "live_Tablet",
+        page: "ADS",
+        jobGroup: "live_Tablet"
+      }
+    ];
+    var expectedCommonLabelParts = "Measurand: firstByteInMillisecsUncached | Page: ADS";
+
+    var seriesLabels = OpenSpeedMonitor.ChartModules.SeriesLabels(seriesDataJustJobGroupDiffers);
+    expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
+    expect(seriesLabels.getCommonLabelParts()).toEqual(expectedCommonLabelParts)
 
   });
 

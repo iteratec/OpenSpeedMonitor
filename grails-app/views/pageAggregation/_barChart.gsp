@@ -1,5 +1,5 @@
 <div id="chart-container">
-    <div id="filter-dropdown-group" class="btn-group hidden">
+    <div id="filter-dropdown-group" class="btn-group">
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
             <g:message code="de.iteratec.osm.dimple.barchart.filter.label" default="filter"/> <span
@@ -31,11 +31,11 @@
     </div>
     <div class="in-chart-buttons">
         <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
-           class="hidden" onclick="initModalDialogValues()">
+           onclick="initModalDialogValues()">
             <i class="fa fa-sliders"></i>
         </a>
         <a href="#downloadAsPngModal" id="download-as-png-button"
-           class="hidden" data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
+           data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
             <i class="fa fa-download"></i>
         </a>
@@ -47,7 +47,6 @@
 <g:render template="/pageAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      // OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/dimple/barchart.js" />',true,'barchart');
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/d3/barchartHorizontal.js" />',true,'barchartHorizontal');
     });
 </asset:script>

@@ -7,28 +7,21 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.LabelUtils = (function () {
+OpenSpeedMonitor.ChartModules.SeriesLabels = function (series) {
 
   var identifierDelimitter = " | ";
 
-  var appendLabelAndHeader = function(seriesData){
+  var seriesData,
+    uniqueEntries;
 
-    var uniqueEntries = getUniqueEntries(seriesData);
-
-    seriesData.forEach(function(series){
-      series.label = "";
-      if (uniqueEntries.uniquePages.length > 1) { series.label += series.page }
-      if (uniqueEntries.uniqueJobGroups.length > 1) { series.label += series.jobGroup }
-      if (uniqueEntries.uniqueMeasurands.length > 1) { series.label += series.measurand }
-    });
-
-    return seriesData;
-
+  var  init = function () {
+    seriesData = series;
+    deduceUniqueEntries();
   };
 
-  var getUniqueEntries = function(seriesData){
+  var deduceUniqueEntries = function(){
 
-    var uniqueEntries = {
+    uniqueEntries = {
       uniquePages: [],
       uniqueJobGroups: [],
       uniqueMeasurands: []
@@ -36,10 +29,9 @@ OpenSpeedMonitor.ChartModules.LabelUtils = (function () {
 
     seriesData.forEach(function(series){
 
-      var splittedIdentifier = series.identifier.split(identifierDelimitter);
+      var splittedIdentifier = series.grouping.split(identifierDelimitter);
       series.page = splittedIdentifier[0];
       series.jobGroup = splittedIdentifier[1];
-      series.measurand = splittedIdentifier[2];
 
       if (uniqueEntries.uniquePages.indexOf(series.page) == -1) {
         uniqueEntries.uniquePages.push(series.page);
@@ -53,16 +45,40 @@ OpenSpeedMonitor.ChartModules.LabelUtils = (function () {
 
     });
 
-    return uniqueEntries;
+  };
+
+  var appendUniqueLabels = function(){
+
+    seriesData.forEach(function(series){
+      series.label = "";
+      if (uniqueEntries.uniquePages.length > 1) { series.label += series.page }
+      if (uniqueEntries.uniqueJobGroups.length > 1) { series.label += series.jobGroup }
+      if (uniqueEntries.uniqueMeasurands.length > 1) { series.label += series.measurand }
+    });
 
   };
 
-  var buildShortestUniqueLabel = function(seriesData){
-    return appendLabelAndHeader(seriesData);
+  var getCommonLabelParts = function () {
+    var commonPartsHeader = ""
+    if (uniqueEntries.uniqueMeasurands.length == 1) { commonPartsHeader += "Measurand: " + uniqueEntries.uniqueMeasurands[0] + identifierDelimitter }
+    if (uniqueEntries.uniquePages.length == 1) { commonPartsHeader += "Page: " + uniqueEntries.uniquePages[0] + identifierDelimitter }
+    if (uniqueEntries.uniqueJobGroups.length == 1) { commonPartsHeader += "Job Group: " + uniqueEntries.uniqueJobGroups[0] + identifierDelimitter }
+    if (commonPartsHeader.indexOf(identifierDelimitter) !== -1) {
+      commonPartsHeader = commonPartsHeader.substr(0, commonPartsHeader.length - identifierDelimitter.length);
+    }
+    return commonPartsHeader;
   };
+
+  var getSeriesWithShortestUniqueLabels = function(){
+    appendUniqueLabels(seriesData);
+    return seriesData;
+  };
+
+  init();
 
   return {
-    buildShortestUniqueLabel: buildShortestUniqueLabel
+    getSeriesWithShortestUniqueLabels: getSeriesWithShortestUniqueLabels,
+    getCommonLabelParts: getCommonLabelParts,
   }
 
-})();
+};
