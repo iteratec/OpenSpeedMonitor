@@ -3,6 +3,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
+import de.iteratec.osm.distributionData.DistributionTrace
 import de.iteratec.osm.distributionData.GetDistributionCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -78,10 +79,19 @@ class DistributionChartController extends ExceptionHandlerController {
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
 
         allEventResults.each { result ->
-            if (distributionChartDTO.series.get(result.page) == null) {
-                distributionChartDTO.series.put(result.page, new ArrayList<>())
+            def jobGroup = result.jobGroup.toString()
+            def page = result.page.toString()
+
+            def identifier = jobGroup + "-" + page
+
+            if (distributionChartDTO.series.get(identifier) == null) {
+                distributionChartDTO.series.put(identifier, new DistributionTrace())
             }
-            distributionChartDTO.series.get(result.page).add(result[selectedMeasurand])
+
+            def newTrace = distributionChartDTO.series.get(identifier)
+            newTrace.jobGroup = jobGroup
+            newTrace.page = page
+            newTrace.data.add(result[selectedMeasurand])
         }
 
         ControllerUtils.sendObjectAsJSON(response, distributionChartDTO)

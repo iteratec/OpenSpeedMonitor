@@ -57,7 +57,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         // add the violins
         Object.keys(chartData.series).forEach( function (trace, i) {
-            var traceData = chartData.series[trace].sort(d3.ascending);
+            var traceData = chartData.series[trace].data.sort(d3.ascending);
 
             var g = svg.append("g")
                        .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
@@ -91,8 +91,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var maxValues = [];
         var minValues = [];
         Object.keys(chartData.series).forEach( function (trace) {
-            maxValues.push(Math.max.apply(null, chartData.series[trace]));
-            minValues.push(Math.min.apply(null, chartData.series[trace]).toString());
+            maxValues.push(Math.max.apply(null, chartData.series[trace].data));
+            minValues.push(Math.min.apply(null, chartData.series[trace].data));
         });
 
         return [Math.min.apply(null, minValues), Math.max.apply(null, maxValues)];
