@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -52,6 +52,13 @@
                                 title="${message(code:'de.iteratec.pageAggregation.title', default:'Page Aggregation')}">
                             <i class="fa fa-bar-chart"></i>
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
+                        <g:link controller="distributionChart" action="show"
+                                title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
+                            <i class="fa fa-area-chart fa-rotate-270"></i>
+                            <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
                         </g:link>
                     </li>
                     <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">

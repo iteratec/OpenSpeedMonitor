@@ -104,11 +104,6 @@ class DistributionChartController extends ExceptionHandlerController {
      */
     private String getErrorMessages(GetDistributionCommand cmd) {
         String result = ""
-//        JOHANNES2DO: create error message if no measurand (or whatever I need here) is selected
-//        if (!cmd.selectedSeries) {
-//            result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
-//            result += "<br />"
-//        }
         if (!cmd.selectedPages) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage", "Please select at least one page")
             result += "<br />"
