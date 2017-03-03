@@ -88,7 +88,7 @@ class DistributionChartController extends ExceptionHandlerController {
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
 
         allEventResults.each { result ->
-            def jobGroup = result.jobGroup.toString()
+            def jobGroup = result.jobGroup.name.toString()
             def page = result.page.toString()
 
             def identifier = page + " / " + jobGroup

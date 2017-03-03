@@ -6,6 +6,23 @@
                 class="caret"></span>
         </button>
         <ul class="dropdown-menu pull-right">
+            <li id="all-violins-header" class="dropdown-header">
+                <g:message code="de.iteratec.osm.distributionChart.filter.noFilterHeader" default="Sort"/>
+            </li>
+            <li>
+                <a id="all-violins-desc" href="#">
+                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                    <g:message code="de.iteratec.osm.distributionChart.filter.noFilterDesc"
+                               default="Descending Median"/>
+                </a>
+            </li>
+            <li>
+                <a id="all-violins-asc" href="#">
+                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                    <g:message code="de.iteratec.osm.distributionChart.filter.noFilterAsc"
+                               default="Ascending Median"/>
+                </a>
+            </li>
             <li id="customer-journey-header" class="dropdown-header">
                 <g:message code="de.iteratec.osm.distributionChart.filter.customerJourneyHeader"
                            default="Customer Journey"/>

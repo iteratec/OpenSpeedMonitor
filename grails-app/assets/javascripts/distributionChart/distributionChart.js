@@ -9,6 +9,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var svgContainer = null,
         chart = null,
         chartData = null,
+        originalSeries = null,
         width = 600,
         height = 600,
         margin = {top: 10, right: 30, bottom: 50, left: 100},
@@ -23,6 +24,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var drawChart = function (distributionChartData) {
         chartData = distributionChartData;
+        if (originalSeries == null) {
+            originalSeries = chartData.series;
+
+            // sort the violins after descending median as default
+            sortByMedian();
+            var sortedSeries = {};
+            chartData.sortingRules.desc.forEach(function (trace) {
+                sortedSeries[trace] = originalSeries[trace];
+            });
+            chartData.series = sortedSeries;
+        }
 
         // delete old chart in same container
         d3.select(svgContainer).selectAll("svg").remove();
@@ -180,6 +192,34 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         gMinus.attr("transform", "rotate(90, 0, 0) scale(1, -1)");
     };
 
+    var sortByMedian = function () {
+        Object.keys(chartData.series).forEach( function (trace) {
+            chartData.series[trace].median = calculateMedian(chartData.series[trace].data);
+        });
+
+        chartData.sortingRules = {};
+
+        chartData.sortingRules.desc = Object.keys(chartData.series).sort( function (a, b) {
+            return chartData.series[b].median - chartData.series[a].median;
+        });
+
+        chartData.sortingRules.asc = Object.keys(chartData.series).sort( function (a, b) {
+            return chartData.series[a].median - chartData.series[b].median;
+        });
+    };
+
+    var calculateMedian = function (arr) {
+        // for safety reasons sort the array
+        arr.sort(function(a, b) {
+            return a - b;
+        });
+
+        var i = arr.length/2;
+        var med = (arr.length % 2 === 0) ? arr[i-1] : (arr[Math.floor(i)-1] + arr[Math.floor(i)])/2;
+
+        return med;
+    };
+
     var initFilterDropdown = function (filterRules) {
         var $filterDropdownGroup = $("#filter-dropdown-group");
         var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
@@ -197,19 +237,48 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                 link.insertAfter($customerJourneyHeader);
             }
         }
+
+        $filterDropdownGroup.find("#all-violins-desc").click(function (e) {
+            filterCustomerJourney(null, true);
+            toogleFilterCheckmarks(e.target);
+        });
+        $filterDropdownGroup.find("#all-violins-asc").click(function (e) {
+            filterCustomerJourney(null, false);
+            toogleFilterCheckmarks(e.target);
+        })
     };
 
-    var filterCustomerJourney = function (journeyKey) {
-        var violins = d3.selectAll(".violin");
-        console.log(chartData.filterRules[journeyKey]);
-        console.log(chartData);
+    var filterCustomerJourney = function (journeyKey, desc) {
+        var filteredAndSortedSeries = {};
+
+        if (journeyKey) {
+            var journey = chartData.filterRules[journeyKey];
+
+            journey.forEach( function (trace) {
+                filteredAndSortedSeries[trace] = originalSeries[trace];
+            });
+        } else {
+            var sortingOrder = desc ? "desc" : "asc";
+            chartData.sortingRules[sortingOrder].forEach( function (trace) {
+                filteredAndSortedSeries[trace] = originalSeries[trace];
+            });
+        }
+
+        chartData.series = filteredAndSortedSeries;
+        drawChart(chartData);
     };
 
     var toogleFilterCheckmarks = function (listItem) {
         // remove all checkmarks
-        $('.filterActive').toggleClass("filterInactive filterActive");
-        // set checkmark on the clicked listItem, if no listItem is passed, do nothing
-        $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
+        $(".filterActive").toggleClass("filterInactive filterActive");
+
+        // reset checkmark to 'descending' if 'Show' gets clicked
+        // otherwise set checkmark to the list item one has clicked on
+        if (typeof listItem == 'undefined') {
+            $('#all-violins-desc > .filterInactive').toggleClass("filterActive filterInactive");
+        } else {
+            $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
+        }
     };
 
     var chartStyling = function () {
