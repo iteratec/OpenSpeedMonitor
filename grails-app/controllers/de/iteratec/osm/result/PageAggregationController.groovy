@@ -64,6 +64,10 @@ class PageAggregationController extends ExceptionHandlerController {
         return modelToRender
     }
 
+    def entryAndFollow(){
+        return [:]
+    }
+
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
@@ -104,11 +108,19 @@ class PageAggregationController extends ExceptionHandlerController {
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), yAxisLabel: getYAxisLabel(series.measurands[0]), stacked: series.stacked)
+            BarchartSeries barchartSeries = new BarchartSeries(
+                    dimensionalUnit: getDimensionalUnit(series.measurands[0]),
+                    yAxisLabel: getYAxisLabel(series.measurands[0]),
+                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
-                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], grouping: "${datum[0]} / ${datum[1]?.name}"))
+                        new BarchartDatum(
+                            measurand: currentMeasurand.replace("Uncached", ""),
+                            value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
+                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                        )
+                    )
                 }
             }
 
@@ -120,6 +132,22 @@ class PageAggregationController extends ExceptionHandlerController {
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+    }
+
+    @RestAction
+    def getEntryAndFollowBarchartData(){
+
+        JobGroup jobGroup = JobGroup.findByName('develop_Desktop')
+        List<Job> jobs = jobDaoService.getJobs(jobGroup)
+        Set<Page> uniqueTestedPages = [] as Set
+
+        jobs*.script*.navigationScript.each {String navigationScript ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+            uniqueTestedPages.addAll(pagesOfThisScript)
+        }
+        uniqueTestedPages.each {
+
+        }
     }
 
     /**
@@ -154,7 +182,7 @@ class PageAggregationController extends ExceptionHandlerController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << "${p.name} / ${it.name}"
+                        filterRule << "${p.name} | ${it.name}"
                     }
                 }
             }

@@ -48,7 +48,9 @@
                                         'includeInterval'          : includeInterval]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
-                            aggrGroupValuesUnCached: aggrGroupValuesUnCached
+                            aggrGroupValuesUnCached: aggrGroupValuesUnCached,
+                            multipleMeasurands: false,
+                            multipleSeries: false
                     ]"/>
                 </div>
 
@@ -83,7 +85,9 @@
     <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:script type="text/javascript">
+
         OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
+
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
         });
@@ -92,9 +96,13 @@
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
         function drawGraph() {
+
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart || OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
+
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
+              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+
             spinner.start();
             $.ajax({
                 type: 'POST',
