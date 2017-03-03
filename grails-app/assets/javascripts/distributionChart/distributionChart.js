@@ -12,7 +12,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         width = 600,
         height = 600,
         margin = {top: 10, right: 30, bottom: 50, left: 100},
-        violinWidth = 150,
+        maxViolinWidth = 150,
+        violinWidth = null,
         resolution = 20,
         interpolation = 'basis';
 
@@ -35,6 +36,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                     .append("svg")
                     .attr("width", "100%")
                     .attr("height", height);
+
+        violinWidth = calculateViolinWidth();
 
         var domain = getDomain();
 
@@ -85,13 +88,15 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         toogleFilterCheckmarks();
     };
 
-    var xRange = function () {
-        var range = [];
-        Object.keys(chartData.series).forEach( function (trace, i) {
-            range.push(i * violinWidth + violinWidth/2);
-        });
+    var calculateViolinWidth = function () {
+        var svgWidth = svgContainer.clientWidth - margin.left;
+        var numberOfViolins = Object.keys(chartData.series).length;
 
-        return range;
+        if (numberOfViolins * maxViolinWidth > svgWidth) {
+            return svgWidth / numberOfViolins;
+        }
+
+        return maxViolinWidth;
     };
 
     var getDomain = function () {
@@ -103,6 +108,15 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         });
 
         return [Math.min.apply(null, minValues), Math.max.apply(null, maxValues)];
+    };
+
+    var xRange = function () {
+        var range = [];
+        Object.keys(chartData.series).forEach( function (trace, i) {
+            range.push(i * violinWidth + violinWidth/2);
+        });
+
+        return range;
     };
 
     var addViolin = function (svg, traceData, height, violinWidth, domain) {
