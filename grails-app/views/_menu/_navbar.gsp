@@ -57,7 +57,7 @@
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
                         <g:link controller="distributionChart" action="show"
                                 title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
-                            <i class="fa fa-area-chart fa-rotate-270"></i>
+                            <i class="fa fa-area-chart"></i>
                             <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
                         </g:link>
                     </li>

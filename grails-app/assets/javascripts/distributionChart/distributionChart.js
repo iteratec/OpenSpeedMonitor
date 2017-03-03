@@ -25,6 +25,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         // delete old chart in same container
         d3.select(svgContainer).selectAll("svg").remove();
+        initFilterDropdown(chartData.filterRules);
 
         // make the chart visible
         $("#chart-card").removeClass("hidden");
@@ -60,6 +61,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var traceData = chartData.series[trace].data.sort(d3.ascending);
 
             var g = svg.append("g")
+                       .attr("class", "violin")
                        .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
             addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
@@ -75,7 +77,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
            .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")")
            .call(xAxis);
 
+        postDraw()
+    };
+
+    var postDraw = function () {
         chartStyling();
+        toogleFilterCheckmarks();
     };
 
     var xRange = function () {
@@ -133,30 +140,62 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         gPlus.append("path")
              .datum(data)
-             .attr("class", "area")
+             .attr("class", "violinArea")
              .attr("d", area)
              .style("fill", violinColor);
 
         gPlus.append("path")
              .datum(data)
-             .attr("class", "violin")
+             .attr("class", "violinOutline")
              .attr("d", line)
              .style("stroke", violinColor);
 
         gMinus.append("path")
               .datum(data)
-              .attr("class", "area")
+              .attr("class", "violinArea")
               .attr("d", area)
               .style("fill", violinColor);
 
         gMinus.append("path")
               .datum(data)
-              .attr("class", "violin")
+              .attr("class", "violinOutline")
               .attr("d", line)
               .style("stroke", violinColor);
 
         gPlus.attr("transform", "rotate(90, 0, 0)  translate(0, -" + violinWidth + ")");
         gMinus.attr("transform", "rotate(90, 0, 0) scale(1, -1)");
+    };
+
+    var initFilterDropdown = function (filterRules) {
+        var $filterDropdownGroup = $("#filter-dropdown-group");
+        var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
+
+        // remove old filter
+        $filterDropdownGroup.find('.filterRule').remove();
+
+        for (var filterRuleKey in filterRules) {
+            if (filterRules.hasOwnProperty(filterRuleKey)) {
+                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+                link.click(function (e) {
+                    filterCustomerJourney(e.target.innerText);
+                    toogleFilterCheckmarks(e.target);
+                });
+                link.insertAfter($customerJourneyHeader);
+            }
+        }
+    };
+
+    var filterCustomerJourney = function (journeyKey) {
+        var violins = d3.selectAll(".violin");
+        console.log(chartData.filterRules[journeyKey]);
+        console.log(chartData);
+    };
+
+    var toogleFilterCheckmarks = function (listItem) {
+        // remove all checkmarks
+        $('.filterActive').toggleClass("filterInactive filterActive");
+        // set checkmark on the clicked listItem, if no listItem is passed, do nothing
+        $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
     };
 
     var chartStyling = function () {

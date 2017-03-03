@@ -1,9 +1,11 @@
-.area {
+/* chart appearance */
+
+.violinArea {
     shape-rendering: geometricPrecision;
     fill: #2961A6 !important;
 }
 
-.violin {
+.violinOutline {
     shape-rendering: geometricPrecision;
     fill: none !important;
     stroke: #265997 !important;
@@ -17,4 +19,27 @@
     color-rendering: optimizeQuality !important;
     shape-rendering: crispEdges !important;
     text-rendering: geometricPrecision !important;
+}
+
+
+/* misc styling */
+
+#chart-container {
+    position: relative;
+}
+
+#filter-dropdown-group {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    z-index: 500;
+    padding: 6px 12px;
+}
+
+.filterActive {
+    visibility: visible;
+}
+
+.filterInactive {
+    visibility: hidden;
 }

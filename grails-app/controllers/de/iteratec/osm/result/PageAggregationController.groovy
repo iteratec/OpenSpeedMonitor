@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.BarchartDTO
 import de.iteratec.osm.dimple.BarchartDatum
@@ -31,6 +32,7 @@ class PageAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
+    FilteringAndSortingDataService filteringAndSortingDataService
 
     def index() {
         redirect(action: 'show')
@@ -59,7 +61,7 @@ class PageAggregationController extends ExceptionHandlerController {
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
-        return modelToRender;
+        return modelToRender
     }
 
     /**
@@ -113,7 +115,9 @@ class PageAggregationController extends ExceptionHandlerController {
             barchartDTO.series.add(barchartSeries)
         }
 
+//      JOHANNES2DO: check how to extract the filteringAndSortingDataService
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+//        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, barchartDTO)
     }
