@@ -66,7 +66,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
     ];
     var expectedCommonLabelParts = "Measurand: docCompleteTimeInMillisecs | Job Group: develop_Desktop";
 
-    var seriesLabels = OpenSpeedMonitor.ChartModules.SeriesLabels(seriesDataJustPageDiffers);
+    var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataJustPageDiffers);
     expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
     expect(seriesLabels.getCommonLabelParts()).toEqual(expectedCommonLabelParts)
 
@@ -157,7 +157,72 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
     ];
     var expectedCommonLabelParts = "Measurand: firstByteInMillisecsUncached | Page: ADS";
 
-    var seriesLabels = OpenSpeedMonitor.ChartModules.SeriesLabels(seriesDataJustJobGroupDiffers);
+    var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataJustJobGroupDiffers);
+    expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
+    expect(seriesLabels.getCommonLabelParts()).toEqual(expectedCommonLabelParts)
+
+  });
+
+  it("provides pages and jobGroups as label and correct header if pages and jobgroups differ", function () {
+    var seriesDataPageAndJobGroupDiffer = [
+      {
+        grouping: "ADS | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413
+      },
+      {
+        grouping: "ADS_entry | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115
+      },
+      {
+        grouping: "ADS | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468
+      },
+      {
+        grouping: "ADS_entry | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413
+      }
+    ];
+    var expectedSeriesData = [
+      {
+        grouping: "ADS | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413,
+        page: "ADS",
+        jobGroup: "develop_Desktop",
+        label: "ADS | develop_Desktop"
+      },
+      {
+        grouping: "ADS_entry | develop_Desktop",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1040.8115,
+        page: "ADS_entry",
+        jobGroup: "develop_Desktop",
+        label: "ADS_entry | develop_Desktop"
+      },
+      {
+        grouping: "ADS | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 1351.7468,
+        page: "ADS",
+        jobGroup: "develop_Tablet",
+        label: "ADS | develop_Tablet"
+      },
+      {
+        grouping: "ADS_entry | develop_Tablet",
+        measurand: "firstByteInMillisecsUncached",
+        value: 909.413,
+        page: "ADS_entry",
+        jobGroup: "develop_Tablet",
+        label: "ADS_entry | develop_Tablet"
+      }
+    ];
+    var expectedCommonLabelParts = "Measurand: firstByteInMillisecsUncached";
+
+    var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataPageAndJobGroupDiffer);
     expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
     expect(seriesLabels.getCommonLabelParts()).toEqual(expectedCommonLabelParts)
 

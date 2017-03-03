@@ -1,4 +1,7 @@
 //= require /bower_components/d3/d3.min.js
+//= require /d3/chartLabelUtil
+//= require /d3/trafficLightDataProvider
+//= require_self
 
 "use strict";
 
@@ -17,7 +20,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     width,
     absoluteMaxValue = 0,
     absoluteMaxYOffset = 0,
-    labelWidth = 0,
+    labelWidths = [],
     xScale = d3.scale.linear(),
     initialBarWidth = 20,
     countTrafficLightBar = 1,
@@ -25,13 +28,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     trafficLightBars,
     transitionDuration = 600,
     svgHeight,
-    trafficLightBarOpacity = 0.4,
     filterRules = {},
-    actualBarchartData;
+    actualBarchartData,
+    commonLabelParts,
+    headerLine;
 
   var drawChart = function (barchartData) {
 
-    if (svg === undefined){
+    if (svg === undefined) {
       initChart();
     }
 
@@ -50,6 +54,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     svg = d3.select("#" + chartIdentifier).append("svg")
       .attr("width", width);
 
+    headerLine = svg.append("g");
     allBarsGroup = svg.append("g");
     trafficLightBars = svg.append("g");
 
@@ -61,16 +66,20 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var initChartData = function (barchartData) {
+
     barchartData.series.forEach(function (series) {
+      var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data);
+      series.data = labelUtil.getSeriesWithShortestUniqueLabels();
+      commonLabelParts = labelUtil.getCommonLabelParts();
       series.data.sort(function (x, y) {
         return d3.descending(x.value, y.value);
       });
     });
-    // actualBarchartData.series.forEach(function (currentSeries) {
-    //   currentSeries.data.originalData = currentSeries.data;
-    // })
+
     barchartData.originalSeries = clone(barchartData.series);
+
     actualBarchartData = barchartData;
+
   };
 
   var drawAllBars = function () {
@@ -83,11 +92,52 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     drawTrafficLight();
 
+    var headerData = [{headerText: commonLabelParts}];
+    drawHeader(headerData);
+
   };
+
+  var drawHeader = function (headerData) {
+
+    var headerText = headerLine.selectAll("text")
+      .data(headerData, function (d) {
+        return d.headerText;
+      });
+
+    // exit
+
+    headerText.exit()
+      .transition()
+      .duration(transitionDuration)
+      .remove();
+
+    // enter
+
+    headerText.enter().append("text")
+      .text(function (d) {
+        return d.headerText;
+      })
+      .attr("y", barPadding + barHeight / 2)
+      .attr("dy", ".35em") //vertical align middle
+      .attr("cx", 0)
+      .attr("transform", function (d) {
+        return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
+      });
+
+    //update
+
+    headerText
+      .transition()
+      .duration(transitionDuration)
+      .attr("transform", function (d) {
+        return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
+      });
+
+  }
 
   var drawSeries = function (seriesData, unitName) {
 
-    var setWidthOfBarByData = function(selection) {
+    var setWidthOfBarByData = function (selection) {
       selection
         .attr("width", function (d) {
           return xScale(d.value)
@@ -97,25 +147,41 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       var paddingBetweenLabelAndBar = barPadding;
       xScale
         .domain([0, absoluteMaxValue])
-        .range([0, width - outerMargin*2 - labelWidth - paddingBetweenLabelAndBar]);
+        .range([0, width - outerMargin * 2 - getMaxLabelWidth() - paddingBetweenLabelAndBar]);
     };
 
     svgHeight = topMargin + (seriesData.length + countTrafficLightBar) * (barHeight + barPadding) + barPadding;
     svg.attr("height", svgHeight);
     absoluteMaxYOffset = (seriesData.length - 1) * (barHeight + barPadding) + barPadding;
 
-    absoluteMaxValue = Math.max(absoluteMaxValue, d3.max(seriesData, function(d) { return d.value; }));
+    absoluteMaxValue = Math.max(absoluteMaxValue, d3.max(seriesData, function (d) {
+      return d.value;
+    }));
 
     var singleBarGroups = allBarsGroup.selectAll("g")
-      .data(seriesData, function(d) { return d.grouping + d.measurand; });
+      .data(seriesData, function (d) {
+        return d.label + d.measurand;
+      });
 
+    // exit ////////////////////////////////////////////////////////////////////////////////////
+
+    singleBarGroups.exit()
+      .transition()
+      .duration(transitionDuration)
+      .attr("width", 0)
+      .remove()
+      .each(function (elem) {
+        labelWidths = labelWidths.filter(function (labelWidth) {
+          return labelWidth.identifier !== elem.label + elem.measurand;
+        })
+      });
 
     // enter ////////////////////////////////////////////////////////////////////////////////////
 
     var singleBarGroupsEnter = singleBarGroups.enter()
       .append("g")
-      .attr("cx",0)
-      .attr("transform", function(d, index) {
+      .attr("cx", 0)
+      .attr("transform", function (d, index) {
         var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
         return "translate(" + outerMargin + "," + yOffset + ")";
       });
@@ -123,17 +189,22 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     singleBarGroupsEnter.append("text")
       .attr("y", barHeight / 2)
       .attr("dy", ".35em") //vertical align middle
-      .text(function(d){ return d.grouping; }).each(function() {
-        labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width))
+      .text(function (d) {
+        return d.label;
+      })
+      .each(function (elem) {
+        labelWidths.push({identifier: elem.label + elem.measurand, width: this.getBBox().width})
       });
 
     defineXScale();
 
     singleBarGroupsEnter.append("rect")
-      .attr("transform", "translate(" + parseInt(labelWidth+barPadding) + ", 0)")
+      .attr("transform", "translate(" + parseInt(getMaxLabelWidth() + barPadding) + ", 0)")
       .attr("height", barHeight)
       .attr("width", initialBarWidth)
-      .attr("fill", function(d,i) { return colorPalette(0); })
+      .attr("fill", function (d, i) {
+        return colorPalette(0);
+      })
       .transition()
       .duration(transitionDuration)
       .call(setWidthOfBarByData);
@@ -141,13 +212,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     singleBarGroupsEnter.append("text")
       .attr("class", "value")
       .attr("y", barHeight / 2)
-      .attr("dx", -valueMarginInBar + labelWidth) //margin right
+      .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
       .attr("dy", ".35em") //vertical align middle
       .attr("text-anchor", "end")
-      .text(function(d){
+      .text(function (d) {
         return (Math.round(d.value)) + " " + unitName;
       })
-      .attr("x", function(d){
+      .attr("x", function (d) {
         var width = this.getBBox().width;
         return Math.max(width + valueMarginInBar, xScale(d.value));
       });
@@ -157,20 +228,18 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     singleBarGroups
       .transition()
       .duration(transitionDuration)
-      .attr("transform", function(d, index) {
+      .attr("transform", function (d, index) {
         var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
         return "translate(" + outerMargin + "," + yOffset + ")";
-      })
+      });
 
-    // exit ////////////////////////////////////////////////////////////////////////////////////
-
-    singleBarGroups.exit()
-      .transition()
-      .duration(transitionDuration)
-      .attr("width", 0)
-      .remove();
+    defineXScale();
 
   };
+
+  var getMaxLabelWidth = function () {
+    return d3.max(labelWidths, function(d) { return d.width; });
+  }
 
   var initFilterDropdown = function () {
 
@@ -217,33 +286,33 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     if (journeyKey && filterRules[journeyKey]) {
 
       // remove elements not in customer Journey from each series
-      actualBarchartData.series.forEach(function(series){
-        series.data = series.data.filter(function(element){
+      actualBarchartData.series.forEach(function (series) {
+        series.data = series.data.filter(function (element) {
           return filterRules[journeyKey].indexOf(element.grouping) >= 0;
         });
       });
       // remove series containing no data after first filter
-      actualBarchartData.series = actualBarchartData.series.filter(function(series){
+      actualBarchartData.series = actualBarchartData.series.filter(function (series) {
         return series.data.length > 0;
       });
       // sort series
-      actualBarchartData.series.forEach(function(series){
-        series.data.sort(function(x, y){
+      actualBarchartData.series.forEach(function (series) {
+        series.data.sort(function (x, y) {
           return filterRules[journeyKey].indexOf(x.grouping) - filterRules[journeyKey].indexOf(y.grouping);
         });
       });
 
     } else {
       desc == desc || false;
-      if (desc){
-        actualBarchartData.series.forEach(function(series){
-          series.data.sort(function(x, y){
+      if (desc) {
+        actualBarchartData.series.forEach(function (series) {
+          series.data.sort(function (x, y) {
             return d3.descending(x.value, y.value);
           });
         });
       } else {
-        actualBarchartData.series.forEach(function(series){
-          series.data.sort(function(x, y){
+        actualBarchartData.series.forEach(function (series) {
+          series.data.sort(function (x, y) {
             return d3.ascending(x.value, y.value);
           });
         });
@@ -265,55 +334,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     }
   };
 
-  var drawTrafficLight = function(){
+  var drawTrafficLight = function () {
 
-    var trafficLightData = getTrafficLightData();
+    var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
 
     var trafficLight = trafficLightBars.selectAll("g")
-      .data(trafficLightData, function(d){ return d.id });
-
-    //enter
-
-    var trafficLightEnter = trafficLight.enter()
-      .append("g")
-      .attr("cx",0)
-      .attr("transform", function(d, index){
-        var xOffset = outerMargin + labelWidth + xScale(d.lowerBoundary) + barPadding;
-        return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding*2) + ")";
-      });
-
-    trafficLightEnter.append("rect")
-      .attr("height", barHeight)
-      .attr("width", initialBarWidth)
-      .attr("fill", function(d) { return d.fill; })
-      .attr("fill-opacity", function(d) { return d.fillOpacity; })
-      .transition()
-      .duration(transitionDuration)
-      .attr("width", function (d) {
-        return xScale(d.upperBoundary - d.lowerBoundary);
-      });
-    trafficLightEnter.append("text")
-      .attr("class", function(d){
-        return d.cssClass;
-      })
-      .text(function(d){
-        return d.name;
-      })
-      .attr("y", barHeight / 2)
-      .attr("dy", ".35em") //vertical align middle
-      .attr("x", function(d){
-        return xScale(d.upperBoundary - d.lowerBoundary) / 2;
-      })
-      .attr("text-anchor", "mid");
-
-    //update
-
-    trafficLight
-      .transition()
-      .duration(transitionDuration)
-      .attr("transform", function(d, index){
-        var xOffset = outerMargin + labelWidth + xScale(d.lowerBoundary) + barPadding;
-        return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding*2) + ")";
+      .data(trafficLightData, function (d) {
+        return d.id
       });
 
     //exit
@@ -324,30 +351,58 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .attr("width", 0)
       .remove();
 
-  };
+    // enter
 
-  var getTrafficLightData = function () {
-    var trafficLightData = []
-    var goodLoadtime = 1000,
-      badLoadtime = 3000;
+    var trafficLightEnter = trafficLight.enter()
+      .append("g")
+      .attr("cx", 0)
+      .attr("transform", function (d, index) {
+        var xOffset = outerMargin + getMaxLabelWidth() + xScale(d.lowerBoundary) + barPadding;
+        return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
+      });
 
-    if (absoluteMaxValue > badLoadtime) {
-      trafficLightData = [
-        {id: "all_good", lowerBoundary: 0, upperBoundary: goodLoadtime, fill: "green", fillOpacity: trafficLightBarOpacity, name: "GOOD", cssClass: "good"},
-        {id: "all_ok", lowerBoundary: goodLoadtime, upperBoundary: badLoadtime, fill: "yellow", fillOpacity: trafficLightBarOpacity, name: "OK", cssClass: "ok"},
-        {id: "all_bad", lowerBoundary: badLoadtime, upperBoundary: absoluteMaxValue, fill: "red", fillOpacity: trafficLightBarOpacity, name: "BAD", cssClass: "bad"}
-      ]
-    } else if (absoluteMaxValue > goodLoadtime) {
-      trafficLightData = [
-        {id: "justGoodAndOk_good", lowerBoundary: 0, upperBoundary: goodLoadtime, fill: "green", fillOpacity: trafficLightBarOpacity, name: "GOOD", cssClass: "good"},
-        {id: "justGoodAndOk_ok", lowerBoundary: goodLoadtime, upperBoundary: absoluteMaxValue, fill: "yellow", fillOpacity: trafficLightBarOpacity, name: "OK", cssClass: "ok"},
-      ]
-    } else if (absoluteMaxValue > 0) {
-      trafficLightData = [
-        {id: "justGood_good", lowerBoundary: 0, upperBoundary: absoluteMaxValue, fill: "green", fillOpacity: trafficLightBarOpacity, name: "GOOD", cssClass: "good"},
-      ]
-    }
-    return trafficLightData;
+    trafficLightEnter.append("rect")
+      .attr("height", barHeight)
+      .attr("width", initialBarWidth)
+      .attr("fill", function (d) {
+        return d.fill;
+      })
+      .attr("fill-opacity", function (d) {
+        return d.fillOpacity;
+      })
+      .transition()
+      .duration(transitionDuration)
+      .attr("width", function (d) {
+        return xScale(d.upperBoundary - d.lowerBoundary);
+      });
+    trafficLightEnter.append("text")
+      .attr("class", function (d) {
+        return d.cssClass;
+      })
+      .text(function (d) {
+        return d.name;
+      })
+      .attr("y", barHeight / 2)
+      .attr("dy", ".35em") //vertical align middle
+      .attr("x", function (d) {
+        return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+      })
+      .attr("text-anchor", "mid");
+
+    //update
+
+    trafficLight
+      .transition()
+      .duration(transitionDuration)
+      .attr("transform", function (d, index) {
+        var xOffset = outerMargin + getMaxLabelWidth() + xScale(d.lowerBoundary) + barPadding;
+        return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
+      })
+      .select('rect')
+        .attr("width", function (d) {
+          return xScale(d.upperBoundary - d.lowerBoundary);
+        });
+
   };
 
   initChart();

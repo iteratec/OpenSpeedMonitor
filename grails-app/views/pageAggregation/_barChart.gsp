@@ -30,10 +30,6 @@
         </ul>
     </div>
     <div class="in-chart-buttons">
-        <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
-           onclick="initModalDialogValues()">
-            <i class="fa fa-sliders"></i>
-        </a>
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">

@@ -7,9 +7,9 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.SeriesLabels = function (series) {
+OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series) {
 
-  var identifierDelimitter = " | ";
+  var delimitter = " | ";
 
   var seriesData,
     uniqueEntries;
@@ -29,7 +29,7 @@ OpenSpeedMonitor.ChartModules.SeriesLabels = function (series) {
 
     seriesData.forEach(function(series){
 
-      var splittedIdentifier = series.grouping.split(identifierDelimitter);
+      var splittedIdentifier = series.grouping.split(delimitter);
       series.page = splittedIdentifier[0];
       series.jobGroup = splittedIdentifier[1];
 
@@ -51,21 +51,26 @@ OpenSpeedMonitor.ChartModules.SeriesLabels = function (series) {
 
     seriesData.forEach(function(series){
       series.label = "";
-      if (uniqueEntries.uniquePages.length > 1) { series.label += series.page }
-      if (uniqueEntries.uniqueJobGroups.length > 1) { series.label += series.jobGroup }
-      if (uniqueEntries.uniqueMeasurands.length > 1) { series.label += series.measurand }
+      if (uniqueEntries.uniquePages.length > 1) { series.label += series.page + delimitter }
+      if (uniqueEntries.uniqueJobGroups.length > 1) { series.label += series.jobGroup + delimitter }
+      if (uniqueEntries.uniqueMeasurands.length > 1) { series.label += series.measurand + delimitter }
+      series.label = cutTrailingDelimitter(series.label)
     });
 
   };
 
+  var cutTrailingDelimitter = function (toCutFrom) {
+    if (toCutFrom.indexOf(delimitter) !== -1) {
+      toCutFrom = toCutFrom.substr(0, toCutFrom.length - delimitter.length);
+    }
+    return toCutFrom;
+  };
   var getCommonLabelParts = function () {
     var commonPartsHeader = ""
-    if (uniqueEntries.uniqueMeasurands.length == 1) { commonPartsHeader += "Measurand: " + uniqueEntries.uniqueMeasurands[0] + identifierDelimitter }
-    if (uniqueEntries.uniquePages.length == 1) { commonPartsHeader += "Page: " + uniqueEntries.uniquePages[0] + identifierDelimitter }
-    if (uniqueEntries.uniqueJobGroups.length == 1) { commonPartsHeader += "Job Group: " + uniqueEntries.uniqueJobGroups[0] + identifierDelimitter }
-    if (commonPartsHeader.indexOf(identifierDelimitter) !== -1) {
-      commonPartsHeader = commonPartsHeader.substr(0, commonPartsHeader.length - identifierDelimitter.length);
-    }
+    if (uniqueEntries.uniqueMeasurands.length == 1) { commonPartsHeader += "Measurand: " + uniqueEntries.uniqueMeasurands[0] + delimitter }
+    if (uniqueEntries.uniquePages.length == 1) { commonPartsHeader += "Page: " + uniqueEntries.uniquePages[0] + delimitter }
+    if (uniqueEntries.uniqueJobGroups.length == 1) { commonPartsHeader += "Job Group: " + uniqueEntries.uniqueJobGroups[0] + delimitter }
+    commonPartsHeader = cutTrailingDelimitter(commonPartsHeader);
     return commonPartsHeader;
   };
 
