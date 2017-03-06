@@ -6,7 +6,7 @@ class ResultSelectionInformationCreationJob {
 
     static triggers = {
         /** Each Day at midnight. */
-        cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 0 0 ? * *')
+        cron(name: 'dailyCreationOfResultSelection', cronExpression: '0 0 0 ? * *')
     }
 
     def execute() {
@@ -19,7 +19,7 @@ class ResultSelectionInformationCreationJob {
         try {
             resultSelectionInformationService.createLatestResultSelectionInformation()
         } catch (Exception e) {
-            log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents throws an exception: " + e.getMessage())
+            log.error("Quartz controlled creation of ResultSelectionInformation throws an exception: " + e.getMessage())
         } finally {
             isCurrentlyRunning = false
         }
