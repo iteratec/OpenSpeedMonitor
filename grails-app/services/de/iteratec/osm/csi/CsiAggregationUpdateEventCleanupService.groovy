@@ -117,9 +117,6 @@ class CsiAggregationUpdateEventCleanupService {
     }
 
     boolean calculateIfNecessary(Long csiAggregationOpenAndExpiredId) {
-        activityUpdater?.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: closing calculated csiAggregations", csiAggregationIds.size())
-
-        activityUpdater?.addComment("${csiAggregationIds.size()} csiAggregations marked as closed and calculated.")
         CsiAggregation csiAggregationOpenAndExpired = CsiAggregation.get(csiAggregationOpenAndExpiredId)
         if (csiAggregationOpenAndExpired.hasToBeCalculated()) {
             calculateCsiAggregation(csiAggregationOpenAndExpired)
