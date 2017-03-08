@@ -286,6 +286,34 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         // remove the xAxis lines
         d3.select(".d3chart-axis.d3chart-xAxis > path.domain").remove();
         d3.selectAll(".d3chart-axis.d3chart-xAxis g > line").remove();
+
+        // rotate the labels if necessary
+        rotateLabels()
+    };
+
+    var rotateLabels = function () {
+        var rotate = false;
+        d3.selectAll(".d3chart-xAxis text").each(function() {
+            if (d3.select(this).node().getComputedTextLength() > violinWidth) {
+                rotate = true;
+            }
+        });
+
+        if (rotate) {
+            d3.selectAll(".d3chart-xAxis text")
+                .style("text-anchor", "start")
+                .each(function () {
+                    var x = d3.select(this).attr("x");
+                    var y = d3.select(this).attr("y");
+                    // get the translate value
+                    var t = d3.transform(d3.select(this).attr("transform"));
+                    var translateX = t.translate[0];
+                    var translateY = t.translate[1];
+
+                    d3.select(this)
+                        .attr("transform", "translate(" + translateX + "," + translateY + ")rotate(" + 45 + ", " + x + ", " + y + ")");
+                });
+        }
     };
 
     init();

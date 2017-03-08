@@ -405,9 +405,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
                 var t = d3.transform(d3.select(this).attr("transform"));
                 var translateX = t.translate[0];
                 var translateY = t.translate[1];
-                // calculate the x value for rotation
-                var rotateX = parseFloat(x) + translateX;
-                console.log(rotateX);
+
                 d3.select(this)
                     .attr("transform", "translate(" + translateX + "," + translateY + ")rotate(" + -45 + ", " + x + ", " + y + ")");
             });
