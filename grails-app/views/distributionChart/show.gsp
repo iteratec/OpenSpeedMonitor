@@ -8,7 +8,7 @@
     </title>
     %{--JOHANNES2DO: enable chart switch functionality--}%
     %{--<asset:javascript src="chartSwitch"/>--}%
-    <asset:stylesheet src="/distributionChart/distributionChart.css"/>
+    <asset:stylesheet src="d3Charts/distributionChart"/>
 </head>
 
 <body>

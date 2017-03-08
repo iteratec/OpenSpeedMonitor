@@ -23,6 +23,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         $(".in-chart-buttons").removeClass("hidden");
 
         svg = d3.select("#" + chartIdentifier + " svg")
+            .attr("class", "d3chart")
             .attr("height", height + margin.top + margin.bottom);
         chartContainer = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -35,7 +36,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         for (var key in updatedMappings) {
             labelMapping[key] = updatedMappings[key];
         }
-        d3.selectAll(".xAxisText").text(function (d) {
+        d3.selectAll(".d3chart-xAxisText").text(function (d) {
             return labelMapping[d.name];
         })
     };
@@ -77,7 +78,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
                 return "translate(" + xScale(d.name) + "," + yScale(d.value) + ")";
             });
         barContainer.append("rect")
-            .attr("class", "bar")
+            .attr("class", "d3chart-bar")
             .attr("height", function (d) {
                 return height - yScale(d.value);
             })
@@ -86,12 +87,12 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .text(function (d) {
                 return (d.value + "%");
             })
-            .attr("class", "barLabel")
+            .attr("class", "d3chart-barLabel")
             .style("text-anchor", "middle")
             .attr("x", barWidth / 2)
             .attr("y", "1.2em");
         barContainer.append("text")
-            .attr("class", "xAxisText")
+            .attr("class", "d3chart-xAxisText")
             .text(function (d) {
                 return labelMapping[d.name];
             })

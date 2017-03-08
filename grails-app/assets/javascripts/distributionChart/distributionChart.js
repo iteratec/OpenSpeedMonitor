@@ -46,6 +46,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         // create the svg which contains the chart
         var svg = d3.select(svgContainer)
                     .append("svg")
+                    .attr("class", "d3chart")
                     .attr("width", "100%")
                     .attr("height", height);
 
@@ -76,19 +77,19 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var traceData = chartData.series[trace].data.sort(d3.ascending);
 
             var g = svg.append("g")
-                       .attr("class", "violin")
+                       .attr("class", "d3chart-violin")
                        .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
             addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
 
         svg.append("g")
-           .attr("class", "axis yAxis")
+           .attr("class", "d3chart-axis d3chart-yAxis")
            .attr("transform", "translate(" + margin.left + ", 0)")
            .call(yAxis);
 
         svg.append("g")
-           .attr("class", "axis xAxis")
+           .attr("class", "d3chart-axis d3chart-xAxis")
            .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")")
            .call(xAxis);
 
@@ -166,25 +167,25 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         gPlus.append("path")
              .datum(data)
-             .attr("class", "violinArea")
+             .attr("class", "d3chart-violinArea")
              .attr("d", area)
              .style("fill", violinColor);
 
         gPlus.append("path")
              .datum(data)
-             .attr("class", "violinOutline")
+             .attr("class", "d3chart-violinOutline")
              .attr("d", line)
              .style("stroke", violinColor);
 
         gMinus.append("path")
               .datum(data)
-              .attr("class", "violinArea")
+              .attr("class", "d3chart-violinArea")
               .attr("d", area)
               .style("fill", violinColor);
 
         gMinus.append("path")
               .datum(data)
-              .attr("class", "violinOutline")
+              .attr("class", "d3chart-violinOutline")
               .attr("d", line)
               .style("stroke", violinColor);
 
@@ -283,8 +284,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var chartStyling = function () {
         // remove the xAxis lines
-        d3.select(".axis.xAxis path.domain").remove();
-        d3.selectAll(".axis.xAxis g > line").remove();
+        d3.select(".d3chart-axis.d3chart-xAxis > path.domain").remove();
+        d3.selectAll(".d3chart-axis.d3chart-xAxis g > line").remove();
     };
 
     init();

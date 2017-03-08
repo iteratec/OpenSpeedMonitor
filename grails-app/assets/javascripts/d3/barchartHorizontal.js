@@ -52,6 +52,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     width = parseInt($("#" + chartIdentifier).width(), 10);
 
     svg = d3.select("#" + chartIdentifier).append("svg")
+      .attr("class", "d3chart")
       .attr("width", width);
 
     headerLine = svg.append("g");
@@ -210,7 +211,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .call(setWidthOfBarByData);
 
     singleBarGroupsEnter.append("text")
-      .attr("class", "value")
+      .attr("class", "d3chart-value")
       .attr("y", barHeight / 2)
       .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
       .attr("dy", ".35em") //vertical align middle

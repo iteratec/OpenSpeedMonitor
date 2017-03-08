@@ -22,7 +22,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "green",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
-          cssClass: "good"
+          cssClass: "d3chart-good"
         },
         {
           id: "all_ok",
@@ -31,7 +31,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "yellow",
           fillOpacity: trafficLightBarOpacity,
           name: "OK",
-          cssClass: "ok"
+          cssClass: "d3chart-ok"
         },
         {
           id: "all_bad",
@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "red",
           fillOpacity: trafficLightBarOpacity,
           name: "BAD",
-          cssClass: "bad"
+          cssClass: "d3chart-bad"
         }
       ]
     } else if (absoluteMaxValue > goodLoadtime) {
@@ -52,7 +52,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "green",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
-          cssClass: "good"
+          cssClass: "d3chart-good"
         },
         {
           id: "justGoodAndOk_ok",
@@ -61,7 +61,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "yellow",
           fillOpacity: trafficLightBarOpacity,
           name: "OK",
-          cssClass: "ok"
+          cssClass: "d3chart-ok"
         },
       ]
     } else if (absoluteMaxValue > 0) {
@@ -73,7 +73,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           fill: "green",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
-          cssClass: "good"
+          cssClass: "d3chart-good"
         },
       ]
     }
