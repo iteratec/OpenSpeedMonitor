@@ -91,7 +91,7 @@ class DistributionChartController extends ExceptionHandlerController {
             def jobGroup = result.jobGroup.name.toString()
             def page = result.page.toString()
 
-            def identifier = page + " / " + jobGroup
+            def identifier = page + " | " + jobGroup
 
             if (distributionChartDTO.series.get(identifier) == null) {
                 distributionChartDTO.series.put(identifier, new DistributionTrace())

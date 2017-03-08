@@ -83,7 +83,7 @@
     </div>
 </div>
 
-%{--<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>--}%
+<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
     <asset:javascript src="/distributionChart/distributionChart.js"/>
