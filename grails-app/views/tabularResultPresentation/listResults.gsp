@@ -103,7 +103,10 @@
     <asset:script type="text/javascript">
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
-           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+        });
+
+        $(window).on("selectIntervalTimeframeCardLoaded", function () {
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
     </asset:script>
 </content>

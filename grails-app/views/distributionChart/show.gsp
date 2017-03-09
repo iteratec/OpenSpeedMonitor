@@ -92,9 +92,12 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="/distributionChart/distributionChart.js"/>
     <asset:javascript src="chartSwitch"/>
+    <asset:javascript src="/distributionChart/distributionChartUrlHandling.js"/>
     <asset:script type="text/javascript">
+
+        OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart().init();
+
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/distributionChart/distributionChart.js" />', true, 'distributionChart')
