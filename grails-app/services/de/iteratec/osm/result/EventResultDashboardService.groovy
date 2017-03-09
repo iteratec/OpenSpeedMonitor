@@ -117,14 +117,8 @@ public class EventResultDashboardService {
     List<Map<String, String>> getAllConnectivities(boolean includeNative = true) {
         List<Map<String, String>> result = [].withDefault { [:] }
         result.addAll(getAllConnectivityProfiles().collect { ["id": it.id, "name": it.toString()] })
-        result.addAll(EventResult.createCriteria().list {
-            isNotNull('customConnectivityName')
-            projections {
-                distinct('customConnectivityName')
-            }
-        }.collect { ["id": it, "name": it] })
 
-        if(includeNative && EventResult.findAllByNoTrafficShapingAtAll(true))  {
+        if(includeNative)  {
             result.add(["id": ResultSelectionController.MetaConnectivityProfileId.Native.value, "name": ResultSelectionController.MetaConnectivityProfileId.Native.value])
         }
 
