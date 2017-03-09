@@ -5,9 +5,9 @@
 <g:set var="userspecificDashboardService" bean="userspecificDashboardService"/>
 <html>
 <head>
+
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
-    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
     <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
 
@@ -15,8 +15,15 @@
 
 <body>
 
-<%-- main menu --%>
-<h1><g:message code="eventResultDashboard.label" default="Time Series"/></h1>
+<h1>
+    <g:message code="eventResultDashboard.label" default="Time Series"/>
+    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
+    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
+    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
+        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
+    </g:if>
+    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
+</h1>
 
 <div class="row">
     <div class="col-md-12">
@@ -263,40 +270,40 @@
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
     <asset:javascript src="iteratecChartRickshaw.js"/>
-
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
 
         var chartContextMenuI18N = ${i18n};
 
         function setAdjustments() {
-            var chartTitle = "${chartTitle}";
-            var chartWidth = "${chartWidth}";
-            var chartHeight = "${chartHeight}";
-            var loadTimeMinimum = "${loadTimeMinimum}";
-            var loadTimeMaximum = "${loadTimeMaximum}";
-            var showDataMarkers = "${showDataMarkers}";
-            var showDataLabels = "${showDataLabels}";
-            var graphNameAliases = ${graphNameAliases};
-            var graphColors = ${graphColors}
-        $("#dia-title").val(chartTitle);
-        $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
-        $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
-        $("#dia-y-axis-max").val(loadTimeMaximum);
-        $("#dia-y-axis-min").val(loadTimeMinimum);
-        initGraphNameAliases(graphNameAliases);
-        initGraphColors(graphColors);
+            var chartTitle = "${chartTitle}",
+                chartWidth = "${chartWidth}",
+                chartHeight = "${chartHeight}",
+                loadTimeMinimum = "${loadTimeMinimum}",
+                loadTimeMaximum = "${loadTimeMaximum}",
+                showDataMarkers = "${showDataMarkers}",
+                showDataLabels = "${showDataLabels}",
+                graphNameAliases = ${graphNameAliases},
+                graphColors = ${graphColors};
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
+            $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
+            $("#dia-y-axis-max").val(loadTimeMaximum);
+            $("#dia-y-axis-min").val(loadTimeMinimum);
+            initGraphNameAliases(graphNameAliases);
+            initGraphColors(graphColors);
 
-        if (eval(showDataMarkers)) {
-            $("#to-enable-marker").click();
+            if (eval(showDataMarkers)) {
+                $("#to-enable-marker").click();
+            }
+            if (eval(showDataLabels)) {
+                $("#to-enable-label").click();
+            }
         }
-        if (eval(showDataLabels)) {
-            $("#to-enable-label").click();
-        }
-    }
 
-    $(document).ready(function () {
+        $(document).ready(function () {
 
-        doOnDomReady(
+            doOnDomReady(
                 '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
 
@@ -307,16 +314,10 @@
         });
 
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"
-                                                                    />')
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    />')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-            "${createLink(action: 'show', controller: 'pageAggregation')}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
 
     </asset:script>
 </content>

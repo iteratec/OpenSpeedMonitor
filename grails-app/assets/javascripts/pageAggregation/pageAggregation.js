@@ -180,7 +180,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         $(window).on("selectIntervalTimeframeCardLoaded", function () {
             markTimeCardAsResolved();
         });
-        $(window).on("barchartLoaded", function () {
+        $(window).on("barchartHorizontalLoaded", function () {
             markBarChartAsResolved();
         });
     };

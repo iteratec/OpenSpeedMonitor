@@ -39,7 +39,7 @@ OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
 /**
  * Map for i18n to use
  */
-OpenSpeedMonitor.urls = OpenSpeedMonitor.i18n || {};
+OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 
 
 /**

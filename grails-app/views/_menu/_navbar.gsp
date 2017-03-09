@@ -1,9 +1,10 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
+<g:elseif test="${controllerName.equals('csiBenchmark')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -53,6 +54,13 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
+                    <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
+                        <g:link controller="distributionChart" action="show"
+                                title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
+                            <i class="fa fa-area-chart"></i>
+                            <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
+                        </g:link>
+                    </li>
                     <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
                         <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
                             <g:link controller="detailAnalysis" action="show"
@@ -87,6 +95,12 @@
                         <g:link controller="csiConfiguration" action="configurations">
                             <i class="fa fa-gears"></i>
                             <g:message code="de.iteratec.isocsi.csiConfiguration" default="Configuration"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('csiBenchmark') ? 'active' : ''}">
+                        <g:link controller="csiBenchmark" action="show">
+                            <i class="fa fa-bar-chart"></i>
+                            <g:message code="de.iteratec.isocsi.csiBenchmark.title" default="Csi Benchmark"/>
                         </g:link>
                     </li>
                 </ul>

@@ -4,6 +4,7 @@ A UI component to select date and time. _dateTimePicker.js works with this compo
 explicitly. See selectIntervalTimeframeCard.js as an example.
 --%>
 <div id="${id}">
+    <g:if test="${!hideHourSelection}">
     <div class="input-group bootstrap-timepicker time-control">
         <span class="input-group-addon">
             <g:checkBox name="${manualTimeName}" checked="${manualTimeValue}"/>
@@ -12,6 +13,7 @@ explicitly. See selectIntervalTimeframeCard.js as an example.
                value="${(time=='00:00'||time=='0:00')?'00:001':time}" disabled/>
         <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
     </div>
+    </g:if>
     <div class="date-control">
         <input class="form-control" type="text" id="${dateControlId}"
                data-date-format="${dateFormat}" data-date-week-start="${weekStart}"

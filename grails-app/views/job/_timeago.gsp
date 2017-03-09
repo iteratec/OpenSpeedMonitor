@@ -1,4 +1,4 @@
-<%@ page import="org.quartz.CronExpression"%>
+<%@ page import="org.joda.time.DateTime; org.quartz.CronExpression"%>
 <%@ page import="de.iteratec.osm.measurement.schedule.CronExpressionFormatter" %>
 <%@ page import="groovy.time.*" %>
 
@@ -11,8 +11,7 @@
 
 <g:if test="${date}">
 	<g:set var="dateDiffMs" value="${ TimeCategory.minus(date, new Date()).toMilliseconds() }" />
-	<g:set var="nextRunISO" value="${ date.format("yyyy-MM-dd'T'HH:mm:ss") }" />
-	<g:set var="nextRunHumanReadable" value="${ date.format(message(code: 'default.humanReadableDateFormat', default: 'yyyy')) }" />
+	<g:set var="nextRunISO" value="${ date.format("yyyy-MM-dd'T'HH:mm:ssZ")}" />
 	${prepend}
 		<g:if test="${url}">
 			<a href="${url}">
@@ -21,8 +20,7 @@
             data-date-diff-ms="${dateDiffMs}"
             <g:if test="${cronstring}">
                 data-cronstring="${cronstring}"
-            </g:if> >
-			${nextRunHumanReadable}
+            </g:if>>
          </abbr>
 		<g:if test="${url}">
 			</a>

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import groovy.transform.EqualsAndHashCode
+
 /**
  * 
  * @TODO TODO mze-2013-07-12: Questions:
@@ -25,6 +27,7 @@ package de.iteratec.osm.report.chart
  *   - Why the constants are int-values and not CsiAggregationInterval instances?
  *   - Name is a bit cryptic - This seems to be a time or date range.
  */
+@EqualsAndHashCode
 class CsiAggregationInterval {
 	
 	public static final int RAW = -1

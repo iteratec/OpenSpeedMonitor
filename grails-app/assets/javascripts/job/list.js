@@ -127,6 +127,14 @@ JobStatusUpdater = function () {
 function initTable(nextExecutionLink) {
     FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
     updatePrettyCrons();
+    //The server will send the next run time with the server timezone.
+    //The mouseenter makes sure to convert it into the locale timezone.
+    $(".timeago").mouseenter(function(){
+        if($(this).attr("converted") != "true"){
+            $(this).attr("title",moment($(this).attr("title")).format("D. MMM YYYY HH:mm"));
+            $(this).attr("converted", true);// Save state, so we won't try to change the format again
+        }
+    })
 }
 
 InactiveJobLoader = function (listLink, nextExecutionLink) {

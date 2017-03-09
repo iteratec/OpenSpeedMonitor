@@ -8,7 +8,13 @@
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.isocsi.detailAnalysis"/></h1>
+<h1>
+    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
+    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
+    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
+    <g:message code="de.iteratec.isocsi.detailAnalysis"/>
+    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
+</h1>
 
 <div class="row">
     <div class="col-md-12">
@@ -110,14 +116,9 @@
 
     <asset:script type="text/javascript">
         $(window).load(function() {
-          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                   />')
+          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+          OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-            "${createLink(action: 'show', controller: 'pageAggregation')}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
     </asset:script>
 </content>
 

@@ -262,7 +262,9 @@ grails:
                             {pattern: '/csiConfigIO/downloadHourOfDayWeights',          access: ["permitAll"]},
                             {pattern: '/csiConfigIO/downloadBrowserConnectivityWeights',access: ["permitAll"]},
                             {pattern: '/csiConfigIO/downloadDefaultTimeToCsMappings',   access: ["permitAll"]},
+                            {pattern: '/csiBenchmark/**',                               access: ["permitAll"]},
                             {pattern: '/detailAnalysis/**',                             access: ["permitAll"]},
+                            {pattern: '/distributionChart/**',                          access: ["permitAll"]},
                             {pattern: '/pageAggregation/**',                            access: ["permitAll"]},
                             {pattern: '/eventResultDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
@@ -301,10 +303,6 @@ grails:
     de:
         iteratec:
             osm:
-                report:
-                    chart:
-                        chartTagLib: RICKSHAW
-                        availableChartTagLibs: RICKSHAW
                 test:
                     geb:
                         login: admin

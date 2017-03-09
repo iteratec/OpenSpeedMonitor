@@ -55,6 +55,8 @@
         <!-----------------------------------------------------public javascripts-->
         <!--                                                        -public external application.js-->
         <!--                                                        -inline blocks of templates-->
+        <!-----------------------------------------------------global postload-Javascript-->
+        <g:render template="/_common/jsGlobals"/>
         <asset:javascript src="application.js"/>
         <g:pageProperty name="page.include.p13nByCookies.script" />
 

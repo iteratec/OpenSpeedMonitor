@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.BarchartDTO
 import de.iteratec.osm.dimple.BarchartDatum
@@ -31,6 +32,7 @@ class PageAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
+    FilteringAndSortingDataService filteringAndSortingDataService
 
     def index() {
         redirect(action: 'show')
@@ -45,10 +47,12 @@ class PageAggregationController extends ExceptionHandlerController {
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
         modelToRender.put('folders', jobGroups)
+        modelToRender.put('selectedFolder', params.selectedFolder)
 
         // Pages
         List<Page> pages = eventResultDashboardService.getAllPages()
         modelToRender.put('pages', pages)
+        modelToRender.put('selectedPages', params.selectedPages)
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
@@ -59,7 +63,11 @@ class PageAggregationController extends ExceptionHandlerController {
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
-        return modelToRender;
+        return modelToRender
+    }
+
+    def entryAndFollow(){
+        return [:]
     }
 
     /**
@@ -102,20 +110,46 @@ class PageAggregationController extends ExceptionHandlerController {
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), yAxisLabel: getYAxisLabel(series.measurands[0]), stacked: series.stacked)
+            BarchartSeries barchartSeries = new BarchartSeries(
+                    dimensionalUnit: getDimensionalUnit(series.measurands[0]),
+                    yAxisLabel: getYAxisLabel(series.measurands[0]),
+                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
-                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], grouping: "${datum[0]} / ${datum[1]?.name}"))
+                        new BarchartDatum(
+                            measurand: currentMeasurand.replace("Uncached", ""),
+                            value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
+                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                        )
+                    )
                 }
             }
 
             barchartDTO.series.add(barchartSeries)
         }
 
+//      JOHANNES2DO: check how to extract the filteringAndSortingDataService
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+//        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+    }
+
+    @RestAction
+    def getEntryAndFollowBarchartData(){
+
+        JobGroup jobGroup = JobGroup.findByName('develop_Desktop')
+        List<Job> jobs = jobDaoService.getJobs(jobGroup)
+        Set<Page> uniqueTestedPages = [] as Set
+
+        jobs*.script*.navigationScript.each {String navigationScript ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+            uniqueTestedPages.addAll(pagesOfThisScript)
+        }
+        uniqueTestedPages.each {
+
+        }
     }
 
     /**
@@ -150,7 +184,7 @@ class PageAggregationController extends ExceptionHandlerController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << "${p.name} / ${it.name}"
+                        filterRule << "${p.name} | ${it.name}"
                     }
                 }
             }

@@ -40,12 +40,10 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 class EventResultDashboardController {
@@ -123,6 +121,8 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         boolean requestedAllowedDashboard = true;
@@ -519,23 +519,6 @@ class EventResultDashboardController {
      * version.
      * </p>
      *
-     * Rounds a double according to CSV and Table requirements.
-     *
-     * @param valueToRound
-     *         The double value to round.
-     * @return The rounded value.
-     * @since IT-102 / copy since: IT-188
-     */
-    static private double roundDouble(double valueToRound) {
-        return new BigDecimal(valueToRound).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-    }
-
-    /**
-     * <p>
-     * WARNING: This method is a duplicate of CsiDashboardController's
-     * version.
-     * </p>
-     *
      * <p>
      * Performs a redirect with HTTP status code 303 (see other).
      * </p>
@@ -613,9 +596,7 @@ class EventResultDashboardController {
      * @since copy since: IT-188
      */
     private
-    static void writeCSV(List<OsmChartGraph> source, Writer target, Locale localeForNumberFormat) throws IOException {
-        NumberFormat valueFormat = NumberFormat.getNumberInstance(localeForNumberFormat);
-
+    static void writeCSV(List<OsmChartGraph> source, Writer target) throws IOException {
         // Sort graph points by time
         TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>();
         for (OsmChartGraph eachCSIValueEntry : source) {
@@ -651,7 +632,7 @@ class EventResultDashboardController {
             for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
                 OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel);
                 if (point != null) {
-                    row.add(valueFormat.format(roundDouble(point.csiAggregation)));
+                    row.add(point.csiAggregation?.round(2));
                 } else {
                     row.add("");
                 }
@@ -702,7 +683,7 @@ class EventResultDashboardController {
         Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
 
         List<OsmChartGraph> csiValues = modelToRender['eventResultValues'];
-        writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request));
+        writeCSV(csiValues, responseWriter);
 
         response.getOutputStream().flush()
         return null;

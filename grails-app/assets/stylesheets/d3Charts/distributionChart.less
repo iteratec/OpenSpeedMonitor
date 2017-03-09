@@ -1,0 +1,48 @@
+@import "d3chart.less";
+
+
+/* chart appearance */
+
+.d3chart-violinArea {
+    shape-rendering: geometricPrecision;
+    fill: #2961A6 !important;
+}
+
+.d3chart-violinOutline {
+    shape-rendering: geometricPrecision;
+    fill: none !important;
+    stroke: #265997 !important;
+    stroke-width: 1px;
+}
+
+.d3chart-axis > path, .d3chart-axis line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1px;
+    color-rendering: optimizeQuality !important;
+    shape-rendering: crispEdges !important;
+    text-rendering: geometricPrecision !important;
+}
+
+
+/* misc styling */
+
+#chart-container {
+    position: relative;
+}
+
+#filter-dropdown-group {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    z-index: 500;
+    padding: 6px 12px;
+}
+
+.filterActive {
+    visibility: visible;
+}
+
+.filterInactive {
+    visibility: hidden;
+}
