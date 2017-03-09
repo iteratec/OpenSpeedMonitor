@@ -4,13 +4,20 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
-    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="/pageAggregation/show.css"/>
 
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></h1>
+<h1>
+    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
+    <g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/>
+    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
+    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
+        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
+    </g:if>
+    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
+</h1>
 
 <p>
     <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
@@ -84,6 +91,7 @@
 <content tag="include.bottom">
     <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
 
         OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
@@ -127,6 +135,7 @@
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
                         OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $('#warning-no-data').show();
@@ -140,11 +149,7 @@
                 }
             });
         }
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-            "${createLink(action: 'show', controller: 'pageAggregation')}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
 
     </asset:script>
 </content>

@@ -47,10 +47,12 @@ class PageAggregationController extends ExceptionHandlerController {
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
         modelToRender.put('folders', jobGroups)
+        modelToRender.put('selectedFolder', params.selectedFolder)
 
         // Pages
         List<Page> pages = eventResultDashboardService.getAllPages()
         modelToRender.put('pages', pages)
+        modelToRender.put('selectedPages', params.selectedPages)
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)

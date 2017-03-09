@@ -439,11 +439,11 @@ class JobController {
 
     def showLastResultForJob(Long id) {
         Job job = Job.get(id)
-        forward(controller: 'eventResultDashboard', action: 'showAll', params: jobService.createTimeSeriesParamsFor(job))
+        redirect(controller: 'eventResultDashboard', action: 'showAll', params: jobService.createTimeSeriesParamsFor(job))
     }
 
     def showLastPageAggregationForJob(Long id) {
         Job job = Job.get(id)
-        forward(controller: 'PageAggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
+        redirect(controller: 'PageAggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
     }
 }

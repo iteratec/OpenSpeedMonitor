@@ -40,12 +40,10 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 class EventResultDashboardController {
@@ -123,6 +121,8 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         boolean requestedAllowedDashboard = true;

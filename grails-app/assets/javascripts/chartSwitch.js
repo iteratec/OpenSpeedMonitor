@@ -4,9 +4,10 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
-OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDashboardLink, pageAggregationLink, tabularResultLink, pageFetchLink, detailLink) {
+OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
 
     var oldParameter = {};
+
     var getUrlParameter = function () {
         var vars = [], hash;
         var currentUrl = window.location.href;
@@ -95,32 +96,43 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
 
 
     var updateUrls = function (withCurrentSelection) {
-        var updatedMap = $.extend({},oldParameter);
-        if(withCurrentSelection){
-            getTimeFrame(updatedMap);
-            getJobGroup(updatedMap);
-            getPage(updatedMap);
-            getBrowser(updatedMap);
-            getLocation(updatedMap);
-            getConnectivity(updatedMap);
-            getStep(updatedMap);
-        }
-        if(updatedMap["selectedFolder"] == null){
-            updatedMap = {};
-        } else{
-            if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = 60;
-            if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
-            if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
-        }
-        updateUrl("#pageAggregationMainMenu",pageAggregationLink+"?"+$.param(updatedMap, true));
-        updateUrl("#eventResultMainMenu",eventResultDashboardLink+"?"+$.param(updatedMap, true));
-        updateUrl("#tabularResultMainMenu",tabularResultLink+"?"+$.param(updatedMap, true));
-        updateUrl("#detailAnalysisMainMenu",detailLink+"?"+$.param(updatedMap, true));
+      var updatedMap = $.extend({},oldParameter);
+      if(withCurrentSelection){
+          getTimeFrame(updatedMap);
+          getJobGroup(updatedMap);
+          getPage(updatedMap);
+          getBrowser(updatedMap);
+          getLocation(updatedMap);
+          getConnectivity(updatedMap);
+          getStep(updatedMap);
+      }
+      if(updatedMap["selectedFolder"] == null){
+          updatedMap = {};
+      } else{
+          if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = 60;
+          if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
+          if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
+      }
+      var params = $.param(updatedMap, true);
+      var showLinks = false;
+      if (params.length > 0) {
+        showLinks = true;
+      }
+      updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll+"?"+ params, showLinks);
+      updateUrl("#pageAggregationWithDataLink", OpenSpeedMonitor.urls.pageAggregationShow+"?"+ params, showLinks);
+      updateUrl("#distributionWithDataLink", OpenSpeedMonitor.urls.distributionChartShow+"?"+params, showLinks);
+      updateUrl("#detailAnalysisWithDataLink", OpenSpeedMonitor.urls.detailAnalysisShow+"?"+params, showLinks);
+      updateUrl("#resultListWithDataLink", OpenSpeedMonitor.urls.tabularResultPresentation+"?"+params, showLinks);
     };
 
 
-    var updateUrl = function (selector, newUrl) {
-        $(selector).find("a").attr("href",newUrl)
+    var updateUrl = function (selector, newUrl, showLink) {
+      if (!showLink){
+        $(selector).addClass("hidden");
+      } else {
+        $(selector).attr("href",newUrl);
+        $(selector).removeClass("hidden");
+      }
     };
 
     var init = function () {
@@ -131,8 +143,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         } else{
             updateUrls(false);
         }
-        $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
-        $('#show-button').on('click', function(){updateUrls(true)});
+        // $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
+        // $('#show-button').on('click', function(){updateUrls(true)});
     };
 
     var getOldParameter = function () {
@@ -158,7 +170,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
 
     var fetchPages = function(measuredEvents){
         $.ajax( {
-            url: pageFetchLink,
+            url: OpenSpeedMonitor.urls.getPagesForMeasuredEvents,
             data: {"measuredEventList": measuredEvents},
             success: function( data ) {
                 oldParameter["selectedPages"] = JSON.parse(data);
@@ -169,12 +181,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function (eventResultDa
         });
     };
 
+    init();
 
     return {
         getJobGroup: getJobGroup,
         getPage: getPage,
         getTimeFrame:getTimeFrame,
-        updateUrls:updateUrls,
-        init:init
+        updateUrls:updateUrls
     };
-});
+})();

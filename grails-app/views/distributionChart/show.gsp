@@ -6,13 +6,19 @@
     <title>
         <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
     </title>
-    %{--JOHANNES2DO: enable chart switch functionality--}%
-    %{--<asset:javascript src="chartSwitch"/>--}%
     <asset:stylesheet src="d3Charts/distributionChart"/>
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/></h1>
+<h1>
+    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
+    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
+    <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
+    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
+        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
+    </g:if>
+    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
+</h1>
 
 <p>
     <g:message code="de.iteratec.osm.distributionChart.description.short"
@@ -87,10 +93,12 @@
 
 <content tag="include.bottom">
     <asset:javascript src="/distributionChart/distributionChart.js"/>
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/distributionChart/distributionChart.js" />', true, 'distributionChart')
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
 
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -124,6 +132,7 @@
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
                         OpenSpeedMonitor.ChartModules.distributionChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $('#warning-no-data').show();

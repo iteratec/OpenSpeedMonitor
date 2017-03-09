@@ -4,7 +4,6 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.csiBenchmark.title" default="Csi Benchmark"/></title>
-    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="/csiBenchmark/show.less"/>
 
 </head>
@@ -92,6 +91,7 @@
 <content tag="include.bottom">
     <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/csiBenchmark/csiBenchmark.js"/>
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         OpenSpeedMonitor.ChartModules.UrlHandling.CsiBenchmark().init();
 
@@ -123,6 +123,7 @@
                         $('#warning-no-data').hide();
                         $('#chart-card').show()
                         OpenSpeedMonitor.ChartModules.CsiBenchmarkBarChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $('#warning-no-data').show();
@@ -137,12 +138,6 @@
                 }
             });
         }
-        // TODOMARCUS necessary?
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-            "${createLink(action: 'show', controller: 'pageAggregation')}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-            "${createLink(action: 'show', controller: 'detailAnalysis')}").init();
 
     </asset:script>
 </content>
