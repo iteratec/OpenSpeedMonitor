@@ -1,4 +1,9 @@
 <div id="chart-container">
+    <div class="in-chart-buttons" id="toggle-logarithmic-y-axis-container">
+        <a href="#toggleLogarithmicYAxis" id="toggle-logarithmic-y-axis">
+            <i class="fa fa-arrows-v" aria-hidden="true"></i>
+        </a>
+    </div>
     <div id="filter-dropdown-group" class="btn-group">
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">

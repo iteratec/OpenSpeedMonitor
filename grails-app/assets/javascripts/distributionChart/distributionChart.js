@@ -16,10 +16,18 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         maxViolinWidth = 150,
         violinWidth = null,
         resolution = 20,
-        interpolation = 'basis';
+        interpolation = 'basis',
+        toggleLogarithmicYAxisButton = null,
+        logarithmicYAxis = false;
 
     var init = function () {
-        svgContainer = document.querySelector("#svg-container")
+        svgContainer = document.querySelector("#svg-container");
+        toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis");
+
+        toggleLogarithmicYAxisButton.addEventListener('click', function () {
+            logarithmicYAxis = !logarithmicYAxis;
+            drawChart(chartData);
+        });
     };
 
     var drawChart = function (distributionChartData) {
@@ -59,12 +67,23 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .range([height - margin.bottom, margin.top])
                   .domain(domain);
 
+        var logY = d3.scale.log()
+                     .range([height - margin.bottom, margin.top])
+                     .domain(domain);
+
         var x = d3.scale.ordinal()
                   .range(xRange())
                   .domain(Object.keys(chartData.series));
 
         // create both axis
-        var yAxis = d3.svg.axis()
+        var yAxis = null;
+        if (logarithmicYAxis)
+            yAxis = d3.svg.axis()
+                .scale(logY)
+                .orient('left')
+                .tickFormat(d3.format('g'));
+        else
+            yAxis = d3.svg.axis()
                       .scale(y)
                       .orient("left");
 
@@ -144,7 +163,14 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // x is now the vertical axis because of the violin being a 90 degree rotated histogram
-        var x = d3.scale.linear()
+        var x = null;
+        if (logarithmicYAxis)
+            x = d3.scale.log()
+                .range([height, 0])
+                .domain(domain)
+                .nice();
+        else
+            x = d3.scale.linear()
                   .range([height, 0])
                   .domain(domain)
                   .nice();
