@@ -81,9 +81,13 @@
                                       'pages'                : pages,
                                       'selectedPages'        : selectedPages]"/>
                 </div>
-                <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                    <i class="fa fa-undo"></i> Reset
-                </button>
+            </div>
+            <div class="row reset-result-selection-button-row">
+                <div class="col-md-12">
+                    <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                        <i class="fa fa-undo"></i> Reset
+                    </button>
+                </div>
             </div>
         </form>
     </div>

@@ -143,7 +143,7 @@ class DistributionChartController extends ExceptionHandlerController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << "${p.name} / ${it.name}"
+                        filterRule << "${p.name} | ${it.name}"
                     }
                 }
             }
