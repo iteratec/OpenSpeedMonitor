@@ -245,7 +245,7 @@ class PageAggregationController extends ExceptionHandlerController {
      * @param measurand the {@link MeasurandGroup}
      * @return the dimensional unit as string
      */
-    private String getDimensionalUnit(String measurand) {
+    public static String getDimensionalUnit(String measurand) {
         def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
         if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
             return "ms"

@@ -266,6 +266,7 @@ grails:
                             {pattern: '/detailAnalysis/**',                             access: ["permitAll"]},
                             {pattern: '/distributionChart/**',                          access: ["permitAll"]},
                             {pattern: '/pageAggregation/**',                            access: ["permitAll"]},
+                            {pattern: '/pageComparison/**',                             access: ["permitAll"]},
                             {pattern: '/eventResultDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
                             {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},

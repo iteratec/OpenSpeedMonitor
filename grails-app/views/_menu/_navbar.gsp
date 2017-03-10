@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -59,6 +59,13 @@
                                 title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
                             <i class="fa fa-area-chart"></i>
                             <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('pageComparison') ? 'active' : ''}" id="pageComparisonMainMenu">
+                        <g:link controller="pageComparison" action="show"
+                                title="${message(code:'de.iteratec.isocsi.pageComparision.title', default:'Page Comparison')}">
+                            <i class="fa fa-balance-scale"></i>
+                            <g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/>
                         </g:link>
                     </li>
                     <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
