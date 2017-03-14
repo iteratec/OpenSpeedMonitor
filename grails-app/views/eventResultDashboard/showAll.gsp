@@ -168,7 +168,7 @@
                 <g:else>
                     <li class="dropdown-header"><g:message
                             code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                            default="None available"/></li>
+                            default="No saved dashboards."/></li>
                 </g:else>
             </ul>
         </div>
