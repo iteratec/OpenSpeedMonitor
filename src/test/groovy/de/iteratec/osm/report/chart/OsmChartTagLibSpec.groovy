@@ -23,9 +23,9 @@ import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.result.CachedView
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.json.JsonSlurper
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Specification
+
 import static org.junit.Assert.assertTrue
 /**
  * Test-suite for {@link OsmChartTagLib}.
@@ -47,176 +47,7 @@ class OsmChartTagLibSpec extends Specification {
         HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment",true)
 	}
 
-	void "HTML provided by taglib iteratec:singleYAxisChart should represent given input"() {
-
-        setup:
-
-        //test specific mocks
-
-		def osmChartTagLib = mockTagLib(OsmChartTagLib)
-		osmChartTagLib.configService = grailsApplication.mainContext.getBean('configService')
-
-		// create test-specific data
-
-		Date now = new Date(1373631796000L);
-		Date oneHourAfterNow = new Date(1373635396000L);
-		Date twoHoursAfterNow = new Date(1373638996000L);
-
-        WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
-				serverBaseUrl: "http://www.example.com/",
-				testId: "161006_8A_YX",
-				numberOfWptRun: 1,
-                cachedView: CachedView.UNCACHED,
-				oneBaseStepIndexInJourney: 4
-		);
-
-		OsmChartPoint nowPoint = new OsmChartPoint(
-                time: now.getTime(),
-                csiAggregation: 1.5d,
-                countOfAggregatedResults: 1,
-                sourceURL: new URL("https://www.example.com/now"),
-                testingAgent: null,
-                chartPointWptInfo: chartPointWptInfo
-        );
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(
-                time: oneHourAfterNow.getTime(),
-                csiAggregation: 3d,
-                countOfAggregatedResults: 1,
-                sourceURL: null,
-                testingAgent: null,
-                chartPointWptInfo: chartPointWptInfo
-        );
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(
-                time: twoHoursAfterNow.getTime(),
-                csiAggregation: 2.3d,
-                countOfAggregatedResults: 1,
-                sourceURL: new URL("https://www.example.com/twoHoursAfterNow"),
-                testingAgent: null,
-                chartPointWptInfo: chartPointWptInfo
-        );
-
-		OsmChartGraph graph=new OsmChartGraph();
-		graph.setLabel("job1");
-		graph.setPoints([
-			nowPoint,
-			oneHourAfterNowPoint_withoutURL,
-			twoHoursAfterNowPoint
-		]);
-
-		List<OsmChartGraph> data = [graph]
-
-		String chartTitle = 'Antwortzeit WPT-Monitore'
-		String targetDivId = 'myDivId'
-		String targetYType = 'Antwortzeit [ms]'
-		String targetWidth = '100%'
-
-		Map<String, Object> model = [
-			targetDivId: targetDivId,
-			data: data,
-			chartTitle: chartTitle,
-			targetYType: targetYType,
-			targetWidth: targetWidth,
-			xAxisMin: 100,
-			xAxisMax: 1000,
-			yAxisMin: 10,
-			yAxisMax: 100,
-			measurementUnit: 'ms',
-			markerEnabled: 'true',
-			dataLabelsActivated: 'false',
-			yAxisScalable: 'true',
-			initialChartHeight: "400"
-		]
-
-		when:
-
-		String actualHtml = applyTemplate(
-				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"400\" '+
-				'title=\"${chartTitle}\" yType=\"${targetYType}\" width=\"${targetWidth}\" xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" yAxisMax=\"${yAxisMax}\"' +
-				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" labelSummary=""/>',
-				model).stripIndent()
-
-		then:
-
-        NodeChild actualHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(actualHtml)
-
-        actualHtmlAsNode.childNodes().size() == 6
-
-        def chartTitleNode = actualHtmlAsNode.childNodes().getAt(0)
-        chartTitleNode.attributes['id'] == 'rickshaw_chart_title'
-        chartTitleNode.attributes['class'] == 'rickshaw_chart_title'
-        chartTitleNode.text() == ''
-
-        def rickshawLableSummaryBoxNode = actualHtmlAsNode.childNodes().getAt(1)
-        rickshawLableSummaryBoxNode.attributes['id'] == 'rickshaw_label_summary_box'
-
-        def rickshawMainNode = actualHtmlAsNode.childNodes().getAt(2)
-        rickshawMainNode.attributes['id'] == 'rickshaw_main'
-
-        def rickshawTimelineNode = actualHtmlAsNode.childNodes().getAt(3)
-        rickshawTimelineNode.attributes['id'] == 'rickshaw_timeline'
-
-        def rickshawAddonsNode = actualHtmlAsNode.childNodes().getAt(4)
-        rickshawAddonsNode.attributes['id'] == 'rickshaw_addons'
-
-        def javascriptRickshawNode = actualHtmlAsNode.childNodes().getAt(5)
-        javascriptRickshawNode.attributes['type'] == 'text/javascript'
-
-        String javascript = javascriptRickshawNode.text();
-        List<String> javascriptLines = javascript.tokenize("\n")*.trim()
-
-//        def jsonSlurper = new JsonSlurper()
-//        def javascriptLinesAsJSON = jsonSlurper.parseText('"' + javascriptLines[6] + '"')
-//        def expected = jsonSlurper.parseText("""
-//            data : [ { " +
-//                "measurandGroup: \"PERCENTAGES\"," +
-//                "yAxisLabel: \"Antwortzeit [ms]\"," +
-//                "name: \"job1\"," +
-//                "data: [ {" +
-//                        "x: 1373631796," +
-//                        "y: 1.5," +
-//                        "url: \"https://www.example.com/now\"," +
-//                        "wptResultInfo: {" +
-//                            "wptServerBaseurl: \"http://www.example.com/\"," +
-//                            "testId: \"161006_8A_YX\"," +
-//                            "numberOfWptRun: 1," +
-//                            "cachedView: false," +
-//                            "oneBaseStepIndexInJourney: 4"+
-//                        "}" +
-//                    "}, { " +
-//                        "x: 1373635396," +
-//                        "y: 3.0," +
-//                        "url: \"undefined\"," +
-//                        "wptResultInfo: {" +
-//                            "wptServerBaseurl: \"http://www.example.com/\"," +
-//                            "testId: \"161006_8A_YX\"," +
-//                            "numberOfWptRun: 1," +
-//                            "cachedView: false," +
-//                            "oneBaseStepIndexInJourney: 4"+
-//                        "}" +
-//                    " }, {" +
-//                        "x: 1373638996," +
-//                        "y: 2.3," +
-//                        "url: \"https://www.example.com/twoHoursAfterNow\"," +
-//                        "wptResultInfo: {" +
-//                            "wptServerBaseurl: \"http://www.example.com/\"," +
-//                            "testId: \"161006_8A_YX\"," +
-//                            "numberOfWptRun: 1," +
-//                            "cachedView: false," +
-//                            "oneBaseStepIndexInJourney: 4"+
-//                        "}" +
-//                "} ] " +
-//            "} ]
-//        """)
-
-        javascriptLines[0] == 'var CHARTLIB="RICKSHAW";'
-        javascriptLines[1] == 'var rickshawGraphBuilder;'
-        javascriptLines[4] == "divId: \"myDivId\","
-        javascriptLines[6] == "data : [ { measurandGroup: \"PERCENTAGES\", yAxisLabel: \"Antwortzeit [ms]\", name: \"job1\", data: [ { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: \"1\", oneBaseStepIndexInJourney: \"4\", cachedView: false } }, { x: 1373635396, y: 3.0, url: \"undefined\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: \"1\", oneBaseStepIndexInJourney: \"4\", cachedView: false } }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: \"1\", oneBaseStepIndexInJourney: \"4\", cachedView: false } } ] } ],"
-        javascriptLines[7] == "height: 400,"
-
-	}
-
-	void "HTML provided by taglib iteratec:multipleAxisChart should represent given input"() {
+	void "HTML provided by taglib iteratec:timeSeriesChart should represent given input"() {
 
         setup:
 
@@ -312,7 +143,7 @@ class OsmChartTagLibSpec extends Specification {
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600\" '+
+				'<iteratec:timeSeriesChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600\" '+
 				'title=\"${title}\" highChartLabels=\"${highChartLabels}\" labelSummary="" />',
 				model).stripIndent()
 

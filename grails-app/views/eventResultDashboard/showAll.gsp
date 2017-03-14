@@ -78,20 +78,15 @@
                                       isAggregatedData             : (selectedInterval && selectedInterval != -1),
                                       chartData                    : eventResultValues,
                                       chartTitle                   : chartTitle,
-                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      chartUnit                    : '%',
-                                      globalLineWidth              : '2',
-                                      xAxisMin                     : fromTimestampForHighChart,
-                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      yAxisScalable                : 'false',
-                                      optimizeForExport            : 'false',
-                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')]"/>
+                                      labelSummary                 : labelSummary,
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
+                              ]"/>
                 </div>
             </div>
         </g:if>
