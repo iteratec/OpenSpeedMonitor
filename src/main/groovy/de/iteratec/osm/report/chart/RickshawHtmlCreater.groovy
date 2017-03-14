@@ -52,7 +52,7 @@ class RickshawHtmlCreater {
      * to place its components. Additional a javascript function
      * will be called, which is responsible to draw the rickshaw graph.
      */
-    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax, String downloadPngLabel ->
+    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations, String yAxisMin, String yAxisMax, String downloadPngLabel, Boolean isAggregatedData ->
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
         def height = heightOfChart
@@ -66,7 +66,7 @@ class RickshawHtmlCreater {
         }
 
         sw << """
-		<div id="${divId}" class="graph">
+		<div id="${divId}" class="graph" data-is-aggregated-data="${isAggregatedData}">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title"></div>
 			<div id="rickshaw_label_summary_box">
                 <div id="rickshaw_chart_label_summary">${labelSummary}</div>

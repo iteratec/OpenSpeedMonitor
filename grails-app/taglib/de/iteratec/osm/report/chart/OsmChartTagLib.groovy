@@ -28,12 +28,13 @@ class OsmChartTagLib {
 
         List<OsmChartGraph> data = attrs["data"];
         String title = attrs["title"]
+        Boolean isAggregatedData = attrs["isAggregatedData"]
         String labelSummary = attrs["labelSummary"];
         String lineType = attrs["lineType"]
         String yType = attrs["yType"]
         String width = attrs["width"]
         String yAxisMax = attrs["yAxisMax"] ?: "auto"
-        String divId = attrs["divId"] ?: UUID.randomUUID().toString();
+        String divId = attrs["divId"] ?: "graph_container"
         String measurementUnit = attrs['measurementUnit'] ?: 'unkown'
         Long xAxisMin = attrs['xAxisMin'] ? Long.valueOf(attrs['xAxisMin']) : null
         Long xAxisMax = attrs['xAxisMax'] ? Long.valueOf(attrs['xAxisMax']) : null
@@ -55,7 +56,7 @@ class OsmChartTagLib {
         highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "", 1, OsmChartAxis.LEFT_CHART_SIDE))
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, highChartLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, highChartLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel, isAggregatedData)
 
         return out.toString()
     }
@@ -64,12 +65,13 @@ class OsmChartTagLib {
             { attrs, body ->
 
                 List<OsmChartGraph> data = attrs["data"];
+                Boolean isAggregatedData = attrs["isAggregatedData"]
                 String title = attrs["title"]
                 String labelSummary = attrs["labelSummary"];
                 String lineType = attrs["lineType"]
                 String width = attrs["width"]
                 String yAxisMax = attrs["yAxisMax"] ?: "auto"
-                String divId = attrs["divId"] ?: UUID.randomUUID().toString();
+                String divId = attrs["divId"] ?: "graph_container"
                 String measurementUnits = attrs['measurementUnit'] ?: 'unkown'
                 Long xAxisMin = attrs['xAxisMin'] ? Long.valueOf(attrs['xAxisMin']) : null
                 Long xAxisMax = attrs['xAxisMax'] ? Long.valueOf(attrs['xAxisMax']) : null
@@ -93,7 +95,7 @@ class OsmChartTagLib {
                 String heightOfChart = attrs["heightOfChart"]
 
                 def htmlCreater = new RickshawHtmlCreater()
-                out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, yAxesLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel)
+                out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, width, yAxesLabels, title, labelSummary, markerEnabled, annotations, yAxisMin, yAxisMax, downloadPngLabel, isAggregatedData)
 
                 return out.toString()
             }
