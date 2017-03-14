@@ -1,6 +1,7 @@
 %{--TODO merge the single- and multiple-axis-chart-function of highchart--}%
 <g:if test="${singleYAxis}">
 	<iteratec:singleYAxisChart
+		isAggregatedData="${isAggregatedData}"
         data="${chartData}"
         yType="${yAxisLabel}"
 		title="${chartTitle}"
@@ -24,7 +25,8 @@
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart
-        data="${chartData}"
+		isAggregatedData="${isAggregatedData}"
+		data="${chartData}"
         title="${chartTitle}"
 		labelSummary="${labelSummary}"
 		lineType="${selectedCharttypeForHighchart}"
