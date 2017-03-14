@@ -9,8 +9,6 @@
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
-
 </head>
 
 <body>
@@ -69,10 +67,12 @@
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
                 <div id="chartbox" class="card">
-                    <div id="dataTableId" class="warning-ribbon" hidden="true" data-toggle="popover" aria-hidden="true"
+                    <div id="dataTableId" class="ribbon ribbon-warning" hidden="true" data-toggle="popover" aria-hidden="true"
                          title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
                          data-placement="right" data-trigger="hover"
-                         data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
+                         data-html="true" data-content="${render(template: "hoverInfo")}">
+                        <i class="fa fa-info"></i>
+                    </div>
                     <g:render template="/highchart/chart"
                               model="[
                                       isAggregatedData             : (selectedInterval && selectedInterval != -1),
