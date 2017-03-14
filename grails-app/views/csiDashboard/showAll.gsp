@@ -91,17 +91,25 @@
                 <div id="chartbox">
                     <g:render template="/highchart/chart"
                               model="[
-                                      isAggregatedData             : true,
+                                      singleYAxis                  : 'false',
                                       chartData                    : wptCustomerSatisfactionValues,
                                       chartTitle                   : chartTitle,
+                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
+                                      chartUnit                    : '%',
+                                      globalLineWidth              : '2',
+                                      xAxisMin                     : fromTimestampForHighChart,
+                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      highChartLabels              : highChartLabels,
+                                      yAxisScalable                : 'false',
+                                      optimizeForExport            : 'false',
+                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
                                       annotations                  : annotations,
                                       labelSummary                 : labelSummary,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
+                                      downloadPngLabel             : null,
+                                      downloadCsvSubmitButton      : g.actionSubmit([value: g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV'), action: 'csiValuesCsv'])
                               ]"/>
                 </div>
             </div>

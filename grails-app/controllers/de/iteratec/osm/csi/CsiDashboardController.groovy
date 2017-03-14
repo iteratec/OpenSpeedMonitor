@@ -437,12 +437,6 @@ class CsiDashboardController {
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, csiAggregationsQueryParams, csiType)
                 break
         }
-
-        modelToRender.put("highChartLabels", [
-            new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
-                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
-        ])
-
         if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
             List<JobGroup> jobGroups = CsiSystem.getAll(cmd.selectedCsiSystems)*.affectedJobGroups
             Collection<Long> jobGroupsIds = jobGroups*.id.flatten().unique(false)

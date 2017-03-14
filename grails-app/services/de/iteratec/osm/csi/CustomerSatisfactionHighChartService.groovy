@@ -172,7 +172,6 @@ class CustomerSatisfactionHighChartService {
 
                     if (!tagToGraph.containsKey(valueTagToGraph)) {
                         OsmChartGraph graph = new OsmChartGraph();
-                        graph.measurandGroup = MeasurandGroup.PERCENTAGES
                         graph.setLabel(getMapLabel(currentCsiAggregation, csiType));
                         tagToGraph.put(valueTagToGraph, graph);
                         graphs.add(graph);
@@ -432,7 +431,6 @@ class CustomerSatisfactionHighChartService {
             OsmChartPoint toPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(toDate.toDate()), csiAggregation: (double) actualTargetGraph.getPercentOfDate(toDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
 
             OsmChartGraph graph = new OsmChartGraph();
-            graph.measurandGroup = MeasurandGroup.PERCENTAGES
             graph.setLabel(actualTargetGraph.label);
             if (fromPoint.isValid())
                 graph.getPoints().add(fromPoint);

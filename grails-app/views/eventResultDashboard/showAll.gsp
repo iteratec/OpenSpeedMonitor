@@ -75,18 +75,22 @@
                          data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
                     <g:render template="/highchart/chart"
                               model="[
-                                      isAggregatedData             : (selectedInterval && selectedInterval != -1),
                                       chartData                    : eventResultValues,
                                       chartTitle                   : chartTitle,
+                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
+                                      chartUnit                    : '%',
+                                      globalLineWidth              : '2',
+                                      xAxisMin                     : fromTimestampForHighChart,
+                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      highChartLabels              : highChartLabels,
+                                      yAxisScalable                : 'false',
+                                      optimizeForExport            : 'false',
+                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
                                       annotations                  : annotations,
-                                      labelSummary                 : labelSummary,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
-                              ]"/>
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')]"/>
                 </div>
             </div>
         </g:if>
@@ -168,7 +172,7 @@
                 <g:else>
                     <li class="dropdown-header"><g:message
                             code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                            default="No saved dashboards."/></li>
+                            default="None available"/></li>
                 </g:else>
             </ul>
         </div>
@@ -310,11 +314,9 @@
         });
 
         $(window).load(function() {
-            if (!$("#graph_container").data("isAggregatedData")) {
-                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
-            }
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
-            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
 
     </asset:script>
