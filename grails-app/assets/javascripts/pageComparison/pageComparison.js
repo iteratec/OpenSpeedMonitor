@@ -62,7 +62,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         var selectedPagesParam = params['selectedPages'];
         // if there is only one selectedPage or selectedFolder put it into an new array
         if(typeof selectedPagesParam === 'string') {
-            selectedPagesParam = [selectedFolderParam]
+            selectedPagesParam = [selectedPagesParam]
         }
         if(typeof selectedFolderParam === 'string') {
             selectedFolderParam = [selectedFolderParam]
@@ -119,31 +119,13 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
 
     };
 
-    var timecardResolved = false;
-    var markTimeCardAsResolved = function () {
-        timecardResolved = true;
-        if (allLoaded()) {
-            init()
-        }
-    };
-
-    var allLoaded = function () {
-        return timecardResolved;
-    };
-
     var init = function () {
         setSelections();
         addHandler();
     };
 
-    var initWaitForPostload = function () {
-        $(window).on("selectIntervalTimeframeCardLoaded", function () {
-            markTimeCardAsResolved();
-        });
-    };
-
     return {
         setSelections: setSelections,
-        init: initWaitForPostload
+        init: init
     };
 });

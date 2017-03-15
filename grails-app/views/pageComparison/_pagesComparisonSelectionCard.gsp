@@ -10,9 +10,9 @@
         </label>
 
         <div class="col-sm-3">
-            <g:select from="${jobGroups}" name="firstJobGroupSelect" class="form-control" optionKey="key"
+            <g:select from="${jobGroups}" name="firstJobGroupSelect" class="form-control jobGroupSelect" optionKey="key"
                       optionValue="value" noSelection="['': ' - choose a jobGroup - ']"/>
-            <g:select from="${pages}" name="firstPageSelect" class="form-control" optionKey="key" optionValue="value"
+            <g:select from="${pages}" name="firstPageSelect" class="form-control pageSelect" optionKey="key" optionValue="value"
                       noSelection="['': ' - choose a page - ']"/>
         </div>
 
@@ -22,9 +22,9 @@
         </label>
 
         <div class="col-sm-3">
-            <g:select from="${jobGroups}" name="secondJobGroupSelect" class="form-control" optionKey="key"
+            <g:select from="${jobGroups}" name="secondJobGroupSelect" class="form-control jobGroupSelect" optionKey="key"
                       optionValue="value" noSelection="['': ' - choose a jobGroup - ']"/>
-            <g:select from="${pages}" name="secondPageSelect" class="form-control" optionKey="key" optionValue="value"
+            <g:select from="${pages}" name="secondPageSelect" class="form-control pageSelect" optionKey="key" optionValue="value"
                       noSelection="['': ' - choose a page - ']"/>
         </div>
 

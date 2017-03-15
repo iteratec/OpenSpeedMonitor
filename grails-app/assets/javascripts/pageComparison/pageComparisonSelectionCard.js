@@ -24,10 +24,23 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.PageComparisonSelection = (function () {
     var init = function () {
         $(".addMeasurandButton").click(addPageComparisonRow);
-        $("#firstJobGroupSelect").on("change", selectionChangeListener);
+
+        addEventListeners();
+
         $("#pageComparisonSelectionCard select option[value='']").attr("disabled", true);
-        $("#pageComparisonSelectionCard select").on("change", enabaleOrDisableShowButton)
-        enabaleOrDisableShowButton()
+        $("#pageComparisonSelectionCard select").on("change", enabaleOrDisableShowButton);
+
+        enabaleOrDisableShowButton();
+    };
+
+    var addEventListeners = function () {
+        var $firstJobGroupSelect = $("#firstJobGroupSelect");
+        var $secondJobGroupSelect = $("#secondJobGroupSelect");
+
+        $firstJobGroupSelect.on("change", updatePageListener);
+        $secondJobGroupSelect.on("change", updatePageListener);
+
+        $firstJobGroupSelect.on("change", selectionChangeListener);
     };
 
     var enabaleOrDisableShowButton = function () {
@@ -43,6 +56,8 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
         clone.find(".removeMeasurandButton").click(removeComparisonRow);
         clone.find(".addMeasurandButton").click(addPageComparisonRow);
         clone.find("#firstJobGroupSelect").on("change", selectionChangeListener);
+        clone.find("#firstJobGroupSelect").on("change", updatePageListener);
+        clone.find("#secondJobGroupSelect").on("change", updatePageListener);
         clone.removeAttr("id");
         if (event) {
             clone.insertAfter($(event.target).closest(".addPageComparisonRow"));
@@ -56,7 +71,48 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
     };
 
     var selectionChangeListener = function (event) {
-        $(event.target).closest(".addPageComparisonRow").find("#secondJobGroupSelect").val($(event.target).val())
+        var secondJobGroupSelect = $(event.target).closest(".addPageComparisonRow").find("#secondJobGroupSelect");
+        secondJobGroupSelect.val($(event.target).val());
+        secondJobGroupSelect.change();
+    };
+
+    var updatePageListener = function (event) {
+        var selectBoxToChange = $(event.target).parent().find(".pageSelect");
+        var url = OpenSpeedMonitor.urls.pageComparisonGetPages;
+        var selectedTimeframe = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+        var queryArgs = {
+            'from': selectedTimeframe[0].toISOString(),
+            'to': selectedTimeframe[1].toISOString(),
+            'jobGroupIds': $(event.target).val(),
+            'caller': null
+        };
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: queryArgs,
+            dataType: "json",
+            success: function (data) {
+                var currentSelection = selectBoxToChange.val();
+                selectBoxToChange.find("option[value!='']").remove();
+                if (data && data.length > 0) {
+                    data.forEach(function (d) {
+                        selectBoxToChange.append("<option value='" + d.id + "'>" + d.name + "</option>")
+                    });
+                    currentSelection = data.some(function (d) {
+                        return d.id == currentSelection;
+                    }) ? currentSelection : "";
+                    selectBoxToChange.val(currentSelection);
+                } else {
+                    selectBoxToChange.val("");
+                }
+            },
+            error: function (e, statusText) {
+                if (statusText != "abort") {
+                    throw e;
+                }
+            },
+            traditional: true // grails compatible parameter array encoding
+        });
     };
 
     var getValues = function () {
@@ -86,8 +142,10 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
             var currentRow = $(comparisonRows[index]);
             currentRow.find("#firstJobGroupSelect").val(currentComparison['jobGroupId1']);
             currentRow.find("#firstPageSelect").val(currentComparison['pageId1']);
+            currentRow.find("#firstJobGroupSelect").change();
             currentRow.find("#secondJobGroupSelect").val(currentComparison['jobGroupId2']);
             currentRow.find("#secondPageSelect").val(currentComparison['pageId2']);
+            currentRow.find("#secondJobGroupSelect").change();
         })
     };
 

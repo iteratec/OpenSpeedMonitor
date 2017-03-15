@@ -6,6 +6,7 @@ import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import grails.databinding.BindUsing
+import jdk.nashorn.api.scripting.JSObject
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
@@ -35,7 +36,8 @@ class ResultSelectionController extends ExceptionHandlerController {
         MeasuredEvents,
         Locations,
         ConnectivityProfiles,
-        Results
+        Results,
+        Pages
     }
 
     def getResultCount(ResultSelectionCommand command) {
@@ -175,6 +177,32 @@ class ResultSelectionController extends ExceptionHandlerController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
+    def getPages(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", 0, {
+            def pages = query(command, ResultSelectionType.Pages, { existing ->
+                if (existing) {
+                    not { 'in'('page', existing) }
+                }
+                projections {
+                    distinct('page')
+                }
+            })
+            return pages.collect {
+                [
+                        id  : it.id,
+                        name: it.name
+                ]
+            }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
     private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
@@ -302,7 +330,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
 
-                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
+                if ((resultSelectionType != ResultSelectionType.MeasuredEvents || resultSelectionType != ResultSelectionType.Pages) && command.pageIds) {
                     page {
                         'in'("id", command.pageIds)
                     }

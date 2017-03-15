@@ -87,8 +87,30 @@
     <asset:javascript src="chartSwitch"/>
     <asset:javascript src="/pageComparison/pageComparison.js"/>
     <asset:script type="text/javascript">
+        var pageComparisonSelectionCardLoaded = false;
+        var timeframeCardLoaded = false;
+        var barchartMeasuringsLoaded = false;
 
-        OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison().init();
+        var allLoaded = function () {
+            if(pageComparisonSelectionCardLoaded && timeframeCardLoaded && barchartMeasuringsLoaded) {
+                OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison().init();
+                OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+            }
+        };
+
+         $(window).on("pageComparisonSelectionCardLoaded", function () {
+             pageComparisonSelectionCardLoaded = true;
+             allLoaded();
+        });
+         $(window).on("selectIntervalTimeframeCardLoaded", function () {
+             timeframeCardLoaded = true;
+             allLoaded();
+        });
+         $(window).on("barchartMeasuringsLoaded", function () {
+             barchartMeasuringsLoaded = true;
+             allLoaded();
+        });
+
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -108,33 +130,29 @@
                     selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.PageComparisonSelection.getValues())
                 },
                 url: "${createLink(controller: 'pageComparison', action: 'getBarchartData')}",
-            dataType: "json",
-            success: function (data) {
-                spinner.stop();
-                if (!$("#error-div").hasClass("hidden"))
-                    $("#error-div").addClass("hidden");
+                dataType: "json",
+                success: function (data) {
+                    spinner.stop();
+                    if (!$("#error-div").hasClass("hidden"))
+                        $("#error-div").addClass("hidden");
 
-                if (!$.isEmptyObject(data)) {
-                    $('#warning-no-data').hide();
-                    OpenSpeedMonitor.ChartModules.PageComparisonBarChart.drawChart(data);
-                    OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-                    $("#dia-save-chart-as-png").removeClass("disabled");
-                } else {
-                    $('#warning-no-data').show();
-                }
-            },
-            error: function (e) {
-                spinner.stop();
-                $("#error-div").removeClass("hidden");
-                $("#chart-card").removeClass("hidden");
-                $("#error-message").html(e.responseText);
-                }
-            });
-        }
-
-    $(window).on("pageComparisonSelectionCardLoaded", function () {
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-    });
+                    if (!$.isEmptyObject(data)) {
+                        $('#warning-no-data').hide();
+                        OpenSpeedMonitor.ChartModules.PageComparisonBarChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+                        $("#dia-save-chart-as-png").removeClass("disabled");
+                    } else {
+                        $('#warning-no-data').show();
+                    }
+                },
+                error: function (e) {
+                    spinner.stop();
+                    $("#error-div").removeClass("hidden");
+                    $("#chart-card").removeClass("hidden");
+                    $("#error-message").html(e.responseText);
+                    }
+                });
+            }
 
     </asset:script>
 </content>

@@ -48,7 +48,8 @@
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
         distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}",
-        pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}"
+        pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}",
+        pageComparisonGetPages: "${createLink(controller: 'resultSelection', action: 'getPages')}"
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
         docCompleteTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteTimeInMillisecs')}',
