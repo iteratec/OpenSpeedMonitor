@@ -68,7 +68,7 @@
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
                 <div id="chartbox" class="card">
-                    <div id="dataTableId" class="ribbon ribbon-warning" hidden="true" data-toggle="popover" aria-hidden="true"
+                    <div id="dataTableId" class="ribbon ribbon-info" hidden="true" data-toggle="popover" aria-hidden="true"
                          title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
                          data-placement="right" data-trigger="hover"
                          data-html="true" data-content="${render(template: "hoverInfo")}">
