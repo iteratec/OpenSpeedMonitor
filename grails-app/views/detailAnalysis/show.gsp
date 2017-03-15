@@ -12,6 +12,7 @@
     <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
     <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
     <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
+    <a href="#" class="btn hidden" id="pageComparisonWithDataLink"><i class="fa fa-balance-scale"></i></a>
     <g:message code="de.iteratec.isocsi.detailAnalysis"/>
     <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
 </h1>

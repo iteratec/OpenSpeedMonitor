@@ -1,3 +1,5 @@
+//= require /urlHandling/urlHelper.js
+
 "use strict";
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
@@ -8,62 +10,37 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
 
     var oldParameter = {};
 
-    var getUrlParameter = function () {
-        var vars = [], hash;
-        var currentUrl = window.location.href;
-
-        // remove html anchor if exists
-        var anchorIndex = currentUrl.indexOf('#');
-        if (anchorIndex > 0) {
-            currentUrl = currentUrl.replace(/#\w*/, "")
-        }
-
-        var paramIndex = currentUrl.indexOf('?');
-        if (paramIndex < 0)
-            return vars;
-
-        var hashes = currentUrl.slice(paramIndex + 1).split('&');
-        for (var i = 0; i < hashes.length; i++) {
-            hash = hashes[i].split('=');
-            var currentValue = vars[hash[0]];
-            if (currentValue == null) {
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
-            } else if (currentValue.constructor === Array) {
-                vars[hash[0]].push(hash[1]);
-            } else {
-                vars[hash[0]] = [vars[hash[0]], hash[1]]
-            }
-        }
-        return vars;
-    };
-
     var getJobGroup = function (map) {
-        var folder = $("#folderSelectHtmlId").val();
-        if(folder != null) map["selectedFolder"] = folder
+        var folder = null;
+        if ($("#pageComparisonSelectionCard").length) {
+            folder = OpenSpeedMonitor.PageComparisonSelection.getJobGroups();
+        } else {
+            folder = $("#folderSelectHtmlId").val();
+        }
+        if (folder != null) map["selectedFolder"] = folder
     };
 
     var getBrowser = function (map) {
         var browserSelect = $("#selectedBrowsersHtmlId");
-        if(browserSelect!= null){
+        if (browserSelect != null) {
             var selectedBrowser = browserSelect.val();
-            if(selectedBrowser != null) map["selectedBrowsers"] = selectedBrowser;
+            if (selectedBrowser != null) map["selectedBrowsers"] = selectedBrowser;
             var selectedAllBrosers = $("#selectedAllBrowsers").prop("checked");
-            if(selectedAllBrosers != null) map["selectedAllBrowsers"] = selectedAllBrosers;
+            if (selectedAllBrosers != null) map["selectedAllBrowsers"] = selectedAllBrosers;
         }
     };
 
     var getLocation = function (map) {
         var selectedLocations = $("#selectedLocationsHtmlId_chosen");
-        if(selectedLocations != null){
+        if (selectedLocations != null) {
             var selectedAllLocations = $("#selectedAllLocations").prop("checked");
-            if(selectedAllLocations) map["selectedAllLocations"] = selectedAllLocations;
+            if (selectedAllLocations) map["selectedAllLocations"] = selectedAllLocations;
         }
     };
 
     var getConnectivity = function (map) {
         var selectedConnectivities = $("#selectedConnectivityProfilesHtmlId");
-        if(selectedConnectivities != null){
+        if (selectedConnectivities != null) {
             var connectivities = selectedConnectivities.val();
             if (connectivities != null) map["selectedConnectivities"] = connectivities;
             var allConnectivies = $("#selectedAllConnectivityProfiles").prop("checked");
@@ -72,21 +49,26 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     };
 
     var getPage = function (map) {
-        var pages = $("#pageSelectHtmlId").val();
-        if(pages) map["selectedPages"] = pages;
+        var pages = null;
+        if($("#pageComparisonSelectionCard").length) {
+            pages = OpenSpeedMonitor.PageComparisonSelection.getPages();
+        }else {
+         pages = $("#pageSelectHtmlId").val();
+        }
+        if (pages) map["selectedPages"] = pages;
     };
 
     var getStep = function (map) {
         var selectedSteps = $("#selectedMeasuredEventsHtmlId");
-        if(selectedSteps != null){
+        if (selectedSteps != null) {
             var values = selectedSteps.val();
-            if(values) map["selectedMeasuredEventIds"] = values
+            if (values) map["selectedMeasuredEventIds"] = values
         }
     };
 
     var getTimeFrame = function (map) {
-        map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
-        map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
+        map["setFromHour"] = ($('#setFromHour:checked').length > 0) ? "on" : "";
+        map["setToHour"] = ($('#setToHour:checked').length > 0) ? "on" : "";
         map["from"] = $("#fromDatepicker").val();
         map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
         map["to"] = $("#toDatepicker").val();
@@ -94,53 +76,53 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     };
 
 
-
     var updateUrls = function (withCurrentSelection) {
-      var updatedMap = $.extend({},oldParameter);
-      if(withCurrentSelection){
-          getTimeFrame(updatedMap);
-          getJobGroup(updatedMap);
-          getPage(updatedMap);
-          getBrowser(updatedMap);
-          getLocation(updatedMap);
-          getConnectivity(updatedMap);
-          getStep(updatedMap);
-      }
-      if(updatedMap["selectedFolder"] == null){
-          updatedMap = {};
-      } else{
-          if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = 60;
-          if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
-          if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
-      }
-      var params = $.param(updatedMap, true);
-      var showLinks = false;
-      if (params.length > 0) {
-        showLinks = true;
-      }
-      updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll+"?"+ params, showLinks);
-      updateUrl("#pageAggregationWithDataLink", OpenSpeedMonitor.urls.pageAggregationShow+"?"+ params, showLinks);
-      updateUrl("#distributionWithDataLink", OpenSpeedMonitor.urls.distributionChartShow+"?"+params, showLinks);
-      updateUrl("#detailAnalysisWithDataLink", OpenSpeedMonitor.urls.detailAnalysisShow+"?"+params, showLinks);
-      updateUrl("#resultListWithDataLink", OpenSpeedMonitor.urls.tabularResultPresentation+"?"+params, showLinks);
+        var updatedMap = $.extend({}, oldParameter);
+        if (withCurrentSelection) {
+            getTimeFrame(updatedMap);
+            getJobGroup(updatedMap);
+            getPage(updatedMap);
+            getBrowser(updatedMap);
+            getLocation(updatedMap);
+            getConnectivity(updatedMap);
+            getStep(updatedMap);
+        }
+        if (updatedMap["selectedFolder"] == null) {
+            updatedMap = {};
+        } else {
+            if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = 60;
+            if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
+            if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
+        }
+        var params = $.param(updatedMap, true);
+        var showLinks = false;
+        if (params.length > 0) {
+            showLinks = true;
+        }
+        updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll + "?" + params, showLinks);
+        updateUrl("#pageAggregationWithDataLink", OpenSpeedMonitor.urls.pageAggregationShow + "?" + params, showLinks);
+        updateUrl("#distributionWithDataLink", OpenSpeedMonitor.urls.distributionChartShow + "?" + params, showLinks);
+        updateUrl("#detailAnalysisWithDataLink", OpenSpeedMonitor.urls.detailAnalysisShow + "?" + params, showLinks);
+        updateUrl("#resultListWithDataLink", OpenSpeedMonitor.urls.tabularResultPresentation + "?" + params, showLinks);
+        updateUrl("#pageComparisonWithDataLink", OpenSpeedMonitor.urls.pageComparisonShow + "?" + params, showLinks)
     };
 
 
     var updateUrl = function (selector, newUrl, showLink) {
-      if (!showLink){
-        $(selector).addClass("hidden");
-      } else {
-        $(selector).attr("href",newUrl);
-        $(selector).removeClass("hidden");
-      }
+        if (!showLink) {
+            $(selector).addClass("hidden");
+        } else {
+            $(selector).attr("href", newUrl);
+            $(selector).removeClass("hidden");
+        }
     };
 
     var init = function () {
         var oldParameter = getOldParameter();
 
-        if(oldParameter["selectedPages"] == null && oldParameter["selectedMeasuredEventIds"] != null){
+        if (oldParameter["selectedPages"] == null && oldParameter["selectedMeasuredEventIds"] != null) {
             fetchPages(oldParameter["selectedMeasuredEventIds"]);
-        } else{
+        } else {
             updateUrls(false);
         }
         // $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
@@ -148,7 +130,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     };
 
     var getOldParameter = function () {
-        var urlParameter = getUrlParameter();
+        var urlParameter = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
         oldParameter["selectedFolder"] = urlParameter["selectedFolder"];
         oldParameter["selectedBrowsers"] = urlParameter["selectedBrowsers"];
         oldParameter["selectedAllBrowsers"] = urlParameter["selectedAllBrowsers"];
@@ -168,11 +150,11 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         return oldParameter;
     };
 
-    var fetchPages = function(measuredEvents){
-        $.ajax( {
+    var fetchPages = function (measuredEvents) {
+        $.ajax({
             url: OpenSpeedMonitor.urls.getPagesForMeasuredEvents,
             data: {"measuredEventList": measuredEvents},
-            success: function( data ) {
+            success: function (data) {
                 oldParameter["selectedPages"] = JSON.parse(data);
                 $("#pageSelectHtmlId").val(oldParameter["selectedPages"]);
                 updateUrls(false);
@@ -186,7 +168,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     return {
         getJobGroup: getJobGroup,
         getPage: getPage,
-        getTimeFrame:getTimeFrame,
-        updateUrls:updateUrls
+        getTimeFrame: getTimeFrame,
+        updateUrls: updateUrls
     };
 })();

@@ -9,7 +9,16 @@
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/></h1>
+<h1>
+    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
+    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
+    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
+    <g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/>
+    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
+        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
+    </g:if>
+    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
+</h1>
 
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
@@ -47,6 +56,7 @@
                               model="${['pages'    : pages,
                                         'jobGroups': jobGroups]}"/>
                 </div>
+
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                             aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
@@ -56,6 +66,7 @@
                     ]"/>
                 </div>
             </div>
+
             <div class="row card-well">
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
@@ -73,7 +84,11 @@
 
 <content tag="include.bottom">
     <asset:javascript src="pngDownloader.js"/>
+    <asset:javascript src="chartSwitch"/>
+    <asset:javascript src="/pageComparison/pageComparison.js"/>
     <asset:script type="text/javascript">
+
+        OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison().init();
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -102,6 +117,7 @@
                 if (!$.isEmptyObject(data)) {
                     $('#warning-no-data').hide();
                     OpenSpeedMonitor.ChartModules.PageComparisonBarChart.drawChart(data);
+                    OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                     $("#dia-save-chart-as-png").removeClass("disabled");
                 } else {
                     $('#warning-no-data').show();
@@ -112,9 +128,13 @@
                 $("#error-div").removeClass("hidden");
                 $("#chart-card").removeClass("hidden");
                 $("#error-message").html(e.responseText);
-            }
-        });
-    }
+                }
+            });
+        }
+
+    $(window).on("pageComparisonSelectionCardLoaded", function () {
+        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+    });
 
     </asset:script>
 </content>

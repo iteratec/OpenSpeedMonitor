@@ -6,23 +6,15 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
-OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
+OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
 
     var getTimeFrame = function (map) {
-            map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
-            map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
-            map["from"] = $("#fromDatepicker").val();
-            map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
-            map["to"] = $("#toDatepicker").val();
-            map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
-          };
-
-    var getJobGroup = function (map) {
-        map["selectedFolder"] = $("#folderSelectHtmlId").val();
-    };
-
-    var getPage = function (map) {
-        map["selectedPages"] = $("#pageSelectHtmlId").val();
+        map["setFromHour"] = ($('#setFromHour:checked').length > 0) ? "on" : "";
+        map["setToHour"] = ($('#setToHour:checked').length > 0) ? "on" : "";
+        map["from"] = $("#fromDatepicker").val();
+        map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
+        map["to"] = $("#toDatepicker").val();
+        map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
     };
 
     var getMeasurands = function (map) {
@@ -48,8 +40,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var updateUrl = function () {
         var map = {};
         getTimeFrame(map);
-        getJobGroup(map);
-        getPage(map);
         getMeasurands(map);
         var path = "show?" + $.param(map, true);
         window.history.pushState("object or string", "Title", path);
@@ -57,31 +47,35 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
 
     var setSelections = function () {
         var params = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
-        // setTrim(params);
         if (params && params.length > 0) {
-            setJobGroups(params);
-            setPages(params);
             setMeasurands(params);
+            setJobGroupsAndPages(params);
             if(params.selectedFolder != null && params.selectedPages != null){
                 clickShowButton();
             }
         }
 
     };
-    var setMultiSelect = function (id, values) {
-        $("#" + id).val(values);
-        $("#" + id).trigger("change")
-    };
-    var setJobGroups = function (params) {
+
+    var setJobGroupsAndPages = function (params) {
         var selectedFolderParam = params['selectedFolder'];
-        if (selectedFolderParam !== undefined && selectedFolderParam != null) {
-            setMultiSelect("folderSelectHtmlId", selectedFolderParam);
-        }
-    };
-    var setPages = function (params) {
         var selectedPagesParam = params['selectedPages'];
-        if (selectedPagesParam !== undefined && selectedPagesParam != null) {
-            setMultiSelect("pageSelectHtmlId", selectedPagesParam);
+        // if there is only one selectedPage or selectedFolder put it into an new array
+        if(typeof selectedPagesParam === 'string') {
+            selectedPagesParam = [selectedFolderParam]
+        }
+        if(typeof selectedFolderParam === 'string') {
+            selectedFolderParam = [selectedFolderParam]
+        }
+
+        if (selectedFolderParam !== undefined && selectedFolderParam != null && selectedPagesParam !== undefined && selectedPagesParam != null) {
+            var values = [];
+            selectedFolderParam.forEach(function (currentFolder) {
+               selectedPagesParam.forEach(function (currentPage) {
+                   values.push({'jobGroupId1': currentFolder, 'jobGroupId2': currentFolder, 'pageId1': currentPage, 'pageId2': currentPage})
+               })
+            });
+            OpenSpeedMonitor.PageComparisonSelection.setValues(values);
         }
     };
 
@@ -126,21 +120,15 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var timecardResolved = false;
-    var barChartResolved = false;
     var markTimeCardAsResolved = function () {
         timecardResolved = true;
-        if (allLoaded()) {
-           init()
-        }
-    };
-    var markBarChartAsResolved = function () {
-        barChartResolved = true;
         if (allLoaded()) {
             init()
         }
     };
+
     var allLoaded = function () {
-        return timecardResolved && barChartResolved;
+        return timecardResolved;
     };
 
     var init = function () {
@@ -151,9 +139,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var initWaitForPostload = function () {
         $(window).on("selectIntervalTimeframeCardLoaded", function () {
             markTimeCardAsResolved();
-        });
-        $(window).on("barchartHorizontalLoaded", function () {
-            markBarChartAsResolved();
         });
     };
 

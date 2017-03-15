@@ -42,12 +42,13 @@
             removeTag: "${createLink(controller: 'job', action: 'removeTag')}",
             addTagToJobs: "${createLink(controller: 'job', action: 'addTagToJobs')}"
         },
-      eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-      pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
-      tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-      getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-      detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
-      distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}"
+        eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
+        pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
+        tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
+        getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
+        detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
+        distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}",
+        pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}"
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
         docCompleteTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteTimeInMillisecs')}',

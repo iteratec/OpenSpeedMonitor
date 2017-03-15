@@ -44,7 +44,11 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
         clone.find(".addMeasurandButton").click(addPageComparisonRow);
         clone.find("#firstJobGroupSelect").on("change", selectionChangeListener);
         clone.removeAttr("id");
-        clone.insertAfter($(event.target).closest(".addPageComparisonRow"));
+        if (event) {
+            clone.insertAfter($(event.target).closest(".addPageComparisonRow"));
+        } else {
+            clone.insertAfter("#measurandSeries-clone")
+        }
     };
 
     var removeComparisonRow = function (event) {
@@ -73,9 +77,49 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
         return result;
     };
 
+    var setValues = function (values) {
+        for (var i = 1; i < values.length; i++) {
+            addPageComparisonRow(null)
+        }
+        var comparisonRows = $(".addPageComparisonRow");
+        values.forEach(function (currentComparison, index) {
+            var currentRow = $(comparisonRows[index]);
+            currentRow.find("#firstJobGroupSelect").val(currentComparison['jobGroupId1']);
+            currentRow.find("#firstPageSelect").val(currentComparison['pageId1']);
+            currentRow.find("#secondJobGroupSelect").val(currentComparison['jobGroupId2']);
+            currentRow.find("#secondPageSelect").val(currentComparison['pageId2']);
+        })
+    };
+
+    var getJobGroups = function () {
+        var result = [];
+        $(".addPageComparisonRow").each(function () {
+            var currentRow = $(this);
+            result.push(currentRow.find("#firstJobGroupSelect").val());
+            result.push(currentRow.find("#secondJobGroupSelect").val());
+        });
+        return result.filter(function (value, index, self) {
+            return self.indexOf(value) === index;
+        })
+    };
+
+    var getPages = function () {
+        var result = [];
+        $(".addPageComparisonRow").each(function () {
+            var currentRow = $(this);
+            result.push(currentRow.find("#firstPageSelect").val());
+            result.push(currentRow.find("#secondPageSelect").val());
+        });
+        return result.filter(function (value, index, self) {
+            return self.indexOf(value) === index;
+        })
+    };
 
     init();
     return {
-        getValues: getValues
+        getValues: getValues,
+        setValues: setValues,
+        getPages: getPages,
+        getJobGroups: getJobGroups
     };
 })();
