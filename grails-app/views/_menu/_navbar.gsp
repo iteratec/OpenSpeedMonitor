@@ -54,6 +54,13 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
+                    <li class="${controllerName.equals('jobGroupAggregation') ? 'active' : ''}" id="jobGroupAggregationMainMenu">
+                        <g:link controller="jobGroupAggregation" action="show"
+                                title="${message(code:'de.iteratec.jobGroupAggregation.title', default:'JobGroup Aggregation')}">
+                            <i class="fa fa-bar-chart fa-rotate-90"></i>
+                            <g:message code="de.iteratec.jobGroupAggregation.title" default="JobGroup Aggregation"/>
+                        </g:link>
+                    </li>
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
                         <g:link controller="distributionChart" action="show"
                                 title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">

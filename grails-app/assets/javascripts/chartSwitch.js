@@ -101,6 +101,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         }
         updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll + "?" + params, showLinks);
         updateUrl("#pageAggregationWithDataLink", OpenSpeedMonitor.urls.pageAggregationShow + "?" + params, showLinks);
+        updateUrl("#jobGroupAggregationWithDataLink", OpenSpeedMonitor.urls.jobGroupAggregationShow + "?" + params, showLinks);
         updateUrl("#distributionWithDataLink", OpenSpeedMonitor.urls.distributionChartShow + "?" + params, showLinks);
         updateUrl("#detailAnalysisWithDataLink", OpenSpeedMonitor.urls.detailAnalysisShow + "?" + params, showLinks);
         updateUrl("#resultListWithDataLink", OpenSpeedMonitor.urls.tabularResultPresentation + "?" + params, showLinks);

@@ -44,6 +44,7 @@
         },
         eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
         pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
+        jobGroupAggregationShow: "${createLink(action: 'show', controller: 'jobGroupAggregation')}",
         tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",

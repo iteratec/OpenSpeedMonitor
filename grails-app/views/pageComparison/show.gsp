@@ -12,6 +12,7 @@
 <h1>
     <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
     <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
+    <a href="#" class="btn hidden" id="jobGroupAggregationWithDataLink"><i class="fa fa-bar-chart fa-rotate-90"></i></a>
     <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
     <g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/>
     <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
