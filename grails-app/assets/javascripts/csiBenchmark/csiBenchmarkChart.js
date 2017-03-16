@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require /charts/commonChartFunctions.js
 
 "use strict";
 
@@ -15,7 +16,8 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         width,
         height = 700 - margin.top - margin.bottom,
         chartContainer,
-        svg;
+        svg,
+        barSelected;
 
     var init = function () {
         // make card and buttons visible
@@ -77,12 +79,14 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("transform", function (d) {
                 return "translate(" + xScale(d.name) + "," + yScale(d.value) + ")";
             });
+
         barContainer.append("rect")
             .attr("class", "d3chart-bar")
             .attr("height", function (d) {
                 return height - yScale(d.value);
             })
-            .attr("width", barWidth);
+            .attr("width", barWidth)
+            .on("click", highlightClickedBar);
         barContainer.append("text")
             .text(function (d) {
                 return (d.value + "%");
@@ -105,6 +109,17 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         // exit
         bars.exit()
             .remove();
+    };
+
+    var highlightClickedBar = function (d) {
+        if (barSelected !== d.name) {
+            barSelected = d.name;
+            d3.selectAll(".d3chart-bar").style("fill", "#d9d9d9");
+            d3.select(this).style("fill", null)
+        } else {
+            d3.selectAll(".d3chart-bar").style("fill", null);
+            barSelected = null;
+        }
     };
 
     return {
