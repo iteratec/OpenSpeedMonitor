@@ -225,6 +225,15 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("x", function (d) {
                 var width = this.getBBox().width;
                 return Math.max(width + valueMarginInBar, xScale(d.value));
+            })
+            .attr("opacity", function (d) {
+                // Hide labels if they are larger than the rect to draw in
+                var textBox = this.getBBox();
+                var rectWidth = xScale(d.value);
+                if (textBox.width > rectWidth - 3 * valueMarginInBar) {
+                    return 0;
+                }
+                return 1;
             });
 
         // update ////////////////////////////////////////////////////////////////////////////////////

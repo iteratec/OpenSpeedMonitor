@@ -9,6 +9,7 @@ import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MeasurandUtilService
 
 class PageComparisonController extends ExceptionHandlerController {
@@ -17,6 +18,7 @@ class PageComparisonController extends ExceptionHandlerController {
     public final static int MONDAY_WEEKSTART = 1
 
     MeasurandUtilService measurandUtilService
+    I18nService i18nService
 
     def index() { redirect(action: 'show') }
 
@@ -62,9 +64,9 @@ class PageComparisonController extends ExceptionHandlerController {
         }
 
         BarchartDTO dto = new BarchartDTO()
-        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
-        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
-        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
+        dto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        dto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        dto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         cmd.selectedPageComparisons.each { row ->
             BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurandUtilService.getDimensionalUnit(cmd.measurand))
