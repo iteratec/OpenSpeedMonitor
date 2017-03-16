@@ -103,7 +103,7 @@ class DistributionChartController extends ExceptionHandlerController {
             newTrace.data.add(result[selectedMeasurand])
         }
 
-//      JOHANNES2DO: check how to extract the filteringAndSortingDataService
+//      TODO: see ticket [IT-1614]
         distributionChartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 //        distributionChartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 

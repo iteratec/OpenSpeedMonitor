@@ -303,7 +303,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
     var clone = function (toClone) {
         return JSON.parse(JSON.stringify(toClone));
-    }
+    };
 
     var filterCustomerJourney = function (journeyKey, desc) {
 

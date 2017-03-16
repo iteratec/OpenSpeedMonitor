@@ -134,7 +134,7 @@ class PageAggregationController extends ExceptionHandlerController {
             barchartDTO.series.add(barchartSeries)
         }
 
-//      JOHANNES2DO: check how to extract the filteringAndSortingDataService
+//      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 

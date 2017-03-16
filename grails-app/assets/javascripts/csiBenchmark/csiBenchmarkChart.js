@@ -17,9 +17,10 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         height = 700 - margin.top - margin.bottom,
         chartContainer,
         svg,
+        xScale,
         barSelected;
 
-    var init = function () {
+    var init = function (data) {
         // make card and buttons visible
         $("#chart-card").removeClass("hidden");
         $(".in-chart-buttons").removeClass("hidden");
@@ -29,6 +30,15 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("height", height + margin.top + margin.bottom);
         chartContainer = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        $("#all-bars-desc").click(function (e) {
+            sortBars(data, "desc");
+            toogleFilterCheckmarks(e.target)
+        });
+        $("#all-bars-asc").click(function (e) {
+            sortBars(data, "asc");
+            toogleFilterCheckmarks(e.target)
+        })
     };
 
     var getLabelMappings = function () {
@@ -45,7 +55,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
 
     var drawChart = function (data) {
         if (svg === undefined) {
-            init();
+            init(data);
         }
 
         // init labelMapping on startup
@@ -57,7 +67,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         width = data.length * (barWidth + padding);
         svg.attr("width", width + margin.left + margin.right);
 
-        var xScale = d3.scale.ordinal()
+        xScale = d3.scale.ordinal()
             .rangeRoundBands([0, width], paddingFactor)
             .domain(data.map(function (d) {
                 return d.name;
@@ -78,8 +88,8 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         var barContainer = bars.enter().append("g")
             .attr("transform", function (d) {
                 return "translate(" + xScale(d.name) + "," + yScale(d.value) + ")";
-            });
-
+            })
+            .attr("class", "d3chart-bar-container");
         barContainer.append("rect")
             .attr("class", "d3chart-bar")
             .attr("height", function (d) {
@@ -109,6 +119,40 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         // exit
         bars.exit()
             .remove();
+
+        // sort bars descending by default
+        sortBars(data, "desc");
+        toogleFilterCheckmarks();
+    };
+
+    var sortBars = function (data, order) {
+        xScale.domain(data.sort(function (a, b) {
+            return (order == "asc") ? a.value - b.value : b.value - a.value;
+        })
+            .map(function (datum) {
+                return datum.name
+            }));
+
+        svg.selectAll(".d3chart-bar-container")
+            .attr("transform", function (datum) {
+                var t = d3.transform(d3.select(this).attr("transform"));
+                var translateY = t.translate[1];
+
+                return "translate(" + xScale(datum.name) + ", " + translateY + ")";
+            });
+    };
+
+    var toogleFilterCheckmarks = function (listItem) {
+        // remove all checkmarks
+        $(".filterActive").toggleClass("filterInactive filterActive");
+
+        // reset checkmark to 'descending' if 'Show' gets clicked
+        // otherwise set checkmark to the list item one has clicked on
+        if (typeof listItem == 'undefined') {
+            $('#all-bars-desc > .filterInactive').toggleClass("filterActive filterInactive");
+        } else {
+            $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
+        }
     };
 
     var highlightClickedBar = function (d) {
