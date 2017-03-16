@@ -18,6 +18,7 @@ import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtilService
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -32,6 +33,7 @@ class PageAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
+    MeasurandUtilService measurandUtilService
     FilteringAndSortingDataService filteringAndSortingDataService
 
     def index() {
@@ -108,17 +110,20 @@ class PageAggregationController extends ExceptionHandlerController {
 
         List allSeries = cmd.selectedSeries
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
+        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: getDimensionalUnit(series.measurands[0]),
-                    yAxisLabel: getYAxisLabel(series.measurands[0]),
+                    dimensionalUnit: measurandUtilService.getDimensionalUnit(series.measurands[0]),
+                    yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
                         new BarchartDatum(
-                            measurand: currentMeasurand.replace("Uncached", ""),
+                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
                             value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
                             grouping: "${datum[0]} | ${datum[1]?.name}"
                         )
@@ -238,47 +243,5 @@ class PageAggregationController extends ExceptionHandlerController {
             result += "<br />"
         }
         return result
-    }
-
-    /**
-     * Returns the dimensional unit for the given measurand
-     * @param measurand the {@link MeasurandGroup}
-     * @return the dimensional unit as string
-     */
-    public static String getDimensionalUnit(String measurand) {
-        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
-            return "ms"
-        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
-            return "%"
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
-            return "#"
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return "kb"
-        } else {
-            return ""
-        }
-
-    }
-
-    /**
-     * Returns the y-axis label for the given measurand
-     * @param measurand the {@link MeasurandGroup}
-     * @return the y-axis label as string
-     */
-    private String getYAxisLabel(String measurand) {
-        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.yAxisLabel", "Loading Time [ms]")
-        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.yAxisLabel", "Percent [%]")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.yAxisLabel", "Amount")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [kb]")
-        } else {
-            return ""
-        }
-
     }
 }

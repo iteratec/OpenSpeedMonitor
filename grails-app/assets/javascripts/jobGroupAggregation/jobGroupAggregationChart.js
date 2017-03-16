@@ -69,7 +69,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
   var initChartData = function (barchartData) {
 
     barchartData.series.forEach(function (series) {
-      var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data);
+      var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
       series.data = labelUtil.getSeriesWithShortestUniqueLabels();
       commonLabelParts = labelUtil.getCommonLabelParts();
       series.data.sort(function (x, y) {

@@ -97,7 +97,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
                 allData.push(currentData);
             })
         });
-        var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(allData);
+        var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(allData, barchartData.i18nMap);
         labelUtil.getSeriesWithShortestUniqueLabels();
         commonLabelParts = labelUtil.getCommonLabelParts();
         absoluteMaxYOffset = (barchartData.series.length - 1) * (barHeight + barPadding) + barPadding;

@@ -9,11 +9,14 @@ import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
+import de.iteratec.osm.util.MeasurandUtilService
 
-class PageComparisonController extends ExceptionHandlerController{
+class PageComparisonController extends ExceptionHandlerController {
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
+
+    MeasurandUtilService measurandUtilService
 
     def index() { redirect(action: 'show') }
 
@@ -59,9 +62,12 @@ class PageComparisonController extends ExceptionHandlerController{
         }
 
         BarchartDTO dto = new BarchartDTO()
+        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         cmd.selectedPageComparisons.each { row ->
-            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: PageAggregationController.getDimensionalUnit(cmd.measurand + "Uncached"))
+            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurandUtilService.getDimensionalUnit(cmd.measurand))
             BarchartDatum datum1 = new BarchartDatum(measurand: cmd.measurand)
             BarchartDatum datum2 = new BarchartDatum(measurand: cmd.measurand)
             def result1 = allEventResults.find {
