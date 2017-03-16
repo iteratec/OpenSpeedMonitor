@@ -9,17 +9,7 @@
 </head>
 
 <body>
-<h1>
-    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
-    <g:message code="de.iteratec.jobGroupAggregation.title" default="JobGroup Aggregation"/>
-    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageComparisonWithDataLink"><i class="fa fa-balance-scale"></i></a>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
-        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
-    </g:if>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'jobGroupAggregation']"/>
 
 <p>
     <g:message code="de.iteratec.isocsi.pageAggregation.description.short"

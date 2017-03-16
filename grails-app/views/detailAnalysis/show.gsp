@@ -8,15 +8,7 @@
 </head>
 
 <body>
-<h1>
-    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
-    <a href="#" class="btn hidden" id="jobGroupAggregationWithDataLink"><i class="fa fa-bar-chart fa-rotate-90"></i></a>
-    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageComparisonWithDataLink"><i class="fa fa-balance-scale"></i></a>
-    <g:message code="de.iteratec.isocsi.detailAnalysis"/>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'detailAnalysis']"/>
 
 <div class="row">
     <div class="col-md-12">

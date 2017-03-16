@@ -9,104 +9,93 @@
 </head>
 
 <body>
-<h1>
-    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
-    <g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/>
-    <a href="#" class="btn hidden" id="jobGroupAggregationWithDataLink"><i class="fa fa-bar-chart fa-rotate-90"></i></a>
-    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageComparisonWithDataLink"><i class="fa fa-balance-scale"></i></a>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
-        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
-    </g:if>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageAggregation']"/>
+<p>
+    <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
+               default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
+</p>
 
-    <p>
-        <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
-                   default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
-    </p>
+<div class="card hidden" id="chart-card">
+    <div id="error-div" class="hidden">
+        <div class="alert alert-danger">
+            <div id="error-message"></div>
+        </div>
+    </div>
+    <g:render template="barChart"/>
+</div>
 
-    <div class="card hidden" id="chart-card">
-        <div id="error-div" class="hidden">
-            <div class="alert alert-danger">
-                <div id="error-message"></div>
+<div class="row">
+    <div class="col-md-12">
+        <form id="dashBoardParamsForm">
+            <!-- show button -->
+            <div class="action-row">
+                <div class="col-md-12">
+
+                    <div class="btn-group pull-right" id="show-button-group">
+                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId"
+                           class="btn btn-primary show-button">
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
+                    </div>
+                    <g:render template="/_resultSelection/hiddenWarnings"/>
+                </div>
             </div>
-        </div>
-        <g:render template="barChart"/>
-    </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <form id="dashBoardParamsForm">
-                <!-- show button -->
-                <div class="action-row">
+            <div class="row card-well">
+                <div class="col-md-4">
+                    <g:render template="/_resultSelection/selectIntervalTimeframeCard"
+                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                        'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
+                                        'includeInterval'          : includeInterval]}"/>
+
+                    <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
+                            aggrGroupValuesUnCached: aggrGroupValuesUnCached,
+                            multipleMeasurands     : false,
+                            multipleSeries         : false
+                    ]"/>
+                </div>
+
+                <div class="col-md-3">
+
+                    <div id="filter-navtab-jobGroup">
+                        <g:render template="/_resultSelection/selectJobGroupCard"
+                                  model="['folders'             : folders, 'selectedFolder': selectedFolder,
+                                          'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
+                    </div>
+                </div>
+                %{--the rest----------------------------------------------------------------------------------------------}%
+                <div id="filter-complete-tabbable" class="col-md-5">
+                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard" model="[
+                            'showOnlyPage'         : true,
+                            'hideMeasuredEventForm': true,
+                            'pages'                : pages,
+                            'selectedPages'        : selectedPages
+                    ]"/>
+                </div>
+
+                <div class="row">
                     <div class="col-md-12">
-
-                        <div class="btn-group pull-right" id="show-button-group">
-                            <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId"
-                               class="btn btn-primary show-button">
-                                ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
-                        </div>
-                        <g:render template="/_resultSelection/hiddenWarnings"/>
+                        <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                            <i class="fa fa-undo"></i> Reset
+                        </button>
                     </div>
                 </div>
-
-                <div class="row card-well">
-                    <div class="col-md-4">
-                        <g:render template="/_resultSelection/selectIntervalTimeframeCard"
-                                  model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                            'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
-                                            'includeInterval'          : includeInterval]}"/>
-
-                        <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
-                                aggrGroupValuesUnCached: aggrGroupValuesUnCached,
-                                multipleMeasurands     : false,
-                                multipleSeries         : false
-                        ]"/>
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div id="filter-navtab-jobGroup">
-                            <g:render template="/_resultSelection/selectJobGroupCard"
-                                      model="['folders'             : folders, 'selectedFolder': selectedFolder,
-                                              'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
-                        </div>
-                    </div>
-                    %{--the rest----------------------------------------------------------------------------------------------}%
-                    <div id="filter-complete-tabbable" class="col-md-5">
-                        <g:render template="/_resultSelection/selectPageLocationConnectivityCard" model="[
-                                'showOnlyPage'         : true,
-                                'hideMeasuredEventForm': true,
-                                'pages'                : pages,
-                                'selectedPages'        : selectedPages
-                        ]"/>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                                <i class="fa fa-undo"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
+</div>
 
-    <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
+<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
-    <content tag="include.bottom">
-        <asset:javascript src="pngDownloader.js"/>
-        <asset:javascript src="/pageAggregation/pageAggregation.js"/>
-        <asset:javascript src="chartSwitch"/>
-        <asset:script type="text/javascript">
+<content tag="include.bottom">
+    <asset:javascript src="pngDownloader.js"/>
+    <asset:javascript src="/pageAggregation/pageAggregation.js"/>
+    <asset:javascript src="chartSwitch"/>
+    <asset:script type="text/javascript">
 
-            OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
+        OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
 
-            $(window).load(function() {
-                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+        $(window).load(function() {
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
@@ -160,8 +149,8 @@
         }
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
 
-        </asset:script>
-    </content>
+    </asset:script>
+</content>
 
 </body>
 </html>
