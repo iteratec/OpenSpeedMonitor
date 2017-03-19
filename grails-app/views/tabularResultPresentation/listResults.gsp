@@ -3,12 +3,11 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.eventResult"/></title>
-    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="tabularResultPresentation/listResults.css"/>
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.result.title" default="Result List"/></h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'resultList']"/>
 <g:if test="${command}">
     <g:hasErrors bean="${command}">
         <div class="alert alert-danger">
@@ -40,6 +39,9 @@
             <g:actionSubmit class="btn btn-primary pull-right show-button" id="show-button"
                             value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                             action="${showSpecificJob ? 'listResultsForJob' : 'listResults'}"/>
+
+            <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                            action="downloadCsv" class="btn btn-primary pull-right space-right show-button"/>
             <g:render template="/_resultSelection/hiddenWarnings"/>
         </div>
     </div>
@@ -89,16 +91,15 @@
 
 <content tag="include.bottom">
     <asset:javascript src="eventresult/eventResult.js"/>
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                            absolute="true"/>')
-                });
-            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
-                "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-                "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
-                "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
-                "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+        });
+
+        $(window).on("selectIntervalTimeframeCardLoaded", function () {
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+        });
     </asset:script>
 </content>
 </body>

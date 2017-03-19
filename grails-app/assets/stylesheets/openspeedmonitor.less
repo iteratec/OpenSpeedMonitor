@@ -22,6 +22,7 @@ body {
   right: 0;
   bottom: 0;
   height: 5rem;
+  padding: 15px 0 0 0;
 }
 
 .footer .container-fluid {
@@ -387,11 +388,11 @@ a.control-label {
   font-size: 24px;
   padding: 6px 12px;
   cursor: pointer;
-  display: block;
 
   &:hover,
   &:focus {
     background: #eeeeee;
+    text-decoration: none;
   }
 }
 
@@ -477,4 +478,8 @@ a.control-label {
 .colorLabel {
   min-width: 17em;
   text-align: left;
+}
+
+a.btn.disabled {
+  pointer-events: inherit;
 }

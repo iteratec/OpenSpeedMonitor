@@ -103,7 +103,7 @@ class JobController {
     }
 
     def list() {
-        redirect(action: 'index')
+        forward(action: 'index')
     }
 
     def index() {
@@ -439,11 +439,11 @@ class JobController {
 
     def showLastResultForJob(Long id) {
         Job job = Job.get(id)
-        redirect(url: jobService.createResultLinkForJob(job))
+        redirect(controller: 'eventResultDashboard', action: 'showAll', params: jobService.createTimeSeriesParamsFor(job))
     }
 
     def showLastPageAggregationForJob(Long id) {
         Job job = Job.get(id)
-        redirect(url: jobService.createPageAggregationLinkForJob(job))
+        redirect(controller: 'PageAggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
     }
 }

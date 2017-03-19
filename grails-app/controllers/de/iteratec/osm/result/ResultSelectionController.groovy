@@ -2,18 +2,21 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import grails.databinding.BindUsing
+import jdk.nashorn.api.scripting.JSObject
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
+import de.iteratec.osm.annotations.RestAction
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
-class ResultSelectionController {
+class ResultSelectionController extends ExceptionHandlerController {
     private final static MAX_RESULT_COUNT = 50000
     private final static RESULT_COUNT_MAX_SECONDS = 1
 
@@ -33,7 +36,8 @@ class ResultSelectionController {
         MeasuredEvents,
         Locations,
         ConnectivityProfiles,
-        Results
+        Results,
+        Pages
     }
 
     def getResultCount(ResultSelectionCommand command) {
@@ -61,6 +65,7 @@ class ResultSelectionController {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
     }
 
+    @RestAction
     def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -91,6 +96,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getMeasuredEvents(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -121,6 +127,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getLocations(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -151,6 +158,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
     def getConnectivityProfiles(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -166,6 +174,32 @@ class ResultSelectionController {
             return dtos
         })
 
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
+    def getPages(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", 0, {
+            def pages = query(command, ResultSelectionType.Pages, { existing ->
+                if (existing) {
+                    not { 'in'('page', existing) }
+                }
+                projections {
+                    distinct('page')
+                }
+            })
+            return pages.collect {
+                [
+                        id  : it.id,
+                        name: it.name
+                ]
+            }
+        })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
@@ -296,7 +330,7 @@ class ResultSelectionController {
                     }
                 }
 
-                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
+                if ((resultSelectionType != ResultSelectionType.MeasuredEvents || resultSelectionType != ResultSelectionType.Pages) && command.pageIds) {
                     page {
                         'in'("id", command.pageIds)
                     }

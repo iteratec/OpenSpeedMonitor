@@ -5,10 +5,10 @@ MAINTAINER nils.kuhn@iteratec.de, birger.kamp@iteratec.de
 ENV OSM_HOME /osm
 ENV OSM_CONFIG_HOME /home/osm/.grails
 ENV JAVA_OPTS "-server -Dgrails.env=prod -Dfile.encoding=UTF-8"
-ENV DOCKERIZE_VERSION v0.2.0
+ENV DOCKERIZE_VERSION v0.3.0
 
 # add osm-user
-RUN useradd -ms /bin/bash osm
+RUN groupadd -r osm && useradd -ms /bin/bash -r -g osm osm
 
 # install dockerize
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \

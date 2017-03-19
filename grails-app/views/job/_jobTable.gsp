@@ -12,20 +12,20 @@
         <td class="summary">
             <div class="show-chart-buttons">
                 <g:if test="${job.lastRun}">
-                    <a href="${createLink(action: 'showLastResultForJob', id: job.id, absolute: true)}" class="show-chart"><i
+                    <a href="${createLink(action: 'showLastResultForJob', id: job.id)}" class="show-chart"><i
                             class="fa fa-line-chart"></i></a>
-                    <a href="${createLink(action: 'showLastPageAggregationForJob', id: job.id, absolute: true)}" class="show-chart"><i
+                    <a href="${createLink(action: 'showLastPageAggregationForJob', id: job.id)}" class="show-chart"><i
                             class="fa fa-bar-chart"></i></a>
                 </g:if>
             </div>
 
             <div class="jobNameContainer"><a
-                    href="${createLink(action: 'edit', id: job.id, absolute: true)}"
+                    href="${createLink(action: 'edit', id: job.id)}"
                     class="jobName ${job.active == false ? 'inactiveJob' : ''}">${job.label}
             </a></div>
             <g:if test="${job.script}">
                 <a
-                        href="${createLink(controller: 'script', action: 'edit', id: job.script.id, absolute: true)}"
+                        href="${createLink(controller: 'script', action: 'edit', id: job.script.id)}"
                         class="script">
                     ${job.script.label}
                 </a>
@@ -47,7 +47,7 @@
         <td>
             <g:render template="timeago"
                       model="${['date': job.lastRun, 'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),
-                                'url' : createLink(controller: 'tabularResultPresentation', action: 'listResultsForJob', params: ['job.id': job.id], absolute: true)]}"/>
+                                'url' : createLink(controller: 'tabularResultPresentation', action: 'listResultsForJob', params: ['job.id': job.id])]}"/>
             <a href="/jobResult/listFailed?jobId=${job.id}" data-toggle="popover"
                title="${g.message(code: 'de.iteratec.osm.job.status.description.title', default: 'State') + ': ' + job.label}"
                data-placement="bottom" data-trigger="hover" data-html="true"

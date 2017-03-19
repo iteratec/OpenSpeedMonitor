@@ -1,0 +1,60 @@
+/*
+*= require /_resultSelection/selectBarchartMeasurings.css
+*= require_self
+*/
+.card-well {
+  position: relative;
+}
+
+.filterActive {
+  visibility: visible;
+}
+
+.filterInactive {
+  visibility: hidden;
+}
+
+#chart-container {
+  position: relative;
+}
+
+#filter-dropdown-group {
+  position: absolute;
+  right: 110px;
+  top: 8px;
+  z-index: 500;
+  padding: 6px 12px;
+}
+
+// BarChart styles
+.d3chart-bar {
+  fill: #44994b;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+.tick line{
+  visibility:hidden;
+}
+.d3chart-barLabel {
+  font: 18px sans-serif;
+  color: white;
+  fill: white;
+}
+.d3chart-xAxisText {
+  font: 11px sans-serif;
+  color: grey;
+  fill: grey;
+}

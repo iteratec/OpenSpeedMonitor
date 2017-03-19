@@ -1,11 +1,14 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.BarchartDTO
 import de.iteratec.osm.dimple.BarchartDatum
 import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.dimple.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
@@ -13,10 +16,12 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtilService
 import org.springframework.http.HttpStatus
 
-class PageAggregationController {
+class PageAggregationController extends ExceptionHandlerController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
@@ -24,9 +29,16 @@ class PageAggregationController {
     public final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
+    JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
+    MeasurandUtilService measurandUtilService
+    FilteringAndSortingDataService filteringAndSortingDataService
+
+    def index() {
+        redirect(action: 'show')
+    }
 
     def show() {
         Map<String, Object> modelToRender = [:]
@@ -37,10 +49,12 @@ class PageAggregationController {
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
         modelToRender.put('folders', jobGroups)
+        modelToRender.put('selectedFolder', params.selectedFolder)
 
         // Pages
         List<Page> pages = eventResultDashboardService.getAllPages()
         modelToRender.put('pages', pages)
+        modelToRender.put('selectedPages', params.selectedPages)
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
@@ -51,7 +65,11 @@ class PageAggregationController {
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
-        return modelToRender;
+        return modelToRender
+    }
+
+    def entryAndFollow(){
+        return [:]
     }
 
     /**
@@ -59,6 +77,7 @@ class PageAggregationController {
      * @param cmd The requested data.
      * @return BarchartDTO as JSON or string message if an error occurred
      */
+    @RestAction
     def getBarchartData(GetBarchartCommand cmd) {
         String errorMessages = getErrorMessages(cmd)
         if (errorMessages) {
@@ -91,22 +110,51 @@ class PageAggregationController {
 
         List allSeries = cmd.selectedSeries
         BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
+        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), yAxisLabel: getYAxisLabel(series.measurands[0]), stacked: series.stacked)
+            BarchartSeries barchartSeries = new BarchartSeries(
+                    dimensionalUnit: measurandUtilService.getDimensionalUnit(series.measurands[0]),
+                    yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
+                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
-                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], grouping: "${datum[0]} / ${datum[1]?.name}"))
+                        new BarchartDatum(
+                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
+                            value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
+                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                        )
+                    )
                 }
             }
 
             barchartDTO.series.add(barchartSeries)
         }
 
+//      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+//        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+    }
+
+    @RestAction
+    def getEntryAndFollowBarchartData(){
+
+        JobGroup jobGroup = JobGroup.findByName('develop_Desktop')
+        List<Job> jobs = jobDaoService.getJobs(jobGroup)
+        Set<Page> uniqueTestedPages = [] as Set
+
+        jobs*.script*.navigationScript.each {String navigationScript ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+            uniqueTestedPages.addAll(pagesOfThisScript)
+        }
+        uniqueTestedPages.each {
+
+        }
     }
 
     /**
@@ -118,7 +166,7 @@ class PageAggregationController {
         Map<String, List<String>> result = [:].withDefault { [] }
 
         // Get all scripts
-        List<Job> jobList = Job.findAllByJobGroupInList(jobGroups)
+        List<Job> jobList = jobDaoService.getJobs(jobGroups)
         List<Script> allScripts = jobList*.script.unique()
 
         allScripts.each { currentScript ->
@@ -141,7 +189,7 @@ class PageAggregationController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << "${p.name} / ${it.name}"
+                        filterRule << "${p.name} | ${it.name}"
                     }
                 }
             }
@@ -195,47 +243,5 @@ class PageAggregationController {
             result += "<br />"
         }
         return result
-    }
-
-    /**
-     * Returns the dimensional unit for the given measurand
-     * @param measurand the {@link MeasurandGroup}
-     * @return the dimensional unit as string
-     */
-    private String getDimensionalUnit(String measurand) {
-        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
-            return "ms"
-        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
-            return "%"
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
-            return "#"
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return "kb"
-        } else {
-            return ""
-        }
-
-    }
-
-    /**
-     * Returns the y-axis label for the given measurand
-     * @param measurand the {@link MeasurandGroup}
-     * @return the y-axis label as string
-     */
-    private String getYAxisLabel(String measurand) {
-        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.yAxisLabel", "Loading Time [ms]")
-        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.yAxisLabel", "Percent [%]")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.yAxisLabel", "Amount")
-        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [kb]")
-        } else {
-            return ""
-        }
-
     }
 }

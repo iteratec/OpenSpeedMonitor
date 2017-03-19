@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
@@ -32,6 +33,8 @@ import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.CsvExportService
+import org.hibernate.sql.JoinType
 import org.joda.time.DateTime
 import org.joda.time.Interval
 
@@ -62,6 +65,8 @@ class TabularResultPresentationController {
     EventResultDashboardService eventResultDashboardService
     UserspecificDashboardService userspecificDashboardService
 
+    CsvExportService csvExportService
+
     private Map<String, Object> listResultsByCommand(TabularResultEventResultsCommandBase cmd) {
 
         Map<String, Object> modelToRender
@@ -71,38 +76,35 @@ class TabularResultPresentationController {
         EventResultListing eventResultsListing = new EventResultListing();
         PaginationListing paginationListing = new PaginationListing();
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
-        if( !ControllerUtils.isEmptyRequest(params)) {
-            if(!cmd.validate() )
-            {
+        if (!ControllerUtils.isEmptyRequest(params)) {
+            if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
                 Interval timeFrame = cmd.receiveSelectedTimeFrame();
                 List<EventResult> eventResults = null
                 if (cmd instanceof TabularResultListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
-                            ((TabularResultListResultsCommand)cmd).createMvQueryParams(),
+                            ((TabularResultListResultsCommand) cmd).createMvQueryParams(),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
                             cmd.getOffset(),
                             new CriteriaSorting(sortAttribute: 'jobResultDate', sortOrder: CriteriaSorting.SortOrder.DESC)
                     )
-                    paginationListing = paginationService.buildListResultsPagination((TabularResultListResultsCommand)cmd, eventResults.getTotalCount())
+                    paginationListing = paginationService.buildListResultsPagination((TabularResultListResultsCommand) cmd, eventResults.getTotalCount())
                 } else if (cmd instanceof TabularResultListResultsForSpecificJobCommand) {
                     eventResults = eventResultDaoService.getEventResultsByJob(
-                            ((TabularResultListResultsForSpecificJobCommand)cmd).job,
+                            ((TabularResultListResultsForSpecificJobCommand) cmd).job,
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
                             cmd.getOffset()
                     )
-                    paginationListing = paginationService.buildListResultsForJobPagination((TabularResultListResultsForSpecificJobCommand)cmd, eventResults.getTotalCount())
+                    paginationListing = paginationService.buildListResultsForJobPagination((TabularResultListResultsForSpecificJobCommand) cmd, eventResults.getTotalCount())
                 }
 
-                for(EventResult eachEventResult : eventResults)
-                {
-                    if(! eachEventResult.medianValue )
-                    {
+                for (EventResult eachEventResult : eventResults) {
+                    if (!eachEventResult.medianValue) {
                         continue;
                     }
                     JobResult correspondingJobResult = eachEventResult.jobResult;
@@ -128,9 +130,9 @@ class TabularResultPresentationController {
      *            not <code>null</code>.
      * @return A model map to be used by the corresponding GSP,
      * 	       not <code>null</code> and never
-     *         {@linkplain Map#isEmpty() empty}.
+     * {@linkplain Map#isEmpty() empty}.
      */
-    public Map<String, Object>listResults(TabularResultListResultsCommand cmd) {
+    public Map<String, Object> listResults(TabularResultListResultsCommand cmd) {
         return listResultsByCommand(cmd)
     }
 
@@ -141,11 +143,11 @@ class TabularResultPresentationController {
      *            not <code>null</code>.
      * @return A model map to be used by the corresponding GSP,
      * 	       not <code>null</code> and never
-     *         {@linkplain Map#isEmpty() empty}.
+     * {@linkplain Map#isEmpty() empty}.
      */
     public Map<String, Object> listResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
         // default to last twelve hours if job but no date range has been specified
-        if (cmd.job!=null && cmd.from==null && cmd.to==null) {
+        if (cmd.job != null && cmd.from == null && cmd.to == null) {
 
             // If this job's last run was more than twelve hours ago, show results from
             // one hour before last run until now
@@ -154,22 +156,22 @@ class TabularResultPresentationController {
             DateTime defaultFrom = now.minusHours(defaultTimeToShowResultsFrom)
 
             cmd.from = new DateTime(cmd.job.lastRun).isBefore(defaultFrom) ? new DateTime(cmd.job.lastRun).minusHours(defaultTimeToShowResultsFrom).toDate() : defaultFrom.toDate()
-            cmd.fromHour = cmd.from.getAt(Calendar.HOUR_OF_DAY) +":"+ cmd.from.getAt(Calendar.MINUTE);
+            cmd.fromHour = cmd.from.getAt(Calendar.HOUR_OF_DAY) + ":" + cmd.from.getAt(Calendar.MINUTE);
 
             cmd.to = new DateTime(cmd.job.lastRun).plusHours(defaultTimeToShowResultsFrom).toDate()
-            cmd.toHour = cmd.to.getAt(Calendar.HOUR_OF_DAY) +":"+ cmd.to.getAt(Calendar.MINUTE);
+            cmd.toHour = cmd.to.getAt(Calendar.HOUR_OF_DAY) + ":" + cmd.to.getAt(Calendar.MINUTE);
 
 
             Interval timeFrame = cmd.receiveSelectedTimeFrame();
 
             SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
             SimpleDateFormat fmtTime = new SimpleDateFormat("hh:mm");
-            redirect(action: 'ShowListResultsForJob', params: [	'selectedTimeFrameInterval': '0',
-                'job.id': cmd.job.getId(),
-                'from': fmtDate.format(cmd.from),
-                'fromHour': fmtTime.format(cmd.from),
-                'to': fmtDate.format(cmd.to),
-                'toHour': fmtTime.format(cmd.to)
+            redirect(action: 'ShowListResultsForJob', params: ['selectedTimeFrameInterval': '0',
+                                                               'job.id'                   : cmd.job.getId(),
+                                                               'from'                     : fmtDate.format(cmd.from),
+                                                               'fromHour'                 : fmtTime.format(cmd.from),
+                                                               'to'                       : fmtDate.format(cmd.to),
+                                                               'toHour'                   : fmtTime.format(cmd.to)
             ])
         }
         Map<String, Object> modelToRender = listResultsByCommand(cmd)
@@ -185,18 +187,16 @@ class TabularResultPresentationController {
      *            not <code>null</code>.
      * @return A model map to be used by the corresponding GSP,
      * 	       not <code>null</code> and never
-     *         {@linkplain Map#isEmpty() empty}.
+     * {@linkplain Map#isEmpty() empty}.
      */
     public Map<String, Object> showListResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
-        if (cmd.job!=null && (cmd.from==null || cmd.to==null)){
-            redirect(action: 'listResultsForJob', params:['job.id': cmd.job.getId()])
+        if (cmd.job != null && (cmd.from == null || cmd.to == null)) {
+            redirect(action: 'listResultsForJob', params: ['job.id': cmd.job.getId()])
         }
         Map<String, Object> modelToRender = listResultsByCommand(cmd)
         modelToRender.put('showSpecificJob', true)
         render(view: 'listResults', model: modelToRender)
     }
-
-
 
     /**
      * <p>
@@ -214,8 +214,7 @@ class TabularResultPresentationController {
      *         further data. Subsequent calls will never return the same
      *         instance.
      */
-    public Map<String, Object> constructStaticViewDataOfListResults()
-    {
+    public Map<String, Object> constructStaticViewDataOfListResults() {
         Map<String, Object> result = [:]
 
         // JobGroups
@@ -242,14 +241,13 @@ class TabularResultPresentationController {
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
         Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
-        for(Page eachPage : pages)
-        {
+        for (Page eachPage : pages) {
             Set<Long> eventIds = new HashSet<Long>();
 
             Collection<Long> ids = measuredEvents.findResults {
-                it.testedPage.getId() == eachPage.getId() ? it.getId() : null }
-            if( !ids.isEmpty() )
-            {
+                it.testedPage.getId() == eachPage.getId() ? it.getId() : null
+            }
+            if (!ids.isEmpty()) {
                 eventIds.addAll(ids);
             }
 
@@ -259,14 +257,13 @@ class TabularResultPresentationController {
 
         // --- Map<BrowserID, Set<LocationID>> for fast view filtering:
         Map<Long, Set<Long>> locationsOfBrowsers = new HashMap<Long, Set<Long>>()
-        for(Browser eachBrowser : browsers)
-        {
+        for (Browser eachBrowser : browsers) {
             Set<Long> locationIds = new HashSet<Long>();
 
             Collection<Long> ids = locations.findResults {
-                it.browser.getId() == eachBrowser.getId() ? it.getId() : null }
-            if( !ids.isEmpty() )
-            {
+                it.browser.getId() == eachBrowser.getId() ? it.getId() : null
+            }
+            if (!ids.isEmpty()) {
                 locationIds.addAll(ids);
             }
 
@@ -284,5 +281,170 @@ class TabularResultPresentationController {
 
         // Done! :)
         return result;
+    }
+
+    /**
+     * <p>
+     * Creates a CSV based on the selection passed as {@link TabularResultEventResultsCommandBase}.
+     * </p>
+     *
+     * @param cmd
+     *         The command with the users selections;
+     *         not <code>null</code>.
+     * @return nothing , immediately renders a CSV to response' output stream.
+     * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
+     */
+    Map<String, Object> downloadCsv(TabularResultListResultsCommand cmd) {
+
+        if (!request.queryString || !cmd.validate()) {
+            redirect(action: 'listResults', params: params)
+            return
+        }
+
+        String filename = ""
+        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(cmd.selectedFolder)
+
+        selectedJobGroups.each { jobGroup ->
+            filename += jobGroup.name + '_'
+        }
+
+        Interval interval = cmd.receiveSelectedTimeFrame()
+        filename += interval.startMillis + '_to_' + interval.endMillis + '.csv'
+
+        response.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        response.setContentType("text/csv;header=present;charset=UTF-8");
+
+        Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
+
+        List<String> headers = getCsvHeaders()
+        List<List<String>> rows = getCsvRows(cmd)
+        csvExportService.writeCSV(headers, rows, responseWriter);
+
+        response.getOutputStream().flush()
+        return null;
+    }
+
+    private List<List<String>> getCsvRows(TabularResultListResultsCommand cmd) {
+        List<List<String>> result = EventResult.createCriteria().list {
+            createAlias('jobGroup', 'jobGroup', JoinType.LEFT_OUTER_JOIN)
+            createAlias('page', 'page', JoinType.LEFT_OUTER_JOIN)
+            createAlias('measuredEvent', 'measuredEvent', JoinType.LEFT_OUTER_JOIN)
+            createAlias('browser', 'browser', JoinType.LEFT_OUTER_JOIN)
+            createAlias('location', 'location', JoinType.LEFT_OUTER_JOIN)
+            createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
+
+            and {
+                'in'('jobGroup.id', cmd.selectedFolder)
+                if (cmd.selectedPages) {
+                    'in'('page.id', cmd.selectedPages)
+                }
+                if (cmd.selectedMeasuredEventIds) {
+                    'in'('measuredEvent.id', cmd.selectedMeasuredEventIds)
+                }
+                if (cmd.selectedBrowsers) {
+                    'in'('browser.id', cmd.selectedBrowsers)
+                }
+                if (cmd.selectedLocations) {
+                    'in'('location.id', cmd.selectedLocations)
+                }
+                if (!cmd.selectedAllConnectivityProfiles) {
+                    or {
+                        if (cmd.selectedConnectivityProfiles) {
+                            'in'('connectivityProfile.id', cmd.selectedConnectivityProfiles)
+                        }
+                        if (cmd.selectedCustomConnectivityNames) {
+                            'in'('customConnectivityName', cmd.selectedCustomConnectivityNames)
+                        }
+                        if (cmd.includeNativeConnectivity) {
+                            eq('noTrafficShapingAtAll', true)
+                        }
+                    }
+                }
+            }
+            projections {
+                property('jobResultDate')
+                property('jobGroup.name')
+                property('browser.name')
+                property('location.label')
+                property('testAgent')
+                property('page.name')
+                property('measuredEvent.name')
+                property('cachedView')
+                property('csByWptDocCompleteInPercent')
+                property('docCompleteIncomingBytes')
+                property('docCompleteRequests')
+                property('docCompleteTimeInMillisecs')
+                property('domTimeInMillisecs')
+                property('firstByteInMillisecs')
+                property('fullyLoadedIncomingBytes')
+                property('fullyLoadedRequestCount')
+                property('fullyLoadedTimeInMillisecs')
+                property('loadTimeInMillisecs')
+                property('medianValue')
+                property('numberOfWptRun')
+                property('speedIndex')
+                property('startRenderInMillisecs')
+                property('visuallyCompleteInMillisecs')
+                property('csByWptVisuallyCompleteInPercent')
+                property('oneBasedStepIndexInJourney')
+                property('customConnectivityName')
+                property('noTrafficShapingAtAll')
+                property('connectivityProfile.name')
+                property('connectivityProfile.bandwidthDown')
+                property('connectivityProfile.bandwidthUp')
+                property('connectivityProfile.latency')
+                property('connectivityProfile.packetLoss')
+            }
+        }
+
+        // round doubles and convert date
+        result.each { row ->
+            // jobResultDate
+            row[0] = csvExportService.CSV_TABLE_DATE_TIME_FORMAT.print(new DateTime(row[0]))
+            // csByWptDocCompleteInPercent
+            row[8] = row[8]?.round(2).toString()
+            // csByWptVisuallyCompleteInPercent
+            row[23] = row[23]?.round(2).toString()
+        }
+        return result
+    }
+
+    private List<String> getCsvHeaders() {
+        List<String> result = []
+
+        result << 'Date'
+        result << 'JobGroup'
+        result << 'Browser'
+        result << 'Location'
+        result << 'TestAgent'
+        result << 'Page'
+        result << 'MeasuredEvent'
+        result << 'CachedView'
+        result << 'CsByWptDocCompleteInPercent'
+        result << 'DocCompleteIncomingBytes'
+        result << 'DocCompleteRequests'
+        result << 'DocCompleteTimeInMillisecs'
+        result << 'DomTimeInMillisecs'
+        result << 'FirstByteInMillisecs'
+        result << 'fullyLoadedIncomingBytes'
+        result << 'fullyLoadedRequestCount'
+        result << 'fullyLoadedTimeInMillisecs'
+        result << 'LoadTimeInMillisecs'
+        result << 'MedianValue'
+        result << 'NumberOfWptRun'
+        result << 'SpeedIndex'
+        result << 'StartRenderInMillisecs'
+        result << 'VisuallyCompleteInMillisecs'
+        result << 'CsByWptVisuallyCompleteInPercent'
+        result << 'OneBasedStepIndexInJourney'
+        result << 'CustomConnectivityName'
+        result << 'NoTrafficShapingAtAll'
+        result << 'Connectivity'
+        result << 'ConnectivityBandwithDown'
+        result << 'ConnectivityBandwithUp'
+        result << 'ConnectivityLatency'
+        result << 'ConnectivityPacketLoss'
+
+        return result
     }
 }

@@ -44,12 +44,10 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService
-    CsiAggregationUtilService csiAggregationUtilService
 
     AggregatorType job
     AggregatorType page
     AggregatorType shop
-    DateTime startOfCreatingHourlyEventValues = new DateTime(2012, 1, 9, 0, 0, 0)
     DateTime startOfCreatingWeeklyPageValues = new DateTime(2012, 2, 6, 0, 0, 0)
     DateTime startOfCreatingWeeklyShopValues = new DateTime(2012, 3, 12, 0, 0, 0)
 

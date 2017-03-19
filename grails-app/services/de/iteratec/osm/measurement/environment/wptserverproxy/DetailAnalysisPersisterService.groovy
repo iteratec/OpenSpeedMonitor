@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.api.MicroServiceApiKey
+import de.iteratec.osm.api.MicroserviceType
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
@@ -35,8 +36,6 @@ import grails.web.mapping.LinkGenerator
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 
-import java.lang.reflect.InvocationTargetException
-
 import static groovyx.net.http.ContentType.URLENC
 
 /**
@@ -44,9 +43,9 @@ import static groovyx.net.http.ContentType.URLENC
  * @author rschuett , nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */
-class AssetRequestPersisterService implements iResultListener {
+class DetailAnalysisPersisterService implements iResultListener {
 
-    private boolean persistenceOfAssetRequestsEnabled = false
+    private boolean persistenceOfDetailAnalysisDataEnabled = false
     private String microserviceUrl
     private boolean callListenerAsync = true
 
@@ -66,7 +65,7 @@ class AssetRequestPersisterService implements iResultListener {
      */
     @Override
     String getListenerName() {
-        return "AssetRequestPersisterService"
+        return "DetailAnalysisPersisterService"
     }
 
     @Override
@@ -75,7 +74,7 @@ class AssetRequestPersisterService implements iResultListener {
             WebPageTestServer wptserverOfResult) {
 
         try {
-            persistAssetRequests(resultXml, wptserverOfResult)
+            persistDetailAnalysisData(resultXml, wptserverOfResult)
 
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
@@ -89,32 +88,39 @@ class AssetRequestPersisterService implements iResultListener {
     }
 
     /**
-     * Triggers the persistence the AssetRequests for a JobResults if persistence is enabled
+     * Triggers the persistence the detailAnalysisData for a JobResults if persistence is enabled
      * @param resultXml
      */
-    private void persistAssetRequests(WptResultXml resultXml, WebPageTestServer wptServerOfResult) {
-        if (!persistenceOfAssetRequestsEnabled){
-            log.debug("Can not send persistAssetRequests since persistenceOfAssetRequests is disabled")
+    private void persistDetailAnalysisData(WptResultXml resultXml, WebPageTestServer wptServerOfResult) {
+        if (!persistenceOfDetailAnalysisDataEnabled){
+            log.debug("Can not send persistDetailAnalysisData since persistenceOfDetailAnalysisData is disabled")
             return
         }
         final String jobLabel = resultXml.getLabel()
         Job job = jobDaoService.getJob(jobLabel)
         if (!job) {
-            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId() +
+            throw new OsmResultPersistanceException("Can't trigger persistence of detailAnalysisData for TestID: " + resultXml.getTestId() +
                     "\n Job with name " + jobLabel + "doesn't exist")
         }
         Long jobId = job.id
         Long jobGroupId = job.jobGroup.id
 
+        // If persisting of detail data is not activated for jobGroup do nothing
         if(!JobGroup.get(jobGroupId).persistDetailData)
             return
+
+        // persistence of detail data is only available for wpt-server > 2.19
+        if(resultXml.version.toString() != WptXmlResultVersion.MULTISTEP.toString()) {
+            log.debug("Persisctence of detailAnalysisData not available for wpt-server with version ${wptVersion}")
+            return
+        }
 
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
-        String wptVersion = getWptVersion(resultXml)
+        String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
         List<String> wptTestIds = [resultXml.getTestId()]
+        String wptVersion = getWptVersion(resultXml)
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
         def resp
@@ -127,14 +133,14 @@ class AssetRequestPersisterService implements iResultListener {
                         body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
                         requestContentType: URLENC)
             } catch (ConnectException ex) {
-                log.error("Couldn't queue persistAssetRequests", ex)
+                log.error("Couldn't queue persistDetailAnalysisData", ex)
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }
 
         }
 
         if (!resp || resp.status != 200)
-            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
+            throw new OsmResultPersistanceException("Can't trigger persistence of detailAnalysisData for TestID: " + resultXml.getTestId())
     }
 
     /**
@@ -156,14 +162,23 @@ class AssetRequestPersisterService implements iResultListener {
     }
 
     public boolean sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
-        if (!persistenceOfAssetRequestsEnabled){
-            log.debug("Can not sendFetchAssetsAsBatchCommand since persistenceOfAssetRequests is disabled")
+        if (!persistenceOfDetailAnalysisDataEnabled){
+            log.debug("Can not sendFetchAssetsAsBatchCommand since persistenceOfDetailAnalysisData is disabled")
             return false
         }
         if ( !jobResults || jobResults.empty) {
             log.debug("Can not sendFetchAssetsAsBatchCommand since jobResultsList is emtpy")
             return false
         }
+        // get all jobResults with wpt-version >= 2.19 or where wpt-version is not defined
+        jobResults = jobResults.findAll {
+            !it.wptVersion || it.wptVersion == WptXmlResultVersion.MULTISTEP.toString()
+        }
+        if(!jobResults) {
+            log.debug("Can not sendFetchAssetsAsBatchCommand since wpt-version of all jobResults < 2.19")
+            return false
+        }
+
         def returnValue = false
         def persistanceJobList = []
         jobResults.each { JobResult jobResult ->
@@ -177,7 +192,7 @@ class AssetRequestPersisterService implements iResultListener {
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
+        String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
         String callbackUrl = "rest/receiveCallback"
 
         def resp
@@ -186,7 +201,7 @@ class AssetRequestPersisterService implements iResultListener {
             attempts++
             BatchActivityUpdater batchActivity
             try {
-                batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
+                batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload DetailAnalysisData" ,1, true, 1)
                 log.debug("Attempt ${attempts+1} to contact DetailDatenService: MicroserviceUrl=${microserviceUrl} OsmUrl=${osmUrl} CallbackUrl=${callbackUrl} CallbackJobId=${batchActivity.getBatchActivityId()} PersistanceJobList =${persistanceJobList}")
                 resp = client.post(path: 'restApi/persistAssetsBatchJob',
                         body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
@@ -197,28 +212,24 @@ class AssetRequestPersisterService implements iResultListener {
                 }
 
             } catch (Exception ex) {
-                log.error("Couldn't queue assetRequestBatch", ex)
+                log.error("Couldn't queue detailAnalysisBatch", ex)
                 if(batchActivity)batchActivity.delete()
                 sleep(1000 * TIMEOUT_IN_SECONDS)
 
             }
         }
 
-
-//        if (!resp || resp.status != 200)
-//            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests")
         return returnValue
-
     }
 
 
-    public void enablePersistenceOfAssetRequestsForJobResults(String microserviceUrl) {
-        this.microserviceUrl = microserviceUrl.endsWith('/') ? microserviceUrl : microserviceUrl + "/"
-        this.persistenceOfAssetRequestsEnabled = true
+    public void enablePersistenceOfDetailAnalysisDataForJobResults(String detailAnalysisMicroserviceUrl) {
+        this.microserviceUrl = detailAnalysisMicroserviceUrl.endsWith('/') ? detailAnalysisMicroserviceUrl : detailAnalysisMicroserviceUrl + "/"
+        this.persistenceOfDetailAnalysisDataEnabled = true
     }
 
-    public void disablePersitenceOfAssetRequestsForJobResults() {
-        persistenceOfAssetRequestsEnabled = false
+    public void disablePersitenceOfDetailAnalysisDataForJobResults() {
+        persistenceOfDetailAnalysisDataEnabled = false
         microserviceUrl = null
     }
 }

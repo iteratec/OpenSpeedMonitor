@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h1><g:message code="de.iteratec.isocsi.detailAnalysis"/></h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'detailAnalysis']"/>
 
 <div class="row">
     <div class="col-md-12">
@@ -63,7 +63,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <g:actionSubmit
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadDetailAnalysisData', 'default': 'Load Assets')}"
                                     action="sendFetchAssetsAsBatchCommand"
                                     class="show-button"/>
                         </li>
@@ -110,14 +110,9 @@
 
     <asset:script type="text/javascript">
         $(window).load(function() {
-          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                   absolute="true"/>')
+          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+          OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
-            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
-            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
     </asset:script>
 </content>
 

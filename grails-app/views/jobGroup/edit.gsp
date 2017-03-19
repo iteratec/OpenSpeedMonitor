@@ -43,7 +43,7 @@
     <asset:script type="text/javascript">
         $(document).ready(function() {
 
-            $("ul[name='jobGroupTags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags', absolute: true)}'});
+            $("ul[name='jobGroupTags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags')}'});
 
         });
 

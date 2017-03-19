@@ -97,9 +97,9 @@
     <asset:javascript src="batchactivity/batchActivityList.js"/>
     <asset:script type="text/javascript">
         $(document).ready(
-            OpenSpeedMonitor.batchActivity.init( '${createLink(action: 'updateTable', absolute: true)}',
-                    '${createLink(action: 'checkForUpdate', absolute: true)}',
-                    '${createLink(action: 'getUpdate', absolute: true)}',
+            OpenSpeedMonitor.batchActivity.init( '${createLink(action: 'updateTable')}',
+                    '${createLink(action: 'checkForUpdate')}',
+                    '${createLink(action: 'getUpdate')}',
                     '${batchActivityCount}',
                     {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
                     "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"},

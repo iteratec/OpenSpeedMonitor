@@ -437,6 +437,12 @@ class CsiDashboardController {
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, csiAggregationsQueryParams, csiType)
                 break
         }
+
+        modelToRender.put("highChartLabels", [
+            new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
+                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
+        ])
+
         if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
             List<JobGroup> jobGroups = CsiSystem.getAll(cmd.selectedCsiSystems)*.affectedJobGroups
             Collection<Long> jobGroupsIds = jobGroups*.id.flatten().unique(false)
@@ -825,8 +831,8 @@ class CsiDashboardController {
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse data for command
-        Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
-        Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        Date fromDate = dashboardValues.from ? SIMPLE_DATE_FORMAT.parse(dashboardValues.from) : null
+        Date toDate = dashboardValues.to ? SIMPLE_DATE_FORMAT.parse(dashboardValues.to) : null
         Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
         Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
         Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")
@@ -895,11 +901,9 @@ class CsiDashboardController {
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
-                return null
-            } else {
-                response.sendError(200, 'OK')
-                return null
             }
+            response.setStatus(200)
+            ControllerUtils.sendObjectAsJSON(response, ["path": "/eventResultDashboard/", "dashboardId": newCustomDashboard.id], false)
         }
     }
 

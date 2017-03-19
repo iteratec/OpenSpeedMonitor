@@ -186,11 +186,8 @@ class JobProcessingService {
         }
 
         if (!result) {
-
             return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus, description)
-
         } else {
-
             updateStatusAndPersist(result, job, testId, statusCode, wptStatus, description)
             return result
         }

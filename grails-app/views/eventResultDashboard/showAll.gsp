@@ -5,18 +5,15 @@
 <g:set var="userspecificDashboardService" bean="userspecificDashboardService"/>
 <html>
 <head>
+
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
-    <asset:javascript src="chartSwitch"/>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
-
 </head>
 
 <body>
 
-<%-- main menu --%>
-<h1><g:message code="eventResultDashboard.label" default="Time Series"/></h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'timeSeries']"/>
 
 <div class="row">
     <div class="col-md-12">
@@ -62,28 +59,26 @@
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
                 <div id="chartbox" class="card">
-                    <div id="dataTableId" class="warning-ribbon" hidden="true" data-toggle="popover" aria-hidden="true"
+                    <div id="dataTableId" class="ribbon ribbon-info" hidden="true" data-toggle="popover" aria-hidden="true"
                          title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
                          data-placement="right" data-trigger="hover"
-                         data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
+                         data-html="true" data-content="${render(template: "hoverInfo")}">
+                        <i class="fa fa-info"></i>
+                    </div>
                     <g:render template="/highchart/chart"
                               model="[
+                                      isAggregatedData             : (selectedInterval && selectedInterval != -1),
                                       chartData                    : eventResultValues,
                                       chartTitle                   : chartTitle,
-                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      chartUnit                    : '%',
-                                      globalLineWidth              : '2',
-                                      xAxisMin                     : fromTimestampForHighChart,
-                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      yAxisScalable                : 'false',
-                                      optimizeForExport            : 'false',
-                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')]"/>
+                                      labelSummary                 : labelSummary,
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
+                              ]"/>
                 </div>
             </div>
         </g:if>
@@ -152,19 +147,20 @@
                 <g:if test="${dropdownHasEntries}">
                     <li class="divider"></li>
                 </g:if>
-                <li class="dropdown-header">
-                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                               default="View a custom time series"/>
-                </li>
                 <g:if test="${availableDashboards}">
+                    <li class="dropdown-header">
+                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                   default="View a custom time series"/>
+                    </li>
                     <g:each in="${availableDashboards}" var="availableDashboard">
                         <li><g:link action="showAll"
                                     params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
                 <g:else>
-                    <li><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                   default="None available"/></li>
+                    <li class="dropdown-header"><g:message
+                            code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                            default="No saved dashboards."/></li>
                 </g:else>
             </ul>
         </div>
@@ -262,40 +258,40 @@
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
     <asset:javascript src="iteratecChartRickshaw.js"/>
-
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
 
         var chartContextMenuI18N = ${i18n};
 
         function setAdjustments() {
-            var chartTitle = "${chartTitle}";
-            var chartWidth = "${chartWidth}";
-            var chartHeight = "${chartHeight}";
-            var loadTimeMinimum = "${loadTimeMinimum}";
-            var loadTimeMaximum = "${loadTimeMaximum}";
-            var showDataMarkers = "${showDataMarkers}";
-            var showDataLabels = "${showDataLabels}";
-            var graphNameAliases = ${graphNameAliases};
-            var graphColors = ${graphColors}
-        $("#dia-title").val(chartTitle);
-        $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
-        $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
-        $("#dia-y-axis-max").val(loadTimeMaximum);
-        $("#dia-y-axis-min").val(loadTimeMinimum);
-        initGraphNameAliases(graphNameAliases);
-        initGraphColors(graphColors);
+            var chartTitle = "${chartTitle}",
+                chartWidth = "${chartWidth}",
+                chartHeight = "${chartHeight}",
+                loadTimeMinimum = "${loadTimeMinimum}",
+                loadTimeMaximum = "${loadTimeMaximum}",
+                showDataMarkers = "${showDataMarkers}",
+                showDataLabels = "${showDataLabels}",
+                graphNameAliases = ${graphNameAliases},
+                graphColors = ${graphColors};
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
+            $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
+            $("#dia-y-axis-max").val(loadTimeMaximum);
+            $("#dia-y-axis-min").val(loadTimeMinimum);
+            initGraphNameAliases(graphNameAliases);
+            initGraphColors(graphColors);
 
-        if (eval(showDataMarkers)) {
-            $("#to-enable-marker").click();
+            if (eval(showDataMarkers)) {
+                $("#to-enable-marker").click();
+            }
+            if (eval(showDataLabels)) {
+                $("#to-enable-label").click();
+            }
         }
-        if (eval(showDataLabels)) {
-            $("#to-enable-label").click();
-        }
-    }
 
-    $(document).ready(function () {
+        $(document).ready(function () {
 
-        doOnDomReady(
+            doOnDomReady(
                 '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
 
@@ -306,16 +302,12 @@
         });
 
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"
-                                                                    absolute="true"/>')
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    absolute="true"/>')
+            if (!$("#graph_container").data("isAggregatedData")) {
+                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+            }
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch("${createLink(action: 'showAll', controller: 'eventResultDashboard', absolute: true)}",
-            "${createLink(action: 'show', controller: 'pageAggregation', absolute: true)}",
-            "${createLink(action: 'listResults', controller: 'tabularResultPresentation', absolute: true)}",
-            "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page', absolute: true)}",
-            "${createLink(action: 'show', controller: 'detailAnalysis', absolute: true)}").init();
 
     </asset:script>
 </content>

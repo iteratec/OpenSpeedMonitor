@@ -85,7 +85,7 @@
                                         <button href="#" type="button" class="btn btn-primary"
                                                 style="display: none;"
                                                 id="removePageMapping"
-                                                onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping', absolute: true)}',
+                                                onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping')}',
                                                         actualCsiConfigurationId);">
                                             <g:message
                                                     code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
@@ -174,7 +174,7 @@
                             <div class="row">
                                 <g:if test="${!readOnly}">
                                     <button class="btn btn-primary"
-                                            onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadDefaultTimeToCsMappings', absolute: true)}')">
+                                            onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadDefaultTimeToCsMappings')}')">
                                         <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
                                     </button>
                                 </g:if>
@@ -262,7 +262,7 @@
 
         <g:if test="${!readOnly}">
             <button class="btn btn-primary"
-                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights', absolute: true)}')">
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights')}')">
                 <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
             </button>
         </g:if>
@@ -314,7 +314,7 @@
 
         <g:if test="${!readOnly}">
             <button class="btn btn-primary"
-                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadPageWeights', absolute: true)}')">
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadPageWeights')}')">
                 <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
             </button>
         </g:if>
@@ -366,7 +366,7 @@
 
         <g:if test="${!readOnly}">
             <button class="btn btn-primary"
-                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadHourOfDayWeights', absolute: true)}')">
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadHourOfDayWeights')}')">
                 <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
             </button>
         </g:if>

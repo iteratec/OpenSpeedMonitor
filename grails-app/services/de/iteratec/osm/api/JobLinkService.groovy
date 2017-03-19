@@ -20,12 +20,10 @@ package de.iteratec.osm.api
 import de.iteratec.osm.csi.CsiDashboardController
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
-
 /**
  * JobResultLinkService
  * A service class encapsulates the core business logic of a Grails application
@@ -42,7 +40,6 @@ class JobLinkService {
         return grailsLinkGenerator.link(
             controller: 'tabularResultPresentation',
             action: 'showListResultsForJob',
-            absolute: true,
             params: [
                 'selectedTimeFrameInterval':0,
                 'job.id':job.id,
@@ -75,7 +72,7 @@ class JobLinkService {
         String csiChartUrl = 'Pages and/or MeasuredEvents tested in submitted job couldn\'t be detected by navigation script.'
 
         if (eventIds && pageIds){
-            resultsChartUrl = grailsLinkGenerator.link(controller: 'eventResultDashboard', action: 'showAll', absolute: true,
+            resultsChartUrl = grailsLinkGenerator.link(controller: 'eventResultDashboard', action: 'showAll',
                     params: [
                             'selectedInterval':-1,
                             'selectedTimeFrameInterval': 0,
@@ -94,7 +91,7 @@ class JobLinkService {
                             '_action_showAll': 'Anzeigen',
                             'selectedChartType': 0
                     ])
-            csiChartUrl = grailsLinkGenerator.link(controller: 'csiDashboard', action: 'showAll', absolute: true,
+            csiChartUrl = grailsLinkGenerator.link(controller: 'csiDashboard', action: 'showAll',
                     params: [
                             'aggrGroupAndInterval':CsiDashboardController.HOURLY_MEASURED_EVENT,
                             'selectedTimeFrameInterval': 0,

@@ -86,11 +86,11 @@
 
                     doOnDomReady(
                             ${job.label == null},
-                            "${g.createLink(action: 'nextExecution', absolute: true)}",
+                            "${g.createLink(action: 'nextExecution')}",
                             '${customConnNameForNative}',
                             ${job.connectivityProfile?job.connectivityProfile.id:'null'},
                             ${job.noTrafficShapingAtAll},
-                            "${g.createLink(action: 'tags', absolute: true)}"
+                            "${g.createLink(action: 'tags')}"
                     );
 
                 });
@@ -118,11 +118,11 @@
                             i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
                             i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
                             measuredEvents: [],
-                            linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
-                            linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
-                            linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
+                            linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript')}',
+                            linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders')}',
+                            linkGetScriptSource: '${createLink(action: 'getScriptSource')}',
                             readonly: true,
-                            parsedScriptUrl: '${createLink(controller: 'script', action: 'getParsedScript', absolute: true)}'
+                            parsedScriptUrl: '${createLink(controller: 'script', action: 'getParsedScript')}'
                         });
                         $('#scriptTabLink').bind("click", function() {
                             editor.update();
@@ -133,11 +133,11 @@
                         $('#script').change();
                     });
                     OpenSpeedMonitor.postLoader.loadJavascript(
-                        '<g:assetPath src="codemirror/codemirrorManifest.js" absolute="true"/>',
+                        '<g:assetPath src="codemirror/codemirrorManifest.js" />',
                         true
                     )
                    OpenSpeedMonitor.postLoader.loadStylesheet(
-                        '<g:assetPath src="codemirror/codemirrorManifest.css" absolute="true"/>',
+                        '<g:assetPath src="codemirror/codemirrorManifest.css" />',
                         true
                     )
 

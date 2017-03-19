@@ -275,7 +275,7 @@
 
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript(
-                '<g:assetPath src="csi/configurationPost.js" absolute="true"/>',
+                '<g:assetPath src="csi/configurationPost.js" />',
                 true
             )
         });

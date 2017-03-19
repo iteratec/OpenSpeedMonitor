@@ -132,8 +132,12 @@ OpenSpeedMonitor.jobListFilter = (function(){
             row = $(row);
             var showRow = filterMatchesRow(filterTerms, row);
             row.toggleClass("hidden", !showRow);
+            if(!showRow) {
+                row.find(".jobCheckbox").attr("checked", false)
+            }
         });
         applyStriping();
+        saveState();
     };
 
     var getFilterTerms = function () {

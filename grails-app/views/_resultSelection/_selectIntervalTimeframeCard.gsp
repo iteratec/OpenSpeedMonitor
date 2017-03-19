@@ -52,16 +52,17 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 			</label>
 			<div class="col-md-8">
 				<g:render template="/_resultSelection/dateTimePicker" model="[
-				        id: 'startDateTimePicker',
-						manualTimeName: 'setFromHour',
-						manualTimeValue: setFromHour,
-						timeName: 'fromHour',
-						time: fromHour,
-						dateControlId: 'fromDatepicker',
-						dateName: 'from',
-						date: from,
-						dateFormat: dateFormat,
-						weekStart: weekStart
+						id               : 'startDateTimePicker',
+						manualTimeName   : 'setFromHour',
+						manualTimeValue  : setFromHour,
+						timeName         : 'fromHour',
+						time             : fromHour,
+						dateControlId    : 'fromDatepicker',
+						dateName         : 'from',
+						date             : from,
+						dateFormat       : dateFormat,
+						weekStart        : weekStart,
+						hideHourSelection: hideHourSelection
 				]" />
 			</div>
 		</div>
@@ -74,16 +75,17 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 			</label>
 			<div class="col-md-8">
 				<g:render template="/_resultSelection/dateTimePicker" model="[
-						id: 'endDateTimePicker',
-						manualTimeName: 'setToHour',
-						manualTimeValue: setToHour,
-						timeName: 'toHour',
-						time: toHour,
-						dateControlId: 'toDatepicker',
-						dateName: 'to',
-						date: to,
-						dateFormat: dateFormat,
-						weekStart: weekStart
+						id               : 'endDateTimePicker',
+						manualTimeName   : 'setToHour',
+						manualTimeValue  : setToHour,
+						timeName         : 'toHour',
+						time             : toHour,
+						dateControlId    : 'toDatepicker',
+						dateName         : 'to',
+						date             : to,
+						dateFormat       : dateFormat,
+						weekStart        : weekStart,
+						hideHourSelection: hideHourSelection
 				]" />
 			</div>
 		</div>
@@ -105,6 +107,6 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 
 <asset:script type="text/javascript">
 	$(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectIntervalTimeframeCard.js" absolute="true"/>', true, 'selectIntervalTimeframeCard')
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectIntervalTimeframeCard.js" />', true, 'selectIntervalTimeframeCard')
     });
 </asset:script>

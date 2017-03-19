@@ -91,13 +91,6 @@
     opacity: 0.4 !important;
 }
 
-.rickshaw_legend ul {
-    column-count: 2;
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    display: inline-block;
-}
-
 .action {
     float: left;
 }
@@ -509,6 +502,7 @@
     clear: both;
     line-height: 140%;
     padding-right: 15px;
+    text-align: left;
 }
 
 .rickshaw_legend .line .swatch {
@@ -520,8 +514,7 @@
 
 .rickshaw_legend .label {
     margin: 0;
-    white-space: nowrap;
-    display: block;
+    white-space: pre-line;
     font-size: inherit;
     background-color: transparent;
     color: inherit;
@@ -530,7 +523,9 @@
     padding: 0px;
     text-shadow: none;
     text-align: left !important;
+    display: inline-block !important;
 }
+
 
 .rickshaw_legend .action:hover {
     opacity: 0.6;

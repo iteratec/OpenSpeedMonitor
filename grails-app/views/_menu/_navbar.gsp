@@ -1,9 +1,10 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
+<g:elseif test="${controllerName.equals('csiBenchmark')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -19,7 +20,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <g:link absolute="true" class="navbar-brand" uri="/">
+        <g:link  class="navbar-brand" uri="/">
             <img class="icon osm-icon-small" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_small.svg')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
@@ -29,7 +30,7 @@
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
             <li class="${controllerName.equals("landing") ? 'active' : ''}">
-                <g:link absolute="true" uri="/"><i class="fa fa-home"></i>
+                <g:link  uri="/"><i class="fa fa-home"></i>
                     <g:message code="navbar.home" default="Home"/>
                 </g:link>
             </li>
@@ -53,7 +54,28 @@
                                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
                         </g:link>
                     </li>
-                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.equals("true")}">
+                    <li class="${controllerName.equals('jobGroupAggregation') ? 'active' : ''}" id="jobGroupAggregationMainMenu">
+                        <g:link controller="jobGroupAggregation" action="show"
+                                title="${message(code:'de.iteratec.jobGroupAggregation.title', default:'JobGroup Aggregation')}">
+                            <i class="fa fa-bar-chart fa-rotate-90"></i>
+                            <g:message code="de.iteratec.jobGroupAggregation.title" default="JobGroup Aggregation"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
+                        <g:link controller="distributionChart" action="show"
+                                title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
+                            <i class="fa fa-area-chart"></i>
+                            <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('pageComparison') ? 'active' : ''}" id="pageComparisonMainMenu">
+                        <g:link controller="pageComparison" action="show"
+                                title="${message(code:'de.iteratec.isocsi.pageComparision.title', default:'Page Comparison')}">
+                            <i class="fa fa-balance-scale"></i>
+                            <g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/>
+                        </g:link>
+                    </li>
+                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
                         <li class="${controllerName.equals('detailAnalysis') ? 'active' : ''}" id="detailAnalysisMainMenu">
                             <g:link controller="detailAnalysis" action="show"
                                     title="Detail Analysis">
@@ -87,6 +109,12 @@
                         <g:link controller="csiConfiguration" action="configurations">
                             <i class="fa fa-gears"></i>
                             <g:message code="de.iteratec.isocsi.csiConfiguration" default="Configuration"/>
+                        </g:link>
+                    </li>
+                    <li class="${controllerName.equals('csiBenchmark') ? 'active' : ''}">
+                        <g:link controller="csiBenchmark" action="show">
+                            <i class="fa fa-bar-chart"></i>
+                            <g:message code="de.iteratec.isocsi.csiBenchmark.title" default="Csi Benchmark"/>
                         </g:link>
                     </li>
                 </ul>

@@ -55,9 +55,10 @@
         var url = '${createLink(controller: 'jobResult', action: 'getJobResults')}'
         OpenSpeedMonitor.jobResult(url);
 
-        if('${selectedJobId}') {
+        if ('${selectedJobId}') {
             $("#selectedJob").val(${selectedJobId});
-            $("#selectedJob").change();
+            $('#selectedJob').trigger("chosen:updated");
+            $('#selectedJob').change();
         }
     </asset:script>
 </content>

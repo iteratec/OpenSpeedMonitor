@@ -2793,77 +2793,8 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 		series.forEach( function(s) {
 			self.addLine(s);
 		} );
-		
-		self.adjustLegendEntrys();
 	},
 
-	adjustLegendEntrys: function() {
-		var self = this;
-		var columns = $(".rickshaw_legend > ul").css("column-count");
-		var widthOfRow = self.getWidthOfEntrysInARow(columns);
-		if (widthOfRow > $("#rickshaw_addons").width()) {
-			if (columns > 1) {
-				// reduce number of columns
-				columns = columns - 1;
-				$(".rickshaw_legend > ul").css({"column-count": ""+columns, "-moz-column-count": ""+columns, "-webkit-column-count": ""+columns});
-				self.render();
-			} else if (columns == 1) {
-				// insert newLines
-				var separatedLines = 1;
-				self.saveLegendEntrys();
-				while(widthOfRow > $("#rickshaw_addons").width()) {
-					separatedLines += 1;
-					self.insertNewLines(separatedLines);
-					widthOfRow = self.getWidthOfEntrysInARow(columns);
-					if (separatedLines == 5) {
-						break;
-					}
-				}
-			}
-		}
-	},
-	
-	saveLegendEntrys: function() {
-		self.legendEntrysText = [];
-		$(".rickshaw_legend > ul > li > span").each(function(index, element) {
-			self.legendEntrysText[index] = $(element).html();
-		});
-	},
-	
-	insertNewLines: function(separatedLines) {
-		$(".rickshaw_legend > ul > li > span").each(function(index, element) {
-			var text = self.legendEntrysText[index];
-			var textParts = [];
-			var sizeOfTextPart =  Math.ceil(text.length/separatedLines);
-			for(var i = 0; i < separatedLines; i++) {
-				textParts[i] = text.substring(i * sizeOfTextPart, (i+1)*sizeOfTextPart);
-			}
-			
-			var table = $('<table></table>').addClass("rickshaw_legend_entry_table");
-			for(var i=0; i<separatedLines; i++){
-			    var row = $('<tr></tr>').text(textParts[i]);
-			    table.append(row);
-			}
-			$(element).html("");
-			$(element).append(table);
-			
-		});
-	},	
-	
-	getWidthOfEntrysInARow: function(columns) {
-		var allEntrys = $(".rickshaw_legend > ul > li");
-		var maxEntrysPerColumn = Math.ceil(allEntrys.length / columns);
-		var widthOfRow = 0;
-		
-		for(var i = 0; i < columns; i++) {
-			var entry = $(allEntrys[i*maxEntrysPerColumn]);
-			if (entry) {
-				widthOfRow += entry.width();
-			}
-		}
-		return widthOfRow;
-	},
-	
 	compareSeries : function compare(a,b) {
 		if (a.name < b.name)
 		   return -1;
@@ -2910,6 +2841,12 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 			this.highlighter.addHighlightEvents(_line);
 		}
 		this.lines.push(_line);
+
+		var width = $(label).width()+$(swatch).width();
+		var rickshawLegendUl = $(".rickshaw_legend > ul");
+		if(rickshawLegendUl.css("column-width")=="auto" || width > parseInt(rickshawLegendUl.css("column-width"))+12){
+			rickshawLegendUl.css({"column-width":  width+12+"px"});
+		}
 		return line;
 	}
 } );

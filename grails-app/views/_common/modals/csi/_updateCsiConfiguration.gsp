@@ -58,7 +58,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '${createLink(controller: 'csiConfiguration', action: 'updateConfiguration', absolute: true)}',
+            url: '${createLink(controller: 'csiConfiguration', action: 'updateConfiguration')}',
             data: {
                 csiConfId: actualCsiConfigurationId,
                 csiConfNewLabel: csiConfLabel,

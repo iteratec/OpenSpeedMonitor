@@ -184,7 +184,18 @@ function RickshawGraphBuilder(args) {
             } else {
                 $(this).html(originName);
             }
-        })
+        });
+        this.calculateLegendColumnWidth();
+    };
+
+    this.calculateLegendColumnWidth = function () {
+        var newMaxWidth = -1;
+        $(".line").each(function () {
+            var swatchWidth = $(this).find(".swatch").width();
+            var width = $(this).find(".label").width() + swatchWidth + 12;
+            if(width>newMaxWidth) newMaxWidth = width;
+        });
+        $(".rickshaw_legend > ul").css({"column-width":  newMaxWidth+"px"});
     };
 
     this.updateYAxes = function () {
@@ -1133,19 +1144,6 @@ function ChartAdjuster(graphBuilder, args) {
                 width: diaWidth,
                 height: diaHeight
             });
-            if (parseInt(diaWidth) < 1070) {
-                $("#rickshaw_legend > ul").css({
-                    "-moz-column-count": 1 + "",
-                    "-webkit-column-count": 1 + "",
-                    "column-count": 1 + ""
-                });
-            } else {
-                $("#rickshaw_legend > ul").css({
-                    "-moz-column-count": 2 + "",
-                    "-webkit-column-count": 2 + "",
-                    "column-count": 2 + ""
-                });
-            }
             return true
         } else {
             window

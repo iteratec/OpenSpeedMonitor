@@ -16,16 +16,16 @@
 */
 
 
-
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.api.MicroServiceApiKey
+import de.iteratec.osm.api.MicroserviceType
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
@@ -45,19 +45,16 @@ import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
-import org.springframework.core.io.DefaultResourceLoader
-import org.springframework.core.io.ResourceLoader
 
 class BootStrap {
 
-    ResourceLoader defaultResourceLoader = new DefaultResourceLoader()
     EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
     JobProcessingService jobProcessingService
     I18nService i18nService
     ResultPersisterService resultPersisterService
     LocationPersisterService locationPersisterService
-    AssetRequestPersisterService assetRequestPersisterService
+    DetailAnalysisPersisterService detailAnalysisPersisterService
     ProxyService proxyService
     HealthReportService healthReportService
     def grailsApplication
@@ -137,12 +134,12 @@ class BootStrap {
             it.delete()
         }
         new OsmConfiguration(
-            detailDataStorageTimeInWeeks: 12,
-            defaultMaxDownloadTimeInMinutes: 60,
-            minDocCompleteTimeInMillisecs: 250,
-            maxDocCompleteTimeInMillisecs: 180000,
-            maxDataStorageTimeInMonths: 13,
-            csiTransformation: CsiTransformation.BY_MAPPING
+                detailDataStorageTimeInWeeks: 12,
+                defaultMaxDownloadTimeInMinutes: 60,
+                minDocCompleteTimeInMillisecs: 250,
+                maxDocCompleteTimeInMillisecs: 180000,
+                maxDataStorageTimeInMonths: 13,
+                csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
     }
 
@@ -193,17 +190,17 @@ class BootStrap {
             createUser(appRootUserName, appRootPassword, rootRole)
         }
 
-
-        //apiKey for microService
-        Boolean enablePersistenceOfAssetRequests = grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests
-        if(enablePersistenceOfAssetRequests) {
-            if (MicroServiceApiKey.list().isEmpty()) {
-                String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
-                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey
-                String initialMicroServiceName = grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName.isEmpty() ?
-                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName
-                if (!initialApiKey || !initialMicroServiceName) log.warn("initial MicroserviceApiKey configuration missing")
-                else new MicroServiceApiKey([secretKey: initialApiKey, microService: initialMicroServiceName, valid: true]).save(failOnError: true)
+        //apiKey for detailAnalysisMicroservice
+        Boolean enablePersistenceOfDetailAnalysisData = grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData
+        if (enablePersistenceOfDetailAnalysisData) {
+            if (MicroServiceApiKey.findAllByMicroService(MicroserviceType.DETAIL_ANALYSIS).isEmpty()) {
+                String initialApiKeyDetailAnalysis = grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey.isEmpty() ?
+                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey
+                if (!initialApiKeyDetailAnalysis) {
+                    log.warn("initial apiKey for detailAnalysisMicroservice missing")
+                } else {
+                    new MicroServiceApiKey([secretKey: initialApiKeyDetailAnalysis, microService: MicroserviceType.DETAIL_ANALYSIS, valid: true]).save(failOnError: true)
+                }
             }
         }
 
@@ -430,12 +427,12 @@ class BootStrap {
                 .save(failOnError: true)
 
         List<WebPageTestServer> webPageTestServers = WebPageTestServer.list()
-        if (webPageTestServers.size() == 0){
+        if (webPageTestServers.size() == 0) {
             initiallyCreatedWptServer = new WebPageTestServer(
-                label: "www.webpagetest.org",
-                proxyIdentifier: "https://www.webpagetest.org",
-                baseUrl: "https://www.webpagetest.org",
-                active: true
+                    label: "www.webpagetest.org",
+                    proxyIdentifier: "https://www.webpagetest.org",
+                    baseUrl: "https://www.webpagetest.org",
+                    active: true
             ).save(failOnError: true)
         }
 
@@ -448,20 +445,20 @@ class BootStrap {
         proxyService.addLocationListener(locationPersisterService)
         proxyService.addResultListener(resultPersisterService)
 
-        // enable peristence of assetRequests for JobResults if configured
-        boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.assetRequests?.enablePersistenceOfAssetRequests
+        // enable persistence of detailAnalysisData for JobResults if configured
+        boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
         if (persistenceEnabled) {
-            String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.assetRequests?.microserviceUrl
+            String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.detailAnalysis?.detailAnalysisMicroserviceUrl
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
             if (!microserviceUrl || !urlValidator.isValid(microserviceUrl)) {
-                throw new IllegalStateException("A valid url for the microservice is required, if persistence of assetRequests is to be enabled")
+                throw new IllegalStateException("A valid url for the detailAnalysisMicroservice is required, if persistence of detailAnalysisData is to be enabled")
             }
-            microserviceUrl = microserviceUrl.endsWith("/")?microserviceUrl: microserviceUrl + "/"
-            assetRequestPersisterService.enablePersistenceOfAssetRequestsForJobResults(microserviceUrl)
-            proxyService.addResultListener(assetRequestPersisterService)
+            microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
+            detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)
+            proxyService.addResultListener(detailAnalysisPersisterService)
         }
 
-        log.info "persistence of assetRequests is enabled: " + persistenceEnabled
+        log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled
         log.info "registerProxyListener OSM ends"
     }
 
@@ -505,8 +502,8 @@ class BootStrap {
         }
     }
 
-    void fetchLocationsOfWebpagetestOnFirstStart(){
-        if (initiallyCreatedWptServer){
+    void fetchLocationsOfWebpagetestOnFirstStart() {
+        if (initiallyCreatedWptServer) {
             Map retrievsLocationsUsableForPublicApiKeys = [k: "A"]
             proxyService.fetchLocations(initiallyCreatedWptServer, retrievsLocationsUsableForPublicApiKeys)
         }

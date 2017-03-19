@@ -27,6 +27,8 @@ import grails.test.mixin.TestFor
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
+import static de.iteratec.osm.util.PerformanceLoggingService.INDENTATION_CHAR
+
 /**
  * Test-suite for {@link PerformanceLoggingService}.
  */
@@ -86,6 +88,91 @@ class PerformanceLoggingServiceTests extends Specification {
 
         then: "We should'nt receive a log entry"
         message == null
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    void "logging silent works as expected for multiple loggings with same indentation depths"() {
+        given: "We get access to the log output and reset execution time logging session"
+        serviceLogger.setLevel(Level.DEBUG)
+        String message = ""
+        Appender appender = addAppender {
+            String m -> message += "${m}\n"
+        }
+        String descriptionLevel_1_1 = "descriptionLevel_1_1"
+        String descriptionLevel_1_2 = "descriptionLevel_1_2"
+        String descriptionLevel_1_3 = "descriptionLevel_1_3"
+        serviceUnderTest.resetExecutionTimeLoggingSession()
+
+        when: "We log execution times of nested code blocks"
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, 1) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+            Thread.sleep(10)
+        }
+        List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
+
+        then: "We should receive sensible logging session data"
+        loggingSessionDataLines.size() == 3
+        loggingSessionDataLines[0].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_1}: 2 call(s) -> took")
+        loggingSessionDataLines[1].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_2}: 2 call(s) -> took")
+        loggingSessionDataLines[2].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_3}: 1 call(s) -> took")
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    void "logging silent works as expected for nested loggings with different indentation depths"() {
+        given: "We get access to the log output and reset execution time logging session"
+        serviceLogger.setLevel(Level.DEBUG)
+        String message = ""
+        Appender appender = addAppender {
+            String m -> message += "${m}\n"
+        }
+        String descriptionLevel_1_1 = "descriptionLevel_1"
+        String descriptionLevel_2_1 = "descriptionLevel_1_1"
+        String descriptionLevel_2_2 = "descriptionLevel_1_2"
+        String descriptionLevel_2_3 = "descriptionLevel_1_3"
+        serviceUnderTest.resetExecutionTimeLoggingSession()
+
+        when: "We log execution times of nested code blocks"
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+            Thread.sleep(10)
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, 2) {
+                    Thread.sleep(10)
+                }
+            }
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, 2) {
+                    Thread.sleep(10)
+                }
+            }
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, 2) {
+                    Thread.sleep(10)
+                }
+            }
+        }
+        List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
+
+        then: "We should receive sensible logging session data"
+        loggingSessionDataLines.size() == 4
+        loggingSessionDataLines[0].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_1}: 10 call(s) -> took")
+        loggingSessionDataLines[1].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_2}: 10 call(s) -> took")
+        loggingSessionDataLines[2].startsWith("${INDENTATION_CHAR*2} ${descriptionLevel_2_3}: 10 call(s) -> took")
+        loggingSessionDataLines[3].startsWith("${INDENTATION_CHAR} ${descriptionLevel_1_1}: 1 call(s) -> took")
 
         cleanup: "Remove the Appender"
         serviceLogger.detachAppender(appender)

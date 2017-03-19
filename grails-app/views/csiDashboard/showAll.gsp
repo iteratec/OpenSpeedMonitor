@@ -12,7 +12,7 @@
     <title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <asset:stylesheet src="csiDashboard/csiDashboard.less" />
+    <asset:stylesheet src="csiDashboard/csiDashboard.less"/>
 </head>
 
 <body>
@@ -91,25 +91,17 @@
                 <div id="chartbox">
                     <g:render template="/highchart/chart"
                               model="[
-                                      singleYAxis                  : 'false',
+                                      isAggregatedData             : true,
                                       chartData                    : wptCustomerSatisfactionValues,
                                       chartTitle                   : chartTitle,
-                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      chartUnit                    : '%',
-                                      globalLineWidth              : '2',
-                                      xAxisMin                     : fromTimestampForHighChart,
-                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      yAxisScalable                : 'false',
-                                      optimizeForExport            : 'false',
-                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
                                       labelSummary                 : labelSummary,
-                                      downloadPngLabel             : null,
-                                      downloadCsvSubmitButton      : g.actionSubmit([value: g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV'), action: 'csiValuesCsv'])
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
                               ]"/>
                 </div>
             </div>
@@ -209,11 +201,11 @@
                             <g:if test="${dropdownHasEntries}">
                                 <li class="divider"></li>
                             </g:if>
-                            <li class="dropdown-header">
-                                <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                           default="View a custom time series"/>
-                            </li>
                             <g:if test="${availableDashboards}">
+                                <li class="dropdown-header">
+                                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                                               default="View a custom time series"/>
+                                </li>
                                 <g:each in="${availableDashboards}" var="availableDashboard">
                                     <li><g:link controller="${affectedController}" action="showAll"
                                                 class="custom-dashboard"
@@ -221,12 +213,15 @@
                                 </g:each>
                             </g:if>
                             <g:else>
-                                <li><g:message
+                                <li class="dropdown-header"><g:message
                                         code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
                                         default="None available"/></li>
                             </g:else>
                         </ul>
                     </div>
+                    <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
+                                    action="csiValuesCsv" class="btn btn-primary pull-right space-right show-button"/>
+
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
@@ -342,6 +337,9 @@
         </div>
     </div>
 </form>
+<button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+    <i class="fa fa-undo"></i> Reset
+</button>
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 <g:if test="${params.dashboardID}">
     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
@@ -398,7 +396,7 @@
         });
         $(window).load(function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    absolute="true"/>')
+                                                                    />')
         });
 
     </asset:script>

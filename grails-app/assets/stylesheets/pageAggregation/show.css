@@ -1,19 +1,11 @@
 /*
-*= require /dimple/barchart.css
+*= require /d3Charts/barChartHorizontal
 *= require /_resultSelection/selectBarchartMeasurings.css
 *= require_self
 */
 
 .card-well {
     position: relative;
-}
-
-.card-well .reset-result-selection {
-    float: none;
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    margin: 0;
 }
 
 .filterActive {
