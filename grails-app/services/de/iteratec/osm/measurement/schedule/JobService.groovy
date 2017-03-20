@@ -145,7 +145,7 @@ class JobService {
         return executionDates
     }
 
-    public Map<String, Object> createTimeSeriesParamsFor(Job job) {
+    Map<String, Object> createTimeSeriesParamsFor(Job job) {
         Map<String, Object> params = createCommonParams(job)
         params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
         params["_overwriteWarningAboutLongProcessingTime"] = ""
@@ -164,12 +164,7 @@ class JobService {
         return params
     }
 
-    String createPageAggregationLinkForJob(Job job) {
-        Map params = createPageAggregationParamsFor(job)
-        return grailsLinkGenerator.link(controller: 'PageAggregation', action: 'show', params: params)
-    }
-
-    public Map createPageAggregationParamsFor(Job job) {
+    Map createPageAggregationParamsFor(Job job) {
         Map params = createCommonParams(job)
         Set<Long> pageIds = []
         new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
