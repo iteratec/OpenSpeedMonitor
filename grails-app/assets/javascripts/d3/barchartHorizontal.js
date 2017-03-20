@@ -399,7 +399,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .attr("x", function (d) {
                 return xScale(d.upperBoundary - d.lowerBoundary) / 2;
             })
-            .attr("text-anchor", "mid");
+            .attr("text-anchor", "middle");
 
         //update
 

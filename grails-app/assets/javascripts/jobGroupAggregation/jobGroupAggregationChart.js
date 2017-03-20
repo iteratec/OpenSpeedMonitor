@@ -413,7 +413,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("x", function (d) {
                 return xScale(d.upperBoundary - d.lowerBoundary) / 2;
             })
-            .attr("text-anchor", "mid");
+            .attr("text-anchor", "middle");
 
         //update
 

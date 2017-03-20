@@ -58,6 +58,7 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
         clone.find("#firstJobGroupSelect").on("change", selectionChangeListener);
         clone.find("#firstJobGroupSelect").on("change", updatePageListener);
         clone.find("#secondJobGroupSelect").on("change", updatePageListener);
+        clone.find("select").on("change", enabaleOrDisableShowButton);
         clone.removeAttr("id");
         if (event) {
             clone.insertAfter($(event.target).closest(".addPageComparisonRow"));
@@ -74,6 +75,7 @@ OpenSpeedMonitor.PageComparisonSelection = (function () {
         var secondJobGroupSelect = $(event.target).closest(".addPageComparisonRow").find("#secondJobGroupSelect");
         secondJobGroupSelect.val($(event.target).val());
         secondJobGroupSelect.change();
+        enabaleOrDisableShowButton();
     };
 
     var updatePageListener = function (event) {
