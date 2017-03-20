@@ -91,14 +91,16 @@ class LocationPersisterService implements iLocationListener {
      * @param uniqueIdentifiersForServer the locationIdentifiers for the webPageTestServer
      */
     void deactivateLocations(WebPageTestServer webPageTestServer, List<String> uniqueIdentifiersForServer) {
-        List<Location> locationsToDeactivate = Location.createCriteria().list {
-            eq('wptServer', webPageTestServer)
-            not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersForServer) }
-            eq('active', true)
-        }
-        locationsToDeactivate.each { currentLocation ->
-            currentLocation.active = false
-            currentLocation.save(failOnError: true)
+        if (uniqueIdentifiersForServer) {
+            List<Location> locationsToDeactivate = Location.createCriteria().list {
+                eq('wptServer', webPageTestServer)
+                not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersForServer) }
+                eq('active', true)
+            }
+            locationsToDeactivate.each { currentLocation ->
+                currentLocation.active = false
+                currentLocation.save(failOnError: true)
+            }
         }
     }
 }
