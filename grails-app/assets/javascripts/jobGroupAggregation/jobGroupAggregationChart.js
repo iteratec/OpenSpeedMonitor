@@ -259,10 +259,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
     var highlightClickedBar = function (d) {
         if (barSelected !== d.grouping) {
             barSelected = d.grouping;
-            d3.selectAll(".d3chart-bar").style("fill", "#d9d9d9");
-            d3.select(this).style("fill", colorPalette(0))
+            d3.selectAll(".d3chart-bar").classed("d3chart-faded", true);
+            d3.select(this).classed("d3chart-faded", false);
         } else {
-            d3.selectAll(".d3chart-bar").style("fill", colorPalette(0));
+            d3.selectAll(".d3chart-bar").classed("d3chart-faded", false);
             barSelected = null;
         }
     };
