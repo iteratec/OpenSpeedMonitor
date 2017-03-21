@@ -41,32 +41,32 @@
                 </div>
             </div>
 
-            <div class="row card-well">
-                <div class="col-md-6">
-                    <g:render template="pagesComparisonSelectionCard"
-                              model="${['pages'    : pages,
-                                        'jobGroups': jobGroups]}"/>
-                </div>
+            <div class="card-well">
+                <div class="row">
+                    <div class="col-md-8">
+                        <g:render template="pagesComparisonSelectionCard"
+                                  model="${['pages'    : pages,
+                                            'jobGroups': jobGroups]}"/>
+                    </div>
 
-                <div class="col-md-4">
-                    <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
-                            aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
-                            multipleMeasurands               : false,
-                            multipleSeries                   : false,
-                            'selectedAggrGroupValuesUnCached': selectedAggrGroupValuesUnCached
-                    ]"/>
+                    <div class="col-md-4">
+                        <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
+                                aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
+                                multipleMeasurands               : false,
+                                multipleSeries                   : false,
+                                'selectedAggrGroupValuesUnCached': selectedAggrGroupValuesUnCached
+                        ]"/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="row card-well">
-                <div class="col-md-4">
-                    <g:render template="/_resultSelection/selectIntervalTimeframeCard"
-                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                        'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
-                                        'includeInterval'          : includeInterval,
-                                        hideHourSelection          : true]}"/>
+                <div class="row">
+                    <div class="col-md-4">
+                        <g:render template="/_resultSelection/selectIntervalTimeframeCard"
+                                  model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                            'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
+                                            'includeInterval'          : includeInterval,
+                                            hideHourSelection          : true]}"/>
+                    </div>
                 </div>
-
             </div>
         </form>
     </div>
