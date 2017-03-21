@@ -74,7 +74,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             series.data = labelUtil.getSeriesWithShortestUniqueLabels();
             commonLabelParts = labelUtil.getCommonLabelParts();
             series.data.sort(function (x, y) {
-                return d3.descending(x.value, y.value);
+                return d3.ascending(x.value, y.value);
             });
         });
 
@@ -315,10 +315,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
     var toogleFilterCheckmarks = function (listItem) {
         $('.filterActive').toggleClass("filterInactive filterActive");
 
-        // reset checkmark to 'descending' if 'Show' gets clicked
+        // reset checkmark to 'ascending' if 'Show' gets clicked
         // otherwise set checkmark to the list item one has clicked on
         if (typeof listItem == 'undefined') {
-            $('#all-bars-desc > .filterInactive').toggleClass("filterActive filterInactive");
+            $('#all-bars-asc > .filterInactive').toggleClass("filterActive filterInactive");
         } else {
             $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
         }

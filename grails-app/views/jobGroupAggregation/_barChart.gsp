@@ -11,14 +11,14 @@
             </li>
             <li>
                 <a id="all-bars-desc" href="#">
-                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterDesc"
                                default="no filter, sorting desc"/>
                 </a>
             </li>
             <li>
                 <a id="all-bars-asc" href="#">
-                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.dimple.barchart.filter.noFilterAsc"
                                default="no filter, sorting asc"/>
                 </a>
