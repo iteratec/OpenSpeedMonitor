@@ -1,7 +1,7 @@
 <g:set var="chartSwitchLinks" value="${[
         ['name': 'timeSeries', 'text': message(code: 'eventResultDashboard.label', default: 'Time Series'), 'icon': 'fa-line-chart'],
         ['name': 'pageAggregation', 'text': message(code: 'de.iteratec.isocsi.pageAggregation', default: 'Page Aggregation'), 'icon': 'fa-bar-chart'],
-        ['name': 'jobGroupAggregation', 'text': message(code: 'de.iteratec.jobGroupAggregation.title', default: 'JobGroup Aggregation'), 'icon': 'fa-bar-chart fa-rotate-90'],
+        ['name': 'jobGroupAggregation', 'text': message(code: 'de.iteratec.jobGroupAggregation.title', default: 'Job Group Aggregation'), 'icon': 'fa-bar-chart fa-rotate-90'],
         ['name': 'distribution', 'text': message(code: 'de.iteratec.osm.distributionChart', default: 'Distribution Chart'), 'icon': 'fa-area-chart'],
         ['name': 'pageComparison', 'text': message(code: 'de.iteratec.isocsi.pageComparision.title', default: 'Page Comparison'), 'icon': 'fa-balance-scale'],
         ['name': 'detailAnalysis', 'text': message(code: 'de.iteratec.isocsi.detailAnalysis', default: 'Detail Analysis'), 'icon': 'fa-pie-chart'],
