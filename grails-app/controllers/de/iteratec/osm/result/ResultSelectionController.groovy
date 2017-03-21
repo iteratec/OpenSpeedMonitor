@@ -1,18 +1,17 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import grails.databinding.BindUsing
-import jdk.nashorn.api.scripting.JSObject
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
-import de.iteratec.osm.annotations.RestAction
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -198,7 +197,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                         id  : it.id,
                         name: it.name
                 ]
-            }
+            }.sort { it.name }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
