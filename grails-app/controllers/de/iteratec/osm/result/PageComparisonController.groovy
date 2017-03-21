@@ -70,8 +70,8 @@ class PageComparisonController extends ExceptionHandlerController {
 
         cmd.selectedPageComparisons.each { row ->
             BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurandUtilService.getDimensionalUnit(cmd.measurand))
-            BarchartDatum datum1 = new BarchartDatum(measurand: cmd.measurand)
-            BarchartDatum datum2 = new BarchartDatum(measurand: cmd.measurand)
+            BarchartDatum datum1 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
+            BarchartDatum datum2 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
             def result1 = allEventResults.find {
                 it[0].toString() == row['jobGroupId1'] &&
                         it[1].toString() == row['pageId1']
