@@ -1,20 +1,13 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dimple.BarchartDTO
 import de.iteratec.osm.dimple.BarchartDatum
 import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.dimple.GetBarchartCommand
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.script.PlaceholdersUtility
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -112,7 +105,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
                         new BarchartDatum(
                             measurand: currentMeasurand.replace("Uncached", ""),
                             value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 1],
-                            grouping: "${datum[0]}"
+                            grouping: "${datum[0].name}"
                         )
                     )
                 }
