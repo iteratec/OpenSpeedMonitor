@@ -23,10 +23,6 @@
                                default="no filter, sorting asc"/>
                 </a>
             </li>
-            <li id="customer-journey-header" class="dropdown-header">
-                <g:message code="de.iteratec.osm.dimple.barchart.filter.customerJourneyHeader"
-                           default="Customer Journey"/>
-            </li>
         </ul>
     </div>
     <div class="in-chart-buttons">

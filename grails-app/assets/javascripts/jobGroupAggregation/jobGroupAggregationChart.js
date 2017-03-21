@@ -269,10 +269,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
     var initFilterDropdown = function () {
 
-        filterRules = actualBarchartData.filterRules;
-
         var $filterDropdownGroup = $("#filter-dropdown-group");
-        var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
 
         // remove old filter
         $filterDropdownGroup.find('.filterRule').remove();
@@ -280,23 +277,12 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         if ($filterDropdownGroup.hasClass("hidden"))
             $filterDropdownGroup.removeClass("hidden");
 
-        for (var filterRuleKey in filterRules) {
-            if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
-                link.click(function (e) {
-                    filterCustomerJourney(e.target.innerText);
-                    toogleFilterCheckmarks(e.target);
-                });
-                link.insertAfter($customerJourneyHeader);
-            }
-        }
-
         $filterDropdownGroup.find("#all-bars-desc").click(function (e) {
-            filterCustomerJourney(null, true);
+            filterBarChartData(true);
             toogleFilterCheckmarks(e.target);
         });
         $filterDropdownGroup.find("#all-bars-asc").click(function (e) {
-            filterCustomerJourney(null, false);
+            filterBarChartData(false);
             toogleFilterCheckmarks(e.target);
         })
     };
@@ -305,44 +291,22 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         return JSON.parse(JSON.stringify(toClone));
     };
 
-    var filterCustomerJourney = function (journeyKey, desc) {
+    var filterBarChartData = function (desc) {
 
         actualBarchartData.series = clone(actualBarchartData.originalSeries);
 
-        if (journeyKey && filterRules[journeyKey]) {
-
-            // remove elements not in customer Journey from each series
-            actualBarchartData.series.forEach(function (series) {
-                series.data = series.data.filter(function (element) {
-                    return filterRules[journeyKey].indexOf(element.grouping) >= 0;
-                });
-            });
-            // remove series containing no data after first filter
-            actualBarchartData.series = actualBarchartData.series.filter(function (series) {
-                return series.data.length > 0;
-            });
-            // sort series
+        if (desc) {
             actualBarchartData.series.forEach(function (series) {
                 series.data.sort(function (x, y) {
-                    return filterRules[journeyKey].indexOf(x.grouping) - filterRules[journeyKey].indexOf(y.grouping);
+                    return d3.descending(x.value, y.value);
                 });
             });
-
         } else {
-            desc == desc || false;
-            if (desc) {
-                actualBarchartData.series.forEach(function (series) {
-                    series.data.sort(function (x, y) {
-                        return d3.descending(x.value, y.value);
-                    });
+            actualBarchartData.series.forEach(function (series) {
+                series.data.sort(function (x, y) {
+                    return d3.ascending(x.value, y.value);
                 });
-            } else {
-                actualBarchartData.series.forEach(function (series) {
-                    series.data.sort(function (x, y) {
-                        return d3.ascending(x.value, y.value);
-                    });
-                });
-            }
+            });
         }
         drawAllBars()
 
