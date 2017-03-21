@@ -103,7 +103,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
                         new BarchartDatum(
-                            measurand: currentMeasurand.replace("Uncached", ""),
+                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
                             value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 1],
                             grouping: "${datum[0].name}"
                         )
