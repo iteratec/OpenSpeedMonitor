@@ -35,13 +35,13 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
             series.page = splittedIdentifier[0];
             series.jobGroup = splittedIdentifier[1];
 
-            if (uniqueEntries.uniquePages.indexOf(series.page) == -1) {
+            if (series.page && uniqueEntries.uniquePages.indexOf(series.page) == -1) {
                 uniqueEntries.uniquePages.push(series.page);
             }
-            if (uniqueEntries.uniqueJobGroups.indexOf(series.jobGroup) == -1) {
+            if (series.jobGroup && uniqueEntries.uniqueJobGroups.indexOf(series.jobGroup) == -1) {
                 uniqueEntries.uniqueJobGroups.push(series.jobGroup);
             }
-            if (uniqueEntries.uniqueMeasurands.indexOf(series.measurand) == -1) {
+            if (series.measurand && uniqueEntries.uniqueMeasurands.indexOf(series.measurand) == -1) {
                 uniqueEntries.uniqueMeasurands.push(series.measurand);
             }
 
