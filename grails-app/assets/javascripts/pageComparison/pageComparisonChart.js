@@ -148,12 +148,12 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
                 return colorPalette(0);
             })
             .attr("opacity", function (d, index) {
-                return index * 0.5 + 0.2;
+                return index * 0.5 + 0.4;
             })
             .call(updateRect);
         // value text
         innerG.append("text")
-            .attr("class", "value")
+            .attr("class", "d3chart-value")
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
             .attr("text-anchor", "end")
