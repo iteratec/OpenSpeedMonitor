@@ -41,7 +41,9 @@
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
             <i class="fa fa-download"></i>
         </a>
+        <input type="number" name="quantity" min="1" id="data-trim-value" class="form-control" step="50" />
     </div>
+
 
     <div id="svg-container"></div>
 </div>
