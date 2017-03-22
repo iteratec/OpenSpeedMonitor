@@ -37,6 +37,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         width = parseInt($("#" + chartIdentifier).width(), 10);
 
         svg = d3.select("#" + chartIdentifier).append("svg")
+            .attr("class", "d3chart")
             .attr("width", width);
 
         headerLine = svg.append("g");
