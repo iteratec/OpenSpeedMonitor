@@ -15,7 +15,10 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
+
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class DistributionChartController extends ExceptionHandlerController {
     public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
@@ -28,6 +31,7 @@ class DistributionChartController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     PageService pageService
     FilteringAndSortingDataService filteringAndSortingDataService
+    PerformanceLoggingService performanceLoggingService
 
     def index() {
         redirect(action: 'show')
@@ -73,10 +77,12 @@ class DistributionChartController extends ExceptionHandlerController {
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
         def selectedMeasurand = cmd.selectedMeasurand.replace("Uncached", "")
 
-        List allEventResults = EventResult.createCriteria().list {
-            'in'('page', allPages)
-            'in'('jobGroup', allJobGroups)
-            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+        List allEventResults = performanceLoggingService.logExecutionTime(DEBUG, "select EventResults for DistributionChart", 1) {
+            EventResult.createCriteria().list {
+                'in'('page', allPages)
+                'in'('jobGroup', allJobGroups)
+                'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            }
         }
 
         // return if no data is available
@@ -86,21 +92,22 @@ class DistributionChartController extends ExceptionHandlerController {
         }
 
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
+        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+            allEventResults.each { result ->
+                def jobGroup = result.jobGroup.name.toString()
+                def page = result.page.toString()
 
-        allEventResults.each { result ->
-            def jobGroup = result.jobGroup.name.toString()
-            def page = result.page.toString()
+                def identifier = page + " | " + jobGroup
 
-            def identifier = page + " | " + jobGroup
+                if (distributionChartDTO.series.get(identifier) == null) {
+                    distributionChartDTO.series.put(identifier, new DistributionTrace())
+                }
 
-            if (distributionChartDTO.series.get(identifier) == null) {
-                distributionChartDTO.series.put(identifier, new DistributionTrace())
+                def newTrace = distributionChartDTO.series.get(identifier)
+                newTrace.jobGroup = jobGroup
+                newTrace.page = page
+                newTrace.data.add(result[selectedMeasurand])
             }
-
-            def newTrace = distributionChartDTO.series.get(identifier)
-            newTrace.jobGroup = jobGroup
-            newTrace.page = page
-            newTrace.data.add(result[selectedMeasurand])
         }
 
 //      TODO: see ticket [IT-1614]
