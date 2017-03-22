@@ -15,29 +15,31 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.report.external.provider;
+package de.iteratec.osm.report.external.provider
 
-import de.iteratec.osm.report.external.GraphiteServer;
-import de.iteratec.osm.report.external.GraphiteSocket;
-import de.iteratec.osm.report.external.GraphiteTCPSocket;
+import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.report.external.GraphiteSocket
+import de.iteratec.osm.report.external.GraphiteTCPSocket
+import de.iteratec.osm.report.external.GraphiteUDPSocket
 
+class DefaultGraphiteSocketProvider implements GraphiteSocketProvider {
+    DefaultGraphiteSocketProvider() {
 
-public class DefaultGraphiteSocketProvider implements GraphiteSocketProvider {
-	public DefaultGraphiteSocketProvider() {
-	
-	}
+    }
 
-	@Override
-	public GraphiteSocket getSocket(GraphiteServer server) {
-		return new GraphiteTCPSocket(server.getServerInetAddress(), server.getPort());
-	}
+    @Override
+    GraphiteSocket getSocket(GraphiteServer server) {
+        return getSocket(server, server.reportProtocol)
+    }
 
-	@Override
-	public GraphiteSocket getSocket(GraphiteServer server, GraphiteSocketProvider.Protocol protocol) {
-		if(protocol.equals(GraphiteSocketProvider.Protocol.TCP)) {
-			return getSocket(server);
-		} else {
-			throw new IllegalArgumentException("The Protocol must be TCP");
-		}
-	}
+    @Override
+    GraphiteSocket getSocket(GraphiteServer server, GraphiteSocketProvider.Protocol protocol) {
+        if (protocol == GraphiteSocketProvider.Protocol.TCP) {
+            return new GraphiteTCPSocket(server.getServerInetAddress(), server.getPort());
+        } else if (protocol == GraphiteSocketProvider.Protocol.UDP) {
+            return new GraphiteUDPSocket(server.getServerInetAddress(), server.getPort())
+        } else {
+            throw new IllegalArgumentException("Unknown Protocol" + protocol);
+        }
+    }
 }

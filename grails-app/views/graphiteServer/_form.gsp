@@ -27,6 +27,15 @@
     </div>
 </div>
 
+<div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'reportProtocol', 'error')} required">
+    <label for="reportProtocol" class="control-label col-md-3"><g:message code="graphiteServer.reportProtocol.label" default="Report Protocol" />
+    <span class="required-indicator">*</span></label>
+
+    <div class="col-md-6">
+        <g:select name="reportProtocol" from="${de.iteratec.osm.report.external.provider.GraphiteSocketProvider.Protocol.values()}" value="${graphiteServer?.reportProtocol}"/>
+    </div>
+</div>
+
 <div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'webappUrl', 'error')} required">
     <label for="webappUrl" class="control-label col-md-3"><g:message code="graphiteServer.webappUrl.label" default="Webapp Url" /><span
             class="required-indicator">*</span></label>

@@ -736,7 +736,7 @@ class MetricReportingServiceTests extends Specification {
     /**
      * <p>
      * Just for testing-purposes. Instances can be used to be returned in Mock of
-     * {@link GraphiteSocketProvider#getSocket(GraphiteServer, GraphiteSocketProvider.Protocol)}.
+     * {@link GraphiteSocketProvider#getSocket(GraphiteServer)}.
      * <br>Map {@link #sendDates} contains the informations about calls to {@link #sendDate(GraphitePathName, double, Date)} for assertions.
      * </p>
      *

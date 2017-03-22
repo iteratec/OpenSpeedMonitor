@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
+import de.iteratec.osm.report.external.provider.*
 
 /**
  * A graphite server to which measured data is to be sent to.
@@ -57,11 +58,12 @@ class GraphiteServer {
      * @see GraphiteEventService
      */
     Protocol webappProtocol
-	/**
-	 * Path to rendering engine of GraphiteServer's webapp.
-	 */
-	String webappPathToRenderingEngine
+    /**
+     * Path to rendering engine of GraphiteServer's webapp.
+     */
+    String webappPathToRenderingEngine
 
+    GraphiteSocketProvider.Protocol reportProtocol = GraphiteSocketProvider.Protocol.UDP
 
     /**
      * {@link GraphitePath}s, for which results should be sent for this server.
@@ -72,7 +74,7 @@ class GraphiteServer {
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
 
-    static hasMany = [graphitePaths:GraphitePath, graphiteEventSourcePaths:GraphiteEventSourcePath]
+    static hasMany = [graphitePaths: GraphitePath, graphiteEventSourcePaths: GraphiteEventSourcePath]
     static transients = ['serverInetAddress']
 
     Boolean reportCsiAggregationsToGraphiteServer = false
@@ -90,7 +92,6 @@ class GraphiteServer {
     int timeBetweenReportsInSeconds = 300
 
 
-
     public InetAddress getServerInetAddress() {
         return InetAddress.getByName(serverAdress)
     }
@@ -100,18 +101,19 @@ class GraphiteServer {
         port(min: 0, max: 65535)
         graphitePaths(nullable: false)
         webappUrl(nullable: false)
-		webappProtocol(nullable: false)
+        webappProtocol(nullable: false)
         webappPathToRenderingEngine(nullable: false)
         reportHealthMetrics(nullable: false)
-        timeBetweenReportsInSeconds(min:0, max: 65535)
-        healthMetricsReportPrefix(nullable: false,maxSize: 255)
+        timeBetweenReportsInSeconds(min: 0, max: 65535)
+        healthMetricsReportPrefix(nullable: false, maxSize: 255)
         garbageCollectorPrefix(nullable: false, maxSize: 255)
-        memoryReportPrefix(nullable:false, maxSize: 255)
+        memoryReportPrefix(nullable: false, maxSize: 255)
         threadStatesReportPrefix(nullable: false, maxSize: 255)
+        reportProtocol(nullable: false, inList: GraphiteSocketProvider.Protocol.values() as List)
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder()
         sb.append("instance object: ${super.toString()}\n")
         sb.append((serverAdress && port) ? "carbon: ${serverAdress}:${port}\n" : '')

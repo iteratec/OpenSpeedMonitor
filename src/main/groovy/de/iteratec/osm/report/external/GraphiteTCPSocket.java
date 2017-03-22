@@ -30,12 +30,7 @@ import de.iteratec.osm.result.Contract;
  * <p>
  * A graphite socket using TCP to send data to Graphite.
  * </p>
- * 
- * <p>
- * TODO Add a class GraphiteUDPSocket to add a UPD connection and select the
- * implementation to use on startup. See note in {@link GraphiteSocket}!
- * </p>
- * 
+ *
  * @author mze
  * @since 2013-11-06 / JIRA IT-195
  */
@@ -51,13 +46,13 @@ public class GraphiteTCPSocket implements GraphiteSocket {
 	 * <p>
 	 * Creates a TCP-Socket based Graphite socket.
 	 * </p>
-	 * 
+	 *
 	 * @param serverAddress
 	 *            The server adress to connect to, not <code>null</code>.
 	 * @param port
 	 *            The port to use for communication; must satisfy
 	 *            {@code 0 <= port <= 65535}.
-	 * 
+	 *
 	 * @throws NullPointerException
 	 *             if {@code serverAddress} is <code>null</code>.
 	 * @throws {@link IllegalArgumentException} if {@code port} is less than 0
@@ -84,7 +79,7 @@ public class GraphiteTCPSocket implements GraphiteSocket {
 		try {
 			graphiteSocket = new Socket(serverAddress, this.port);
 			//if the server isn't reachable the try to report should stop after 10 seconds
-			graphiteSocket.setSoTimeout(10000);
+			graphiteSocket.setSoTimeout(3000);
 
 			OutputStream graphiteFeedStream = graphiteSocket.getOutputStream();
 

@@ -41,11 +41,11 @@ public interface GraphiteSocketProvider {
 	 * @author mze
 	 */
 	enum Protocol {
-		TCP
+		TCP, UDP
 	}
 
 	/**
-	 * Returns a TCP-{@link GraphiteSocket}
+	 * Returns a {@link GraphiteSocket} for given server
 	 * 
 	 * @param server
 	 *            the server to connect to
@@ -59,7 +59,7 @@ public interface GraphiteSocketProvider {
 	 * @param server
 	 *            the server to connect to
 	 * @param protocol
-	 *            the protocol to use
+	 *            the reportProtocol to use
 	 * @return never <code>null</code>.
 	 */
 	GraphiteSocket getSocket(GraphiteServer server, Protocol protocol);
