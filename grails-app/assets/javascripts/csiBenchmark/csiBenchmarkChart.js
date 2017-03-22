@@ -158,10 +158,10 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
     var highlightClickedBar = function (d) {
         if (barSelected !== d.name) {
             barSelected = d.name;
-            d3.selectAll(".d3chart-bar").style("fill", "#d9d9d9");
-            d3.select(this).style("fill", null)
+            d3.selectAll(".d3chart-bar").classed("d3chart-faded", true);
+            d3.select(this).classed("d3chart-faded", false);
         } else {
-            d3.selectAll(".d3chart-bar").style("fill", null);
+            d3.selectAll(".d3chart-bar").classed("d3chart-faded", false);
             barSelected = null;
         }
     };
