@@ -6,21 +6,22 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputJobName" required>
+                <input type="text" class="form-control" id="inputJobName" name="job.label" required>
             </div>
         </div>
 
         <div class="form-group">
+            <g:hiddenField name="job.executionSchedule" value="0 0 0/1 1/1 * ? *"/>
             <label for="inputCronString" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputCronStringLabel" default="Execution Plan"/>
             </label>
 
             <div class="col-sm-5">
                 <select class="form-control chosen-select" id="selectExecutionSchedule">
-                    <option value="0/30 * * * ? *">
+                    <option value="0 0/30 * 1/1 * ? *">
                         <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly" default="Every half an hour"/>
                     </option>
-                    <option value="0 * * * ? *">
+                    <option value="0 0 0/1 1/1 * ? *">
                         <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly" default="Every hour"/>
                     </option>
                     %{--JOHANNES2DO: More than these options for default Cron Strings?--}%

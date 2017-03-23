@@ -1,7 +1,4 @@
-<div class="form-horizontal">
-
-    <div class="row">
-
+<div class="row form-horizontal">
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="inputScriptName" class="col-sm-2 control-label" id="">
@@ -9,7 +6,7 @@
                 </label>
 
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputScriptName" required>
+                    <input type="text" class="form-control" id="inputScriptName" name="script.label"  value="${script?.label}" required>
                 </div>
             </div>
 
@@ -19,8 +16,8 @@
                 </label>
 
                 <div class="col-sm-10">
-                    <textarea class="form-control" id="inputScriptDescription"
-                              placeholder="Optional" rows="3"></textarea>
+                    <textarea class="form-control" id="inputScriptDescription" name="script.description"
+                              placeholder="Optional" rows="3">${script?.description}</textarea>
                 </div>
             </div>
 
@@ -38,7 +35,7 @@
 
                 <div class="col-sm-10">
                     <div class="fieldcontain ${hasErrors(bean: script, field: 'navigationScript', 'error')}">
-                        <textarea id="navigationScript" class="form-control" style="display: none;">${code}</textarea>
+                        <textarea id="navigationScript" name="script.navigationScript" class="form-control" style="display: none;">${script?.navigationScript}</textarea>
                         <span id="setEventName-warning-clone" class="setEventName-warning-icon" style="display: none;"
                               rel="tooltip" data-html="true"></span>
                     </div>
@@ -101,9 +98,6 @@
                 </div>
             </div>
         </div>
-
-    </div> %{-- row --}%
-
 </div>
 
 <div class="row navigationRow">

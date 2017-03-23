@@ -18,6 +18,21 @@
     Steht hier ein sinnvoller Text?
 </p>
 
+<div class="row">
+    <div class="col-md-12">
+        <g:if test="${errors}">
+            <div class="alert alert-danger">
+                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
+                <ul>
+                    <g:each var="currentError" in="${errors}">
+                        <li><g:message error="${currentError}"/></li>
+                    </g:each>
+                </ul>
+            </div>
+        </g:if>
+    </div>
+</div>
+
 <div class="card">
     <div class="progress" id="setupWizardProgressBarContainer">
         <div class="progress-bar" id="setupWizardProgressBar" role="progressbar"></div>
@@ -52,7 +67,7 @@
         </li>
     </ul>
 
-    <form>
+    <form action="save">
 
         <div class="tab-content">
             <div class="tab-pane active" id="setJobGroup">
@@ -87,21 +102,21 @@
     <asset:script type="text/javascript">
         function createCodeMirror(idCodemirrorElement, readonly){
             OpenSpeedMonitor.script.codemirrorEditor.init({
-                idCodemirrorElement: idCodemirrorElement,
-                i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
-                        i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',
-                        i18nMessage_DANGLING_SETEVENTNAME_STATEMENT: '${message(code: 'script.DANGLING_SETEVENTNAME_STATEMENT.warning')}',
-                        i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
-                        i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
-                        i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
-                        i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
-                        i18nMessage_VARIABLE_NOT_SUPPORTED: '${message(code: 'script.VARIABLE_NOT_SUPPORTED.error')}',
-                        i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
-                        measuredEvents: ${measuredEvents},
-                        linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
-                        linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
-                        linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
-                        readonly: readonly
+                    idCodemirrorElement: idCodemirrorElement,
+                    i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
+                    i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',
+                    i18nMessage_DANGLING_SETEVENTNAME_STATEMENT: '${message(code: 'script.DANGLING_SETEVENTNAME_STATEMENT.warning')}',
+                    i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
+                    i18nMessage_WRONG_PAGE: '${message(code: 'script.WRONG_PAGE.error')}',
+                    i18nMessage_TOO_MANY_SEPARATORS: '${message(code: 'script.TOO_MANY_SEPARATORS.error')}',
+                    i18nMessage_MEASUREDEVENT_NOT_UNIQUE: '${message(code: 'script.MEASUREDEVENT_NOT_UNIQUE.error')}',
+                    i18nMessage_VARIABLE_NOT_SUPPORTED: '${message(code: 'script.VARIABLE_NOT_SUPPORTED.error')}',
+                    i18nMessage_WRONG_URL_FORMAT: '${message(code: 'script.WRONG_URL_FORMAT.error')}',
+                    measuredEvents: ${measuredEvents},
+                    linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
+                    linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
+                    linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
+                    readonly: readonly
                     });
                 }
                 function promptForDuplicateName() {

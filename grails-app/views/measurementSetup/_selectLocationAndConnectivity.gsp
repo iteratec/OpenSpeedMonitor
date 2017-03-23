@@ -10,8 +10,7 @@
             </label>
 
             <div class="col-sm-10">
-                %{--<input type="text" class="form-control" id="inputLocation" required>--}%
-                <select id="inputLocation" class="form-control chosen-select" required>
+                <select id="inputLocation" class="form-control chosen-select" name="location" required>
                     <g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
                         <optgroup label="${server.label}">
                         <g:each in="${Location.findAllByWptServerAndActive(server, true)}" var="loc">
@@ -31,8 +30,7 @@
             </label>
 
             <div class="col-sm-10">
-                %{--<input type="text" class="form-control" id="inputConnectivity" required>--}%
-                <select type="text" class="form-control chosen-select" id="inputConnectivity" required>
+                <select type="text" class="form-control chosen-select" id="inputConnectivity" name="connectivity" required>
                     <g:each in="${ConnectivityProfile.findAllByActive(true)}" var="connectivity">
                         <option value="${connectivity.name}">
                             ${connectivity.name}

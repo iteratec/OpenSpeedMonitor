@@ -6,8 +6,8 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputJobGroup" name="inputJobGroup"
-                       placeholder="Set name for job group" required>
+                <input type="text" class="form-control" id="inputJobGroup" name="jobGroup.name"
+                       placeholder="Set name for job group" value="${jobGroup?.name}" required>
             </div>
         </div>
     </div>

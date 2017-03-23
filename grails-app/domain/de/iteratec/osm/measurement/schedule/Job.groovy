@@ -44,7 +44,7 @@ class Job implements Taggable {
     Date lastRun;
 
     @BindUsing({ obj, source -> source['description'] })
-    String description;
+    String description = "";
     int runs = 1;
 
     boolean active;
