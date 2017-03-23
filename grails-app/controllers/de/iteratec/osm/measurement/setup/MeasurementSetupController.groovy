@@ -30,9 +30,8 @@ class MeasurementSetupController {
         job.connectivityProfile = connectivityProfile
         job.jobGroup = jobGroup
         job.script = script
-
-        job.description = ""
-        job.maxDownloadTimeInMinutes = 10
+        // set default to 60 minutes
+        job.maxDownloadTimeInMinutes = 60
 
         def errors = []
 

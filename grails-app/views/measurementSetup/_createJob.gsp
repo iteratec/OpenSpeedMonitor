@@ -11,33 +11,34 @@
         </div>
 
         <div class="form-group">
-            <g:hiddenField name="job.executionSchedule" value="0 0 0/1 1/1 * ? *"/>
+            <g:hiddenField id="executionSchedule" name="job.executionSchedule" value="${job?.executionSchedule}"/>
             <label for="inputCronString" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputCronStringLabel" default="Execution Plan"/>
             </label>
 
             <div class="col-sm-5">
                 <select class="form-control chosen-select" id="selectExecutionSchedule">
+                    <option value="">
+                        <g:message code="de.iteratec.isocsi.custom" default="Custom"/>
+                    </option>
                     <option value="0 0/30 * 1/1 * ? *">
                         <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly" default="Every half an hour"/>
                     </option>
                     <option value="0 0 0/1 1/1 * ? *">
                         <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly" default="Every hour"/>
                     </option>
-                    %{--JOHANNES2DO: More than these options for default Cron Strings?--}%
-                    <option value="">...</option>
+                    <option value="0 0/15 * 1/1 * ? *">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.15min" default="Every 15 minutes"/>
+                    </option>
+                    <option value="0 0 15 1/1 * ? *">
+                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.daily" default="Daily at 3pm"/>
+                    </option>
                 </select>
             </div>
 
             <div class="col-sm-5">
                 <div class="input-group">
-                    <span class="input-group-btn" data-toggle="buttons">
-                        <label class="btn btn-default">
-                            <input type="checkbox" id="inputCustomCronString">
-                            <g:message code="de.iteratec.osm.setupMeasurementWizard.toggleCustomCronString" default="Change Cron String"/>
-                        </label>
-                    </span>
-                    <input type="text" class="form-control" id="inputCronString" disabled required
+                    <input type="text" class="form-control hidden" id="inputCronString" required
                            value="0/30 * * * ? *">
                 </div>
             </div>
@@ -50,6 +51,7 @@
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
+
             <div class="panel-body">
                 %{--JOHANNES2DO: Write help text for Job tab in wizard--}%
                 <p>
@@ -74,44 +76,9 @@
             </a>
             <button type="submit" name="_action_save" class="btn btn-primary" id="createJobTabCreationButton">
                 <i class='fa fa-plus' aria-hidden='true'></i>
-                <g:message code="de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement" default="Create Job and Start Measurement"/>
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement"
+                           default="Create Job and Start Measurement"/>
             </button>
         </div>
     </div>
 </div>
-
-<content tag="include.bottom">
-    <asset:script type="text/javascript">
-        function preselectCronStrings() {
-            var selectExecutionSchedule = document.querySelector("#selectExecutionSchedule");
-            var inputCronString = document.querySelector("#inputCronString");
-
-            selectExecutionSchedule.addEventListener("change", function (e) {
-                inputCronString.value = e.target.value;
-            });
-        }
-
-        function customCronString() {
-            var inputCustomCronString = document.querySelector("#inputCustomCronString");
-            var selectExecutionSchedule = document.querySelector("#selectExecutionSchedule");
-            var inputCronString = document.querySelector("#inputCronString");
-
-            // JOHANNES2DO: Why does the jQuery version work, but the JavaScript version not
-            // inputCustomCronString.addEventListener("change", function (e) {
-            $(inputCustomCronString).on("change", function (e) {
-                if (e.target.checked) {
-                    selectExecutionSchedule.disabled = true;
-                    inputCronString.disabled = false;
-                } else {
-                    selectExecutionSchedule.disabled = false;
-                    inputCronString.disabled = true;
-                }
-            });
-        }
-
-        $(document).ready( function () {
-            preselectCronStrings();
-            customCronString();
-        });
-    </asset:script>
-</content>

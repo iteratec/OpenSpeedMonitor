@@ -95,11 +95,14 @@
 %{-- initially invisible modal dialog to ask if user wants to cancel the job creation --}%
 <g:render template="cancelJobCreationDialog"/>
 
+
 <content tag="include.bottom">
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
     <asset:javascript src="prettycron/prettycronManifest.js"/>
     <asset:javascript src="script/versionControl.js"/>
     <asset:script type="text/javascript">
+    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/create.js" />', true, 'measurementSetupWizard')
+
         function createCodeMirror(idCodemirrorElement, readonly){
             OpenSpeedMonitor.script.codemirrorEditor.init({
                     idCodemirrorElement: idCodemirrorElement,
