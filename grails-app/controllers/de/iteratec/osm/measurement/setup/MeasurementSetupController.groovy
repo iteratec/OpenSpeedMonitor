@@ -16,16 +16,17 @@ class MeasurementSetupController {
     }
 
     def create() {
-        [script: new Script(params), pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""]
+        return createStaticViewData()
     }
 
     def save() {
         Script script = new Script(params.script)
-        JobGroup jobGroup = new JobGroup(params.jobGroup)
+        JobGroup jobGroup = getOrCreateJobGroup(params.jobGroup.name)
         Location location = Location.findById(params.location)
         ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(params.connectivity)
         Job job = new Job()
-        job.properties = params.job // update properties instead of using 'new Job(params.job)' to avoid overriding default values
+        job.properties = params.job
+        // update properties instead of using 'new Job(params.job)' to avoid overriding default values
         job.location = location
         job.connectivityProfile = connectivityProfile
         job.jobGroup = jobGroup
@@ -47,7 +48,25 @@ class MeasurementSetupController {
         }
 
         // on error
-        def modelToRender = [errors: errors, script: params.script, jobGroup: params.jobGroup, location: params.location, connectivity: params.connectivity, pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""]
+        Map modelToRender = createStaticViewData()
+        modelToRender['errors'] = errors
+        modelToRender['script'] = params.script
+        modelToRender['jobGroup'] = params.jobGroup
+        modelToRender['location'] = params.location
+        modelToRender['connectivity'] = params.connectivity
+
         render(view: 'create', model: modelToRender)
+    }
+
+    private JobGroup getOrCreateJobGroup(String jobGroupName) {
+        JobGroup jobGroup = JobGroup.findByName(jobGroupName)
+        if (!jobGroup) {
+            jobGroup = new JobGroup(name: jobGroupName)
+        }
+        return jobGroup
+    }
+
+    private Map createStaticViewData() {
+        return [script: new Script(params), pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: "", allJobGroups: JobGroup.list()]
     }
 }

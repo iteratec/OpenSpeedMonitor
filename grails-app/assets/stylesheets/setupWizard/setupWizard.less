@@ -1,10 +1,8 @@
 @import "../variables-corporate";
 
-
 @inactiveProgressColor: @iteratec-blue-lighter;
 @activeProgressColor: @brand-primary;
 @progressBarHeightheight: 10px;
-
 
 /* Restyle the nav-tabs to apply the new wizard step indicator layout */
 
@@ -36,7 +34,7 @@
   transition-property: color;
   transition-duration: @wizardStepActiveTransitionDuration;
   transition-timing-function: @wizardStepActiveTransitionTimingFunction;
-  color: @activeProgressColor !important;
+  color: @activeProgressColor;
   > i {
     transition-property: background-color;
     transition-duration: @wizardStepActiveTransitionDuration;
@@ -78,7 +76,6 @@
 
 /* --- End of wizard step indicator layout */
 
-
 .panel.panel-info {
   border: none;
   box-shadow: none;
@@ -91,7 +88,6 @@
   }
 }
 
-
 /* Move navigation buttons to the bottom */
 .navigationRow {
   position: absolute;
@@ -100,12 +96,10 @@
   bottom: 15px;
 }
 
-
 #createJobTabCreationButton {
   background-color: @iteratec-magenta;
   border-color: @iteratec-magenta-dark;
 }
-
 
 .infoImage {
   margin: 0 auto;
@@ -113,7 +107,10 @@
   max-width: 100%;
 }
 
-
 .chosen-container.chosen-container-single {
   width: 100% !important; // for some reason the chosen-select element gets initialized with a width 0px
+}
+
+.failureText {
+  color: @state-danger-text !important;
 }

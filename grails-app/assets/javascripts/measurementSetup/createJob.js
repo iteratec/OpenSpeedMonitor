@@ -28,6 +28,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         } else {
             // set default value.
             predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val())
+            predefinedCronSelectBox.trigger("chosen:updated");
         }
     }
 

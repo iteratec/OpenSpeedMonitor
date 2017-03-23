@@ -142,7 +142,7 @@
                     jobGroubTabNextButton.addEventListener("click", function () {
                         // if the user changed the script name, don't set the value
                         if (inputScriptName.value == "")
-                            inputScriptName.value = document.querySelector("#inputJobGroup").value;
+                            inputScriptName.value = document.querySelector("#jobGroupName").value;
                     });
                 }
 
@@ -153,7 +153,7 @@
                     jobGroubTabNextButton.addEventListener("click", function () {
                         // if the user changed the script name, don't set the value
                         if (inputJobName.value == "") {
-                            var jobGroup = document.querySelector("#inputJobGroup").value;
+                            var jobGroup = document.querySelector("#jobGroupName").value;
 
                             var locationOptions = document.querySelector("#inputLocation").options;
                             var selectedLocationIndex = locationOptions.selectedIndex;

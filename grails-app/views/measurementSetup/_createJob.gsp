@@ -18,28 +18,35 @@
 
             <div class="col-sm-5">
                 <select class="form-control chosen-select" id="selectExecutionSchedule">
-                    <option value="">
-                        <g:message code="de.iteratec.isocsi.custom" default="Custom"/>
-                    </option>
-                    <option value="0 0/30 * 1/1 * ? *">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly" default="Every half an hour"/>
-                    </option>
-                    <option value="0 0 0/1 1/1 * ? *">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly" default="Every hour"/>
-                    </option>
-                    <option value="0 0/15 * 1/1 * ? *">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.15min" default="Every 15 minutes"/>
-                    </option>
-                    <option value="0 0 15 1/1 * ? *">
-                        <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.daily" default="Daily at 3pm"/>
-                    </option>
+                    <optgroup label="${message(code: 'de.iteratec.isocsi.custom', default: 'Custom')}">
+                        <option value="">
+                            <g:message code="de.iteratec.isocsi.custom" default="Custom"/>
+                        </option>
+                    </optgroup>
+                    <optgroup label="${message(code: 'de.iteratec.osm.result.predefined.linktext', default: 'Predefined')}">
+                        <option value="0 0 0/1 1/1 * ? *">
+                            <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly"
+                                       default="Every hour"/>
+                        </option>
+                        <option value="0 0/30 * 1/1 * ? *">
+                            <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly"
+                                       default="Every half an hour"/>
+                        </option>
+                        <option value="0 0/15 * 1/1 * ? *">
+                            <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.15min"
+                                       default="Every 15 minutes"/>
+                        </option>
+                        <option value="0 0 15 1/1 * ? *">
+                            <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.daily"
+                                       default="Daily at 3pm"/>
+                        </option>
+                    </optgroup>
                 </select>
             </div>
 
             <div class="col-sm-5">
                 <div class="input-group">
-                    <input type="text" class="form-control hidden" id="inputCronString" required
-                           value="0/30 * * * ? *">
+                    <input type="text" class="form-control hidden" id="inputCronString">
                 </div>
             </div>
         </div>
