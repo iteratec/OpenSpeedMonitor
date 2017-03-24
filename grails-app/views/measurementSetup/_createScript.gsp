@@ -1,12 +1,13 @@
 <div class="row form-horizontal">
         <div class="col-sm-6">
-            <div class="form-group">
+            <div class="form-group" id="scriptNameFormGroup">
                 <label for="inputScriptName" class="col-sm-2 control-label" id="">
                     <g:message code="de.iteratec.osm.setupMeasurementWizard.inputScriptNameLabel" default="Script Name"/>
                 </label>
 
                 <div class="col-sm-10">
                     <input type="text" class="form-control" id="inputScriptName" name="script.label"  value="${script?.label}" required>
+                    <span id="scriptNameHelpBlock" class="help-block hidden"><g:message code="de.iteratec.osm.measurement.script.Script.label.unique" default="Already Exists"/></span>
                 </div>
             </div>
 

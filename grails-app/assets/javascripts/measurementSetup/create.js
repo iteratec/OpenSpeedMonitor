@@ -1,5 +1,6 @@
 //= require createJob.js
 //= require createJobGroup.js
+//= require createScript.js
 //= require self
 
 "use strict";
@@ -11,9 +12,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
 
     var formSubmissonButton = $("#createJobTabCreationButton");
     var createJobGroupCardHasErrors = false;
+    var createScriptCardHasErrors = false;
 
     var allCardsValid = function () {
-        return !createJobGroupCardHasErrors
+        return !createJobGroupCardHasErrors && !createScriptCardHasErrors;
     }
 
     var validateForm = function () {
@@ -30,6 +32,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
         switch (caller) {
             case 'createJobGroupCard':
                 createJobGroupCardHasErrors = hasErrors;
+                break;
+            case 'createScriptCard':
+                createScriptCardHasErrors = hasErrors;
                 break;
         }
 

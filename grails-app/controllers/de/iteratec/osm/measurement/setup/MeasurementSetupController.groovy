@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.setup
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -7,9 +8,11 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.ExceptionHandlerController
 import grails.converters.JSON
 
-class MeasurementSetupController {
+class MeasurementSetupController extends ExceptionHandlerController {
 
     def index() {
         forward(action: 'create')
@@ -68,5 +71,15 @@ class MeasurementSetupController {
 
     private Map createStaticViewData() {
         return [script: new Script(params), pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: "", allJobGroups: JobGroup.list()]
+    }
+
+    @RestAction
+    def getScriptNames() {
+        def scriptNames = Script.createCriteria().list {
+            projections {
+                property('label')
+            }
+        }
+        ControllerUtils.sendObjectAsJSON(response, scriptNames)
     }
 }
