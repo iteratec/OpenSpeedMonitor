@@ -34,6 +34,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
     static final Integer DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS = 30
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
+    static final Integer INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
 
 
     /* Default (injected) attributes of GORM */
@@ -62,6 +63,8 @@ class OsmConfiguration {
     Integer maxBatchActivityStorageTimeInDays = DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
     /** Method of transformation from measured load time to percent of users which are satisfied by that load time used in the application. */
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
+    /** Time in days internal monitoring data like location queues is stored. */
+    Integer internalMonitoringStorageTimeInDays
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
@@ -73,9 +76,8 @@ class OsmConfiguration {
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
+        internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     }
-
-
 
     static constraints = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS, min: -2147483648, max: 2147483647)
@@ -87,5 +89,6 @@ class OsmConfiguration {
         maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS, min: 0, max: 2147483647)
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
+        internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     }
 }

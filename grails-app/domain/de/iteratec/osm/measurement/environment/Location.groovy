@@ -17,12 +17,13 @@
 
 package de.iteratec.osm.measurement.environment
 
-
+import groovy.transform.EqualsAndHashCode
 
 /**
  * A combination of wpt-agent and browser that is configured in the settings/locations.ini-file of one wptserver.
  * Uniquely identified through {@link #location} and {@link #wptServer}.
  */
+@EqualsAndHashCode
 class Location {
 
     String label

@@ -34,7 +34,6 @@ import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.ContentType
 import org.joda.time.DateTime
 import org.quartz.CronExpression
-
 /**
  * QueueAndJobStatusService returns various figures regarding Jobs, Queues and EventResults.
  *
@@ -57,7 +56,7 @@ class QueueAndJobStatusService {
      * @return A list of maps. Each map's key is the retrieved Location and its value is the <location> tag in the XML
      *  	response returned by getLocations.php
      */
-    List<Map<Location, Object>> getFilteredLocations(WebPageTestServer wptServer) {
+    List<LocationWithXmlNode> getActiveLocations(WebPageTestServer wptServer) {
         GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
         List locations = []
         if (locationsResponse != null) {
@@ -68,7 +67,10 @@ class QueueAndJobStatusService {
                     String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
                     Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, uniqueIdentfierForServer)
                     if (location)
-                        locations << [location: location, tag: locationTagInXml]
+                        locations << new LocationWithXmlNode(
+                                location: location,
+                                locationXmlNode: locationTagInXml
+                        )
                 }
             }
 
@@ -307,4 +309,5 @@ class QueueAndJobStatusService {
 
         return result
     }
+
 }
