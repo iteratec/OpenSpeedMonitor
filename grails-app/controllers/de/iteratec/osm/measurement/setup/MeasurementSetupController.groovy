@@ -82,4 +82,14 @@ class MeasurementSetupController extends ExceptionHandlerController {
         }
         ControllerUtils.sendObjectAsJSON(response, scriptNames)
     }
+
+    @RestAction
+    def getJobNames() {
+        def jobNames = Job.createCriteria().list {
+            projections {
+                property('label')
+            }
+        }
+        ControllerUtils.sendObjectAsJSON(response, jobNames)
+    }
 }

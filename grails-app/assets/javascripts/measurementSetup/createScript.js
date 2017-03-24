@@ -11,9 +11,8 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
     var existingScriptNames;
 
     var init = function () {
-        scriptNameInput.change(validateScriptName);
         scriptNameInput.keyup(validateScriptName);
-        nextButton.click(validateInput);
+        nextButton.click(validateScriptName);
         getExistingScriptNames();
     }
 

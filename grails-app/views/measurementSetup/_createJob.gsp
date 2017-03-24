@@ -1,16 +1,17 @@
 <div class="row form-horizontal">
     <div class="col-sm-6">
-        <div class="form-group">
+        <div class="form-group" id="jobNameFormGroup">
             <label for="inputJobName" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputJobLabel" default="Job Name"/>
             </label>
 
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="inputJobName" name="job.label" required>
+                <span id="jobNameHelpBlock" class="help-block hidden"><g:message code="de.iteratec.osm.measurement.schedule.Job.label.unique" default="Already Exists"/></span>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="executionScheduleFormGroup">
             <g:hiddenField id="executionSchedule" name="job.executionSchedule" value="${job?.executionSchedule}"/>
             <label for="inputCronString" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputCronStringLabel" default="Execution Plan"/>
