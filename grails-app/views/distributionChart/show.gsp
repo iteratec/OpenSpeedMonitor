@@ -105,7 +105,9 @@
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
 
+            $("#chart-card").removeClass("hidden");
             spinner.start();
+            
             $.ajax({
                 type: 'POST',
                 data: {

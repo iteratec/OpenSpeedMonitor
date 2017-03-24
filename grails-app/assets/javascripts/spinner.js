@@ -42,11 +42,11 @@ OpenSpeedMonitor.Spinner = function(spinnerTargetElement, size) {
     var spinnerOptions = null;
     var defaultSpinnerOptions = {
           lines: 13             // The number of lines to draw
-        , length: 28            // The length of each line
-        , width: 10             // The line thickness
-        , radius: 35            // The radius of the inner circle
+        , length: 10            // The length of each line
+        , width: 3              // The line thickness
+        , radius: 10            // The radius of the inner circle
         , scale: 1              // Scales overall size of the spinner
-        , corners: 0.5          // Corner roundness (0..1)
+        , corners: 1.0          // Corner roundness (0..1)
         , color: '#333333'      // #rgb or #rrggbb or array of colors
         , opacity: 0.25         // Opacity of the lines
         , rotate: 0             // The rotation offset

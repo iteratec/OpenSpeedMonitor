@@ -57,9 +57,6 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         d3.select(svgContainer).selectAll("svg").remove();
         initFilterDropdown(chartData.filterRules);
 
-        // make the chart visible
-        $("#chart-card").removeClass("hidden");
-
         // create the svg which contains the chart
         var svg = d3.select(svgContainer)
                     .append("svg")
