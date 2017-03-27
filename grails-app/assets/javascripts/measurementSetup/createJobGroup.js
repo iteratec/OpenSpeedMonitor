@@ -8,7 +8,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
     var existingJobGroupSelectBox = $("#jobGroupSelect");
     var jobGroupNameInputField = $("#inputNewJobGroupName");
     var hiddenFieldForJobGroupName = $("#jobGroupName");
-    var nextButton = $("#setJobGroubTabNextButton")
+    var nextButton = $("#setJobGroubTabNextButton");
+    var inputValid = false;
+    var jobGroupDiv = $("#setJobGroup");
 
     var init = function () {
         // set change listeners
@@ -54,7 +56,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
     }
 
     var validateInput = function () {
-        var inputValid = false;
+        inputValid = false;
         var currentInput = jobGroupNameInputField.val();
         if (!currentInput) {
             $("#jobGroupFormGroup").addClass("has-error");
@@ -71,9 +73,20 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
             $('#setJobGroupTab').removeClass("failureText");
             inputValid = true;
         }
-        OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm.setErrors('createJobGroupCard', !inputValid);
+        informListeners();
+    }
+
+    var informListeners = function () {
+        var event = new Event('changed')
+        jobGroupDiv.get(0).dispatchEvent(event);
+    }
+
+    var isValid = function () {
+        return inputValid;
     }
 
     init();
-    return {}
+    return {
+        isValid: isValid
+    }
 })();

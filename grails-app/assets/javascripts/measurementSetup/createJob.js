@@ -11,6 +11,8 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var jobNameInput = $("#inputJobName");
     var jobNameValid = true;
     var existingJobNames;
+    var inputsValid = false;
+    var jobDiv = $("#createJob");
 
     var init = function () {
         // set change listeners
@@ -90,7 +92,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         var inputsValid = cronInputValid && jobNameValid;
         $('#createJobTab').toggleClass("failureText", !inputsValid);
 
-        OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm.setErrors('createJobCard', !inputsValid);
+        informListeners();
     }
 
     var getExistingJobNames = function () {
@@ -110,6 +112,17 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         });
     }
 
+    var informListeners = function () {
+        var event = new Event('changed')
+        jobDiv.get(0).dispatchEvent(event);
+    }
+
+    var isValid = function () {
+        return inputsValid;
+    }
+
     init();
-    return {}
+    return {
+        isValid: isValid
+    }
 })();

@@ -7,11 +7,19 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
 
     var nextButton = $("#createScriptTabNextButton")
     var scriptNameInput = $("#inputScriptName");
+    var navigationScriptInput = $(".CodeMirror textarea")
+    var scriptNameFormGroup = $("#scriptNameFormGroup");
+    var navigationScriptFormGroup = $("#navigationScriptFormGroup");
     var scriptNameValid = false;
+    var inputValid = false;
+    var navigationScriptValid = false;
     var existingScriptNames;
+    var scriptNavPill = $("#createScriptTab");
+    var scriptDiv = $("#createScript");
 
     var init = function () {
         scriptNameInput.keyup(validateScriptName);
+        navigationScriptInput.keyup(validateNavigationScript);
         nextButton.click(validateScriptName);
         getExistingScriptNames();
     }
@@ -21,25 +29,40 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
 
         var currentScriptName = scriptNameInput.val();
         if (!currentScriptName) {
-            $("#scriptNameFormGroup").addClass("has-error");
+            scriptNameFormGroup.addClass("has-error");
         } else if (isExistingScriptName(currentScriptName)) {
-            $("#scriptNameFormGroup").addClass("has-error");
+            scriptNameFormGroup.addClass("has-error");
             $("#scriptNameHelpBlock").removeClass("hidden");
         } else {
             $("#scriptNameHelpBlock").addClass("hidden");
-            $("#scriptNameFormGroup").removeClass("has-error");
+            scriptNameFormGroup.removeClass("has-error");
             scriptNameValid = true;
         }
         validateInput();
     }
 
-    var validateInput = function () {
-        if (scriptNameValid) {
-            $('#createScriptTab').removeClass("failureText");
+    var validateNavigationScript = function () {
+        navigationScriptValid = false;
+
+        var errors = OpenSpeedMonitor.script.codemirrorEditor.getErrors();
+        if (!errors || errors.length == 0) {
+            navigationScriptFormGroup.removeClass("has-error")
+            navigationScriptValid = true;
         } else {
-            $('#createScriptTab').addClass("failureText");
+            navigationScriptFormGroup.addClass("has-error")
         }
-        OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm.setErrors('createScriptCard', !scriptNameValid)
+
+        validateInput();
+    }
+
+    var validateInput = function () {
+        inputValid = scriptNameValid && navigationScriptValid;
+        if (inputValid) {
+            scriptNavPill.removeClass("failureText");
+        } else {
+            scriptNavPill.addClass("failureText");
+        }
+        informListeners();
     }
 
     var isExistingScriptName = function (scriptName) {
@@ -63,6 +86,17 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
         });
     }
 
+    var informListeners = function () {
+        var event = new Event('changed')
+        scriptDiv.get(0).dispatchEvent(event);
+    }
+
+    var isValid = function () {
+        return inputValid;
+    }
+
     init();
-    return {}
+    return {
+        isValid: isValid
+    }
 })();

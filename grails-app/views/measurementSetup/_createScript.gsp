@@ -29,7 +29,7 @@
                 </p>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="navigationScriptFormGroup">
                 <label for="navigationScript" class="col-sm-2 control-label">
                     <g:message code="script.navigationScript.label" default="Code"/>
                 </label>

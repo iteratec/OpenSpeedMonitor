@@ -37,6 +37,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
     var parsedScriptUrl;
     var clipboard;
     var editor;
+    var errors;
 
 
     var init = function(data){
@@ -207,6 +208,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
                             .attr('title', '<ul><li>' + warningsForCurrentLine + '</li></ul>')
                             .css('display', 'block')[0]);
                 }
+                errors = result.errors;
                 for (var lineNumber in result.errors) {
                     $('#saveButton').prop('disabled', true);
                     $('#saveCopyButton').prop('disabled', true);
@@ -279,11 +281,15 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         markedLines = [];
     };
 
+    var getErrors = function () {
+        return errors;
+    }
 
     return {
         init:init,
         update:update,
-        setNewContent: setNewContent
+        setNewContent: setNewContent,
+        getErrors: getErrors
     };
 
 

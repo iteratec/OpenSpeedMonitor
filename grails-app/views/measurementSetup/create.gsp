@@ -173,58 +173,12 @@
                     });
                 }
 
-                function moveThroughWizard() {
-                    var progressBar = document.querySelector("#setupWizardProgressBar");
-
-                    document.querySelector("#setJobGroubTabNextButton").addEventListener("click", function () {
-                        document.querySelector("#setJobGroupTab").parentElement.classList.toggle("active");
-                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
-
-                        if (!document.querySelector("#createScriptTab").parentElement.classList.contains("wasActive"))
-                            progressBar.style.width = "37.5%";
-
-                        document.querySelector("#createScriptTab").parentElement.classList.add("wasActive");
-                    });
-                    document.querySelector("#createScriptTabNextButton").addEventListener("click", function () {
-                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
-                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
-
-                        if (!document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.contains("wasActive"))
-                            progressBar.style.width = "62.5%";
-
-                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.add("wasActive");
-                    });
-                    document.querySelector("#selectLocationAndConnectivityTabNextButton").addEventListener("click", function () {
-                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
-                        document.querySelector("#createJobTab").parentElement.classList.toggle("active");
-
-                        if (!document.querySelector("#createJobTab").parentElement.classList.contains("wasActive"))
-                            progressBar.style.width = "100%";
-
-                        document.querySelector("#createJobTab").parentElement.classList.add("wasActive");
-                    });
-
-                    document.querySelector("#createScriptTabPreviousButton").addEventListener("click", function () {
-                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
-                        document.querySelector("#setJobGroupTab").parentElement.classList.toggle("active");
-                    });
-                    document.querySelector("#selectLocationAndConnectivityTabPreviousButton").addEventListener("click", function () {
-                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
-                        document.querySelector("#createScriptTab").parentElement.classList.toggle("active");
-                    });
-                    document.querySelector("#createJobTabPreviousButton").addEventListener("click", function () {
-                        document.querySelector("#createJobTab").parentElement.classList.toggle("active");
-                        document.querySelector("#selectLocationAndConnectivityTab").parentElement.classList.toggle("active");
-                    });
-                }
-
                 createCodeMirror("navigationScript", false);
                 window.onload = function() {
                     OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
                     $(".chosen-select").chosen({ search_contains: true });
                     presetScriptName();
                     presetJobName();
-                    moveThroughWizard();
                 }
     </asset:script>
 </content>
