@@ -11,9 +11,9 @@
 
             <div class="col-sm-10">
                 <select id="inputLocation" class="form-control chosen-select" name="location" required>
-                    <g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
-                        <optgroup label="${server.label}">
-                        <g:each in="${Location.findAllByWptServerAndActive(server, true)}" var="loc">
+                    <g:each in="${wptServersWithLocations}" var="server">
+                        <optgroup label="${server.key}">
+                        <g:each in="${server.value}" var="loc">
                             <option value="${loc.id}" <g:if test="${job?.location?.id == loc.id}"> selected </g:if>>
                                 ${loc.uniqueIdentifierForServer ?: loc.location}
                             </option>
@@ -32,7 +32,7 @@
             <div class="col-sm-10">
                 <select type="text" class="form-control chosen-select" id="inputConnectivity" name="connectivity"
                         required data-default-option="DSL 6.000">
-                    <g:each in="${ConnectivityProfile.findAllByActive(true)}" var="connectivity">
+                    <g:each in="${connectivityProfiles}" var="connectivity">
                         <option value="${connectivity.name}">
                             ${connectivity.name}
                         </option>

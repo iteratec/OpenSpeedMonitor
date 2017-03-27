@@ -3,6 +3,7 @@ package de.iteratec.osm.measurement.setup
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -70,7 +71,19 @@ class MeasurementSetupController extends ExceptionHandlerController {
     }
 
     private Map createStaticViewData() {
-        return [script: new Script(params), pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: "", allJobGroups: JobGroup.list()]
+        List<WebPageTestServer> wptServers = WebPageTestServer.findAllByActive(true, [sort: "label"])
+        Map wptServersWithLocations = [:]
+        wptServers.each { server ->
+            wptServersWithLocations[server.label] = Location.findAllByWptServerAndActive(server, true, [sort: "label"])
+        }
+        return [script: new Script(params),
+                pages: Page.list(),
+                measuredEvents: MeasuredEvent.list() as JSON,
+                archivedScripts: "",
+                allJobGroups: JobGroup.list([sort: "name"]),
+                connectivityProfiles: ConnectivityProfile.findAllByActive(true,  [sort: "name"]),
+                wptServersWithLocations: wptServersWithLocations
+        ]
     }
 
     @RestAction
