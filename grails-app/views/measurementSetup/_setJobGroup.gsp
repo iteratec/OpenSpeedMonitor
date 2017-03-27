@@ -1,7 +1,7 @@
 <div class="row form-horizontal">
     <div class="col-sm-6">
         <div class="form-group" id="jobGroupFormGroup">
-            <label for="inputJobGroup" class="col-sm-2 control-label">
+            <label for="jobGroupSelect" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputJobGroupLabel" default="Job Group"/>
             </label>
 
@@ -26,9 +26,13 @@
             </div>
 
             <div class="col-sm-5">
-                <div class="input-group">
-                    <input type="text" class="form-control hidden" id="inputNewJobGroupName"  aria-describedby="jobGroupNameHelpBlock" >
-                    <span id="jobGroupNameHelpBlock" class="help-block hidden"><g:message code="de.iteratec.osm.measurement.schedule.JobGroup.name.unique" default="Already Exists"/></span>
+                <div class="form-group">
+                    <input type="text" class="form-control hidden" id="inputNewJobGroupName"
+                           aria-describedby="jobGroupNameHelpBlock"
+                           placeholder="${message(code:'de.iteratec.osm.setupMeasurementWizard.setJobGroup.newJobGroupPlaceholder', default: 'Job Group, e.g. My Awesome Application')}">
+                    <span id="jobGroupNameHelpBlock" class="help-block hidden">
+                        <g:message code="de.iteratec.osm.measurement.schedule.JobGroup.name.unique" default="Already Exists"/>
+                    </span>
                 </div>
             </div>
         </div>
