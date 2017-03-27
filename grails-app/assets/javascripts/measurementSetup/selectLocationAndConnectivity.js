@@ -19,11 +19,11 @@ OpenSpeedMonitor.MeasurementSetupWizard.SelectLocationAndConnectivity = (functio
     };
 
     var getConnectivity = function () {
-        return connectivitySelect.text();
+        return connectivitySelect.find("option:selected").text().trim();
     };
 
     var getBrowserOrLocationName = function () {
-        var location = locationSelect.text();
+        var location = locationSelect.find("option:selected").text().trim();
         var parts = location.split(":");
         return parts[parts.length - 1];
     };

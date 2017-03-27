@@ -32,7 +32,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
     }
 
     var isExistingJobGroup = function (jobGroupName) {
-        return existingJobGroupSelectBox.find("option").is(function (index, elem) {
+        return jobGroupName && existingJobGroupSelectBox.find("option").is(function (index, elem) {
             return $(elem).val() === jobGroupName;
         });
     }
@@ -55,24 +55,13 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
         validateInputs();
     }
 
-    var validateInputs = function () {
-        inputValid = false;
+    var validateInputs = function (isInitialCheck) {
         var currentInput = jobGroupNameInputField.val();
-        if (!currentInput) {
-            $("#jobGroupFormGroup").addClass("has-error");
-            $("#jobGroupNameHelpBlock").addClass("hidden");
-            $('#setJobGroupTab').addClass("failureText")
-        } else if (!jobGroupNameInputField.hasClass("hidden") && isExistingJobGroup(currentInput)) {
-            $("#jobGroupFormGroup").addClass("has-error");
-            $("#jobGroupNameHelpBlock").removeClass("hidden");
-            $('#setJobGroupTab').addClass("failureText");
-        }
-        else {
-            $("#jobGroupNameHelpBlock").addClass("hidden");
-            $("#jobGroupFormGroup").removeClass("has-error");
-            $('#setJobGroupTab').removeClass("failureText");
-            inputValid = true;
-        }
+        var isDuplicateName = isExistingJobGroup(currentInput);
+        inputValid = currentInput && !isDuplicateName;
+        $("#jobGroupFormGroup").toggleClass("has-error", !inputValid && !isInitialCheck);
+        $('#setJobGroupTab').toggleClass("failureText",  !inputValid && !isInitialCheck);
+        $("#jobGroupNameHelpBlock").toggleClass("hidden", !isDuplicateName);
         informListeners();
     }
 
@@ -96,4 +85,4 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
         validate: validateInputs
     }
 })();
-OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard.validate();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard.validate(true);

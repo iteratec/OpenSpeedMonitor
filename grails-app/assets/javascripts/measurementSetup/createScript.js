@@ -10,59 +10,41 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
     var navigationScriptInput = $(".CodeMirror textarea")
     var scriptNameFormGroup = $("#scriptNameFormGroup");
     var navigationScriptFormGroup = $("#navigationScriptFormGroup");
-    var scriptNameValid = false;
     var inputValid = false;
-    var navigationScriptValid = false;
-    var existingScriptNames;
+    var existingScriptNames = [];
     var scriptNavPill = $("#createScriptTab");
     var scriptDiv = $("#createScript");
     var defaultScriptName = "";
 
     var init = function () {
-        scriptNameInput.keyup(validateScriptName);
-        navigationScriptInput.keyup(validateNavigationScript);
-        nextButton.click(validateScriptName);
+        scriptNameInput.keyup(function() { validateInputs(); });
+        navigationScriptInput.keyup(function() { validateInputs(); });
+        nextButton.click(function() { validateInputs(); });
         getExistingScriptNames();
     }
 
-    var validateScriptName = function () {
-        scriptNameValid = false;
-
+    var validateScriptName = function (isInitialCheck) {
         var currentScriptName = scriptNameInput.val();
-        if (!currentScriptName) {
-            scriptNameFormGroup.addClass("has-error");
-        } else if (isExistingScriptName(currentScriptName)) {
-            scriptNameFormGroup.addClass("has-error");
-            $("#scriptNameHelpBlock").removeClass("hidden");
-        } else {
-            $("#scriptNameHelpBlock").addClass("hidden");
-            scriptNameFormGroup.removeClass("has-error");
-            scriptNameValid = true;
-        }
-        validateInputs();
+        var isDuplicateName = isExistingScriptName(currentScriptName);
+
+        scriptNameFormGroup.toggleClass("has-error", isDuplicateName || (!currentScriptName && !isInitialCheck));
+        $("#scriptNameHelpBlock").toggleClass("hidden", !isDuplicateName);
+
+        return currentScriptName && !isDuplicateName;
     }
 
-    var validateNavigationScript = function () {
-        navigationScriptValid = false;
-
+    var validateNavigationScript = function (isInitialCheck) {
         var errors = OpenSpeedMonitor.script.codemirrorEditor.getErrors();
-        if (!errors || errors.length === 0) {
-            navigationScriptFormGroup.removeClass("has-error")
-            navigationScriptValid = true;
-        } else {
-            navigationScriptFormGroup.addClass("has-error")
-        }
-
-        validateInputs();
+        var scriptIsEmpty = !String(OpenSpeedMonitor.script.codemirrorEditor.getContent()).trim();
+        var navigationScriptValid = (!errors || errors.length === 0) && !scriptIsEmpty;
+        navigationScriptFormGroup.toggleClass("has-error", !navigationScriptValid && !isInitialCheck);
+        return navigationScriptValid;
     }
 
-    var validateInputs = function () {
-        inputValid = scriptNameValid && navigationScriptValid;
-        if (inputValid) {
-            scriptNavPill.removeClass("failureText");
-        } else {
-            scriptNavPill.addClass("failureText");
-        }
+    var validateInputs = function (isInitialCheck) {
+        inputValid = validateScriptName(isInitialCheck) && validateNavigationScript(isInitialCheck);
+        var cardWasActive = scriptNavPill.parent().hasClass("wasActive");
+        scriptNavPill.toggleClass("failureText", !inputValid && !isInitialCheck && cardWasActive);
         informListeners();
     }
 
@@ -101,7 +83,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
         defaultScriptName = newDefault;
         if (getScriptName() === oldDefault) {
             scriptNameInput.val(defaultScriptName);
-            validateScriptName();
+            validateInputs();
         }
     }
 
@@ -117,4 +99,4 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
         validate: validateInputs
     }
 })();
-OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard.validate();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard.validate(true);
