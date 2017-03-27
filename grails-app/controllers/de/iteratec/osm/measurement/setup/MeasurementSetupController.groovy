@@ -30,6 +30,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
         ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(params.connectivity)
         Job job = new Job()
         job.properties = params.job
+        job.executionSchedule = "0 " + job.executionSchedule // prepend seconds, user shouldn't do this
         // update properties instead of using 'new Job(params.job)' to avoid overriding default values
         job.location = location
         job.connectivityProfile = connectivityProfile
