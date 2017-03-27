@@ -14,8 +14,10 @@
 <h1><g:message code="de.iteratec.osm.setupMeasurementWizard.title" default="Setup Measurement"/></h1>
 
 <p>
-    %{--JOHANNES2DO: Write description for the wizard--}%
-    Steht hier ein sinnvoller Text?
+    <g:message code="de.iteratec.osm.setupMeasurementWizard.description" default="A Wizard for creating a new Measurement"
+               encodeAs="raw" args="${[
+            link(controller: 'job', action: 'list') { message(code:'de.iteratec.isj.jobs', default:'jobs')},
+    ]}"/>
 </p>
 
 <div class="row">
