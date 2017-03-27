@@ -80,19 +80,11 @@
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                     <g:message code="default.info.title" default="Information"/>
                 </div>
+
                 <div class="panel-body">
-                    %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
-                    <p>The script defines the steps of your measurement.</p>
-                    <p>
-                        For a full list of available commands see the Documentation of the
-                        <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting" target="_blank">
-                            <g:message code="de.iteratec.osm.measurement.script.wpt-dsl.link.text"
-                                       default="WebPagetest DSL"/>
-                        </a>.
-                    </p>
-                    <p>
-                        Below you can see a simple example script with two steps (click to enlarge):
-                    </p>
+                    <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createScript.description" encodeAs="raw" args="[
+                            link(url: 'https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting', target: '_blank') { message(code:'de.iteratec.osm.measurement.script.wpt-dsl.link.text', default:'Wpt Doc')}
+                    ]" /></p>
                     <img class="infoImage" id="exampleScriptImg"
                          src="${resource(dir: 'images', file: 'exampleScript.png')}"
                          alt="Example Script"/>

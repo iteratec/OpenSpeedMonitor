@@ -49,10 +49,7 @@
             </div>
 
             <div class="panel-body">
-                %{--JOHANNES2DO: Write help/description text for script creation in wizard--}%
-                <p>
-                    Choosing a combination of location and browser as well as setting a constant connectivity ensures that the measurements will be comparable.
-                </p>
+                <p><g:message code="de.iteratec.osm.setupMeasurementWizard.locationAndConnectivity.description" /></p>
             </div>
         </div>
     </div>

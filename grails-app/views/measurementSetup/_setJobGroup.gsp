@@ -46,10 +46,7 @@
             </div>
 
             <div class="panel-body">
-                %{--JOHANNES2DO: Define help text Job Group Creation--}%
-                <p>You will find the results of your measurement under the here created Job Group.</p>
-
-                <p>The job group can be selected in the result views via a select box you can see below:</p>
+                <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createJobGroup.description" /></p>
                 <img class="infoImage thumbnail" id="jobGroupSelectionImg"
                      src="${resource(dir: 'images', file: 'jobGroupSelection.png')}"
                      alt="Job Group Selection"/>

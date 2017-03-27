@@ -61,10 +61,9 @@
             </div>
 
             <div class="panel-body">
-                %{--JOHANNES2DO: Write help text for Job tab in wizard--}%
-                <p>
-                    With the execution plan you can define when and how often your job will be started.
-                </p>
+                <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createJob.description" encodeAs="raw" args="[
+                        link(url: 'http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html', target: '_blank') { message(code:'job.cronInstructions.moreInformation', default:'Quartz Doku')}
+                ]"/></p>
             </div>
         </div>
     </div>
