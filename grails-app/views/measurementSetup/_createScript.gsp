@@ -106,7 +106,7 @@
                 <g:message code="default.paginate.prev" default="Previous"/>
             </a>
             <a data-toggle="tab" href="#selectLocationAndConnectivity"
-               class="btn btn-primary" id="createScriptTabNextButton">
+               class="btn btn-primary disabled" id="createScriptTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>

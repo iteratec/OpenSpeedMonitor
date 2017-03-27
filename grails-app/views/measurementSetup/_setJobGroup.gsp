@@ -62,7 +62,7 @@
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
             </a>
-            <a data-toggle="tab" href="#createScript" class="btn btn-primary" id="setJobGroubTabNextButton">
+            <a data-toggle="tab" href="#createScript" class="btn btn-primary disabled" id="setJobGroubTabNextButton">
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>
