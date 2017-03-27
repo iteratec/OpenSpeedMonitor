@@ -206,9 +206,6 @@ class ResultSelectionController extends ExceptionHandlerController {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
-                connectivityProfile {
-                    eq('active', true)
-                }
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
                 }
