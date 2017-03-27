@@ -16,6 +16,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
     var existingScriptNames;
     var scriptNavPill = $("#createScriptTab");
     var scriptDiv = $("#createScript");
+    var defaultScriptName = "";
 
     var init = function () {
         scriptNameInput.keyup(validateScriptName);
@@ -38,7 +39,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
             scriptNameFormGroup.removeClass("has-error");
             scriptNameValid = true;
         }
-        validateInput();
+        validateInputs();
     }
 
     var validateNavigationScript = function () {
@@ -52,10 +53,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
             navigationScriptFormGroup.addClass("has-error")
         }
 
-        validateInput();
+        validateInputs();
     }
 
-    var validateInput = function () {
+    var validateInputs = function () {
         inputValid = scriptNameValid && navigationScriptValid;
         if (inputValid) {
             scriptNavPill.removeClass("failureText");
@@ -95,8 +96,25 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
         return inputValid;
     }
 
+    var setDefaultScriptName = function (newDefault) {
+        var oldDefault = defaultScriptName;
+        defaultScriptName = newDefault;
+        if (getScriptName() === oldDefault) {
+            scriptNameInput.val(defaultScriptName);
+            validateScriptName();
+        }
+    }
+
+    var getScriptName = function () {
+        return scriptNameInput.val();
+    }
+
     init();
     return {
-        isValid: isValid
+        isValid: isValid,
+        setDefaultScriptName: setDefaultScriptName,
+        getScriptName: getScriptName,
+        validate: validateInputs
     }
 })();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard.validate();

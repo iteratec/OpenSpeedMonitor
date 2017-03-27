@@ -15,6 +15,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
     var jobDiv = $("#createJob");
     var setJobGroubTabNextButton = $("#setJobGroubTabNextButton");
     var createScriptTabNextButton = $("#createScriptTabNextButton");
+    var locationAndConnectivityDiv = $("#selectLocationAndConnectivity");
 
     var init = function () {
         initTabEventListeners();
@@ -22,18 +23,41 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
     }
 
     var initTabEventListeners = function () {
-        jobGroupDiv.get(0).addEventListener('changed', function () {
-            setJobGroupCardValid = OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard.isValid();
+        jobGroupDiv.on('changed', function () {
+            var jobGroupCard = OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard;
+            setJobGroupCardValid = jobGroupCard.isValid();
+            var scriptCard = OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard;
+            if (scriptCard) {
+                scriptCard.setDefaultScriptName(jobGroupCard.getJobGroup());
+            }
             validateForm();
         })
-        scriptDiv.get(0).addEventListener('changed', function () {
+        scriptDiv.on('changed', function () {
             scriptCardIsValid = OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard.isValid();
             validateForm();
+            setDefaultJobName();
         });
-        jobDiv.get(0).addEventListener('changed', function () {
+        locationAndConnectivityDiv.on("changed", function() {
+            setDefaultJobName();
+        })
+        jobDiv.on('changed', function () {
             createJobCardValid = OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.isValid();
             validateForm();
         })
+    }
+
+    var setDefaultJobName = function () {
+        if (!OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard) {
+            return;
+        }
+        var scriptCard = OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard;
+        var scriptName = scriptCard ? scriptCard.getScriptName() : "";
+
+        var locationConnectivityCard = OpenSpeedMonitor.MeasurementSetupWizard.SelectLocationAndConnectivity;
+        var browser = locationConnectivityCard ? locationConnectivityCard.getBrowserOrLocationName() : "";
+
+        var defaultJobName = (scriptName + " " + browser).trim();
+        OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.setDefaultJobName(defaultJobName);
     }
 
     var initTabNavigation = function () {
@@ -93,3 +117,4 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
 
     return {}
 })();
+

@@ -13,6 +13,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var existingJobNames;
     var inputsValid = false;
     var jobDiv = $("#createJob");
+    var defaultJobName = "";
 
     var init = function () {
         // set change listeners
@@ -35,7 +36,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         } else {
             // set default value.
             predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
-            updateCronStringFromPredefined();
+            updateCronStringFromPredefined(true);
         }
 
         getExistingJobNames();
@@ -47,13 +48,15 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         });
     }
 
-    var updateCronStringFromPredefined = function () {
+    var updateCronStringFromPredefined = function (preventValidation) {
         var selectedValue = predefinedCronSelectBox.val();
         cronStringInputField.prop("readonly", !!selectedValue);
         if (!!selectedValue) {
             cronStringInputField.val(selectedValue);
         }
-        validateCronInput()
+        if (!preventValidation) {
+            validateCronInput();
+        }
     }
 
     var validateCronInput = function () {
@@ -121,8 +124,20 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         return inputsValid;
     }
 
+    var setDefaultJobName = function (newDefault) {
+        var oldDefault = defaultJobName;
+        defaultJobName = newDefault;
+        if (jobNameInput.val() === oldDefault) {
+            jobNameInput.val(defaultJobName);
+            validateJobNameInput();
+        }
+    }
+
     init();
     return {
-        isValid: isValid
+        isValid: isValid,
+        setDefaultJobName: setDefaultJobName,
+        validate: validateInputs
     }
 })();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.validate();

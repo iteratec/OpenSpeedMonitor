@@ -16,7 +16,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
         // set change listeners
         existingJobGroupSelectBox.change(updateJobGroupNameFromExisting);
         jobGroupNameInputField.keyup(updateHiddenField);
-        nextButton.click(validateInput);
+        nextButton.click(validateInputs);
 
         // init value
         var initValue = hiddenFieldForJobGroupName.val();
@@ -52,10 +52,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
 
     var updateHiddenField = function () {
         hiddenFieldForJobGroupName.val(jobGroupNameInputField.val());
-        validateInput();
+        validateInputs();
     }
 
-    var validateInput = function () {
+    var validateInputs = function () {
         inputValid = false;
         var currentInput = jobGroupNameInputField.val();
         if (!currentInput) {
@@ -85,8 +85,15 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
         return inputValid;
     }
 
+    var getJobGroup = function () {
+        return jobGroupNameInputField.val();
+    }
+
     init();
     return {
-        isValid: isValid
+        isValid: isValid,
+        getJobGroup: getJobGroup,
+        validate: validateInputs
     }
 })();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard.validate();

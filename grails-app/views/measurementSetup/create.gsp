@@ -107,6 +107,7 @@
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createJobGroup.js"/>')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createScript.js"/>')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createJob.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/selectLocationAndConnectivity.js"/>')
         });
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/create.js"/>', true, 'measurementSetupWizard')
 
@@ -129,56 +130,10 @@
                     readonly: readonly
                     });
                 }
-                function promptForDuplicateName() {
-
-                    var newName = prompt(
-                            OpenSpeedMonitor.i18n.duplicatePrompt,
-                            $('input#label').val() + OpenSpeedMonitor.i18n.duplicateSuffix
-                    );
-                    if (newName != null && newName != '') {
-                        $('input#label').val(newName);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-                function presetScriptName() {
-                    var jobGroubTabNextButton = document.querySelector("#setJobGroubTabNextButton");
-                    var inputScriptName = document.querySelector("#inputScriptName");
-
-                    jobGroubTabNextButton.addEventListener("click", function () {
-                        // if the user changed the script name, don't set the value
-                        if (inputScriptName.value == "")
-                            inputScriptName.value = document.querySelector("#jobGroupName").value;
-                    });
-                }
-
-                function presetJobName() {
-                    var jobGroubTabNextButton = document.querySelector("#selectLocationAndConnectivityTabNextButton");
-                    var inputJobName = document.querySelector("#inputJobName");
-
-                    jobGroubTabNextButton.addEventListener("click", function () {
-                        // if the user changed the script name, don't set the value
-                        if (inputJobName.value == "") {
-                            var jobGroup = document.querySelector("#jobGroupName").value;
-
-                            var locationOptions = document.querySelector("#inputLocation").options;
-                            var selectedLocationIndex = locationOptions.selectedIndex;
-                            var location = locationOptions[selectedLocationIndex].text;
-
-                            var connectivity = document.querySelector("#inputConnectivity").value;
-
-                            inputJobName.value = jobGroup + "_" + location + "_" + connectivity;
-                        }
-                    });
-                }
-
                 createCodeMirror("navigationScript", false);
                 window.onload = function() {
                     OpenSpeedMonitor.script.versionControl.initVersionControl(${archivedScripts*.id},'${createLink(controller: 'script', action: 'getArchivedNavigationScript', absolute: true)}','${createLink(controller: 'script', action: 'updateVersionDescriptionUrl', absolute: true)}');
                     $(".chosen-select").chosen({ search_contains: true });
-                    presetScriptName();
-                    presetJobName();
                 }
     </asset:script>
 </content>
