@@ -12,8 +12,7 @@
         </div>
 
         <div class="form-group" id="executionScheduleFormGroup">
-            <g:hiddenField id="executionSchedule" name="job.executionSchedule" value="${job?.executionSchedule}"/>
-            <label for="inputCronString" class="col-sm-2 control-label">
+            <label for="executionSchedule" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputCronStringLabel" default="Execution Plan"/>
             </label>
 
@@ -25,19 +24,19 @@
                         </option>
                     </optgroup>
                     <optgroup label="${message(code: 'de.iteratec.osm.result.predefined.linktext', default: 'Predefined')}">
-                        <option value="0 0 0/1 1/1 * ? *">
+                        <option value="0 * * * ? *" selected>
                             <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly"
                                        default="Every hour"/>
                         </option>
-                        <option value="0 0/30 * 1/1 * ? *">
+                        <option value="0/30 * * * ? *">
                             <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly"
                                        default="Every half an hour"/>
                         </option>
-                        <option value="0 0/15 * 1/1 * ? *">
+                        <option value="0/15 * * * ? *">
                             <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.15min"
                                        default="Every 15 minutes"/>
                         </option>
-                        <option value="0 0 15 1/1 * ? *">
+                        <option value="0 15 * * ? *">
                             <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.daily"
                                        default="Daily at 3pm"/>
                         </option>
@@ -46,9 +45,7 @@
             </div>
 
             <div class="col-sm-5">
-                <div class="input-group">
-                    <input type="text" class="form-control hidden" id="inputCronString">
-                </div>
+                <input type="text" class="form-control" id="executionSchedule" name="job.executionSchedule" value="${job?.executionSchedule}">
             </div>
         </div>
     </div>

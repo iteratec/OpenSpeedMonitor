@@ -6,8 +6,7 @@ OpenSpeedMonitor.MeasurementSetupWizard = OpenSpeedMonitor.MeasurementSetupWizar
 OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
 
     var predefinedCronSelectBox = $("#selectExecutionSchedule");
-    var cronStringInputField = $("#inputCronString");
-    var hiddenFieldForCronString = $("#executionSchedule");
+    var cronStringInputField = $("#executionSchedule");
     var cronInputValid = true;
     var jobNameInput = $("#inputJobName");
     var jobNameValid = true;
@@ -16,12 +15,12 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var init = function () {
         // set change listeners
         predefinedCronSelectBox.change(updateCronStringFromPredefined);
-        cronStringInputField.keyup(updateHiddenField);
+        cronStringInputField.keyup(validateCronInput);
         jobNameInput.change(validateJobNameInput);
         jobNameInput.keyup(validateJobNameInput);
 
         // init value
-        var initValue = hiddenFieldForCronString.val()
+        var initValue = cronStringInputField.val()
         if (initValue) {
             // check if init value is a predefined cron string
             if (isPredefinedCronString(initValue)) {
@@ -48,32 +47,16 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
 
     var updateCronStringFromPredefined = function () {
         var selectedValue = predefinedCronSelectBox.val();
-        if (selectedValue) {
-            cronStringInputField.val(selectedValue)
-            cronStringInputField.addClass("hidden")
-        } else {
-            // custom cron string
-            cronStringInputField.removeClass("hidden")
+        cronStringInputField.prop("readonly", !!selectedValue);
+        if (!!selectedValue) {
+            cronStringInputField.val(selectedValue);
         }
-        updateHiddenField()
-    }
-
-    var updateHiddenField = function () {
-        hiddenFieldForCronString.val(cronStringInputField.val())
         validateCronInput()
     }
 
     var validateCronInput = function () {
-        cronInputValid = false;
-
-        var currentCronInput = hiddenFieldForCronString.val();
-        if (!isValidCronInput(currentCronInput)) {
-            $("#executionScheduleFormGroup").addClass("has-error");
-        } else {
-            $("#executionScheduleFormGroup").removeClass("has-error");
-            cronInputValid = true;
-        }
-
+        cronInputValid = isValidCronInput(cronStringInputField.val());
+        $("#executionScheduleFormGroup").toggleClass("has-error", !cronInputValid);
         validateInputs();
     }
 
@@ -105,12 +88,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
 
     var validateInputs = function () {
         var inputsValid = cronInputValid && jobNameValid;
-
-        if (!inputsValid) {
-            $('#createJobTab').addClass("failureText")
-        } else {
-            $('#createJobTab').removeClass("failureText")
-        }
+        $('#createJobTab').toggleClass("failureText", !inputsValid);
 
         OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm.setErrors('createJobCard', !inputsValid);
     }
