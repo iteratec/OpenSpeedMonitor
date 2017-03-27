@@ -12,7 +12,7 @@
 </p>
 <g:if test="${autoload}">
 	<p id="usedVariables" 
-		data-instructions="${HtmlUtils.htmlEscape(message(code: 'script.placeholdersInstructions.label'))}"
+		data-instructions="${message(code: 'script.placeholdersInstructions.label')}"
 		data-usedvars="${HtmlUtils.htmlEscape(message(code: 'codemirror.usedVariables.label'))}">
     </p>
 </g:if>	
