@@ -45,7 +45,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
         navigationScriptValid = false;
 
         var errors = OpenSpeedMonitor.script.codemirrorEditor.getErrors();
-        if (!errors || errors.length == 0) {
+        if (!errors || errors.length === 0) {
             navigationScriptFormGroup.removeClass("has-error")
             navigationScriptValid = true;
         } else {

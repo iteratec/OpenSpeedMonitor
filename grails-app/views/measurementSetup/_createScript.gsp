@@ -100,16 +100,16 @@
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
             </a>
-            <a data-toggle="tab" href="#setJobGroup"
+            <button data-toggle="tab" href="#setJobGroup"
                class="btn btn-default" id="createScriptTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
-            </a>
-            <a data-toggle="tab" href="#selectLocationAndConnectivity"
-               class="btn btn-primary disabled" id="createScriptTabNextButton">
+            </button>
+            <button data-toggle="tab" href="#selectLocationAndConnectivity"
+               class="btn btn-primary" id="createScriptTabNextButton" disabled>
                 <g:message code="default.paginate.next" default="Next"/>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
-            </a>
+            </button>
         </div>
     </div>
 </div>

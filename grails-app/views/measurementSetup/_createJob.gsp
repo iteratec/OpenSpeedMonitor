@@ -73,12 +73,12 @@
                 <i class="fa fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
             </a>
-            <a data-toggle="tab" href="#selectLocationAndConnectivity"
+            <button data-toggle="tab" href="#selectLocationAndConnectivity"
                class="btn btn-default" id="createJobTabPreviousButton">
                 <i class="fa fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
-            </a>
-            <button type="submit" name="_action_save" class="btn btn-primary disabled" id="createJobTabCreationButton">
+            </button>
+            <button type="submit" name="_action_save" class="btn btn-primary" id="createJobTabCreationButton" disabled>
                 <i class='fa fa-plus' aria-hidden='true'></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement"
                            default="Create Job and Start Measurement"/>

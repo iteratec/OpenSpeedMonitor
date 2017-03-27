@@ -89,7 +89,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     }
 
     var validateInputs = function () {
-        var inputsValid = cronInputValid && jobNameValid;
+        inputsValid = cronInputValid && jobNameValid;
         $('#createJobTab').toggleClass("failureText", !inputsValid);
 
         informListeners();
