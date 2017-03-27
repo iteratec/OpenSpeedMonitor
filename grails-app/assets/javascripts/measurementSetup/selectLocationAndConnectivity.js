@@ -7,10 +7,21 @@ OpenSpeedMonitor.MeasurementSetupWizard.SelectLocationAndConnectivity = (functio
     var selectLocationAndConnectivityTab = $("#selectLocationAndConnectivity");
     var locationSelect = $("#inputLocation");
     var connectivitySelect = $("#inputConnectivity");
+    var connectivityDefaultOption = connectivitySelect.data("default-option");
 
     var init = function () {
         locationSelect.on("change", triggerChanged);
         connectivitySelect.on("change", triggerChanged);
+        if (connectivityDefaultOption) {
+            var defaultValue = connectivitySelect.find("option").filter(function () {
+                return $(this).text().trim() === connectivityDefaultOption;
+            }).val();
+            if (defaultValue) {
+                connectivitySelect.val(defaultValue);
+                connectivitySelect.trigger("chosen:updated")
+            }
+        }
+
     };
 
     var triggerChanged = function () {

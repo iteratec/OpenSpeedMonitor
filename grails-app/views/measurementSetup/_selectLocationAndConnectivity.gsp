@@ -30,7 +30,8 @@
             </label>
 
             <div class="col-sm-10">
-                <select type="text" class="form-control chosen-select" id="inputConnectivity" name="connectivity" required>
+                <select type="text" class="form-control chosen-select" id="inputConnectivity" name="connectivity"
+                        required data-default-option="DSL 6.000">
                     <g:each in="${ConnectivityProfile.findAllByActive(true)}" var="connectivity">
                         <option value="${connectivity.name}">
                             ${connectivity.name}
