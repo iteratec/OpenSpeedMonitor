@@ -294,7 +294,6 @@ grails:
                             {pattern: '/csiDashboard/storeCustomDashboard',             access: ["permitAll"]},
                             {pattern: '/csiDashboard/validateDashboardName',            access: ["permitAll"]},
                             {pattern: '/csiDashboard/validateAndSaveDashboardValues',   access: ["permitAll"]},
-                            {pattern: '/i18n/getAllMessages',                           access: ["permitAll"]},
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
                             {pattern: '/securityInfo/mappings',                         access: ["denyAll"]},
