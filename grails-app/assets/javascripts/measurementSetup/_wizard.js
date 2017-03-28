@@ -69,6 +69,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
                 progressBar.css("width", "37.5%");
 
             $("#createScriptTab").parent().addClass("wasActive");
+            setTimeout(function() {
+                OpenSpeedMonitor.script.codemirrorEditor.refresh()
+            }, 1); // so codemirror is properly initialized after the browser has layouted the page
         });
         createScriptTabNextButton.click(function () {
             $("#createScriptTab").parent().toggleClass("active");

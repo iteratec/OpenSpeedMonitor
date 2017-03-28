@@ -289,12 +289,17 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         return editor.getDoc().getValue();
     }
 
+    var refresh = function () {
+        editor.refresh();
+    }
+
     return {
         init:init,
         update:update,
         setNewContent: setNewContent,
         getErrors: getErrors,
-        getContent: getContent
+        getContent: getContent,
+        refresh: refresh
     };
 
 

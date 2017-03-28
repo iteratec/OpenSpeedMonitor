@@ -36,7 +36,11 @@
 
                 <div class="col-sm-10">
                     <div class="fieldcontain ${hasErrors(bean: script, field: 'navigationScript', 'error')}">
-                        <textarea id="navigationScript" name="script.navigationScript" class="form-control" style="display: none;">${script?.navigationScript}</textarea>
+                        <textarea id="navigationScript" name="script.navigationScript" class="form-control hidden"
+                                  data-default-script="${defaultScript}">${script?.navigationScript}</textarea>
+                        <span class="help-block" id="navigationScriptHelpBlock">
+                            <g:message code="script.navigationScript.emptyOrDefaultError" default="You need to specify your own, custom script." />
+                        </span>
                         <span id="setEventName-warning-clone" class="setEventName-warning-icon" style="display: none;"
                               rel="tooltip" data-html="true"></span>
                     </div>
@@ -57,19 +61,6 @@
                    data-instructions="${message(code: 'script.placeholdersInstructions.label')}"
                    data-usedvars="${HtmlUtils.htmlEscape(message(code: 'codemirror.usedVariables.label'))}">
                 </p>
-
-                <div id="newPageOrMeasuredEventInfo" class="alert alert-info" style="display:none;">
-                    <div id="newPagesContainer" style="display:none;">
-                        ${message(code: 'script.newPage.info')}
-                        <div id="newPages"></div>
-                        <hr class="style-one">
-                    </div>
-
-                    <div id="newMeasuredEventsContainer" style="display:none;">
-                        ${message(code: 'script.newMeasuredEvent.info')}
-                        <div id="newMeasuredEvents"></div>
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -88,6 +79,19 @@
                     <img class="infoImage" id="exampleScriptImg"
                          src="${resource(dir: 'images', file: 'exampleScript.png')}"
                          alt="Example Script"/>
+
+                    <div id="newPageOrMeasuredEventInfo" class="alert alert-info" style="display:none;">
+                        <div id="newPagesContainer" style="display:none;">
+                            ${message(code: 'script.newPage.info')}
+                            <div id="newPages"></div>
+                            <hr class="style-one">
+                        </div>
+
+                        <div id="newMeasuredEventsContainer" style="display:none;">
+                            ${message(code: 'script.newMeasuredEvent.info')}
+                            <div id="newMeasuredEvents"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

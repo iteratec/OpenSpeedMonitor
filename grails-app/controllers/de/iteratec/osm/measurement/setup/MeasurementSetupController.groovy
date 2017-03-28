@@ -77,13 +77,16 @@ class MeasurementSetupController extends ExceptionHandlerController {
         wptServers.each { server ->
             wptServersWithLocations[server.label] = Location.findAllByWptServerAndActive(server, true, [sort: "label"])
         }
+        String defaultScript = "setEventName\tHomepage:::Homepage\n" +
+                               "navigate\thttp://my-awesome-application.com"
         return [script: new Script(params),
                 pages: Page.list(),
                 measuredEvents: MeasuredEvent.list() as JSON,
                 archivedScripts: "",
                 allJobGroups: JobGroup.list([sort: "name"]),
                 connectivityProfiles: ConnectivityProfile.findAllByActive(true,  [sort: "name"]),
-                wptServersWithLocations: wptServersWithLocations
+                wptServersWithLocations: wptServersWithLocations,
+                defaultScript: defaultScript
         ]
     }
 
