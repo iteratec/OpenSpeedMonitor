@@ -15,7 +15,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var defaultJobName = "";
     var jobNameHelpBlock = $("#jobNameHelpBlock");
     var executionScheduleFormGroup = $("#executionScheduleFormGroup");
-    var cronInputHelpBlock = $("#cronInputHelpBlock")
+    var cronInputHelpBlock = $("#cronInputHelpBlock");
+    var createJobNavPill = $('#createJobTab');
+
 
     var init = function () {
         // set change listeners
@@ -73,10 +75,11 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         return existingJobNames.indexOf(jobName) >= 0;
     }
 
-    var validateInputs = function (isInitialCheck) {
+    var validateInputs = function () {
         inputsValid = cronInputValid && validateJobNameInput();
+        var cardWasActive = createJobNavPill.parent().hasClass("wasActive");
 
-        $('#createJobTab').toggleClass("failureText", !inputsValid && !isInitialCheck);
+        createJobNavPill.toggleClass("failureText", !inputsValid && cardWasActive);
 
         informListeners();
     }
@@ -138,7 +141,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         defaultJobName = newDefault;
         if (jobNameInput.val() === oldDefault) {
             jobNameInput.val(defaultJobName);
-            validateJobNameInput();
+            validateInputs();
         }
     }
 
@@ -146,7 +149,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     return {
         isValid: isValid,
         setDefaultJobName: setDefaultJobName,
-        validate: validateInputs
+        validateCronExpression: validateCronExpression
     }
 })();
-OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.validate(true);
+OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.validateCronExpression();
