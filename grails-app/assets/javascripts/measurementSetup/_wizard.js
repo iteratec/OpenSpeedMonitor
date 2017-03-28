@@ -13,7 +13,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
     var scriptDiv = $("#createScript");
     var jobGroupDiv = $("#setJobGroup");
     var jobDiv = $("#createJob");
-    var setJobGroubTabNextButton = $("#setJobGroubTabNextButton");
+    var setJobGroupTabNextButton = $("#setJobGroubTabNextButton");
     var createScriptTabNextButton = $("#createScriptTabNextButton");
     var locationAndConnectivityDiv = $("#selectLocationAndConnectivity");
 
@@ -61,7 +61,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
     }
 
     var initTabNavigation = function () {
-        setJobGroubTabNextButton.click(function () {
+        setJobGroupTabNextButton.click(function () {
             $("#setJobGroupTab").parent().toggleClass("active");
             $("#createScriptTab").parent().toggleClass("active");
 
@@ -108,7 +108,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
     }
 
     var validateForm = function () {
-        setJobGroubTabNextButton.prop('disabled', !setJobGroupCardValid);
+        setJobGroupTabNextButton.prop('disabled', !setJobGroupCardValid);
         createScriptTabNextButton.prop('disabled', !scriptCardIsValid);
         formSubmissonButton.prop('disabled', !allCardsValid());
     }
