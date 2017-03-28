@@ -88,7 +88,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
             dataType: "text",
             type: 'GET',
             success: function (data) {
-                processCronExpressionValidation(true, data);
+                processCronExpressionValidation(true, prettyCron.toString(cronStringInputField.val()));
             },
             error: function (e, status) {
                 if (status === "error") {

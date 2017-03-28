@@ -101,7 +101,6 @@
 <content tag="include.bottom">
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
     <asset:javascript src="prettycron/prettycronManifest.js"/>
-    <asset:javascript src="script/versionControl.js"/>
     <asset:script type="text/javascript">
         $(window).on("measurementSetupWizardLoaded", function () {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createJobGroup.js"/>')
