@@ -3,7 +3,7 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.MeasurementSetupWizard = OpenSpeedMonitor.MeasurementSetupWizard || {};
 
-OpenSpeedMonitor.MeasurementSetupWizard.CreateMeasurementForm = (function () {
+OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
 
     var formSubmissonButton = $("#createJobTabCreationButton");
     var setJobGroupCardValid = false;

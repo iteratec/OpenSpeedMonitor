@@ -102,13 +102,7 @@
     <asset:javascript src="codemirror/codemirrorManifest.js"/>
     <asset:javascript src="prettycron/prettycronManifest.js"/>
     <asset:script type="text/javascript">
-        $(window).on("measurementSetupWizardLoaded", function () {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createJobGroup.js"/>')
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createScript.js"/>')
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/createJob.js"/>')
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/selectLocationAndConnectivity.js"/>')
-        });
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/create.js"/>', true, 'measurementSetupWizard')
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/measurementSetup/measurementSetupWizard.js"/>');
 
         function createCodeMirror(idCodemirrorElement, readonly){
             OpenSpeedMonitor.script.codemirrorEditor.init({
