@@ -25,7 +25,7 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'org.grails.plugins:database-migration:2.0.0.RC4'
+        classpath 'org.grails.plugins:database-migration:2.0.0'
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.2"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
         classpath "org.grails.plugins:hibernate4:5.0.4"
