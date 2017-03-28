@@ -9,18 +9,20 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var cronStringInputField = $("#executionSchedule");
     var cronInputValid = true;
     var jobNameInput = $("#inputJobName");
-    var jobNameValid = true;
-    var existingJobNames;
+    var existingJobNames = [];
     var inputsValid = false;
     var jobDiv = $("#createJob");
     var defaultJobName = "";
+    var jobNameHelpBlock = $("#jobNameHelpBlock");
+    var executionScheduleFormGroup = $("#executionScheduleFormGroup");
+    var cronInputHelpBlock = $("#cronInputHelpBlock")
 
     var init = function () {
         // set change listeners
         predefinedCronSelectBox.change(updateCronStringFromPredefined);
-        cronStringInputField.keyup(validateCronInput);
-        jobNameInput.change(validateJobNameInput);
-        jobNameInput.keyup(validateJobNameInput);
+        cronStringInputField.keyup(validateCronExpression);
+        jobNameInput.change(function() { validateInputs(); });
+        jobNameInput.keyup(function() { validateInputs(); });
 
         // init value
         var initValue = cronStringInputField.val()
@@ -36,7 +38,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         } else {
             // set default value.
             predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
-            updateCronStringFromPredefined(true);
+            updateCronStringFromPredefined();
         }
 
         getExistingJobNames();
@@ -48,54 +50,61 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         });
     }
 
-    var updateCronStringFromPredefined = function (preventValidation) {
+    var updateCronStringFromPredefined = function () {
         var selectedValue = predefinedCronSelectBox.val();
         cronStringInputField.prop("readonly", !!selectedValue);
         if (!!selectedValue) {
             cronStringInputField.val(selectedValue);
         }
-        if (!preventValidation) {
-            validateCronInput();
-        }
-    }
-
-    var validateCronInput = function () {
-        cronInputValid = isValidCronInput(cronStringInputField.val());
-        $("#executionScheduleFormGroup").toggleClass("has-error", !cronInputValid);
-        validateInputs();
+        validateCronExpression();
     }
 
     var validateJobNameInput = function () {
-        jobNameValid = false;
-
         var currentJobName = jobNameInput.val();
-        if (!currentJobName) {
-            $("#jobNameFormGroup").addClass("has-error");
-        } else if (isExistingJobName(currentJobName)) {
-            $("#jobNameFormGroup").addClass("has-error");
-            $("#jobNameHelpBlock").removeClass("hidden");
-        } else {
-            $("#jobNameHelpBlock").addClass("hidden");
-            $("#jobNameFormGroup").removeClass("has-error");
-            jobNameValid = true;
-        }
+        var isDuplicateName = isExistingJobName(currentJobName);
 
-        validateInputs();
+        $("#jobNameFormGroup").toggleClass("has-error", !currentJobName);
+        jobNameHelpBlock.toggleClass("hidden", !isDuplicateName);
+
+        return currentJobName && !isDuplicateName;
     }
 
     var isExistingJobName = function (jobName) {
         return existingJobNames.indexOf(jobName) >= 0;
     }
 
-    var isValidCronInput = function (cronString) {
-        return !!cronString;
-    }
+    var validateInputs = function (isInitialCheck) {
+        inputsValid = cronInputValid && validateJobNameInput();
 
-    var validateInputs = function () {
-        inputsValid = cronInputValid && jobNameValid;
-        $('#createJobTab').toggleClass("failureText", !inputsValid);
+        $('#createJobTab').toggleClass("failureText", !inputsValid && !isInitialCheck);
 
         informListeners();
+    }
+
+    var validateCronExpression = function () {
+        $.ajax({
+            url: OpenSpeedMonitor.urls.cronExpressionNextExecution,
+            data: { cronExpression: cronStringInputField.val()},
+            dataType: "text",
+            type: 'GET',
+            success: function (data) {
+                processCronExpressionValidation(true, data);
+            },
+            error: function (e, status) {
+                if (status === "error") {
+                    processCronExpressionValidation(false, e.responseText);
+                } else {
+                    console.error(e);
+                }
+            }
+        });
+    }
+
+    var processCronExpressionValidation = function (isValid, helpText) {
+        cronInputValid = isValid;
+        executionScheduleFormGroup.toggleClass("has-error", !isValid);
+        cronInputHelpBlock.text(helpText);
+        validateInputs();
     }
 
     var getExistingJobNames = function () {
@@ -140,4 +149,4 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         validate: validateInputs
     }
 })();
-OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.validate();
+OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard.validate(true);

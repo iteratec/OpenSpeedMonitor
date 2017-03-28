@@ -44,8 +44,9 @@
                 </select>
             </div>
 
-            <div class="col-sm-5">
+            <div class="col-sm-5 form-group">
                 <input type="text" class="form-control" id="executionSchedule" name="job.executionSchedule" value="${job?.executionSchedule}">
+                <span id="cronInputHelpBlock" class="help-block"></span>
             </div>
         </div>
     </div>

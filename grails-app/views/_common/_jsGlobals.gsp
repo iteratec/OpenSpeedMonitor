@@ -52,7 +52,8 @@
         pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}",
         pageComparisonGetPages: "${createLink(controller: 'resultSelection', action: 'getPages')}",
         getScriptNames: "${createLink(controller: 'measurementSetup', action: 'getScriptNames')}",
-        getJobNames: "${createLink(controller: 'measurementSetup', action: 'getJobNames')}"
+        getJobNames: "${createLink(controller: 'measurementSetup', action: 'getJobNames')}",
+        cronExpressionNextExecution: "${createLink(controller: 'cronExpression', action: 'nextExecutionTime')}"
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
         docCompleteTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteTimeInMillisecs')}',
