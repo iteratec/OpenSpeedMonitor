@@ -61,6 +61,7 @@
                 <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createJob.description" encodeAs="raw" args="[
                         link(url: 'http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html', target: '_blank') { message(code:'job.cronInstructions.moreInformation', default:'Quartz Doku')}
                 ]"/></p>
+                <g:render template="/job/cronInstructions"></g:render>
             </div>
         </div>
     </div>
