@@ -64,7 +64,7 @@ class OsmConfiguration {
     /** Method of transformation from measured load time to percent of users which are satisfied by that load time used in the application. */
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
     /** Time in days internal monitoring data like location queues is stored. */
-    Integer internalMonitoringStorageTimeInDays
+    Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
