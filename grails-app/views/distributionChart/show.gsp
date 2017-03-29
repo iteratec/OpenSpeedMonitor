@@ -10,15 +10,7 @@
 </head>
 
 <body>
-<h1>
-    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
-    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
-    <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
-        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
-    </g:if>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'distribution']"/>
 
 <p>
     <g:message code="de.iteratec.osm.distributionChart.description.short"
@@ -81,9 +73,13 @@
                                       'pages'                : pages,
                                       'selectedPages'        : selectedPages]"/>
                 </div>
-                <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                    <i class="fa fa-undo"></i> Reset
-                </button>
+            </div>
+            <div class="row reset-result-selection-button-row">
+                <div class="col-md-12">
+                    <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                        <i class="fa fa-undo"></i> Reset
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -109,7 +105,9 @@
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
 
+            $("#chart-card").removeClass("hidden");
             spinner.start();
+            
             $.ajax({
                 type: 'POST',
                 data: {

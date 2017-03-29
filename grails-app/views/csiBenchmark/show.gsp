@@ -121,7 +121,7 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
-                        $('#chart-card').show()
+                        $('#chart-card').show();
                         OpenSpeedMonitor.ChartModules.CsiBenchmarkBarChart.drawChart(data);
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");

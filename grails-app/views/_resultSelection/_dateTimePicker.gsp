@@ -10,7 +10,7 @@ explicitly. See selectIntervalTimeframeCard.js as an example.
             <g:checkBox name="${manualTimeName}" checked="${manualTimeValue}"/>
         </span>
         <input type="text" class="form-control"
-               value="${(time=='00:00'||time=='0:00')?'00:001':time}" disabled/>
+               value="${(time=='00:00'||time=='0:00')?'00:00':time}" disabled/>
         <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
     </div>
     </g:if>

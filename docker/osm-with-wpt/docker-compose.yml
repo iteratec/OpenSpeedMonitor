@@ -1,0 +1,76 @@
+version: '2'
+
+services:
+  
+  osm-wpt-server.de:
+    image: webpagetest/server
+    volumes:
+      - ./locations.ini:/var/www/html/settings/locations.ini
+      - wpt_results:/var/www/html/results
+      - wpt_logs:/var/www/html/logs
+    ports:
+     - "9000:80"
+
+  osm_wpt_agent:
+    image: webpagetest/agent
+    environment:
+      SERVER_URL: http://osm-wpt-server.de/work/
+      LOCATION: Local_Docker
+      NAME: default-wpt-agent
+
+  osm:
+    image: iteratec/openspeedmonitor:latest
+    container_name: osm_service
+    ports:
+     - "8080:8080"
+    environment:
+      MYSQL_HOST: osm_mysql
+      MYSQL_DATABASE: osm
+      MYSQL_USER: osm
+      MYSQL_PASSWORD: osm
+      OSM_ADMIN_USER: admin
+      OSM_ADMIN_PASSWORD: admin
+      OSM_ROOT_USER: root
+      OSM_ROOT_PASSWORD: root
+      DETAIL_ANALYSIS_URL: 'http://localhost:8088'
+      ENABLE_DETAIL_ANALYSIS: 'true'
+      API_KEY_DETAIL_ANALYSIS: 'api_key_detail_analysis'
+
+  osm_mysql:
+    image: mysql:latest
+    container_name: osm_mysql
+    volumes:
+      - osm_mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_root_passwd
+      MYSQL_DATABASE: osm
+      MYSQL_USER: osm
+      MYSQL_PASSWORD: osm
+
+  osmda:
+    image: iteratec/osm-detail-analysis:latest
+    container_name: osmda_service
+    ports:
+     - "8088:8081"
+    environment:
+      OSMDA_MONGODB_HOST: osmda_mongodb
+      OSMDA_INITIAL_API_KEY: api_key_osmda
+      OSMDA_INITIAL_OSM_URL: 'http://localhost:8080'
+      OSMDA_JVM_XMS: 1024m
+      OSMDA_JVM_XMX: 2048m
+
+  osmda_mongodb:
+    image:  mongo:3.2
+    container_name: osmda_mongodb
+    volumes:
+      - osmda_mongodb_data:/data/db
+
+volumes:
+  osm_mysql_data:
+    driver: local
+  osmda_mongodb_data:
+    driver: local
+  wpt_logs:
+    driver: local
+  wpt_results:
+    driver: local

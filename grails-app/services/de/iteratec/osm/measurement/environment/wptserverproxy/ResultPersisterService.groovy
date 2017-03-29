@@ -466,6 +466,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private void informDependents(WptResultXml resultXml) {
 
         JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), resultXml.getTestId())

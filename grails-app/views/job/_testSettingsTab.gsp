@@ -21,6 +21,7 @@
         <br><span id="cronhelp-next-execution"></span>
         <br>
         <span id="cron-instructions" style="display: none;">
+            <h3><g:message code="job.cronInstructions.header" default="Cron expressions for measurement jobs"/></h3>
             <g:render template="cronInstructions"></g:render>
         </span>
     </div>

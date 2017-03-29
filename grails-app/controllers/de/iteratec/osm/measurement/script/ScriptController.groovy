@@ -147,7 +147,9 @@ class ScriptController {
 		}
 		parser.newMeasuredEvents.each { String measuredEventName, String pageName ->
 			def page = Page.findByName(pageName)
-			MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
+			if (page) {
+				MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
+			}
 		}
 	}
 

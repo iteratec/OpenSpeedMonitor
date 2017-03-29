@@ -42,12 +42,18 @@
             removeTag: "${createLink(controller: 'job', action: 'removeTag')}",
             addTagToJobs: "${createLink(controller: 'job', action: 'addTagToJobs')}"
         },
-      eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-      pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
-      tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
-      getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
-      detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
-      distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}"
+        eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
+        pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
+        jobGroupAggregationShow: "${createLink(action: 'show', controller: 'jobGroupAggregation')}",
+        tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
+        getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
+        detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
+        distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}",
+        pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}",
+        pageComparisonGetPages: "${createLink(controller: 'resultSelection', action: 'getPages')}",
+        getScriptNames: "${createLink(controller: 'measurementSetup', action: 'getScriptNames')}",
+        getJobNames: "${createLink(controller: 'measurementSetup', action: 'getJobNames')}",
+        cronExpressionNextExecution: "${createLink(controller: 'cronExpression', action: 'nextExecutionTime')}"
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
         docCompleteTimeInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.docCompleteTimeInMillisecs')}',

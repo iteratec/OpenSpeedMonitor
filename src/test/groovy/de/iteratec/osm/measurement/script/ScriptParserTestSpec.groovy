@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import spock.lang.Specification
 
@@ -24,11 +25,12 @@ import grails.test.mixin.*
 import grails.test.mixin.support.*
 
 @TestMixin(GrailsUnitTestMixin)
+@Mock([MeasuredEvent])
 class ScriptParserTestSpec extends Specification {
 
     PageService pageService
 
-    void "Script without setEventName commands results in MISSING_SETEVENTNAME_STATEMENT warnings"() {
+    void "Script without setEventName commands results in MISSING_SETEVENTNAME_STATEMENT errors"() {
         when:
         ScriptParser parser = new ScriptParser(pageService, """
                 ignoreErrors	1
@@ -53,9 +55,9 @@ class ScriptParserTestSpec extends Specification {
                         """)
 
         then:
-        parser.warnings.size() == 8
-        parser.warnings.each { warning ->
-            warning == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
+        parser.errors.size() == 8
+        parser.errors.each { error ->
+            error == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
         }
     }
 
@@ -71,14 +73,14 @@ class ScriptParserTestSpec extends Specification {
     }
 
 
-    void "Missing PageCommand after setEventName command results in warning"() {
+    void "Missing PageCommand after setEventName command results in error"() {
         when:
         ScriptParser parser = new ScriptParser(pageService, 'setEventName 456')
 
         then:
-        parser.warnings.size() == 2
-        parser.warnings*.type.contains(ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT)
-        parser.warnings*.type.contains(ScriptEventNameCmdWarningType.NO_STEPS_FOUND)
+        parser.errors.size() == 2
+        parser.errors*.type.contains(ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT)
+        parser.errors*.type.contains(ScriptEventNameCmdWarningType.NO_STEPS_FOUND)
     }
 
     void "PageViewCommandOnlyScript results in warning"() {
@@ -86,15 +88,15 @@ class ScriptParserTestSpec extends Specification {
         ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com')
 
         then:
-        parser.warnings.size() == 1
-        parser.warnings[0].type == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
+        parser.errors.size() == 1
+        parser.errors[0].type == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
         parser.measuredEventsCount == 1
         parser.steps.size() == 2
         parser.eventNames.size() == 0
     }
 
 
-    void "GlobalLogDataZeroScript results in warning"() {
+    void "GlobalLogDataZeroScript results in error"() {
         when:
         ScriptParser parser = new ScriptParser(pageService, """
                     void testGlobalLogDataZeroScript() {
@@ -114,8 +116,8 @@ class ScriptParserTestSpec extends Specification {
         parser.measuredEventsCount == 0
         parser.steps == []
         parser.eventNames.size() == 3
-        parser.warnings.size() == 1
-        parser.warnings[0].type == ScriptEventNameCmdWarningType.NO_STEPS_FOUND
+        parser.errors.size() == 1
+        parser.errors[0].type == ScriptEventNameCmdWarningType.NO_STEPS_FOUND
     }
 
     void "alternatingLogData01Script results in warning" () {

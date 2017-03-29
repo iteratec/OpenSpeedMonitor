@@ -407,7 +407,7 @@ class JobController {
     Map getStaticModelPartForEditOrCreateView() {
         return [
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
-                connectivites                  : ConnectivityProfile.list(),
+                connectivites                  : ConnectivityProfile.findAllByActive(true),
                 customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
         ]
     }

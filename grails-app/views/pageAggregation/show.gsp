@@ -9,20 +9,12 @@
 </head>
 
 <body>
-<h1>
-    <a href="#" class="btn hidden" id="timeSeriesWithDataLink"><i class="fa fa-line-chart"></i></a>
-    <g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/>
-    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
-        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
-    </g:if>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
-
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageAggregation']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
+
 <div class="card hidden" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
@@ -40,10 +32,11 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId" class="btn btn-primary show-button">
+                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId"
+                           class="btn btn-primary show-button">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
                     </div>
-                    <g:render template="/_resultSelection/hiddenWarnings" />
+                    <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
 
@@ -56,8 +49,8 @@
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                             aggrGroupValuesUnCached: aggrGroupValuesUnCached,
-                            multipleMeasurands: false,
-                            multipleSeries: false
+                            multipleMeasurands     : false,
+                            multipleSeries         : false
                     ]"/>
                 </div>
 
@@ -78,9 +71,14 @@
                             'selectedPages'        : selectedPages
                     ]"/>
                 </div>
-                <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                    <i class="fa fa-undo"></i> Reset
-                </button>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
+                            <i class="fa fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -97,7 +95,7 @@
         OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
 
         $(window).load(function() {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer

@@ -91,25 +91,17 @@
                 <div id="chartbox">
                     <g:render template="/highchart/chart"
                               model="[
-                                      singleYAxis                  : 'false',
+                                      isAggregatedData             : true,
                                       chartData                    : wptCustomerSatisfactionValues,
                                       chartTitle                   : chartTitle,
-                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      chartUnit                    : '%',
-                                      globalLineWidth              : '2',
-                                      xAxisMin                     : fromTimestampForHighChart,
-                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      yAxisScalable                : 'false',
-                                      optimizeForExport            : 'false',
-                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
                                       labelSummary                 : labelSummary,
-                                      downloadPngLabel             : null,
-                                      downloadCsvSubmitButton      : g.actionSubmit([value: g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV'), action: 'csiValuesCsv'])
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
                               ]"/>
                 </div>
             </div>

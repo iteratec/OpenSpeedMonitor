@@ -43,13 +43,13 @@ class QueueStatusController {
                 performanceLoggingService.logExecutionTime(LogLevel.INFO, "getAgentsHttpResponse", 1) {
                     agentsResponse = queueAndJobStatusService.getAgentsHttpResponse(wptServer)
                 }
-                List<Map<Location, Object>> filteredLocations
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFilteredLocations", 1) {
-                    filteredLocations = queueAndJobStatusService.getFilteredLocations(wptServer)
+                List<LocationWithXmlNode> activeLocations
+                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getActiveLocations", 1) {
+                    activeLocations = queueAndJobStatusService.getActiveLocations(wptServer)
                 }
-                filteredLocations.each {
+                activeLocations.each {
                     Location location = it.location
-                    Object locationTagInXml = it.tag
+                    Object locationTagInXml = it.locationXmlNode
 
                     List<JobResult> executingJobResults
                     performanceLoggingService.logExecutionTime(LogLevel.INFO, "getExecutingJobResults", 2) {

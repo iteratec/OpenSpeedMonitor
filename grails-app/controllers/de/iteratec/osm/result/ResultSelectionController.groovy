@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
@@ -11,7 +12,6 @@ import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
-import de.iteratec.osm.annotations.RestAction
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -35,7 +35,8 @@ class ResultSelectionController extends ExceptionHandlerController {
         MeasuredEvents,
         Locations,
         ConnectivityProfiles,
-        Results
+        Results,
+        Pages
     }
 
     def getResultCount(ResultSelectionCommand command) {
@@ -175,13 +176,36 @@ class ResultSelectionController extends ExceptionHandlerController {
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
+    @RestAction
+    def getPages(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", 0, {
+            def pages = query(command, ResultSelectionType.Pages, { existing ->
+                if (existing) {
+                    not { 'in'('page', existing) }
+                }
+                projections {
+                    distinct('page')
+                }
+            })
+            return pages.collect {
+                [
+                        id  : it.id,
+                        name: it.name
+                ]
+            }.sort { it.name }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
     private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
             def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
-                connectivityProfile {
-                    eq('active', true)
-                }
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
                 }
@@ -302,7 +326,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
 
-                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.pageIds) {
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionType.Pages && command.pageIds) {
                     page {
                         'in'("id", command.pageIds)
                     }
@@ -386,6 +410,7 @@ class ResultSelectionCommand {
                 return ['datePriorTo', val.toString(), obj.from.toString()]
             }
         })
+        caller(nullable: true)
         nativeConnectivity(blank: true, nullable: true)
     }
 

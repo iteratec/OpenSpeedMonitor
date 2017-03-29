@@ -8,14 +8,6 @@
     position: relative;
 }
 
-.card-well .reset-result-selection {
-    float: none;
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    margin: 0;
-}
-
 .filterActive {
     visibility: visible;
 }

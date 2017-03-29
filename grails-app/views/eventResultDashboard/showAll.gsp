@@ -9,21 +9,11 @@
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-    <asset:stylesheet src="eventResultDashboard/eventResultDashboard.less"/>
-
 </head>
 
 <body>
 
-<h1>
-    <g:message code="eventResultDashboard.label" default="Time Series"/>
-    <a href="#" class="btn hidden" id="pageAggregationWithDataLink"><i class="fa fa-bar-chart"></i></a>
-    <a href="#" class="btn hidden" id="distributionWithDataLink"><i class="fa fa-area-chart"></i></a>
-    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData')?.equals("true")}">
-        <a href="#" class="btn hidden" id="detailAnalysisWithDataLink"><i class="fa fa-pie-chart"></i></a>
-    </g:if>
-    <a href="#" class="btn hidden" id="resultListWithDataLink"><i class="fa fa-th-list"></i></a>
-</h1>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'timeSeries']"/>
 
 <div class="row">
     <div class="col-md-12">
@@ -69,28 +59,26 @@
         <g:if test="${eventResultValues}">
             <div class="col-md-12">
                 <div id="chartbox" class="card">
-                    <div id="dataTableId" class="warning-ribbon" hidden="true" data-toggle="popover" aria-hidden="true"
+                    <div id="dataTableId" class="ribbon ribbon-info" hidden="true" data-toggle="popover" aria-hidden="true"
                          title="${message([code: 'de.iteratec.osm.eventResultDashboard.hiddenFieldWarning'])}"
                          data-placement="right" data-trigger="hover"
-                         data-html="true" data-content="${render(template: "hoverInfo")}"><p>!</p></div>
+                         data-html="true" data-content="${render(template: "hoverInfo")}">
+                        <i class="fa fa-info"></i>
+                    </div>
                     <g:render template="/highchart/chart"
                               model="[
+                                      isAggregatedData             : (selectedInterval && selectedInterval != -1),
                                       chartData                    : eventResultValues,
                                       chartTitle                   : chartTitle,
-                                      yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      chartUnit                    : '%',
-                                      globalLineWidth              : '2',
-                                      xAxisMin                     : fromTimestampForHighChart,
-                                      xAxisMax                     : toTimestampForHighChart,
                                       markerEnabled                : markerShouldBeEnabled,
                                       dataLabelsActivated          : labelShouldBeEnabled,
-                                      yAxisScalable                : 'false',
-                                      optimizeForExport            : 'false',
-                                      openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                      highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
-                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')]"/>
+                                      labelSummary                 : labelSummary,
+                                      downloadPngLabel             : g.message(code: 'de.iteratec.ism.ui.button.save.name')
+                              ]"/>
                 </div>
             </div>
         </g:if>
@@ -172,7 +160,7 @@
                 <g:else>
                     <li class="dropdown-header"><g:message
                             code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                            default="None available"/></li>
+                            default="No saved dashboards."/></li>
                 </g:else>
             </ul>
         </div>
@@ -314,9 +302,11 @@
         });
 
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
-           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+            if (!$("#graph_container").data("isAggregatedData")) {
+                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+            }
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
 
     </asset:script>

@@ -245,7 +245,7 @@ class ScriptParser {
 	 * statement found before the lookBackFromth statement.
 	 */
 	private void reportDanglingSetEventNameCommand(List<ScriptStatement> statements, int lookBackFrom) {
-		warnings << new ScriptEventNameCmdWarning(
+		errors << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT,
 			lineNumber: statements.take(lookBackFrom+1).reverse().find { it.keyword == setEventNameCmd }.lineNumber
 		)
@@ -257,14 +257,14 @@ class ScriptParser {
 	 */
 	private void reportMissingSetEventNameStatement(ScriptStatement statement) {
 		assert(statement.isPageViewCmd)
-		warnings << new ScriptEventNameCmdWarning(
+		errors << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT,
 			lineNumber: statement.lineNumber
 		)
 	}
 
 	private void reportNoStepsFound() {
-		warnings << new ScriptEventNameCmdWarning(
+		errors << new ScriptEventNameCmdWarning(
 			type: ScriptEventNameCmdWarningType.NO_STEPS_FOUND,
 			lineNumber: 0
 		)

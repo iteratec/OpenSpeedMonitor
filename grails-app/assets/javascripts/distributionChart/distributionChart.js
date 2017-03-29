@@ -15,17 +15,34 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         margin = {top: 10, right: 30, bottom: 50, left: 100},
         maxViolinWidth = 150,
         violinWidth = null,
-        resolution = 20,
-        interpolation = 'basis';
+        mainDataResolution = 30,
+        interpolation = 'basis',
+        toggleLogarithmicYAxisButton = null,
+        dataTrimValue = null,
+        logarithmicYAxis = false;
 
     var init = function () {
-        svgContainer = document.querySelector("#svg-container")
+        svgContainer = document.querySelector("#svg-container");
+        toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis")
+
+        dataTrimValue = document.querySelector("#data-trim-value");
+        dataTrimValue.addEventListener('change', function() {
+            drawChart(chartData);
+        });
+
+        toggleLogarithmicYAxisButton.addEventListener('click', function () {
+            logarithmicYAxis = !logarithmicYAxis;
+            drawChart(chartData);
+        });
     };
 
     var drawChart = function (distributionChartData) {
         chartData = distributionChartData;
         if (originalSeries == null) {
+            sortSeriesDataAscending();
             originalSeries = chartData.series;
+
+            dataTrimValue.value = getDomain()[1];
 
             // sort the violins after descending median as default
             sortByMedian();
@@ -39,9 +56,6 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         // delete old chart in same container
         d3.select(svgContainer).selectAll("svg").remove();
         initFilterDropdown(chartData.filterRules);
-
-        // make the chart visible
-        $("#chart-card").removeClass("hidden");
 
         // create the svg which contains the chart
         var svg = d3.select(svgContainer)
@@ -59,12 +73,23 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .range([height - margin.bottom, margin.top])
                   .domain(domain);
 
+        var logY = d3.scale.log()
+                     .range([height - margin.bottom, margin.top])
+                     .domain(domain);
+
         var x = d3.scale.ordinal()
                   .range(xRange())
                   .domain(Object.keys(chartData.series));
 
         // create both axis
-        var yAxis = d3.svg.axis()
+        var yAxis = null;
+        if (logarithmicYAxis)
+            yAxis = d3.svg.axis()
+                .scale(logY)
+                .orient('left')
+                .tickFormat(d3.format('g'));
+        else
+            yAxis = d3.svg.axis()
                       .scale(y)
                       .orient("left");
 
@@ -74,7 +99,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         // add the violins
         Object.keys(chartData.series).forEach( function (trace, i) {
-            var traceData = chartData.series[trace].data.sort(d3.ascending);
+            var traceData = chartData.series[trace].data;
 
             var g = svg.append("g")
                        .attr("class", "d3chart-violin")
@@ -96,6 +121,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         postDraw()
     };
 
+    var sortSeriesDataAscending = function() {
+        Object.keys(chartData.series).forEach( function (trace, i) {
+            chartData.series[trace].data.sort(d3.ascending);
+        });
+    };
+
     var postDraw = function () {
         chartStyling();
         toogleFilterCheckmarks();
@@ -114,13 +145,27 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var getDomain = function () {
         var maxValues = [];
-        var minValues = [];
         Object.keys(chartData.series).forEach( function (trace) {
             maxValues.push(Math.max.apply(null, chartData.series[trace].data));
-            minValues.push(Math.min.apply(null, chartData.series[trace].data));
         });
+        var maxValue = Math.max.apply(null, maxValues);
+        var trimValue = dataTrimValue.value || maxValue;
 
-        return [Math.min.apply(null, minValues), Math.max.apply(null, maxValues)];
+        return [0, Math.min(maxValue, trimValue)];
+    };
+
+    var getGreatestDomainTrace = function () {
+        var maxDomainSize = -1;
+        var greatestTrace = [];
+        Object.keys(chartData.series).forEach( function (trace) {
+            var curTrace = chartData.series[trace].data;
+            var domainSize = curTrace[curTrace.length - 1] - curTrace[0];
+            if (domainSize > maxDomainSize) {
+                maxDomainSize = domainSize;
+                greatestTrace = curTrace;
+            }
+        });
+        return greatestTrace;
     };
 
     var xRange = function () {
@@ -133,6 +178,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var addViolin = function (svg, traceData, height, violinWidth, domain) {
+        var resolution = histogramResolutionForTraceData(traceData);
+
         var data = d3.layout.histogram()
                      .bins(resolution)
                      .frequency(0)
@@ -144,7 +191,14 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // x is now the vertical axis because of the violin being a 90 degree rotated histogram
-        var x = d3.scale.linear()
+        var x = null;
+        if (logarithmicYAxis)
+            x = d3.scale.log()
+                .range([height, 0])
+                .domain(domain)
+                .nice();
+        else
+            x = d3.scale.linear()
                   .range([height, 0])
                   .domain(domain)
                   .nice();
@@ -191,6 +245,14 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         gPlus.attr("transform", "rotate(90, 0, 0)  translate(0, -" + violinWidth + ")");
         gMinus.attr("transform", "rotate(90, 0, 0) scale(1, -1)");
+    };
+
+    var histogramResolutionForTraceData = function (traceData) {
+        var greatestDomainTrace = getGreatestDomainTrace();
+        var quantile25 = d3.quantile(greatestDomainTrace, 0.25);
+        var quantile75 = d3.quantile(greatestDomainTrace, 0.75);
+        var binSize = (quantile75 - quantile25) / mainDataResolution;
+        return (traceData[traceData.length -1] - traceData[0]) / binSize;
     };
 
     var sortByMedian = function () {

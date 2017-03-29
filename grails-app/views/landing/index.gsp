@@ -65,8 +65,8 @@
                             link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
                     ]"/>
                 </p>
-                %{--<a href="#" class="btn btn-primary">--}%
-                    %{--<g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>--}%
+                <a href="/measurementSetup/create" class="btn btn-primary">
+                    <g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>
             </div>
         </div>
     </div>

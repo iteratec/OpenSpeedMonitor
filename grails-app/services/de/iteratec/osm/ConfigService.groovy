@@ -128,6 +128,14 @@ class ConfigService {
     }
 
     /**
+     * Get method load times should be calculated to percent of
+     * users which are satisfied by that load time.
+     */
+    Integer getInternalMonitoringStorageTimeInDays(){
+        return getConfig().internalMonitoringStorageTimeInDays
+    }
+
+    /**
      * Gets the name of the used database driver of running environment
      * @return {@link String} of the used database driver name
      */

@@ -6,14 +6,6 @@
   position: relative;
 }
 
-.card-well .reset-result-selection {
-  float: none;
-  position: absolute;
-  bottom: 14px;
-  right: 14px;
-  margin: 0;
-}
-
 .filterActive {
   visibility: visible;
 }
@@ -26,9 +18,22 @@
   position: relative;
 }
 
+#filter-dropdown-group {
+  position: absolute;
+  right: 110px;
+  top: 8px;
+  z-index: 2;
+  padding: 6px 12px;
+}
+
 // BarChart styles
 .d3chart-bar {
   fill: #44994b;
+  transition: 0.2s fill ease;
+}
+
+.d3chart-faded {
+  fill: #AAB2AA !important;
 }
 
 .axis text {

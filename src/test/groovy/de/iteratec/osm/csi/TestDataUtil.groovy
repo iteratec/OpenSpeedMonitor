@@ -1176,7 +1176,8 @@ class TestDataUtil implements OsmTestLogin {
                     maxDocCompleteTimeInMillisecs: 180000,
                     initialChartHeightInPixels: 400,
                     maxDataStorageTimeInMonths: 12,
-                    csiTransformation: CsiTransformation.BY_MAPPING
+                    csiTransformation: CsiTransformation.BY_MAPPING,
+                    internalMonitoringStorageTimeInDays: OsmConfiguration.INTERNAL_MONITORING_STORAGETIME_IN_DAYS
             ).save(failOnError: true)
         }
     }

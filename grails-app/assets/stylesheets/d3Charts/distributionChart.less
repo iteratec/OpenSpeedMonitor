@@ -29,13 +29,14 @@
 
 #chart-container {
     position: relative;
+    min-height: 100px;
 }
 
 #filter-dropdown-group {
     position: absolute;
     right: 60px;
     top: 10px;
-    z-index: 500;
+    z-index: 2;
     padding: 6px 12px;
 }
 
@@ -45,4 +46,15 @@
 
 .filterInactive {
     visibility: hidden;
+}
+
+#toggle-logarithmic-y-axis-container {
+    left: 0;
+}
+
+#data-trim-value {
+    top: 50px;
+    position: absolute;
+    width: 120px;
+    right: 0;
 }
