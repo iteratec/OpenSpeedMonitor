@@ -152,7 +152,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         $(window).on("selectIntervalTimeframeCardLoaded", function () {
             markTimeCardAsResolved();
         });
-        $(window).on("barchartHorizontalLoaded", function () {
+        $(window).on("groupedBarchartHorizontalLoaded", function () {
             markBarChartAsResolved();
         });
     };
