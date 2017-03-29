@@ -23,17 +23,19 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var init = function () {
         svgContainer = document.querySelector("#svg-container");
-        toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis")
+        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
+        // toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis");
 
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
             drawChart(chartData);
         });
 
-        toggleLogarithmicYAxisButton.addEventListener('click', function () {
-            logarithmicYAxis = !logarithmicYAxis;
-            drawChart(chartData);
-        });
+        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
+        // toggleLogarithmicYAxisButton.addEventListener('click', function () {
+        //     logarithmicYAxis = !logarithmicYAxis;
+        //     drawChart(chartData);
+        // });
     };
 
     var drawChart = function (distributionChartData) {
