@@ -67,8 +67,8 @@ class ScriptGebSpec extends CustomUrlGebReportingSpec{
     }
     void "a script can be created with label and scriptCode"(){
         when: "a script code is added"
-        String scriptCode = "setEventName\\tHomepage\\nnavigate\\thttps://www.amazon.de"
-        js.exec("OpenSpeedMonitor.script.codemirrorEditor.setNewContent('${scriptCode}')")
+        String scriptCode = "setEventName\tHomepage\nnavigate\thttps://www.amazon.de"
+        js.exec(scriptCode,"OpenSpeedMonitor.script.codemirrorEditor.setNewContent(arguments[0])")
         createButton.click()
         then: "script was created and we are on script list page"
         waitFor {
