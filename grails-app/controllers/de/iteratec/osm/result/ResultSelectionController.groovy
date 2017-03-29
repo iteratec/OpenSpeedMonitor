@@ -326,7 +326,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
 
-                if ((resultSelectionType != ResultSelectionType.MeasuredEvents || resultSelectionType != ResultSelectionType.Pages) && command.pageIds) {
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionType.Pages && command.pageIds) {
                     page {
                         'in'("id", command.pageIds)
                     }
