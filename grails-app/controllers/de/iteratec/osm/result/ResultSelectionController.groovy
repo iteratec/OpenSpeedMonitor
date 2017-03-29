@@ -410,6 +410,7 @@ class ResultSelectionCommand {
                 return ['datePriorTo', val.toString(), obj.from.toString()]
             }
         })
+        caller(nullable: true)
         nativeConnectivity(blank: true, nullable: true)
     }
 
