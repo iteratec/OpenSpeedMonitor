@@ -57,7 +57,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
 
     var validateInputs = function (isInitialCheck) {
         var currentInput = jobGroupNameInputField.val();
-        var isDuplicateName = isExistingJobGroup(currentInput);
+        var isDuplicateName = !existingJobGroupSelectBox.val() && isExistingJobGroup(currentInput);
         inputValid = currentInput && !isDuplicateName;
         $("#jobGroupFormGroup").toggleClass("has-error", !inputValid && !isInitialCheck);
         $('#setJobGroupTab').toggleClass("failureText",  !inputValid && !isInitialCheck);
