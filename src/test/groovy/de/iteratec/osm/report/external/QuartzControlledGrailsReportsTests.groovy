@@ -69,6 +69,7 @@ class QuartzControlledGrailsReportsTests {
     static final String eventName = 'event'
     static final String browserName = 'browser'
     static final String locationLocation = 'location'
+    ServiceMocker serviceMocker
 
     MetricReportingService serviceUnderTest
     public MockedGraphiteSocket graphiteSocketUsedInTests
@@ -91,6 +92,7 @@ class QuartzControlledGrailsReportsTests {
         serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         new ServiceMocker().mockBatchActivityService(serviceUnderTest)
         new OsmConfiguration().save(failOnError: true)
+        serviceMocker = ServiceMocker.create()
     }
 
     @After
@@ -512,17 +514,4 @@ class QuartzControlledGrailsReportsTests {
         return hmv
     }
 
-    class MockedGraphiteSocket implements GraphiteSocket {
-        class SentDate {
-            GraphitePathName path
-            Double value
-            Date timestamp
-        }
-        List<SentDate> sentDates = []
-
-        @Override
-        void sendDate(GraphitePathName path, double value, Date timestamp) throws NullPointerException, GraphiteComunicationFailureException {
-            sentDates.add(new SentDate(path: path, value: value, timestamp: timestamp))
-        }
-    }
 }

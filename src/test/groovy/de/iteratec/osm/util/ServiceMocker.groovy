@@ -30,12 +30,16 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.MetricReportingService
+import de.iteratec.osm.report.external.MockedGraphiteSocket
+import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
+import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 
@@ -427,4 +431,5 @@ class ServiceMocker {
 		}
 		serviceToMockIn.batchActivityService = service
 	}
+
 }

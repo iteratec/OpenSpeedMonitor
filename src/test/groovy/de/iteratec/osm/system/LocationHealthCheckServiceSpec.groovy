@@ -15,27 +15,26 @@ import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
+
 @TestFor(LocationHealthCheckService)
-@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup, OsmConfiguration, BatchActivity])
+@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
+        OsmConfiguration, BatchActivity])
 class LocationHealthCheckServiceSpec extends Specification {
 
-    List<JobResult> jobResults
-    int expectedNumberOfAgents = 2
-    int expectedNumberOfJobResultsNextHour = 3
-    int expectedNumberOfEventResultsNextHour = 9
-    int expectedNumberOfPendingJobsInWpt = 0
-    int expectedNumberOfJobResultsLastHour = 2
-    int expectedNumberOfEventResultsLastHour = 6
-    int expectedNumberOfErrorsLastHour
+    private List<JobResult> jobResults
+    private int expectedNumberOfAgents = 2
+    private int expectedNumberOfJobResultsNextHour = 3
+    private int expectedNumberOfEventResultsNextHour = 9
+    private int expectedNumberOfPendingJobsInWpt = 0
+    private int expectedNumberOfJobResultsLastHour = 2
+    private int expectedNumberOfEventResultsLastHour = 6
+    private int expectedNumberOfErrorsLastHour
     private Location location
-    public static final INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
+    private static int INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
 
     def setup() {
-        createTestDataCommonForAllTests()
         prepareMocksCommonForAllTests()
+        createTestDataCommonForAllTests()
     }
     static doWithConfig(c) {
         c.internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
@@ -55,7 +54,7 @@ class LocationHealthCheckServiceSpec extends Specification {
         )
         GPathResult getTestersResponseMockedInThisTest = null
 
-        when: "runHealthCheckForLocation is called with a location"
+        when: "runHealthCheckForLocation is called with a location and no graphite server exists"
         service.runHealthCheckForLocation(locationWithXmlNode, getTestersResponseMockedInThisTest)
         List<LocationHealthCheck> locationHealthChecks = LocationHealthCheck.list()
 
@@ -76,10 +75,10 @@ class LocationHealthCheckServiceSpec extends Specification {
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
         DateTime now = new DateTime()
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-1)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-2)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-3)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-4)).save(validate: false)
+        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1)).save(validate: false)
+        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2)).save(validate: false)
+        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3)).save(validate: false)
+        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4)).save(validate: false)
         new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1)).save(validate: false)
         new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2)).save(validate: false)
         new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3)).save(validate: false)
@@ -93,7 +92,7 @@ class LocationHealthCheckServiceSpec extends Specification {
         locationHealthChecks.size() == 4
     }
 
-    public void createTestDataCommonForAllTests() {
+    private void createTestDataCommonForAllTests() {
         location = TestDataUtil.createLocation()
         Script script = TestDataUtil.createScript()
         JobGroup jobGroup = TestDataUtil.createJobGroup("jobGroup")
@@ -108,7 +107,11 @@ class LocationHealthCheckServiceSpec extends Specification {
     }
 
 
-    void prepareMocksCommonForAllTests(){
+    private void prepareMocksCommonForAllTests(){
+        mockQueueAndJobStatusService()
+    }
+
+    private mockQueueAndJobStatusService() {
         QueueAndJobStatusService queueAndJobStatusService = new QueueAndJobStatusService()
         queueAndJobStatusService.metaClass.getExecutingJobResults = { Location location ->
             return jobResults

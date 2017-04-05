@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
@@ -43,6 +44,7 @@ import de.iteratec.osm.util.OsmTestLogin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.util.Holders
+import org.apache.xpath.operations.Bool
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -396,11 +398,16 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths) {
+    static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths, Boolean reportHealthMetrics, String healthMetricsReportPrefix) {
         new GraphiteServer(
-                serverAdress: '',
+                serverAdress: serverAdress,
                 port: port,
-                graphitePaths: paths
+                graphitePaths: paths,
+                reportHealthMetrics: reportHealthMetrics,
+                healthMetricsReportPrefix: healthMetricsReportPrefix,
+                webappUrl: "https://my-graphite.webapp.com",
+                webappProtocol: Protocol.HTTPS,
+                webappPathToRenderingEngine: "/render"
         ).save(failOnError: true)
     }
 
