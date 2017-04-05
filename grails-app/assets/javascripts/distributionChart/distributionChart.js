@@ -40,8 +40,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var drawChart = function (distributionChartData) {
         chartData = distributionChartData;
-        if (originalSeries == null) {
-            sortSeriesDataAscending();
+        sortSeriesDataAscending();
+        if (originalSeries === null) {
             originalSeries = chartData.series;
 
             dataTrimValue.value = getDomain()[1];
@@ -254,7 +254,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var quantile25 = d3.quantile(greatestDomainTrace, 0.25);
         var quantile75 = d3.quantile(greatestDomainTrace, 0.75);
         var binSize = (quantile75 - quantile25) / mainDataResolution;
-        return (traceData[traceData.length -1] - traceData[0]) / binSize;
+        return Math.floor((traceData[traceData.length -1] - traceData[0]) / binSize);
     };
 
     var sortByMedian = function () {
