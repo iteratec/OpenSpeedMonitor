@@ -43,8 +43,6 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.util.Holders
-import org.apache.xpath.operations.Bool
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
