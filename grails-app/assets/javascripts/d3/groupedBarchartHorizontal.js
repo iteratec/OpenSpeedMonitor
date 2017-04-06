@@ -35,6 +35,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         headerLine,
         flattenedData,
         groupings,
+        valueLabelOffset = 5,
+        unitScales,
         units;
 
     var drawChart = function (barchartData) {
@@ -113,7 +115,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var drawAllBars = function () {
         flattenData();
-        barXOffSet = measureComponent($("<text>"+getLongestGroupName()+5+"</text>"),function (d) {
+        barXOffSet = measureComponent($("<text>"+getLongestGroupName()+valueLabelOffset+"</text>"),function (d) {
             return d.width();
         });
         updateInFrontSwitch();
@@ -196,7 +198,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             inFrontButton.click(function () {
                 if(canBeStacked()){
                     drawBarsInFrontOfEachOther();
-                } 
+                }
             });
             besideButton.appendTo(input);
             inFrontButton.appendTo(input);
@@ -227,7 +229,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         y0.domain(groupings);
 
-        var unitScales = {};
+        unitScales = {};
         $.each(units, function (unit,values) {
             var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
             scale.domain([0,d3.max(values)]);
@@ -241,7 +243,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             var bars = d3.select(this).selectAll(".baar").data(group.bars);
             bars.enter().append("g").attr("class", "baar").each(function (d) {
                 d3.select(this).append("rect");
-                d3.select(this).append("text").attr("font-weight","bold").attr("fill", "white").attr("text-anchor","end").attr("alignment-baseline","central");
+                d3.select(this).append("text").style({
+                    "font-weight": "bold",
+                    "fill": "white",
+                    "text-shadow": "0 0 3px #000000",
+                    "text-anchor":"end",
+                    "alignment-baseline":"central"
+                })
             });
             bars.exit().remove();
         });
@@ -309,33 +317,37 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                     d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
                     d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
                 } else{
-                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 1);
-                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 1);
+                    var rect = d3.select(this).select("rect");
+                    var text = d3.select(this).select("text");
+                    var rectSize = parseInt(rect.attr("width"));
+                    var textSize = text.node().getBBox().width;
+
+                    if(rectSize<textSize){
+                        var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+                        text.transition().duration(transitionDuration).attr("x", position).attr("visibility","visible").style("opacity", 1);
+                    } else {
+                        text.transition().duration(transitionDuration).style("opacity", 1)
+                    }
+                    rect.transition().duration(transitionDuration).style("opacity", 1);
                 }
             });
         }
     };
-    
+
     var mouseOut = function () {
         return function () {
-                d3.selectAll(".baar").each(function () {
-                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 1);
-                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 1);
+                d3.selectAll(".baar").each(function (bar) {
+                    var text = d3.select(this).select("text");
+                    var rect = d3.select(this).select("rect");
+                    var rectSize = parseInt(rect.attr("width"));
+                    var textSize = text.node().getBBox().width;
+                    if(rectSize<textSize){
+                        text.transition().duration(transitionDuration).attr("x", 0).attr("visibility","hidden");
+                    } else{
+                        text.transition().duration(transitionDuration).style("opacity", 1);
+                    }
+                    rect.transition().duration(transitionDuration).style("opacity", 1);
                 });
-        };
-    };
-
-    var translFnk = function () {
-        return function(d, i, a) {
-            if(a === null){
-                a = "translate(0,0)"
-            }
-            var split = a.replace("translate(","").replace(")","").split(",");
-            var y = split[1];
-            return function(t) {
-                var currentPos = y-(y*t);
-                return "translate(0,"+currentPos+")"
-            };
         };
     };
 
@@ -354,7 +366,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         y0.domain(groupings);
         y1.domain(measurands).rangeRoundBands([0,y0.rangeBand()]);
 
-        var unitScales = {};
+        unitScales = {};
         $.each(units, function (unit,values) {
             var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
             scale.domain([0,d3.max(values)]);
@@ -367,8 +379,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         select1.each(function (group) {
                 var bars = d3.select(this).selectAll(".baar").data(group.bars);
                  bars.enter().append("g").attr("class", "baar").each(function (d) {
-                    d3.select(this).append("rect");
-                    d3.select(this).append("text").attr("font-weight","bold").attr("fill", "white").attr("text-anchor","end").attr("alignment-baseline","central");
+                     d3.select(this).append("rect");
+                     d3.select(this).append("text").style({
+                         "font-weight": "bold",
+                         "fill": "white",
+                         "text-shadow": "0 0 3px #000000",
+                         "text-anchor":"end",
+                         "alignment-baseline":"central"
+                     })
                 });
                 bars.exit().remove();
 
@@ -389,15 +407,26 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         d3.selectAll(".baar").each(function (bar) {
 
             //Update Rectangle Position and Size
-            d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
+            var barWidth = unitScales[bar.unit](bar.value);
+            var rect = d3.select(this).select("rect");
+            rect.attr("fill", seriesColorScale(bar.measurand)).transition()
                 .attr("width", unitScales[bar.unit](bar.value))
                 .attr("height", y1.rangeBand());
 
             //Update Bar Label
-            d3.select(this).select("text")
-                .text(""+Math.round(bar.value)+" ms").transition()
-                .attr("y", textX)
-                .attr("x", unitScales[bar.unit](bar.value)-5);
+            var textLabel = d3.select(this).select("text");
+            var text = ""+Math.round(bar.value)+" ms";
+            var textTrans = textLabel.transition()
+                .text(text)
+                .attr("y", textX);
+            if (!checkIfTextWouldFitRect(text,textLabel, barWidth)){
+                textTrans
+                .attr("visibility","hidden")
+                .style("text-anchor","start")
+            } else {
+                textTrans.attr("x", unitScales[bar.unit](bar.value)-valueLabelOffset);
+            }
+
         });
 
         //Update Group Labels
@@ -405,7 +434,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             var groupLabelY = y1.rangeBand()*(d.bars.length)/2;
             d3.select(this).select(".barGroupLabel").text(d.label).attr("y",groupLabelY);
         })
+    };
 
+    var checkIfTextWouldFitRect = function (text, textLabel, barWidth) {
+        var clone = $("<text>"+text+"</text>");
+        clone.text(text);
+        var width = measureComponent(clone, function (d) {
+            return d.width()
+        });
+        return width<barWidth
     };
 
 
