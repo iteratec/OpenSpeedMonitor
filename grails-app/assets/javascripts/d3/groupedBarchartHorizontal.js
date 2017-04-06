@@ -22,18 +22,21 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         absoluteMaxValue = 0,
         absoluteMaxYOffset = 0,
         labelWidths = [],
+        barXOffSet,
         xScale = d3.scale.linear(),
         initialBarWidth = 20,
         countTrafficLightBar = 1,
         allBarsGroup,
         trafficLightBars,
-        transitionDuration = 600,
+        transitionDuration = 200,
         svgHeight,
         filterRules = {},
         actualBarchartData,
         commonLabelParts,
         headerLine,
-        flattenedData;
+        flattenedData,
+        groupings,
+        units;
 
     var drawChart = function (barchartData) {
 
@@ -76,7 +79,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         barchartData.series.forEach(function (series) {
             var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
-            series.data = labelUtil.getSeriesWithShortestUniqueLabels();
+            series.data = labelUtil.getSeriesWithShortestUniqueLabels(true);
             commonLabelParts = labelUtil.getCommonLabelParts();
             series.data.sort(function (x, y) {
                 return d3.descending(x.value, y.value);
@@ -88,107 +91,145 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         actualBarchartData = barchartData;
 
     };
+    
+    var getLongestGroupName = function() {
+        var longestString = "";
+        $.each(flattenedData, function (_,d) {
+            if(d.label.length > longestString.length){
+                longestString = d.label;
+            }
+        });
+        return longestString;
+    };
+
+    var measureComponent = function(component, fn){
+        var el = component.clone();
+        el.css("visibility",'hidden');
+        el.css("position",'absolut');
+        el.appendTo('body');
+        var result = fn(el);
+        el.remove();
+        return result
+    };
 
     var drawAllBars = function () {
+        flattenData();
+        barXOffSet = measureComponent($("<text>"+getLongestGroupName()+5+"</text>"),function (d) {
+            return d.width();
+        });
+        if(canBeStacked()){
+            createInFrontSwitch();
+        }
+        drawBarsBesideEachOther();
+        var headerData = [{headerText: commonLabelParts}];
+        // drawHeader(headerData);
+
+    };
+    
+    var flattenData = function () {
+        units = {};
         var dataMap = {};
-        var serieses = [];
-        console.log(actualBarchartData);
-        var measurandInSeries = {};
-        var units = {};
         $.each(actualBarchartData.series, function (i,series) {
-            serieses.push(i);
             if(units[series.dimensionalUnit] === undefined){
                 units[series.dimensionalUnit] = [];
             }
-            measurandInSeries[i] = [];
             $.each(series.data, function (_,datum) {
                 var currentDatum = dataMap[datum.grouping];
                 if(currentDatum === undefined ){
                     currentDatum = {};
                     currentDatum["bars"] = [];
                     currentDatum["grouping"] = datum.grouping;
+                    currentDatum["label"] = datum.label;
                     dataMap[datum.grouping] = currentDatum;
                 }
                 var bar = {};
                 bar["measurand"] = datum.measurand;
                 bar["value"] = datum.value;
-                bar["series"] = i;
                 bar["unit"] = series.dimensionalUnit;
                 bar["grouping"] = datum.grouping;
                 currentDatum["bars"].push(bar);
                 units[series.dimensionalUnit].push(datum.value);
-
-                if($.inArray(datum.measurand, measurandInSeries[i]) == -1){
-                    measurandInSeries[i].push(datum.measurand);
-                }
             })
         });
-        var groupings = Object.keys(dataMap);
+        groupings = Object.keys(dataMap);
         $.each(units, function (k,v) {
             v.sort(function(a, b) { return a > b ? 1 : -1});
         });
-        var flattenedData = Object.keys(dataMap).map(function (key) {
+        flattenedData = Object.keys(dataMap).map(function (key) {
             return dataMap[key];
         });
-        var y0 = d3.scale.ordinal()
-            .rangeRoundBands([0, height], .1);
 
-        var y1 = d3.scale.ordinal();
-        $.each(flattenedData, function (_,d) {
-            console.log(d);
-            d.bars.sort(function(a, b) { return a.value < b.value ? 1 : -1});
-        });
+        $.each(flattenedData, function (_,data) {
+            data.bars.sort(function(a, b) { return a.value < b.value});
+        })
+    };
 
+    var recreateOrder = function () {
+        d3.selectAll(".barGroup").each(function(){d3.select(this).selectAll(".baar").sort(function(a, b) { return a.value < b.value})});
+    };
 
-        var seriesColorScale = d3.scale.category10();
+    var canBeStacked = function () {
+        return Object.keys(units).length == 1
+    };
 
-        var measurands = $.unique(Array.prototype.concat.apply([], actualBarchartData.series.map(function (series) {
+    var getAllMeasurands = function () {
+        return $.unique(Array.prototype.concat.apply([], actualBarchartData.series.map(function (series) {
             return series.data.map(function (datum) {
                 return datum.measurand
             })
         })));
-        var map = {};
-        var measurandMap = {};
-        $.each(measurands, function (i,measurand) {
-            measurandMap[measurand] = i;
-        });
+    };
 
-        $.each(serieses, function (_,series) {
-            var domain = measurandInSeries[series].map(function (measurand) {
-               return measurandMap[measurand];
+    var createInFrontSwitch = function () {
+        if(!$("#besideSwitches").length){
+            var input = $('<div class="btn-group pull-left" data-toggle="buttons" id="besideSwitches"></div>');
+            var besideButton = $('<label class="btn btn-default active"><input type="radio" name="mode" id="option1">Beside</label>');
+            var inFrontButton = $('<label class="btn btn-default"><input type="radio" name="mode" id="option1">In Front</label>');
+            besideButton.click(function () {
+                drawBarsBesideEachOther();
             });
-            if(domain.length==1) domain.push(domain[0]);
-            map[series] = d3.scale.linear().domain(domain)
-                .range([d3.rgb(seriesColorScale(series).toString()), d3.rgb(seriesColorScale(series).toString()).brighter()]);
-        });
+            inFrontButton.click(function () {
+                drawBarsInFrontOfEachOther();
+            });
+            besideButton.appendTo(input);
+            inFrontButton.appendTo(input);
+            input.appendTo($("#graphButtonHtmlId").parent().parent());
+        }
+    };
 
-        var innerSeriesColorScale = function (series, measurand) {
-            return map[series](measurandMap[measurand]);
-        };
+
+    var drawBarsInFrontOfEachOther = function () {
+
+        var y0 = d3.scale.ordinal()
+            .rangeRoundBands([0, height], .1);
+
+        var seriesColorScale = d3.scale.category20();
 
         y0.domain(groupings);
-        y1.domain(serieses).rangeRoundBands([0,y0.rangeBand()]);
 
         var unitScales = {};
         $.each(units, function (unit,values) {
-            var scale = d3.scale.linear().rangeRound([0, width]);
+            var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
             scale.domain([0,d3.max(values)]);
             unitScales[unit] = scale;
         });
-        var select1 = allBarsGroup.selectAll("g").data(flattenedData);
+        var select1 = allBarsGroup.selectAll(".barGroup").data(flattenedData);
 
-        select1.enter().append("g");
+        select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline","central");
         select1.exit().remove();
         select1.each(function (group) {
-            var rects = d3.select(this).selectAll("rect").data(group.bars);
-                rects.enter().append("rect");
-                rects.exit().remove();
+            var bars = d3.select(this).selectAll(".baar").data(group.bars);
+            bars.enter().append("g").attr("class", "baar").each(function (d) {
+                d3.select(this).append("rect");
+                d3.select(this).append("text").attr("font-weight","bold").attr("fill", "white").attr("text-anchor","end").attr("alignment-baseline","central");
+            });
+            bars.exit().remove();
         });
 
-        allBarsGroup.selectAll("g").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
+        allBarsGroup.selectAll(".barGroup").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
 
-        console.log(flattenedData);
-
+        var y1 = d3.scale.ordinal();
+        y1.domain([0]).rangeRoundBands([0,y0.rangeBand()]);
         var valuesMap = {};
         $.each(flattenedData, function (_,group) {
             var actualGroupMap =  {};
@@ -207,54 +248,143 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 v.sort(function(a, b) { return a > b ? 1 : -1})
             })
         });
+        d3.selectAll(".baar")
+            .on("mouseover", mouseOver())
+            .on("mouseout", mouseOut());
 
-        var xFunction = function (d) {
-            var valueList = valuesMap[d.grouping][d.series];
-            var index = valueList.indexOf(d.value);
-            if(index >0){
-                return unitScales[d.unit](valueList[index-1]);
-            } else{
-                return 0;
-            }
-        };
+        //Update Bar Container
+        var bars = d3.selectAll(".baar");
+        bars.transition()
+            .attrTween("transform", function(d,i,a) { return d3.interpolateString(a,"translate("+barXOffSet+",0)"); });
 
-        d3.selectAll("rect")
-            .attr("x", function(d){
-                return xFunction(d);
-            })
-            .attr("y", function(d) {return  y1(d.series); })
-            .attr("width", function(d) { return  unitScales[d.unit](d.value) -xFunction(d) ; })
-            .attr("height", function() { return y1.rangeBand() })
-            .attr("name", function (d) {return d.measurand})
-            .attr("text","abc")
-            .attr("fill", function(d) {return innerSeriesColorScale(d.series,d.measurand); })
-            .on("mouseover", function(hoverRect) {
-                d3.selectAll("rect").each(function (rect) {
-                    if(rect.measurand != hoverRect.measurand){
-                        d3.select(this).transition()
-                            .duration(150).style("opacity", 0.2).attr("width", function(d) { return  unitScales[d.unit](d.value) -xFunction(d) ; }).attr("x", function (d) {
-                            return xFunction(d)
-                        });
-                    } else{
-                        this.parentNode.appendChild(this);
-                        d3.select(this).transition().duration(200).style("opacity", 1).attr("x",0).attr("width", function(d) { return  unitScales[d.unit](d.value) });
-                    }
-                });
-            })
-            .on("mouseout", function(d, i) {
-                d3.selectAll("rect").each(function (rect) {
-                    if(d.measurand === rect.measurand){
-                        d3.select(this).transition().duration(200).attr("width", function(d) { return  unitScales[d.unit](d.value) -xFunction(d) ; }).attr("x", function (d) {
-                            return xFunction(d)
-                        });
-                    } else{
-                        d3.select(this).transition().duration(200).style("opacity", 1);
-                    }
+        //Update actual bars
+        var textX = y1.rangeBand()/2;
+        d3.selectAll(".baar").each(function (bar) {
 
-                })
-            });
+            //Update Rectangle Position and Size
+            d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
+                .attr("width", unitScales[bar.unit](bar.value))
+                .attr("height", y1.rangeBand());
+
+            //Update Bar Label
+            d3.select(this).select("text")
+                .text(""+Math.round(bar.value)+" ms").transition()
+                .attr("y", textX)
+                .attr("x", unitScales[bar.unit](bar.value)-5);
+        });
+
+        //Update Group Labels
+        var groupLabelY = y1.rangeBand()/2;
+        d3.selectAll(".barGroup").each(function (d) {
+            d3.select(this).select(".barGroupLabel").text(d.label).attr("y",groupLabelY);
+        })
+
 
     };
+
+    var mouseOver = function () {
+        return function(hoverBar) {
+            d3.selectAll(".baar").each(function (bar) {
+                if(bar.measurand != hoverBar.measurand){
+                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
+                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
+                } else{
+                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 1);
+                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 1);
+                }
+            });
+        }
+    };
+    
+    var mouseOut = function () {
+        return function () {
+                d3.selectAll(".baar").each(function () {
+                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 1);
+                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 1);
+                });
+        };
+    };
+
+    var translFnk = function () {
+        return function(d, i, a) {
+            if(a === null){
+                a = "translate(0,0)"
+            }
+            var split = a.replace("translate(","").replace(")","").split(",");
+            var y = split[1];
+            return function(t) {
+                var currentPos = y-(y*t);
+                return "translate(0,"+currentPos+")"
+            };
+        };
+    };
+
+    var drawBarsBesideEachOther = function () {
+        flattenData();
+        var y0 = d3.scale.ordinal()
+            .rangeRoundBands([0, height], .1);
+
+        var y1 = d3.scale.ordinal();
+
+        var seriesColorScale = d3.scale.category20();
+
+        var measurands = getAllMeasurands();
+
+
+        y0.domain(groupings);
+        y1.domain(measurands).rangeRoundBands([0,y0.rangeBand()]);
+
+        var unitScales = {};
+        $.each(units, function (unit,values) {
+            var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
+            scale.domain([0,d3.max(values)]);
+            unitScales[unit] = scale;
+        });
+        var select1 = allBarsGroup.selectAll(".barGroup").data(flattenedData);
+
+        select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline","central");
+        select1.exit().remove();
+        select1.each(function (group) {
+                var bars = d3.select(this).selectAll(".baar").data(group.bars);
+                 bars.enter().append("g").attr("class", "baar").each(function (d) {
+                    d3.select(this).append("rect");
+                    d3.select(this).append("text").attr("font-weight","bold").attr("fill", "white").attr("text-anchor","end").attr("alignment-baseline","central");
+                });
+                bars.exit().remove();
+
+        });
+
+        allBarsGroup.selectAll(".barGroup").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
+
+        //Update Bar Container
+        var bars = d3.selectAll(".baar");
+        bars.transition()
+            .attrTween("transform", function(d) { return d3.interpolateString("translate("+barXOffSet+",0)", "translate("+barXOffSet+","+y1(d.measurand)+")"); });
+
+        //Update actual bars
+        var textX = y1.rangeBand()/2;
+        d3.selectAll(".baar").each(function (bar) {
+
+            //Update Rectangle Position and Size
+            d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
+                .attr("width", unitScales[bar.unit](bar.value))
+                .attr("height", y1.rangeBand());
+
+            //Update Bar Label
+            d3.select(this).select("text")
+                .text(""+Math.round(bar.value)+" ms").transition()
+                .attr("y", textX)
+                .attr("x", unitScales[bar.unit](bar.value)-5);
+        });
+
+        //Update Group Labels
+        d3.selectAll(".barGroup").each(function (d) {
+            var groupLabelY = y1.rangeBand()*(d.bars.length)/2;
+            d3.select(this).select(".barGroupLabel").text(d.label).attr("y",groupLabelY);
+        })
+
+    };
+
 
     var drawHeader = function (headerData) {
 
