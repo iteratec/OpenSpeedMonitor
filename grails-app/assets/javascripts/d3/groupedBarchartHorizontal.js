@@ -11,8 +11,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdentifier) {
 
     var svg,
-        topMargin = 50,
-        outerMargin = 25,
+        margin,
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
@@ -60,14 +59,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .attr("class", "d3chart")
             .attr("height", 400)
             .attr("width", width);
-        var margin = {top: 20, right: 20, bottom: 30, left: 40};
+        margin = {top: 40, right: 20, bottom: 20, left: 20};
             width = +svg.attr("width") - margin.left - margin.right;
             height = +svg.attr("height") - margin.top - margin.bottom;
             allBarsGroup = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         headerLine = svg.append("g");
         trafficLightBars = svg.append("g");
-
+        createInFrontSwitch();
         window.onresize = function () {
             // calcChartWidth();
             // resize();
@@ -117,13 +116,19 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         barXOffSet = measureComponent($("<text>"+getLongestGroupName()+5+"</text>"),function (d) {
             return d.width();
         });
-        if(canBeStacked()){
-            createInFrontSwitch();
-        }
+        updateInFrontSwitch();
         drawBarsBesideEachOther();
         var headerData = [{headerText: commonLabelParts}];
-        // drawHeader(headerData);
+        drawHeader(headerData);
 
+    };
+
+    var updateInFrontSwitch = function () {
+      if(canBeStacked()){
+          $("#inFrontButton").removeClass("disabled")
+      }  else{
+          $("#inFrontButton").addClass("disabled")
+      }
     };
     
     var flattenData = function () {
@@ -183,18 +188,33 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var createInFrontSwitch = function () {
         if(!$("#besideSwitches").length){
             var input = $('<div class="btn-group pull-left" data-toggle="buttons" id="besideSwitches"></div>');
-            var besideButton = $('<label class="btn btn-default active"><input type="radio" name="mode" id="option1">Beside</label>');
-            var inFrontButton = $('<label class="btn btn-default"><input type="radio" name="mode" id="option1">In Front</label>');
+            var besideButton = $('<label class="btn btn-default active" id="besideButton"><input type="radio" name="mode" >Beside</label>');
+            var inFrontButton = $('<label class="btn btn-default" id="inFrontButton"><input type="radio" name="mode" >In Front</label>');
             besideButton.click(function () {
                 drawBarsBesideEachOther();
             });
             inFrontButton.click(function () {
-                drawBarsInFrontOfEachOther();
+                if(canBeStacked()){
+                    drawBarsInFrontOfEachOther();
+                } 
             });
             besideButton.appendTo(input);
             inFrontButton.appendTo(input);
-            input.appendTo($("#graphButtonHtmlId").parent().parent());
+            //TODO move all css stuff in a file
+            var css = {
+                'padding': '5px 10px',
+                'padding-top': '5px',
+                'padding-right': '10px',
+                'padding-bottom': '5px',
+                'padding-left': '10px',
+                'font-size': '12px',
+                'line-height': '1.5'
+            };
+            inFrontButton.css(css);
+            besideButton.css(css);
+            input.prependTo($("#filter-dropdown-group"));
         }
+
     };
 
 
@@ -356,6 +376,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         allBarsGroup.selectAll(".barGroup").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
 
+        d3.selectAll(".baar")
+            .on("mouseover", mouseOver())
+            .on("mouseout", mouseOut());
         //Update Bar Container
         var bars = d3.selectAll(".baar");
         bars.transition()
@@ -410,7 +433,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .attr("dy", ".35em") //vertical align middle
             .attr("cx", 0)
             .attr("transform", function (d) {
-                return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
+                return "translate(" + parseInt(barXOffSet+margin.left) + ")";
             });
 
         //update
@@ -419,7 +442,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .transition()
             .duration(transitionDuration)
             .attr("transform", function (d) {
-                return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
+                return "translate(" + parseInt(barXOffSet+margin.left) + ")";
             });
 
     }
