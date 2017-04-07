@@ -33,7 +33,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         actualBarchartData,
         commonLabelParts,
         headerLine,
-        flattenedData,
+        transformedData,
         groupings,
         valueLabelOffset = 5,
         unitScales,
@@ -95,7 +95,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     
     var getLongestGroupName = function() {
         var longestString = "";
-        $.each(flattenedData, function (_,d) {
+        $.each(transformedData, function (_,d) {
             if(d.label.length > longestString.length){
                 longestString = d.label;
             }
@@ -114,7 +114,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     };
 
     var drawAllBars = function () {
-        flattenData();
+        transformData();
         barXOffSet = measureComponent($("<text>"+getLongestGroupName()+valueLabelOffset+"</text>"),function (d) {
             return d.width();
         });
@@ -126,14 +126,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     };
 
     var updateInFrontSwitch = function () {
-      if(canBeStacked()){
+      if(canBeInFront()){
           $("#inFrontButton").removeClass("disabled")
       }  else{
           $("#inFrontButton").addClass("disabled")
       }
     };
     
-    var flattenData = function () {
+    var transformData = function () {
         units = {};
         var dataMap = {};
         $.each(actualBarchartData.series, function (i,series) {
@@ -162,11 +162,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         $.each(units, function (k,v) {
             v.sort(function(a, b) { return a > b ? 1 : -1});
         });
-        flattenedData = Object.keys(dataMap).map(function (key) {
+        transformedData = Object.keys(dataMap).map(function (key) {
             return dataMap[key];
         });
 
-        $.each(flattenedData, function (_,data) {
+        $.each(transformedData, function (_,data) {
             data.bars.sort(function(a, b) { return a.value < b.value});
         })
     };
@@ -175,7 +175,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         d3.selectAll(".barGroup").each(function(){d3.select(this).selectAll(".baar").sort(function(a, b) { return a.value < b.value})});
     };
 
-    var canBeStacked = function () {
+    var canBeInFront = function () {
         return Object.keys(units).length == 1
     };
 
@@ -196,7 +196,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 drawBarsBesideEachOther();
             });
             inFrontButton.click(function () {
-                if(canBeStacked()){
+                if(canBeInFront()){
                     drawBarsInFrontOfEachOther();
                 }
             });
@@ -219,9 +219,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     };
 
-
     var drawBarsInFrontOfEachOther = function () {
-
         var y0 = d3.scale.ordinal()
             .rangeRoundBands([0, height], .1);
 
@@ -229,57 +227,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         y0.domain(groupings);
 
-        unitScales = {};
-        $.each(units, function (unit,values) {
-            var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
-            scale.domain([0,d3.max(values)]);
-            unitScales[unit] = scale;
-        });
-        var select1 = allBarsGroup.selectAll(".barGroup").data(flattenedData);
-
-        select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline","central");
-        select1.exit().remove();
-        select1.each(function (group) {
-            var bars = d3.select(this).selectAll(".baar").data(group.bars);
-            bars.enter().append("g").attr("class", "baar").each(function (d) {
-                d3.select(this).append("rect");
-                d3.select(this).append("text").style({
-                    "font-weight": "bold",
-                    "fill": "white",
-                    "text-shadow": "0 0 3px #000000",
-                    "text-anchor":"end",
-                    "alignment-baseline":"central"
-                })
-            });
-            bars.exit().remove();
-        });
+        unitScales = createUnitScales();
+        enterBarGroups();
 
         allBarsGroup.selectAll(".barGroup").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
 
         var y1 = d3.scale.ordinal();
         y1.domain([0]).rangeRoundBands([0,y0.rangeBand()]);
-        var valuesMap = {};
-        $.each(flattenedData, function (_,group) {
-            var actualGroupMap =  {};
-            valuesMap[group.grouping] = actualGroupMap;
-            $.each(group.bars, function (_,bar) {
-                var actualSeriesList = actualGroupMap[bar.series];
-                if(actualSeriesList === undefined){
-                    actualSeriesList = [];
-                    actualGroupMap[bar.series] = actualSeriesList;
-                }
-                if($.inArray(actualSeriesList, bar.value) == -1) {
-                    actualSeriesList.push(bar.value)
-                }
-            });
-            $.each(actualGroupMap, function (_,v) {
-                v.sort(function(a, b) { return a > b ? 1 : -1})
-            })
-        });
-        d3.selectAll(".baar")
-            .on("mouseover", mouseOver())
-            .on("mouseout", mouseOut());
 
+        appendMouseEvents()
         //Update Bar Container
         var bars = d3.selectAll(".baar");
         bars.transition()
@@ -309,50 +265,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
 
     };
-
-    var mouseOver = function () {
-        return function(hoverBar) {
-            d3.selectAll(".baar").each(function (bar) {
-                if(bar.measurand != hoverBar.measurand){
-                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
-                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
-                } else{
-                    var rect = d3.select(this).select("rect");
-                    var text = d3.select(this).select("text");
-                    var rectSize = parseInt(rect.attr("width"));
-                    var textSize = text.node().getBBox().width;
-
-                    if(rectSize<textSize){
-                        var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
-                        text.transition().duration(transitionDuration).attr("x", position).attr("visibility","visible").style("opacity", 1);
-                    } else {
-                        text.transition().duration(transitionDuration).style("opacity", 1)
-                    }
-                    rect.transition().duration(transitionDuration).style("opacity", 1);
-                }
-            });
-        }
-    };
-
-    var mouseOut = function () {
-        return function () {
-                d3.selectAll(".baar").each(function (bar) {
-                    var text = d3.select(this).select("text");
-                    var rect = d3.select(this).select("rect");
-                    var rectSize = parseInt(rect.attr("width"));
-                    var textSize = text.node().getBBox().width;
-                    if(rectSize<textSize){
-                        text.transition().duration(transitionDuration).attr("x", 0).attr("visibility","hidden");
-                    } else{
-                        text.transition().duration(transitionDuration).style("opacity", 1);
-                    }
-                    rect.transition().duration(transitionDuration).style("opacity", 1);
-                });
-        };
-    };
-
+    
     var drawBarsBesideEachOther = function () {
-        flattenData();
         var y0 = d3.scale.ordinal()
             .rangeRoundBands([0, height], .1);
 
@@ -366,37 +280,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         y0.domain(groupings);
         y1.domain(measurands).rangeRoundBands([0,y0.rangeBand()]);
 
-        unitScales = {};
-        $.each(units, function (unit,values) {
-            var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
-            scale.domain([0,d3.max(values)]);
-            unitScales[unit] = scale;
-        });
-        var select1 = allBarsGroup.selectAll(".barGroup").data(flattenedData);
+        unitScales = createUnitScales();
 
-        select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline","central");
-        select1.exit().remove();
-        select1.each(function (group) {
-                var bars = d3.select(this).selectAll(".baar").data(group.bars);
-                 bars.enter().append("g").attr("class", "baar").each(function (d) {
-                     d3.select(this).append("rect");
-                     d3.select(this).append("text").style({
-                         "font-weight": "bold",
-                         "fill": "white",
-                         "text-shadow": "0 0 3px #000000",
-                         "text-anchor":"end",
-                         "alignment-baseline":"central"
-                     })
-                });
-                bars.exit().remove();
-
-        });
+        enterBarGroups();
 
         allBarsGroup.selectAll(".barGroup").attr("transform", function (d) {return "translate(0,"+y0(d.grouping)+")"});
 
-        d3.selectAll(".baar")
-            .on("mouseover", mouseOver())
-            .on("mouseout", mouseOut());
+        appendMouseEvents();
         //Update Bar Container
         var bars = d3.selectAll(".baar");
         bars.transition()
@@ -435,6 +325,86 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             d3.select(this).select(".barGroupLabel").text(d.label).attr("y",groupLabelY);
         })
     };
+
+    var appendMouseEvents = function () {
+        d3.selectAll(".baar")
+            .on("mouseover", mouseOver())
+            .on("mouseout", mouseOut());
+    };
+
+    var createUnitScales = function () {
+        unitScales = {};
+        $.each(units, function (unit,values) {
+            var scale = d3.scale.linear().rangeRound([0, width-barXOffSet]);
+            scale.domain([0,d3.max(values)]);
+            unitScales[unit] = scale;
+        });
+        return unitScales;
+    };
+
+    var enterBarGroups = function () {
+        var select1 = allBarsGroup.selectAll(".barGroup").data(transformedData);
+
+        select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline","central");
+        select1.exit().remove();
+        select1.each(function (group) {
+            var bars = d3.select(this).selectAll(".baar").data(group.bars);
+            bars.enter().append("g").attr("class", "baar").each(function (d) {
+                d3.select(this).append("rect");
+                d3.select(this).append("text").style({
+                    "font-weight": "bold",
+                    "fill": "white",
+                    "text-shadow": "0 0 3px #000000",
+                    "text-anchor":"end",
+                    "alignment-baseline":"central"
+                })
+            });
+            bars.exit().remove();
+
+        });
+    };
+
+    var mouseOver = function () {
+        return function(hoverBar) {
+            d3.selectAll(".baar").each(function (bar) {
+                if(bar.measurand != hoverBar.measurand){
+                    d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
+                    d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
+                } else{
+                    var rect = d3.select(this).select("rect");
+                    var text = d3.select(this).select("text");
+                    var rectSize = parseInt(rect.attr("width"));
+                    var textSize = text.node().getBBox().width;
+
+                    if(rectSize<textSize){
+                        var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+                        text.transition().duration(transitionDuration).attr("x", position).attr("visibility","visible").style("opacity", 1);
+                    } else {
+                        text.transition().duration(transitionDuration).style("opacity", 1)
+                    }
+                    rect.transition().duration(transitionDuration).style("opacity", 1);
+                }
+            });
+        }
+    };
+
+    var mouseOut = function () {
+        return function () {
+            d3.selectAll(".baar").each(function (bar) {
+                var text = d3.select(this).select("text");
+                var rect = d3.select(this).select("rect");
+                var rectSize = parseInt(rect.attr("width"));
+                var textSize = text.node().getBBox().width;
+                if(rectSize<textSize){
+                    text.transition().duration(transitionDuration).attr("x", 0).attr("visibility","hidden");
+                } else{
+                    text.transition().duration(transitionDuration).style("opacity", 1);
+                }
+                rect.transition().duration(transitionDuration).style("opacity", 1);
+            });
+        };
+    };
+
 
     var checkIfTextWouldFitRect = function (text, textLabel, barWidth) {
         var clone = $("<text>"+text+"</text>");
