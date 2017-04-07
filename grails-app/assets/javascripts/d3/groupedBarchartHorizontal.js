@@ -30,6 +30,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     valueLabelOffset = 5,
     unitScales,
     units,
+    legendMarginRight = 350,
     inFrontSwitchButton = $("#inFrontButton"),
     seriesColorScale = d3.scale.category20();
 
@@ -84,7 +85,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     barchartData.series.forEach(function (series) {
       var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
       series.data = labelUtil.getSeriesWithShortestUniqueLabels(true);
-      commonLabelParts = labelUtil.getCommonLabelParts();
+      commonLabelParts = labelUtil.getCommonLabelParts(true);
       series.data.sort(function (x, y) {
         return d3.descending(x.value, y.value);
       });
@@ -109,7 +110,42 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     }
     var headerData = [{headerText: commonLabelParts}];
     drawHeader(headerData);
+    drawLegend();
+  };
 
+  var drawLegend = function () {
+    var colorScale = seriesColorScale;
+
+    var legendRectSize = 10;
+    var legendSpacing = 5;
+    var legendHeight = colorScale.domain().length * (legendRectSize + legendSpacing) + legendSpacing;
+
+
+    var legend = svg.selectAll('.legend')
+      .data(colorScale.domain())
+      .enter()
+      .append('g')
+      .attr('class', 'legend');
+
+    legend.append('rect')
+        .attr('width', legendRectSize)
+        .attr('height', legendRectSize)
+        .style('fill', colorScale)
+        .style('stroke', colorScale);
+
+    var texts = legend.append('text')
+        .attr('x', legendRectSize + legendSpacing)
+        .attr('y', legendRectSize)
+        .text(function(d) { return d; });
+
+    var maxLegendSize = 70;
+    maxLegendSize += legendRectSize + legendSpacing;
+
+    svg.selectAll('.legend').attr('transform', function(d, i) {
+        var horz = width - legendMarginRight - maxLegendSize;
+        var vert = margin.top - legendHeight + i * (legendRectSize + legendSpacing) - legendSpacing;
+        return 'translate(' + horz + ',' + vert + ')';
+    });
   };
 
   var getLongestGroupName = function () {
