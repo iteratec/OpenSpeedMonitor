@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     initChartData(barchartData);
 
-    // initFilterDropdown();
+    initFilterDropdown();
     drawAllBars();
 
   };
