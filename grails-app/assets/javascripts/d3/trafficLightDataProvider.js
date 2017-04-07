@@ -81,7 +81,8 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
   };
 
   return {
-    getTimeData: getTimeData
+    getTimeData: getTimeData,
+    initialBarWidth: 20
   }
 
 })();

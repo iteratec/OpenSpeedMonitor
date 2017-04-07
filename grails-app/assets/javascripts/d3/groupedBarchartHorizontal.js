@@ -32,7 +32,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     units,
     legendMarginRight = 350,
     inFrontSwitchButton = $("#inFrontButton"),
-    seriesColorScale = d3.scale.category20();
+    absoluteMaxYOffset = 0;
 
   var drawChart = function (barchartData) {
 
@@ -108,6 +108,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     } else {
       drawBarsBesideEachOther();
     }
+    drawTrafficLight();
+
     var headerData = [{headerText: commonLabelParts}];
     drawHeader(headerData);
     drawLegend();
@@ -243,10 +245,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var inFrontButton = $("#inFrontButton")
     besideButton.click(function () {
       drawBarsBesideEachOther();
+      drawTrafficLight();
     });
     inFrontButton.click(function () {
       if (canBeInFront()) {
         drawBarsInFrontOfEachOther();
+        drawTrafficLight();
       }
     });
   };
@@ -324,8 +328,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     unitScales = createUnitScales();
 
-    console.log(transformedData)
-
     enterBarGroups();
 
     allBarsGroup.selectAll(".barGroup")
@@ -378,7 +380,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var updateSvgHeight = function (barCount) {
     height = barCount * barHeight;
-    svg.attr("height", height + margin.top + margin.bottom)
+    svg.attr("height", height + margin.top + margin.bottom + barHeight + barPadding)
+    absoluteMaxYOffset = height + margin.top + margin.bottom;
   };
 
   var appendMouseEvents = function () {
@@ -390,10 +393,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var createUnitScales = function () {
     unitScales = {};
     $.each(units, function (unit, values) {
+      var maxValueForThisUnit = d3.max(values);
       var scale = d3.scale.linear()
         .rangeRound([0, width - barXOffSet])
-        .domain([0, d3.max(values)]);
+        .domain([0, maxValueForThisUnit]);
       unitScales[unit] = scale;
+      absoluteMaxValue = Math.max(absoluteMaxValue, maxValueForThisUnit);
     });
     return unitScales;
   };
@@ -401,7 +406,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var enterBarGroups = function () {
     var select1 = allBarsGroup.selectAll(".barGroup").data(transformedData);
 
-    select1.enter().append("g").attr("class", "barGroup").append("text").attr("class", "barGroupLabel").attr("alignment-baseline", "central");
+    select1.enter().append("g")
+      .attr("class", "barGroup")
+      .append("text")
+      .attr("class", "barGroupLabel")
+      .attr("alignment-baseline", "central");
     select1.exit().remove();
     select1.each(function (group) {
       var bars = d3.select(this).selectAll(".baar").data(group.bars);
@@ -603,6 +612,87 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     } else {
       $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
     }
+  };
+
+  var drawTrafficLight = function () {
+
+    var unitNames = Object.keys(units);
+    if (unitNames.length == 1 && unitNames[0] == "ms") {
+      drawTrafficLightForTimings();
+    }
+
+  }
+
+  var drawTrafficLightForTimings = function () {
+
+    var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
+    var microsecsXScale = unitScales["ms"];
+
+    var trafficLight = trafficLightBars.selectAll("g")
+      .data(trafficLightData, function (d) {
+        return d.id
+      });
+
+    //exit
+
+    trafficLight.exit()
+      .transition()
+      .duration(transitionDuration)
+      .attr("width", 0)
+      .remove();
+
+    // enter
+
+    var trafficLightEnter = trafficLight.enter()
+      .append("g")
+      .attr("cx", 0)
+      .attr("transform", function (d, index) {
+        var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary) + 2 * barPadding;
+        return "translate(" + xOffset + ", " + absoluteMaxYOffset + ")";
+      });
+
+    trafficLightEnter.append("rect")
+      .attr("height", barHeight)
+      .attr("width", OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.initialBarWidth)
+      .attr("fill", function (d) {
+        return d.fill;
+      })
+      .attr("fill-opacity", function (d) {
+        return d.fillOpacity;
+      })
+      .transition()
+      .duration(transitionDuration)
+      .attr("width", function (d) {
+        return microsecsXScale(d.upperBoundary - d.lowerBoundary);
+      });
+    trafficLightEnter.append("text")
+      .attr("class", function (d) {
+        return d.cssClass;
+      })
+      .text(function (d) {
+        return d.name;
+      })
+      .attr("y", barHeight / 2)
+      .attr("dy", ".35em") //vertical align middle
+      .attr("x", function (d) {
+        return microsecsXScale(d.upperBoundary - d.lowerBoundary) / 2;
+      })
+      .attr("text-anchor", "middle");
+
+    //update
+
+    trafficLight
+      .transition()
+      .duration(transitionDuration)
+      .attr("transform", function (d, index) {
+        var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary) + 2 * barPadding;
+        return "translate(" + xOffset + ", " + absoluteMaxYOffset + ")";
+      })
+      .select('rect')
+      .attr("width", function (d) {
+        return microsecsXScale(d.upperBoundary - d.lowerBoundary);
+      });
+
   };
 
 
