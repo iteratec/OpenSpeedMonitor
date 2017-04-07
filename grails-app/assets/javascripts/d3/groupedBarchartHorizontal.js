@@ -30,6 +30,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     valueLabelOffset = 5,
     unitScales,
     units,
+    inFrontSwitchButton = $("#inFrontButton"),
     seriesColorScale = d3.scale.category20();
 
   var drawChart = function (barchartData) {
@@ -101,7 +102,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       return d.width();
     });
     updateInFrontSwitch();
-    drawBarsBesideEachOther();
+    if (inFrontSwitchButton.hasClass("active")) {
+      drawBarsInFrontOfEachOther();
+    } else {
+      drawBarsBesideEachOther();
+    }
     var headerData = [{headerText: commonLabelParts}];
     drawHeader(headerData);
 
@@ -128,10 +133,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var updateInFrontSwitch = function () {
-    if (canBeInFront()) {
-      $("#inFrontButton").removeClass("disabled")
-    } else {
-      $("#inFrontButton").addClass("disabled")
+    var needToBeBeside = !canBeInFront();
+    inFrontSwitchButton.toggleClass("disabled", needToBeBeside);
+    if (needToBeBeside) {
+        inFrontSwitchButton.removeClass("active");
     }
   };
 
