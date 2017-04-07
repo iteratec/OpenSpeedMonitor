@@ -14,21 +14,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     margin,
     barHeight = 40,
     barPadding = 10,
-    valueMarginInBar = 4,
-    colorPalette = d3.scale.category20(),
     width,
     height,
-    absoluteMaxValue = 0,
-    absoluteMaxYOffset = 0,
     labelWidths = [],
     barXOffSet,
-    xScale = d3.scale.linear(),
-    initialBarWidth = 20,
-    countTrafficLightBar = 1,
     allBarsGroup,
     trafficLightBars,
     transitionDuration = 200,
-    svgHeight,
     filterRules = {},
     actualBarchartData,
     commonLabelParts,
@@ -103,6 +95,18 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   };
 
+  var drawAllBars = function () {
+    transformData();
+    barXOffSet = measureComponent($("<text>" + getLongestGroupName() + valueLabelOffset + "</text>"), function (d) {
+      return d.width();
+    });
+    updateInFrontSwitch();
+    drawBarsBesideEachOther();
+    var headerData = [{headerText: commonLabelParts}];
+    drawHeader(headerData);
+
+  };
+
   var getLongestGroupName = function () {
     var longestString = "";
     $.each(transformedData, function (_, d) {
@@ -121,18 +125,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var result = fn(el);
     el.remove();
     return result
-  };
-
-  var drawAllBars = function () {
-    transformData();
-    barXOffSet = measureComponent($("<text>" + getLongestGroupName() + valueLabelOffset + "</text>"), function (d) {
-      return d.width();
-    });
-    updateInFrontSwitch();
-    drawBarsBesideEachOther();
-    var headerData = [{headerText: commonLabelParts}];
-    drawHeader(headerData);
-
   };
 
   var updateInFrontSwitch = function () {
