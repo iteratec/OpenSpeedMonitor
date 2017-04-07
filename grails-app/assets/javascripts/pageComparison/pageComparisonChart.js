@@ -157,7 +157,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .attr("class", "d3chart-value")
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
-            .attr("text-anchor", "end")
             .call(updateText);
 
         // exit //////////////////////////////////////////////////////////////////////////////////

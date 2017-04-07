@@ -1,5 +1,9 @@
 <div id="chart-container">
     <div id="filter-dropdown-group" class="btn-group">
+        <div class="btn-group pull-left" data-toggle="buttons" id="besideSwitches">
+            <label class="btn btn-sm btn-default active" id="besideButton"><input type="radio" name="mode" >Beside</label>
+            <label class="btn btn-sm btn-default" id="inFrontButton"><input type="radio" name="mode" >In Front</label>
+        </div>
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
             <g:message code="de.iteratec.osm.dimple.barchart.filter.label" default="filter"/> <span
