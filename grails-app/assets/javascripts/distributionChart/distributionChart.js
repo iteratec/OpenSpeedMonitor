@@ -161,7 +161,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var greatestTrace = [];
         Object.keys(chartData.series).forEach( function (trace) {
             var curTrace = chartData.series[trace].data;
-            var domainSize = curTrace[curTrace.length - 1] - curTrace[0];
+            var domainSize = d3.quantile(curTrace, 0.75) - d3.quantile(curTrace, 0.25);
             if (domainSize > maxDomainSize) {
                 maxDomainSize = domainSize;
                 greatestTrace = curTrace;
