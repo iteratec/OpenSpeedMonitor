@@ -6,18 +6,18 @@
     </h2>
 
     <div id="measurandSeries-clone" class="hidden">
-        <g:if test="${selectedAggrGroupValuesUnCached.size() == 0}">
+        %{--<g:if test="${selectedAggrGroupValuesUnCached.size() == 0}">--}%
             <g:set var="selectedAggrGroupValuesUnCached"
             value="${['docCompleteTimeInMillisecsUncached']}"/>
-        </g:if>
+        %{--</g:if>--}%
 
-        <g:if test="${multipleSeries}">
+        %{--<g:if test="${multipleSeries}">--}%
             <div class="removeMeasurandSeriesContainer">
                 <a href="#/" class="removeMeasurandSeriesButton">
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </a>
             </div>
-        </g:if>
+        %{--</g:if>--}%
 
         <div class="row form-group addMeasurandRow">
             <label class="col-sm-3 control-label" for="selectedAggrGroupValuesUnCached">
@@ -33,13 +33,13 @@
                                            value="${selectedAggrGroupValuesUnCached}"/>
             </div>
 
-            <g:if test="${multipleMeasurands}">
+            %{--<g:if test="${multipleMeasurands}">--}%
                 <div class="col-sm-2 control-label removeAddMeasurands">
                     <a href="#/" class="addMeasurandButton">
                         <i class="fa fa-lg fa-plus-circle"></i>
                     </a>
                 </div>
-            </g:if>
+            %{--</g:if>--}%
 
         </div>
 
@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <g:if test="${multipleSeries}">
+    %{--<g:if test="${multipleSeries}">--}%
         <div class="row">
             <a href="#/" id="addMeasurandSeriesButton">
                 <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
@@ -87,7 +87,7 @@
                            default="Add Measurand Series"/>
             </a>
         </div>
-    </g:if>
+    %{--</g:if>--}%
 </div>
 
 <asset:script type="text/javascript">
