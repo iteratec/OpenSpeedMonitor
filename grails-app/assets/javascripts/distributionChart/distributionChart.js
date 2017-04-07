@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require /d3/chartLabelUtil
 
 "use strict";
 
@@ -12,14 +13,16 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         originalSeries = null,
         width = 600,
         height = 600,
-        margin = {top: 10, right: 30, bottom: 50, left: 100},
+        margin = {top: 50, right: 50, bottom: 70, left: 100},
         maxViolinWidth = 150,
         violinWidth = null,
         mainDataResolution = 30,
         interpolation = 'basis',
         toggleLogarithmicYAxisButton = null,
         dataTrimValue = null,
-        logarithmicYAxis = false;
+        logarithmicYAxis = false,
+        headerline,
+        commonLabelParts;
 
     var init = function () {
         svgContainer = document.querySelector("#svg-container");
@@ -40,7 +43,11 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var drawChart = function (distributionChartData) {
         chartData = distributionChartData;
+
         sortSeriesDataAscending();
+
+        assignShortLabels();
+
         if (originalSeries === null) {
             originalSeries = chartData.series;
 
@@ -55,11 +62,9 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             chartData.series = sortedSeries;
         }
 
-        // delete old chart in same container
         d3.select(svgContainer).selectAll("svg").remove();
         initFilterDropdown(chartData.filterRules);
 
-        // create the svg which contains the chart
         var svg = d3.select(svgContainer)
                     .append("svg")
                     .attr("class", "d3chart")
@@ -70,20 +75,74 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         var domain = getDomain();
 
-        // create the scales for both axis
+        drawXAxis(svg);
+        drawYAxis(svg, domain);
+        drawViolins(svg, domain);
+        drawHeader(svg);
+
+        postDraw();
+    };
+
+    var assignShortLabels = function () {
+        var seriesLabelParts = Object.keys(chartData.series).map(function (traceLabel) {
+            return {grouping: traceLabel};
+        });
+
+        var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesLabelParts, chartData.i18nMap);
+        labelUtil.getSeriesWithShortestUniqueLabels();
+        commonLabelParts = labelUtil.getCommonLabelParts();
+
+        seriesLabelParts.forEach(function (labelPart) {
+            chartData.series[labelPart.grouping].label = labelPart.label;
+        });
+    };
+
+    var drawHeader = function (svg) {
+        var widthOfAllViolins = Object.keys(chartData.series).length * violinWidth;
+
+        svg.append("rect")
+            .attr("x", margin.left)
+            .attr("width", svgContainer.clientWidth - margin.left)
+            .attr("height", margin.top)
+            .attr("fill", "white");
+
+        svg.append("g").selectAll("text")
+            .data([commonLabelParts])
+            .enter()
+            .append("text")
+            .text(commonLabelParts)
+            .attr("id", "header-text")
+            .attr("transform", "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)");
+    };
+
+    var drawXAxis = function (svg) {
+        var x = d3.scale.ordinal()
+            .range(xRange())
+            .domain(Object.keys(chartData.series).map(function (seriesKey) {
+                return chartData.series[seriesKey].label;
+            }));
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        svg.append("g")
+            .attr("class", "d3chart-axis d3chart-xAxis")
+            .call(xAxis)
+            .call(rotateLabels)
+            .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")");
+    };
+
+    var drawYAxis = function (svg, domain) {
         var y = d3.scale.linear()
-                  .range([height - margin.bottom, margin.top])
-                  .domain(domain);
+            .range([height - margin.bottom, margin.top])
+            .domain(domain);
 
         var logY = d3.scale.log()
-                     .range([height - margin.bottom, margin.top])
-                     .domain(domain);
+            .range([height - margin.bottom, margin.top])
+            .domain(domain);
 
-        var x = d3.scale.ordinal()
-                  .range(xRange())
-                  .domain(Object.keys(chartData.series));
 
-        // create both axis
         var yAxis = null;
         if (logarithmicYAxis)
             yAxis = d3.svg.axis()
@@ -92,35 +151,29 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                 .tickFormat(d3.format('g'));
         else
             yAxis = d3.svg.axis()
-                      .scale(y)
-                      .orient("left");
+                .scale(y)
+                .orient("left");
 
-        var xAxis = d3.svg.axis()
-                      .scale(x)
-                      .orient("bottom");
 
-        // add the violins
-        Object.keys(chartData.series).forEach( function (trace, i) {
+        var g = svg.append("g")
+            .attr("class", "d3chart-axis d3chart-yAxis")
+            .attr("transform", "translate(" + margin.left + ", 0)")
+            .call(yAxis);
+
+        g.selectAll(".tick line").classed("d3chart-yAxis-line", true);
+        g.selectAll("path").classed("d3chart-yAxis-line", true);
+    };
+
+    var drawViolins = function (svg, domain) {
+        Object.keys(chartData.series).forEach(function (trace, i) {
             var traceData = chartData.series[trace].data;
 
             var g = svg.append("g")
-                       .attr("class", "d3chart-violin")
-                       .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
+                .attr("class", "d3chart-violin")
+                .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
             addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
-
-        svg.append("g")
-           .attr("class", "d3chart-axis d3chart-yAxis")
-           .attr("transform", "translate(" + margin.left + ", 0)")
-           .call(yAxis);
-
-        svg.append("g")
-           .attr("class", "d3chart-axis d3chart-xAxis")
-           .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")")
-           .call(xAxis);
-
-        postDraw()
     };
 
     var sortSeriesDataAscending = function() {
@@ -350,20 +403,26 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         // remove the xAxis lines
         d3.select(".d3chart-axis.d3chart-xAxis > path.domain").remove();
         d3.selectAll(".d3chart-axis.d3chart-xAxis g > line").remove();
-
-        // rotate the labels if necessary
-        rotateLabels()
     };
 
     var rotateLabels = function () {
         var rotate = false;
+        var maxLabelLength = -1;
         d3.selectAll(".d3chart-xAxis text").each(function() {
-            if (d3.select(this).node().getComputedTextLength() > violinWidth) {
+            var labelLength = d3.select(this).node().getComputedTextLength();
+
+            if (labelLength > maxLabelLength)
+                maxLabelLength = labelLength;
+
+            if (labelLength > violinWidth)
                 rotate = true;
-            }
+
+            margin.bottom = d3.select(this).node().getBoundingClientRect().height + 20;
         });
 
         if (rotate) {
+            margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
+
             d3.selectAll(".d3chart-xAxis text")
                 .style("text-anchor", "start")
                 .each(function () {
