@@ -32,7 +32,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     units,
     legendMarginRight = 350,
     inFrontSwitchButton = $("#inFrontButton"),
-    absoluteMaxYOffset = 0;
+    absoluteMaxYOffset = 0,
+    absoluteMaxValue = 0,
+    seriesColorScale = d3.scale.category20();
 
   var drawChart = function (barchartData) {
 
