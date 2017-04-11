@@ -12,12 +12,12 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
     var svg,
         topMargin = 50,
+        svgContainer = $("#" + chartIdentifier),
         outerMargin = 25,
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
         colorPalette = d3.scale.category20(),
-        width,
         absoluteMaxValue = 0,
         absoluteMaxYOffset = 0,
         labelWidths = [],
@@ -50,21 +50,15 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
     var initChart = function () {
 
         $("#chart-card").removeClass("hidden");
-        width = parseInt($("#" + chartIdentifier).width(), 10);
 
         svg = d3.select("#" + chartIdentifier).append("svg")
-            .attr("class", "d3chart")
-            .attr("width", width);
+            .attr("class", "d3chart");
 
         headerLine = svg.append("g");
         allBarsGroup = svg.append("g");
         trafficLightBars = svg.append("g");
 
-        window.onresize = function () {
-            // calcChartWidth();
-            // resize();
-        };
-
+        $(window).resize(drawAllBars);
     };
 
     var initChartData = function (barchartData) {
@@ -86,6 +80,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
     var drawAllBars = function () {
 
+        updateSvgWidth();
+
         actualBarchartData.series.forEach(function (currentSeries) {
             var seriesData = currentSeries.data;
             var unitName = currentSeries.dimensionalUnit;
@@ -97,6 +93,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         var headerData = [{headerText: commonLabelParts}];
         drawHeader(headerData);
 
+    };
+
+    var updateSvgWidth = function () {
+        svg.attr("width", svgContainer.width());
     };
 
     var drawHeader = function (headerData) {
@@ -138,18 +138,11 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
     }
 
     var drawSeries = function (seriesData, unitName) {
-
-        var setWidthOfBarByData = function (selection) {
-            selection
-                .attr("width", function (d) {
-                    return xScale(d.value)
-                })
-        };
         var defineXScale = function () {
             var paddingBetweenLabelAndBar = barPadding;
             xScale
                 .domain([0, absoluteMaxValue])
-                .range([0, width - outerMargin * 2 - getMaxLabelWidth() - paddingBetweenLabelAndBar]);
+                .range([0, svg.attr("width") - outerMargin * 2 - getMaxLabelWidth() - paddingBetweenLabelAndBar]);
         };
 
         svgHeight = topMargin + (seriesData.length + countTrafficLightBar) * (barHeight + barPadding) + barPadding;
@@ -191,6 +184,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         singleBarGroupsEnter.append("text")
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
+            .classed("d3chart-label", true)
             .text(function (d) {
                 return d.label;
             })
@@ -208,20 +202,36 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("fill", function (d, i) {
                 return colorPalette(0);
             })
-            .on("click", highlightClickedBar)
-            .transition()
-            .duration(transitionDuration)
-            .call(setWidthOfBarByData);
+            .on("click", highlightClickedBar);
 
         singleBarGroupsEnter.append("text")
-            .attr("class", "d3chart-value")
+            .classed("d3chart-value", true)
             .attr("y", barHeight / 2)
             .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
-            .attr("dy", ".35em") //vertical align middle
             .attr("text-anchor", "end")
             .text(function (d) {
                 return (Math.round(d.value)) + " " + unitName;
+            });
+
+
+        // update ////////////////////////////////////////////////////////////////////////////////////
+
+        singleBarGroups
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", function (d, index) {
+                var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
+                return "translate(" + outerMargin + "," + yOffset + ")";
             })
+            .select("rect")
+            .attr("width", function (d) {
+                return xScale(d.value);
+            });
+
+        singleBarGroups
+            .select(".d3chart-value")
+            .transition()
+            .duration(transitionDuration)
             .attr("x", function (d) {
                 var width = this.getBBox().width;
                 return Math.max(width + valueMarginInBar, xScale(d.value));
@@ -234,16 +244,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
                     return 0;
                 }
                 return 1;
-            });
-
-        // update ////////////////////////////////////////////////////////////////////////////////////
-
-        singleBarGroups
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", function (d, index) {
-                var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
-                return "translate(" + outerMargin + "," + yOffset + ")";
             });
 
         defineXScale();
@@ -361,10 +361,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
                 return d.fillOpacity;
             })
             .transition()
-            .duration(transitionDuration)
-            .attr("width", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary);
-            });
+            .duration(transitionDuration);
+
         trafficLightEnter.append("text")
             .attr("class", function (d) {
                 return d.cssClass;
@@ -374,9 +372,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             })
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
-            .attr("x", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
-            })
             .attr("text-anchor", "middle");
 
         //update
@@ -393,6 +388,13 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
                 return xScale(d.upperBoundary - d.lowerBoundary);
             });
 
+        trafficLight
+            .select("text")
+            .transition()
+            .duration(transitionDuration)
+            .attr("x", function (d) {
+                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+            });
     };
 
     initChart();
