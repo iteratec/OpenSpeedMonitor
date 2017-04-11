@@ -39,6 +39,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         //     logarithmicYAxis = !logarithmicYAxis;
         //     drawChart(chartData);
         // });
+
+        $(window).resize(draw);
     };
 
     var drawChart = function (distributionChartData) {
@@ -62,15 +64,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             chartData.series = sortedSeries;
         }
 
-        d3.select(svgContainer).selectAll("svg").remove();
         initFilterDropdown(chartData.filterRules);
+        draw();
+    };
 
-        var svg = d3.select(svgContainer)
-                    .append("svg")
-                    .attr("class", "d3chart")
-                    .attr("width", "100%")
-                    .attr("height", height);
-
+    var draw = function () {
+        var svg = initSvg();
         violinWidth = calculateViolinWidth();
 
         var domain = getDomain();
@@ -81,6 +80,16 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         drawHeader(svg);
 
         postDraw();
+    };
+
+    var initSvg = function () {
+        d3.select(svgContainer).selectAll("svg").remove();
+
+        return d3.select(svgContainer)
+            .append("svg")
+            .attr("class", "d3chart")
+            .attr("height", height)
+            .attr("width", svgContainer.clientWidth);
     };
 
     var assignShortLabels = function () {
