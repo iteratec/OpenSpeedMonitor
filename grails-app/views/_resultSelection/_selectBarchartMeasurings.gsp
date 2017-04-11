@@ -21,7 +21,7 @@
 
         <div class="row form-group addMeasurandRow">
             <label class="col-sm-3 control-label" for="selectedAggrGroupValuesUnCached">
-                <g:message code="de.iteratec.osm.dimple.barchart.measurands"
+                <g:message code="de.iteratec.osm.barchart.measurands"
                            default="Measurands:"/>
             </label>
 
@@ -48,12 +48,12 @@
                 <div class="btn-group btn-group-justified stackedOptions" data-toggle="buttons">
                     <label class="btn btn-default active">
                         <input type="radio" class="stackedOption" autocomplete="off" value="stacked" checked>
-                        <g:message code="de.iteratec.osm.dimple.barchart.stacked.true.label"
+                        <g:message code="de.iteratec.osm.barchart.stacked.true.label"
                                    default="stacked"/>
                     </label>
                     <label class="btn btn-default">
                         <input type="radio" class="stackedOption" autocomplete="off" value="notStacked">
-                        <g:message code="de.iteratec.osm.dimple.barchart.stacked.false.label"
+                        <g:message code="de.iteratec.osm.barchart.stacked.false.label"
                                    default="notStacked"/>
                     </label>
                 </div>
@@ -83,7 +83,7 @@
         <div class="row">
             <a href="#/" id="addMeasurandSeriesButton">
                 <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
-                <g:message code="de.iteratec.osm.dimple.barchart.addMeasurandSeriesButton.label"
+                <g:message code="de.iteratec.osm.barchart.addMeasurandSeriesButton.label"
                            default="Add Measurand Series"/>
             </a>
         </div>
