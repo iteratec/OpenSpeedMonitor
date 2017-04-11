@@ -111,6 +111,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     drawLegend();
   };
 
+
   var drawLegend = function () {
     var colorScale = seriesColorScale;
 
@@ -218,7 +219,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var recreateOrder = function () {
     d3.selectAll(".barGroup").each(function () {
-      d3.select(this).selectAll(".baar").sort(function (a, b) {
+      d3.select(this).selectAll(".bar").sort(function (a, b) {
         return a.value < b.value
       })
     });
@@ -274,7 +275,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     appendMouseEvents()
 
     //Update Bar Container
-    var bars = d3.selectAll(".baar");
+    var bars = d3.selectAll(".bar");
     bars.transition()
       .attrTween("transform", function (d, i, a) {
         return d3.interpolateString(a, "translate(" + barXOffSet + ",0)");
@@ -282,7 +283,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     //Update actual bars
     var textX = innerYScale.rangeBand() / 2;
-    d3.selectAll(".baar").each(function (bar) {
+    d3.selectAll(".bar").each(function (bar) {
 
       //Update Rectangle Position and Size
       d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
@@ -334,7 +335,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     appendMouseEvents();
 
     //Update Bar Container
-    var bars = d3.selectAll(".baar");
+    var bars = d3.selectAll(".bar");
     bars.transition()
       .attrTween("transform", function (d) {
         return d3.interpolateString("translate(" + barXOffSet + ",0)", "translate(" + barXOffSet + "," + innerYScale(d.measurand) + ")");
@@ -342,7 +343,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     //Update actual bars
     var textX = innerYScale.rangeBand() / 2;
-    d3.selectAll(".baar").each(function (bar) {
+    d3.selectAll(".bar").each(function (bar) {
 
       //Update Rectangle Position and Size
       var barWidth = unitScales[bar.unit](bar.value);
@@ -387,7 +388,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var appendMouseEvents = function () {
-    d3.selectAll(".baar")
+    d3.selectAll(".bar")
       .on("mouseover", mouseOver())
       .on("mouseout", mouseOut());
   };
@@ -415,8 +416,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .attr("alignment-baseline", "central");
     select1.exit().remove();
     select1.each(function (group) {
-      var bars = d3.select(this).selectAll(".baar").data(group.bars);
-      bars.enter().append("g").attr("class", "baar").each(function (d) {
+      var bars = d3.select(this).selectAll(".bar").data(group.bars);
+      bars.enter().append("g").attr("class", "bar").each(function (d) {
         d3.select(this).append("rect");
         d3.select(this).append("text")
           .classed("d3chart-value", true)
@@ -428,7 +429,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var mouseOver = function () {
     return function (hoverBar) {
-      d3.selectAll(".baar").each(function (bar) {
+      d3.selectAll(".bar").each(function (bar) {
         if (bar.measurand != hoverBar.measurand) {
           d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
           d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
@@ -452,7 +453,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var mouseOut = function () {
     return function () {
-      d3.selectAll(".baar").each(function (bar) {
+      d3.selectAll(".bar").each(function (bar) {
         var text = d3.select(this).select("text");
         var rect = d3.select(this).select("rect");
         var rectSize = parseInt(rect.attr("width"));
