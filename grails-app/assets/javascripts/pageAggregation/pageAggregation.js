@@ -108,21 +108,22 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             currentGroup = JSON.parse(decodeURIComponent(measurandGroups));
             addMeasurands(currentGroup, 0);
         }
+
     };
 
     var addMeasurands = function (measurands, index) {
+        var values = measurands['values'];
         var firstSelect = $(".firstMeasurandSelect").eq(index);
-        firstSelect.val(measurands['values'].shift());
-        var length = measurands['values'].length;
-        var currentPanel = firstSelect.closest(".panel");
-        var currentAddButton = currentPanel.find(".addMeasurandButton");
-        for (var i = 0; i < length; i++) {
+        firstSelect.val(values.shift());
+        var amountToAdd = values.length;
+        var currentAddButton = $("#addMeasurandButton");
+        while(amountToAdd--){
             currentAddButton.click();
-            currentPanel.find(".additionalMeasurand").eq(i).val(measurands['values'].shift());
-            currentAddButton = currentPanel.find(".addMeasurandButton").eq(i + 1);
         }
-        currentPanel.find(".stackedSelect").val(measurands['stacked'])
 
+        $(".additionalMeasurand").each(function () {
+            $(this).val(values.shift())
+        })
     };
 
     var timecardResolved = false;
