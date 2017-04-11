@@ -14,6 +14,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     margin,
     barHeight = 40,
     barPadding = 10,
+    svgContainer = $("#" + chartIdentifier),
     width,
     height,
     labelWidths = [],
@@ -59,14 +60,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     $("#chart-card").removeClass("hidden");
 
     margin = {top: 50, right: 20, bottom: 20, left: 20};
-    width = parseInt($("#" + chartIdentifier).width(), 10);
 
     svg = d3.select("#" + chartIdentifier).append("svg")
-      .attr("class", "d3chart")
-      .attr("height", 400)
-      .attr("width", width);
-    width = +svg.attr("width") - margin.left - margin.right;
-    height = +svg.attr("height") - margin.top - margin.bottom;
+      .attr("class", "d3chart");
 
     allBarsGroup = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -75,10 +71,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     addBesideInFrontSwitchEventHandlers();
 
-    window.onresize = function () {
-      // calcChartWidth();
-      // resize();
-    };
+    $(window).resize(drawAllBars);
 
   };
 
@@ -100,6 +93,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var drawAllBars = function () {
+    updateSvgWidth();
     transformData();
     barXOffSet = measureComponent($("<text>" + getLongestGroupName() + valueLabelOffset + "</text>"), function (d) {
       return d.width();
@@ -382,8 +376,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var updateSvgHeight = function (barCount) {
     height = barCount * barHeight;
-    svg.attr("height", height + margin.top + margin.bottom + barHeight + barPadding)
+    svg.attr("height", height + margin.top + margin.bottom + barHeight + barPadding);
     absoluteMaxYOffset = height + margin.top + margin.bottom;
+  };
+
+  var updateSvgWidth = function () {
+    var fullWidth = svgContainer.width();
+    svg.attr("width", fullWidth);
+    width = fullWidth - margin.left - margin.right;
   };
 
   var appendMouseEvents = function () {
