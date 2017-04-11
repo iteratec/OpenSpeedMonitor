@@ -35,6 +35,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     inFrontSwitchButton = $("#inFrontButton"),
     absoluteMaxYOffset = 0,
     absoluteMaxValue = 0,
+    selectedSeries = "",
     seriesColorScale = d3.scale.category20();
 
   var drawChart = function (barchartData) {
@@ -392,7 +393,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var appendMouseEvents = function () {
     d3.selectAll(".bar")
       .on("mouseover", mouseOver())
-      .on("mouseout", mouseOut());
+      .on("mouseout", mouseOut())
+      .on("click", click());
   };
 
   var createUnitScales = function () {
@@ -420,7 +422,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     select1.each(function (group) {
       var bars = d3.select(this).selectAll(".bar").data(group.bars);
       bars.enter().append("g").attr("class", "bar").each(function (d) {
-        d3.select(this).append("rect");
+        d3.select(this).append("rect").classed("d3chart-bar-clickable", true);
         d3.select(this).append("text")
           .classed("d3chart-value", true)
       });
@@ -431,47 +433,66 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var mouseOver = function () {
     return function (hoverBar) {
-      d3.selectAll(".bar").each(function (bar) {
-        if (bar.measurand != hoverBar.measurand) {
-          d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
-          d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
-        } else {
-          var rect = d3.select(this).select("rect");
-          var text = d3.select(this).select("text");
-          var rectSize = parseInt(rect.attr("width"));
-          var textSize = text.node().getBBox().width;
+      if(selectedSeries == ""){
+          d3.selectAll(".bar").each(function (bar) {
+              if (bar.measurand != hoverBar.measurand) {
+                  d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
+                  d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
+              } else {
+                  var rect = d3.select(this).select("rect");
+                  var text = d3.select(this).select("text");
+                  var rectSize = parseInt(rect.attr("width"));
+                  var textSize = text.node().getBBox().width;
 
-          if (rectSize < textSize) {
-            var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
-            text.classed("d3chart-value",false).classed("d3chart-value-out", true);
-            text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
-          } else {
-            text.transition().duration(transitionDuration).style("opacity", 1)
-          }
-          rect.transition().duration(transitionDuration).style("opacity", 1);
-        }
-      });
+                  if (rectSize < textSize) {
+                      var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+                      text.classed("d3chart-value",false).classed("d3chart-value-out", true);
+                      text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
+                  } else {
+                      text.transition().duration(transitionDuration).style("opacity", 1)
+                  }
+                  rect.transition().duration(transitionDuration).style("opacity", 1);
+              }
+          });
+      }
     }
   };
 
   var mouseOut = function () {
     return function () {
-      d3.selectAll(".bar").each(function (bar) {
-        var text = d3.select(this).select("text");
-        var rect = d3.select(this).select("rect");
-        var rectSize = parseInt(rect.attr("width"));
-        var textSize = text.node().getBBox().width;
-        if (rectSize < textSize) {
-          text.classed("d3chart-value-out", false).classed("d3chart-value",true);
-          text.transition().duration(transitionDuration).attr("x", 0).attr("visibility", "hidden");
-        } else {
-          text.transition().duration(transitionDuration).style("opacity", 1);
-        }
-        rect.transition().duration(transitionDuration).style("opacity", 1);
-      });
+      if(selectedSeries == ""){
+          d3.selectAll(".bar").each(function (bar) {
+              var text = d3.select(this).select("text");
+              var rect = d3.select(this).select("rect");
+              var rectSize = parseInt(rect.attr("width"));
+              var textSize = text.node().getBBox().width;
+              if (rectSize < textSize) {
+                  text.classed("d3chart-value-out", false).classed("d3chart-value",true);
+                  text.transition().duration(transitionDuration).attr("x", 0).attr("visibility", "hidden");
+              } else {
+                  text.transition().duration(transitionDuration).style("opacity", 1);
+              }
+              rect.transition().duration(transitionDuration).style("opacity", 1);
+          });
+      }
     };
   };
 
+  var click = function () {
+      return function (hoverBar) {
+        if(selectedSeries == ""){
+            selectedSeries = hoverBar.measurand;
+            mouseOver()(hoverBar);
+        } else if(selectedSeries == hoverBar.measurand){
+            selectedSeries = "";
+            mouseOver()(hoverBar);
+        } else {
+            selectedSeries = "";
+            mouseOver()(hoverBar);
+            selectedSeries = hoverBar.measurand;
+        }
+      }
+  };
 
   var checkIfTextWouldFitRect = function (text, textLabel, barWidth) {
     var clone = $("<text>" + text + "</text>");
