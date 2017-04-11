@@ -3,9 +3,9 @@ package de.iteratec.osm.result
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
-import de.iteratec.osm.dimple.BarchartDTO
-import de.iteratec.osm.dimple.BarchartDatum
-import de.iteratec.osm.dimple.BarchartSeries
+import de.iteratec.osm.barchart.BarchartDTO
+import de.iteratec.osm.barchart.BarchartDatum
+import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController

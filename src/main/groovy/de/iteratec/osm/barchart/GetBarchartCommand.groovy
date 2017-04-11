@@ -1,4 +1,4 @@
-package de.iteratec.osm.dimple
+package de.iteratec.osm.barchart
 
 import grails.databinding.BindUsing
 import grails.validation.Validateable

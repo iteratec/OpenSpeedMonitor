@@ -1,4 +1,4 @@
-package de.iteratec.osm.dimple
+package de.iteratec.osm.barchart
 
 class BarchartDatum {
     String measurand = ""

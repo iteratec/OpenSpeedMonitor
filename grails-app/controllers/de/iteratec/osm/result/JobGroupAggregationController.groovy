@@ -1,10 +1,10 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.dimple.BarchartDTO
-import de.iteratec.osm.dimple.BarchartDatum
-import de.iteratec.osm.dimple.BarchartSeries
-import de.iteratec.osm.dimple.GetBarchartCommand
+import de.iteratec.osm.barchart.BarchartDTO
+import de.iteratec.osm.barchart.BarchartDatum
+import de.iteratec.osm.barchart.BarchartSeries
+import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
