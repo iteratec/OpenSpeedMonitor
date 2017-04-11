@@ -48,8 +48,7 @@
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                             aggrGroupValuesUnCached: aggrGroupValuesUnCached,
-                            multipleMeasurands     : false,
-                            multipleSeries         : false
+                            multipleMeasurands     : true
                     ]"/>
                 </div>
 
