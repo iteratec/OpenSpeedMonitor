@@ -260,6 +260,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
                 return xScale(d.upperBoundary - d.lowerBoundary);
             });
 
+        trafficLight
+            .select("text")
+            .transition()
+            .duration(transitionDuration)
+            .attr("x", function (d) {
+                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+            });
     };
 
     initChart();
