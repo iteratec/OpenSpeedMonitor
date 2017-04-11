@@ -363,7 +363,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var updateBarLabel = function (bar,barElement,barWidth, innerYScale) {
       var textY = innerYScale.rangeBand() / 2;
       var textLabel = d3.select(barElement).select("text");
-      var text = "" + Math.round(bar.value) + " ms";
+      var text = "" + Math.round(bar.value) +" "+ bar.unit;
       var textTrans = textLabel.transition()
           .text(text)
           .attr("y", textY);
