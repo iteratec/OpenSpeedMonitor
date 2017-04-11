@@ -272,7 +272,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .domain([0])
       .rangeRoundBands([0, outerYScale.rangeBand()]);
 
-    appendMouseEvents()
+    appendMouseEvents();
 
     //Update Bar Container
     var bars = d3.selectAll(".bar");
@@ -282,19 +282,16 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       });
 
     //Update actual bars
-    var textX = innerYScale.rangeBand() / 2;
     d3.selectAll(".bar").each(function (bar) {
 
       //Update Rectangle Position and Size
+      var barWidth = unitScales[bar.unit](bar.value);
       d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
-        .attr("width", unitScales[bar.unit](bar.value))
+        .attr("width", barWidth)
         .attr("height", innerYScale.rangeBand());
 
-      //Update Bar Label
-      d3.select(this).select("text")
-        .text("" + Math.round(bar.value) + " ms").transition()
-        .attr("y", textX)
-        .attr("x", unitScales[bar.unit](bar.value) - 5);
+        //Update Bar Label
+        updateBarLabel(bar,this,barWidth, innerYScale);
     });
 
     //Update Group Labels
@@ -342,29 +339,17 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       });
 
     //Update actual bars
-    var textX = innerYScale.rangeBand() / 2;
     d3.selectAll(".bar").each(function (bar) {
 
       //Update Rectangle Position and Size
       var barWidth = unitScales[bar.unit](bar.value);
       var rect = d3.select(this).select("rect");
       rect.attr("fill", seriesColorScale(bar.measurand)).transition()
-        .attr("width", unitScales[bar.unit](bar.value))
+        .attr("width", barWidth)
         .attr("height", innerYScale.rangeBand());
 
       //Update Bar Label
-      var textLabel = d3.select(this).select("text");
-      var text = "" + Math.round(bar.value) + " ms";
-      var textTrans = textLabel.transition()
-        .text(text)
-        .attr("y", textX);
-      if (!checkIfTextWouldFitRect(text, textLabel, barWidth)) {
-        textTrans
-          .attr("visibility", "hidden")
-          .style("text-anchor", "start")
-      } else {
-        textTrans.attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset);
-      }
+      updateBarLabel(bar,this,barWidth, innerYScale);
 
     });
 
@@ -373,6 +358,23 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       var groupLabelY = innerYScale.rangeBand() * (d.bars.length) / 2;
       d3.select(this).select(".barGroupLabel").text(d.label).attr("y", groupLabelY);
     })
+  };
+
+  var updateBarLabel = function (bar,barElement,barWidth, innerYScale) {
+      var textY = innerYScale.rangeBand() / 2;
+      var textLabel = d3.select(barElement).select("text");
+      var text = "" + Math.round(bar.value) + " ms";
+      var textTrans = textLabel.transition()
+          .text(text)
+          .attr("y", textY);
+      if (!checkIfTextWouldFitRect(text, textLabel, barWidth)) {
+          textTrans
+              .attr("visibility", "hidden");
+      } else {
+          textTrans
+              .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
+              .attr("visibility","");
+      }
   };
 
   var updateSvgHeight = function (barCount) {
@@ -441,6 +443,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
           if (rectSize < textSize) {
             var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+            text.classed("d3chart-value",false).classed("d3chart-value-out", true);
             text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
           } else {
             text.transition().duration(transitionDuration).style("opacity", 1)
@@ -459,6 +462,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         var rectSize = parseInt(rect.attr("width"));
         var textSize = text.node().getBBox().width;
         if (rectSize < textSize) {
+          text.classed("d3chart-value-out", false).classed("d3chart-value",true);
           text.transition().duration(transitionDuration).attr("x", 0).attr("visibility", "hidden");
         } else {
           text.transition().duration(transitionDuration).style("opacity", 1);
@@ -472,6 +476,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var checkIfTextWouldFitRect = function (text, textLabel, barWidth) {
     var clone = $("<text>" + text + "</text>");
     clone.text(text);
+    clone.addClass("d3chart-value");
     var width = measureComponent(clone, function (d) {
       return d.width()
     });

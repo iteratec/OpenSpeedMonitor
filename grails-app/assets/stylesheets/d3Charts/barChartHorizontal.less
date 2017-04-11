@@ -6,6 +6,13 @@
   text-anchor: end;
   alignment-baseline: central;
 }
+
+.d3chart-value-out{
+  &:extend(.d3chart-value);
+  text-shadow: 0 0 3px #000000;
+  text-anchor: start;
+}
+
 .d3chart-good{
   font-weight: bold;
   fill: green;
