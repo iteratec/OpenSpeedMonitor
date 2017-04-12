@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus
 
 class ScriptController {
 	PageService pageService
+	ScriptService scriptService
 
 	private String getScriptI18n() {
 		return message(code: 'de.iteratec.iss.script', default: 'Skript')
@@ -68,7 +69,7 @@ class ScriptController {
 			render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
 			return
 		}
-		createNewPagesAndMeasuredEvents(s)
+		scriptService.createNewPagesAndMeasuredEvents(s)
 		def flashMessageArgs = [getScriptI18n(), s.label]
 		flash.message = message(code: 'default.created.message', args: flashMessageArgs)
 		redirect(action: "list")
@@ -124,7 +125,7 @@ class ScriptController {
 			render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(s)])
 			return
 		}
-		createNewPagesAndMeasuredEvents(s)
+		scriptService.createNewPagesAndMeasuredEvents(s)
 		archivedScript.save(failOnError:true, flush:true)
 
 		flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
@@ -138,19 +139,6 @@ class ScriptController {
 				navigationScript: s.navigationScript,
 				script: s)
 
-	}
-
-	private void createNewPagesAndMeasuredEvents(Script s) {
-		ScriptParser parser = new ScriptParser(pageService, s.navigationScript)
-		parser.newPages.each { String name ->
-			Page.findOrSaveByName(name)
-		}
-		parser.newMeasuredEvents.each { String measuredEventName, String pageName ->
-			def page = Page.findByName(pageName)
-			if (page) {
-				MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
-			}
-		}
 	}
 
 	def delete() {
