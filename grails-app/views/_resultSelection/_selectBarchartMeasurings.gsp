@@ -39,10 +39,9 @@
                                        optionKey="value" optionValue="value"
                                        value="${selectedAggrGroupValuesUnCached}"/>
         </div>
-
-        <div class="col-sm-2 control-label removeAddMeasurands">
+        <div class="col-sm-1 control-label removeAddMeasurands">
             <a href="#/" class="removeMeasurandButton">
-                <i class="fa fa-lg fa-minus-circle" aria-hidden="true"></i>
+                <i class="fa fa-times" aria-hidden="true"></i>
             </a>
         </div>
     </div>
