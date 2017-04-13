@@ -51,10 +51,9 @@ class QueueAndJobStatusService {
 
     /**
      * Retrieves only those locations for the given WebPageTestServer from the database which are also returned
-     * when querying getLocations.php
+     * when querying getLocations.php and who are active in osm database.
      *
-     * @return A list of maps. Each map's key is the retrieved Location and its value is the <location> tag in the XML
-     *  	response returned by getLocations.php
+     * @return A list of {@link LocationWithXmlNode}.
      */
     List<LocationWithXmlNode> getActiveLocations(WebPageTestServer wptServer) {
         GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
@@ -66,7 +65,7 @@ class QueueAndJobStatusService {
                 browsersForLocation.each { Browser currentBrowser ->
                     String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
                     Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, uniqueIdentfierForServer)
-                    if (location)
+                    if (location && location.active)
                         locations << new LocationWithXmlNode(
                                 location: location,
                                 locationXmlNode: locationTagInXml

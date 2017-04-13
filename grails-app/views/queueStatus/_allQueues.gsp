@@ -1,7 +1,7 @@
 <g:each var="wptServer" in="${servers}">
 	<div class="card">
 	<h2>${wptServer.key}</h2>
-	
+
 	<g:if test="${wptServer.value instanceof String}">
 		<p>Error: ${wptServer.value}</p>
 	</g:if>
@@ -33,7 +33,7 @@
 			<g:each var="location" in="${wptServer.value}">
 				<tr class="queueRow">
 					<td>
-						<abbr title="${message(code: "queue.label.label")}: ${location.label}">${location.id}</abbr>
+						<abbr title="${message(code: "queue.label.label")}: ${location.label} | ${message(code: "de.iteratec.osm.location.queue.date.label")}: ${location.dateOfOsmQueueData}">${location.id}</abbr>
 					</td>
 					<td>
 						${location.agents}

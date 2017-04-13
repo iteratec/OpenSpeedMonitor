@@ -18,102 +18,79 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.system.LocationHealthCheck
+import de.iteratec.osm.system.LocationHealthCheckDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import groovy.time.TimeCategory
-import groovy.util.slurpersupport.GPathResult
 
 class QueueStatusController {
+
     QueueAndJobStatusService queueAndJobStatusService
     PerformanceLoggingService performanceLoggingService
+    LocationHealthCheckDaoService locationHealthCheckDaoService
 
-    JobService jobService
     PageService pageService
 
     private Map getServersWithQueues() {
-        Map model = [:].withDefault { [] }
-        // for all active WptServers...
+
+        Map queueDataByWptServer = [:].withDefault { [] }
+
         WebPageTestServer.findAllByActive(true).each { WebPageTestServer wptServer ->
-            // Request getTesters.php and getLocations.php and iterate over returned locations:
             try {
-                GPathResult agentsResponse
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getAgentsHttpResponse", 1) {
-                    agentsResponse = queueAndJobStatusService.getAgentsHttpResponse(wptServer)
-                }
-                List<LocationWithXmlNode> activeLocations
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, "getActiveLocations", 1) {
-                    activeLocations = queueAndJobStatusService.getActiveLocations(wptServer)
-                }
-                activeLocations.each {
-                    Location location = it.location
-                    Object locationTagInXml = it.locationXmlNode
 
-                    List<JobResult> executingJobResults
-                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "getExecutingJobResults", 2) {
-                        executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
-                    }
-                    Map<Job, List<JobResult>> executingJobs
-                    performanceLoggingService.logExecutionTime(LogLevel.INFO, "aggregateJobs", 2) {
-                        executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
+                List<Location> activeLocationsOfServer = Location.findAllByActiveAndWptServer(true, wptServer)
+                List<LocationHealthCheck> healthChecks = locationHealthCheckDaoService.getLatestHealthChecksFor(activeLocationsOfServer)
+
+                activeLocationsOfServer.each{Location location ->
+
+                    List<LocationHealthCheck> healthChecksOfLocation = healthChecks.findAll {it.location == location}
+
+                    if (healthChecksOfLocation.size() == 1){
+
+                        LocationHealthCheck healthCheck = healthChecksOfLocation[0]
+
+                        Map queueDataOfThisLocation = deduceQueueDataFromHealthCheck(location, healthCheck)
+                        queueDataByWptServer[(wptServer.label)] << queueDataOfThisLocation
+
                     }
 
-                    use(TimeCategory) {
-                        Date now = new Date()
-                        Map nextHour
-                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfJobsAndEventsDueToRunFromNowUntil", 2) {
-                            nextHour = queueAndJobStatusService.getNumberOfJobsAndEventsDueToRunFromNowUntil(location, now + 1.hour)
-                        }
-                        performanceLoggingService.logExecutionTime(LogLevel.INFO, "build map", 2) {
-                            Integer numberOfAgents
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfAgents", 3) {
-                                numberOfAgents = queueAndJobStatusService.getNumberOfAgents(locationTagInXml, agentsResponse)
-                            }
-                            Integer numberOfPendingJobs
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getNumberOfPendingJobsFromWptServer", 3) {
-                                numberOfPendingJobs = queueAndJobStatusService.getNumberOfPendingJobsFromWptServer(locationTagInXml)
-                            }
-                            int eventResultCount
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getEventResultCountSince", 3) {
-                                eventResultCount = queueAndJobStatusService.getEventResultCountBetween(location, now - 1.hour, now)
-                            }
-                            int finishedJobResultCountSince
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getFinishedJobResultCountSince", 3) {
-                                finishedJobResultCountSince = queueAndJobStatusService.getFinishedJobResultCountSince(location, now - 1.hour)
-                            }
-                            int erroneousJobResultCountSince
-                            performanceLoggingService.logExecutionTime(LogLevel.INFO, "getErroneousJobResultCountSince", 3) {
-                                erroneousJobResultCountSince = queueAndJobStatusService.getErroneousJobResultCountSince(location, now - 1.hour)
-                            }
-                            Map output = [
-                                    id                  : location.uniqueIdentifierForServer,
-                                    label               : location.location,
-                                    agents              : numberOfAgents,
-                                    jobs                : numberOfPendingJobs,
-                                    eventResultsLastHour: eventResultCount,
-                                    jobResultsLastHour  : finishedJobResultCountSince,
-                                    errorsLastHour      : erroneousJobResultCountSince,
-                                    jobsNextHour        : nextHour.jobs,
-                                    eventsNextHour      : nextHour.events,
-                                    executingJobs       : executingJobs,
-                                    runningJobs         : executingJobResults.findAll {
-                                        it.httpStatusCode == 101
-                                    }.size(),
-                                    pendingJobs         : executingJobResults.findAll {
-                                        it.httpStatusCode == 100
-                                    }.size()
-                            ]
-                            model[(wptServer.label)] << output
-                        }
-                    }
                 }
+
             } catch (Exception e) {
-                model[(wptServer.label)] = e.getMessage()
+                queueDataByWptServer[(wptServer.label)] = e.getMessage()
             }
         }
-        return model
+        return queueDataByWptServer
+    }
+
+    private Map deduceQueueDataFromHealthCheck(Location location, LocationHealthCheck healthCheck) {
+
+        List<JobResult> executingJobResults
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, "getExecutingJobResults", 2) {
+            executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
+        }
+        Map<Job, List<JobResult>> executingJobs
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, "aggregateJobs", 2) {
+            executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
+        }
+
+        Map queueDataOfThisLocation = [
+            dateOfOsmQueueData: healthCheck.date,
+            id                  : location.uniqueIdentifierForServer,
+            label               : location.location,
+            agents              : healthCheck.numberOfAgents,
+            jobs                : healthCheck.numberOfPendingJobsInWpt,
+            eventResultsLastHour: healthCheck.numberOfEventResultsLastHour,
+            jobResultsLastHour  : healthCheck.numberOfJobResultsLastHour,
+            errorsLastHour      : healthCheck.numberOfErrorsLastHour,
+            jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
+            eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
+            executingJobs       : [],
+            runningJobs         : healthCheck.numberOfCurrentlyRunningJobs,
+            pendingJobs         : healthCheck.numberOfCurrentlyPendingJobs
+        ]
+        return queueDataOfThisLocation
     }
 
     def index() {
