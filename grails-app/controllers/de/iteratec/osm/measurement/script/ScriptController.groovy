@@ -64,13 +64,13 @@ class ScriptController {
 	}
 	
 	def save() {
-		Script s = new Script(params)
-		if (!s.save(flush: true)) {
-			render(view: 'create', model: [script: s,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
+		Script script = new Script(params)
+		if (!script.save(flush: true)) {
+			render(view: 'create', model: [script: script,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
 			return
 		}
-		scriptService.createNewPagesAndMeasuredEvents(s)
-		def flashMessageArgs = [getScriptI18n(), s.label]
+		scriptService.createNewPagesAndMeasuredEvents(script)
+		def flashMessageArgs = [getScriptI18n(), script.label]
 		flash.message = message(code: 'default.created.message', args: flashMessageArgs)
 		redirect(action: "list")
 	}
