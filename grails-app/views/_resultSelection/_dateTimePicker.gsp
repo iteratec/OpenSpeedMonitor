@@ -5,7 +5,7 @@ explicitly. See selectIntervalTimeframeCard.js as an example.
 --%>
 <div id="${id}">
     <g:if test="${!hideHourSelection}">
-    <div class="input-group bootstrap-timepicker time-control">
+    <div class="input-group time-control">
         <span class="input-group-addon">
             <g:checkBox name="${manualTimeName}" checked="${manualTimeValue}"/>
         </span>

@@ -1,4 +1,3 @@
-//= require /bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js
 //= require _dateTimePicker.js
 //= require_self
 

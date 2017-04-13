@@ -15,7 +15,7 @@
 
 
     <div class="col-md-6">
-        <div class="input-group bootstrap-timepicker" >
+        <div class="input-group" >
             <input id="hourTimepicker" name="time" type="text" class="form-control"
                    value="<g:if test="${(eventInstance?.eventDate?.getHours() as String)}">${
                        (eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")
