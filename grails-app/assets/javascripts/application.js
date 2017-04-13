@@ -25,6 +25,8 @@
 //= require spinner
 //= require_self
 
+delete $.fn.datepicker; // so it can be replaced by air-datepicker
+
 /**
  * Global namespace for OpenSpeedMonitor application.
  */

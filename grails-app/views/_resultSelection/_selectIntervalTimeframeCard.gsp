@@ -41,55 +41,18 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 					value="${selectedTimeFrameInterval}" />
 		</div>
 	</div>
+	<div class="form-group">
+		<div class="col-md-8 col-md-offset-4" id="timeframe-picker">
+			<g:render template="/_resultSelection/timeRangePicker" model="${[
+					'nameFrom': 'from',
+					'nameTo': 'to',
+					'valueFrom': from,
+					'valueTo': to
+			]}" />
+		</div>
+	</div>
 
-	<%--------------------------------------------------------------------- manual start date --%>
-	<fieldset id="manual-timeframe-selection">
-		<div class="form-group">
-			<label class="col-md-4 control-label" for="fromDatepicker">
-				<g:message
-						code="de.iteratec.isr.wptrd.labels.timeframes.start"
-						default="Start" />:
-			</label>
-			<div class="col-md-8">
-				<g:render template="/_resultSelection/dateTimePicker" model="[
-						id               : 'startDateTimePicker',
-						manualTimeName   : 'setFromHour',
-						manualTimeValue  : setFromHour,
-						timeName         : 'fromHour',
-						time             : fromHour,
-						dateControlId    : 'fromDatepicker',
-						dateName         : 'from',
-						date             : from,
-						dateFormat       : dateFormat,
-						weekStart        : weekStart,
-						hideHourSelection: hideHourSelection
-				]" />
-			</div>
-		</div>
-	<%--------------------------------------------------------------------- manual end date --%>
-		<div class="form-group">
-			<label class="col-md-4 control-label" for="toDatepicker">
-				<g:message
-						code="de.iteratec.isr.wptrd.labels.timeframes.end"
-						default="End" />:
-			</label>
-			<div class="col-md-8">
-				<g:render template="/_resultSelection/dateTimePicker" model="[
-						id               : 'endDateTimePicker',
-						manualTimeName   : 'setToHour',
-						manualTimeValue  : setToHour,
-						timeName         : 'toHour',
-						time             : toHour,
-						dateControlId    : 'toDatepicker',
-						dateName         : 'to',
-						date             : to,
-						dateFormat       : dateFormat,
-						weekStart        : weekStart,
-						hideHourSelection: hideHourSelection
-				]" />
-			</div>
-		</div>
-	</fieldset>
+
 	<g:if test="${showIncludeInterval}">
 		<div class="row">
 			<div class="col-md-offset-4 col-md-8">
