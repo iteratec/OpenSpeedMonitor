@@ -175,7 +175,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                 .attr("class", "d3chart-violin")
                 .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
-            addViolin(g, traceData, height - margin.bottom - margin.top, violinWidth, domain);
+            addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
     };
 
@@ -252,12 +252,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var x = null;
         if (logarithmicYAxis)
             x = d3.scale.log()
-                .range([height, 0])
+                .range([height, margin.top])
                 .domain(domain)
                 .nice();
         else
             x = d3.scale.linear()
-                  .range([height, 0])
+                  .range([height, margin.top])
                   .domain(domain)
                   .nice();
 
