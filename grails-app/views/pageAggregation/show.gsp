@@ -85,7 +85,6 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">

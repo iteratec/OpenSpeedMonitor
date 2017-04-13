@@ -207,6 +207,7 @@ task bowerSyncJavascript(type: Sync) {
     include 'StickyTableHeaders/js/jquery.stickytableheaders.js'
     include 'file-saver/FileSaver.min.js'
     include 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
+    include 'saveSvgAsPng/saveSvgAsPng.js'
     dependsOn bowerInstall
 }
 

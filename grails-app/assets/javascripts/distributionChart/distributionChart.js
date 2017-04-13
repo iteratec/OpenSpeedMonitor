@@ -109,12 +109,6 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var drawHeader = function (svg) {
         var widthOfAllViolins = Object.keys(chartData.series).length * violinWidth;
 
-        svg.append("rect")
-            .attr("x", margin.left)
-            .attr("width", svgContainer.clientWidth - margin.left)
-            .attr("height", margin.top)
-            .attr("fill", "white");
-
         svg.append("g").selectAll("text")
             .data([commonLabelParts])
             .enter()
@@ -181,7 +175,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                 .attr("class", "d3chart-violin")
                 .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
-            addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
+            addViolin(g, traceData, height - margin.bottom - margin.top, violinWidth, domain);
         });
     };
 
