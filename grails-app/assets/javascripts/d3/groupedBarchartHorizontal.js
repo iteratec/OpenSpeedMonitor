@@ -52,9 +52,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var countBars = function () {
-      return  transformedData.reduce(function (count, d) {
-          return count + d.bars.length;
-      }, 0);
+    if(inFront){
+      return transformedData.length
+    } else{
+        return  transformedData.reduce(function (count, d) {
+            return count + d.bars.length;
+        }, 0);
+    }
   };
 
   /**
@@ -118,7 +122,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     drawHeader(headerData);
     drawTrafficLight();
     drawLegend();
-    updateSvgHeight(countBars());
+    updateSvgHeight();
+  };
+
+  var getAmountOfDifferentBars = function(){
+
   };
 
 
@@ -286,7 +294,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var drawBarsInFrontOfEachOther = function () {
     inFront = true;
-    updateSvgHeight(transformedData.length);
+    updateSvgHeight();
 
     var outerYScale = d3.scale.ordinal()
       .domain(groupings)
@@ -339,7 +347,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     inFront = false;
     var measurands = getAllMeasurands();
 
-    updateSvgHeight(countBars());
+    updateSvgHeight();
 
     var outerYScale = d3.scale.ordinal()
       .rangeRoundBands([0, height], .1)
@@ -406,8 +414,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       }
   };
 
-  var updateSvgHeight = function (barCount) {
-    height = barCount * barHeight;
+  var updateSvgHeight = function () {
+    height = countBars() * barHeight;
     var newHeight = height + margin.top + margin.bottom + barHeight + barPadding + legend.node().getBBox().height;
     if(shouldDrawTrafficLight()) newHeight+=barHeight + barPadding;
     svg.attr("height", newHeight);
