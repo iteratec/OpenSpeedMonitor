@@ -31,8 +31,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     valueLabelOffset = 5,
     unitScales,
     units,
-    legendMarginRight = 350,
+    legend,
     inFrontSwitchButton = $("#inFrontButton"),
+    inFront,
     absoluteMaxYOffset = 0,
     absoluteMaxValue = 0,
     selectedSeries = "",
@@ -48,7 +49,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     initFilterDropdown();
     drawAllBars();
+  };
 
+  var countBars = function () {
+      return  transformedData.reduce(function (count, d) {
+          return count + d.bars.length;
+      }, 0);
   };
 
   /**
@@ -69,6 +75,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     headerLine = svg.append("g");
     trafficLightBars = svg.append("g");
+    legend = svg.append("g");
 
     addBesideInFrontSwitchEventHandlers();
 
@@ -96,6 +103,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var drawAllBars = function () {
     updateSvgWidth();
     transformData();
+
     barXOffSet = measureComponent($("<text>" + getLongestGroupName() + valueLabelOffset + "</text>"), function (d) {
       return d.width();
     });
@@ -105,47 +113,74 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     } else {
       drawBarsBesideEachOther();
     }
-    drawTrafficLight();
 
     var headerData = [{headerText: commonLabelParts}];
     drawHeader(headerData);
+    drawTrafficLight();
     drawLegend();
+    updateSvgHeight(countBars());
   };
 
 
   var drawLegend = function () {
+    var measurands = getAllMeasurands();
     var colorScale = seriesColorScale;
-
+    var replaceRegex =/\(.*\)/g;
     var legendRectSize = 10;
     var legendSpacing = 5;
-    var legendHeight = colorScale.domain().length * (legendRectSize + legendSpacing) + legendSpacing;
-
-
-    var legend = svg.selectAll('.legend')
-      .data(colorScale.domain())
-      .enter()
-      .append('g')
-      .attr('class', 'legend');
-
-    legend.append('rect')
-        .attr('width', legendRectSize)
-        .attr('height', legendRectSize)
-        .style('fill', colorScale)
-        .style('stroke', colorScale);
-
-    var texts = legend.append('text')
-        .attr('x', legendRectSize + legendSpacing)
-        .attr('y', legendRectSize)
-        .text(function(d) { return d; });
-
-    var maxLegendSize = 70;
-    maxLegendSize += legendRectSize + legendSpacing;
-
-    svg.selectAll('.legend').attr('transform', function(d, i) {
-        var horz = width - legendMarginRight - maxLegendSize;
-        var vert = margin.top - legendHeight + i * (legendRectSize + legendSpacing) - legendSpacing;
-        return 'translate(' + horz + ',' + vert + ')';
+    var longestString = "";
+    //we doesn't want to show additional information within parenthesis, but we need the original name for later action
+    //between the legend and bars. So we find the longest shortened name, but won't touch the original data
+    $.each(measurands, function (_, d) {
+      var simplified = d.replace(replaceRegex,"");
+        if (simplified.length > longestString.length) {
+            longestString = simplified;
+        }
     });
+    var maxWidth = measureComponent($("<text>"+longestString+"</text>"), function (d) {
+          return d.width();
+    });
+    var legendMargin = 20;
+    var leftPadding = margin.left+barXOffSet;
+    var legendSpace = parseInt(svg.style("width"))-leftPadding-margin.right;
+    var maxEntriesInRow = Math.floor(legendSpace/(maxWidth+legendRectSize+legendSpacing+legendMargin));
+
+    var entries = legend.selectAll("g").data(measurands);
+    entries.enter()
+        .append("g")
+        .each(function () {
+          var line = d3.select(this);
+          line.append('rect')
+              .attr('width', legendRectSize)
+              .attr('height', legendRectSize);
+          line.append("text")
+              .attr('x', legendRectSize + legendSpacing)
+              .attr('y', legendRectSize);
+        });
+    entries.exit().remove();
+
+    //Update
+    legend.selectAll("g").each(function (d,i) {
+        var line = d3.select(this);
+        line.select("rect").style('fill', colorScale);
+        line.select("text").text(function (d) {
+            return d.replace(replaceRegex,"")
+        });
+        var x = (maxWidth+legendRectSize+legendSpacing+legendMargin)*(i%maxEntriesInRow);
+        var y = Math.floor(i/maxEntriesInRow)*legendMargin;
+        line.attr("transform","translate("+x+","+y+")")
+    });
+
+    var yOffset = calculateLegendYPosition();
+    legend.attr("transform", "translate("+leftPadding+","+yOffset+")")
+  };
+
+  var calculateLegendYPosition = function () {
+    var y= absoluteMaxYOffset;
+    if(shouldDrawTrafficLight()){
+      y+=trafficLightBars.node().getBBox().height + barPadding
+    }
+    return y
   };
 
   var getLongestGroupName = function () {
@@ -218,24 +253,18 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     })
   };
 
-  var recreateOrder = function () {
-    d3.selectAll(".barGroup").each(function () {
-      d3.select(this).selectAll(".bar").sort(function (a, b) {
-        return a.value < b.value
-      })
-    });
-  };
-
   var canBeInFront = function () {
     return Object.keys(units).length == 1
   };
 
   var getAllMeasurands = function () {
-    return $.unique(Array.prototype.concat.apply([], actualBarchartData.series.map(function (series) {
-      return series.data.map(function (datum) {
-        return datum.measurand
-      })
-    })));
+    var measurands = [];
+    $.each(transformedData, function (_,d) {
+        $.each(d.bars, function (_,bar) {
+            if($.inArray(bar.measurand,measurands) == -1) measurands.push(bar.measurand);
+        })
+    });
+    return measurands;
   };
 
   var addBesideInFrontSwitchEventHandlers = function () {
@@ -244,17 +273,19 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     besideButton.click(function () {
       drawBarsBesideEachOther();
       drawTrafficLight();
+      drawLegend();
     });
     inFrontButton.click(function () {
       if (canBeInFront()) {
         drawBarsInFrontOfEachOther();
         drawTrafficLight();
+        drawLegend();
       }
     });
   };
 
   var drawBarsInFrontOfEachOther = function () {
-
+    inFront = true;
     updateSvgHeight(transformedData.length);
 
     var outerYScale = d3.scale.ordinal()
@@ -305,13 +336,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var drawBarsBesideEachOther = function () {
-
+    inFront = false;
     var measurands = getAllMeasurands();
 
-    var barCount = transformedData.reduce(function (count, d) {
-      return count + d.bars.length;
-    }, 0);
-    updateSvgHeight(barCount);
+    updateSvgHeight(countBars());
 
     var outerYScale = d3.scale.ordinal()
       .rangeRoundBands([0, height], .1)
@@ -380,7 +408,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var updateSvgHeight = function (barCount) {
     height = barCount * barHeight;
-    svg.attr("height", height + margin.top + margin.bottom + barHeight + barPadding);
+    var newHeight = height + margin.top + margin.bottom + barHeight + barPadding + legend.node().getBBox().height;
+    if(shouldDrawTrafficLight()) newHeight+=barHeight + barPadding;
+    svg.attr("height", newHeight);
     absoluteMaxYOffset = height + margin.top + margin.bottom;
   };
 
@@ -644,13 +674,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var drawTrafficLight = function () {
-
-    var unitNames = Object.keys(units);
-    if (unitNames.length == 1 && unitNames[0] == "ms") {
+    if (shouldDrawTrafficLight()) {
       drawTrafficLightForTimings();
     }
+  };
 
-  }
+  var shouldDrawTrafficLight = function () {
+      var unitNames = Object.keys(units);
+      return unitNames.length == 1 && unitNames[0] == "ms"
+  };
 
   var drawTrafficLightForTimings = function () {
 
