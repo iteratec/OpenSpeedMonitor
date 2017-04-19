@@ -304,6 +304,10 @@ class JobProcessingService {
             log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
             return false
         }
+        if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
+            //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
+            return false
+        }
 
         Map params = [testId: '']
         int statusCode

@@ -31,11 +31,15 @@ class InMemoryConfigService {
 
     static final Boolean DEFAULT_DATABASE_CLEANUP_ENABLED = false
 
+    static final Boolean PAUSE_JOBPROCESSING_FOR_OVERLOADED_LOCATIONS = false
+
     /** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
     Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
 
     /** If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldCsiAggregationsWithDependenciesJob}) */
     Boolean databaseCleanupEnabled = DEFAULT_DATABASE_CLEANUP_ENABLED
+
+    Boolean pauseJobProcessingForOverloadedLocations = PAUSE_JOBPROCESSING_FOR_OVERLOADED_LOCATIONS
 
     /**
      * Gets status of measurementsGenerallyEnabled
