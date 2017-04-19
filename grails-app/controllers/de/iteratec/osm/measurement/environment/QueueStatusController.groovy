@@ -50,7 +50,7 @@ class QueueStatusController {
 
                         LocationHealthCheck healthCheck = healthChecksOfLocation[0]
 
-                        Map queueDataOfThisLocation = deduceQueueDataFromHealthCheck(location, healthCheck)
+                        Map queueDataOfThisLocation = getQueueData(location, healthCheck)
                         queueDataByWptServer[(wptServer.label)] << queueDataOfThisLocation
 
                     }
@@ -64,7 +64,7 @@ class QueueStatusController {
         return queueDataByWptServer
     }
 
-    private Map deduceQueueDataFromHealthCheck(Location location, LocationHealthCheck healthCheck) {
+    private Map getQueueData(Location location, LocationHealthCheck healthCheck) {
 
         List<JobResult> executingJobResults
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, "getExecutingJobResults", 2) {
@@ -86,9 +86,9 @@ class QueueStatusController {
             errorsLastHour      : healthCheck.numberOfErrorsLastHour,
             jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
             eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
-            executingJobs       : [],
-            runningJobs         : healthCheck.numberOfCurrentlyRunningJobs,
-            pendingJobs         : healthCheck.numberOfCurrentlyPendingJobs
+            executingJobs       : executingJobs,
+            pendingJobs         : executingJobResults.findAll { it.httpStatusCode == 100 }.size(),
+            runningJobs         : executingJobResults.findAll { it.httpStatusCode == 101 }.size()
         ]
         return queueDataOfThisLocation
     }
