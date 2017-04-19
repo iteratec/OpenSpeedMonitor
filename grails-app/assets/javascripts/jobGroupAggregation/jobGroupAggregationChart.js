@@ -1,6 +1,7 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
+//= require /d3/chartColorProvider
 //= require_self
 
 "use strict";
@@ -17,6 +18,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
+        colorProvider = OpenSpeedMonitor.ChartColorProvider(),
         colorPalette = d3.scale.category20(),
         absoluteMaxValue = 0,
         absoluteMaxYOffset = 0,
@@ -200,7 +202,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("height", barHeight)
             .attr("width", initialBarWidth)
             .attr("fill", function (d, i) {
-                return colorPalette(0);
+                var colorscale = colorProvider.getColorscaleForMeasurandGroup(unitName);
+                return colorscale(0);
             })
             .on("click", highlightClickedBar);
 
