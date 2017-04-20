@@ -19,6 +19,7 @@
 
 //= require /bower_components/air-datepicker/dist/js/datepicker.min.js
 //= require /bower_components/air-datepicker/dist/js/i18n/datepicker.en.js
+//= require /bower_components/moment/min/moment.min.js
 //= require_self
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
@@ -36,13 +37,14 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
     var datePicker = $.fn.datepicker.Constructor;
     var eventsEnabled = false;
     var defaultDateFormat = "dd.mm.yyyy";
+    var wasManualChange = false;
     var datePickerOptions = {
         language: "en",
         timepicker: true,
         timeFormat: "hh:ii",
         minutesStep: 1,
         offset: 5,
-        autoClose: true,
+        autoClose: false,
         toggleSelected: false
     };
 
@@ -52,6 +54,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
 
         pickerFrom.selectDate(dateFrom);
         pickerTo.selectDate(dateTo);
+        registerEvents();
         eventsEnabled = true;
     };
 
@@ -65,9 +68,11 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
                 dateFrom = date;
                 valueFromElement.val(date.toISOString());
                 pickerTo.update("minDate", date);
-                if (!pickerFrom.timepickerIsActive) {
+                if (!pickerFrom.timepickerIsActive && !wasManualChange) {
+                    pickerFrom.hide();
                     userInputToElement.focus();
                 }
+                wasManualChange = false;
                 triggerRangeChanged();
             }
         })).data("datepicker");
@@ -93,6 +98,10 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
                 dateTo = date;
                 valueToElement.val(date.toISOString());
                 pickerFrom.update("maxDate", date);
+                if (!pickerTo.timepickerIsActive && !wasManualChange) {
+                    pickerTo.hide();
+                }
+                wasManualChange = false;
                 triggerRangeChanged();
             }
         })).data("datepicker");
@@ -103,6 +112,37 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
         userInputToElement.click(function () {
             pickerFrom.hide();
         });
+    };
+
+    var registerEvents = function () {
+        userInputFromElement.on("change keyup", function () { onManualChange(pickerFrom, $(this).val()); });
+        userInputFromElement.on("blur", function () { onBlur(pickerFrom, dateFrom)});
+        userInputToElement.on("change keyup", function () { onManualChange(pickerTo, $(this).val()); });
+        userInputToElement.on("blur", function () { onBlur(pickerTo, dateTo)});
+    };
+
+    var onBlur = function (pickerInstance, resetDate) {
+        if (pickerInstance.$el.hasClass("has-error")) {
+            wasManualChange = true;
+            pickerInstance.selectDate(resetDate);
+            pickerInstance.$el.removeClass("has-error");
+        }
+    };
+
+    var onManualChange = function (pickerInstance, value) {
+        var selected = moment(value, getMomentDateTimeFormat(pickerInstance), true);
+        var valid = !isNaN(selected.valueOf());
+        pickerInstance.$el.toggleClass("has-error", !valid);
+        if (valid) {
+            wasManualChange = true;
+            pickerInstance.selectDate(new Date(selected.valueOf()));
+        }
+    };
+
+    var getMomentDateTimeFormat = function (pickerInstance) {
+        var format = pickerInstance.opts.dateFormat + pickerInstance.opts.dateTimeSeparator + pickerInstance.opts.timeFormat;
+        return format.replace(/y/g, "Y").replace(/m/g, "M").replace(/d/g, "D")
+                     .replace(/h/g, "H").replace(/i/g, "m").replace(/@/g, "S");
     };
 
     var convertToDateOrDefault = function (isoDate, defaultValue) {
@@ -171,13 +211,8 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
 
     var setRange = function (from, to) {
         var eventsWereEnabled = enableEvents(false);
-
-        dateFrom = convertToDateOrDefault(from, dateFrom);
-        pickerFrom.selectDate(dateFrom);
-
-        dateTo = convertToDateOrDefault(to, dateTo);
-        pickerTo.selectDate(dateTo);
-
+        pickerFrom.selectDate(convertToDateOrDefault(from, dateFrom));
+        pickerTo.selectDate(convertToDateOrDefault(to, dateTo));
         enableEvents(eventsWereEnabled);
     };
 
