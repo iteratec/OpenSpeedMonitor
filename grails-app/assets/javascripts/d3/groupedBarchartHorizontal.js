@@ -1,6 +1,7 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
+//= require /d3/chartColorProvider
 //= require_self
 
 "use strict";
@@ -21,7 +22,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     barXOffSet,
     allBarsGroup,
     trafficLightBars,
-    transitionDuration = 200,
+    transitionDuration = 100,
     filterRules = {},
     actualBarchartData,
     commonLabelParts,
@@ -37,7 +38,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     absoluteMaxYOffset = 0,
     absoluteMaxValue = 0,
     selectedSeries = "",
-    seriesColorScale = d3.scale.category20(),
+    colorScales = {},
     measurandOrder = {
         ms:{
           order: 1,
@@ -179,11 +180,41 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       });
   };
 
+  var createColorScale = function () {
+      var colorProvider = OpenSpeedMonitor.ChartColorProvider();
+      var units = {};
+      $.each(transformedData, function (_,d) {
+          $.each(d.bars, function (_,bar) {
+              var unitMeasurands = units[bar.unit];
+              if(!unitMeasurands){
+                  unitMeasurands = [];
+                  units[bar.unit] = unitMeasurands;
+              }
+              if($.inArray(bar.measurand,unitMeasurands) == -1) unitMeasurands.push(bar.measurand);
+          })
+      });
+      $.each(units, function (key, value) {
+          var currentMeasurandGroupOrder = measurandOrder[key];
+          value.sort(function (a, b) {
+              return currentMeasurandGroupOrder[a] < currentMeasurandGroupOrder[b];
+          });
+      });
+      //we iterate over all measurands and get the color, so the provider will register our order of colors for later use
+      $.each(units, function (key,value) {
+          var currentColorScale = colorProvider.getColorscaleForMeasurandGroup(key);
+          colorScales[key] = currentColorScale;
+          $.each(value, function (_,measurand) {
+              currentColorScale(measurand);
+          })
+      })
+  };
+
   var drawAllBars = function () {
     updateSvgWidth();
     transformData();
     setHighestMeasurand();
     sortGroupsByHighestMeasurand();
+    createColorScale();
     groupings = transformedData.map(function (d) {
         return d.grouping;
     });
@@ -205,8 +236,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var drawLegend = function () {
-    var measurands = getAllMeasurands();
-    var colorScale = seriesColorScale;
+    var measurands = getAllMeasurandsWithUnit();
     var replaceRegex =/\(.*\)/g;
     var legendRectSize = 10;
     var legendSpacing = 5;
@@ -214,7 +244,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     //we doesn't want to show additional information within parenthesis, but we need the original name for later action
     //between the legend and bars. So we find the longest shortened name, but won't touch the original data
     $.each(measurands, function (_, d) {
-      var simplified = d.replace(replaceRegex,"");
+      var simplified = d.measurand.replace(replaceRegex,"");
         if (simplified.length > longestString.length) {
             longestString = simplified;
         }
@@ -244,13 +274,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     //Update
     legend.selectAll("g").each(function (d,i) {
         var line = d3.select(this);
-        line.select("rect").style('fill', colorScale);
+        line.select("rect").style('fill', function (d) {
+            return colorScales[d.unit](d.measurand);
+        });
         line.select("text").text(function (d) {
-            return d.replace(replaceRegex,"")
+            return d.measurand.replace(replaceRegex,"")
         });
         var x = (maxWidth+legendRectSize+legendSpacing+legendMargin)*(i%maxEntriesInRow);
         var y = Math.floor(i/maxEntriesInRow)*legendMargin;
-        line.attr("transform","translate("+x+","+y+")")
+        line.attr("transform","translate("+x+","+y+")");
     });
 
     var yOffset = calculateLegendYPosition();
@@ -343,10 +375,26 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     });
     return measurands;
   };
+  
+  var getAllMeasurandsWithUnit = function () {
+      var visitedMeasurands = [];
+      var measurands = [];
+      $.each(transformedData, function (_,d) {
+          $.each(d.bars, function (_,bar) {
+              var measurandObject = {measurand:bar.measurand, unit:bar.unit};
+              if($.inArray(bar.measurand,visitedMeasurands) == -1){
+                   measurands.push(measurandObject);
+                   visitedMeasurands.push(bar.measurand)
+              }
+
+          })
+      });
+      return measurands;
+  };
 
   var addBesideInFrontSwitchEventHandlers = function () {
     var besideButton = $("#besideButton");
-    var inFrontButton = $("#inFrontButton")
+    var inFrontButton = $("#inFrontButton");
     besideButton.click(function () {
       drawBarsBesideEachOther();
       drawTrafficLight();
@@ -440,7 +488,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
       //Update Rectangle Position and Size
       var barWidth = unitScales[bar.unit](bar.value);
-      d3.select(this).select("rect").attr("fill", seriesColorScale(bar.measurand)).transition()
+      d3.select(this).select("rect").attr("fill", colorScales[bar.unit](bar.measurand)).transition()
         .attr("width", barWidth)
         .attr("height", innerYScale.rangeBand());
 
@@ -451,7 +499,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     //Update Group Labels
     var groupLabelY = innerYScale.rangeBand() / 2;
     d3.selectAll(".barGroup").each(function (d) {
-      d3.select(this).select(".barGroupLabel").text(d.label).attr("y", groupLabelY);
+      d3.select(this).select(".barGroupLabel").text(d.label).transition().duration(transitionDuration).attr("y", groupLabelY);
     })
 
 
@@ -459,9 +507,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var drawBarsBesideEachOther = function () {
     inFront = false;
-
-      sortBarsInGroupByMeasurandOrder();
-      var measurands = getAllMeasurands();
+    sortBarsInGroupByMeasurandOrder();
+    var measurands = getAllMeasurands();
     updateSvgHeight();
 
     var outerYScale = d3.scale.ordinal()
@@ -496,7 +543,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       //Update Rectangle Position and Size
       var barWidth = unitScales[bar.unit](bar.value);
       var rect = d3.select(this).select("rect");
-      rect.attr("fill", seriesColorScale(bar.measurand)).transition()
+      rect.attr("fill", colorScales[bar.unit](bar.measurand)).transition()
         .attr("width", barWidth)
         .attr("height", innerYScale.rangeBand());
 
@@ -508,7 +555,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     //Update Group Labels
     d3.selectAll(".barGroup").each(function (d) {
       var groupLabelY = innerYScale.rangeBand() * (d.bars.length) / 2;
-      d3.select(this).select(".barGroupLabel").text(d.label).attr("y", groupLabelY);
+      d3.select(this).select(".barGroupLabel").text(d.label).transition().duration(transitionDuration).attr("y", groupLabelY);
     })
   };
 
@@ -694,7 +741,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         return "translate(" + parseInt(barXOffSet + margin.left) + ")";
       });
 
-  }
+  };
 
 
   var getMaxLabelWidth = function () {
