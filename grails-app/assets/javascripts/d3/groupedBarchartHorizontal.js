@@ -81,7 +81,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         }
       },
       highesMeasurand,
-      descending = true;
+  descending = true;
 
   var drawChart = function (barchartData) {
 
@@ -233,6 +233,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     drawTrafficLight();
     drawLegend();
     updateSvgHeight();
+    appendMouseEvents();
   };
 
   var drawLegend = function () {
@@ -260,6 +261,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var entries = legend.selectAll("g").data(measurands);
     entries.enter()
         .append("g")
+        .classed("d3chart-legend-entry",true)
         .each(function () {
           var line = d3.select(this);
           line.append('rect')
@@ -386,7 +388,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                    measurands.push(measurandObject);
                    visitedMeasurands.push(bar.measurand)
               }
-
           })
       });
       return measurands;
@@ -474,8 +475,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .domain([0])
       .rangeRoundBands([0, outerYScale.rangeBand()]);
 
-    appendMouseEvents();
-
     //Update Bar Container
     var bars = d3.selectAll(".bar");
     bars.transition()
@@ -527,8 +526,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .attr("transform", function (d) {
         return "translate(0," + outerYScale(d.grouping) + ")";
       });
-
-    appendMouseEvents();
 
     //Update Bar Container
     var bars = d3.selectAll(".bar");
@@ -590,13 +587,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     width = fullWidth - margin.left - margin.right;
   };
 
-  var appendMouseEvents = function () {
-    d3.selectAll(".bar")
-      .on("mouseover", mouseOver())
-      .on("mouseout", mouseOut())
-      .on("click", click());
-  };
-
   var createUnitScales = function () {
     unitScales = {};
     $.each(units, function (unit, values) {
@@ -631,28 +621,32 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     });
   };
 
+  var appendMouseEvents = function () {
+    d3.selectAll(".bar")
+        .on("mouseover", mouseOver())
+        .on("mouseout", mouseOut())
+        .on("click", click());
+
+    d3.selectAll(".d3chart-legend-entry")
+        .on("mouseover", mouseOver())
+        .on("mouseout", mouseOut())
+        .on("click", click());
+    };
+
   var mouseOver = function () {
     return function (hoverBar) {
       if(selectedSeries == ""){
           d3.selectAll(".bar").each(function (bar) {
               if (bar.measurand != hoverBar.measurand) {
-                  d3.select(this).select("rect").transition().duration(transitionDuration).style("opacity", 0.2);
-                  d3.select(this).select("text").transition().duration(transitionDuration).style("opacity", 0);
+                  changeBarOpacity(this,0.2);
               } else {
-                  var rect = d3.select(this).select("rect");
-                  var text = d3.select(this).select("text");
-                  var rectSize = parseInt(rect.attr("width"));
-                  var textSize = text.node().getBBox().width;
-
-                  if (rectSize < textSize) {
-                      var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
-                      text.classed("d3chart-value",false).classed("d3chart-value-out", true);
-                      text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
-                  } else {
-                      text.transition().duration(transitionDuration).style("opacity", 1)
-                  }
-                  rect.transition().duration(transitionDuration).style("opacity", 1);
+                  highlightBar(this);
               }
+          });
+          d3.selectAll(".d3chart-legend-entry").each(function (entry) {
+              var opacity = 1;
+              if (entry.measurand != hoverBar.measurand) opacity = 0.2;
+              changeBarOpacity(this,opacity);
           });
       }
     }
@@ -674,9 +668,33 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
               }
               rect.transition().duration(transitionDuration).style("opacity", 1);
           });
+          d3.selectAll(".d3chart-legend-entry").each(function (entry) {
+              changeBarOpacity(this,1);
+          });
       }
     };
   };
+
+    var changeBarOpacity = function (bar, opacity) {
+        d3.select(bar).select("rect").transition().duration(transitionDuration).style("opacity", opacity);
+        d3.select(bar).select("text").transition().duration(transitionDuration).style("opacity", opacity);
+    };
+
+    var highlightBar = function (bar) {
+        var rect = d3.select(bar).select("rect");
+        var text = d3.select(bar).select("text");
+        var rectSize = parseInt(rect.attr("width"));
+        var textSize = text.node().getBBox().width;
+
+        if (rectSize < textSize) {
+            var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+            text.classed("d3chart-value",false).classed("d3chart-value-out", true);
+            text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
+        } else {
+            text.transition().duration(transitionDuration).style("opacity", 1)
+        }
+        rect.transition().duration(transitionDuration).style("opacity", 1);
+    };
 
   var click = function () {
       return function (hoverBar) {
@@ -786,7 +804,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
   var clone = function (toClone) {
     return JSON.parse(JSON.stringify(toClone));
-  }
+  };
 
   var filterCustomerJourney = function (journeyKey, desc) {
 
