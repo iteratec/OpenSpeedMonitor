@@ -843,6 +843,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   var drawTrafficLight = function () {
     if (shouldDrawTrafficLight()) {
       drawTrafficLightForTimings();
+    } else{
+        trafficLightBars.remove();
     }
   };
 
