@@ -32,12 +32,7 @@ OpenSpeedMonitor.ChartColorProvider = function() {
                 "#b3dec2",
                 "#e0f2e6"
             ],
-            speedIndexColors = [
-                "#1660A7",
-                "#558BBF",
-                "#95b6d7",
-                "#d4e2ef"
-            ];
+            speedIndexColors = loadingTimeColors;
 
         measurandGroupColorCombination = {
             "ms": loadingTimeColors,
@@ -51,9 +46,16 @@ OpenSpeedMonitor.ChartColorProvider = function() {
     var getColorscaleForMeasurandGroup = function (measurandUnit) {
         var colors = measurandGroupColorCombination[measurandUnit];
         var colorscale = d3.scale.ordinal()
+                           .domain(arrayFilledAscendingWithLengthOfColors())
                            .range(colors);
 
         return colorscale;
+    };
+
+    var arrayFilledAscendingWithLengthOfColors = function () {
+        var measurandGroup = Object.keys(measurandGroupColorCombination)[0];
+        var numberOfColors = measurandGroupColorCombination[measurandGroup].length;
+        return Array.apply(null, {length: numberOfColors}).map(Number.call, Number);
     };
 
     init();

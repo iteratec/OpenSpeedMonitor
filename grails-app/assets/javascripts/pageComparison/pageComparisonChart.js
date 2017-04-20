@@ -1,6 +1,7 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
+//= require /d3/chartColorProvider
 //= require_self
 
 "use strict";
@@ -17,7 +18,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
-        colorPalette = d3.scale.category20(),
+        colorProvider = OpenSpeedMonitor.ChartColorProvider(),
         width,
         absoluteMaxValue = 0,
         xScale,
@@ -150,16 +151,14 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             });
 
         var innerG = innerData.enter().append("g").attr("class", "inner");
+        var colorscale = colorProvider.getColorscaleForMeasurandGroup(unitName);
         // bar
         innerG.append("rect")
             .attr("transform", "translate(" + barPadding + ", 0)")
             .attr("height", barHeight)
             .attr("width", initialBarWidth)
             .attr("fill", function (d, i) {
-                return colorPalette(0);
-            })
-            .attr("opacity", function (d, index) {
-                return index * 0.5 + 0.4;
+                return colorscale( (i+1) % 2 );
             });
 
         // value text

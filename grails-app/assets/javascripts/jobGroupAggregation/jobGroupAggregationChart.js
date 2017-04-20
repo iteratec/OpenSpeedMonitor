@@ -19,7 +19,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         barPadding = 10,
         valueMarginInBar = 4,
         colorProvider = OpenSpeedMonitor.ChartColorProvider(),
-        colorPalette = d3.scale.category20(),
         absoluteMaxValue = 0,
         absoluteMaxYOffset = 0,
         labelWidths = [],
