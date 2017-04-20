@@ -640,7 +640,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
               if (bar.measurand != hoverBar.measurand) {
                   changeBarOpacity(this,0.2);
               } else {
-                  highlightBar(this);
+                  highlightBar(this, bar);
               }
           });
           d3.selectAll(".d3chart-legend-entry").each(function (entry) {
@@ -680,14 +680,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         d3.select(bar).select("text").transition().duration(transitionDuration).style("opacity", opacity);
     };
 
-    var highlightBar = function (bar) {
-        var rect = d3.select(bar).select("rect");
-        var text = d3.select(bar).select("text");
+    var highlightBar = function (barDom, barData) {
+        var rect = d3.select(barDom).select("rect");
+        var text = d3.select(barDom).select("text");
         var rectSize = parseInt(rect.attr("width"));
         var textSize = text.node().getBBox().width;
 
         if (rectSize < textSize) {
-            var position = unitScales[bar.unit](bar.value) + valueLabelOffset;
+            var position = unitScales[barData.unit](barData.value) + valueLabelOffset;
             text.classed("d3chart-value",false).classed("d3chart-value-out", true);
             text.transition().duration(transitionDuration).attr("x", position).attr("visibility", "visible").style("opacity", 1);
         } else {
