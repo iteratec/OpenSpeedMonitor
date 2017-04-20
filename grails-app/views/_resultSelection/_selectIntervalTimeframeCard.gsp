@@ -47,7 +47,8 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 					'nameFrom': 'from',
 					'nameTo': 'to',
 					'valueFrom': from,
-					'valueTo': to
+					'valueTo': to,
+					'dateFormat': dateFormat
 			]}" />
 		</div>
 	</div>

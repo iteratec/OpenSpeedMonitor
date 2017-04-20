@@ -35,10 +35,10 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
     var dateFrom = null;
     var datePicker = $.fn.datepicker.Constructor;
     var eventsEnabled = false;
+    var defaultDateFormat = "dd.mm.yyyy";
     var datePickerOptions = {
         language: "en",
         timepicker: true,
-        dateFormat: "dd.mm.yyyy",
         timeFormat: "hh:ii",
         minutesStep: 1,
         offset: 5,
@@ -60,6 +60,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
         pickerFrom = userInputFromElement.datepicker($.extend({}, datePickerOptions, {
             startDate: dateFrom,
             maxDate: new Date(),
+            dateFormat: userInputFromElement.data("date-format") || defaultDateFormat,
             onSelect: function (formatted, date) {
                 dateFrom = date;
                 valueFromElement.val(date.toISOString());
@@ -87,6 +88,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
             startDate: dateTo,
             maxDate: maxDate,
             minDate: dateFrom,
+            dateFormat: userInputFromElement.data("date-format") || defaultDateFormat,
             onSelect: function (formatted, date) {
                 dateTo = date;
                 valueToElement.val(date.toISOString());
