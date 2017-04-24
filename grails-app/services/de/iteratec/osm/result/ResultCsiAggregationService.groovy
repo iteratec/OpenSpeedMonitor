@@ -62,7 +62,8 @@ class ResultCsiAggregationService {
                         AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME,
                         AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE,
                         AggregatorType.RESULT_CACHED_DOM_TIME,
-                        AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME],
+                        AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME,
+                        AggregatorType.RESULT_CACHED_SPEED_INDEX],
                 (MeasurandGroup.REQUEST_COUNTS): [
                         AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS,
                         AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT],
@@ -72,8 +73,7 @@ class ResultCsiAggregationService {
                 (MeasurandGroup.PERCENTAGES)   : [
                         AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT,
                         AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT],
-                (MeasurandGroup.UNDEFINED)     : [
-                        AggregatorType.RESULT_CACHED_SPEED_INDEX]
+                (MeasurandGroup.UNDEFINED)     : []
         ])
 
         fillMap.put(CachedView.UNCACHED, [
@@ -84,7 +84,8 @@ class ResultCsiAggregationService {
                         AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
                         AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE,
                         AggregatorType.RESULT_UNCACHED_DOM_TIME,
-                        AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME],
+                        AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME,
+                        AggregatorType.RESULT_UNCACHED_SPEED_INDEX],
                 (MeasurandGroup.REQUEST_COUNTS): [
                         AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS,
                         AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT],
@@ -94,8 +95,7 @@ class ResultCsiAggregationService {
                 (MeasurandGroup.PERCENTAGES)   : [
                         AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT,
                         AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT],
-                (MeasurandGroup.UNDEFINED)     : [
-                        AggregatorType.RESULT_UNCACHED_SPEED_INDEX]
+                (MeasurandGroup.UNDEFINED)     : []
         ])
 
         return Collections.unmodifiableMap(fillMap);
