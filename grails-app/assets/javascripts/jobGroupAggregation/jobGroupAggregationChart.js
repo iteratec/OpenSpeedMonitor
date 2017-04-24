@@ -34,6 +34,9 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         commonLabelParts,
         headerLine,
         barSelected;
+    var unitPrecisions = {
+        MB: 2
+    };
 
     var drawChart = function (barchartData) {
 
@@ -212,7 +215,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
             .attr("text-anchor", "end")
             .text(function (d) {
-                return (Math.round(d.value)) + " " + unitName;
+                return formatValue(d.value, unitName) + " " + unitName;
             });
 
 
@@ -250,6 +253,12 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
         defineXScale();
 
+    };
+
+
+    var formatValue = function (value, unit) {
+        var precision = unitPrecisions[unit] || 0;
+        return parseFloat(value).toFixed(precision);
     };
 
     var getMaxLabelWidth = function () {

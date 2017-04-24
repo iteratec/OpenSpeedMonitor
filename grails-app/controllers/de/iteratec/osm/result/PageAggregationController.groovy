@@ -124,7 +124,7 @@ class PageAggregationController extends ExceptionHandlerController {
                         new BarchartDatum(
                             measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
                             originalMeasurandName: currentMeasurand,
-                            value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
+                            value: measurandUtilService.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], currentMeasurand),
                             grouping: "${datum[0]} | ${datum[1]?.name}"
                         )
                     )

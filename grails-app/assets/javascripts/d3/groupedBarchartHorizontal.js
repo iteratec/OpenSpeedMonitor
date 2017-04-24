@@ -59,7 +59,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 docCompleteRequests: 1
             }
         },
-        kb:{
+        MB:{
           order: 3,
             measurands: {
                 fullyLoadedIncomingBytes: 2,
@@ -82,6 +82,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       },
       highesMeasurand,
   descending = true;
+  var unitPrecisions = {
+      MB: 2
+  };
 
   var drawChart = function (barchartData) {
 
@@ -556,10 +559,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     })
   };
 
+  var formatValue = function (value, unit) {
+      var precision = unitPrecisions[unit] || 0;
+      return parseFloat(value).toFixed(precision);
+  };
+
   var updateBarLabel = function (bar,barElement,barWidth, innerYScale) {
       var textY = innerYScale.rangeBand() / 2;
       var textLabel = d3.select(barElement).select("text");
-      var text = "" + Math.round(bar.value) +" "+ bar.unit;
+      var text = "" + formatValue(bar.value, bar.unit) +" "+ bar.unit;
       var textTrans = textLabel.transition()
           .text(text)
           .attr("y", textY);
