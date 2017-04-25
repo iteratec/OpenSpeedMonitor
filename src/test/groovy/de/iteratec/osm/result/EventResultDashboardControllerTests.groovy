@@ -51,12 +51,12 @@ class EventResultDashboardControllerTests extends Specification {
     static EventResultDashboardShowAllCommand command
 
     void setup() {
-        controllerUnderTest = controller;
+        controllerUnderTest = controller
 
         // Mock relevant services:
         command = new EventResultDashboardShowAllCommand()
-        controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService);
-        controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService);
+        controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
+        controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
     }
 
     void "command without bound parameters is invalid"() {
@@ -85,6 +85,7 @@ class EventResultDashboardControllerTests extends Specification {
     void "command bound with default parameters is valid"() {
         given:
         setDefaultParams()
+
         when:
         controllerUnderTest.bindData(command, params)
 
@@ -97,12 +98,33 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedAggrGroupValuesUnCached == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
         command.selectedFolder == [1L]
         command.selectedPages == [1L, 5L]
-        command.selectedAllMeasuredEvents
         command.selectedMeasuredEventIds == [7L, 8L, 9L]
-        command.selectedAllBrowsers
         command.selectedBrowsers == [2L]
-        command.selectedAllLocations
         command.selectedLocations == [17L]
+        command.includeNativeConnectivity
+        command.getSelectedCustomConnectivityNames() == ["testCustom"]
+        command.selectedConnectivityProfiles == [1L]
+    }
+
+    void "command without browsers, locations, connectivities and measuredEvents is valid"() {
+        given:
+        setDefaultParams()
+        params.remove("selectedMeasuredEventIds")
+        params.remove("selectedConnectivities")
+        params.remove("selectedBrowsers")
+        params.remove("selectedLocations")
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+        command.selectedMeasuredEventIds == []
+        command.selectedBrowsers == []
+        command.selectedLocations == []
+        command.includeNativeConnectivity
+        command.getSelectedCustomConnectivityNames() == []
+        command.selectedConnectivityProfiles == []
     }
 
     void "command is invalid if 'to' is before 'from'"() {
@@ -169,128 +191,47 @@ class EventResultDashboardControllerTests extends Specification {
         Math.abs(timeFrame.startMillis - (nowInMillis - 3000 * 1000)) < allowedDelta
     }
 
-
-    void "command is valid with non-default values"() {
+    void "command is invalid when binding parameters of wrong type"() {
         given:
         setDefaultParams()
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
-        params.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME.toString()]
-        params.includeNativeConnectivity = false
-        params.includeCustomConnectivity = true
+        params.selectedPages = ['NOT-A-NUMBER']
+        params.selectedLocations = 'UGLY'
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+        command.selectedPages == []
+        command.selectedLocations == []
+    }
+
+    void "command is invalid without pages"() {
+        given:
+        setDefaultParams()
+        params.selectedPages = []
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+    }
+
+    void "command does not include native or custom if only numbers are set"() {
+        given:
+        setDefaultParams()
+        params.selectedConnectivities = ['1', '2']
 
         when:
         controllerUnderTest.bindData(command, params)
 
         then:
         command.validate()
-        !command.selectedAllBrowsers
-        !command.selectedAllLocations
-        !command.selectedMeasuredEventIds
-        !command.selectedAggrGroupValuesCached == [AggregatorType.RESULT_CACHED_LOAD_TIME]
+        command.getSelectedCustomConnectivityNames() == []
         !command.includeNativeConnectivity
-        command.includeCustomConnectivity
-        command.
-    }
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid() {
-        given:
-        setDefaultParams()
-        // Fill-in request args:
-        params.selectedPages = ['NOT-A-NUMBER']
-        params.selectedLocations = 'UGLY'
-
-
-        when:
-        // Create and fill the command:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        // Verification:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-
-        assertTrue("Invalid data -> no elements in Collection", command.selectedPages.isEmpty())
-        assertTrue("Invalid data -> no elements in Collection", command.selectedLocations.isEmpty())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
-        given:
-        setDefaultParams()
-        params.selectedPages = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_WEEKLY_PAGE() {
-        given:
-        setDefaultParams()
-        params.aggrGroup = AggregatorType.PAGE.toString()
-        params.selectedPages = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedMeasuredEvents_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
-        given:
-        setDefaultParams()
-        params.selectedMeasuredEventIds = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedBrowsers_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
-        given:
-        setDefaultParams()
-        params.selectedBrowsers = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedLocations_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
-        given:
-        setDefaultParams()
-        params.selectedLocations = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertFalse(command.validate())
+        command.getSelectedConnectivityProfiles() == [1L, 2L]
     }
 
     void testConstructViewDataMap() {
@@ -941,15 +882,12 @@ class EventResultDashboardControllerTests extends Specification {
         assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_invalidCommand() {
+    void "createMvQueryParams throws with invalid command"() {
         given: "an invalid command"
-        assertFalse(command.validate())
+        !command.validate()
 
         when:
-        command.createMvQueryParams();
+        command.createMvQueryParams()
 
         then: "an exception is thrown"
         thrown IllegalStateException
@@ -990,9 +928,9 @@ class EventResultDashboardControllerTests extends Specification {
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedConnectivities = ['1', 'testCustom', 'native']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
         params.showDataMarkers = false
         params.showDataLabels = false
         params.selectedInterval = 0
@@ -1007,5 +945,9 @@ class EventResultDashboardControllerTests extends Specification {
         params.chartWidth = 0
         params.chartHeight = 0
         params.loadTimeMinimum = 0
+    }
+
+    private setDefaultCommandProperties() {
+
     }
 }

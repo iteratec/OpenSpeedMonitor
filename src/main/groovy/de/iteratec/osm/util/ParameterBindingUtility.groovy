@@ -13,8 +13,8 @@ class ParameterBindingUtility {
         if (!value) {
             return null
         }
-        if (value instanceof Date) {
-            return new DateTime(value)
+        if (value instanceof DateTime) {
+            return value
         }
         String strValue = value.toString()
         try {
