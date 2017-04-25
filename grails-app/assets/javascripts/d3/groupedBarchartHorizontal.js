@@ -22,7 +22,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     barXOffSet,
     allBarsGroup,
     trafficLightBars,
-    transitionDuration = 100,
+    transitionDuration = 250,
     filterRules = {},
     actualBarchartData,
     commonLabelParts,
@@ -278,9 +278,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var legendSpace = parseInt(svg.style("width"))-leftPadding-margin.right;
     var maxEntriesInRow = Math.floor(legendSpace/(maxWidth+legendRectSize+legendSpacing+legendMargin));
 
+    var yPosition = calculateLegendYPosition();
     var entries = legend.selectAll("g").data(measurands);
     entries.enter()
         .append("g")
+        .attr("transform", "translate("+leftPadding+","+yPosition+")")
         .classed("d3chart-legend-entry",true)
         .each(function () {
           var line = d3.select(this);
@@ -307,8 +309,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         line.attr("transform","translate("+x+","+y+")");
     });
 
-    var yOffset = calculateLegendYPosition();
-    legend.attr("transform", "translate("+leftPadding+","+yOffset+")")
+    legend.transition().duration(transitionDuration).attr("transform", "translate("+leftPadding+","+yPosition+")")
   };
 
   var calculateLegendYPosition = function () {
@@ -397,7 +398,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     });
     return measurands;
   };
-  
+
   var getAllMeasurandsWithUnit = function () {
       var visitedMeasurands = [];
       var measurands = [];
@@ -437,7 +438,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
           });
       });
   };
-  
+
   var sortBarsInGroupByMeasurandOrder = function () {
     var compareFunction = sortFunction();
     if(descending){
@@ -461,7 +462,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         });
     });
   };
-  
+
   var sortFunction = function () {
       if(descending){
           return function (a,b) {
@@ -481,12 +482,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var outerYScale = d3.scale.ordinal()
       .domain(groupings)
-      .rangeRoundBands([0, height], .1);
+      .rangeRoundBands([0, height], .05);
 
     unitScales = createUnitScales();
     enterBarGroups();
 
-    allBarsGroup.selectAll(".barGroup")
+    allBarsGroup.selectAll(".barGroup").transition().duration(transitionDuration)
       .attr("transform", function (d) {
         return "translate(0," + outerYScale(d.grouping) + ")"
       });
@@ -497,7 +498,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     //Update Bar Container
     var bars = d3.selectAll(".bar");
-    bars.transition()
+    bars.transition().duration(transitionDuration)
       .attrTween("transform", function (d, i, a) {
         return d3.interpolateString(a, "translate(" + barXOffSet + ",0)");
       });
@@ -531,8 +532,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     updateSvgHeight();
 
     var outerYScale = d3.scale.ordinal()
-      .rangeRoundBands([0, height], .1)
-      .domain(groupings);
+      .rangeRoundBands([0, height], .05)
+       .domain(groupings);
 
     var innerYScale = d3.scale.ordinal()
       .domain(measurands)
@@ -542,7 +543,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     enterBarGroups();
 
-    allBarsGroup.selectAll(".barGroup")
+    allBarsGroup.selectAll(".barGroup").transition().duration(transitionDuration)
       .attr("transform", function (d) {
         return "translate(0," + outerYScale(d.grouping) + ")";
       });
@@ -550,8 +551,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     //Update Bar Container
     var bars = d3.selectAll(".bar");
     bars.transition()
-      .attrTween("transform", function (d) {
-        return d3.interpolateString("translate(" + barXOffSet + ",0)", "translate(" + barXOffSet + "," + innerYScale(d.measurand) + ")");
+      .attrTween("transform", function (d,i) {
+          var currentY = d3.select(this).attr("transform");
+          if(!currentY){
+               currentY = "translate(" + barXOffSet + ",0)"
+          }
+        return d3.interpolateString(currentY, "translate(" + barXOffSet + "," + innerYScale(d.measurand) + ")");
       });
 
     //Update actual bars
@@ -560,9 +565,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       //Update Rectangle Position and Size
       var barWidth = unitScales[bar.unit](bar.value);
       var rect = d3.select(this).select("rect");
-      rect.attr("fill", colorScales[bar.unit](bar.measurand)).transition()
-        .attr("width", barWidth)
-        .attr("height", innerYScale.rangeBand());
+      rect.attr("height", innerYScale.rangeBand())
+          .attr("fill", colorScales[bar.unit](bar.measurand))
+          .transition().duration(transitionDuration)
+          .attr("width", barWidth);
+        // .attr("height", innerYScale.rangeBand());
 
       //Update Bar Label
       updateBarLabel(bar,this,barWidth, innerYScale);
@@ -570,10 +577,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     });
 
     //Update Group Labels
-    d3.selectAll(".barGroup").each(function (d) {
-      var groupLabelY = innerYScale.rangeBand() * (d.bars.length) / 2;
-      d3.select(this).select(".barGroupLabel").text(d.label).transition().duration(transitionDuration).attr("y", groupLabelY);
-    })
+     d3.selectAll(".barGroup").each(function (d) {
+       var groupLabelY = innerYScale.rangeBand() * (d.bars.length) / 2;
+       d3.select(this).select(".barGroupLabel").text(d.label).transition().duration(transitionDuration).attr("y", groupLabelY);
+     })
   };
 
   var formatValue = function (value, unit) {
@@ -585,7 +592,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       var textY = innerYScale.rangeBand() / 2;
       var textLabel = d3.select(barElement).select("text");
       var text = "" + formatValue(bar.value, bar.unit) +" "+ bar.unit;
-      var textTrans = textLabel.transition()
+      var textTrans = textLabel.transition().duration(transitionDuration)
           .text(text)
           .attr("y", textY);
       if (!checkIfTextWouldFitRect(text, textLabel, barWidth)) {
@@ -626,7 +633,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var enterBarGroups = function () {
-    var select1 = allBarsGroup.selectAll(".barGroup").data(transformedData);
+    var select1 = allBarsGroup.selectAll(".barGroup").data(transformedData, function (bar) {
+        return bar.grouping;
+    });
 
     select1.enter().append("g")
       .attr("class", "barGroup")
@@ -635,7 +644,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       .attr("alignment-baseline", "central");
     select1.exit().remove();
     select1.each(function (group) {
-      var bars = d3.select(this).selectAll(".bar").data(group.bars);
+      var bars = d3.select(this).selectAll(".bar").data(group.bars, function (bar) {
+        return bar.grouping+bar.measurand;
+      });
       bars.enter().append("g").attr("class", "bar").each(function (d) {
         d3.select(this).append("rect").classed("d3chart-bar-clickable", true);
         d3.select(this).append("text")
