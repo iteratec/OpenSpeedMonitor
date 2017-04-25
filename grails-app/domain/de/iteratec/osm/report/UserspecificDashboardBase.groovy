@@ -19,6 +19,7 @@ package de.iteratec.osm.report
 
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
+import org.joda.time.DateTime
 
 import java.text.SimpleDateFormat
 
@@ -50,14 +51,14 @@ class UserspecificDashboardBase {
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    Date fromDate
+    DateTime fromDate
 
     /**
      * The selected end date (inclusive).
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    Date toDate
+    DateTime toDate
 
     /**
      * The selected start hour of date.

@@ -10,6 +10,7 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
@@ -31,7 +32,27 @@ import java.util.regex.Pattern
  */
 public class EventResultDashboardShowAllCommand implements Validateable {
     private final
-    static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING);
+    static DateTimeFormatter SIMPLE_DATE_FORMAT = DateTimeFormat.forPattern(EventResultDashboardController.DATE_FORMAT_STRING)
+    private final
+    static DateTimeFormatter DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
+
+    private static boolean isIsoDateString (String dateString) {
+        try {
+            def isoDateTime = DATE_TIME_FORMATTER.parseDateTime(dateString)
+        } catch (Exception exception) {
+            return false
+        }
+        return true
+    }
+
+    private static boolean isSimpleDateString (String dateString) {
+        try {
+            def isoDateTime = SIMPLE_DATE_FORMAT.parseDateTime(dateString)
+        } catch (Exception exception) {
+            return false
+        }
+        return true
+    }
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -45,15 +66,21 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         obj, source ->
 
             def dateObject = source['from']
-            if (dateObject) {
-                if (dateObject instanceof Date) {
-                    return dateObject
-                } else {
-                    return SIMPLE_DATE_FORMAT.parse(dateObject)
-                }
+            if (!dateObject) {
+                return null
+            }
+            if (dateObject instanceof Date) {
+                // JOHANNES2DO: parse Date to ISODateTime
+                return dateObject
+            }
+            if (EventResultDashboardShowAllCommand.isIsoDateString(dateObject)) {
+                return DATE_TIME_FORMATTER.parseDateTime(dateObject)
+            }
+            if (EventResultDashboardShowAllCommand.isSimpleDateString(dateObject)) {
+                return SIMPLE_DATE_FORMAT.parseDateTime(dateObject)
             }
     })
-    Date from
+    DateTime from
 
     /**
      * The selected end date.
@@ -64,15 +91,23 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         obj, source ->
 
             def dateObject = source['to']
-            if (dateObject) {
-                if (dateObject instanceof Date) {
-                    return dateObject
-                } else {
-                    return SIMPLE_DATE_FORMAT.parse(dateObject)
-                }
+            if (!dateObject) {
+                return null
+            }
+            if (dateObject instanceof Date) {
+                // JOHANNES2DO: parse Date to ISODateTime
+                return dateObject
+            }
+            if (EventResultDashboardShowAllCommand.isIsoDateString(dateObject)) {
+                return DATE_TIME_FORMATTER.parseDateTime(dateObject)
+            }
+            if (EventResultDashboardShowAllCommand.isSimpleDateString(dateObject)) {
+                return SIMPLE_DATE_FORMAT.parseDateTime(dateObject)
             }
     })
-    Date to
+    DateTime to
+
+
 
     /**
      * The selected start hour of date.
@@ -296,14 +331,14 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      * Constraints needs to fit.
      */
     static constraints = {
-        from(nullable: true, validator: { Date currentFrom, EventResultDashboardShowAllCommand cmd ->
+        from(nullable: true, validator: { DateTime currentFrom, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
-        to(nullable: true, validator: { Date currentTo, EventResultDashboardShowAllCommand cmd ->
+        to(nullable: true, validator: { DateTime currentTo, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
-            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.isBefore(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
         fromHour(nullable: true, validator: { String currentFromHour, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
@@ -485,12 +520,12 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
 
-        viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
+        viewModelToCopyTo.put('from', this.from)
         if (!this.fromHour.is(null)) {
             viewModelToCopyTo.put('fromHour', this.fromHour)
         }
 
-        viewModelToCopyTo.put('to', this.to ? SIMPLE_DATE_FORMAT.format(this.to) : null)
+        viewModelToCopyTo.put('to', this.to)
         if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
