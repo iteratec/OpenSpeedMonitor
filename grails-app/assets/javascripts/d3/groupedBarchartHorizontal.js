@@ -81,7 +81,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         }
       },
       highesMeasurand,
-  descending = true;
+  descending = true,
+  customerJourneyFilter;
   var unitPrecisions = {
       MB: 2
   };
@@ -129,13 +130,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     legend = svg.append("g");
 
     addBesideInFrontSwitchEventHandlers();
-
     $(window).resize(drawAllBars);
 
   };
 
   var initChartData = function (barchartData) {
-
     barchartData.series.forEach(function (series) {
       var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
       series.data = labelUtil.getSeriesWithShortestUniqueLabels(true);
@@ -172,6 +171,24 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
       });
 
       highesMeasurand = measurand.measurand;
+  };
+
+  var sortGroups = function () {
+     if(customerJourneyFilter){
+         sortGroupsByJourney();
+     } else{
+         sortGroupsByHighestMeasurand();
+     }
+  };
+
+  var sortGroupsByJourney = function () {
+    var filter = actualBarchartData.filterRules[customerJourneyFilter];
+    transformedData.sort(function (a,b) {
+       var aIndex = filter.indexOf(a.grouping);
+       var bIndex = filter.indexOf(b.grouping);
+       return aIndex > bIndex;
+    })
+
   };
   
   var sortGroupsByHighestMeasurand = function () {
@@ -216,7 +233,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     updateSvgWidth();
     transformData();
     setHighestMeasurand();
-    sortGroupsByHighestMeasurand();
+    sortGroups();
     createColorScale();
     groupings = transformedData.map(function (d) {
         return d.grouping;
@@ -815,25 +832,24 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
   };
 
   var filterCustomerJourney = function (journeyKey, desc) {
-
+    customerJourneyFilter = journeyKey;
+    descending = desc;
     actualBarchartData.series = clone(actualBarchartData.originalSeries);
+      if (journeyKey && filterRules[journeyKey]) {
 
-    if (journeyKey && filterRules[journeyKey]) {
-
-      // remove elements not in customer Journey from each series
+        // remove elements not in customer Journey from each series
       actualBarchartData.series.forEach(function (series) {
         series.data = series.data.filter(function (element) {
           return filterRules[journeyKey].indexOf(element.grouping) >= 0;
         });
       });
-      // remove series containing no data after first filter
+        // remove series containing no data after first filter
       actualBarchartData.series = actualBarchartData.series.filter(function (series) {
         return series.data.length > 0;
       });
+        descending = true;
     }
-    descending = desc;
     drawAllBars()
-
   };
 
   var toogleFilterCheckmarks = function (listItem) {
