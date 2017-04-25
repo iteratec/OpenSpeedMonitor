@@ -205,8 +205,16 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
         }
     };
 
+    var getStart = function () {
+        return new Date(dateFrom.valueOf());
+    };
+
+    var getEnd = function () {
+        return new Date(dateTo.valueOf());
+    };
+
     var getRange = function () {
-        return [new Date(dateFrom.valueOf()), new Date(dateTo.valueOf())];
+        return [getStart(), getEnd()];
     };
 
     var setRange = function (from, to) {
@@ -224,6 +232,8 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
 
     init();
     return {
+        getStart: getStart,
+        getEnd: getEnd,
         getRange: getRange,
         setRange: setRange
     };

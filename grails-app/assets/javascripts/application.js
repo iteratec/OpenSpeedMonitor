@@ -20,7 +20,6 @@
 //= require_tree bower_components/bootstrap-colorpicker/dist/js/
 //= require_tree bower_components/chosen
 //= require_tree bower_components/clipboard
-//= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require spinner
 //= require_self

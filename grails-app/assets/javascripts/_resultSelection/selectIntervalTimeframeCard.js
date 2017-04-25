@@ -49,7 +49,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
 
     var defaultValueForStart = function() {
         if (isSavedDashboard) {
-            return timeFramePicker.getRange()[0].toISOString();
+            return timeFramePicker.getStart().toISOString();
         }
         return OpenSpeedMonitor.urlUtils.getVar("from") ||
                clientStorage.getFromLocalStorage(clientStorageTimeFrameFromKey);
@@ -57,7 +57,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
 
     var defaultValueForEnd = function() {
         if (isSavedDashboard) {
-            return timeFramePicker.getRange()[1].toISOString();
+            return timeFramePicker.getEnd().toISOString();
         }
         return OpenSpeedMonitor.urlUtils.getVar("to") ||
             clientStorage.getFromLocalStorage(clientStorageTimeFrameToKey);
