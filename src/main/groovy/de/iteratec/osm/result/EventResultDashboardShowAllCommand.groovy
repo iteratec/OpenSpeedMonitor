@@ -11,10 +11,6 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
-
-import java.text.SimpleDateFormat
-import java.util.regex.Pattern
-
 /**
  * <p>
  * Command of {@link EventResultDashboardController#showAll(EventResultDashboardShowAllCommand)
@@ -31,28 +27,11 @@ import java.util.regex.Pattern
  * @since IT-6
  */
 public class EventResultDashboardShowAllCommand implements Validateable {
-    private final
-    static DateTimeFormatter SIMPLE_DATE_FORMAT = DateTimeFormat.forPattern(EventResultDashboardController.DATE_FORMAT_STRING)
-    private final
-    static DateTimeFormatter DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
 
-    private static boolean isIsoDateString (String dateString) {
-        try {
-            def isoDateTime = DATE_TIME_FORMATTER.parseDateTime(dateString)
-        } catch (Exception exception) {
-            return false
-        }
-        return true
-    }
-
-    private static boolean isSimpleDateString (String dateString) {
-        try {
-            def isoDateTime = SIMPLE_DATE_FORMAT.parseDateTime(dateString)
-        } catch (Exception exception) {
-            return false
-        }
-        return true
-    }
+    private final
+    static DateTimeFormatter FALLBACK_DATE_FORMAT = DateTimeFormat.forPattern(EventResultDashboardController.DATE_FORMAT_STRING)
+    private final
+    static DateTimeFormatter ISO_DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -62,24 +41,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    @BindUsing({
-        obj, source ->
-
-            def dateObject = source['from']
-            if (!dateObject) {
-                return null
-            }
-            if (dateObject instanceof Date) {
-                // JOHANNES2DO: parse Date to ISODateTime
-                return dateObject
-            }
-            if (EventResultDashboardShowAllCommand.isIsoDateString(dateObject)) {
-                return DATE_TIME_FORMATTER.parseDateTime(dateObject)
-            }
-            if (EventResultDashboardShowAllCommand.isSimpleDateString(dateObject)) {
-                return SIMPLE_DATE_FORMAT.parseDateTime(dateObject)
-            }
-    })
+    @BindUsing({obj, source -> parseDateTimeParameter(source["from"], false)})
     DateTime from
 
     /**
@@ -87,41 +49,8 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    @BindUsing({
-        obj, source ->
-
-            def dateObject = source['to']
-            if (!dateObject) {
-                return null
-            }
-            if (dateObject instanceof Date) {
-                // JOHANNES2DO: parse Date to ISODateTime
-                return dateObject
-            }
-            if (EventResultDashboardShowAllCommand.isIsoDateString(dateObject)) {
-                return DATE_TIME_FORMATTER.parseDateTime(dateObject)
-            }
-            if (EventResultDashboardShowAllCommand.isSimpleDateString(dateObject)) {
-                return SIMPLE_DATE_FORMAT.parseDateTime(dateObject)
-            }
-    })
+    @BindUsing({obj, source -> parseDateTimeParameter(source["to"], true)})
     DateTime to
-
-
-
-    /**
-     * The selected start hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String fromHour
-
-    /**
-     * The selected end hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String toHour
 
     /**
      * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
@@ -292,15 +221,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      */
     Boolean debug
 
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setFromHour
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setToHour
-
     String chartTitle
     int chartWidth
     int chartHeight
@@ -340,20 +260,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
             if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
             else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.isBefore(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
-        fromHour(nullable: true, validator: { String currentFromHour, EventResultDashboardShowAllCommand cmd ->
-            boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.fromHour.nullWithManualSelection']
-        })
-        toHour(nullable: true, validator: { String currentToHour, EventResultDashboardShowAllCommand cmd ->
-            boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentToHour == null) {
-                return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.nullWithManualSelection']
-            } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
-                DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
-                DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
-            }
-        })
         selectedAggrGroupValuesCached(nullable: false, validator: { Collection<String> selectedCheckedAggregators, EventResultDashboardShowAllCommand cmd ->
             if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.osm.gui.selectedAggrGroupValuesCached.error.validator.error.selectedAggrGroupValuesCached']
         })
@@ -387,8 +293,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         trimBelowRequestCounts(nullable: true)
         trimBelowRequestSizes(nullable: true)
         debug(nullable: true)
-        setToHour(nullable: true)
-        setFromHour(nullable: true)
         selectChartType(nullable: true)
         aggrGroup(nullable: true)
         selectedConnectivities(validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
@@ -424,8 +328,8 @@ public class EventResultDashboardShowAllCommand implements Validateable {
     /**
      * <p>
      * Returns the selected time frame as {@link org.joda.time.Interval}.
-     * That is the interval from {@link #from} / {@link #fromHour} to {@link #to} / {@link #toHour} if {@link #selectedTimeFrameInterval} is 0 (that means manual).
-     * If {@link #selectedTimeFrameInterval} is greater 0 the returned time frame is now minus {@link #selectedTimeFrameInterval} minutes to now.
+     * That is the interval from {@link #from} to {@link #to} if {@link #selectedTimeFrameInterval} is 0 (that means manual).
+     * If {@link #selectedTimeFrameInterval} is greater 0 the returned time frame is now minus {@link #selectedTimeFrameInterval} seconds to now.
      * </p>
      *
      * @return not <code>null</code>.
@@ -433,58 +337,12 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      *         if called on an invalid instance.
      */
     public Interval getSelectedTimeFrame() throws IllegalStateException {
-        DateTime start
-        DateTime end
-
-        Boolean manualTimeframe = this.selectedTimeFrameInterval == 0
-        if (manualTimeframe && fromHour && toHour) {
-
-            DateTime firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
-            DateTime firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
-
-            start = new DateTime(this.from.getTime())
-                    .withTime(
-                    firstDayWithFromHourAsDaytime.getHourOfDay(),
-                    firstDayWithFromHourAsDaytime.getMinuteOfHour(),
-                    0, 0
-            )
-            end = new DateTime(this.to.getTime())
-                    .withTime(
-                    firstDayWithToHourAsDaytime.getHourOfDay(),
-                    firstDayWithToHourAsDaytime.getMinuteOfHour(),
-                    59, 999
-            )
-
+        if (this.selectedTimeFrameInterval == 0) {
+            return new Interval(this.from, this.to)
         } else {
-
-            end = new DateTime()
-            start = end.minusSeconds(this.selectedTimeFrameInterval)
-
+            DateTime now = new DateTime()
+            return new Interval(now.minusSeconds(this.selectedTimeFrameInterval), now)
         }
-
-        return new Interval(start, end);
-    }
-
-    /**
-     * Returns a {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-     * @param timeWithOrWithoutMeridian
-     * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-     * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-     * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
-     */
-    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException {
-
-        Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
-        Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
-        String dateFormatString
-
-        if (timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-        else if (timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
-        else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
-
-        DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
-        return fmt.parseDateTime("01.01.1970 ${timeWithOrWithoutMeridian}")
-
     }
 
     /**
@@ -520,15 +378,8 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
 
-        viewModelToCopyTo.put('from', this.from)
-        if (!this.fromHour.is(null)) {
-            viewModelToCopyTo.put('fromHour', this.fromHour)
-        }
-
-        viewModelToCopyTo.put('to', this.to)
-        if (!this.toHour.is(null)) {
-            viewModelToCopyTo.put('toHour', this.toHour)
-        }
+        viewModelToCopyTo.put('from', ISO_DATE_TIME_FORMATTER.print(this.from))
+        viewModelToCopyTo.put('to', ISO_DATE_TIME_FORMATTER.print(this.to))
 
         viewModelToCopyTo.put("selectedChartType", this.selectChartType ? POINT_CHART_SELECTION : LINE_CHART_SELECTION);
 
@@ -542,8 +393,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('trimBelowRequestSizes', this.trimBelowRequestSizes)
         viewModelToCopyTo.put('trimAboveRequestSizes', this.trimAboveRequestSizes)
         viewModelToCopyTo.put('debug', this.debug ?: false)
-        viewModelToCopyTo.put('setFromHour', this.setFromHour)
-        viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('chartTitle', this.chartTitle)
         viewModelToCopyTo.put('chartWidth', this.chartWidth)
         viewModelToCopyTo.put('chartHeight', this.chartHeight)
@@ -641,6 +490,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      * @return <code>true</code> if the user should be warned,
      *         <code>false</code> else.
      * @since IT-157
+     * TODO(sburnicki): Remove as its obsolete and unused
      */
     public boolean shouldWarnAboutLongProcessingTime(int countOfSelectedAggregatorTypes, int countOfSelectedBrowser) {
 
@@ -668,4 +518,20 @@ public class EventResultDashboardShowAllCommand implements Validateable {
             return expectedTotalNumberOfPoints > 50000;
         }
     }
+
+    private static DateTime parseDateTimeParameter(def value, boolean fallbackToEndOfDay) {
+        if (!value) {
+            return null
+        }
+        if (value instanceof Date) {
+            return new DateTime(value)
+        }
+        String strValue = value.toString()
+        try {
+            return ISO_DATE_TIME_FORMATTER.parseDateTime(strValue)
+        } catch (IllegalArgumentException ignored) {}
+        DateTime fallback = FALLBACK_DATE_FORMAT.parseDateTime(strValue)
+        return fallbackToEndOfDay ? fallback.millisOfDay().withMaximumValue() : fallback
+    }
+
 }
