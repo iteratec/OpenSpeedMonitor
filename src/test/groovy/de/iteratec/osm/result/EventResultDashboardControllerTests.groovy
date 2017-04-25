@@ -30,9 +30,6 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
-
-import static org.junit.Assert.*
-
 /**
  * <p>
  * Test-suite of {@link EventResultDashboardController} and 
@@ -102,7 +99,7 @@ class EventResultDashboardControllerTests extends Specification {
         command.selectedBrowsers == [2L]
         command.selectedLocations == [17L]
         command.includeNativeConnectivity
-        command.getSelectedCustomConnectivityNames() == ["testCustom"]
+        command.getSelectedCustomConnectivityNames() == [CUSTOM_CONNECTIVITY_NAME]
         command.selectedConnectivityProfiles == [1L]
     }
 
@@ -234,652 +231,183 @@ class EventResultDashboardControllerTests extends Specification {
         command.getSelectedConnectivityProfiles() == [1L, 2L]
     }
 
-    void testConstructViewDataMap() {
+    void "static model data is correctly generated"() {
         given:
         Page page1 = new Page(name: 'Page1', weight: 0) {
-            public Long getId() { return 1L; }
-        };
+            Long getId() { return 1L }
+        }
         Page page2 = new Page(name: 'Page2', weight: 0.25d) {
-            public Long getId() { return 2L; }
-        };
+            Long getId() { return 2L }
+        }
         Page page3 = new Page(name: 'Page3', weight: 0.5d) {
-            public Long getId() { return 3L; }
-        };
+            Long getId() { return 3L }
+        }
 
         MeasuredEvent measuredEvent1 = new MeasuredEvent(name: 'MeasuredEvent1', testedPage: page3) {
-            public Long getId() { return 1001L; }
-        };
+            Long getId() { return 1001L }
+        }
         MeasuredEvent measuredEvent2 = new MeasuredEvent(name: 'MeasuredEvent2', testedPage: page2) {
-            public Long getId() { return 1002L; }
-        };
+            Long getId() { return 1002L }
+        }
         MeasuredEvent measuredEvent3 = new MeasuredEvent(name: 'MeasuredEvent3', testedPage: page1) {
-            public Long getId() { return 1003L; }
-        };
+            Long getId() { return 1003L }
+        }
         MeasuredEvent measuredEvent4 = new MeasuredEvent(name: 'MeasuredEvent4', testedPage: page2) {
-            public Long getId() { return 1004L; }
-        };
+            Long getId() { return 1004L }
+        }
 
         Browser browser1 = new Browser(name: 'Browser1') {
-            public Long getId() { return 11L; }
-        };
+            Long getId() { return 11L }
+        }
 
         Location location1 = new Location(label: 'Location1', browser: browser1) {
-            public Long getId() { return 101L; }
-        };
+            Long getId() { return 101L }
+        }
         Location location2 = new Location(label: 'Location2', browser: browser1) {
-            public Long getId() { return 102L; }
-        };
+            Long getId() { return 102L }
+        }
         Location location3 = new Location(label: 'Location3', browser: browser1) {
-            public Long getId() { return 103L; }
-        };
+            Long getId() { return 103L }
+        }
 
         controllerUnderTest.eventResultDashboardService.getAllJobGroups() >> {
             return [new JobGroup(name: 'Group2'),
                     new JobGroup(name: 'Group1')]
-        };
+        }
         controllerUnderTest.eventResultDashboardService.getAllPages() >> {
             return [page1, page2, page3]
-        };
+        }
         controllerUnderTest.eventResultDashboardService.getAllMeasuredEvents() >> {
             return [measuredEvent3, measuredEvent1, measuredEvent2, measuredEvent4]
-        };
+        }
         controllerUnderTest.eventResultDashboardService.getAllBrowser() >> {
             return [browser1]
-        };
+        }
         controllerUnderTest.eventResultDashboardService.getAllLocations() >> {
             return [location1, location2, location3]
-        };
+        }
 
         when:
-        // Run the test:
         Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll();
 
         then:
-        // Verify result (lists should be sorted by UI visible name or label):
-        assertNotNull(result);
-        assertEquals(17, result.size());
+        result != null
+        result.size() == 14
 
-        // AggregatorType
-        assertTrue(result.containsKey('aggrGroupLabels'))
-        List<String> aggrGroupLabels = result.get('aggrGroupLabels');
-        assertEquals(EventResultDashboardController.AGGREGATOR_GROUP_LABELS, aggrGroupLabels)
-        //		assertEquals(2, aggrGroupLabels.size())
-        //		assertEquals('AT-1', aggrGroupLabels.get(0))
-        //		assertEquals('AT-2', aggrGroupLabels.get(1))
+        result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED)
+        result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
 
-        assertTrue(result.containsKey('aggrGroupValuesCached'))
-        assertTrue(result.containsKey('aggrGroupValuesUnCached'))
+        result["folders"]*.getName() == ["Group2", "Group1"]
+        result["pages"]*.getName() == ["Page1", "Page2", "Page3"]
+        result["measuredEvents"]*.getName() == ["MeasuredEvent3", "MeasuredEvent1", "MeasuredEvent2", "MeasuredEvent4"]
+        result["browsers"]*.getName() == ["Browser1"]
+        result["locations"]*.getLabel() == ["Location1", "Location2", "Location3"]
 
-        // CSI-groups
-        assertTrue(result.containsKey('folders'))
-        List<JobGroup> csiGroups = result.get('folders');
-        assertEquals(2, csiGroups.size())
-        assertEquals('Group2', csiGroups.get(0).getName())
-        assertEquals('Group1', csiGroups.get(1).getName())
+        result["dateFormat"] == EventResultDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
+        result["weekStart"] == EventResultDashboardController.MONDAY_WEEKSTART
 
-        // Pages
-        assertTrue(result.containsKey('pages'))
-        List<Page> pages = result.get('pages');
-        assertEquals(3, pages.size())
-        assertEquals('Page1', pages.get(0).getName())
-        assertEquals('Page2', pages.get(1).getName())
-        assertEquals('Page3', pages.get(2).getName())
-
-        // MeasuredEvents
-        assertTrue(result.containsKey('measuredEvents'))
-        List<MeasuredEvent> measuredEvents = result.get('measuredEvents');
-        assertEquals(4, measuredEvents.size())
-        assertEquals('MeasuredEvent3', measuredEvents.get(0).getName())
-        assertEquals('MeasuredEvent1', measuredEvents.get(1).getName())
-        assertEquals('MeasuredEvent2', measuredEvents.get(2).getName())
-        assertEquals('MeasuredEvent4', measuredEvents.get(3).getName())
-
-        // Browsers
-        assertTrue(result.containsKey('browsers'))
-        List<Browser> browsers = result.get('browsers');
-        assertEquals(1, browsers.size())
-        assertEquals('Browser1', browsers.get(0).getName())
-
-        // Locations
-        assertTrue(result.containsKey('locations'))
-        List<Location> locations = result.get('locations');
-        assertEquals(3, locations.size())
-        assertEquals('Location1', locations.get(0).getLabel())
-        assertEquals('Location2', locations.get(1).getLabel())
-        assertEquals('Location3', locations.get(2).getLabel())
-
-        // Data for java-script utilities:
-        assertTrue(result.containsKey('dateFormat'))
-        assertEquals(EventResultDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
-        assertTrue(result.containsKey('weekStart'))
-        assertEquals(EventResultDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
-
-        // --- Map<PageID, Set<MeasuredEventID>>
-        Map<Long, Set<Long>> eventsOfPages = result.get('eventsOfPages')
-        assertNotNull(eventsOfPages)
-
-        Set<Long> eventsOfPage1 = eventsOfPages.get(1L)
-        assertNotNull(eventsOfPage1)
-        assertEquals(1, eventsOfPage1.size());
-        assertTrue(eventsOfPage1.contains(1003L));
-
-        Set<Long> eventsOfPage2 = eventsOfPages.get(2L)
-        assertNotNull(eventsOfPage2)
-        assertEquals(2, eventsOfPage2.size());
-        assertTrue(eventsOfPage2.contains(1002L));
-        assertTrue(eventsOfPage2.contains(1004L));
-
-        Set<Long> eventsOfPage3 = eventsOfPages.get(3L)
-        assertNotNull(eventsOfPage3)
-        assertEquals(1, eventsOfPage3.size());
-        assertTrue(eventsOfPage3.contains(1001L));
-
-        // --- Map<BrowserID, Set<LocationID>>
-        Map<Long, Set<Long>> locationsOfBrowsers = result.get('locationsOfBrowsers')
-        assertNotNull(locationsOfBrowsers)
-
-        Set<Long> locationsOfBrowser1 = locationsOfBrowsers.get(11L)
-        assertNotNull(locationsOfBrowser1)
-        assertEquals(3, locationsOfBrowser1.size());
-        assertTrue(locationsOfBrowser1.contains(101L));
-        assertTrue(locationsOfBrowser1.contains(102L));
-        assertTrue(locationsOfBrowser1.contains(103L));
+        result["eventsOfPages"] == [
+                1L: [1003L] as Set,
+                2L: [1002L, 1004L] as Set,
+                3L: [1001L] as Set
+        ]
+        result["locationsOfBrowsers"] == [
+                11L: [101L, 102L, 103L] as Set
+        ]
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCopyRequestDataToViewModelMap() {
+    void "command properties are correctly copied to map"() {
         given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        Date expectedFromDate = new Date(1376776800000L)
-        command.from = expectedFromDate
-        command.fromHour = "12:00"
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedAllMeasuredEvents = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.debug = false
-        command.setFromHour = false
-        command.setToHour = false
-        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
-        command.selectedAllConnectivityProfiles = true
-        command.showDataMarkers = false
+        setDefaultCommandProperties()
 
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        // Run the test:
         when:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
+        Map<String, Object> result = [:]
+        command.copyRequestDataToViewModelMap(result)
 
         then:
-        // Verification:
-        assertEquals(40, dataUnderTest.size());
+        result.size() == 29
+        result["selectedFolder"] == [1L]
+        result["selectedPages"] == [1L, 5L]
+        result['selectedFolder'] == [1L]
+        result['selectedPages'] == [1L, 5L]
+        result['selectedMeasuredEventIds'] == [7L, 8L, 9L]
+        result['selectedBrowsers'] == [2L]
+        result['selectedLocations'] == [17L]
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivities', [CUSTOM_CONNECTIVITY_NAME]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        result['from'] == '2013-08-18T12:00:00.000Z'
+        result['to'] == '2013-08-19T13:00:00.000Z'
+        result['selectedConnectivities'] == [CUSTOM_CONNECTIVITY_NAME, "1", "native"]
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCopyRequestDataToViewModelMap_defaultsForMissingValues() {
+    void "command creates correct ErQueryParameters"() {
         given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        Date expectedFromDate = new Date(1376776800000L)
-        command.from = expectedFromDate
-        command.fromHour = null // Missing!
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = null // Missing!
-        command.aggrGroup = null // Missing!
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedAllMeasuredEvents = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.debug = false
-        command.setFromHour = false
-        command.setToHour = false
-        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
-        command.showDataMarkers = false
+        setDefaultCommandProperties()
 
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-
-        // Run the test:
         when:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
+        ErQueryParams erQueryParams = command.createErQueryParams()
 
         then:
-        // Verification:
-        assertEquals(38, dataUnderTest.size());
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
+        erQueryParams != null
+        erQueryParams.jobGroupIds == [1L] as SortedSet
+        erQueryParams.pageIds == [1L, 5L] as SortedSet
+        erQueryParams.measuredEventIds == [7L, 8L, 9L] as SortedSet
+        erQueryParams.browserIds == [2L] as SortedSet
+        erQueryParams.locationIds == [17L] as SortedSet
+        erQueryParams.connectivityProfileIds == [1L] as SortedSet
+        !erQueryParams.includeAllConnectivities
+        erQueryParams.includeNativeConnectivity
+        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as SortedSet
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCopyRequestDataToViewModelMap_selectAllSelection() {
+    void "command creates correct ErQueryParameters with empty filters"() {
         given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        Date expectedFromDate = new Date(1376776800000L)
-        command.from = expectedFromDate
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = 'on'
+        setDefaultCommandProperties()
+        command.selectedConnectivities = []
         command.selectedMeasuredEventIds = []
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.debug = true
-        command.setFromHour = false
-        command.setToHour = false
+        command.selectedBrowsers = []
+        command.selectedLocations = []
+
+        when:
+        ErQueryParams erQueryParams = command.createErQueryParams()
+
+        then:
+        erQueryParams.measuredEventIds == [] as Set
+        erQueryParams.browserIds == [] as Set
+        erQueryParams.locationIds == [] as Set
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [] as Set
+        erQueryParams.includeNativeConnectivity
+        erQueryParams.includeAllConnectivities
+    }
+
+    void "command creates correct ErQueryParameters with only native connectivites"() {
+        given:
+        setDefaultCommandProperties()
+        command.selectedConnectivities = ["native"]
+
+        when:
+        ErQueryParams erQueryParams = command.createErQueryParams()
+
+        then:
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [] as Set
+        !erQueryParams.includeAllConnectivities
+        erQueryParams.includeNativeConnectivity
+    }
+
+    void "command creates correct ErQueryParameters with only custom connectivites"() {
+        given:
+        setDefaultCommandProperties()
         command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
-        command.selectedAllConnectivityProfiles = true
-        command.showDataMarkers = false
-
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
 
         when:
-        // Run the test:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
+        ErQueryParams erQueryParams = command.createErQueryParams()
 
         then:
-        // Verification:
-        assertEquals(40, dataUnderTest.size());
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', []);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', "12:00");
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', "13:00");
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivities', [CUSTOM_CONNECTIVITY_NAME]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams() {
-        given:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedAllMeasuredEvents = false
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedTimeFrameInterval = 0
-        command.showDataMarkers = false
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.debug = false
-
-        when:
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        then:
-        // Run the test:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-
-        // Verification:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_MeasuredEvents() {
-        given:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = 'on';
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.showDataMarkers = false
-
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.debug = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-        when:
-        // Run the test:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-        then:
-        // Verification:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Browsers() {
-        given:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = true;
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAllLocations = false
-        command.selectedAllMeasuredEvents = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.showDataMarkers = false
-
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.debug = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        // Run the test:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-        then:
-        // Verification:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Locations() {
-        given:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = true;
-        command.selectedLocations = [17L]
-        command.selectedAllBrowsers = false
-        command.selectedAllMeasuredEvents = false
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        command.showDataMarkers = false
-
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.debug = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-        when:
-        // Run the test:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-        then:
-        // Verification:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_() {
-        given:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = "13:00"
-        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedAllMeasuredEvents = false
-        command.selectedAllBrowsers = false
-        command.selectedAllLocations = false
-        command.selectedTimeFrameInterval = 0
-        command.selectedAllConnectivityProfiles = true
-        command.showDataMarkers = false
-
-        command.showDataLabels = false
-        command.selectedInterval = 0
-        command.selectChartType = 0
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.debug = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-        when:
-        // Run the test:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-        then:
-        // Verification:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as Set
+        !erQueryParams.includeAllConnectivities
+        !erQueryParams.includeNativeConnectivity
     }
 
     void "createMvQueryParams throws with invalid command"() {
@@ -887,38 +415,10 @@ class EventResultDashboardControllerTests extends Specification {
         !command.validate()
 
         when:
-        command.createMvQueryParams()
+        command.createErQueryParams()
 
         then: "an exception is thrown"
         thrown IllegalStateException
-    }
-
-    /**
-     * <p>
-     * Asserts that a value is contained in a {@link Map}, that the value is
-     * not <code>null</code> and is equals to specified expected value.
-     * </p>
-     *
-     * @param dataUnderTest
-     *         The map which contents is to be checked, not <code>null</code>.
-     * @param key
-     *         The key to which the value to check is bound,
-     *         not <code>null</code>.
-     * @param expectedValue
-     *         The expected value to be equals to according to
-     * {@link Object#equals(Object)}; not <code>null</code>.
-     * @throws AssertionError
-     *         if at least one of the conditions are not satisfied.
-     */
-    private
-    static void assertContainedAndNotNullAndEquals(Map<String, Object> dataUnderTest, String key, Object expectedValue) throws AssertionError {
-        assertNotNull('dataUnderTest', dataUnderTest)
-        assertNotNull('key', key)
-        assertNotNull('expectedValue', expectedValue)
-
-        assertTrue('Map must contain key \"' + key + '\"', dataUnderTest.containsKey(key))
-        assertNotNull('Map must contain a not-null value for key \"' + key + '\"', dataUnderTest.get(key))
-        assertEquals(expectedValue, dataUnderTest.get(key))
     }
 
     private setDefaultParams() {
@@ -928,7 +428,7 @@ class EventResultDashboardControllerTests extends Specification {
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedConnectivities = ['1', 'testCustom', 'native']
+        params.selectedConnectivities = ['1', CUSTOM_CONNECTIVITY_NAME, 'native']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.showDataMarkers = false
@@ -948,6 +448,29 @@ class EventResultDashboardControllerTests extends Specification {
     }
 
     private setDefaultCommandProperties() {
+        command.from = new DateTime(2013, 8, 18, 12, 0, 0, DateTimeZone.UTC)
+        command.to = new DateTime(2013, 8, 19, 13, 0, 0, DateTimeZone.UTC)
+        command.selectedFolder = [1L]
+        command.selectedPages = [1L, 5L]
+        command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedBrowsers = [2L]
+        command.selectedLocations = [17L]
+        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
+        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME, '1', 'native']
+        command.selectedInterval = 0
 
+        command.trimBelowLoadTimes = 0
+        command.trimAboveLoadTimes = 0
+        command.trimBelowRequestCounts = 0
+        command.trimAboveRequestCounts = 0
+        command.trimBelowRequestSizes = 0
+        command.trimAboveRequestSizes = 0
+
+        command.chartWidth = 0
+        command.chartHeight = 0
+        command.loadTimeMinimum = 0
+        command.showDataMarkers = false
+        command.showDataLabels = false
+        command.validate()
     }
 }

@@ -282,7 +282,7 @@ class EventResultDashboardShowAllCommand implements Validateable {
 
     /**
      * <p>
-     * Creates {@link MvQueryParams} based on this command. This command
+     * Creates {@link ErQueryParams} based on this command. This command
      * need to be valid for this operation to be successful.
      * </p>
      *
@@ -290,7 +290,7 @@ class EventResultDashboardShowAllCommand implements Validateable {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public MvQueryParams createMvQueryParams() throws IllegalStateException {
+    public ErQueryParams createErQueryParams() throws IllegalStateException {
         if (!this.validate()) {
             throw new IllegalStateException('Query params are not available from an invalid command.')
         }
@@ -332,13 +332,8 @@ class EventResultDashboardShowAllCommand implements Validateable {
         }
         result.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         result.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
-
-        if (this.selectedConnectivityProfiles) {
-            result.includeAllConnectivities = false
-            result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
-        } else {
-            result.includeAllConnectivities = true
-        }
+        result.includeAllConnectivities = !this.selectedConnectivities
+        result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
 
         return result
     }

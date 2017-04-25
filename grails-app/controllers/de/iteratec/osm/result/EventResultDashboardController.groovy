@@ -69,9 +69,6 @@ class EventResultDashboardController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final
-    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
-
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
@@ -412,7 +409,7 @@ class EventResultDashboardController {
         labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES",
                 MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.RIGHT_CHART_SIDE));
 
-        MvQueryParams queryParams = cmd.createMvQueryParams();
+        ErQueryParams queryParams = cmd.createErQueryParams();
 
         OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
                 timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams
@@ -709,7 +706,6 @@ class EventResultDashboardController {
         Map<String, Object> result = [:]
 
         // AggregatorTypes
-        result.put('aggrGroupLabels', AGGREGATOR_GROUP_LABELS)
         result.put('aggrGroupValuesCached', AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED))
         result.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
 
@@ -774,9 +770,6 @@ class EventResultDashboardController {
             locationsOfBrowsers.put(eachBrowser.getId(), locationIds);
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers);
-
-        result.put("selectedChartType", 0);
-        result.put("warnAboutExceededPointsPerGraphLimit", false);
 
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
