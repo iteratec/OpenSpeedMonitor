@@ -27,6 +27,7 @@ import de.iteratec.osm.report.chart.AggregatorType
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
 
@@ -58,411 +59,148 @@ class EventResultDashboardControllerTests extends Specification {
         controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService);
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
-     */
-    void testShowAllCommand_EmptyCreationIsInvalid() {
+    void "command without bound parameters is invalid"() {
         expect:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        !command.validate()
+        command.selectedFolder == []
+        command.selectedPages == []
+        command.selectedMeasuredEventIds == []
+        command.selectedBrowsers == []
+        command.selectedLocations == []
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromEmptyRequestArgsIsInvalid() {
+    void "command with empty bound parameters is invalid"() {
         when:
         controllerUnderTest.bindData(command, params)
 
         then:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        !command.validate()
+        command.selectedFolder == []
+        command.selectedPages == []
+        command.selectedMeasuredEventIds == []
+        command.selectedBrowsers == []
+        command.selectedLocations == []
     }
 
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults() {
+    void "command bound with default parameters is valid"() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
+        setDefaultParams()
+        when:
+        controllerUnderTest.bindData(command, params)
 
-        params.fromHour = '12:00'
+        then:
+        command.validate()
+        command.from == new DateTime(2013, 8, 18, 16, 0, 0, DateTimeZone.UTC)
+        command.to == new DateTime(2013, 8, 18, 18, 0, 0, DateTimeZone.UTC)
+        command.createTimeFrameInterval().start == command.from
+        command.createTimeFrameInterval().end == command.to
+        command.selectedAggrGroupValuesUnCached == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
+        command.selectedFolder == [1L]
+        command.selectedPages == [1L, 5L]
+        command.selectedAllMeasuredEvents
+        command.selectedMeasuredEventIds == [7L, 8L, 9L]
+        command.selectedAllBrowsers
+        command.selectedBrowsers == [2L]
+        command.selectedAllLocations
+        command.selectedLocations == [17L]
+    }
 
-        params.to = '19.08.2013'
-        Date expectedDateForTo = new Date(1376863200000L)
+    void "command is invalid if 'to' is before 'from'"() {
+        given:
+        setDefaultParams()
+        params.from = "2013-08-18T12:00:00.000Z"
+        params.to = "2013-08-18T11:00:00.000Z"
 
-        params.toHour = '13:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+    }
+
+    void "command is invalid if 'to' is equal to 'from'"() {
+        given:
+        setDefaultParams()
+        params.from = "2013-08-18T11:00:00.000Z"
+        params.to = "2013-08-18T11:00:00.000Z"
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+    }
+
+    void "command supports legacy date format in 'from' and 'to'"() {
+        given:
+        setDefaultParams()
+        params.from = "18.08.2013"
+        params.to = "18.08.2013"
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+        command.from == new DateTime(2013, 8, 18, 0, 0, 0, 0)
+        command.to == new DateTime(2013, 8, 18, 23, 59, 59, 999)
+        command.createTimeFrameInterval().start == command.from
+        command.createTimeFrameInterval().end == command.to
+    }
+
+    void "command supports automatic time frame"() {
+        given:
+        setDefaultParams()
+        params.from = null
+        params.to = null
+        params.selectedTimeFrameInterval = 3000
+        long nowInMillis = DateTime.now().getMillis()
+        long allowedDelta = 1000
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+        command.from == null
+        command.to == null
+        Interval timeFrame = command.createTimeFrameInterval()
+        Math.abs(timeFrame.endMillis - nowInMillis) < allowedDelta
+        Math.abs(timeFrame.startMillis - (nowInMillis - 3000 * 1000)) < allowedDelta
+    }
+
+
+    void "command is valid with non-default values"() {
+        given:
+        setDefaultParams()
         params.selectedAllBrowsers = false
         params.selectedAllLocations = false
         params.selectedAllMeasuredEvents = false
-        params.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        params.selectedTimeFrameInterval = 0
+        params.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME.toString()]
         params.includeNativeConnectivity = false
         params.includeCustomConnectivity = true
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
 
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
         then:
-        // Verification:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("12:00", command.fromHour);
-        assertEquals("13:00", command.toHour);
-        assertEquals(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, command.aggrGroup);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(2, command.selectedPages.size())
-        assertTrue(command.selectedPages.contains(1L))
-        assertTrue(command.selectedPages.contains(5L))
-
-        assertFalse(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, command.selectedMeasuredEventIds.size())
-        assertTrue(command.selectedMeasuredEventIds.contains(7L))
-        assertTrue(command.selectedMeasuredEventIds.contains(8L))
-        assertTrue(command.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(command.selectedAllBrowsers as boolean)
-        assertEquals(1, command.selectedBrowsers.size())
-        assertTrue(command.selectedBrowsers.contains(2L))
-
-        assertFalse(command.selectedAllLocations as boolean)
-        assertEquals(1, command.selectedLocations.size())
-        assertTrue(command.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(12, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(19, end.getDayOfMonth())
-        assertEquals(13, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '17.08.2013'
-        params.toHour = '13:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
-        when:
-        // Create and fill the command:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        // Verification:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '18.08.2013'
-        params.toHour = '11:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        params.showDataMarkers = false
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
-        when:
-        // Create and fill the command:
-        controllerUnderTest.bindData(command, params)
-        then:
-        // Verification:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '18.08.2013'
-        params.toHour = '12:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
-        when:
-        // Create and fill the command:
-        controllerUnderTest.bindData(command, params)
-        then:
-        // Verification:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link EventResultDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
-
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        Date expectedDateForTo = new Date(1376776800000L)
-
-        params.toHour = '18:00'
-        params.aggrGroup = AggregatorType.PAGE.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
-        params.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_LOAD_TIME]
-        params.selectedTimeFrameInterval = 0
-        params.includeNativeConnectivity = false
-        params.includeCustomConnectivity = true
-        params.showDataMarkers = false
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
-        // Create and fill the command:
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        // Verification:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("16:00", command.fromHour);
-        assertEquals("18:00", command.toHour);
-        assertEquals(AggregatorType.PAGE, command.aggrGroup);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(2, command.selectedPages.size())
-        assertTrue(command.selectedPages.contains(1L))
-        assertTrue(command.selectedPages.contains(5L))
-
-        assertFalse(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, command.selectedMeasuredEventIds.size())
-        assertTrue(command.selectedMeasuredEventIds.contains(7L))
-        assertTrue(command.selectedMeasuredEventIds.contains(8L))
-        assertTrue(command.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(command.selectedAllBrowsers as boolean)
-        assertEquals(1, command.selectedBrowsers.size())
-        assertTrue(command.selectedBrowsers.contains(2L))
-
-        assertFalse(command.selectedAllLocations as boolean)
-        assertEquals(1, command.selectedLocations.size())
-        assertTrue(command.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(16, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(18, end.getDayOfMonth())
-        assertEquals(18, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
+        command.validate()
+        !command.selectedAllBrowsers
+        !command.selectedAllLocations
+        !command.selectedMeasuredEventIds
+        !command.selectedAggrGroupValuesCached == [AggregatorType.RESULT_CACHED_LOAD_TIME]
+        !command.includeNativeConnectivity
+        command.includeCustomConnectivity
+        command.
     }
 
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid() {
         given:
+        setDefaultParams()
         // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-        params.to = '19.08.2013'
-        params.toHour = '13:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
         params.selectedPages = ['NOT-A-NUMBER']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
         params.selectedLocations = 'UGLY'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
 
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
 
         when:
         // Create and fill the command:
@@ -486,42 +224,13 @@ class EventResultDashboardControllerTests extends Specification {
      */
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
+        setDefaultParams()
         params.selectedPages = []
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
 
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
         then:
-        // Verification:
         assertFalse(command.validate())
     }
 
@@ -530,42 +239,14 @@ class EventResultDashboardControllerTests extends Specification {
      */
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_WEEKLY_PAGE() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
+        setDefaultParams()
         params.aggrGroup = AggregatorType.PAGE.toString()
-        params.selectedFolder = '1'
         params.selectedPages = []
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
 
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
         then:
-        // Verification:
         assertFalse(command.validate())
     }
 
@@ -574,42 +255,13 @@ class EventResultDashboardControllerTests extends Specification {
      */
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedMeasuredEvents_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
+        setDefaultParams()
         params.selectedMeasuredEventIds = []
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
-
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
 
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
         then:
-        // Verification:
         assertFalse(command.validate())
     }
 
@@ -618,40 +270,12 @@ class EventResultDashboardControllerTests extends Specification {
      */
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedBrowsers_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
+        setDefaultParams()
         params.selectedBrowsers = []
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
 
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
         then:
-        // Verification:
         assertFalse(command.validate())
     }
 
@@ -660,40 +284,12 @@ class EventResultDashboardControllerTests extends Specification {
      */
     void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedLocations_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '1'
+        setDefaultParams()
         params.selectedLocations = []
-        params._action_showAll = 'Anzeigen'
-        params.showDataMarkers = false
 
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.debug = false
-        params.setFromHour = false
-        params.setToHour = false
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
         when:
-        // Create and fill the command:
         controllerUnderTest.bindData(command, params)
         then:
-        // Verification:
         assertFalse(command.validate())
     }
 
@@ -1385,5 +981,31 @@ class EventResultDashboardControllerTests extends Specification {
         assertTrue('Map must contain key \"' + key + '\"', dataUnderTest.containsKey(key))
         assertNotNull('Map must contain a not-null value for key \"' + key + '\"', dataUnderTest.get(key))
         assertEquals(expectedValue, dataUnderTest.get(key))
+    }
+
+    private setDefaultParams() {
+        params.from = '2013-08-18T16:00:00.000Z'
+        params.to = '2013-08-18T18:00:00.000Z'
+        params.selectedAggrGroupValuesUnCached = AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+        params.selectedFolder = '1'
+        params.selectedPages = ['1', '5']
+        params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedBrowsers = '2'
+        params.selectedLocations = '17'
+        params._action_showAll = 'Anzeigen'
+        params.showDataMarkers = false
+        params.showDataLabels = false
+        params.selectedInterval = 0
+        params.selectedTimeFrameInterval = 0
+        params.selectChartType = 0
+        params.trimBelowLoadTimes = 0
+        params.trimAboveLoadTimes = 0
+        params.trimBelowRequestCounts = 0
+        params.trimAboveRequestCounts = 0
+        params.trimBelowRequestSizes = 0
+        params.trimAboveRequestSizes = 0
+        params.chartWidth = 0
+        params.chartHeight = 0
+        params.loadTimeMinimum = 0
     }
 }

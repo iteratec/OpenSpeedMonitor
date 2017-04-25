@@ -392,7 +392,7 @@ class EventResultDashboardController {
     }
 
     private void fillWithCsiAggregationData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
-        Interval timeFrame = cmd.getSelectedTimeFrame();
+        Interval timeFrame = cmd.createTimeFrameInterval();
 
         List<String> aggregatorNames = [];
         aggregatorNames.addAll(cmd.getSelectedAggrGroupValuesCached());

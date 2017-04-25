@@ -2,15 +2,13 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.util.ParameterBindingUtility
 import grails.converters.JSON
 import grails.validation.Validateable
 import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.Interval
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
 /**
  * <p>
  * Command of {@link EventResultDashboardController#showAll(EventResultDashboardShowAllCommand)
@@ -28,10 +26,6 @@ import org.joda.time.format.ISODateTimeFormat
  */
 public class EventResultDashboardShowAllCommand implements Validateable {
 
-    private final
-    static DateTimeFormatter FALLBACK_DATE_FORMAT = DateTimeFormat.forPattern(EventResultDashboardController.DATE_FORMAT_STRING)
-    private final
-    static DateTimeFormatter ISO_DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -39,17 +33,21 @@ public class EventResultDashboardShowAllCommand implements Validateable {
     /**
      * The selected start date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #createTimeFrameInterval()}.
      */
-    @BindUsing({obj, source -> parseDateTimeParameter(source["from"], false)})
+    @BindUsing({obj, source ->
+        ParameterBindingUtility.parseDateTimeParameter(source["from"], false)
+    })
     DateTime from
 
     /**
      * The selected end date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #createTimeFrameInterval()}.
      */
-    @BindUsing({obj, source -> parseDateTimeParameter(source["to"], true)})
+    @BindUsing({obj, source ->
+        ParameterBindingUtility.parseDateTimeParameter(source["to"], true)
+    })
     DateTime to
 
     /**
@@ -258,7 +256,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         to(nullable: true, validator: { DateTime currentTo, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
-            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.isBefore(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && !currentTo.isAfter(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
         selectedAggrGroupValuesCached(nullable: false, validator: { Collection<String> selectedCheckedAggregators, EventResultDashboardShowAllCommand cmd ->
             if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.osm.gui.selectedAggrGroupValuesCached.error.validator.error.selectedAggrGroupValuesCached']
@@ -319,13 +317,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
     }
 
     /**
-     * Whether or not EventResults measured with native connectivity should get included.
-     */
-    boolean getIncludeNativeConnectivity() {
-        return selectedAllConnectivityProfiles || selectedConnectivities.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
-    }
-
-    /**
      * <p>
      * Returns the selected time frame as {@link org.joda.time.Interval}.
      * That is the interval from {@link #from} to {@link #to} if {@link #selectedTimeFrameInterval} is 0 (that means manual).
@@ -333,16 +324,21 @@ public class EventResultDashboardShowAllCommand implements Validateable {
      * </p>
      *
      * @return not <code>null</code>.
-     * @throws IllegalStateException
-     *         if called on an invalid instance.
      */
-    public Interval getSelectedTimeFrame() throws IllegalStateException {
+    Interval createTimeFrameInterval() {
         if (this.selectedTimeFrameInterval == 0) {
             return new Interval(this.from, this.to)
         } else {
-            DateTime now = new DateTime()
+            DateTime now = DateTime.now()
             return new Interval(now.minusSeconds(this.selectedTimeFrameInterval), now)
         }
+    }
+
+    /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    boolean getIncludeNativeConnectivity() {
+        return selectedAllConnectivityProfiles || selectedConnectivities.contains(ResultSelectionController.MetaConnectivityProfileId.Native.value)
     }
 
     /**
@@ -495,7 +491,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
     public boolean shouldWarnAboutLongProcessingTime(int countOfSelectedAggregatorTypes, int countOfSelectedBrowser) {
 
         int countOfSelectedSystems = selectedFolder.size()
-        Interval timeFrame = getSelectedTimeFrame()
+        Interval timeFrame = createTimeFrameInterval()
         int interval = getSelectedInterval()
         int countOfSelectedPages = selectedPages.size()
         int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes();
@@ -519,19 +515,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         }
     }
 
-    private static DateTime parseDateTimeParameter(def value, boolean fallbackToEndOfDay) {
-        if (!value) {
-            return null
-        }
-        if (value instanceof Date) {
-            return new DateTime(value)
-        }
-        String strValue = value.toString()
-        try {
-            return ISO_DATE_TIME_FORMATTER.parseDateTime(strValue)
-        } catch (IllegalArgumentException ignored) {}
-        DateTime fallback = FALLBACK_DATE_FORMAT.parseDateTime(strValue)
-        return fallbackToEndOfDay ? fallback.millisOfDay().withMaximumValue() : fallback
-    }
+
 
 }
