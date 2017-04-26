@@ -1,5 +1,6 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
+//= require /d3/chartColorProvider
 
 "use strict";
 
@@ -22,7 +23,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         dataTrimValue = null,
         logarithmicYAxis = false,
         headerline,
-        commonLabelParts;
+        commonLabelParts,
+        colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
     var init = function () {
         svgContainer = document.querySelector("#svg-container");
@@ -275,7 +277,9 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var gPlus = svg.append("g");
         var gMinus = svg.append("g");
 
-        var violinColor = "#808080";
+
+        var colorscale = colorProvider.getColorscaleForMeasurandGroup(chartData.dimensionalUnit);
+        var violinColor = colorscale(0);
 
         gPlus.append("path")
              .datum(data)

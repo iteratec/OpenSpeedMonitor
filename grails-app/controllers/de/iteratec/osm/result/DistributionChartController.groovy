@@ -16,6 +16,7 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtilService
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
@@ -34,6 +35,7 @@ class DistributionChartController extends ExceptionHandlerController {
     PageService pageService
     FilteringAndSortingDataService filteringAndSortingDataService
     PerformanceLoggingService performanceLoggingService
+    MeasurandUtilService measurandUtilService
 
     def index() {
         redirect(action: 'show')
@@ -111,6 +113,9 @@ class DistributionChartController extends ExceptionHandlerController {
                 newTrace.data.add(result[selectedMeasurand])
             }
         }
+
+        distributionChartDTO.dimensionalUnit = measurandUtilService.getDimensionalUnit(selectedMeasurand)
+
         distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         distributionChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         distributionChartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))

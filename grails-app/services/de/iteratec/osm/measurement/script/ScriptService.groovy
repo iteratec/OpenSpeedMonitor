@@ -9,8 +9,8 @@ import grails.transaction.Transactional
 class ScriptService {
     PageService pageService
 
-    def createNewPagesAndMeasuredEvents(Script s) {
-        ScriptParser parser = new ScriptParser(pageService, s.navigationScript)
+    def createNewPagesAndMeasuredEvents(Script script) {
+        ScriptParser parser = new ScriptParser(pageService, script.navigationScript)
         parser.newPages.each { String name ->
             Page.findOrSaveByName(name)
         }

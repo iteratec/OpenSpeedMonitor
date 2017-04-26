@@ -23,7 +23,7 @@ class MeasurandUtilService {
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
             return "#"
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return "kb"
+            return "MB"
         } else {
             return ""
         }
@@ -40,11 +40,22 @@ class MeasurandUtilService {
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
             return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.yAxisLabel", "Amount")
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [kb]")
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [MB]")
         } else {
             return ""
         }
 
+    }
+
+    def normalizeValue(def value, String measurand) {
+        measurand = parseMeasurandString(measurand)
+
+        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
+        if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
+            return ((double) value) / 1024 / 1024
+        }
+
+        return value
     }
 
     String getI18nMeasurand(String measurand) {

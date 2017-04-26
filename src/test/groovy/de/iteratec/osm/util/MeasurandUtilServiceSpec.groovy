@@ -40,11 +40,11 @@ class MeasurandUtilServiceSpec extends Specification {
         'fullyLoadedTimeInMillisecs'       || 'ms'
         'docCompleteRequests'              || '#'
         'fullyLoadedRequestCount'          || '#'
-        'docCompleteIncomingBytes'         || 'kb'
-        'fullyLoadedIncomingBytes'         || 'kb'
+        'docCompleteIncomingBytes'         || 'MB'
+        'fullyLoadedIncomingBytes'         || 'MB'
         'csByWptVisuallyCompleteInPercent' || '%'
         'csByWptDocCompleteInPercent'      || '%'
-        'speedIndex'                       || ''
+        'speedIndex'                       || 'ms'
     }
 
     void "test getDimensionalUnit does not diffentiate between cached and uncached measurands"() {
@@ -73,11 +73,11 @@ class MeasurandUtilServiceSpec extends Specification {
         'fullyLoadedTimeInMillisecs'       || 'Loading Time [ms]'
         'docCompleteRequests'              || 'Amount'
         'fullyLoadedRequestCount'          || 'Amount'
-        'docCompleteIncomingBytes'         || 'Size [kb]'
-        'fullyLoadedIncomingBytes'         || 'Size [kb]'
+        'docCompleteIncomingBytes'         || 'Size [MB]'
+        'fullyLoadedIncomingBytes'         || 'Size [MB]'
         'csByWptVisuallyCompleteInPercent' || 'Percent [%]'
         'csByWptDocCompleteInPercent'      || 'Percent [%]'
-        'speedIndex'                       || ''
+        'speedIndex'                       || 'Loading Time [ms]'
     }
 
     void "test getAxisLabel does not diffentiate between cached and uncached measurands"() {

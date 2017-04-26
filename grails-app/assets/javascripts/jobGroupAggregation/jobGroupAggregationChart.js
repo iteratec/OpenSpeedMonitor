@@ -1,6 +1,7 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
+//= require /d3/chartColorProvider
 //= require_self
 
 "use strict";
@@ -17,7 +18,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
-        colorPalette = d3.scale.category20(),
+        colorProvider = OpenSpeedMonitor.ChartColorProvider(),
         absoluteMaxValue = 0,
         absoluteMaxYOffset = 0,
         labelWidths = [],
@@ -33,6 +34,9 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         commonLabelParts,
         headerLine,
         barSelected;
+    var unitPrecisions = {
+        MB: 2
+    };
 
     var drawChart = function (barchartData) {
 
@@ -200,7 +204,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("height", barHeight)
             .attr("width", initialBarWidth)
             .attr("fill", function (d, i) {
-                return colorPalette(0);
+                var colorscale = colorProvider.getColorscaleForMeasurandGroup(unitName);
+                return colorscale(0);
             })
             .on("click", highlightClickedBar);
 
@@ -210,7 +215,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
             .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
             .attr("text-anchor", "end")
             .text(function (d) {
-                return (Math.round(d.value)) + " " + unitName;
+                return formatValue(d.value, unitName) + " " + unitName;
             });
 
 
@@ -248,6 +253,12 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
 
         defineXScale();
 
+    };
+
+
+    var formatValue = function (value, unit) {
+        var precision = unitPrecisions[unit] || 0;
+        return parseFloat(value).toFixed(precision);
     };
 
     var getMaxLabelWidth = function () {

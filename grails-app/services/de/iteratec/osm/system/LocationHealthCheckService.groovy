@@ -18,6 +18,9 @@ import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 
+/**
+ * Functionality for getting and managing webpagetest locations health check data.
+ */
 @Transactional
 class LocationHealthCheckService {
 
@@ -31,6 +34,10 @@ class LocationHealthCheckService {
     BatchActivityService batchActivityService
     GraphiteSocketProvider graphiteSocketProvider
 
+    /**
+     * Run a health check for every active {@link Location} of every active {@link WebPageTestServer} and persist it.
+     * @see LocationHealthCheckJob
+     */
     public void runHealthChecksForAllActiveLocations(){
 
         List<LocationHealthCheck> writtenHealthChecks = []
@@ -128,6 +135,9 @@ class LocationHealthCheckService {
 
     }
 
+    /**
+     * Deletes all {@link LocationHealthCheck}s older config setting internalMonitoringStorageTimeInDays.
+     */
     public void cleanupHealthChecks(){
 
         Date toDeleteBefore = getDateToDeleteBefore()
@@ -159,6 +169,10 @@ class LocationHealthCheckService {
         }
     }
 
+    /**
+     * Gets internalMonitoringStorageTimeInDays from osm configuration.
+     * @return
+     */
     private Date getDateToDeleteBefore() {
         Integer internalMonitoringStorageTimeInDays = configService.getInternalMonitoringStorageTimeInDays()
         if (internalMonitoringStorageTimeInDays == null || internalMonitoringStorageTimeInDays < 1){

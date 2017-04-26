@@ -58,22 +58,22 @@
                         if ($(nextRow).hasClass('jobsRow')) {
                             var jobsRowVisible = $(nextRow).is(":visible");
                             if (!jobsRowVisible || $(nextRow).attr('status') != status) {
-                      $.each($('tbody tr', nextRow), function() {
-                        $(this).parent().parent().toggle($(this).attr('data-statuscode') == status);
-                        $(this).parent().parent().prev().toggle($(this).attr('data-statuscode') == status);
-                      });
+                                $.each($('tbody tr', nextRow), function() {
+                                    $(this).parent().parent().toggle($(this).attr('data-statuscode') == status);
+                                    $(this).parent().parent().prev().toggle($(this).attr('data-statuscode') == status);
+                                });
                                 $(nextRow).attr('status', status);
 
-                                $('.arrow').toggleClass('glyphicon-chevron-down', false);
-                                $('.arrow').toggleClass('glyphicon-chevron-up', true);
+                                $('.arrow').toggleClass('fa-chevron-down', false);
+                                $('.arrow').toggleClass('fa-chevron-up', true);
 
-                                $('.arrow', this).toggleClass('glyphicon-chevron-down', true);
-                                $('.arrow', this).toggleClass('glyphicon-chevron-up', false);
+                                // $('.arrow', this).toggleClass('fa-chevron-down', true);
+                                // $('.arrow', this).toggleClass('fa-chevron-up', false);
                                 $(nextRow).toggle(true);
                             } else {
                                 // hide row
-                                $('.arrow', this).toggleClass('glyphicon-chevron-down', false);
-                                $('.arrow', this).toggleClass('glyphicon-chevron-up', true);
+                                $('.arrow', this).toggleClass('fa-chevron-down', true);
+                                $('.arrow', this).toggleClass('fa-chevron-up', false);
                                 $(nextRow).toggle(false);
                             }
                         }
@@ -83,8 +83,8 @@
                     $(document).on('click', 'tr.queueRow', function () {
                         var thisRow = this;
                         if ($(this).next().hasClass('jobsRow')) {
-                            $('.arrow', thisRow).removeClass('glyphicon-chevron-down');
-                            $('.arrow', thisRow).addClass('glyphicon-chevron-up');
+                            $('.arrow', thisRow).removeClass('fa fa-chevron-down');
+                            $('.arrow', thisRow).addClass('fa fa-chevron-up');
                             $(this).next().hide();
                         }
                     });
