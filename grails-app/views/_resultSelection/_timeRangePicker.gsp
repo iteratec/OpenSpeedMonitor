@@ -4,4 +4,4 @@
     <input type="text" class="form-control timerange-userinput-to" data-date-format="${dateFormat}">
 </div>
 <input type="hidden" name="${nameFrom}" class="timerange-value-from" value="${valueFrom}" />
-<input type="hidden" name="${nameTo}" class="timerange-value-from" value="${valueTo}" />
+<input type="hidden" name="${nameTo}" class="timerange-value-to" value="${valueTo}" />
