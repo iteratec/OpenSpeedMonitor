@@ -46,16 +46,18 @@ OpenSpeedMonitor.ChartColorProvider = function() {
     var getColorscaleForMeasurandGroup = function (measurandUnit) {
         var colors = measurandGroupColorCombination[measurandUnit];
         var colorscale = d3.scale.ordinal()
-                           .domain(arrayFilledAscendingWithLengthOfColors())
+                           .domain(createDomain(colors.length))
                            .range(colors);
 
         return colorscale;
     };
 
-    var arrayFilledAscendingWithLengthOfColors = function () {
-        var measurandGroup = Object.keys(measurandGroupColorCombination)[0];
-        var numberOfColors = measurandGroupColorCombination[measurandGroup].length;
-        return Array.apply(null, {length: numberOfColors}).map(Number.call, Number);
+    var createDomain = function (arrayLength) {
+        var array = [];
+        for (var i = 0; i < arrayLength; i++) {
+            array.push(i);
+        }
+        return array;
     };
 
     init();
