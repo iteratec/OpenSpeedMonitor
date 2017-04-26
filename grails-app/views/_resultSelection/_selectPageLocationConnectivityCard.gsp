@@ -54,8 +54,7 @@ A card to select page & measured step, browser & location, and the connectivity
                               value="${selectedBrowsers}"
                               title="${message(code:'de.iteratec.isr.wptrd.labels.filterBrowser')}" />
                     <label class="checkbox-inline">
-                        <g:checkBox name="selectedAllBrowsers"
-                                    checked="${selectedAllBrowsers}" value="${true}"/>
+                        <input type="checkbox" id="selectedAllBrowsers" ${selectedBrowsers ? '' : 'checked'} />
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllBrowsers.label"
                                    default="Select all Browsers"/>
                     </label>
@@ -76,8 +75,7 @@ A card to select page & measured step, browser & location, and the connectivity
                               multiple="true" value="${selectedLocations}"/>
                     <br>
                     <label class="checkbox-inline">
-                        <g:checkBox name="selectedAllLocations"
-                                    checked="${selectedAllLocations}" value="${true}"/>
+                        <input type="checkbox" id="selectedAllLocations" ${selectedLocations ? '' : 'checked'} />
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
                                    default="Select all locations"/>
                     </label>
@@ -92,8 +90,7 @@ A card to select page & measured step, browser & location, and the connectivity
                               value="${avaiableConnectivities.findAll {selectedConnectivities*.toString().contains(it.id.toString())}}"
                               title="${message(code:'de.iteratec.isr.wptrd.labels.filterConnectivityProfile')}" />
                     <label class="checkbox-inline">
-                        <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
-                                    checked="${selectedAllConnectivityProfiles}" value="${true}"/>
+                        <input type="checkbox" id="selectedAllConnectivityProfiles" ${selectedConnectivities ? '' : 'checked'} />
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
                                    default="Select all Connectivity Profiles"/>
                     </label>
