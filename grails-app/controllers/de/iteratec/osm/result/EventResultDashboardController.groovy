@@ -67,12 +67,8 @@ class EventResultDashboardController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
-
-
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
-    public final static int MONDAY_WEEKSTART = 1
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
 
     def intervals = ['not', 'hourly', 'daily', 'weekly']
@@ -667,79 +663,31 @@ class EventResultDashboardController {
      *         further data. Subsequent calls will never return the same
      *         instance.
      */
-    public Map<String, Object> constructStaticViewDataOfShowAll() {
-        Map<String, Object> result = [:]
-
-        // AggregatorTypes
-        result.put('aggrGroupValuesCached', AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED))
-        result.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
-
-        // Intervals
-        result.put('csiAggregationIntervals', csiAggregationIntervals)
-
-        // JobGroups
-        List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
-        result.put('folders', jobGroups)
-
-        // Pages
-        List<Page> pages = eventResultDashboardService.getAllPages()
-        result.put('pages', pages)
-
-        // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
-        result.put('measuredEvents', measuredEvents)
-
-        // Browsers
-        List<Browser> browsers = eventResultDashboardService.getAllBrowser()
-        result.put('browsers', browsers)
-
-        // Locations
-        List<Location> locations = eventResultDashboardService.getAllLocations()
-        result.put('locations', locations)
-
-        // ConnectivityProfiles
-        result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(true)
-
-        // JavaScript-Utility-Stuff:
-        result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
-        result.put("weekStart", MONDAY_WEEKSTART)
-
-        // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
-        Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
-        for (Page eachPage : pages) {
-            Set<Long> eventIds = new HashSet<Long>();
-
-            Collection<Long> ids = measuredEvents.findResults {
-                it.testedPage.getId() == eachPage.getId() ? it.getId() : null
-            }
-            if (!ids.isEmpty()) {
-                eventIds.addAll(ids);
-            }
-
-            eventsOfPages.put(eachPage.getId(), eventIds);
+    Map<String, Object> constructStaticViewDataOfShowAll() {
+        def pages = eventResultDashboardService.getAllPages()
+        def measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
+        def browsers = eventResultDashboardService.getAllBrowser()
+        def locations = eventResultDashboardService.getAllLocations()
+        def eventsOfPages = pages.collectEntries { page ->
+            [(page.id): measuredEvents.findResults { page.id == it.testedPage.id ? it.id : null } as HashSet<Long>]
         }
-        result.put('eventsOfPages', eventsOfPages);
-
-        // --- Map<BrowserID, Set<LocationID>> for fast view filtering:
-        Map<Long, Set<Long>> locationsOfBrowsers = new HashMap<Long, Set<Long>>()
-        for (Browser eachBrowser : browsers) {
-            Set<Long> locationIds = new HashSet<Long>();
-
-            Collection<Long> ids = locations.findResults {
-                it.browser.getId() == eachBrowser.getId() ? it.getId() : null
-            }
-            if (!ids.isEmpty()) {
-                locationIds.addAll(ids);
-            }
-
-            locationsOfBrowsers.put(eachBrowser.getId(), locationIds);
+        def locationsOfBrowsers = browsers.collectEntries { browser ->
+            [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
-        result.put('locationsOfBrowsers', locationsOfBrowsers);
-
-        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
-
-        // Done! :)
-        return result;
+        return [
+                'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED),
+                'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED),
+                'folders': eventResultDashboardService.getAllJobGroups(),
+                'pages': pages,
+                'measuredEvents': measuredEvents,
+                'browsers': browsers,
+                'locations': locations,
+                'avaiableConnectivities': eventResultDashboardService.getAllConnectivities(true),
+                'dateFormat': DATE_FORMAT_STRING_FOR_HIGH_CHART,
+                'tagToJobGroupNameMap' : jobGroupDaoService.getTagToJobGroupNameMap(),
+                'eventsOfPages': eventsOfPages,
+                'locationsOfBrowsers': locationsOfBrowsers
+        ]
     }
 
     public def checkDashboardNameUnique(String values) {

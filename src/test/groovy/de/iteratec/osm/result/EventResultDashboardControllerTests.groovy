@@ -36,7 +36,7 @@ import spock.lang.Specification
  * {@link EventResultDashboardShowAllCommand}.
  * </p> 
  *
- * @author rhe
+ * @author rhe, sburnicki
  * @since IT-98
  */
 @TestFor(EventResultDashboardController)
@@ -292,7 +292,7 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         result != null
-        result.size() == 14
+        result.size() == 12
 
         result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED)
         result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
@@ -304,7 +304,6 @@ class EventResultDashboardControllerTests extends Specification {
         result["locations"]*.getLabel() == ["Location1", "Location2", "Location3"]
 
         result["dateFormat"] == EventResultDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
-        result["weekStart"] == EventResultDashboardController.MONDAY_WEEKSTART
 
         result["eventsOfPages"] == [
                 1L: [1003L] as Set,
