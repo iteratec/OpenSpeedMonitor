@@ -276,24 +276,7 @@ class CsiAggregationUtilService {
 			throw new IllegalArgumentException("Unknown interval: ${intervalInMinutes}")
 		}
 	}
-	
-	/**
-	 * Delivers the number of intervals (of type interval) between from and to. 
-	 * @param from
-	 * @param to
-	 * @param interval
-	 * @return
-	 */
-	Integer getNumberOfIntervals(DateTime from, DateTime to, CsiAggregationInterval interval){
-		DateTime currentDateTime = from
-		Integer numberOfIntervals = 0
-		while (!currentDateTime.isAfter(to)) {
-			numberOfIntervals++
-			currentDateTime = addOneInterval(currentDateTime, interval.intervalInMinutes)
-		}
-		return numberOfIntervals
-	}
-	
+
 	/**
 	 * Returns an instance of {@link DateTime} with timezone UTC and value of now.
 	 * @return Now as an instance of {@link DateTime} with timezone UTC.
