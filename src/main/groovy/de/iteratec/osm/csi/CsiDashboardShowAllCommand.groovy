@@ -4,6 +4,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.util.ParameterBindingUtility
 import grails.converters.JSON
 import grails.validation.Validateable
 import org.grails.databinding.BindUsing
@@ -31,8 +32,7 @@ import java.util.regex.Pattern
  * @author mze
  * @since IT-74
  */
-public class CsiDashboardShowAllCommand implements Validateable {
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING);
+class CsiDashboardShowAllCommand implements Validateable {
     CsiAggregationUtilService csiAggregationUtilService
 
     /**
@@ -40,51 +40,20 @@ public class CsiDashboardShowAllCommand implements Validateable {
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
-    @BindUsing({
-        obj, source ->
-            def dateObject = source['from']
-            if (dateObject) {
-                if (dateObject instanceof Date) {
-                    return dateObject
-                } else {
-                    return SIMPLE_DATE_FORMAT.parse(dateObject)
-                }
-            }
+    @BindUsing({ obj, source ->
+        ParameterBindingUtility.parseDateTimeParameter(source["from"], false)
     })
-    Date from
+    DateTime from
 
     /**
      * The selected end date (inclusive).
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
-    @BindUsing({
-        obj, source ->
-
-            def dateObject = source['to']
-            if (dateObject) {
-                if (dateObject instanceof Date) {
-                    return dateObject
-                } else {
-                    return SIMPLE_DATE_FORMAT.parse(dateObject)
-                }
-            }
+    @BindUsing({ obj, source ->
+        ParameterBindingUtility.parseDateTimeParameter(source["to"], true)
     })
-    Date to
-
-    /**
-     * The selected start hour of date.
-     *
-     * Please use {@link #receiveSelectedTimeFrame()}.
-     */
-    String fromHour
-
-    /**
-     * The selected end hour of date.
-     *
-     * Please use {@link #receiveSelectedTimeFrame()}.
-     */
-    String toHour
+    DateTime to
 
     /**
      * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
@@ -123,16 +92,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
     Collection<Long> selectedMeasuredEventIds = []
 
     /**
-     * User enforced the selection of all measured events.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedMeasuredEventIds} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedMeasuredEventIds} should be ignored.
-     */
-    Boolean selectedAllMeasuredEvents = true
-
-    /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
      * browsers} which results to be shown.
      *
@@ -143,16 +102,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
     Collection<Long> selectedBrowsers = []
 
     /**
-     * User enforced the selection of all browsers.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedBrowsers} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedBrowsers} should be ignored.
-     */
-    Boolean selectedAllBrowsers = true
-
-    /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
      * locations} which results to be shown.
      *
@@ -161,16 +110,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
      * <code>false</code>.
      */
     Collection<Long> selectedLocations = []
-
-    /**
-     * User enforced the selection of all locations.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedLocations} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedLocations} should be ignored.
-     */
-    Boolean selectedAllLocations = true
 
     /**
      * The database IDs of the selected {@linkplain CsiSystem}
@@ -190,24 +129,9 @@ public class CsiDashboardShowAllCommand implements Validateable {
     Boolean overwriteWarningAboutLongProcessingTime
 
     /**
-     * Flag for manual debugging.
-     * Used for debugging highcharts-export-server, e.g.
-     */
-    Boolean debug
-
-    /**
      * A predefined time frame.
      */
     int selectedTimeFrameInterval = 259200
-
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setFromHour
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setToHour
 
     /**
      * Whether or not current and not yet finished intervals should be loaded and displayed
@@ -219,16 +143,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
      */
     Collection<Long> selectedConnectivities = []
 
-    /**
-     * User enforced the selection of all ConnectivityProfiles.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedConnectivities} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedConnectivities} should be ignored.
-     */
-    Boolean selectedAllConnectivityProfiles = true
-
     String chartTitle
     int chartWidth
     int chartHeight
@@ -239,7 +153,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
     String loadTimeMaximum = "auto"
     boolean showDataMarkers
     boolean showDataLabels
-    boolean wideScreenDiagramMontage = false;
     // If map is not specified, it acts as a string/string mapping (gorm default)
     Map graphNameAliases = [:]
     Map graphColors = [:]
@@ -260,53 +173,14 @@ public class CsiDashboardShowAllCommand implements Validateable {
      * Constraints needs to fit.
      */
     static constraints = {
-        from(nullable: true, validator: { Date currentFrom, CsiDashboardShowAllCommand cmd ->
-
+        from(nullable: true, validator: { DateTime currentFrom, CsiDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-
-            if (manualTimeframe && currentFrom == null) {
-                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.from.nullWithManualSelection']
-            }
-
+            if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
-
-        to(nullable: true, validator: { Date currentTo, CsiDashboardShowAllCommand cmd ->
-
+        to(nullable: true, validator: { DateTime currentTo, CsiDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-
-            if (manualTimeframe && currentTo == null) {
-                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.nullWithManualSelection']
-            } else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) {
-                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.beforeFromDate']
-            }
-        })
-
-        fromHour(nullable: true, validator: { String currentFromHour, CsiDashboardShowAllCommand cmd ->
-
-            boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-
-            if (manualTimeframe && currentFromHour == null) {
-                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
-            }
-
-        })
-
-        toHour(nullable: true, validator: { String currentToHour, CsiDashboardShowAllCommand cmd ->
-
-            boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-
-            if (manualTimeframe && currentToHour == null) {
-                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
-            } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
-
-                DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
-                DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-
-                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) {
-                    return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
-                }
-
-            }
+            if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && !currentTo.isAfter(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
 
         aggrGroupAndInterval(nullable: false, inList: [CsiDashboardController.HOURLY_MEASURED_EVENT,
@@ -336,9 +210,9 @@ public class CsiDashboardShowAllCommand implements Validateable {
 
         })
 
-        selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedMeasuredEventIds(nullable: true, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || !currentCollection)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
             boolean correctBeacuseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
@@ -349,9 +223,9 @@ public class CsiDashboardShowAllCommand implements Validateable {
 
         })
 
-        selectedBrowsers(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedBrowsers(nullable: true, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || !currentCollection)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
             boolean correctBeacuseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
@@ -362,9 +236,9 @@ public class CsiDashboardShowAllCommand implements Validateable {
 
         })
 
-        selectedLocations(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedLocations(nullable: true, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)
+            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || !currentCollection)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
             boolean correctBecauseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
@@ -391,16 +265,12 @@ public class CsiDashboardShowAllCommand implements Validateable {
             }
         })
 
-        setFromHour(nullable: true)
-        setToHour(nullable: true)
         includeInterval(nullable: true)
         csiAggregationUtilService(nullable: true)
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
         dashboardName(nullable: true)
-        debug(nullable: true)
-        selectedAllConnectivityProfiles(nullable: true)
     }
 
     static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType']
@@ -421,42 +291,12 @@ public class CsiDashboardShowAllCommand implements Validateable {
         DateTime start
         DateTime end
 
-        Boolean manualTimeframe = this.selectedTimeFrameInterval == 0
-        if (manualTimeframe && fromHour && toHour) {
-
-            DateTime firstDayWithFromHourAsDaytime
-            DateTime firstDayWithToHourAsDaytime
-
-            if (fromHour.indexOf(":") > -1) {
-                firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
-            } else {
-                firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":00")
-            }
-
-            if (toHour.indexOf(":") > -1) {
-                firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
-            } else {
-                firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":00")
-            }
-
-            start = new DateTime(this.from.getTime())
-                    .withTime(
-                    firstDayWithFromHourAsDaytime.getHourOfDay(),
-                    firstDayWithFromHourAsDaytime.getMinuteOfHour(),
-                    0, 0
-            )
-            end = new DateTime(this.to.getTime())
-                    .withTime(
-                    firstDayWithToHourAsDaytime.getHourOfDay(),
-                    firstDayWithToHourAsDaytime.getMinuteOfHour(),
-                    59, 999
-            )
-
+        if (this.selectedTimeFrameInterval == 0) {
+            start = this.from
+            end = this.to
         } else {
-
-            end = new DateTime()
+            end = DateTime.now()
             start = end.minusSeconds(this.selectedTimeFrameInterval)
-
         }
         if (!includeInterval) {
             Integer intervalInMinutes = this.receiveSelectedMeasuredIntervalInMinutes()
@@ -468,28 +308,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
             }
         }
         return new Interval(start, end)
-    }
-
-    /**
-     * Returns a {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-     * @param timeWithOrWithoutMeridian
-     * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-     * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-     * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
-     */
-    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException {
-
-        Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
-        Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
-        String dateFormatString
-
-        if (timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-        else if (timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
-        else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
-
-        DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
-        return fmt.parseDateTime("01.01.1970 ${timeWithOrWithoutMeridian}")
-
     }
 
     /**
@@ -511,34 +329,19 @@ public class CsiDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
         viewModelToCopyTo.put('selectedPages', this.selectedPages)
 
-        viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents))
         viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
 
-        viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers))
         viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
 
-        viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations))
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
-        viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
         viewModelToCopyTo.put('selectedCsiSystems', this.selectedCsiSystems)
 
-        viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
-        if (!this.fromHour.is(null)) {
-            viewModelToCopyTo.put('fromHour', this.fromHour)
-        }
+        viewModelToCopyTo.put('from', this.from ? ParameterBindingUtility.ISO_DATE_TIME_FORMATTER.print(this.from) : null)
 
-        viewModelToCopyTo.put('to', this.to ? SIMPLE_DATE_FORMAT.format(this.to) : null)
-        if (!this.toHour.is(null)) {
-            viewModelToCopyTo.put('toHour', this.toHour)
-        }
+        viewModelToCopyTo.put('to', this.to ? ParameterBindingUtility.ISO_DATE_TIME_FORMATTER.print(this.to) : null)
         viewModelToCopyTo.put('aggrGroupAndInterval', this.aggrGroupAndInterval ?: CsiDashboardController.HOURLY_MEASURED_EVENT)
-        viewModelToCopyTo.put('debug', this.debug ?: false)
-        viewModelToCopyTo.put('setFromHour', this.setFromHour)
-        viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('includeInterval', this.includeInterval)
-        viewModelToCopyTo.put('setFromHour', this.setFromHour)
-        viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('chartTitle', this.chartTitle)
         viewModelToCopyTo.put('chartWidth', this.chartWidth)
         viewModelToCopyTo.put('chartHeight', this.chartHeight)
@@ -552,7 +355,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('graphColors', this.graphColors as JSON)
         viewModelToCopyTo.put('publiclyVisible', this.publiclyVisible)
         viewModelToCopyTo.put('dashboardName', this.dashboardName)
-        viewModelToCopyTo.put('wideScreenDiagramMontage', this.wideScreenDiagramMontage)
     }
 
     /**
@@ -574,20 +376,20 @@ public class CsiDashboardShowAllCommand implements Validateable {
 
         result.jobGroupIds.addAll(this.selectedFolder)
 
-        if (!this.selectedAllMeasuredEvents) {
+        if (this.selectedMeasuredEventIds) {
             result.measuredEventIds.addAll(this.selectedMeasuredEventIds)
         }
 
         result.pageIds.addAll(this.selectedPages)
 
-        if (!this.selectedAllBrowsers) {
+        if (this.selectedBrowsers) {
             result.browserIds.addAll(this.selectedBrowsers)
         }
 
-        if (!this.selectedAllLocations) {
+        if (this.selectedLocations) {
             result.locationIds.addAll(this.selectedLocations)
         }
-        if (this.selectedAllConnectivityProfiles) {
+        if (!this.selectedConnectivities) {
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
         } else if (this.selectedConnectivities.size() > 0) {
             result.connectivityProfileIds.addAll(this.selectedConnectivities.collect {it as Long})
