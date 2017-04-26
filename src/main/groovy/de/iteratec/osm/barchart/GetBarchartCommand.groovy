@@ -9,6 +9,9 @@ class GetBarchartCommand implements Validateable {
     DateTime from
     DateTime to
 
+    DateTime fromComparative
+    DateTime toComparative
+
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['selectedPages'])
     })

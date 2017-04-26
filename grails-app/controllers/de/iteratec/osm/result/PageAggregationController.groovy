@@ -18,6 +18,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MeasurandUtilService
+import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -88,7 +89,7 @@ class PageAggregationController extends ExceptionHandlerController {
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
 
-        List allEventResults = EventResult.createCriteria().list {
+        List eventResultAverages = EventResult.createCriteria().list {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
@@ -101,8 +102,26 @@ class PageAggregationController extends ExceptionHandlerController {
             }
         }
 
+        Map comparativeEventResultAverages = null
+        if (cmd.fromComparative && cmd.toComparative) {
+            comparativeEventResultAverages = EventResult.createCriteria().list {
+                'in'('page', allPages)
+                'in'('jobGroup', allJobGroups)
+                'between'('jobResultDate', cmd.fromComparative.toDate(), cmd.toComparative.toDate())
+                projections {
+                    groupProperty('page')
+                    groupProperty('jobGroup')
+                    allMeasurands.each { m ->
+                        avg(m)
+                    }
+                }
+            }?.collectEntries({ it ->
+                [("${it[0].name} | ${it[1].name}".toString()): it.takeRight(it.size()-2)]
+            })
+        }
+
         // return if no data is available
-        if (!allEventResults) {
+        if (!eventResultAverages && !comparativeEventResultAverages) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
@@ -119,13 +138,16 @@ class PageAggregationController extends ExceptionHandlerController {
                     yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
-                allEventResults.each { datum ->
+                eventResultAverages.each { datum ->
+                    def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
+                    def key = "${datum[0]} | ${datum[1]?.name}"
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
                             originalMeasurandName: currentMeasurand,
-                            value: measurandUtilService.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2], currentMeasurand),
-                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                            value: measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand),
+                            valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                            grouping: key
                         )
                     )
                 }
