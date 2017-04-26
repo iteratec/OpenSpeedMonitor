@@ -48,8 +48,6 @@ import java.text.SimpleDateFormat
 
 class EventResultDashboardController {
 
-    static final int RESULT_DASHBOARD_MAX_POINTS_PER_SERIES = 100000
-
     JobGroupDaoService jobGroupDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -150,8 +148,6 @@ class EventResultDashboardController {
 
         log.info("from=${modelToRender['from']}")
         log.info("to=${modelToRender['to']}")
-        log.info("fromHour=${modelToRender['fromHour']}")
-        log.info("toHour=${modelToRender['toHour']}")
 
         fillWithI18N(modelToRender)
 
@@ -420,20 +416,10 @@ class EventResultDashboardController {
         modelToRender.put("yAxisMax", cmd.loadTimeMaximum)
         modelToRender.put("yAxisMin", cmd.loadTimeMinimum)
 
-        if (isHighchartGraphLimitReached(chart.osmChartGraphs)) {
-            modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);
-        }
-        modelToRender.put("highChartsTurboThreshold", RESULT_DASHBOARD_MAX_POINTS_PER_SERIES);
-
         modelToRender.put("highChartLabels", labelToDataMap);
         modelToRender.put("markerShouldBeEnabled", false);
         modelToRender.put("labelShouldBeEnabled", false);
 
-        //add / remove 5 Minutes
-        modelToRender.put('fromTimestampForHighChart', (timeFrame.getStart().toDate().getTime() - 300000))
-        modelToRender.put('toTimestampForHighChart', (timeFrame.getEnd().toDate().getTime() + 300000))
-
-        modelToRender.put("selectedCharttypeForHighchart", cmd.getSelectChartType());
         fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
     }
 
@@ -474,27 +460,6 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
-    }
-
-    /**
-     * <p>
-     * Checks if the maximum count of points per graph is exceeded.
-     * </p>
-     * <p><strong>Important: </strong> The current limit is 1000 points per graph: {@link http://api.highcharts.com/highcharts#plotOptions.series.turboThreshold} </p>
-     *
-     * @param graphCollection List of Highchart graphs, not <code>null</code>!
-     * @return <code>true</code> if the limit is exceeded,
-     *         <code>false</code> else.
-     */
-    private boolean isHighchartGraphLimitReached(List<OsmChartGraph> graphCollection) {
-        boolean returnValue = false;
-
-        graphCollection.each { OsmChartGraph graph ->
-            if (graph.getPoints().size() > RESULT_DASHBOARD_MAX_POINTS_PER_SERIES) {
-                returnValue = true;
-            }
-        }
-        return returnValue;
     }
 
     private Collection<AggregatorType> getAggregators(Collection<String> aggregatorNames) {
