@@ -1111,33 +1111,6 @@ class CsiDashboardController {
     }
 
     /**
-     * Checks if hours between given fromDate and toDate is greater than 4 months.
-     *
-     *
-     * @param fromDate TODO Doc: Inclusive? Eclusive?
-     * @param toDate TODO Doc: Inclusive? Eclusive?
-     * @return TODO Doc
-     * @deprecated TODO Currently unused -> Discuss if this range check is required or just should be done in UI.
-     */
-    @Deprecated
-    private boolean exceedsTimeframeBoundary(Date fromDate, Date toDate, CsiAggregationInterval interval) {
-        Days daysBetween = Days.daysBetween(new DateTime(fromDate), new DateTime(toDate))
-        Integer maxDays
-        switch (interval.intervalInMinutes) {
-            case CsiAggregationInterval.WEEKLY:
-                maxDays = 26 * 7
-                break
-            case CsiAggregationInterval.DAILY:
-                maxDays = 6 * 7
-                break
-            default:
-                maxDays = 2 * 7
-                break
-        }
-        return daysBetween.isGreaterThan(new Days(maxDays))
-    }
-
-    /**
      * Creates the CSV as String to be converted to HTML table by view. Thrown Exceptions get catched and an error-message is returned instead of csv-representation.
      * @return String-representation of data or an error-message if any {@link Exception} is thrown.
      */
