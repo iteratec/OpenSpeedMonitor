@@ -18,9 +18,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.p13n.CustomDashboardService
@@ -31,6 +28,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.ParameterBindingUtility
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
 import grails.web.mapping.LinkGenerator
@@ -67,9 +65,7 @@ class EventResultDashboardController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
-    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
     def intervals = ['not', 'hourly', 'daily', 'weekly']
 
@@ -163,13 +159,8 @@ class EventResultDashboardController {
         UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
 
         cmd.with {
-            from = dashboard.fromDate
-            to = dashboard.toDate
-            fromHour = dashboard.fromHour
-            toHour = dashboard.toHour
-
-            setFromHour = dashboard.setFromHour
-            setToHour = dashboard.setToHour
+            from = dashboard.from
+            to = dashboard.to
 
             selectedTimeFrameInterval = dashboard.selectedTimeFrameInterval
             selectedInterval = dashboard.selectedInterval
@@ -210,14 +201,6 @@ class EventResultDashboardController {
                 }
             }
 
-            selectedAllMeasuredEvents = dashboard.selectedAllMeasuredEvents
-            selectedAllBrowsers = dashboard.selectedAllBrowsers
-            selectedAllLocations = dashboard.selectedAllLocations
-            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles as boolean
-
-            overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
-            debug = dashboard.debug
-
             trimBelowLoadTimes = dashboard.trimBelowLoadTimes
             trimAboveLoadTimes = dashboard.trimAboveLoadTimes
             trimBelowRequestCounts = dashboard.trimBelowRequestCounts
@@ -234,7 +217,6 @@ class EventResultDashboardController {
             loadTimeMaximum = dashboard.loadTimeMaximum
             showDataMarkers = dashboard.showDataMarkers
             showDataLabels = dashboard.showDataLabels
-            wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
 
             if (dashboard.graphNameAliases.size() > 0) {
                 graphNameAliases = dashboard.graphNameAliases
@@ -264,11 +246,10 @@ class EventResultDashboardController {
         String dashboardName = dashboardValues.dashboardName
         String username = springSecurityService.authentication.principal.getUsername()
         Boolean publiclyVisible = dashboardValues.publiclyVisible as Boolean
-        String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse JSON Data for Command
-        Date fromDate = dashboardValues.from ? SIMPLE_DATE_FORMAT.parse(dashboardValues.from) : null
-        Date toDate = dashboardValues.to ? SIMPLE_DATE_FORMAT.parse(dashboardValues.to) : null
+        DateTime from = ParameterBindingUtility.parseDateTimeParameter(dashboardValues.from, false)
+        DateTime to = ParameterBindingUtility.parseDateTimeParameter(dashboardValues.to, true)
 
 
         Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
@@ -312,27 +293,16 @@ class EventResultDashboardController {
 
         // Create cmd for validation
         EventResultDashboardShowAllCommand cmd = new EventResultDashboardShowAllCommand(
-                from: fromDate,
-                to: toDate,
-                fromHour: dashboardValues.fromHour,
-                toHour: dashboardValues.toHour,
-                aggrGroup: dashboardValues.aggrGroup,
+                from: from,
+                to: to,
                 selectedFolder: selectedFolder,
                 selectedPages: selectedPages,
                 selectedMeasuredEventIds: selectedMeasuredEventIds,
-                selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers,
-                selectedAllBrowsers: dashboardValues.selectedAllBrowsers,
                 selectedLocations: selectedLocations,
-                selectedAllLocations: dashboardValues.selectedAllLocations,
                 selectedAggrGroupValuesCached: selectedAggrGroupValuesCached,
                 selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
-                overwriteWarningAboutLongProcessingTime: true,
-                debug: dashboardValues.debug,
-                setFromHour: dashboardValues.setFromHour,
-                setToHour: dashboardValues.setToHour,
                 selectedConnectivities: selectedConnectivities,
-                selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles,
                 chartTitle: dashboardValues.chartTitle ?: "",
                 loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
                 showDataLabels: dashboardValues.showDataLabels,
@@ -343,7 +313,6 @@ class EventResultDashboardController {
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
         if (dashboardValues.selectedTimeFrameInterval) cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()
-        if (dashboardValues.selectChartType) cmd.selectChartType = dashboardValues.selectChartType.toInteger()
         if (dashboardValues.trimAboveRequestSizes) cmd.trimAboveRequestSizes = dashboardValues.trimAboveRequestSizes.toInteger()
         if (dashboardValues.trimBelowRequestSizes) cmd.trimBelowRequestSizes = dashboardValues.trimBelowRequestSizes.toInteger()
         if (dashboardValues.trimAboveRequestCounts) cmd.trimAboveRequestCounts = dashboardValues.trimAboveRequestCounts.toInteger()
@@ -370,7 +339,7 @@ class EventResultDashboardController {
                 existing.delete(flush: true, failOnError: true)
             }
 
-            UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(cmd, dashboardName, publiclyVisible, wideScreenDiagramMontage, username)
+            UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(cmd, dashboardName, publiclyVisible, username)
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
