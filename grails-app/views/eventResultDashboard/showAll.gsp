@@ -93,22 +93,6 @@
         </div>
 
         <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
-        <g:if test="${warnAboutLongProcessingTime}">
-            <div class="alert alert-warning">
-                <strong><g:message
-                        code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
-
-                <p></p>
-
-                <p>
-                    <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
-                                style="display:none;"/>
-                    <g:actionSubmit id="override-long-processing-time"
-                                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
-                                    action="showAll" class="btn btn-warning"/>
-                </p>
-            </div>
-        </g:if>
     </div>
 </div>
 
