@@ -600,7 +600,8 @@ class EventResultDashboardController {
         if (modelToRender['selectedInterval'] != -1) {
             filename += modelToRender['selectedInterval'] + 'm_'
         }
-        filename += Double.valueOf(modelToRender['fromTimestampForHighChart'] / 1000L).longValue() + '_to_' + Double.valueOf(modelToRender['toTimestampForHighChart'] / 1000L).longValue() + '.csv'
+        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss")
+        filename += dateFormatter.print(modelToRender["from"]) + '_to_' + dateFormatter.print(modelToRender["to"]) + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename);
         response.setContentType("text/csv;header=present;charset=UTF-8");
