@@ -28,7 +28,14 @@
             </div>
         </div>
         <g:if test="${multipleMeasurands}">
-            <button type="button" id="addMeasurandButton" class="btn btn-primary btn-block">Add Measurand</button>
+            <div class="row">
+                <div class="col-sm-7 col-sm-offset-3">
+                    <button type="button" id="addMeasurandButton" class="btn btn-default btn-block">
+                        <i class="fa fa-plus"></i>
+                        <g:message code="de.iteratec.osm.barchart.addMeasurandSeriesButton.label" default="Add Measurand"/>
+                    </button>
+                </div>
+            </div>
         </g:if>
     </div>
 

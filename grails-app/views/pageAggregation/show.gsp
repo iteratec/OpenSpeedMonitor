@@ -42,9 +42,11 @@
             <div class="row card-well">
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
-                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                        'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
-                                        'includeInterval'          : includeInterval]}"/>
+                              model="${[
+                                'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
+                                'showIncludeInterval': false,
+                                'showComparisonInterval': true
+                              ]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                             aggrGroupValuesUnCached: aggrGroupValuesUnCached,
