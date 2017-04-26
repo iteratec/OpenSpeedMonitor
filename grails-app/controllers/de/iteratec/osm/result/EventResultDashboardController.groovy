@@ -42,8 +42,6 @@ import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import java.text.SimpleDateFormat
-
 class EventResultDashboardController {
 
     JobGroupDaoService jobGroupDaoService
@@ -133,7 +131,7 @@ class EventResultDashboardController {
             if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
-                fillWithCsiAggregationData(modelToRender, cmd);
+                fillWithEventResultData(modelToRender, cmd);
             }
         }
         modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
@@ -349,7 +347,7 @@ class EventResultDashboardController {
         }
     }
 
-    private void fillWithCsiAggregationData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
+    private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
         List<String> aggregatorNames = [];
@@ -587,7 +585,7 @@ class EventResultDashboardController {
         Map<String, Object> modelToRender = new HashMap<String, Object>();
 
         if (request.queryString && cmd.validate()) {
-            fillWithCsiAggregationData(modelToRender, cmd);
+            fillWithEventResultData(modelToRender, cmd);
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
             redirectWith303('showAll', params)
