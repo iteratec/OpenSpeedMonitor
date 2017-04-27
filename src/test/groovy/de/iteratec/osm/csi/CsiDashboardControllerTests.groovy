@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
@@ -36,8 +37,12 @@ import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Interval
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
+
 /**
  * <p>
  * Test-suite of {@link CsiDashboardController} and 
@@ -51,6 +56,7 @@ import spock.lang.Specification
 @Mock([ConnectivityProfile, CsiSystem, CsiConfiguration])
 class CsiDashboardControllerTests extends Specification {
 
+    DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime()
     CsiDashboardController controllerUnderTest
     CsiDashboardShowAllCommand command
 
@@ -61,7 +67,7 @@ class CsiDashboardControllerTests extends Specification {
 
         // Mock relevant services:
         command = new CsiDashboardShowAllCommand()
-        command.csiAggregationUtilService = Stub(CsiAggregationUtilService)
+        command.csiAggregationUtilService = Spy(CsiAggregationUtilService)
 
         controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
         controllerUnderTest.pageDaoService = Stub(PageDaoService)
@@ -304,6 +310,219 @@ class CsiDashboardControllerTests extends Specification {
         command.shouldWarnAboutLongProcessingTime(timeFrameOneYear, intervalOneHour, countOfSelectedBrowser)
     }
 
+    void "create time frame including actual interval for daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0)
+        DateTime fromDateExpected = toDateExpected.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime().withTime(12, 0, 0, 0)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
+        DateTime fromDateExpected = toDate.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = false
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for small chosen interval with daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
+        DateTime fromDate = new DateTime(2015, 4, 19, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDate)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = false
+        command.csiAggregationUtilService.isInActualInterval(_, _) >> true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame including last interval if actual interval not in chosen for daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0).minusDays(2)
+        DateTime fromDateExpected = toDateExpected.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame including actual interval for weekly aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0)
+        DateTime fromDateExpected = toDateExpected.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for weekly aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime().withTime(12, 0, 0, 0)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        DateTime fromDateExpected = toDate.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = false
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for small chosen interval with weekly aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        DateTime fromDate = new DateTime(2015, 4, 16, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDate)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = false
+        command.csiAggregationUtilService.isInActualInterval(_, _) >> true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame including last interval if actual interval not in chosen for weekly aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0).minusWeeks(2)
+        DateTime fromDateExpected = toDateExpected.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
 
     void "construct view data of show all"() {
         given:
