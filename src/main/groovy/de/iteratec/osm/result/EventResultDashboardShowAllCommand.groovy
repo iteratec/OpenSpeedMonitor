@@ -75,19 +75,7 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         trimBelowRequestSizes(nullable: true)
     }
 
-    /**
-     * <p>
-     * Copies all request data to the specified map. This operation does
-     * not care about the validation status of this instance.
-     * For missing values the defaults are inserted.
-     * </p>
-     *
-     * @param viewModelToCopyTo
-     *         The {@link Map} the request data contained in this command
-     *         object should be copied to. The map must be modifiable.
-     *         Previously contained data will be overwritten.
-     *         The argument might not be <code>null</code>.
-     */
+    @Override
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
@@ -113,27 +101,35 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      *         if called on an invalid instance.
      */
     ErQueryParams createErQueryParams() throws IllegalStateException {
-        ErQueryParams result = super.createErQueryParams()
+        ErQueryParams queryParams = new ErQueryParams()
+        fillMvQueryParams(queryParams)
 
+        queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
+        queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
         if (this.trimBelowLoadTimes) {
-            result.minLoadTimeInMillisecs = this.trimBelowLoadTimes
+            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes
         }
         if (this.trimAboveLoadTimes) {
-            result.maxLoadTimeInMillisecs = this.trimAboveLoadTimes
+            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes
         }
         if (this.trimBelowRequestCounts) {
-            result.minRequestCount = this.trimBelowRequestCounts
+            queryParams.minRequestCount = this.trimBelowRequestCounts
         }
         if (this.trimAboveRequestCounts) {
-            result.maxRequestCount = this.trimAboveRequestCounts
+            queryParams.maxRequestCount = this.trimAboveRequestCounts
         }
         if (this.trimBelowRequestSizes) {
-            result.minRequestSizeInBytes = this.trimBelowRequestSizes * 1000
+            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes * 1000
         }
         if (this.trimAboveRequestSizes) {
-            result.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
+            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
         }
 
-        return result
+        return queryParams
+    }
+
+    @Override
+    MvQueryParams createMvQueryParams() throws IllegalStateException {
+        return createErQueryParams()
     }
 }

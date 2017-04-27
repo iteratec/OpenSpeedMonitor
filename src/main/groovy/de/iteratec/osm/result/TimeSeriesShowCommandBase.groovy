@@ -199,7 +199,7 @@ class TimeSeriesShowCommandBase implements Validateable {
 
     /**
      * <p>
-     * Creates {@link ErQueryParams} based on this command. This command
+     * Create {@link MvQueryParams} based on this command. This command
      * need to be valid for this operation to be successful.
      * </p>
      *
@@ -207,34 +207,36 @@ class TimeSeriesShowCommandBase implements Validateable {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    ErQueryParams createErQueryParams() throws IllegalStateException {
+    MvQueryParams createMvQueryParams() throws IllegalStateException {
+        MvQueryParams queryParams = new MvQueryParams()
+        fillMvQueryParams(queryParams)
+        return queryParams
+    }
+
+    protected fillMvQueryParams(MvQueryParams queryParams) throws IllegalStateException {
         if (!this.validate()) {
             throw new IllegalStateException('Query params are not available from an invalid command.')
         }
 
-        ErQueryParams result = new ErQueryParams()
+        queryParams.jobGroupIds.addAll(this.selectedFolder)
 
-        result.jobGroupIds.addAll(this.selectedFolder)
-
-        result.pageIds.addAll(this.selectedPages)
+        queryParams.pageIds.addAll(this.selectedPages)
 
         if (this.selectedMeasuredEventIds) {
-            result.measuredEventIds.addAll(this.selectedMeasuredEventIds)
+            queryParams.measuredEventIds.addAll(this.selectedMeasuredEventIds)
         }
 
         if (this.selectedBrowsers) {
-            result.browserIds.addAll(this.selectedBrowsers)
+            queryParams.browserIds.addAll(this.selectedBrowsers)
         }
 
         if (this.selectedLocations) {
-            result.locationIds.addAll(this.selectedLocations)
+            queryParams.locationIds.addAll(this.selectedLocations)
         }
 
-        result.includeNativeConnectivity = this.getIncludeNativeConnectivity()
-        result.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
-        result.includeAllConnectivities = !this.selectedConnectivities
-        result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
+        queryParams.includeAllConnectivities = !this.selectedConnectivities
+        queryParams.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
 
-        return result
+        return queryParams
     }
 }
