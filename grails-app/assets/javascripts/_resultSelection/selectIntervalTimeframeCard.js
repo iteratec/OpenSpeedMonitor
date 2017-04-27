@@ -12,6 +12,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
   var intervalSelectElement = $("#selectedIntervalHtmlId");
   var timeFramePickerElement = $("#timeframe-picker");
   var timeFramePicker = null;
+  var comparativeTimeFramePickerContainer = $("#timeframe-picker-previous-container");
   var comparativeTimeFramePickerElement = $("#timeframe-picker-previous");
   var comparativeTimeFramePicker = null;
 
@@ -108,7 +109,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     });
     $("#removeComparativeTimeFrame").on("click", function (ev) {
       $("#comparativeTimeFrameButton").toggleClass("hidden");
-      $(".comparison-initially-hidden").toggleClass("hidden");
+        $(".comparison-initially-hidden").toggleClass("hidden");
       $('#timeframe-picker').toggleClass("col-md-offset-4");
     });
   };
@@ -155,7 +156,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
   };
 
   var getComparativeTimeFrame = function () {
-    return comparativeEnabled ? comparativeTimeFramePicker.getTimeFrame() : null;
+    return comparativeEnabled() && !comparativeTimeFramePickerContainer.hasClass("hidden") ? comparativeTimeFramePicker.getRange() : null;
   };
 
   var triggerTimeFrameChanged = function () {

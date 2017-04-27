@@ -140,7 +140,7 @@ class PageAggregationController extends ExceptionHandlerController {
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
-                    def key = "${datum[0]} | ${datum[1]?.name}"
+                    def key = "${datum[0]} | ${datum[1]?.name}".toString()
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),

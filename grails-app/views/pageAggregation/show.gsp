@@ -103,15 +103,10 @@
         function drawGraph() {
 
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+            var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
-
-            spinner.start();
-            $.ajax({
-                type: 'POST',
-                data: {
+            var data = {
                     from: selectedTimeFrame[0].toISOString(),
                     to: selectedTimeFrame[1].toISOString(),
                     selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
@@ -121,7 +116,20 @@
                         return $(e).text()
                     })),
                     selectedSeries: JSON.stringify(selectedSeries)
-                },
+                };
+
+            if (comparativeTimeFrame) {
+                data.fromComparative = comparativeTimeFrame[0].toISOString();
+                data.toComparative = comparativeTimeFrame[1].toISOString();
+            }
+
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
+              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+
+            spinner.start();
+            $.ajax({
+                type: 'POST',
+                data: data,
                 url: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
                 dataType: "json",
                 success: function (data) {

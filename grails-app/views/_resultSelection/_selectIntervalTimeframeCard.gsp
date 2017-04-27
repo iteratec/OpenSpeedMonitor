@@ -72,7 +72,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
             </div>
         </div>
         <%------------ initially NOT visible --%>
-        <div class="hidden comparison-initially-hidden">
+        <div class="hidden comparison-initially-hidden" id="timeframe-picker-previous-container">
             <div class="row form-group">
                 <div class="control-label col-md-4">
                     <label for="timeframe-picker-previous" class="text-muted sub">
