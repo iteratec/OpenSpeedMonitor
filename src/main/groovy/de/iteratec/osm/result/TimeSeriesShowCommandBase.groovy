@@ -8,7 +8,7 @@ import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 
-class TimeSeriesDashboardCommandBase implements Validateable {
+class TimeSeriesShowCommandBase implements Validateable {
     /**
      * The selected start date (inclusive).
      */
@@ -131,20 +131,20 @@ class TimeSeriesDashboardCommandBase implements Validateable {
     }
 
     static constraints = {
-        from(nullable: true, validator: { DateTime currentFrom, EventResultDashboardShowAllCommand cmd ->
+        from(nullable: true, validator: { DateTime currentFrom, TimeSeriesShowCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
-        to(nullable: true, validator: { DateTime currentTo, EventResultDashboardShowAllCommand cmd ->
+        to(nullable: true, validator: { DateTime currentTo, TimeSeriesShowCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
             else if (manualTimeframe && currentTo != null && cmd.from != null && !currentTo.isAfter(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
 
-        selectedFolder(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
+        selectedFolder(nullable: false, validator: { Collection currentCollection, TimeSeriesShowCommandBase cmd ->
             if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
-        selectedPages(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
+        selectedPages(nullable: false, validator: { Collection currentCollection, TimeSeriesShowCommandBase cmd ->
             if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedPage']
         })
         selectedBrowsers(nullable: true)

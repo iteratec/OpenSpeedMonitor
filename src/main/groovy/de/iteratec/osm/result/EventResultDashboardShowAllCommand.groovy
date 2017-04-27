@@ -11,7 +11,7 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
  * @author mze , rhe
  * @since IT-6
  */
-class EventResultDashboardShowAllCommand extends TimeSeriesDashboardCommandBase {
+class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     /**
      * Aggregation interval
      */
@@ -63,7 +63,10 @@ class EventResultDashboardShowAllCommand extends TimeSeriesDashboardCommandBase 
      * Constraints needs to fit.
      */
     static constraints = {
-        importFrom(TimeSeriesDashboardCommandBase)
+        importFrom(TimeSeriesShowCommandBase)
+        selectedAggrGroupValuesCached(nullable: false, validator: { Collection<String> selectedCheckedAggregators, EventResultDashboardShowAllCommand cmd ->
+            if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.osm.gui.selectedAggrGroupValuesCached.error.validator.error.selectedAggrGroupValuesCached']
+        })
         trimAboveLoadTimes(nullable: true)
         trimAboveRequestCounts(nullable: true)
         trimAboveRequestSizes(nullable: true)

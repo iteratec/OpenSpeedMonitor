@@ -26,9 +26,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.AggregatorType
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.joda.time.Interval
 import spock.lang.Specification
 /**
  * <p>
@@ -45,7 +42,7 @@ class EventResultDashboardControllerTests extends Specification {
 
     public static final String CUSTOM_CONNECTIVITY_NAME = 'Custom (6.000/512 Kbps, 50ms)'
     EventResultDashboardController controllerUnderTest
-    static EventResultDashboardShowAllCommand command
+    EventResultDashboardShowAllCommand command
 
     void setup() {
         controllerUnderTest = controller
@@ -59,24 +56,6 @@ class EventResultDashboardControllerTests extends Specification {
     void "command without bound parameters is invalid"() {
         expect:
         !command.validate()
-        command.selectedFolder == []
-        command.selectedPages == []
-        command.selectedMeasuredEventIds == []
-        command.selectedBrowsers == []
-        command.selectedLocations == []
-    }
-
-    void "command with empty bound parameters is invalid"() {
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        !command.validate()
-        command.selectedFolder == []
-        command.selectedPages == []
-        command.selectedMeasuredEventIds == []
-        command.selectedBrowsers == []
-        command.selectedLocations == []
     }
 
     void "command bound with default parameters is valid"() {
@@ -88,147 +67,27 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         command.validate()
-        command.from == new DateTime(2013, 8, 18, 16, 0, 0, DateTimeZone.UTC)
-        command.to == new DateTime(2013, 8, 18, 18, 0, 0, DateTimeZone.UTC)
-        command.createTimeFrameInterval().start == command.from
-        command.createTimeFrameInterval().end == command.to
         command.selectedAggrGroupValuesUnCached == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedFolder == [1L]
-        command.selectedPages == [1L, 5L]
-        command.selectedMeasuredEventIds == [7L, 8L, 9L]
-        command.selectedBrowsers == [2L]
-        command.selectedLocations == [17L]
-        command.includeNativeConnectivity
-        command.getSelectedCustomConnectivityNames() == [CUSTOM_CONNECTIVITY_NAME]
-        command.selectedConnectivityProfiles == [1L]
+        command.selectedAggrGroupValuesCached == [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
+        command.trimBelowLoadTimes == 100
+        command.trimAboveLoadTimes == 10000
+        command.trimBelowRequestCounts == 2
+        command.trimAboveRequestCounts == 200
+        command.trimBelowRequestSizes == 30
+        command.trimAboveRequestSizes == 3000
     }
 
-    void "command without browsers, locations, connectivities and measuredEvents is valid"() {
+    void "command is invalid if no aggrgroupvalue is set"() {
         given:
         setDefaultParams()
-        params.remove("selectedMeasuredEventIds")
-        params.remove("selectedConnectivities")
-        params.remove("selectedBrowsers")
-        params.remove("selectedLocations")
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        command.validate()
-        command.selectedMeasuredEventIds == []
-        command.selectedBrowsers == []
-        command.selectedLocations == []
-        command.includeNativeConnectivity
-        command.getSelectedCustomConnectivityNames() == []
-        command.selectedConnectivityProfiles == []
-    }
-
-    void "command is invalid if 'to' is before 'from'"() {
-        given:
-        setDefaultParams()
-        params.from = "2013-08-18T12:00:00.000Z"
-        params.to = "2013-08-18T11:00:00.000Z"
+        params.remove("selectedAggrGroupValuesUnCached")
+        params.remove("selectedAggrGroupValuesCached")
 
         when:
         controllerUnderTest.bindData(command, params)
 
         then:
         !command.validate()
-    }
-
-    void "command is invalid if 'to' is equal to 'from'"() {
-        given:
-        setDefaultParams()
-        params.from = "2013-08-18T11:00:00.000Z"
-        params.to = "2013-08-18T11:00:00.000Z"
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        !command.validate()
-    }
-
-    void "command supports legacy date format in 'from' and 'to'"() {
-        given:
-        setDefaultParams()
-        params.from = "18.08.2013"
-        params.to = "18.08.2013"
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        command.validate()
-        command.from == new DateTime(2013, 8, 18, 0, 0, 0, 0)
-        command.to == new DateTime(2013, 8, 18, 23, 59, 59, 999)
-        command.createTimeFrameInterval().start == command.from
-        command.createTimeFrameInterval().end == command.to
-    }
-
-    void "command supports automatic time frame"() {
-        given:
-        setDefaultParams()
-        params.from = null
-        params.to = null
-        params.selectedTimeFrameInterval = 3000
-        long nowInMillis = DateTime.now().getMillis()
-        long allowedDelta = 1000
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        command.validate()
-        command.from == null
-        command.to == null
-        Interval timeFrame = command.createTimeFrameInterval()
-        Math.abs(timeFrame.endMillis - nowInMillis) < allowedDelta
-        Math.abs(timeFrame.startMillis - (nowInMillis - 3000 * 1000)) < allowedDelta
-    }
-
-    void "command is invalid when binding parameters of wrong type"() {
-        given:
-        setDefaultParams()
-        params.selectedPages = ['NOT-A-NUMBER']
-        params.selectedLocations = 'UGLY'
-
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        !command.validate()
-        command.selectedPages == []
-        command.selectedLocations == []
-    }
-
-    void "command is invalid without pages"() {
-        given:
-        setDefaultParams()
-        params.selectedPages = []
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        !command.validate()
-    }
-
-    void "command does not include native or custom if only numbers are set"() {
-        given:
-        setDefaultParams()
-        params.selectedConnectivities = ['1', '2']
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        command.validate()
-        command.getSelectedCustomConnectivityNames() == []
-        !command.includeNativeConnectivity
-        command.getSelectedConnectivityProfiles() == [1L, 2L]
     }
 
     void "static model data is correctly generated"() {
@@ -325,17 +184,9 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         result.size() == 29
-        result["selectedFolder"] == [1L]
-        result["selectedPages"] == [1L, 5L]
-        result['selectedFolder'] == [1L]
-        result['selectedPages'] == [1L, 5L]
-        result['selectedMeasuredEventIds'] == [7L, 8L, 9L]
-        result['selectedBrowsers'] == [2L]
-        result['selectedLocations'] == [17L]
-
-        result['from'] == '2013-08-18T12:00:00.000Z'
-        result['to'] == '2013-08-19T13:00:00.000Z'
-        result['selectedConnectivities'] == [CUSTOM_CONNECTIVITY_NAME, "1", "native"]
+        result["selectedInterval"] == 60
+        result["selectedAggrGroupValuesCached"] == [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
+        result["selectedAggrGroupValuesUnCached"] == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
     }
 
     void "command creates correct ErQueryParameters"() {
@@ -347,66 +198,12 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         erQueryParams != null
-        erQueryParams.jobGroupIds == [1L] as SortedSet
-        erQueryParams.pageIds == [1L, 5L] as SortedSet
-        erQueryParams.measuredEventIds == [7L, 8L, 9L] as SortedSet
-        erQueryParams.browserIds == [2L] as SortedSet
-        erQueryParams.locationIds == [17L] as SortedSet
-        erQueryParams.connectivityProfileIds == [1L] as SortedSet
-        !erQueryParams.includeAllConnectivities
-        erQueryParams.includeNativeConnectivity
-        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as SortedSet
-    }
-
-    void "command creates correct ErQueryParameters with empty filters"() {
-        given:
-        setDefaultCommandProperties()
-        command.selectedConnectivities = []
-        command.selectedMeasuredEventIds = []
-        command.selectedBrowsers = []
-        command.selectedLocations = []
-
-        when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
-
-        then:
-        erQueryParams.measuredEventIds == [] as Set
-        erQueryParams.browserIds == [] as Set
-        erQueryParams.locationIds == [] as Set
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [] as Set
-        erQueryParams.includeNativeConnectivity
-        erQueryParams.includeAllConnectivities
-    }
-
-    void "command creates correct ErQueryParameters with only native connectivites"() {
-        given:
-        setDefaultCommandProperties()
-        command.selectedConnectivities = ["native"]
-
-        when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
-
-        then:
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [] as Set
-        !erQueryParams.includeAllConnectivities
-        erQueryParams.includeNativeConnectivity
-    }
-
-    void "command creates correct ErQueryParameters with only custom connectivites"() {
-        given:
-        setDefaultCommandProperties()
-        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
-
-        when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
-
-        then:
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as Set
-        !erQueryParams.includeAllConnectivities
-        !erQueryParams.includeNativeConnectivity
+        erQueryParams.minLoadTimeInMillisecs == 100
+        erQueryParams.maxLoadTimeInMillisecs == 10000
+        erQueryParams.minRequestCount == 2
+        erQueryParams.maxRequestCount == 200
+        erQueryParams.minRequestSizeInBytes == 30000
+        erQueryParams.maxRequestSizeInBytes == 3000000
     }
 
     void "createMvQueryParams throws with invalid command"() {
@@ -421,55 +218,34 @@ class EventResultDashboardControllerTests extends Specification {
     }
 
     private setDefaultParams() {
-        params.from = '2013-08-18T16:00:00.000Z'
-        params.to = '2013-08-18T18:00:00.000Z'
+        TimeSeriesShowCommandBaseSpec.getDefaultParams().each { key, value ->
+            params.setProperty(key, value)
+        }
         params.selectedAggrGroupValuesUnCached = AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedAggrGroupValuesCached = AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME.toString()
         params.selectedConnectivities = ['1', CUSTOM_CONNECTIVITY_NAME, 'native']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params.showDataMarkers = false
-        params.showDataLabels = false
-        params.selectedInterval = 0
-        params.selectedTimeFrameInterval = 0
-        params.selectChartType = 0
-        params.trimBelowLoadTimes = 0
-        params.trimAboveLoadTimes = 0
-        params.trimBelowRequestCounts = 0
-        params.trimAboveRequestCounts = 0
-        params.trimBelowRequestSizes = 0
-        params.trimAboveRequestSizes = 0
-        params.chartWidth = 0
-        params.chartHeight = 0
-        params.loadTimeMinimum = 0
+        params.selectedInterval = 60
+        params.trimBelowLoadTimes = 100
+        params.trimAboveLoadTimes = 10000
+        params.trimBelowRequestCounts = 2
+        params.trimAboveRequestCounts = 200
+        params.trimBelowRequestSizes = 30
+        params.trimAboveRequestSizes = 3000
     }
 
     private setDefaultCommandProperties() {
-        command.from = new DateTime(2013, 8, 18, 12, 0, 0, DateTimeZone.UTC)
-        command.to = new DateTime(2013, 8, 19, 13, 0, 0, DateTimeZone.UTC)
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedBrowsers = [2L]
-        command.selectedLocations = [17L]
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME, '1', 'native']
-        command.selectedInterval = 0
+        TimeSeriesShowCommandBaseSpec.setDefaultCommandProperties(command)
+        command.selectedAggrGroupValuesUnCached = [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
+        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
+        command.selectedInterval = 60
 
-        command.trimBelowLoadTimes = 0
-        command.trimAboveLoadTimes = 0
-        command.trimBelowRequestCounts = 0
-        command.trimAboveRequestCounts = 0
-        command.trimBelowRequestSizes = 0
-        command.trimAboveRequestSizes = 0
+        command.trimBelowLoadTimes = 100
+        command.trimAboveLoadTimes = 10000
+        command.trimBelowRequestCounts = 2
+        command.trimAboveRequestCounts = 200
+        command.trimBelowRequestSizes = 30
+        command.trimAboveRequestSizes = 3000
 
-        command.chartWidth = 0
-        command.chartHeight = 0
-        command.loadTimeMinimum = 0
-        command.showDataMarkers = false
-        command.showDataLabels = false
         command.validate()
     }
 }
