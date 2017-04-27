@@ -92,38 +92,15 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
      * @param username the creator of the dashboard
      */
     UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, Boolean publiclyVisible, String username) {
+        super(cmd, dashboardName, publiclyVisible, username)
 
-        this.dashboardName = dashboardName
-        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
-        this.username = username
-
-        // Get Data from command
-        from = cmd.from
-        to = cmd.to
         selectedInterval = cmd.selectedInterval
-        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         trimBelowLoadTimes = cmd.trimBelowLoadTimes
         trimAboveLoadTimes = cmd.trimAboveLoadTimes
         trimBelowRequestCounts = cmd.trimBelowRequestCounts
         trimAboveRequestCounts = cmd.trimAboveRequestCounts
         trimBelowRequestSizes = cmd.trimBelowRequestSizes
         trimAboveRequestSizes = cmd.trimAboveRequestSizes
-        selectedConnectivities = cmd.selectedConnectivities
-        chartTitle = cmd.chartTitle
-        chartWidth = cmd.chartWidth
-        chartHeight = cmd.chartHeight
-        loadTimeMinimum = cmd.loadTimeMinimum
-        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
-        showDataMarkers = cmd.showDataMarkers
-        showDataLabels = cmd.showDataLabels
-        graphNameAliases = cmd.graphNameAliases
-        graphColors = cmd.graphColors
-
-        selectedFolder = cmd.selectedFolder.join(",")
-        selectedPages = cmd.selectedPages.join(",")
-        selectedMeasuredEventIds = cmd.selectedMeasuredEventIds.join(",")
-        selectedBrowsers = cmd.selectedBrowsers.join(",")
-        selectedLocations = cmd.selectedLocations.join(",")
         selectedAggrGroupValuesCached = cmd.selectedAggrGroupValuesCached.join(",")
         selectedAggrGroupValuesUnCached = cmd.selectedAggrGroupValuesUnCached.join(",")
     }

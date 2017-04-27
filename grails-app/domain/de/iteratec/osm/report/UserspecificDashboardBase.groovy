@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.result.EventResultDashboardShowAllCommand
+import de.iteratec.osm.result.TimeSeriesShowCommandBase
 import org.joda.time.DateTime
 
 /**
@@ -125,17 +127,51 @@ class UserspecificDashboardBase {
         dashboardName(nullable: false, blank: false)
         username(nullable: true)
         publiclyVisible(nullable: true)
-        fromDate(nullable: true)
-        toDate(nullable: true)
+        from(nullable: true)
+        to(nullable: true)
         selectedFolder(nullable: true)
         selectedPages(nullable: true)
         selectedMeasuredEventIds(nullable: true)
         selectedBrowsers(nullable: true)
         selectedLocations(nullable: true)
         selectedTimeFrameInterval(nullable: true)
-        wideScreenDiagramMontage(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
         selectedConnectivities(nullable: true)
+    }
+
+    /**
+     * Creates Userspecific Dashboard from TimeSeriesShowCommandBase
+     * @param cmd the command the set values
+     * @param dashboardName a unique name for the dashboard
+     * @param publiclyVisible true if the dashboard should be visible for all
+     * @param username the creator of the dashboard
+     */
+    UserspecificDashboardBase(TimeSeriesShowCommandBase cmd, String dashboardName, Boolean publiclyVisible, String username) {
+
+        this.dashboardName = dashboardName
+        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
+        this.username = username
+
+        // Get Data from command
+        from = cmd.from
+        to = cmd.to
+        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
+        selectedConnectivities = cmd.selectedConnectivities
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
+        graphNameAliases = cmd.graphNameAliases
+        graphColors = cmd.graphColors
+
+        selectedFolder = cmd.selectedFolder.join(",")
+        selectedPages = cmd.selectedPages.join(",")
+        selectedMeasuredEventIds = cmd.selectedMeasuredEventIds.join(",")
+        selectedBrowsers = cmd.selectedBrowsers.join(",")
+        selectedLocations = cmd.selectedLocations.join(",")
     }
 }
