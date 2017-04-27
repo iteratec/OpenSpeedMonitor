@@ -334,7 +334,6 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         command.loadTimeMinimum = 0
         command.showDataMarkers = false
         command.showDataLabels = false
-        command.validate()
     }
 
 }

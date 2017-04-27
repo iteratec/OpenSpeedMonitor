@@ -183,6 +183,7 @@ class EventResultDashboardControllerTests extends Specification {
         command.copyRequestDataToViewModelMap(result)
 
         then:
+        command.validate()
         result.size() == 29
         result["selectedInterval"] == 60
         result["selectedAggrGroupValuesCached"] == [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
@@ -197,6 +198,7 @@ class EventResultDashboardControllerTests extends Specification {
         ErQueryParams erQueryParams = command.createErQueryParams()
 
         then:
+        command.validate()
         erQueryParams != null
         erQueryParams.minLoadTimeInMillisecs == 100
         erQueryParams.maxLoadTimeInMillisecs == 10000
@@ -245,7 +247,5 @@ class EventResultDashboardControllerTests extends Specification {
         command.trimAboveRequestCounts = 200
         command.trimBelowRequestSizes = 30
         command.trimAboveRequestSizes = 3000
-
-        command.validate()
     }
 }
