@@ -566,11 +566,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         //Update actual bars
         d3.selectAll(".bar").each(function (bar) {
+            var newBarHeight = innerYScale.rangeBand();
 
             //Update Rectangle Position and Size
             var barWidth = unitScales[bar.unit](bar.value);
             var rect = d3.select(this).select("rect");
-            rect.attr("height", innerYScale.rangeBand())
+            rect.attr("height", newBarHeight)
                 .attr("fill", colorScales[bar.unit](bar.measurand))
                 .transition().duration(transitionDuration)
                 .attr("width", barWidth);
@@ -581,16 +582,16 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             if (bar.valueComparative) {
                 comparativeIndicator.select(".d3chart-comparative-indicator.vertical-line")
                     .attr("x1", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y1", 0)
+                    .attr("y1", 0.25 * newBarHeight)
                     .attr("x2", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y2", innerYScale.rangeBand())
+                    .attr("y2", 0.75 * newBarHeight)
                     .attr("stroke", indicatorColor);
 
                 comparativeIndicator.select(".d3chart-comparative-indicator.horizontal-line")
                     .attr("x1", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y1", innerYScale.rangeBand() / 2)
+                    .attr("y1", newBarHeight / 2)
                     .attr("x2", unitScales[bar.unit](bar.value))
-                    .attr("y2", innerYScale.rangeBand() / 2)
+                    .attr("y2", newBarHeight / 2)
                     .attr("stroke", indicatorColor);
             }
 
@@ -645,8 +646,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var createUnitScales = function () {
         unitScales = {};
+
+        var comparativeValues = transformedData.map( function (element) {
+            return element.bars[0].valueComparative;
+        });
+
         $.each(units, function (unit, values) {
-            var maxValueForThisUnit = d3.max(values);
+            var maxValueForThisUnit = d3.max(values.concat(comparativeValues));
             var scale = d3.scale.linear()
                 .rangeRound([0, width - barXOffSet])
                 .domain([0, maxValueForThisUnit]);
