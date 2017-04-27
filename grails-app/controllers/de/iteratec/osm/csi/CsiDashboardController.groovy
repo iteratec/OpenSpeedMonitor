@@ -765,16 +765,6 @@ class CsiDashboardController {
      */
     private static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
-    //	/**
-    //	 * The {@link NumberFormat} used to format CSI values for CSV export and table view.
-    //	 */
-    //	private static final NumberFormat CSV_TABLE_CSI_VALUE_FORMAT_GERMAN = NumberFormat.getNumberInstance(Locale.GERMAN);
-    //
-    //	/**
-    //	 * The {@link NumberFormat} used to format CSI values for CSV export and table view.
-    //	 */
-    //	private static final NumberFormat CSV_TABLE_CSI_VALUE_FORMAT_DEFAULT = NumberFormat.getNumberInstance(Locale.US);
-
     /**
      * <p>
      * Creates a CSV based on the selection passed as {@link CsiDashboardShowAllCommand}.

@@ -67,6 +67,8 @@ class CsiDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      * Constraints needs to fit.
      */
     static constraints = {
+        def systemAggregators = [CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM, CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM]
+
         importFrom(TimeSeriesShowCommandBase, exclude:["selectedFolder", "selectedPages"])
 
         aggrGroupAndInterval(nullable: false, inList: [CsiDashboardController.HOURLY_MEASURED_EVENT,
@@ -75,34 +77,19 @@ class CsiDashboardShowAllCommand extends TimeSeriesShowCommandBase {
                                                        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM, CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM])
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty() &&
-              !(cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM))) {
+            if (!currentCollection && !(cmd.aggrGroupAndInterval in systemAggregators)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
             }
         })
 
         selectedPages(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-
-            boolean correctBecauseHourlyEventAndNotEmpty = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty())
-            boolean correctBecausePageAggregatorAndNotEmpty =
-                    (cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE)) &&
-                            !currentCollection.isEmpty()
-            boolean correctBecauseShop = cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP)
-            boolean correctBeacuseCsiSystem = cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM)
-
-            if (!(correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty || correctBecauseShop || correctBeacuseCsiSystem)) {
+            if (!currentCollection && (cmd.aggrGroupAndInterval in [CsiDashboardController.HOURLY_MEASURED_EVENT, CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_PAGE])) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
             }
-
         })
 
         selectedCsiSystems(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            boolean correctBecauseHourlyEventAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT)
-            boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
-            boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
-            boolean correctBecauseCsiSystemAggreagatorAndNotEmpty = (cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)) && !currentCollection.isEmpty()
-
-            if (!(correctBecauseHourlyEventAggregator || correctBecausePageAggregator || correctBecauseShopAggregator || correctBecauseCsiSystemAggreagatorAndNotEmpty)) {
+            if (!currentCollection && (cmd.aggrGroupAndInterval in systemAggregators)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiSystems']
             }
         })
