@@ -1,5 +1,33 @@
 @import "d3chart.less";
 
+
+#chart-container {
+  position: relative;
+}
+#filter-dropdown-group {
+  position: absolute;
+  right: 50px;
+  top: 8px;
+  z-index: 2;
+  padding: 6px 12px;
+}
+.d3chart{
+  transition: height 0.3s ease;
+}
+
+.d3chart-bar {
+  transition: 0.2s fill ease;
+}
+
+.d3chart-bar-clickable{
+  &:extend(.bar);
+  cursor: pointer;
+}
+
+.d3chart-faded {
+  fill: #97aab7 !important;
+}
+
 .d3chart-value{
   font-weight: bold;
   fill: white;
@@ -11,6 +39,10 @@
   &:extend(.d3chart-value);
   text-shadow: 0 0 3px #000000;
   text-anchor: start;
+}
+
+.d3chart-comparative-indicator {
+  stroke-width: 4px;
 }
 
 .d3chart-good{
@@ -26,34 +58,9 @@
   fill: red;
 }
 
-.d3chart-bar {
-  transition: 0.2s fill ease;
-}
-
-.d3chart-bar-clickable{
-  &:extend(.bar);
-  cursor: pointer;
-}
-
 .d3chart-legend-entry{
   cursor: pointer;
 }
 
 
-.d3chart-faded {
-  fill: #97aab7 !important;
-}
 
-#chart-container {
-  position: relative;
-}
-#filter-dropdown-group {
-  position: absolute;
-  right: 50px;
-  top: 8px;
-  z-index: 2;
-  padding: 6px 12px;
-}
-.d3chart{
- transition: height 0.3s ease;
-}
