@@ -18,7 +18,6 @@
 package de.iteratec.osm.report
 
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
-
 /**
  * UserspecificCsiDashboard
  * A domain class describes the data object and it's mapping to the database
@@ -68,5 +67,19 @@ class UserspecificCsiDashboard extends UserspecificDashboardBase{
         overwriteWarningAboutLongProcessingTime = cmd.overwriteWarningAboutLongProcessingTime
         csiTypeDocComplete = cmd.csiTypeDocComplete
         csiTypeVisuallyComplete = cmd.csiTypeVisuallyComplete
+    }
+
+    void fillCommand(CsiDashboardShowAllCommand cmd) {
+        super.fillCommand(cmd)
+        cmd.aggrGroupAndInterval = aggrGroup
+        cmd.includeInterval = includeInterval
+        if (selectedCsiSystems) {
+            for (item in selectedCsiSystems.tokenize(',')) {
+                cmd.selectedCsiSystems.add(Long.parseLong(item))
+            }
+        }
+        cmd.overwriteWarningAboutLongProcessingTime = overwriteWarningAboutLongProcessingTime
+        cmd.csiTypeVisuallyComplete = csiTypeVisuallyComplete
+        cmd.csiTypeDocComplete = csiTypeDocComplete
     }
 }

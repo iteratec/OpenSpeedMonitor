@@ -147,7 +147,7 @@ class UserspecificDashboardBase {
      * @param publiclyVisible true if the dashboard should be visible for all
      * @param username the creator of the dashboard
      */
-    UserspecificDashboardBase(TimeSeriesShowCommandBase cmd, String dashboardName, Boolean publiclyVisible, String username) {
+    protected UserspecificDashboardBase(TimeSeriesShowCommandBase cmd, String dashboardName, Boolean publiclyVisible, String username) {
 
         this.dashboardName = dashboardName
         this.publiclyVisible = Boolean.valueOf(publiclyVisible)
@@ -173,5 +173,55 @@ class UserspecificDashboardBase {
         selectedMeasuredEventIds = cmd.selectedMeasuredEventIds.join(",")
         selectedBrowsers = cmd.selectedBrowsers.join(",")
         selectedLocations = cmd.selectedLocations.join(",")
+    }
+
+    protected void fillCommand(TimeSeriesShowCommandBase cmd) {
+        cmd.from = from
+        cmd.to = to
+        if (selectedFolder) {
+            for (item in selectedFolder.tokenize(',')) {
+                cmd.selectedFolder.add(Long.parseLong(item))
+            }
+        }
+        if (selectedPages) {
+            for (item in selectedPages.tokenize(',')) {
+                cmd.selectedPages.add(Long.parseLong(item))
+            }
+        }
+        if (selectedMeasuredEventIds) {
+            for (item in selectedMeasuredEventIds.tokenize(',')) {
+                cmd.selectedMeasuredEventIds.add(Long.parseLong(item))
+            }
+        }
+        if (selectedBrowsers) {
+            for (item in selectedBrowsers.tokenize(',')) {
+                cmd.selectedBrowsers.add(Long.parseLong(item))
+            }
+        }
+        if (selectedLocations) {
+            for (item in selectedLocations.tokenize(',')) {
+                cmd.selectedLocations.add(Long.parseLong(item))
+            }
+        }
+        cmd.selectedTimeFrameInterval = selectedTimeFrameInterval
+        cmd.chartTitle = chartTitle
+        cmd.chartWidth = chartWidth
+        cmd.chartHeight = chartHeight
+        cmd.loadTimeMinimum = loadTimeMinimum
+        cmd.loadTimeMaximum = loadTimeMaximum
+        cmd.showDataMarkers = showDataMarkers
+        cmd.showDataLabels = showDataLabels
+
+        cmd.selectedConnectivities = selectedConnectivities ?: []
+
+        if (graphNameAliases.size() > 0) {
+            cmd.graphNameAliases = graphNameAliases
+        }
+        if (graphColors.size() > 0) {
+            cmd.graphColors = graphColors
+        }
+
+        cmd.dashboardName = dashboardName
+        cmd.publiclyVisible = publiclyVisible
     }
 }

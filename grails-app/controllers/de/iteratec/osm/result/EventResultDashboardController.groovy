@@ -155,76 +155,7 @@ class EventResultDashboardController {
  */
     private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, String dashboardID) {
         UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
-
-        cmd.with {
-            from = dashboard.from
-            to = dashboard.to
-
-            selectedTimeFrameInterval = dashboard.selectedTimeFrameInterval
-            selectedInterval = dashboard.selectedInterval
-
-            if (dashboard.selectedFolder) {
-                for (item in dashboard.selectedFolder.tokenize(',')) {
-                    selectedFolder.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedPages) {
-                for (item in dashboard.selectedPages.tokenize(',')) {
-                    selectedPages.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedMeasuredEventIds) {
-                for (item in dashboard.selectedMeasuredEventIds.tokenize(',')) {
-                    selectedMeasuredEventIds.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedBrowsers) {
-                for (item in dashboard.selectedBrowsers.tokenize(',')) {
-                    selectedBrowsers.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedLocations) {
-                for (item in dashboard.selectedLocations.tokenize(',')) {
-                    selectedLocations.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedAggrGroupValuesCached) {
-                for (item in dashboard.selectedAggrGroupValuesCached.tokenize(',')) {
-                    selectedAggrGroupValuesCached.add(item)
-                }
-            }
-            if (dashboard.selectedAggrGroupValuesUnCached) {
-                for (item in dashboard.selectedAggrGroupValuesUnCached.tokenize(',')) {
-                    selectedAggrGroupValuesUnCached.add(item)
-                }
-            }
-
-            trimBelowLoadTimes = dashboard.trimBelowLoadTimes
-            trimAboveLoadTimes = dashboard.trimAboveLoadTimes
-            trimBelowRequestCounts = dashboard.trimBelowRequestCounts
-            trimAboveRequestCounts = dashboard.trimAboveRequestCounts
-            trimBelowRequestSizes = dashboard.trimBelowRequestSizes
-            trimAboveRequestSizes = dashboard.trimAboveRequestSizes
-
-            selectedConnectivities = dashboard.selectedConnectivities ?: []
-
-            chartTitle = dashboard.chartTitle
-            chartWidth = dashboard.chartWidth
-            chartHeight = dashboard.chartHeight
-            loadTimeMinimum = dashboard.loadTimeMinimum
-            loadTimeMaximum = dashboard.loadTimeMaximum
-            showDataMarkers = dashboard.showDataMarkers
-            showDataLabels = dashboard.showDataLabels
-
-            if (dashboard.graphNameAliases.size() > 0) {
-                graphNameAliases = dashboard.graphNameAliases
-            }
-            if (dashboard.graphColors.size() > 0) {
-                graphColors = dashboard.graphColors
-            }
-            dashboardName = dashboard.dashboardName
-            publiclyVisible = dashboard.publiclyVisible
-        }
+        dashboard.fillCommand(cmd)
     }
 
     /**
