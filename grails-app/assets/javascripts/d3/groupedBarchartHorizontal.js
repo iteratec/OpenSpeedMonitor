@@ -12,6 +12,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdentifier) {
 
     var svg,
+        svgDefinitions,
         margin,
         barHeight = 40,
         barPadding = 10,
@@ -123,6 +124,23 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         svg = d3.select("#" + chartIdentifier).append("svg")
             .attr("class", "d3chart");
+        svgDefinitions = svg.append("defs");
+
+        // JOHANNES2DO: assign the correct color
+        svgDefinitions.append("marker")
+            .attr({
+                "id":"arrow",
+                "viewBox":"0 -5 10 10",
+                "refX":10,
+                "refY":0,
+                "markerWidth":4,
+                "markerHeight":4,
+                "orient":"auto"
+            })
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .style("fill", "#000000")
+            .attr("class","arrowHead");
 
         allBarsGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -544,6 +562,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .domain(measurands)
             .rangeRoundBands([0, outerYScale.rangeBand()]);
 
+        var actualBarHeight = innerYScale.rangeBand();
+
         unitScales = createUnitScales();
 
         enterBarGroups();
@@ -566,38 +586,37 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         //Update actual bars
         d3.selectAll(".bar").each(function (bar) {
-            var newBarHeight = innerYScale.rangeBand();
-
             //Update Rectangle Position and Size
             var barWidth = unitScales[bar.unit](bar.value);
             var rect = d3.select(this).select("rect");
-            rect.attr("height", newBarHeight)
+            rect.attr("height", actualBarHeight)
                 .attr("fill", colorScales[bar.unit](bar.measurand))
                 .transition().duration(transitionDuration)
                 .attr("width", barWidth);
 
-            // Update comparative indicators
-            var indicatorColor = colorScales[bar.unit](2);
-            var comparativeIndicator = d3.select(this).select("g.d3chart-comparative-indicator-group");
-            if (bar.valueComparative) {
-                comparativeIndicator.select(".d3chart-comparative-indicator.vertical-line")
-                    .attr("x1", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y1", 0.25 * newBarHeight)
-                    .attr("x2", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y2", 0.75 * newBarHeight)
-                    .attr("stroke", indicatorColor);
-
-                comparativeIndicator.select(".d3chart-comparative-indicator.horizontal-line")
-                    .attr("x1", unitScales[bar.unit](bar.valueComparative))
-                    .attr("y1", newBarHeight / 2)
-                    .attr("x2", unitScales[bar.unit](bar.value))
-                    .attr("y2", newBarHeight / 2)
-                    .attr("stroke", indicatorColor);
-            }
-
             //Update Bar Label
             updateBarLabel(bar, this, barWidth, innerYScale);
 
+        });
+
+        // Update comparative indicators
+        d3.selectAll("g.d3chart-comparative-indicator-group").each( function (comparativeIndicator) {
+            if (comparativeIndicator.valueComparative) {
+                d3.select(this).select(".d3chart-comparative-indicator.vertical-line")
+                    .attr("x1", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
+                    .attr("y1", 0.15 * actualBarHeight)
+                    .attr("x2", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
+                    .attr("y2", 0.85 * actualBarHeight)
+                    .attr("stroke", "#000000");
+
+                d3.select(this).select(".d3chart-comparative-indicator.horizontal-line")
+                    .attr("x1", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
+                    .attr("y1", actualBarHeight / 2)
+                    .attr("x2", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.value))
+                    .attr("y2", actualBarHeight / 2)
+                    .attr("stroke", "#000000")
+                    .attr("marker-end", "url(#arrow)");
+            }
         });
 
 
@@ -624,9 +643,25 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             textTrans
                 .attr("visibility", "hidden");
         } else {
-            textTrans
-                .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
-                .attr("visibility", "");
+            if (!bar.valueComparative) {
+                textTrans
+                    .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
+                    .attr("visibility", "");
+                textLabel.classed("d3chart-out-of-bar", false);
+            } else {
+                if (bar.value < bar.valueComparative) {
+                    textTrans
+                        .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
+                        .attr("visibility", "");
+                    textLabel.classed("d3chart-out-of-bar", false);
+                } else {
+                    var textLength = textTrans.node().getComputedTextLength();
+                    textTrans
+                        .attr("x", unitScales[bar.unit](bar.value) + valueLabelOffset + textLength)
+                        .attr("visibility", "");
+                        textLabel.classed("d3chart-out-of-bar", true);
+                }
+            }
         }
     };
 
@@ -663,29 +698,41 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     };
 
     var enterBarGroups = function () {
-        var select1 = allBarsGroup.selectAll(".barGroup").data(transformedData, function (bar) {
+        var barGroup = allBarsGroup.selectAll(".barGroup").data(transformedData, function (bar) {
             return bar.grouping;
         });
 
-        select1.enter().append("g")
+        barGroup.enter().append("g")
             .attr("class", "barGroup")
             .append("text")
             .attr("class", "barGroupLabel")
             .attr("alignment-baseline", "central");
-        select1.exit().remove();
-        select1.each(function (group) {
+        barGroup.exit().remove();
+
+        barGroup.each(function (group) {
             var bars = d3.select(this).selectAll(".bar").data(group.bars, function (bar) {
                 return bar.grouping + bar.measurand;
             });
             bars.enter().append("g").attr("class", "bar").each(function (d) {
                 d3.select(this).append("rect").classed("d3chart-bar-clickable", true);
-                var comparativeGroup = d3.select(this).append("g").classed("d3chart-comparative-indicator-group", true);
-                comparativeGroup.append("line").classed("d3chart-comparative-indicator vertical-line", true);
-                comparativeGroup.append("line").classed("d3chart-comparative-indicator horizontal-line", true);
                 d3.select(this).append("text").classed("d3chart-value", true)
             });
             bars.exit().remove();
 
+            var comparativeIndicatorsGroup = d3.select(this).selectAll(".d3chart-comparative-indicator-group").data(group.bars, function (bar) {
+                return bar.valueComparative;
+            });
+            comparativeIndicatorsGroup.enter().append("g")
+                .attr("class", "d3chart-comparative-indicator-group")
+                .each( function () {
+                    d3.select(this)
+                        .append("line")
+                        .classed("d3chart-comparative-indicator vertical-line", true);
+                    d3.select(this)
+                        .append("line")
+                        .classed("d3chart-comparative-indicator horizontal-line", true);
+            });
+            comparativeIndicatorsGroup.exit().remove();
         });
     };
 
