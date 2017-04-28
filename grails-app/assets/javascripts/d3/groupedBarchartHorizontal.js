@@ -125,22 +125,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         svg = d3.select("#" + chartIdentifier).append("svg")
             .attr("class", "d3chart");
         svgDefinitions = svg.append("defs");
-
-        // JOHANNES2DO: assign the correct color
-        svgDefinitions.append("marker")
-            .attr({
-                "id":"arrow",
-                "viewBox":"0 -5 10 10",
-                "refX":10,
-                "refY":0,
-                "markerWidth":4,
-                "markerHeight":4,
-                "orient":"auto"
-            })
-            .append("path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .style("fill", "#000000")
-            .attr("class","arrowHead");
+        createDiagonalHatchPattern();
 
         allBarsGroup = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -220,6 +205,25 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             })[0].value;
             return compare(aValue, bValue)
         });
+    };
+
+    var createDiagonalHatchPattern = function () {
+        svgDefinitions.append("pattern")
+            .attr({
+                "id": "diagonalHatch",
+                "width": "5",
+                "height": "5",
+                "patternTransform": "rotate(45 0 0)",
+                "patternUnits": "userSpaceOnUse"
+            })
+            .append("line")
+            .attr({
+                "x1": "0",
+                "y1": "0",
+                "x2": "0",
+                "y2": "5",
+                "style": "stroke:#558BBF; stroke-width:2"
+            });
     };
 
     var createColorScale = function () {
@@ -600,23 +604,21 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         });
 
         // Update comparative indicators
-        d3.selectAll("g.d3chart-comparative-indicator-group").each( function (comparativeIndicator) {
-            if (comparativeIndicator.valueComparative) {
-                d3.select(this).select(".d3chart-comparative-indicator.vertical-line")
-                    .attr("x1", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
-                    .attr("y1", 0.15 * actualBarHeight)
-                    .attr("x2", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
-                    .attr("y2", 0.85 * actualBarHeight)
-                    .attr("stroke", "#000000");
+        d3.selectAll(".d3chart-comparative-indicator").each(function (comparativeIndicator) {
+            var value = unitScales[comparativeIndicator.unit](comparativeIndicator.value);
+            var valueComparative = unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative);
+            var x = value < valueComparative ? barXOffSet + value : barXOffSet;
+            var width = value < valueComparative ? valueComparative - value : valueComparative;
 
-                d3.select(this).select(".d3chart-comparative-indicator.horizontal-line")
-                    .attr("x1", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.valueComparative))
-                    .attr("y1", actualBarHeight / 2)
-                    .attr("x2", barXOffSet + unitScales[comparativeIndicator.unit](comparativeIndicator.value))
-                    .attr("y2", actualBarHeight / 2)
-                    .attr("stroke", "#000000")
-                    .attr("marker-end", "url(#arrow)");
+            if (comparativeIndicator.valueComparative) {
+                d3.select(this)
+                    .attr("x", x)
+                    .attr("height", actualBarHeight)
+                    .attr("width", width)
+                    .attr("fill", "url(#diagonalHatch)");
             }
+
+            $("#diagonalHatch line").css("stroke", colorScales[comparativeIndicator.unit](1))
         });
 
 
@@ -643,25 +645,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             textTrans
                 .attr("visibility", "hidden");
         } else {
-            if (!bar.valueComparative) {
-                textTrans
-                    .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
-                    .attr("visibility", "");
-                textLabel.classed("d3chart-out-of-bar", false);
-            } else {
-                if (bar.value < bar.valueComparative) {
-                    textTrans
-                        .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
-                        .attr("visibility", "");
-                    textLabel.classed("d3chart-out-of-bar", false);
-                } else {
-                    var textLength = textTrans.node().getComputedTextLength();
-                    textTrans
-                        .attr("x", unitScales[bar.unit](bar.value) + valueLabelOffset + textLength)
-                        .attr("visibility", "");
-                        textLabel.classed("d3chart-out-of-bar", true);
-                }
-            }
+            textTrans
+                .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
+                .attr("visibility", "");
         }
     };
 
@@ -682,7 +668,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var createUnitScales = function () {
         unitScales = {};
 
-        var comparativeValues = transformedData.map( function (element) {
+        var comparativeValues = transformedData.map(function (element) {
             return element.bars[0].valueComparative;
         });
 
@@ -715,23 +701,15 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             });
             bars.enter().append("g").attr("class", "bar").each(function (d) {
                 d3.select(this).append("rect").classed("d3chart-bar-clickable", true);
-                d3.select(this).append("text").classed("d3chart-value", true)
+                d3.select(this).append("text").classed("d3chart-value", true);
             });
             bars.exit().remove();
 
-            var comparativeIndicatorsGroup = d3.select(this).selectAll(".d3chart-comparative-indicator-group").data(group.bars, function (bar) {
+            var comparativeIndicatorsGroup = d3.select(this).selectAll(".d3chart-comparative-indicator").data(group.bars, function (bar) {
                 return bar.valueComparative;
             });
-            comparativeIndicatorsGroup.enter().append("g")
-                .attr("class", "d3chart-comparative-indicator-group")
-                .each( function () {
-                    d3.select(this)
-                        .append("line")
-                        .classed("d3chart-comparative-indicator vertical-line", true);
-                    d3.select(this)
-                        .append("line")
-                        .classed("d3chart-comparative-indicator horizontal-line", true);
-            });
+            comparativeIndicatorsGroup.enter().append("rect")
+                .attr("class", "d3chart-comparative-indicator");
             comparativeIndicatorsGroup.exit().remove();
         });
     };
