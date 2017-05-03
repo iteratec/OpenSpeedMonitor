@@ -345,7 +345,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var createSingleLegendEntryForComparativeTimeframe = function () {
         return {
-            'measurand': 'Comparative Timeframe',
+            'measurand': actualBarchartData.i18nMap.comparativeTimeframeLabel,
             'fill': "url(#diagonalHatch)"
         };
     };
