@@ -15,6 +15,16 @@
     <h1><g:message code="landing.headline" default="Welcome" /></h1>
     <p><g:message code="landing.headlineText"
                   default="OpenSpeedMonitor - Open Source Web Performance Monitoring." /></p>
+    <g:if test="${flash.success}">
+        <div class="alert alert-info" style="display: block">
+            <g:message code="de.iteratec.osm.ui.setupwizards.infra.success" default="success" args="${flash.success}"/>
+        </div>
+    </g:if>
+    <g:if test="${flash.continue}">
+        <div class="alert alert-info" style="display: block">
+            <g:message code="de.iteratec.osm.ui.setupwizards.infra.continue" default="continue"/>
+        </div>
+    </g:if>
 </div>
 
 <div class="row card-well">

@@ -5,64 +5,73 @@ OpenSpeedMonitor.InfrastructureSetupWizard = OpenSpeedMonitor.InfrastructureSetu
 
 OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
 
-    var formSubmissonButton = $("#createJobTabCreationButton");
-    var setJobGroupCardValid = false;
-    var scriptCardIsValid = false;
-    var createJobCardValid = false;
+    var serverSelectBox = $("#serverSelect");
+    var WPTKeyInputFields = $("#WPTKeyFields");
+    var CustomServerFields = $("#CustomServerFields");
+    var WPTKeyInputInfo = $("#WPTKeyInfo");
+    var CustomServerInfo = $("#CustomServerInfo");
+    var finishButton = $("#finishButton");
+    var WPTKeyField = $("#inputWPTKey");
+    var ServerNameField = $("#inputServerName");
+    var ServerAddressField = $("#inputServerAddress");
+    var invalidAddressText = $("#invalidAddress");
     var progressBar = $("#setupWizardProgressBar");
-    var scriptDiv = $("#createScript");
-    var jobGroupDiv = $("#setJobGroup");
-    var jobDiv = $("#createJob");
-    var setJobGroupTabNextButton = $("#setJobGroubTabNextButton");
-    var createScriptTabNextButton = $("#createScriptTabNextButton");
-    var locationAndConnectivityDiv = $("#selectLocationAndConnectivity");
+
+    var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
     var init = function () {
-        initTabNavigation();
+        serverSelectBox.change(updateInputFields);
+        WPTKeyField.on('input propertychange paste',validate);
+        ServerNameField.on('input propertychange paste',validate);
+        ServerAddressField.on('input propertychange paste',validate);
+        finishButton.click(function () {
+            spinner.start();
+        });
+        validate();
+        updateInputFields();
+    };
+
+    var validate = function() {
+        if (serverSelectBox.val() == "WPTServer") {
+            finishButton.prop('disabled', !WPTKeyField.val());
+        }
+        else {
+            var validURL = ValidURL(ServerAddressField.val());
+            finishButton.prop('disabled', !(ServerNameField.val() && validURL));
+            if (validURL || !ServerAddressField.val()) {
+                invalidAddressText.addClass("hidden");
+            }
+            else {
+                invalidAddressText.removeClass("hidden");
+            }
+        }
+    };
+
+    function ValidURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+            '(\\#[-a-z\\d_]*)?$','i'); // fragment locater
+        return pattern.test(str);
     }
 
-    var initTabNavigation = function () {
-        setJobGroupTabNextButton.click(function () {
-            $("#setJobGroupTab").parent().toggleClass("active");
-            $("#createScriptTab").parent().toggleClass("active");
-
-            if (!$("#createScriptTab").parent().hasClass("wasActive"))
-                progressBar.css("width", "37.5%");
-
-            $("#createScriptTab").parent().addClass("wasActive");
-        });
-        createScriptTabNextButton.click(function () {
-            $("#createScriptTab").parent().toggleClass("active");
-            $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
-
-            if (!$("#selectLocationAndConnectivityTab").parent().hasClass("wasActive"))
-                progressBar.css("width", "62.5%");
-
-            $("#selectLocationAndConnectivityTab").parent().addClass("wasActive");
-        });
-        $("#selectLocationAndConnectivityTabNextButton").click(function () {
-            $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
-            $("#createJobTab").parent().toggleClass("active");
-
-            if (!$("#createJobTab").parent().hasClass("wasActive"))
-                progressBar.css("width", "100%");
-
-            $("#createJobTab").parent().addClass("wasActive");
-        });
-
-        $("#createScriptTabPreviousButton").click(function () {
-            $("#createScriptTab").parent().toggleClass("active");
-            $("#setJobGroupTab").parent().toggleClass("active");
-        });
-        $("#selectLocationAndConnectivityTabPreviousButton").click(function () {
-            $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
-            $("#createScriptTab").parent().toggleClass("active");
-        });
-        $("#createJobTabPreviousButton").click(function () {
-            $("#createJobTab").parent().toggleClass("active");
-            $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
-        });
-    }
+    var updateInputFields = function () {
+        if (serverSelectBox.val() == "WPTServer") {
+            WPTKeyInputFields.removeClass("hidden");
+            CustomServerFields.addClass("hidden");
+            WPTKeyInputInfo.removeClass("hidden");
+            CustomServerInfo.addClass("hidden");
+        } else {
+            // newJobGroup selected
+            WPTKeyInputFields.addClass("hidden");
+            CustomServerFields.removeClass("hidden");
+            WPTKeyInputInfo.addClass("hidden");
+            CustomServerInfo.removeClass("hidden");
+        }
+        validate();
+    };
 
     init();
 

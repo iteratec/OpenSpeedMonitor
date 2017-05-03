@@ -65,6 +65,12 @@ class OsmConfiguration {
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
     /** Time in days internal monitoring data like location queues is stored. */
     Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+    /** Did the infrastructure setup run already? */
+    InfrastructureSetupRan infrastructureSetupRan = InfrastructureSetupRan.FALSE
+
+    enum InfrastructureSetupRan {
+        FALSE, ABORTED, TRUE
+    }
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
@@ -77,6 +83,7 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+        infrastructureSetupRan defaultValue: InfrastructureSetupRan.FALSE
     }
 
     static constraints = {
@@ -90,5 +97,6 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+        infrastructureSetupRan defaultValue: InfrastructureSetupRan.FALSE
     }
 }
