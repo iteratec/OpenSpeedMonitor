@@ -163,6 +163,7 @@ class EventResultDashboardControllerTests extends Specification {
         result["locations"]*.getLabel() == ["Location1", "Location2", "Location3"]
 
         result["dateFormat"] == EventResultDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
+        result["aggregationIntervals"] == EventResultDashboardController.AGGREGATION_INTERVALS
 
         result["eventsOfPages"] == [
                 1L: [1003L] as Set,

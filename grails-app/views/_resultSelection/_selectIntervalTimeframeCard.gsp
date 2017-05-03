@@ -1,11 +1,11 @@
 <%@page defaultCodec="none" %>
 <%-- 
 A card with controls to select a time frame (manual, or presets like 'last 12 hours') and optionally
-a control to select an aggregation interval (if csiAggregationIntervals is set)
+a control to select an aggregation interval (if aggregationIntervals is set)
 --%>
 <div class="card form-horizontal" id="select-interval-timeframe-card">
     <h2>
-		<g:if test="${csiAggregationIntervals}">
+		<g:if test="${aggregationIntervals}">
 			<g:message code="de.iteratec.isocsi.csi.aggreator.heading"
 					   default="Aggregation"/>
 			&amp;
@@ -13,7 +13,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 		<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
 	</h2>
 
-	<g:if test="${csiAggregationIntervals}">
+	<g:if test="${aggregationIntervals}">
 		<div class="form-group">
 			<label class="col-md-4 control-label" for="selectedIntervalHtmlId">
 				<g:message
@@ -23,7 +23,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 
 			<div class="col-md-8">
 				<g:select id="selectedIntervalHtmlId" class="form-control"
-						  name="selectedInterval" from="${csiAggregationIntervals}"
+						  name="selectedInterval" from="${aggregationIntervals}"
 						  valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
 						  value="${selectedInterval}"/>
 			</div>

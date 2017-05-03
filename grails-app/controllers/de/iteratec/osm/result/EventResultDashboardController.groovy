@@ -65,6 +65,9 @@ class EventResultDashboardController {
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
+    public final static List<Long> AGGREGATION_INTERVALS = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
+
+
     def intervals = ['not', 'hourly', 'daily', 'weekly']
 
     def index() {
@@ -576,6 +579,7 @@ class EventResultDashboardController {
         return [
                 'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED),
                 'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED),
+                'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,
                 'measuredEvents': measuredEvents,

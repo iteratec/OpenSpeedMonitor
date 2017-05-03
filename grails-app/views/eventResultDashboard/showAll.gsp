@@ -183,7 +183,7 @@
                                     'selectedInterval'               : selectedInterval,
                                     'dateFormat'                     : dateFormat,
                                     'weekStart'                      : weekStart,
-                                    'csiAggregationIntervals'        : csiAggregationIntervals,
+                                    'aggregationIntervals'           : aggregationIntervals,
                                     'locationsOfBrowsers'            : locationsOfBrowsers,
                                     'eventsOfPages'                  : eventsOfPages,
                                     'folders'                        : folders,
