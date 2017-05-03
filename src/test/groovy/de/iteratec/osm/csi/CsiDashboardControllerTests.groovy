@@ -555,7 +555,7 @@ class CsiDashboardControllerTests extends Specification {
 
         then:
         result != null
-        result.size() == 15
+        result.size() == 14
 
         result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
         result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
@@ -611,7 +611,7 @@ class CsiDashboardControllerTests extends Specification {
         Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
         then:
         result != null
-        result.size() == 15
+        result.size() == 14
 
         result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
         result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
