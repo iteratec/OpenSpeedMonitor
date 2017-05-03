@@ -46,13 +46,13 @@ class UserspecificDashboardBase {
      * The selected start date (inclusive).
      *
      */
-    DateTime from
+    Date from
 
     /**
      * The selected end date (inclusive).
      *
      */
-    DateTime to
+    Date to
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -154,8 +154,8 @@ class UserspecificDashboardBase {
         this.username = username
 
         // Get Data from command
-        from = cmd.from
-        to = cmd.to
+        from = cmd.from.toDate()
+        to = cmd.to.toDate()
         selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         selectedConnectivities = cmd.selectedConnectivities
         chartTitle = cmd.chartTitle
@@ -176,8 +176,8 @@ class UserspecificDashboardBase {
     }
 
     protected void fillCommand(TimeSeriesShowCommandBase cmd) {
-        cmd.from = from
-        cmd.to = to
+        cmd.from = new DateTime(from)
+        cmd.to = new DateTime(to)
         if (selectedFolder) {
             for (item in selectedFolder.tokenize(',')) {
                 cmd.selectedFolder.add(Long.parseLong(item))
