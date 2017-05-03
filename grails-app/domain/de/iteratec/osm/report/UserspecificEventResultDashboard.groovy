@@ -114,8 +114,6 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
         cmd.trimAboveRequestCounts = trimAboveRequestCounts
         cmd.trimBelowRequestSizes = trimBelowRequestSizes
         cmd.trimAboveRequestSizes = trimAboveRequestSizes
-        selectedAggrGroupValuesCached = cmd.selectedAggrGroupValuesCached.join(",")
-        selectedAggrGroupValuesUnCached = cmd.selectedAggrGroupValuesUnCached.join(",")
 
         if (selectedAggrGroupValuesCached) {
             for (item in selectedAggrGroupValuesCached.tokenize(',')) {
