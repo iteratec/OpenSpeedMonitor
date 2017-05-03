@@ -140,6 +140,11 @@ class UserspecificDashboardBase {
         selectedConnectivities(nullable: true)
     }
 
+    static mapping = {
+        from column: '`from`'
+        to column: '`to`'
+    }
+
     /**
      * Creates Userspecific Dashboard from TimeSeriesShowCommandBase
      * @param cmd the command the set values
