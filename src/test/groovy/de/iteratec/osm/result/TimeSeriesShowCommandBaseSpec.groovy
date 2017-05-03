@@ -222,19 +222,17 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         setDefaultCommandProperties(command)
 
         when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
+        MvQueryParams mvQueryParams = command.createMvQueryParams()
 
         then:
-        erQueryParams != null
-        erQueryParams.jobGroupIds == [1L] as SortedSet
-        erQueryParams.pageIds == [1L, 5L] as SortedSet
-        erQueryParams.measuredEventIds == [7L, 8L, 9L] as SortedSet
-        erQueryParams.browserIds == [2L] as SortedSet
-        erQueryParams.locationIds == [17L] as SortedSet
-        erQueryParams.connectivityProfileIds == [1L] as SortedSet
-        !erQueryParams.includeAllConnectivities
-        erQueryParams.includeNativeConnectivity
-        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as SortedSet
+        mvQueryParams != null
+        mvQueryParams.jobGroupIds == [1L] as SortedSet
+        mvQueryParams.pageIds == [1L, 5L] as SortedSet
+        mvQueryParams.measuredEventIds == [7L, 8L, 9L] as SortedSet
+        mvQueryParams.browserIds == [2L] as SortedSet
+        mvQueryParams.locationIds == [17L] as SortedSet
+        mvQueryParams.connectivityProfileIds == [1L] as SortedSet
+        !mvQueryParams.includeAllConnectivities
     }
 
     void "command creates correct ErQueryParameters with empty filters"() {
@@ -246,31 +244,14 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         command.selectedLocations = []
 
         when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
+        MvQueryParams mvQueryParams = command.createMvQueryParams()
 
         then:
-        erQueryParams.measuredEventIds == [] as Set
-        erQueryParams.browserIds == [] as Set
-        erQueryParams.locationIds == [] as Set
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [] as Set
-        erQueryParams.includeNativeConnectivity
-        erQueryParams.includeAllConnectivities
-    }
-
-    void "command creates correct ErQueryParameters with only native connectivites"() {
-        given:
-        setDefaultCommandProperties(command)
-        command.selectedConnectivities = ["native"]
-
-        when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
-
-        then:
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [] as Set
-        !erQueryParams.includeAllConnectivities
-        erQueryParams.includeNativeConnectivity
+        mvQueryParams.measuredEventIds == [] as Set
+        mvQueryParams.browserIds == [] as Set
+        mvQueryParams.locationIds == [] as Set
+        mvQueryParams.connectivityProfileIds == [] as Set
+        mvQueryParams.includeAllConnectivities
     }
 
     void "command creates correct ErQueryParameters with only custom connectivites"() {
@@ -279,13 +260,11 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
 
         when:
-        ErQueryParams erQueryParams = command.createErQueryParams()
+        MvQueryParams mvQueryParams = command.createMvQueryParams()
 
         then:
-        erQueryParams.connectivityProfileIds == [] as Set
-        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as Set
-        !erQueryParams.includeAllConnectivities
-        !erQueryParams.includeNativeConnectivity
+        mvQueryParams.connectivityProfileIds == [] as Set
+        !mvQueryParams.includeAllConnectivities
     }
 
     void "createMvQueryParams throws with invalid command"() {
@@ -293,7 +272,7 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         !command.validate()
 
         when:
-        command.createErQueryParams()
+        command.createMvQueryParams()
 
         then: "an exception is thrown"
         thrown IllegalStateException

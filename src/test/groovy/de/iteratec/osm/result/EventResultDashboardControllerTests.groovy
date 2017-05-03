@@ -207,6 +207,53 @@ class EventResultDashboardControllerTests extends Specification {
         erQueryParams.maxRequestCount == 200
         erQueryParams.minRequestSizeInBytes == 30000
         erQueryParams.maxRequestSizeInBytes == 3000000
+        erQueryParams.includeNativeConnectivity
+        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as SortedSet
+    }
+
+    void "command creates correct ErQueryParameters with empty connectivities"() {
+        given:
+        setDefaultCommandProperties()
+        command.selectedConnectivities = []
+
+        when:
+        ErQueryParams erQueryParams = command.createErQueryParams()
+
+        then:
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [] as Set
+        erQueryParams.includeNativeConnectivity
+        erQueryParams.includeAllConnectivities
+    }
+
+    void "command creates correct ErQueryParameters with only custom connectivites"() {
+        given:
+        setDefaultCommandProperties()
+        command.selectedConnectivities = [CUSTOM_CONNECTIVITY_NAME]
+
+        when:
+        ErQueryParams erQueryParams = command.createErQueryParams()
+
+        then:
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [CUSTOM_CONNECTIVITY_NAME] as Set
+        !erQueryParams.includeAllConnectivities
+        !erQueryParams.includeNativeConnectivity
+    }
+
+    void "command creates correct ErQueryParameters with only native connectivites"() {
+        given:
+        setDefaultCommandProperties()
+        command.selectedConnectivities = ["native"]
+
+        when:
+        ErQueryParams erQueryParams = command.createErQueryParams()
+
+        then:
+        erQueryParams.connectivityProfileIds == [] as Set
+        erQueryParams.customConnectivityNames == [] as Set
+        !erQueryParams.includeAllConnectivities
+        erQueryParams.includeNativeConnectivity
     }
 
     void "createMvQueryParams throws with invalid command"() {

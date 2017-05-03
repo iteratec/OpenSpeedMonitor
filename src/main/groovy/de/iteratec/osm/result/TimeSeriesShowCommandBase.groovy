@@ -197,22 +197,6 @@ class TimeSeriesShowCommandBase implements Validateable {
         viewModelToCopyTo.put('dashboardName', this.dashboardName)
     }
 
-    /**
-     * <p>
-     * Create {@link MvQueryParams} based on this command. This command
-     * need to be valid for this operation to be successful.
-     * </p>
-     *
-     * @return not <code>null</code>.
-     * @throws IllegalStateException
-     *         if called on an invalid instance.
-     */
-    MvQueryParams createMvQueryParams() throws IllegalStateException {
-        MvQueryParams queryParams = new MvQueryParams()
-        fillMvQueryParams(queryParams)
-        return queryParams
-    }
-
     protected fillMvQueryParams(MvQueryParams queryParams) throws IllegalStateException {
         if (!this.validate()) {
             throw new IllegalStateException('Query params are not available from an invalid command.')
@@ -237,6 +221,22 @@ class TimeSeriesShowCommandBase implements Validateable {
         queryParams.includeAllConnectivities = !this.selectedConnectivities
         queryParams.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
 
+        return queryParams
+    }
+
+    /**
+     * <p>
+     * Create {@link MvQueryParams} based on this command. This command
+     * need to be valid for this operation to be successful.
+     * </p>
+     *
+     * @return not <code>null</code>.
+     * @throws IllegalStateException
+     *         if called on an invalid instance.
+     */
+    MvQueryParams createMvQueryParams() throws IllegalStateException {
+        MvQueryParams queryParams = new MvQueryParams()
+        fillMvQueryParams(queryParams)
         return queryParams
     }
 }
