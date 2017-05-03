@@ -151,7 +151,7 @@ class EventResultDashboardControllerTests extends Specification {
 
         then:
         result != null
-        result.size() == 12
+        result.size() == 13
 
         result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED)
         result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
