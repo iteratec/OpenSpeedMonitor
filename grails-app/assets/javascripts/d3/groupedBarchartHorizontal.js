@@ -305,6 +305,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         var maxEntriesInRow = Math.floor(legendSpace / (maxWidth + legendRectSize + legendSpacing + legendMargin));
 
         var yPosition = calculateLegendYPosition();
+
+        var comparativeLegendEntry = createSingleLegendEntryForComparativeTimeframe();
+        if (comparativeTimeframeIsEnabled())
+            measurands.push(comparativeLegendEntry);
+
         var entries = legend.selectAll("g").data(measurands);
         entries.enter()
             .append("g")
@@ -325,7 +330,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         legend.selectAll("g").each(function (d, i) {
             var line = d3.select(this);
             line.select("rect").style('fill', function (d) {
-                return colorScales[d.unit](d.measurand);
+                return d.fill || colorScales[d.unit](d.measurand);
             });
             line.select("text").text(function (d) {
                 return d.measurand.replace(replaceRegex, "")
@@ -336,6 +341,22 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         });
 
         legend.transition().duration(transitionDuration).attr("transform", "translate(" + leftPadding + "," + yPosition + ")")
+    };
+
+    var createSingleLegendEntryForComparativeTimeframe = function () {
+        return {
+            'measurand': 'Comparative Timeframe',
+            'fill': "url(#diagonalHatch)"
+        };
+    };
+
+    var comparativeTimeframeIsEnabled =  function () {
+        var everyPageHasComparativeValue = actualBarchartData.series[0].data.reduce( function (result, d) {
+            var hasValueComparative = d.valueComparative ? true : false;
+            return result && hasValueComparative;
+        }, true);
+
+        return everyPageHasComparativeValue;
     };
 
     var calculateLegendYPosition = function () {
