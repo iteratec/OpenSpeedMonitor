@@ -21,9 +21,9 @@
         </div>
     </g:if>
     <g:if test="${flash.continue}">
-        <div class="alert alert-info" style="display: block">
-            <g:message code="de.iteratec.osm.ui.setupwizards.infra.continue" default="continue"/>
-        </div>
+        <a href="/infrastructureSetup" class="btn btn-primary" id="setup-wpt-server-button">
+            <g:message code="de.iteratec.osm.ui.setupwizards.infra.continueButton" default="continueButton" />
+        </a>
     </g:if>
 </div>
 
@@ -75,8 +75,8 @@
                             link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
                     ]"/>
                 </p>
-                <a href="/measurementSetup/create" class="btn btn-primary">
-                    <g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>
+                    <a <g:if test="${flash.button}">href="/measurementSetup/create"</g:if> <g:if test="${flash.continue}">title="<g:message code="de.iteratec.osm.ui.setupwizards.infra.continueInfo" default="continueButton" />"</g:if> class="btn btn-primary <g:if test="${flash.continue}">submit disabled</g:if>">
+                        <g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>
             </div>
         </div>
     </div>

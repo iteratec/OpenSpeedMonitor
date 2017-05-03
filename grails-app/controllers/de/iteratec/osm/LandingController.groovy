@@ -6,6 +6,7 @@ class LandingController {
     OsmStateService osmStateService
 
     def index() {
+        def enableButton = true;
         if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupRan.TRUE) {
             if (osmStateService.untouched()) {
                 if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupRan.FALSE) {
@@ -13,8 +14,9 @@ class LandingController {
                 }
                 if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupRan.ABORTED) {
                     if (!flash.continue) {
+                        enableButton = false;
                         flash.continue = "Continue Setup"
-                        forward(action: 'index')
+                        render(view: 'index')
                     }
                 }
             }
@@ -25,5 +27,9 @@ class LandingController {
                 forward(action: 'index')
             }
         }
+        if (enableButton) {
+            flash.button = "enabled"
+        }
+        render(view: 'index')
     }
 }
