@@ -189,7 +189,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         transformedData.sort(function (a, b) {
             var aIndex = filter.indexOf(a.grouping);
             var bIndex = filter.indexOf(b.grouping);
-            return aIndex > bIndex;
+            return aIndex - bIndex;
         })
 
     };
@@ -514,11 +514,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var sortFunction = function () {
         if (descending) {
             return function (a, b) {
-                return a < b;
+                return b - a;
             }
         } else {
             return function (a, b) {
-                return a > b;
+                return a - b;
             }
         }
     };
