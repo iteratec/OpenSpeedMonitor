@@ -67,9 +67,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         to EventResultDashboardPage
 
         when: "User selects a wrong time frame again"
-        timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "21.06.2015")
-        selectDateInDatepicker(toDatepicker, "23.06.2015")
+        selectDateInDatepicker(fromDatepicker, "21.06.2015 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2015 23:59")
 
         then: "The selections show only warnings, a no data warning appears, and the show button is disabled"
         at EventResultDashboardPage
@@ -104,9 +103,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         to EventResultDashboardPage
 
         when: "User selects valid timeframe"
-        timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "21.06.2016")
-        selectDateInDatepicker(toDatepicker, "23.06.2016")
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
 
         then:
         waitFor {
@@ -141,9 +139,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         to EventResultDashboardPage
 
         when: "User selects valid time frame and jobgroup"
-        timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "21.06.2016")
-        selectDateInDatepicker(toDatepicker, "23.06.2016")
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
 
         then:
@@ -167,9 +164,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         to EventResultDashboardPage
 
         when: "User selects time frame, job group and page"
-        timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "21.06.2016")
-        selectDateInDatepicker(toDatepicker, "23.06.2016")
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
         pageList[0].click()
 
@@ -1183,9 +1179,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker.click()
-        datePicker << Keys.chord(Keys.CONTROL, "a")
-        datePicker << Keys.chord(Keys.DELETE)
-        datePicker << Keys.chord(Keys.ESCAPE)
+        datePicker << Keys.chord(Keys.END)
+        25.times {
+            datePicker << Keys.chord(Keys.BACK_SPACE)
+        }
         datePicker << date
     }
 

@@ -17,19 +17,14 @@
 
 package de.iteratec.osm.report
 
-import de.iteratec.osm.csi.CsiDashboardShowAllCommand
-import grails.plugin.springsecurity.SpringSecurityUtils
+import de.iteratec.osm.result.TimeSeriesShowCommandBase
 import org.joda.time.DateTime
-
-import java.text.SimpleDateFormat
 
 /**
  * UserspecificDashboardBase
  * A domain class describes the data object and it's mapping to the database
  */
 class UserspecificDashboardBase {
-    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
-    protected final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
 
     /**
      * name of dashboard
@@ -49,30 +44,14 @@ class UserspecificDashboardBase {
     /**
      * The selected start date (inclusive).
      *
-     * Please use {@link #getSelectedTimeFrame()}.
      */
-    DateTime fromDate
+    Date fromDate
 
     /**
      * The selected end date (inclusive).
      *
-     * Please use {@link #getSelectedTimeFrame()}.
      */
-    DateTime toDate
-
-    /**
-     * The selected start hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String fromHour
-
-    /**
-     * The selected end hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String toHour
+    Date toDate
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -98,16 +77,6 @@ class UserspecificDashboardBase {
     String selectedMeasuredEventIds = ""
 
     /**
-     * User enforced the selection of all measured events.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedMeasuredEventIds} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedMeasuredEventIds} should be ignored.
-     */
-    Boolean selectedAllMeasuredEvents
-
-    /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
      * browsers} which results to be shown.
      *
@@ -116,16 +85,6 @@ class UserspecificDashboardBase {
      * <code>false</code>.
      */
     String selectedBrowsers = ""
-
-    /**
-     * User enforced the selection of all browsers.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedBrowsers} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedBrowsers} should be ignored.
-     */
-    Boolean selectedAllBrowsers
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
@@ -138,46 +97,9 @@ class UserspecificDashboardBase {
     String selectedLocations = ""
 
     /**
-     * User enforced the selection of all locations.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedLocations} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedLocations} should be ignored.
-     */
-    Boolean selectedAllLocations
-
-    /**
-     * If the user has been warned about a potentially long processing
-     * time, did he overwrite the waring and really want to perform
-     * the request?
-     *
-     * A value of <code>true</code> indicates that overwrite, everything
-     * should be done as requested, <code>false</code> indicates that
-     * the user hasn't been warned before, so there is no overwrite.
-     */
-    Boolean overwriteWarningAboutLongProcessingTime = true
-
-    /**
-     * Flag for manual debugging.
-     * Used for debugging highcharts-export-server, e.g.
-     */
-    Boolean debug
-
-
-    /**
      * A predefined time frame.
      */
     int selectedTimeFrameInterval = 259200
-
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setFromHour
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setToHour
 
     //#####Chart Adjustments#####
     String chartTitle
@@ -196,12 +118,6 @@ class UserspecificDashboardBase {
     boolean showDataMarkers
     boolean showDataLabels
 
-    /**
-     * toggle formatting rickshaw export to wide screen format
-     */
-    Boolean wideScreenDiagramMontage = false
-
-    Boolean selectedAllConnectivityProfiles
     Collection<String> selectedConnectivities
 
     static hasMany = [selectedConnectivities:String]
@@ -212,25 +128,99 @@ class UserspecificDashboardBase {
         publiclyVisible(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
-        fromHour(nullable: true)
-        toHour(nullable: true)
         selectedFolder(nullable: true)
         selectedPages(nullable: true)
         selectedMeasuredEventIds(nullable: true)
         selectedBrowsers(nullable: true)
         selectedLocations(nullable: true)
-        overwriteWarningAboutLongProcessingTime(nullable: true)
-        selectedAllMeasuredEvents(nullable: true)
-        selectedAllBrowsers(nullable: true)
-        selectedAllLocations(nullable: true)
-        debug(nullable: true)
         selectedTimeFrameInterval(nullable: true)
-        setFromHour(nullable: true)
-        setToHour(nullable: true)
-        wideScreenDiagramMontage(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
         selectedConnectivities(nullable: true)
-        selectedAllConnectivityProfiles(nullable: true)
+    }
+
+    /**
+     * Creates Userspecific Dashboard from TimeSeriesShowCommandBase
+     * @param cmd the command the set values
+     * @param dashboardName a unique name for the dashboard
+     * @param publiclyVisible true if the dashboard should be visible for all
+     * @param username the creator of the dashboard
+     */
+    protected UserspecificDashboardBase(TimeSeriesShowCommandBase cmd, String dashboardName, Boolean publiclyVisible, String username) {
+
+        this.dashboardName = dashboardName
+        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
+        this.username = username
+
+        // Get Data from command
+        fromDate = cmd.from.toDate()
+        toDate = cmd.to.toDate()
+        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
+        selectedConnectivities = cmd.selectedConnectivities
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
+        graphNameAliases = cmd.graphNameAliases
+        graphColors = cmd.graphColors
+
+        selectedFolder = cmd.selectedFolder.join(",")
+        selectedPages = cmd.selectedPages.join(",")
+        selectedMeasuredEventIds = cmd.selectedMeasuredEventIds.join(",")
+        selectedBrowsers = cmd.selectedBrowsers.join(",")
+        selectedLocations = cmd.selectedLocations.join(",")
+    }
+
+    protected void fillCommand(TimeSeriesShowCommandBase cmd) {
+        cmd.from = new DateTime(fromDate)
+        cmd.to = new DateTime(toDate)
+        if (selectedFolder) {
+            for (item in selectedFolder.tokenize(',')) {
+                cmd.selectedFolder.add(Long.parseLong(item))
+            }
+        }
+        if (selectedPages) {
+            for (item in selectedPages.tokenize(',')) {
+                cmd.selectedPages.add(Long.parseLong(item))
+            }
+        }
+        if (selectedMeasuredEventIds) {
+            for (item in selectedMeasuredEventIds.tokenize(',')) {
+                cmd.selectedMeasuredEventIds.add(Long.parseLong(item))
+            }
+        }
+        if (selectedBrowsers) {
+            for (item in selectedBrowsers.tokenize(',')) {
+                cmd.selectedBrowsers.add(Long.parseLong(item))
+            }
+        }
+        if (selectedLocations) {
+            for (item in selectedLocations.tokenize(',')) {
+                cmd.selectedLocations.add(Long.parseLong(item))
+            }
+        }
+        cmd.selectedTimeFrameInterval = selectedTimeFrameInterval
+        cmd.chartTitle = chartTitle
+        cmd.chartWidth = chartWidth
+        cmd.chartHeight = chartHeight
+        cmd.loadTimeMinimum = loadTimeMinimum
+        cmd.loadTimeMaximum = loadTimeMaximum
+        cmd.showDataMarkers = showDataMarkers
+        cmd.showDataLabels = showDataLabels
+
+        cmd.selectedConnectivities = selectedConnectivities ?: []
+
+        if (graphNameAliases.size() > 0) {
+            cmd.graphNameAliases = graphNameAliases
+        }
+        if (graphColors.size() > 0) {
+            cmd.graphColors = graphColors
+        }
+
+        cmd.dashboardName = dashboardName
+        cmd.publiclyVisible = publiclyVisible
     }
 }

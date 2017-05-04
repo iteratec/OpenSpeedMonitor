@@ -28,19 +28,20 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.TimeSeriesShowCommandBaseSpec
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Interval
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
-
-import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
-import static org.junit.Assert.*
 
 /**
  * <p>
@@ -55,8 +56,9 @@ import static org.junit.Assert.*
 @Mock([ConnectivityProfile, CsiSystem, CsiConfiguration])
 class CsiDashboardControllerTests extends Specification {
 
+    DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime()
     CsiDashboardController controllerUnderTest
-    static CsiDashboardShowAllCommand command
+    CsiDashboardShowAllCommand command
 
     void setup() {
 
@@ -65,7 +67,7 @@ class CsiDashboardControllerTests extends Specification {
 
         // Mock relevant services:
         command = new CsiDashboardShowAllCommand()
-        command.csiAggregationUtilService = Stub(CsiAggregationUtilService)
+        command.csiAggregationUtilService = Spy(CsiAggregationUtilService)
 
         controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
         controllerUnderTest.pageDaoService = Stub(PageDaoService)
@@ -75,7 +77,7 @@ class CsiDashboardControllerTests extends Specification {
         controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
         controllerUnderTest.userspecificDashboardService = Stub(UserspecificDashboardService) {
             getListOfAvailableCsiDashboards() >> []
-        };
+        }
         controllerUnderTest.configService = Stub(ConfigService) {
             getInitialChartHeightInPixels() >> 400
         }
@@ -84,1594 +86,588 @@ class CsiDashboardControllerTests extends Specification {
         }
     }
 
-/**
- * Test for inner class {@link CsiDashboardShowAllCommand}.
- */
-
-    void testShowAllCommand_EmptyCreationIsInvalid() {
+    void "command without bound parameters is invalid"() {
         expect:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        !command.validate()
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromEmptyRequestArgsIsInvalid() {
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults() {
+    void "command bound with default parameters is valid"() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
-
-        params.fromHour = '12:00'
-
-        params.to = '19.08.2013'
-        Date expectedDateForTo = new Date(1376863200000L)
-
-        params.toHour = '13:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedAllMeasuredEvents = false
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedAllBrowsers = false
-        params.selectedBrowsers = '2'
-        params.selectedAllLocations = false
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.selectedTimeFrameInterval = 0
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
-        params.includeInterval = false
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("12:00", command.fromHour);
-        assertEquals("13:00", command.toHour);
-        assertEquals(CsiDashboardController.HOURLY_MEASURED_EVENT, command.aggrGroupAndInterval);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(2, command.selectedPages.size())
-        assertTrue(command.selectedPages.contains(1L))
-        assertTrue(command.selectedPages.contains(5L))
-
-        assertFalse(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, command.selectedMeasuredEventIds.size())
-        assertTrue(command.selectedMeasuredEventIds.contains(7L))
-        assertTrue(command.selectedMeasuredEventIds.contains(8L))
-        assertTrue(command.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(command.selectedAllBrowsers as boolean)
-        assertEquals(1, command.selectedBrowsers.size())
-        assertTrue(command.selectedBrowsers.contains(2L))
-
-        assertFalse(command.selectedAllLocations as boolean)
-        assertEquals(1, command.selectedLocations.size())
-        assertTrue(command.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.receiveSelectedTimeFrame();
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(12, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(19, end.getDayOfMonth())
-        assertEquals(13, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-        params.to = '17.08.2013'
-        params.toHour = '13:00'
-        params.selectedTimeFrameInterval = 0
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-        params.to = '18.08.2013'
-        params.toHour = '11:00'
-        params.selectedTimeFrameInterval = 0
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        when:
-        controllerUnderTest.bindData(command, params)
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '18.08.2013'
-        params.toHour = '12:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedTimeFrameInterval = 0
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
+        setDefaultParams()
 
         when:
         controllerUnderTest.bindData(command, params)
 
         then:
-        assertFalse(command.validate())
+        command.validate()
+        command.aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.selectedCsiSystems == [] as Set
+        command.csiTypeVisuallyComplete
+        !command.csiTypeDocComplete
+        !command.includeInterval
+        !command.overwriteWarningAboutLongProcessingTime
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults() {
+    void "command with different aggregation group and interval values is valid"(String value) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
+        setDefaultParams()
+        params.aggrGroupAndInterval = value
+        when:
+        controllerUnderTest.bindData(command, params)
 
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        Date expectedDateForTo = new Date(1376776800000L)
+        then:
+        command.validate()
+        command.aggrGroupAndInterval == value
 
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedAllMeasuredEvents = false
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedAllBrowsers = false
-        params.selectedBrowsers = '2'
-        params.selectedAllLocations = false
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.selectedTimeFrameInterval = 0
+        where:
+        value                                         | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "command aggregation by system is invalid without selected CSI system"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+
+        where:
+        aggrGroupAndInterval                            | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM | _
+    }
+
+    void "command aggregation by system is valid with selected CSI system"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+        params.selectedCsiSystems = ['1', '2']
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+        command.selectedCsiSystems == [1L, 2L] as Set
+
+        where:
+        aggrGroupAndInterval                            | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM | _
+    }
+
+    void "selected folder must be set for aggregation by measured event, page or shop"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.selectedFolder = []
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+
+        where:
+        aggrGroupAndInterval                          | _
+        CsiDashboardController.HOURLY_MEASURED_EVENT  | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "selected folder may be empty for aggregation by system"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.selectedFolder = []
+        params.selectedCsiSystems = "1"
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+
+        where:
+        aggrGroupAndInterval                            | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM | _
+    }
+
+    void "selected pages must be set for aggregation by measured event or page"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.selectedPages = []
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+
+        where:
+        aggrGroupAndInterval                          | _
+        CsiDashboardController.HOURLY_MEASURED_EVENT  | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+    }
+
+    void "selected pages may be empty for aggregation by shop or system"(String aggrGroupAndInterval) {
+        given:
+        setDefaultParams()
+        params.selectedPages = []
+        params.selectedCsiSystems = "1"
+        params.aggrGroupAndInterval = aggrGroupAndInterval
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+
+        where:
+        aggrGroupAndInterval                            | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP    | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM  | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP   | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM | _
+    }
+
+    void "command is invalid if neither csiTypeDocComplete nor csiTypeVisuallyComplete is set"() {
+        given:
+        setDefaultParams()
+        params.csiTypeVisuallyComplete = false
+        params.csiTypeDocComplete = false
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        !command.validate()
+    }
+
+    void "command is valid if either csiTypeDocComplete or csiTypeVisuallyComplete is set"(visually, docComplete) {
+        given:
+        setDefaultParams()
+        params.csiTypeVisuallyComplete = visually
+        params.csiTypeDocComplete = docComplete
+
+        when:
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        command.validate()
+
+        where:
+        visually | docComplete
+        true     | false
+        false    | true
+        true     | true
+    }
+
+    def "Should not warn about long processing time - weekly csi aggs interval two weeks"() {
+        given: "Two weeks for 2 JobGroups, 5 Pages and 2 browsers of selected data and weekly csi aggs"
+        int countOfSelectedBrowser = 2
+        setDefaultParams()
+        DateTime start = new DateTime(2013, 9, 30, 0, 0)
+        DateTime end = new DateTime(2013, 10, 13, 23, 59)
+        Interval timeFrameTwoWeeks = new Interval(start, end)
+        int intervalOneWeek = 7 * 24 * 60
+        params.selectedFolder = ['1', '2']
+        params.selectedPages = ['1', '2', '3', '4', '5']
+
+        when: "are given by the user in dashboard"
+        controllerUnderTest.bindData(command, params)
+
+        then: "No warning is provided about longer processing time"
+        !command.shouldWarnAboutLongProcessingTime(timeFrameTwoWeeks, intervalOneWeek, countOfSelectedBrowser)
+    }
+
+    def "Should not warn about long processing time - hourly csi aggs interval one year"() {
+        given: "One year for 2 JobGroups, 5 Pages and 2 browsers of selected data and hourly csi aggs"
+        int countOfSelectedBrowser = 2
+        DateTime start = new DateTime(2013, 9, 30, 0, 0)
+        DateTime end = new DateTime(2014, 9, 30, 0, 0)
+        Interval timeFrameOneYear = new Interval(start, end)
+        int intervalOneHour = 60 // one hour
+        params.selectedFolder = ['1', '2']
+        params.selectedPages = ['1', '2', '3', '4', '5']
+
+        when: "are given by the user in dashboard"
+        controllerUnderTest.bindData(command, params)
+
+        then: "A warning is provided about longer processing time"
+        command.shouldWarnAboutLongProcessingTime(timeFrameOneYear, intervalOneHour, countOfSelectedBrowser)
+    }
+
+    void "create time frame including actual interval for daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0)
+        DateTime fromDateExpected = toDateExpected.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = true
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
+
+
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for daily aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime().withTime(12, 0, 0, 0)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
+        DateTime fromDateExpected = toDate.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
 
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("16:00", command.fromHour);
-        assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, command.aggrGroupAndInterval);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(2, command.selectedPages.size())
-        assertTrue(command.selectedPages.contains(1L))
-        assertTrue(command.selectedPages.contains(5L))
-
-        assertFalse(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, command.selectedMeasuredEventIds.size())
-        assertTrue(command.selectedMeasuredEventIds.contains(7L))
-        assertTrue(command.selectedMeasuredEventIds.contains(8L))
-        assertTrue(command.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(command.selectedAllBrowsers as boolean)
-        assertEquals(1, command.selectedBrowsers.size())
-        assertTrue(command.selectedBrowsers.contains(2L))
-
-        assertFalse(command.selectedAllLocations as boolean)
-        assertEquals(1, command.selectedLocations.size())
-        assertTrue(command.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.receiveSelectedTimeFrame();
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(16, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(18, end.getDayOfMonth())
-        assertEquals(18, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
     }
 
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults_DAILY_PAGE() {
+    void "create time frame excluding actual interval for small chosen interval with daily aggregation"(String aggregationGroup) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
-
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        Date expectedDateForTo = new Date(1376776800000L)
-
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedAllMeasuredEvents = false
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedAllBrowsers = false
-        params.selectedBrowsers = '2'
-        params.selectedAllLocations = false
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.selectedTimeFrameInterval = 0
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
+        DateTime fromDate = new DateTime(2015, 4, 19, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDate)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
+        command.csiAggregationUtilService.isInActualInterval(_, _) >> true
+
+
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("16:00", command.fromHour);
-        assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE, command.aggrGroupAndInterval);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(2, command.selectedPages.size())
-        assertTrue(command.selectedPages.contains(1L))
-        assertTrue(command.selectedPages.contains(5L))
-
-        assertFalse(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, command.selectedMeasuredEventIds.size())
-        assertTrue(command.selectedMeasuredEventIds.contains(7L))
-        assertTrue(command.selectedMeasuredEventIds.contains(8L))
-        assertTrue(command.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(command.selectedAllBrowsers as boolean)
-        assertEquals(1, command.selectedBrowsers.size())
-        assertTrue(command.selectedBrowsers.contains(2L))
-
-        assertFalse(command.selectedAllLocations as boolean)
-        assertEquals(1, command.selectedLocations.size())
-        assertTrue(command.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.receiveSelectedTimeFrame();
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(16, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(18, end.getDayOfMonth())
-        assertEquals(18, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
     }
 
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults_DAILY_SHOP() {
+    void "create time frame including last interval if actual interval not in chosen for daily aggregation"(String aggregationGroup) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0).minusDays(2)
+        DateTime fromDateExpected = toDateExpected.minusDays(14)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
 
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        Date expectedDateForTo = new Date(1376776800000L)
 
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
-        params.selectedFolder = '1'
-        params.selectedPages = []
-        params.selectedAllMeasuredEvents = true
-        params.selectedMeasuredEventIds = []
-        params.selectedAllBrowsers = true
-        params.selectedBrowsers = []
-        params.selectedAllLocations = true
-        params.selectedLocations = []
-        params._action_showAll = 'Anzeigen'
-        params.selectedTimeFrameInterval = 0
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
-        params.includeInterval = false
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("16:00", command.fromHour);
-        assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP, command.aggrGroupAndInterval);
-
-        assertEquals(1, command.selectedFolder.size())
-        assertTrue(command.selectedFolder.contains(1L))
-
-        assertEquals(0, command.selectedPages.size())
-
-        assertTrue(command.selectedAllMeasuredEvents as boolean)
-        assertEquals(0, command.selectedMeasuredEventIds.size())
-
-        assertTrue(command.selectedAllBrowsers as boolean)
-        assertEquals(0, command.selectedBrowsers.size())
-
-        assertTrue(command.selectedAllLocations as boolean)
-        assertEquals(0, command.selectedLocations.size())
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.receiveSelectedTimeFrame();
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(16, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(18, end.getDayOfMonth())
-        assertEquals(18, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
+        where:
+        aggregationGroup                             | _
+        CsiDashboardController.DAILY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.DAILY_AGGR_GROUP_SHOP | _
     }
 
-
-    void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults_DAILY_SYSTEM() {
+    void "create time frame including actual interval for weekly aggregation"(String aggregationGroup) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0)
+        DateTime fromDateExpected = toDateExpected.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
 
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        Date expectedDateForTo = new Date(1376776800000L)
 
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM
-        params.selectedCsiSystems = [1, 2]
-        params._action_showAll = 'Anzeigen'
-        params.selectedTimeFrameInterval = 0
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
+        when:
+        controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
+
+        then:
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
+
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
+    }
+
+    void "create time frame excluding actual interval for weekly aggregation"(String aggregationGroup) {
+        given:
+        DateTime toDate = new DateTime().withTime(12, 0, 0, 0)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        DateTime fromDateExpected = toDate.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
 
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertTrue(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
-        assertNotNull("Collections are never null", command.selectedCsiSystems)
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertEquals(expectedDateForFrom, command.from);
-        assertEquals("16:00", command.fromHour);
-        assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM, command.aggrGroupAndInterval);
-
-        assertEquals(2, command.selectedCsiSystems.size())
-        assertTrue(command.selectedCsiSystems.contains(1L))
-        assertTrue(command.selectedCsiSystems.contains(2L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = command.receiveSelectedTimeFrame();
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(16, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(18, end.getDayOfMonth())
-        assertEquals(18, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BUG_IT_189() {
+    void "create time frame excluding actual interval for small chosen interval with weekly aggregation"(String aggregationGroup) {
         given:
-        // Fill-in request args:
-        params.from = '29.10.2013'
-
-        params.fromHour = '12:00'
-        params.to = '29.10.2013'
-
-        params.toHour = '13:00'
-        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-        params.csiTypeDocComplete = true
-        params.setToHour = false
-        params.setFromHour = false
-        params.debug = false
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        DateTime fromDate = new DateTime(2015, 4, 16, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDate)
+        params.to = ISO_FORMAT.print(toDate)
+        params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
+        command.csiAggregationUtilService.isInActualInterval(_, _) >> true
+
 
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertTrue(command.validate())
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertEquals("12:00", command.fromHour);
-        assertEquals("13:00", command.toHour);
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
     }
 
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid() {
+    void "create time frame including last interval if actual interval not in chosen for weekly aggregation"(String aggregationGroup) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-        params.to = '19.08.2013'
-        params.toHour = '13:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['NOT-A-NUMBER']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = 'UGLY'
-        params._action_showAll = 'Anzeigen'
+        DateTime toDateExpected = new DateTime().withTime(12, 0, 0, 0).minusWeeks(2)
+        DateTime fromDateExpected = toDateExpected.minusWeeks(12)
+        setDefaultParams()
+        params.from = ISO_FORMAT.print(fromDateExpected)
+        params.to = ISO_FORMAT.print(toDateExpected)
+        params.aggrGroupAndInterval = aggregationGroup
+        params.includeInterval = true
+
 
         when:
         controllerUnderTest.bindData(command, params)
+        Interval interval = command.createTimeFrameInterval()
 
         then:
-        assertFalse(command.validate())
-        assertNotNull("Collections are never null", command.selectedFolder)
-        assertNotNull("Collections are never null", command.selectedPages)
-        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", command.selectedBrowsers)
-        assertNotNull("Collections are never null", command.selectedLocations)
+        command.validate()
+        interval.start == fromDateExpected
+        interval.end == toDateExpected
 
-        assertTrue("Invalid data -> no elements in Collection", command.selectedPages.isEmpty())
-        assertTrue("Invalid data -> no elements in Collection", command.selectedLocations.isEmpty())
+        where:
+        aggregationGroup                              | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE | _
+        CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP | _
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_MEASURED_EVENT() {
+    void "construct view data of show all"() {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = []
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_WEEKLY_PAGE() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
-        params.selectedFolder = '1'
-        params.selectedPages = []
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_DAILY_PAGE() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
-        params.selectedFolder = '1'
-        params.selectedPages = []
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedCsiSystems_isEmpty_for_WEEKLY_SYTEM() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM
-        params.selectedCsiSystems = []
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedCsiSystems_isEmpty_for_DAILY_System() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM
-        params.selectedCsiSystems = []
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedMeasuredEventIds_isEmpty_for_MEASURED_EVENT() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedAllMeasuredEvents = false
-        params.selectedMeasuredEventIds = []
-        params.selectedAllBrowsers = false
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedBrowsers_isEmpty_for_MEASURED_EVENT() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = []
-        params.selectedAllBrowsers = false
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedLocations_isEmpty_for_MEASURED_EVENT() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '16:00'
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '1'
-        params.selectedAllLocations = false
-        params.selectedLocations = []
-        params._action_showAll = 'Anzeigen'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-
-        then:
-        assertFalse(command.validate())
-    }
-
-
-    void testConstructViewDataMap() {
-        given:
-        controllerUnderTest.jobGroupDaoService.findCSIGroups() >> {
-            [new JobGroup(name: 'Group2'),
-             new JobGroup(name: 'Group1')] as Set
-        };
-
-        Page page1 = new Page(name: 'Page1', weight: 0) {
-            public Long getId() { return 1L; }
-        };
-        Page page2 = new Page(name: 'Page3', weight: 0.25d) {
-            public Long getId() { return 2L; }
-        };
-        Page page3 = new Page(name: 'Page2', weight: 0.5d) {
-            public Long getId() { return 3L; }
-        };
-        controllerUnderTest.pageDaoService.findAll() >> {
-            [page1, page2, page3] as Set
-        };
-
-        MeasuredEvent measuredEvent1 = new MeasuredEvent(name: 'MeasuredEvent1', testedPage: page3) {
-            public Long getId() { return 1001L; }
-        };
-        MeasuredEvent measuredEvent2 = new MeasuredEvent(name: 'MeasuredEvent2', testedPage: page2) {
-            public Long getId() { return 1002L; }
-        };
-        MeasuredEvent measuredEvent3 = new MeasuredEvent(name: 'MeasuredEvent3', testedPage: page1) {
-            public Long getId() { return 1003L; }
-        };
-        MeasuredEvent measuredEvent4 = new MeasuredEvent(name: 'MeasuredEvent4', testedPage: page2) {
-            public Long getId() { return 1004L; }
-        };
-        controllerUnderTest.measuredEventDaoService.findAll() >> {
-            [measuredEvent3, measuredEvent1, measuredEvent2, measuredEvent4] as Set
-        };
+        createDefaultDaoMockData()
 
         Browser browser1 = new Browser(name: 'Browser1') {
-            public Long getId() { return 11L; }
-        };
+            Long getId() { return 11L }
+        }
         controllerUnderTest.browserDaoService.findAll() >> {
             [browser1] as Set
-        };
+        }
 
-        WebPageTestServer server1 = new WebPageTestServer(label: 'server1');
+        WebPageTestServer server1 = new WebPageTestServer(label: 'server1')
 
         Location location1 = new Location(label: 'Location1', location: 'locationA', browser: browser1, wptServer: server1) {
-            public Long getId() { return 101L; }
-        };
+            Long getId() { return 101L }
+        }
         Location location2 = new Location(label: 'Location2', location: 'locationB', browser: browser1, wptServer: server1) {
-            public Long getId() { return 102L; }
-        };
+            Long getId() { return 102L }
+        }
         Location location3 = new Location(label: 'Location3', location: 'locationC', browser: browser1, wptServer: server1) {
-            public Long getId() { return 103L; }
-        };
+            Long getId() { return 103L }
+        }
         controllerUnderTest.locationDaoService.findAll() >> {
             [location2, location1, location3] as Set
-        };
+        }
 
         when:
-        // Run the test:
-        Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll();
+        Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
 
         then:
-        // Verify result (lists should be sorted by UI visible name or label):
-        assertNotNull(result);
-        assertEquals(15, result.size());
+        result != null
+        result.size() == 14
 
-        // AggregatorType
-        assertTrue(result.containsKey('aggrGroupLabels'))
-        List<String> aggrGroupLabels = result.get('aggrGroupLabels');
-        assertEquals(CsiDashboardController.AGGREGATOR_GROUP_LABELS, aggrGroupLabels)
-        //		assertEquals(2, aggrGroupLabels.size())
-        //		assertEquals('AT-1', aggrGroupLabels.get(0))
-        //		assertEquals('AT-2', aggrGroupLabels.get(1))
-
-        assertTrue(result.containsKey('aggrGroupValues'))
-        List<String> aggrGroupValues = result.get('aggrGroupValues');
-        assertEquals(CsiDashboardController.AGGREGATOR_GROUP_VALUES, aggrGroupValues)
-        //		assertEquals(2, aggrGroupValues.size())
-        //		assertEquals('1', aggrGroupValues.get(0))
-        //		assertEquals('2', aggrGroupValues.get(1))
-
-        // Folders / CSI-groups
-        assertTrue(result.containsKey('folders'))
-        List<JobGroup> folders = result.get('folders');
-        assertEquals(2, folders.size())
-        assertEquals('Group1', folders.get(0).getName())
-        assertEquals('Group2', folders.get(1).getName())
-
-        // Pages
-        assertTrue(result.containsKey('pages'))
-        List<Page> pages = result.get('pages');
-        assertEquals(3, pages.size())
-        assertEquals('Page1', pages.get(0).getName())
-        assertEquals('Page2', pages.get(1).getName())
-        assertEquals('Page3', pages.get(2).getName())
-
-        // MeasuredEvents
-        assertTrue(result.containsKey('measuredEvents'))
-        List<MeasuredEvent> measuredEvents = result.get('measuredEvents');
-        assertEquals(4, measuredEvents.size())
-        assertEquals('MeasuredEvent1', measuredEvents.get(0).getName())
-        assertEquals('MeasuredEvent2', measuredEvents.get(1).getName())
-        assertEquals('MeasuredEvent3', measuredEvents.get(2).getName())
-        assertEquals('MeasuredEvent4', measuredEvents.get(3).getName())
-
-        // Browsers
-        assertTrue(result.containsKey('browsers'))
-        List<Browser> browsers = result.get('browsers');
-        assertEquals(1, browsers.size())
-        assertEquals('Browser1', browsers.get(0).getName())
-
-        // Locations
-        assertTrue(result.containsKey('locations'))
-        List<Location> locations = result.get('locations');
-        assertEquals(3, locations.size())
-        assertEquals('Location1', locations.get(0).getLabel())
-        assertEquals('Location2', locations.get(1).getLabel())
-        assertEquals('Location3', locations.get(2).getLabel())
-
-        // Data for java-script utilities:
-        assertTrue(result.containsKey('dateFormat'))
-        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
-        assertTrue(result.containsKey('weekStart'))
-        assertEquals(CsiDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
-
-        // --- Map<PageID, Set<MeasuredEventID>>
-        Map<Long, Set<Long>> eventsOfPages = result.get('eventsOfPages')
-        assertNotNull(eventsOfPages)
-
-        Set<Long> eventsOfPage1 = eventsOfPages.get(1L)
-        assertNotNull(eventsOfPage1)
-        assertEquals(1, eventsOfPage1.size());
-        assertTrue(eventsOfPage1.contains(1003L));
-
-        Set<Long> eventsOfPage2 = eventsOfPages.get(2L)
-        assertNotNull(eventsOfPage2)
-        assertEquals(2, eventsOfPage2.size());
-        assertTrue(eventsOfPage2.contains(1002L));
-        assertTrue(eventsOfPage2.contains(1004L));
-
-        Set<Long> eventsOfPage3 = eventsOfPages.get(3L)
-        assertNotNull(eventsOfPage3)
-        assertEquals(1, eventsOfPage3.size());
-        assertTrue(eventsOfPage3.contains(1001L));
-
-        // --- Map<BrowserID, Set<LocationID>>
-        Map<Long, Set<Long>> locationsOfBrowsers = result.get('locationsOfBrowsers')
-        assertNotNull(locationsOfBrowsers)
-
-        Set<Long> locationsOfBrowser1 = locationsOfBrowsers.get(11L)
-        assertNotNull(locationsOfBrowser1)
-        assertEquals(3, locationsOfBrowser1.size());
-        assertTrue(locationsOfBrowser1.contains(101L));
-        assertTrue(locationsOfBrowser1.contains(102L));
-        assertTrue(locationsOfBrowser1.contains(103L));
+        result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
+        result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
+        result["folders"]*.getName() == ["Group1", "Group2"]
+        result["pages"]*.getName() == ["Page1", "Page2", "Page3"]
+        result["measuredEvents"]*.getName() == ["MeasuredEvent1", "MeasuredEvent2", "MeasuredEvent3", "MeasuredEvent4"]
+        result["browsers"]*.getName() == ["Browser1"]
+        result["locations"]*.getLabel() == ["Location1", "Location2", "Location3"]
+        result["dateFormat"] == CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
+        result["eventsOfPages"] == [
+                (1L): [1003L] as Set,
+                (2L): [1002L, 1004L] as Set,
+                (3L): [1001L] as Set
+        ]
+        result["locationsOfBrowsers"] == [
+                (11L): [101L, 102L, 103L] as Set
+        ]
     }
 
 
-    void testConstructViewDataMap_withDuplicatedLocationsStrings() {
+    void "construct view data of show all with duplicated location strings"() {
         given:
-        controllerUnderTest.jobGroupDaoService.findCSIGroups() >> {
-            [new JobGroup(name: 'Group2'),
-             new JobGroup(name: 'Group1')] as Set
-        };
-
-        Page page1 = new Page(name: 'Page1', weight: 0) {
-            public Long getId() { return 1L; }
-        };
-        Page page2 = new Page(name: 'Page3', weight: 0.25d) {
-            public Long getId() { return 2L; }
-        };
-        Page page3 = new Page(name: 'Page2', weight: 0.5d) {
-            public Long getId() { return 3L; }
-        };
-        controllerUnderTest.pageDaoService.findAll() >> {
-            [page1, page2, page3] as Set
-        };
-
-        MeasuredEvent measuredEvent1 = new MeasuredEvent(name: 'MeasuredEvent1', testedPage: page3) {
-            public Long getId() { return 1001L; }
-        };
-        MeasuredEvent measuredEvent2 = new MeasuredEvent(name: 'MeasuredEvent2', testedPage: page2) {
-            public Long getId() { return 1002L; }
-        };
-        MeasuredEvent measuredEvent3 = new MeasuredEvent(name: 'MeasuredEvent3', testedPage: page1) {
-            public Long getId() { return 1003L; }
-        };
-        MeasuredEvent measuredEvent4 = new MeasuredEvent(name: 'MeasuredEvent4', testedPage: page2) {
-            public Long getId() { return 1004L; }
-        };
-        controllerUnderTest.measuredEventDaoService.findAll() >> {
-            [measuredEvent3, measuredEvent1, measuredEvent2, measuredEvent4] as Set
-        };
+        createDefaultDaoMockData()
 
         Browser browser1 = new Browser(name: 'Browser1') {
-            public Long getId() { return 11L; }
-        };
+            Long getId() { return 11L }
+        }
         Browser browser2 = new Browser(name: 'Browser2') {
-            public Long getId() { return 12L; }
-        };
+            Long getId() { return 12L }
+        }
         controllerUnderTest.browserDaoService.findAll() >> {
             [browser1, browser2] as Set
-        };
+        }
 
-        WebPageTestServer server1 = new WebPageTestServer(label: 'server1');
-        WebPageTestServer server2 = new WebPageTestServer(label: 'server2');
+        WebPageTestServer server1 = new WebPageTestServer(label: 'server1')
+        WebPageTestServer server2 = new WebPageTestServer(label: 'server2')
 
         Location location1 = new Location(label: 'Location1', location: 'duplicatedLocation', browser: browser1, wptServer: server1) {
-            public Long getId() { return 101L; }
-        };
+            Long getId() { return 101L }
+        }
         Location location2 = new Location(label: 'Location2', location: 'duplicatedLocation', browser: browser2, wptServer: server2) {
-            public Long getId() { return 102L; }
-        };
+            Long getId() { return 102L }
+        }
         Location location3 = new Location(label: 'Location3', location: 'duplicatedLocation', browser: browser2, wptServer: server1) {
-            public Long getId() { return 103L; }
-        };
+            Long getId() { return 103L }
+        }
         controllerUnderTest.locationDaoService.findAll() >> {
             [location2, location1, location3] as Set
-        };
+        }
 
         when:
         // Run the test:
-        Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll();
+        Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
         then:
-        // Verify result (lists should be sorted by UI visible name or label):
-        assertNotNull(result);
-        assertEquals(15, result.size());
+        result != null
+        result.size() == 14
 
-        // AggregatorType
-        assertTrue(result.containsKey('aggrGroupLabels'))
-        List<String> aggrGroupLabels = result.get('aggrGroupLabels');
-        assertEquals(CsiDashboardController.AGGREGATOR_GROUP_LABELS, aggrGroupLabels)
-        //		assertEquals(2, aggrGroupLabels.size())
-        //		assertEquals('AT-1', aggrGroupLabels.get(0))
-        //		assertEquals('AT-2', aggrGroupLabels.get(1))
-
-        assertTrue(result.containsKey('aggrGroupValues'))
-        List<String> aggrGroupValues = result.get('aggrGroupValues');
-        assertEquals(CsiDashboardController.AGGREGATOR_GROUP_VALUES, aggrGroupValues)
-        //		assertEquals(2, aggrGroupValues.size())
-        //		assertEquals('1', aggrGroupValues.get(0))
-        //		assertEquals('2', aggrGroupValues.get(1))
-
-        // Folders / CSI-groups
-        assertTrue(result.containsKey('folders'))
-        List<JobGroup> folders = result.get('folders');
-        assertEquals(2, folders.size())
-        assertEquals('Group1', folders.get(0).getName())
-        assertEquals('Group2', folders.get(1).getName())
-
-        // Pages
-        assertTrue(result.containsKey('pages'))
-        List<Page> pages = result.get('pages');
-        assertEquals(3, pages.size())
-        assertEquals('Page1', pages.get(0).getName())
-        assertEquals('Page2', pages.get(1).getName())
-        assertEquals('Page3', pages.get(2).getName())
-
-        // MeasuredEvents
-        assertTrue(result.containsKey('measuredEvents'))
-        List<MeasuredEvent> measuredEvents = result.get('measuredEvents');
-        assertEquals(4, measuredEvents.size())
-        assertEquals('MeasuredEvent1', measuredEvents.get(0).getName())
-        assertEquals('MeasuredEvent2', measuredEvents.get(1).getName())
-        assertEquals('MeasuredEvent3', measuredEvents.get(2).getName())
-        assertEquals('MeasuredEvent4', measuredEvents.get(3).getName())
-
-        // Browsers
-        assertTrue(result.containsKey('browsers'))
-        List<Browser> browsers = result.get('browsers');
-        assertEquals(2, browsers.size())
-        assertEquals('Browser1', browsers.get(0).getName())
-        assertEquals('Browser2', browsers.get(1).getName())
-
-        // Locations
-        assertTrue(result.containsKey('locations'))
-        List<Location> locations = result.get('locations');
-        assertEquals(3, locations.size())
-        assertEquals(101L, locations.get(0).getId())
-        assertEquals(103L, locations.get(1).getId())
-        assertEquals(102L, locations.get(2).getId())
-
-        // Data for java-script utilities:
-        assertTrue(result.containsKey('dateFormat'))
-        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
-        assertTrue(result.containsKey('weekStart'))
-        assertEquals(CsiDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
-
-        // --- Map<PageID, Set<MeasuredEventID>>
-        Map<Long, Set<Long>> eventsOfPages = result.get('eventsOfPages')
-        assertNotNull(eventsOfPages)
-
-        Set<Long> eventsOfPage1 = eventsOfPages.get(1L)
-        assertNotNull(eventsOfPage1)
-        assertEquals(1, eventsOfPage1.size());
-        assertTrue(eventsOfPage1.contains(1003L));
-
-        Set<Long> eventsOfPage2 = eventsOfPages.get(2L)
-        assertNotNull(eventsOfPage2)
-        assertEquals(2, eventsOfPage2.size());
-        assertTrue(eventsOfPage2.contains(1002L));
-        assertTrue(eventsOfPage2.contains(1004L));
-
-        Set<Long> eventsOfPage3 = eventsOfPages.get(3L)
-        assertNotNull(eventsOfPage3)
-        assertEquals(1, eventsOfPage3.size());
-        assertTrue(eventsOfPage3.contains(1001L));
-
-        // --- Map<BrowserID, Set<LocationID>>
-        Map<Long, Set<Long>> locationsOfBrowsers = result.get('locationsOfBrowsers')
-        assertNotNull(locationsOfBrowsers)
-
-        Set<Long> locationsOfBrowser1 = locationsOfBrowsers.get(11L)
-        assertNotNull(locationsOfBrowser1)
-        assertEquals(1, locationsOfBrowser1.size());
-        assertTrue(locationsOfBrowser1.contains(101L));
+        result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
+        result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
+        result["folders"]*.getName() == ["Group1", "Group2"]
+        result["pages"]*.getName() == ["Page1", "Page2", "Page3"]
+        result["measuredEvents"]*.getName() == ["MeasuredEvent1", "MeasuredEvent2", "MeasuredEvent3", "MeasuredEvent4"]
+        result["browsers"]*.getName() == ["Browser1", "Browser2"]
+        result["locations"]*.getLabel() == ["Location1", "Location3", "Location2"]
+        result["dateFormat"] == CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
+        result["eventsOfPages"] == [
+                (1L): [1003L] as Set,
+                (2L): [1002L, 1004L] as Set,
+                (3L): [1001L] as Set
+        ]
+        result["locationsOfBrowsers"] == [
+                (11L): [101L] as Set,
+                (12L): [102L, 103L] as Set
+        ]
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCopyRequestDataToViewModelMap() {
+    void "command properties are correctly copied to map"() {
         given:
-        // form = '18.08.2013'
-        Date expectedDate = new Date(1376776800000L)
-        command.from = expectedDate
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.debug = true
-        command.selectedTimeFrameInterval = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = true
-        command.includeInterval = false
-
-        // Create and fill a command:
-        assertTrue(command.validate())
+        setDefaultCommandProperties()
 
         when:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
+        Map<String, Object> result = [:]
+        command.copyRequestDataToViewModelMap(result)
 
         then:
-        assertEquals(35, dataUnderTest.size());
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setToHour', false)
+        command.validate()
+        result != null
+        result.size() == 25
+        result["aggrGroupAndInterval"] == CsiDashboardController.HOURLY_MEASURED_EVENT
+        result["selectedCsiSystems"] == [] as Set
+        !result["overwriteWarningAboutLongProcessingTime"]
+        result["csiTypeVisuallyComplete"]
+        !result["csiTypeDocComplete"]
+        !result["includeInterval"]
     }
 
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCopyRequestDataToViewModelMap_defaultsForMissingValues() {
+    void "invalid request causes error message by passing command back to page"() {
         given:
-        // form = '18.08.2013'
-        Date expectedDate = new Date(1376776800000L)
-        command.from = expectedDate
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = '18:00'
-        command.aggrGroupAndInterval = null // Missing! -> Default should be set
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.debug = false
-        command.selectedTimeFrameInterval = 0
-        command.setFromHour = false
-        command.setToHour = false
-
-        when:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
-
-        then:
-        assertEquals(35, dataUnderTest.size());
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '18:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setToHour', false)
-    }
-//    /**
-//     * Test for inner class {@link CsiDashboardShowAllCommand}.
-//     */
-
-    void testShowAllCommand_testNoCsiTypeSelectedLeadsToFail() {
-        when:
-        // form = '18.08.2013'
-        Date expectedDate = new Date(1376776800000L)
-        command.from = expectedDate
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.debug = true
-        command.selectedTimeFrameInterval = 0
-        command.setFromHour = false
-        command.setToHour = false
-        then:
-        assertFalse(command.validate())
-
-    }
-
-
-    void testShowAllCommand_testAtleastOneCsiTypeSelected() {
-        when:
-        // form = '18.08.2013'
-        Date expectedDate = new Date(1376776800000L)
-        command.from = expectedDate
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.debug = true
-        command.selectedTimeFrameInterval = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-        then:
-        assertTrue(command.validate())
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCopyRequestDataToViewModelMap_selectAllSelection() {
-        given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        Date expectedFromDate = new Date(1376776800000L)
-        command.from = expectedFromDate
-        command.fromHour = "12:00"
-        // to = '19.08.2013'
-        Date expectedToDate = new Date(1376863200000L)
-        command.to = expectedToDate
-        command.toHour = "13:00"
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = true
-        command.selectedMeasuredEventIds = []
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.debug = false
-        command.selectedTimeFrameInterval = 0
-        command.setFromHour = false
-        command.setToHour = false
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-        command.copyRequestDataToViewModelMap(dataUnderTest);
-
-        then:
-        assertEquals(35, dataUnderTest.size());
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', true);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', []);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
-
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'setToHour', false)
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCreateMvQueryParams() {
-        given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-
-        then:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_MeasuredEvents() {
-        given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = true
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-
-        then:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Browsers() {
-        given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = true;
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = false
-        command.selectedLocations = [17L]
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-
-        then:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.browserIds);
-        assertEquals([17L] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-
-    void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Locations() {
-        given:
-        // Create and fill a command:
-        // form = '18.08.2013'
-        command.from = new Date(1376776800000L)
-        command.fromHour = '12:00'
-        // to = '19.08.2013'
-        command.to = new Date(1376863200000L)
-        command.toHour = '13:00'
-        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
-        command.selectedFolder = [1L]
-        command.selectedPages = [1L, 5L]
-        command.selectedAllMeasuredEvents = false
-        command.selectedMeasuredEventIds = [7L, 8L, 9L]
-        command.selectedAllBrowsers = false
-        command.selectedBrowsers = [2L]
-        command.selectedAllLocations = true;
-        command.selectedLocations = [17L]
-        command.csiTypeDocComplete = true
-        command.setToHour = false
-        command.setFromHour = false
-        command.debug = false
-        command.includeInterval = false
-
-        // Do we fill all fields?
-        assertTrue(command.validate())
-
-        when:
-        MvQueryParams mvQueryParams = command.createMvQueryParams();
-
-        then:
-        assertNotNull(mvQueryParams);
-        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
-        assertEquals([1L, 5L] as SortedSet, mvQueryParams.pageIds);
-        assertEquals([7L, 8L, 9L] as SortedSet, mvQueryParams.measuredEventIds);
-        assertEquals([2L] as SortedSet, mvQueryParams.browserIds);
-        assertEquals("This set is empty which means to fit all",
-                [] as SortedSet, mvQueryParams.locationIds);
-    }
-
-    /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
-    void testShowAllCommand_testCreateMvQueryParams_invalidCommand() {
-        given: "an invalid command"
-        assertFalse(command.validate())
-
-        when:
-        command.createMvQueryParams();
-        then: "an exception is thrown"
-        thrown IllegalStateException
-    }
-
-
-    void testShowAll_InvalidRequestCausesErrorMessagesByPassingCommandBackToPage() {
-        given:
-        // Fill invalid data to request args:
-        params.from = '18.08.2013'
-        params.fromHour = null // Invalid!!!
-        params.to = '18.08.2013'
-        params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
-        params.selectedTimeFrameInterval = 0
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_showAll = 'Anzeigen'
+        setDefaultParams()
+        params.from = null
 
         when:
         controllerUnderTest.bindData(command, params)
-
-        // Check tests precondition:
-        assertFalse(command.validate())
-
-        // Run the test:
-        Map<String, Object> dataUnderTest = controllerUnderTest.showAll(command);
+        Map<String, Object> result = controllerUnderTest.showAll(command)
 
         then:
-        assertTrue(dataUnderTest.containsKey('command'));
-        assertSame(command, dataUnderTest.get('command'));
+        !command.validate()
+        result["command"] == command
     }
 
 
-    void testShowAll_EmptyRequestDoesNotCausesErrorMessagesByItNotPassesCommandBackToPage() {
+    void "empty request does not cause error message and passes command back to page"() {
         given:
         // We leave 'params' 'empty' here (only grails additions are present! => first and empty request!
         params.action = 'showAll'
@@ -1679,73 +675,103 @@ class CsiDashboardControllerTests extends Specification {
 
         when:
         controllerUnderTest.bindData(command, params)
-
-        // Check tests precondition:
-        assertFalse(command.validate())
-
-        // Run the test:
-        Map<String, Object> dataUnderTest = controllerUnderTest.showAll(command);
+        Map<String, Object> model = controllerUnderTest.showAll(command)
 
         then:
-        assertFalse(dataUnderTest.containsKey('command'));
+        !command.validate()
+        !model['command']
     }
 
-
-    void testShowAll_EmptyRequestDoesNotCausesErrorMessagesAlsoIfItIsALanguageChangeByItNotPassesCommandBackToPage() {
+    void "empty request does not cause error message with language and passes command back to page"() {
         given:
-        // We leave 'params' empty except of the lang attribute to change the language => first and empty request after language change
+        // We leave 'params' 'empty' here (only grails additions are present! => first and empty request!
         params.lang = 'de'
         params.action = 'showAll'
         params.controller = 'csiDashboard'
 
         when:
         controllerUnderTest.bindData(command, params)
-
-        // Check tests precondition:
-        assertFalse(command.validate())
-
-        // Run the test:
-        Map<String, Object> dataUnderTest = controllerUnderTest.showAll(command);
+        Map<String, Object> model = controllerUnderTest.showAll(command)
 
         then:
-        assertFalse(dataUnderTest.containsKey('command'));
+        !command.validate()
+        !model['command']
     }
 
-
-    void testGetControlnameForCsiType() {
+    void "get control name for CSI type"(CsiType type, String controlName) {
         expect:
-        assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.DOC_COMPLETE), 'csiTypeDocComplete')
-        assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.VISUALLY_COMPLETE), 'csiTypeVisuallyComplete')
-        shouldFail(IllegalArgumentException) {
-            CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
+        CsiDashboardShowAllCommand.receiveControlnameFor(type) == controlName
+
+        where:
+        type                      | controlName
+        CsiType.VISUALLY_COMPLETE | "csiTypeVisuallyComplete"
+        CsiType.DOC_COMPLETE      | "csiTypeDocComplete"
+    }
+
+    void "get control name throws for non existent CSI type"() {
+        when:
+        CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
+
+        then:
+        IllegalArgumentException e = thrown()
+    }
+
+    private setDefaultParams() {
+        TimeSeriesShowCommandBaseSpec.getDefaultParams().each { key, value ->
+            params.setProperty(key, value)
+        }
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.selectedCsiSystems = []
+        params.overwriteWarningAboutLongProcessingTime = false
+        params.includeInterval = false
+        params.csiTypeVisuallyComplete = true
+        params.csiTypeDocComplete = false
+    }
+
+    private setDefaultCommandProperties() {
+        TimeSeriesShowCommandBaseSpec.setDefaultCommandProperties(command)
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.selectedCsiSystems = []
+        command.overwriteWarningAboutLongProcessingTime = false
+
+        command.includeInterval = false
+        command.csiTypeVisuallyComplete = true
+        command.csiTypeDocComplete = false
+    }
+
+    private createDefaultDaoMockData() {
+        controllerUnderTest.jobGroupDaoService.findCSIGroups() >> {
+            [new JobGroup(name: 'Group2'), new JobGroup(name: 'Group1')] as Set
+        }
+
+        Page page1 = new Page(name: 'Page1', weight: 0) {
+            Long getId() { return 1L }
+        }
+        Page page2 = new Page(name: 'Page3', weight: 0.25d) {
+            Long getId() { return 2L }
+        }
+        Page page3 = new Page(name: 'Page2', weight: 0.5d) {
+            Long getId() { return 3L }
+        }
+        controllerUnderTest.pageDaoService.findAll() >> {
+            [page1, page2, page3] as Set
+        }
+
+        MeasuredEvent measuredEvent1 = new MeasuredEvent(name: 'MeasuredEvent1', testedPage: page3) {
+            Long getId() { return 1001L }
+        }
+        MeasuredEvent measuredEvent2 = new MeasuredEvent(name: 'MeasuredEvent2', testedPage: page2) {
+            Long getId() { return 1002L }
+        }
+        MeasuredEvent measuredEvent3 = new MeasuredEvent(name: 'MeasuredEvent3', testedPage: page1) {
+            Long getId() { return 1003L }
+        }
+        MeasuredEvent measuredEvent4 = new MeasuredEvent(name: 'MeasuredEvent4', testedPage: page2) {
+            Long getId() { return 1004L }
+        }
+        controllerUnderTest.measuredEventDaoService.findAll() >> {
+            [measuredEvent3, measuredEvent1, measuredEvent2, measuredEvent4] as Set
         }
     }
 
-    /**
-     * <p>
-     * Asserts that a value is contained in a {@link Map}, that the value is
-     * not <code>null</code> and is equals to specified expected value.
-     * </p>
-     *
-     * @param dataUnderTest
-     *         The map which contents is to be checked, not <code>null</code>.
-     * @param key
-     *         The key to which the value to check is bound,
-     *         not <code>null</code>.
-     * @param expectedValue
-     *         The expected value to be equals to according to
-     * {@link Object#equals(Object)}; not <code>null</code>.
-     * @throws AssertionError
-     *         if at least one of the conditions are not satisfied.
-     */
-    private
-    static void assertContainedAndNotNullAndEquals(Map<String, Object> dataUnderTest, String key, Object expectedValue) throws AssertionError {
-        requiresArgumentNotNull('dataUnderTest', dataUnderTest)
-        requiresArgumentNotNull('key', key)
-        requiresArgumentNotNull('expectedValue', expectedValue)
-
-        assertTrue('Map must contain key \"' + key + '\"', dataUnderTest.containsKey(key))
-        assertNotNull('Map must contain a not-null value for key \"' + key + '\"', dataUnderTest.get(key))
-        assertEquals(expectedValue, dataUnderTest.get(key))
-    }
 }
