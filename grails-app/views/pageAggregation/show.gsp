@@ -95,6 +95,7 @@
 
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationGuiHandling.js"/>')
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
