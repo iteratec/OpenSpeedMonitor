@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report
 
-import de.iteratec.osm.result.EventResultDashboardShowAllCommand
 import de.iteratec.osm.result.TimeSeriesShowCommandBase
 import org.joda.time.DateTime
 
@@ -46,13 +45,13 @@ class UserspecificDashboardBase {
      * The selected start date (inclusive).
      *
      */
-    Date from
+    Date fromDate
 
     /**
      * The selected end date (inclusive).
      *
      */
-    Date to
+    Date toDate
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -127,8 +126,8 @@ class UserspecificDashboardBase {
         dashboardName(nullable: false, blank: false)
         username(nullable: true)
         publiclyVisible(nullable: true)
-        from(nullable: true)
-        to(nullable: true)
+        fromDate(nullable: true)
+        toDate(nullable: true)
         selectedFolder(nullable: true)
         selectedPages(nullable: true)
         selectedMeasuredEventIds(nullable: true)
@@ -138,11 +137,6 @@ class UserspecificDashboardBase {
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
         selectedConnectivities(nullable: true)
-    }
-
-    static mapping = {
-        from column: '`from`'
-        to column: '`to`'
     }
 
     /**
@@ -159,8 +153,8 @@ class UserspecificDashboardBase {
         this.username = username
 
         // Get Data from command
-        from = cmd.from.toDate()
-        to = cmd.to.toDate()
+        fromDate = cmd.from.toDate()
+        toDate = cmd.to.toDate()
         selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         selectedConnectivities = cmd.selectedConnectivities
         chartTitle = cmd.chartTitle
@@ -181,8 +175,8 @@ class UserspecificDashboardBase {
     }
 
     protected void fillCommand(TimeSeriesShowCommandBase cmd) {
-        cmd.from = new DateTime(from)
-        cmd.to = new DateTime(to)
+        cmd.from = new DateTime(fromDate)
+        cmd.to = new DateTime(toDate)
         if (selectedFolder) {
             for (item in selectedFolder.tokenize(',')) {
                 cmd.selectedFolder.add(Long.parseLong(item))

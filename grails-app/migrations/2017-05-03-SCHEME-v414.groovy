@@ -3,10 +3,6 @@ databaseChangeLog = {
         dropColumn(columnName: "debug", tableName: "userspecific_dashboard_base")
     }
 
-    changeSet(author: "sburnicki (generated)", id: "1493813874383-5") {
-        dropColumn(columnName: "from_date", tableName: "userspecific_dashboard_base")
-    }
-
     changeSet(author: "sburnicki (generated)", id: "1493813874383-6") {
         dropColumn(columnName: "from_hour", tableName: "userspecific_dashboard_base")
     }
@@ -33,10 +29,6 @@ databaseChangeLog = {
 
     changeSet(author: "sburnicki (generated)", id: "1493813874383-12") {
         dropColumn(columnName: "set_to_hour", tableName: "userspecific_dashboard_base")
-    }
-
-    changeSet(author: "sburnicki (generated)", id: "1493813874383-13") {
-        dropColumn(columnName: "to_date", tableName: "userspecific_dashboard_base")
     }
 
     changeSet(author: "sburnicki (generated)", id: "1493813874383-14") {
