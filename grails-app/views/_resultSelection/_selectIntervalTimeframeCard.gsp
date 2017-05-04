@@ -15,7 +15,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
 
     <%--------------------------------------------------------------------- aggregations --%>
 	<g:if test="${aggregationIntervals}">
-		<div class="form-group">
+		<div class="row form-group">
 			<label class="col-md-4 control-label" for="selectedIntervalHtmlId">
 				<g:message
 						code="de.iteratec.isr.wptrd.labels.timeframes.interval"

@@ -34,7 +34,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     var timeFramePreselection = defaultValueForTimeFramePreselection();
     timeFrameSelectElement.val(timeFramePreselection);
     timeFramePicker = OpenSpeedMonitor.timeRangePicker(timeFramePickerElement);
-    if (comparativeEnabled) {
+    if (comparativeEnabled()) {
       comparativeTimeFramePicker = OpenSpeedMonitor.timeRangePicker(comparativeTimeFramePickerElement);
     }
 
@@ -134,7 +134,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     }
 
     timeFramePicker.setRange(from, to);
-    if (comparativeEnabled){
+    if (comparativeEnabled()){
       setComparativeTimeFramePreselection();
     }
 
