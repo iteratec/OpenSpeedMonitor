@@ -16,8 +16,8 @@ class CsiDashboardPage extends I18nGebPage{
         adjustChartApplyButton{$('#adjustChartApply')}
         timeFrameSelect{$("#timeframeSelect").find("option").contextElements[0]}
         showButton (to: CsiDashboardPage) {$("#chart-submit")}
-        fromDatepicker{$("#fromDatepicker")}
-        toDatepicker{$("#toDatepicker")}
+        fromDatepicker { $(".timerange-userinput-from") }
+        toDatepicker { $(".timerange-userinput-to") }
         aggregationRadioButtons{$("#aggregationRadioButtons")} //possible values measured_event, daily_page, weekly_page, daily_shop, weekly_shop, daily_system, weekly_system
         basedOnVisuallyCompleteButton{$("#csiTypeVisuallyComplete")}
         saveAsDashboardButton(required: false) { $("a", href: "#CreateUserspecifiedDashboardModal") }
