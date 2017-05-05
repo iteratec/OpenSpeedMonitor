@@ -264,6 +264,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         groupings = transformedData.map(function (d) {
             return d.grouping;
         });
+
         barXOffSet = measureComponent($("<text>" + getLongestGroupName() + valueLabelOffset + "</text>"), function (d) {
             return d.width();
         });
@@ -351,12 +352,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     };
 
     var comparativeTimeframeIsEnabled =  function () {
-        var everyPageHasComparativeValue = actualBarchartData.series[0].data.reduce( function (result, d) {
-            var hasValueComparative = d.valueComparative ? true : false;
-            return result && hasValueComparative;
-        }, true);
+        var anyPageHasComparativeValue = actualBarchartData.series[0].data.reduce( function (result, d) {
+            var hasValueComparative = d.valueComparative !== null;
+            return result || hasValueComparative;
+        }, false);
 
-        return everyPageHasComparativeValue;
+        return anyPageHasComparativeValue;
     };
 
     var calculateLegendYPosition = function () {
@@ -415,7 +416,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 bar["measurand"] = datum.measurand;
                 bar["originalMeasurandName"] = datum.originalMeasurandName.replace("Uncached", "");
                 bar["value"] = datum.value;
-                bar["valueComparative"] = datum.valueComparative;
+                bar["comparativeDifference"] = datum.valueComparative !== null ? datum.value - datum.valueComparative : 0;
                 bar["unit"] = series.dimensionalUnit;
                 bar["grouping"] = datum.grouping;
                 currentDatum["bars"].push(bar);
@@ -611,31 +612,33 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         //Update actual bars
         d3.selectAll(".bar").each(function (bar) {
+            var value = unitScales[bar.unit](bar.value);
+
             //Update Rectangle Position and Size
-            var barWidth = unitScales[bar.unit](bar.value);
+            var barX = unitScales[bar.unit](0);
+            var barWidth = value - barX;
             var rect = d3.select(this).select("rect");
+            var barFill = comparativeTimeframeIsEnabled() ? colorScales[bar.unit](2) : colorScales[bar.unit](bar.measurand);
             rect.attr("height", actualBarHeight)
-                .attr("fill", colorScales[bar.unit](bar.measurand))
+                .attr("x", barX)
+                .attr("fill", barFill)
                 .transition().duration(transitionDuration)
                 .attr("width", barWidth);
 
             updateBarLabel(bar, this, barWidth, innerYScale);
 
-            var value = unitScales[bar.unit](bar.value);
-            var valueComparative = unitScales[bar.unit](bar.valueComparative);
-            var x = value < valueComparative ? value : 0;
-            var width = value < valueComparative ? valueComparative - value : valueComparative;
+            var comparativeBarWidth = unitScales[bar.unit](bar.comparativeDifference);
+            var x = d3.min([comparativeBarWidth, barX]);
+            var width = d3.max([comparativeBarWidth, barX]) - x;
 
+            var trafficLightColorscale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
+            var comparativeBarFill = trafficLightColorscale(bar.comparativeDifference < 0 ? "good" : "bad");
             d3.select(this).select(".d3chart-comparative-indicator")
                 .attr("x", x)
                 .attr("height", actualBarHeight)
                 .attr("width", width)
                 .transition().duration(transitionDuration)
-                .attr("fill", "url(#diagonalHatch)");
-
-            var strokeColor = colorScales[bar.unit](1);
-            $("#diagonalHatch line").css("stroke", strokeColor)
-
+                .attr("fill", comparativeBarFill);
         });
 
         //Update Group Labels
@@ -684,15 +687,16 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var createUnitScales = function () {
         unitScales = {};
 
-        var comparativeValues = transformedData.map(function (element) {
-            return element.bars[0].valueComparative;
+        var comparativeDifferences = transformedData.map(function (element) {
+            return element.bars[0].comparativeDifference;
         });
 
         $.each(units, function (unit, values) {
-            var maxValueForThisUnit = d3.max(values.concat(comparativeValues));
+            var maxValueForThisUnit = d3.max(values);
+            var minValueForThisUnit = d3.min(comparativeDifferences);
             var scale = d3.scale.linear()
                 .rangeRound([0, width - barXOffSet])
-                .domain([0, maxValueForThisUnit]);
+                .domain([minValueForThisUnit, maxValueForThisUnit]);
             unitScales[unit] = scale;
             absoluteMaxValue = Math.max(absoluteMaxValue, maxValueForThisUnit);
         });

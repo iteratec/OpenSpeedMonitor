@@ -7,6 +7,12 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartColorProvider = function() {
     var measurandGroupColorCombination = null;
 
+    var trafficColors = [
+        "#5cb85c",
+        "#f0ad4e",
+        "#d9534f"
+    ];
+
     var init = function () {
         var loadingTimeColors = [
                 "#1660A7",
@@ -52,6 +58,14 @@ OpenSpeedMonitor.ChartColorProvider = function() {
         return colorscale;
     };
 
+    var getColorscaleForTrafficlight = function () {
+        var colorscale = d3.scale.ordinal()
+                           .domain(["good", "ok", "bad"])
+                           .range(trafficColors);
+
+        return colorscale;
+    };
+
     var createDomain = function (arrayLength) {
         var array = [];
         for (var i = 0; i < arrayLength; i++) {
@@ -63,7 +77,8 @@ OpenSpeedMonitor.ChartColorProvider = function() {
     init();
 
     return {
-        getColorscaleForMeasurandGroup: getColorscaleForMeasurandGroup
+        getColorscaleForMeasurandGroup: getColorscaleForMeasurandGroup,
+        getColorscaleForTrafficlight: getColorscaleForTrafficlight
     }
 };
 
