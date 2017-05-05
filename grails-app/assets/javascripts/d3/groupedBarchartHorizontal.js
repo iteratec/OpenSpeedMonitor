@@ -637,18 +637,20 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
             updateBarLabel(bar, this, barWidth, innerYScale);
 
-            var comparativeBarWidth = unitScales[bar.unit](bar.comparativeDifference);
-            var x = d3.min([comparativeBarWidth, barX]);
-            var width = d3.max([comparativeBarWidth, barX]) - x;
+            var comparativeBarEnd = unitScales[bar.unit](bar.comparativeDifference);
+            var x = d3.min([comparativeBarEnd, barX]);
+            var comparativeBarWidth = d3.max([comparativeBarEnd, barX]) - x;
 
             var trafficLightColorscale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
             var comparativeBarFill = trafficLightColorscale(bar.comparativeDifference < 0 ? "good" : "bad");
             d3.select(this).select(".d3chart-comparative-indicator")
                 .attr("x", x)
                 .attr("height", actualBarHeight)
-                .attr("width", width)
+                .attr("width", comparativeBarWidth)
                 .transition().duration(transitionDuration)
                 .attr("fill", comparativeBarFill);
+
+            updateComparativeBarLabel(bar, this, comparativeBarWidth, innerYScale, comparativeBarEnd);
         });
 
         //Update Group Labels
@@ -665,7 +667,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var updateBarLabel = function (bar, barElement, barWidth, innerYScale) {
         var textY = innerYScale.rangeBand() / 2;
-        var textLabel = d3.select(barElement).select("text");
+        var textLabel = d3.select(barElement).select(".d3chart-value");
         var text = "" + formatValue(bar.value, bar.unit) + " " + bar.unit;
         var textTrans = textLabel.transition().duration(transitionDuration)
             .text(text)
@@ -678,6 +680,23 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 .attr("x", unitScales[bar.unit](bar.value) - valueLabelOffset)
                 .attr("visibility", "");
         }
+    };
+
+    var updateComparativeBarLabel = function(bar, barElement, barWidth, innerYScale, position) {
+        var textY = innerYScale.rangeBand() / 2;
+        var textLabel = d3.select(barElement).select(".d3chart-comparative-value");
+        var sign = bar.comparativeDifference > 0 ? "+" : "";
+        var text = sign + formatValue(bar.comparativeDifference, bar.unit) + " " + bar.unit;
+
+        var visibility = checkIfTextWouldFitRect(text, textLabel, barWidth) ? "" : "hidden";
+        var labelOffset = bar.comparativeDifference > 0 ? -valueLabelOffset : valueLabelOffset;
+        textLabel
+            .classed("d3chart-text-start", bar.comparativeDifference < 0)
+            .transition().duration(transitionDuration)
+            .text(text)
+            .attr("visibility", visibility)
+            .attr("x", position + labelOffset)
+            .attr("y", textY);
     };
 
     var updateSvgHeight = function () {
@@ -733,6 +752,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 d3.select(this).append("rect").classed("d3chart-bar-clickable", true);
                 d3.select(this).append("rect").classed("d3chart-comparative-indicator", true);
                 d3.select(this).append("text").classed("d3chart-value", true);
+                d3.select(this).append("text").classed("d3chart-comparative-value", true);
             });
             bars.exit().remove();
         });
