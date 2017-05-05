@@ -642,7 +642,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             var comparativeBarWidth = d3.max([comparativeBarEnd, barX]) - x;
 
             var trafficLightColorscale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
-            var comparativeBarFill = trafficLightColorscale(bar.comparativeDifference < 0 ? "good" : "bad");
+            var comparativeBarFill = "";
+            if (bar.unit == "%") {
+                comparativeBarFill = trafficLightColorscale(bar.comparativeDifference < 0 ? "bad" : "good");
+            } else {
+                comparativeBarFill = trafficLightColorscale(bar.comparativeDifference < 0 ? "good" : "bad");
+            }
+
             d3.select(this).select(".d3chart-comparative-indicator")
                 .attr("x", x)
                 .attr("height", actualBarHeight)
