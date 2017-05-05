@@ -307,9 +307,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         var yPosition = calculateLegendYPosition();
 
-        var comparativeLegendEntry = createSingleLegendEntryForComparativeTimeframe();
+        var comparativeLegendEntries = createLegendEntriesForComparativeTimeframe();
         if (comparativeTimeframeIsEnabled())
-            measurands.push(comparativeLegendEntry);
+            measurands = measurands.concat(comparativeLegendEntries);
 
         var entries = legend.selectAll("g").data(measurands);
         entries.enter()
@@ -344,11 +344,21 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         legend.transition().duration(transitionDuration).attr("transform", "translate(" + leftPadding + "," + yPosition + ")")
     };
 
-    var createSingleLegendEntryForComparativeTimeframe = function () {
-        return {
-            'measurand': actualBarchartData.i18nMap.comparativeTimeframeLabel,
-            'fill': "url(#diagonalHatch)"
-        };
+    var createLegendEntriesForComparativeTimeframe = function () {
+        var good = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight()("good");
+        var bad = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight()("bad");
+
+        var legendEntries = [
+            {
+                'measurand': actualBarchartData.i18nMap.comparativeImprovement,
+                'fill': good
+            },{
+                'measurand': actualBarchartData.i18nMap.comparativeDeterioration,
+                'fill': bad
+            }
+        ];
+
+        return legendEntries;
     };
 
     var comparativeTimeframeIsEnabled =  function () {

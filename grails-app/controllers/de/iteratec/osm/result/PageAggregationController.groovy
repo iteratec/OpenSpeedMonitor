@@ -131,7 +131,8 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
-        barchartDTO.i18nMap.put("comparativeTimeframeLabel", i18nService.msg("de.iteratec.osm.comparative-timeframe.heading", "Comparative Timeframe"))
+        barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
+        barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
