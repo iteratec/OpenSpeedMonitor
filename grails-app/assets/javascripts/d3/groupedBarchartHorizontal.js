@@ -862,7 +862,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         var width = measureComponent(clone, function (d) {
             return d.width()
         });
-        return width < barWidth
+        return width < (barWidth - valueLabelOffset);
     };
 
 
