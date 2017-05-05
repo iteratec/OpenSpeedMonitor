@@ -4,12 +4,12 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -19,6 +19,7 @@ import spock.lang.Specification
 @TestFor(LocationHealthCheckService)
 @Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
         OsmConfiguration, BatchActivity])
+@Build([Location, JobResult, OsmConfiguration])
 class LocationHealthCheckServiceSpec extends Specification {
 
     private List<JobResult> jobResults
@@ -93,17 +94,16 @@ class LocationHealthCheckServiceSpec extends Specification {
     }
 
     private void createTestDataCommonForAllTests() {
-        location = TestDataUtil.createLocation()
-        Script script = TestDataUtil.createScript()
-        JobGroup jobGroup = TestDataUtil.createJobGroup("jobGroup")
-        Job job = TestDataUtil.createJob("job", script, this.location, jobGroup)
+        location = Location.build()
         jobResults = []
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 100)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 100)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 101)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 200)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 200)
-        TestDataUtil.createOsmConfig()
+        2.times {
+            jobResults << JobResult.build(httpStatusCode: 100)
+        }
+        jobResults << JobResult.build(httpStatusCode: 101)
+        2.times {
+            jobResults << JobResult.build(httpStatusCode: 200)
+        }
+        OsmConfiguration.build()
     }
 
 
