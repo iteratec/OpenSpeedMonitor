@@ -999,7 +999,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 return d.id
             });
 
-        //exit
+        // exit
 
         trafficLight.exit()
             .transition()
@@ -1025,11 +1025,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             })
             .attr("fill-opacity", function (d) {
                 return d.fillOpacity;
-            })
-            .transition()
-            .duration(transitionDuration)
-            .attr("width", function (d) {
-                return microsecsXScale(d.upperBoundary - d.lowerBoundary);
             });
         trafficLightEnter.append("text")
             .attr("class", function (d) {
@@ -1040,23 +1035,28 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             })
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
-            .attr("x", function (d) {
-                return microsecsXScale(d.upperBoundary - d.lowerBoundary) / 2;
-            })
             .attr("text-anchor", "middle");
 
-        //update
+        // update
 
-        trafficLight
+        var trafficLightTransition = trafficLight
             .transition()
-            .duration(transitionDuration)
+            .duration(transitionDuration);
+
+        trafficLightTransition
             .attr("transform", function (d, index) {
                 var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary) + 2 * barPadding;
                 return "translate(" + xOffset + ", " + absoluteMaxYOffset + ")";
             })
             .select('rect')
             .attr("width", function (d) {
-                return microsecsXScale(d.upperBoundary - d.lowerBoundary);
+                return microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0);
+            });
+
+        trafficLightTransition
+            .select('text')
+            .attr("x", function (d) {
+                return (microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0)) / 2;
             });
 
     };
