@@ -36,7 +36,9 @@
         </div>
 
         <!-----------------------------------------------------main navigation-->
-        <g:render template="/_menu/navbar"/>
+        <g:if test="${!disableNavbar}">
+            <g:render template="/_menu/navbar"/>
+        </g:if>
 
         <!-----------------------------------------------------body-->
         <g:render template="/layouts/content_osm"/>
@@ -46,7 +48,9 @@
             <g:pageProperty name="page.footer" />
         </g:if>
         <g:else>
-            <g:render template="/layouts/footer"/>
+            <g:if test="${!disableNavbar}">
+                <g:render template="/layouts/footer"/>
+            </g:if>
         </g:else>
 
         <!-----------------------------------------------------global modal dialogs-->

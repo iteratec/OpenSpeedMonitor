@@ -16,11 +16,11 @@
     <p><g:message code="landing.headlineText"
                   default="OpenSpeedMonitor - Open Source Web Performance Monitoring." /></p>
     <g:if test="${flash.success}">
-        <div class="alert alert-info" style="display: block">
+        <div class="alert alert-success">
             <g:message code="de.iteratec.osm.ui.setupwizards.infra.success" default="success" args="${flash.success}"/>
         </div>
     </g:if>
-    <g:if test="${flash.continue}">
+    <g:if test="${!isSetupFinished}">
         <a href="/infrastructureSetup" class="btn btn-primary" id="setup-wpt-server-button">
             <g:message code="de.iteratec.osm.ui.setupwizards.infra.continueButton" default="continueButton" />
         </a>
@@ -75,7 +75,7 @@
                             link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
                     ]"/>
                 </p>
-                    <a <g:if test="${flash.button}">href="/measurementSetup/create"</g:if> <g:if test="${flash.continue}">title="<g:message code="de.iteratec.osm.ui.setupwizards.infra.continueInfo" default="continueButton" />"</g:if> class="btn btn-primary <g:if test="${flash.continue}">submit disabled</g:if>">
+                    <a <g:if test="${isSetupFinished}">href="/measurementSetup/create"</g:if> <g:if test="${isSetupFinished}">title="<g:message code="de.iteratec.osm.ui.setupwizards.infra.continueInfo" default="continueButton" />"</g:if> class="btn btn-primary <g:if test="${!isSetupFinished}">submit disabled</g:if>">
                         <g:message code="landing.measurement.createNew" default="Create New Measurement" /></a>
             </div>
         </div>

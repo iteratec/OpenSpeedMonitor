@@ -10,7 +10,7 @@ class WptServerService {
 
     static final String WPT_URL = "www.webpagetest.org"
 
-    List<Location> tryMakeServerAndGetLocations(String serverSelect, String inputWPTKey, String inputServerName, String inputServerAddress) {
+    List<Location> tryMakeServerAndGetLocations(String serverSelect, String inputWPTKey, String inputServerName, String inputServerAddress,String inputServerKey) {
         WebPageTestServer server = new WebPageTestServer()
         server.active = true
         if (serverSelect == "WPTServer") {
@@ -23,6 +23,7 @@ class WptServerService {
             server.label = inputServerName
             server.proxyIdentifier = inputServerName
             server.baseUrl = inputServerAddress
+            server.apiKey = inputServerKey
             if (!server.baseUrl.contains("://")) {
                 server.baseUrl = "http://" + server.baseUrl
             }

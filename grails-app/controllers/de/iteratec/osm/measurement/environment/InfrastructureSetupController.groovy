@@ -13,27 +13,25 @@ class InfrastructureSetupController {
     }
 
     def create() {
-        return params
+        return [params:params,disableNavbar:true]
     }
 
     def cancel() {
-        List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
-        osmConfigs[0].infrastructureSetupRan = OsmConfiguration.InfrastructureSetupRan.ABORTED
+        configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.Aborted)
         redirect(controller: 'Landing', action: 'index')
     }
 
     def save() {
-        List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(params.serverSelect, params.inputWPTKey, params.inputServerName, params.inputServerAddress)
-        if (addedLocations.size() > 0) {
-            OsmConfiguration config = configService.getConfig()
-            config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupRan.TRUE
-            config.save(failOnError: true)
-            redirect(controller: 'Landing', action: 'index')
-            flash.success = addedLocations.size()
-        }
-        else {
-            flash.error = "An error occured"
-            forward(actionName: 'create')
-        }
+        //if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.Finished) {
+            List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(params.serverSelect, params.inputWptKey, params.inputServerName, params.inputServerAddress, params.inputServerKey)
+            if (addedLocations.size() > 0) {
+                configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.Finished)
+                flash.success = addedLocations.size()
+                redirect(controller: 'Landing', action: 'index')
+            } else {
+                flash.error = "An error occured"
+                forward(actionName: 'create')
+            }
+        //}
     }
 }

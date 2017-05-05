@@ -426,16 +426,6 @@ class BootStrap {
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 
-        /*List<WebPageTestServer> webPageTestServers = WebPageTestServer.list()
-        if (webPageTestServers.size() == 0) {
-            initiallyCreatedWptServer = new WebPageTestServer(
-                    label: "www.webpagetest.org",
-                    proxyIdentifier: "https://www.webpagetest.org",
-                    baseUrl: "https://www.webpagetest.org",
-                    active: true
-            ).save(failOnError: true)
-        }*/
-
         log.info "init measurement infrastructure OSM ends"
 
     }

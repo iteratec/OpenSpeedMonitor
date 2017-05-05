@@ -6,30 +6,22 @@ class LandingController {
     OsmStateService osmStateService
 
     def index() {
-        def enableButton = true;
-        if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupRan.TRUE) {
+        if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupStatus.Finished) {
             if (osmStateService.untouched()) {
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupRan.FALSE) {
+                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.NotStarted) {
                     forward(controller: 'InfrastructureSetup', action: 'index')
                 }
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupRan.ABORTED) {
-                    if (!flash.continue) {
-                        enableButton = false;
-                        flash.continue = "Continue Setup"
-                        render(view: 'index')
-                    }
+                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.Aborted) {
+                    return [isSetupFinished:false]
                 }
             }
             else {
                 OsmConfiguration config = configService.getConfig()
-                config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupRan.TRUE
+                config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.Finished
                 config.save(failOnError: true)
                 forward(action: 'index')
             }
         }
-        if (enableButton) {
-            flash.button = "enabled"
-        }
-        render(view: 'index')
+        return [isSetupFinished:true]
     }
 }

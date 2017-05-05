@@ -137,8 +137,12 @@ class ConfigService {
 	/**
 	 * Whether initial setup of Webpagetest server already ran.
 	 */
-	OsmConfiguration.InfrastructureSetupRan getInfrastructureSetupRan(){
+	OsmConfiguration.InfrastructureSetupStatus getInfrastructureSetupRan(){
 		return getConfig().infrastructureSetupRan
+	}
+
+	void setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus state){
+		getConfig().infrastructureSetupRan = state;
 	}
 
     /**
@@ -149,7 +153,7 @@ class ConfigService {
         return grailsApplication.config.dataSource.driverClassName
     }
 
-    OsmConfiguration getConfig(){
+    private OsmConfiguration getConfig(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
         int confCount = osmConfigs.size()
         if (confCount != 1) {
