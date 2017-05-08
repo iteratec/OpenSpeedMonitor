@@ -20,78 +20,34 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import org.apache.commons.io.FileUtils
 import org.grails.plugins.testing.GrailsMockMultipartFile
 import spock.lang.Specification
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiConfigIOController)
 @Mock([CsiConfiguration, BrowserConnectivityWeight, ConnectivityProfile, Browser, Page, PageWeight, CsiDay])
+@Build([CsiConfiguration, BrowserConnectivityWeight, PageWeight, Browser, ConnectivityProfile, Page])
 class CsiConfigIOControllerSpec extends Specification{
+
     CsiConfiguration csiConfigurationFilled
     CsiConfiguration csiConfigurationEmpty
+
     def doWithSpring = {
         customerSatisfactionWeightService(CustomerSatisfactionWeightService)
     }
 
     void setup() {
-        controller.customerSatisfactionWeightService = grailsApplication.mainContext.getBean('customerSatisfactionWeightService')
-        Browser browser1 = TestDataUtil.createBrowser("Browser1")
-        Browser browser2 = TestDataUtil.createBrowser("Browser2")
-        ConnectivityProfile connectivityProfile1 = TestDataUtil.createConnectivityProfile("DSL1")
-        ConnectivityProfile connectivityProfile2 = TestDataUtil.createConnectivityProfile("DSL2")
-        TestDataUtil.createPages(['HP','MES','SE','ADS','WKBS','WK'])
-        CsiDay tempDay = new CsiDay()
-        tempDay.setHourWeight(0,2.9)
-        tempDay.setHourWeight(1,0.4)
-        tempDay.setHourWeight(2,0.2)
-        tempDay.setHourWeight(3,0.1)
-        tempDay.setHourWeight(4,0.1)
-        tempDay.setHourWeight(5,0.2)
-        tempDay.setHourWeight(6,0.7)
-        tempDay.setHourWeight(7,1.7)
-        tempDay.setHourWeight(8,3.2)
-        tempDay.setHourWeight(9,4.8)
-        tempDay.setHourWeight(10,5.6)
-        tempDay.setHourWeight(11,5.7)
-        tempDay.setHourWeight(12,5.5)
-        tempDay.setHourWeight(13,5.8)
-        tempDay.setHourWeight(14,5.9)
-        tempDay.setHourWeight(15,6.0)
-        tempDay.setHourWeight(16,6.7)
-        tempDay.setHourWeight(17,7.3)
-        tempDay.setHourWeight(18,7.6)
-        tempDay.setHourWeight(19,8.8)
-        tempDay.setHourWeight(20,9.3)
-        tempDay.setHourWeight(21,7.0)
-        tempDay.setHourWeight(22,3.6)
-        tempDay.setHourWeight(23,0.9)
-        csiConfigurationFilled = TestDataUtil.createCsiConfiguration()
-        csiConfigurationFilled.label = "conf1"
-        csiConfigurationFilled.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser1,connectivity: connectivityProfile1, weight: 45.0))
-        csiConfigurationFilled.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser2,connectivity: connectivityProfile2, weight: 12.0))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('HP'),weight: 12))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('MES'),weight: 3.4))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('SE'),weight: 6.7))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('ADS'),weight: 0.3))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('WKBS'),weight: 45))
-        csiConfigurationFilled.pageWeights.add(new PageWeight(page: Page.findByName('WK'),weight: 26.1))
-        csiConfigurationFilled.csiDay = tempDay
-        csiConfigurationFilled.save(flush: true)
-
-        csiConfigurationEmpty = TestDataUtil.createCsiConfiguration()
-        csiConfigurationEmpty.label = "emptyConf"
-        csiConfigurationEmpty.save(flush: true)
-        ServiceMocker.create().mockI18nService(controller.customerSatisfactionWeightService)
-    }
-
-    void tearDown() {
-        // Tear down logic here
+        initializeSpringBeanServices()
+        createTestDataCommonToAllTestsViaBuild()
+        createMocksCommonToAllTests()
     }
 
     //################### EXPORTS ###################
@@ -262,4 +218,60 @@ class CsiConfigIOControllerSpec extends Specification{
     }
 
     //################# END UPLOADS #################
+
+    private createMocksCommonToAllTests() {
+        ServiceMocker.create().mockI18nService(controller.customerSatisfactionWeightService)
+    }
+
+    private void createTestDataCommonToAllTestsViaBuild() {
+        csiConfigurationFilled = CsiConfiguration.build(
+            browserConnectivityWeights: [
+                BrowserConnectivityWeight.build(browser: Browser.build(name: "Browser1"), connectivity: ConnectivityProfile.build(name: "DSL1"), weight: 45.0),
+                BrowserConnectivityWeight.build(browser: Browser.build(name: "Browser2"), connectivity: ConnectivityProfile.build(name: "DSL2"), weight: 12.0)
+            ],
+            pageWeights: [
+                PageWeight.build(page: Page.build(name: 'HP'), weight: 12),
+                PageWeight.build(page: Page.build(name: 'MES'), weight: 3.4),
+                PageWeight.build(page: Page.build(name: 'SE'), weight: 6.7),
+                PageWeight.build(page: Page.build(name: 'ADS'), weight: 0.3),
+                PageWeight.build(page: Page.build(name: 'WKBS'), weight: 45),
+                PageWeight.build(page: Page.build(name: 'WK'), weight: 26.1)
+            ],
+            csiDay: createCsiDay()
+        )
+        csiConfigurationEmpty = CsiConfiguration.build()
+    }
+
+    private CsiDay createCsiDay() {
+        CsiDay tempDay = new CsiDay()
+        tempDay.setHourWeight(0, 2.9)
+        tempDay.setHourWeight(1, 0.4)
+        tempDay.setHourWeight(2, 0.2)
+        tempDay.setHourWeight(3, 0.1)
+        tempDay.setHourWeight(4, 0.1)
+        tempDay.setHourWeight(5, 0.2)
+        tempDay.setHourWeight(6, 0.7)
+        tempDay.setHourWeight(7, 1.7)
+        tempDay.setHourWeight(8, 3.2)
+        tempDay.setHourWeight(9, 4.8)
+        tempDay.setHourWeight(10, 5.6)
+        tempDay.setHourWeight(11, 5.7)
+        tempDay.setHourWeight(12, 5.5)
+        tempDay.setHourWeight(13, 5.8)
+        tempDay.setHourWeight(14, 5.9)
+        tempDay.setHourWeight(15, 6.0)
+        tempDay.setHourWeight(16, 6.7)
+        tempDay.setHourWeight(17, 7.3)
+        tempDay.setHourWeight(18, 7.6)
+        tempDay.setHourWeight(19, 8.8)
+        tempDay.setHourWeight(20, 9.3)
+        tempDay.setHourWeight(21, 7.0)
+        tempDay.setHourWeight(22, 3.6)
+        tempDay.setHourWeight(23, 0.9)
+        return tempDay
+    }
+
+    private void initializeSpringBeanServices() {
+        controller.customerSatisfactionWeightService = grailsApplication.mainContext.getBean('customerSatisfactionWeightService')
+    }
 }
