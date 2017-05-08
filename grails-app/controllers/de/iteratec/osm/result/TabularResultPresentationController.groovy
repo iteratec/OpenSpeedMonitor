@@ -37,6 +37,8 @@ import de.iteratec.osm.util.CsvExportService
 import org.hibernate.sql.JoinType
 import org.joda.time.DateTime
 import org.joda.time.Interval
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 
 import java.text.SimpleDateFormat
 
@@ -309,16 +311,17 @@ class TabularResultPresentationController {
         }
 
         Interval interval = cmd.receiveSelectedTimeFrame()
-        filename += interval.startMillis + '_to_' + interval.endMillis + '.csv'
+        DateTimeFormatter dateFormatter = ISODateTimeFormat.date()
+        filename += dateFormatter.print(interval.start) + '_to_' + dateFormatter.print(interval.end) + '.csv'
 
-        response.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        response.setContentType("text/csv;header=present;charset=UTF-8");
+        response.setHeader('Content-disposition', 'attachment; filename=' + filename)
+        response.setContentType("text/csv;header=present;charset=UTF-8")
 
-        Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
+        Writer responseWriter = new OutputStreamWriter(response.getOutputStream())
 
         List<String> headers = getCsvHeaders()
         List<List<String>> rows = getCsvRows(cmd)
-        csvExportService.writeCSV(headers, rows, responseWriter);
+        csvExportService.writeCSV(headers, rows, responseWriter)
 
         response.getOutputStream().flush()
         return null;
@@ -394,6 +397,7 @@ class TabularResultPresentationController {
                 property('connectivityProfile.bandwidthUp')
                 property('connectivityProfile.latency')
                 property('connectivityProfile.packetLoss')
+                property('test_details_waterfallurl')
             }
         }
 
@@ -444,7 +448,7 @@ class TabularResultPresentationController {
         result << 'ConnectivityBandwithUp'
         result << 'ConnectivityLatency'
         result << 'ConnectivityPacketLoss'
-
+        result << 'WPTResultUrl'
         return result
     }
 }
