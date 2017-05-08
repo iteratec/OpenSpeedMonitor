@@ -44,7 +44,7 @@ src/java/logging.properties
 
 # misc
 testorder*.txt
-test/resources/**/private_*
+src/test/resources/**/private_*
 
 # ignore h2 dumps
 *.h2.gzip

@@ -76,7 +76,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 
             System.out.println('Loading CSV-data...');
             TestDataUtil.
-                    loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
+                    loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
             System.out.println('Loading CSV-data... DONE');
 
             System.out.println('Create some common test-data... DONE');

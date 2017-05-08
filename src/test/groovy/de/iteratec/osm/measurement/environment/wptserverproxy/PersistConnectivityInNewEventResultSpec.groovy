@@ -115,7 +115,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
 
     void "MULTISTEP: persisting predefined connectivity profile in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
@@ -139,7 +139,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
 
     void "MULTISTEP: persisting custom connectivity in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
@@ -162,7 +162,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
 
     void "MULTISTEP: persisting native connectivity in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)
@@ -190,7 +190,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting predefined connectivity profile in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
@@ -212,7 +212,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting custom connectivity in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
@@ -233,7 +233,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting native connectivity in event result"() {
         setup:
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)

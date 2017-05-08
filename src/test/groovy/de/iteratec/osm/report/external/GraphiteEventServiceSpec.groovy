@@ -53,7 +53,7 @@ class GraphiteEventServiceSpec extends Specification{
     public static final int minutesInPast = 1
     GraphiteEventService serviceUnderTest
 
-    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule public RecorderRule recorder = new RecorderRule(configuration)
     public static final String jobGroupName = 'associated JobGroup'
 

@@ -110,7 +110,7 @@ class PersistingLocationsTests {
         //create test-specific data
 
         Integer locationCount = Location.findAll().size()
-        def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
+        def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
 
         //test execution and assertions
@@ -139,7 +139,7 @@ class PersistingLocationsTests {
         //create test-specific data
 
         Integer locationCount = Location.findAll().size()
-        def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
+        def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
 
 
@@ -182,7 +182,7 @@ class PersistingLocationsTests {
         Integer locationCount = Location.findAll().size()
         assertEquals(0, locationCount);
 
-        def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
+        def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
 
         Integer newLocationCount = result.data.location.size();

@@ -60,7 +60,7 @@ class CustomerSatisfactionWeightServiceTests {
 
         // test correct files
         WeightFactor.each { weightCategory ->
-            def csv = new File("test/resources/CsiData/${weightCategory}_weights.csv")
+            def csv = new File("src/test/resources/CsiData/${weightCategory}_weights.csv")
             InputStream csvStream = new FileInputStream(csv)
             List<String> errorMessages = serviceUnderTest.validateWeightCsv(weightCategory, csvStream)
 
@@ -69,27 +69,27 @@ class CustomerSatisfactionWeightServiceTests {
         }
 
         // test incorrect files
-        File csvFalse = new File("test/resources/CsiData/BROWSER_weights_should_fail.csv")
+        File csvFalse = new File("src/test/resources/CsiData/BROWSER_weights_should_fail.csv")
         List<String> errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.BROWSER, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
         assertEquals(2, errorMessages.size())
 
-        csvFalse = new File("test/resources/CsiData/PAGE_weights_should_fail.csv")
+        csvFalse = new File("src/test/resources/CsiData/PAGE_weights_should_fail.csv")
         errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.PAGE, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
         assertEquals(1, errorMessages.size())
 
-        csvFalse = new File("test/resources/CsiData/HOUROFDAY_weights_should_fail.csv")
+        csvFalse = new File("src/test/resources/CsiData/HOUROFDAY_weights_should_fail.csv")
         errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.HOUROFDAY, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
         assertEquals(1, errorMessages.size())
 
-        csvFalse = new File("test/resources/CsiData/HOUROFDAY_weights_should_fail_2.csv")
+        csvFalse = new File("src/test/resources/CsiData/HOUROFDAY_weights_should_fail_2.csv")
         errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.HOUROFDAY, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
         assertEquals(1, errorMessages.size())
 
-        csvFalse = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights_should_fail.csv")
+        csvFalse = new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights_should_fail.csv")
         errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
         assertEquals(4, errorMessages.size())
@@ -98,19 +98,19 @@ class CustomerSatisfactionWeightServiceTests {
     @Test
     void testPersistNewWeights() {
         Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
-        File csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
+        File csv = new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
         InputStream csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream, csiConfiguration)
         assertTrue(BrowserConnectivityWeight.findAll().size() > browserConnectivityWeights)
 
         Integer pageWeightsBeforeUpload = PageWeight.findAll().size()
-        csv = new File("test/resources/CsiData/PAGE_weights.csv")
+        csv = new File("src/test/resources/CsiData/PAGE_weights.csv")
         csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream, csiConfiguration)
         assertTrue(PageWeight.findAll().size() > pageWeightsBeforeUpload)
 
         Integer hoursofdayBeforeUpload = CsiDay.findAll().size()
-        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
+        csv = new File("src/test/resources/CsiData/HOUROFDAY_weights.csv")
         csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream, csiConfiguration)
         assertTrue(CsiDay.findAll().size() > hoursofdayBeforeUpload)
@@ -119,19 +119,19 @@ class CustomerSatisfactionWeightServiceTests {
     @Test
     void testUpdateWeights() {
         Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
-        File csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
+        File csv = new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
         InputStream csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream, csiConfiguration)
         assertTrue(BrowserConnectivityWeight.findAll().size() > browserConnectivityWeights)
 
         Integer pageWeightsBeforeUpload = PageWeight.findAll().size()
-        csv = new File("test/resources/CsiData/PAGE_weights.csv")
+        csv = new File("src/test/resources/CsiData/PAGE_weights.csv")
         csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream, csiConfiguration)
         assertTrue(PageWeight.findAll().size() > pageWeightsBeforeUpload)
 
         Integer hoursofdayBeforeUpload = CsiDay.findAll().size()
-        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
+        csv = new File("src/test/resources/CsiData/HOUROFDAY_weights.csv")
         csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream, csiConfiguration)
         assertTrue(CsiDay.findAll().size() > hoursofdayBeforeUpload)
@@ -140,7 +140,7 @@ class CustomerSatisfactionWeightServiceTests {
     @Test
     void testPersistMappingCsv() {
         int defaultMappingSizeBeforePersist = DefaultTimeToCsMapping.findAll().size()
-        File csv = new File("test/resources/CsiData/DefaultMappings.csv")
+        File csv = new File("src/test/resources/CsiData/DefaultMappings.csv")
         InputStream csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewDefaultMapping(csvStream);
 

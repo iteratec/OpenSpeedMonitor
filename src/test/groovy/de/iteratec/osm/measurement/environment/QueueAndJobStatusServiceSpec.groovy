@@ -32,7 +32,7 @@ import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 class QueueAndJobStatusServiceSpec extends Specification {
 
 //    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/betamaxrties').toURL()).toProperties())
-    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule public RecorderRule recorder = new RecorderRule(configuration)
 
     public static final String WPTSERVER_URL = 'dev.server01.wpt.iteratec.de'

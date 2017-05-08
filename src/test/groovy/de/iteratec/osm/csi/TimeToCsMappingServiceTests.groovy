@@ -240,7 +240,7 @@ class TimeToCsMappingServiceTests {
     }
 
     void csiConfigurationSetup() {
-        File csvFile = new File("test/resources/CsiData/TimeToCsMapping/${MAPPINGS_CSV}")
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${MAPPINGS_CSV}")
         mappings = []
 
         int lineCounter = 0
@@ -274,7 +274,7 @@ class TimeToCsMappingServiceTests {
     @BeforeClass
     static void frustrationsSetup() {
 
-        File csvFile = new File("test/resources/CsiData/TimeToCsMapping/${FRUSTRATIONS_CSV}")
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${FRUSTRATIONS_CSV}")
         frustrations = [:].withDefault{[]}
 
         int lineCounter = 0
@@ -296,7 +296,7 @@ class TimeToCsMappingServiceTests {
     @BeforeClass
     static void parseExpectedValues() {
 
-        File csvFile = new File("test/resources/CsiData/TimeToCsMapping/${EXPECTED_CUSTOMER_SATISFACTION_CSV}")
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${EXPECTED_CUSTOMER_SATISFACTION_CSV}")
         expectedCustomerSatisfactions = [:].withDefault{[]}
 
         int lineCounter = 0

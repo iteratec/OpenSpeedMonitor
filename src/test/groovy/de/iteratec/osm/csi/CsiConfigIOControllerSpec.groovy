@@ -98,7 +98,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download BrowserConnectivityWeights-CSV should equal CsiConfiguration.browserConnectivityWeights"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
 
         when:
         params.id = csiConfigurationFilled.ident()
@@ -122,7 +122,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download PageWeights-CSV should equal CsiConfiguration.pageWeights"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/PAGE_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
 
         when:
         params.id = csiConfigurationFilled.ident()
@@ -146,7 +146,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download HourOfDay-CSV should equal CsiConfiguration.csiDay"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/HOUROFDAY_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
 
         when:
         params.id = csiConfigurationFilled.ident()
@@ -174,7 +174,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "upload BrowserConnectivityWeights-CSV should change CsiConfiguration.browserConnectivityWeights"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('browserConnectivityCsv', csvContent.bytes)
         request.addFile(multipartFile)
         assert csiConfigurationEmpty.browserConnectivityWeights.size() == 0
@@ -191,7 +191,7 @@ class CsiConfigIOControllerSpec extends Specification{
     void "upload BrowserConnectivityWeights-CSV should not create BrowserConnectivityWeights if existing"() {
         given:
         int beforeAmountBrowserConnectivityWeights = BrowserConnectivityWeight.count
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('browserConnectivityCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
@@ -205,7 +205,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "upload PageWeights-CSV should change CsiConfiguration.pageWeights"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/PAGE_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('pageCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
@@ -220,7 +220,7 @@ class CsiConfigIOControllerSpec extends Specification{
     void "upload PageWeights-CSV should not create PageWeights if existing"() {
         given:
         int beforeAmountPageWeights = PageWeight.count
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/PAGE_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('pageCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
@@ -234,7 +234,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "upload HourOfDay-CSV should change CsiConfiguration.csiDay"() {
         given:
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/HOUROFDAY_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('hourOfDayCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
@@ -249,7 +249,7 @@ class CsiConfigIOControllerSpec extends Specification{
     void "upload HourOfDay-CSV should not create CsiDay if existing"() {
         given:
         int beforeAmountCsiDays = CsiDay.count
-        String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/HOUROFDAY_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('hourOfDayCsv', csvContent.bytes)
         request.addFile(multipartFile)
 

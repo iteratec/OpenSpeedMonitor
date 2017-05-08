@@ -130,7 +130,7 @@ class PersistScreenshotDependentWptMetricsSpec {
 
     void testPersistingScreenshotDependentMetricsForMultistep1Run3EventsFvOnlyWithVideo() {
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
@@ -153,7 +153,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     }
     void testPersistingScreenshotDependentMetricsForMultistep1Run3EventsFvOnlyWithoutVideo() {
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, Page.findByName('SE'))
@@ -175,7 +175,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForMultistep5Run3EventsFvOnlyWithVideo() {
 
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
@@ -241,7 +241,7 @@ class PersistScreenshotDependentWptMetricsSpec {
 
     void testPersistingScreenshotDependentMetricsForSinglestep1RunWithVideo() {
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
@@ -258,7 +258,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     }
     void testPersistingScreenshotDependentMetricsForSinglestep1RunWithoutVideo() {
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
@@ -276,7 +276,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForSinglestep5RunsWithVideo() {
 
         //test data specific for this test
-        File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO}")
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
 

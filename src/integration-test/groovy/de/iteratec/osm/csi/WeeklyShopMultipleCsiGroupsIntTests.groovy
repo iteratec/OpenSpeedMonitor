@@ -66,7 +66,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         System.out.println('Create some common test-data... DONE');
 
         System.out.println('Loading CSV-data...');
-        TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
+        TestDataUtil.loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
         System.out.println('Loading CSV-data... DONE');
         csiGroups = [
                 JobGroup.findByName(csiGroup1Name),
