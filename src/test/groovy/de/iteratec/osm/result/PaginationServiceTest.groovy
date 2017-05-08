@@ -29,6 +29,7 @@ import de.iteratec.osm.report.ui.PaginationListing
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.web.mapping.LinkGenerator
+import org.joda.time.DateTime
 import spock.lang.Specification
 
 import static org.junit.Assert.assertEquals
@@ -112,24 +113,17 @@ class PaginationServiceTest extends Specification {
     void testBuildListResultsPagination() {
         given:
         TabularResultListResultsCommand cmd = new TabularResultListResultsCommand()
-        //08.08.2014
-        cmd.setFrom(new Date(1407456000000L))
-        cmd.setFromHour("4:00")
-        //08.08.2014
-        cmd.setTo(new Date(1407456000000L))
-        cmd.setToHour("6:00")
+        cmd.setFrom(new DateTime(2014, 8, 8, 4, 0))
+        cmd.setTo(new DateTime(2014, 8, 8, 6, 0))
         cmd.setSelectedFolder([2L])
         cmd.setSelectedPages([1L])
         cmd.setSelectedBrowsers([3L])
         cmd.setSelectedMeasuredEventIds([])
-        cmd.setSelectedAllBrowsers(false)
-        cmd.setSelectedAllLocations(false)
-        cmd.setSelectedAllMeasuredEvents(false)
 
         // Simulate GrailsLinkGenerator
         // Inject relevant services
         serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator) {
-            link(_) >> "http://example.com/eventResult/listResults?selectedTimeFrameInterval=0&_setFromHour=&setFromHour=on&from=08.08.2014&fromHour=4%3A00&_setToHour=&setToHour=on&to=08.08.2014&toHour=6%3A00&selectedFolder=2&selectedPages=1&selectedBrowsers=3&_selectedAllBrowsers=&_selectedAllMeasuredEvents=&selectedAllMeasuredEvents=on&_selectedAllLocations=&selectedAllLocations=on&_action_listResults=Show"
+            link(_) >> "http://example.com/eventResult/listResults?selectedTimeFrameInterval=0&from=2014-08-08T04%3A00%3A00.000Z&to=2014-08-08T06%3A00%3A00.000Z&selectedFolder=2&selectedPages=1&selectedBrowsers=3&_action_listResults=Show"
         }
 
         PaginationListing paginationListing = serviceUnderTest.buildListResultsPagination(cmd, 100)
@@ -141,16 +135,11 @@ class PaginationServiceTest extends Specification {
         assertEquals(2, paginationListing.getRows().size())
         assertEquals(1, paginationListing.getRows().get(0).pageNumber)
 
-        assertEquals("08.08.2014", queryParams.get("from").get(0))
-        assertEquals(cmd.getFromHour(), queryParams.get("fromHour").get(0))
-        assertEquals("08.08.2014", queryParams.get("to").get(0))
-        assertEquals(cmd.getToHour(), queryParams.get("toHour").get(0))
+        assertEquals("2014-08-08T04:00:00.000Z", queryParams.get("from").get(0))
+        assertEquals("2014-08-08T06:00:00.000Z", queryParams.get("to").get(0))
         assertEquals(cmd.getSelectedFolder().toString(), queryParams.get("selectedFolder").toString())
         assertEquals(cmd.getSelectedPages().toString(), queryParams.get("selectedPages").toString())
         assertEquals(cmd.getSelectedBrowsers().toString(), queryParams.get("selectedBrowsers").toString())
-        assertEquals("[]", queryParams.get("_selectedAllBrowsers").toString())
-        assertEquals("[]", queryParams.get("_selectedAllMeasuredEvents").toString())
-        assertEquals("[]", queryParams.get("_selectedAllLocations").toString())
     }
 
     void testBuildListResultsForJobPagination() {
@@ -159,19 +148,15 @@ class PaginationServiceTest extends Specification {
 
         cmd.setJob(job)
 
-        //07.08.2014 - 04:00
-        cmd.setFrom(new Date(1407376800000L))
-        cmd.setFromHour("04:00")
-        //08.08.2014 - 04:00
-        cmd.setTo(new Date(1407463200000L))
-        cmd.setToHour("04:00")
+        cmd.setFrom(new DateTime(2014, 8, 7, 4, 0))
+        cmd.setTo(new DateTime(2014, 8, 8, 4, 0))
         cmd.setMax(50)
         cmd.setOffset(0)
 
         // Simulate GrailsLinkGenerator
         // Inject relevant services
         serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator) {
-            link(_) >>"http://example.com/eventResult/showListResultsForJob?selectedTimeFrameInterval=0&job.id=1&from=07.08.2012&fromHour=04%3A00&to=08.08.2012&toHour=04%3A00"
+            link(_) >> "http://example.com/eventResult/showListResultsForJob?selectedTimeFrameInterval=0&job.id=1&from=2014-08-07T04%3A00%3A00.000Z&to=2014-08-08T04%3A00%3A00.000Z"
         };
 
         PaginationListing paginationListing = serviceUnderTest.buildListResultsForJobPagination(cmd, 100)
@@ -185,10 +170,8 @@ class PaginationServiceTest extends Specification {
         assertEquals(2, paginationListing.getRows().size())
         assertEquals(1, paginationListing.getRows().get(0).pageNumber)
 
-        assertEquals("07.08.2012", queryParams.get("from").get(0))
-        assertEquals(cmd.getFromHour(), queryParams.get("fromHour").get(0))
-        assertEquals("08.08.2012", queryParams.get("to").get(0))
-        assertEquals(cmd.getToHour(), queryParams.get("toHour").get(0))
+        assertEquals("2014-08-07T04:00:00.000Z", queryParams.get("from").get(0))
+        assertEquals("2014-08-08T04:00:00.000Z", queryParams.get("to").get(0))
         assertEquals(cmd.getJob().getId().toString(), queryParams.get("job.id").get(0).toString())
     }
 

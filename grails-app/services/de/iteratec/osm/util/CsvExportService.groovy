@@ -1,8 +1,8 @@
 package de.iteratec.osm.util
 
 import grails.transaction.Transactional
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
@@ -13,7 +13,7 @@ class CsvExportService {
     /**
      * The {@link org.joda.time.format.DateTimeFormat} used for CSV export and table view.
      */
-    static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis()
+    static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
     /**
      * Writes given data as csv file to target.

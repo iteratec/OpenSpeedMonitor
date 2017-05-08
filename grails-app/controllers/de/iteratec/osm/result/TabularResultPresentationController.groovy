@@ -52,9 +52,7 @@ import java.text.SimpleDateFormat
  */
 class TabularResultPresentationController {
 
-    private final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
     private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
-    private final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
@@ -86,7 +84,7 @@ class TabularResultPresentationController {
                 List<EventResult> eventResults = null
                 if (cmd instanceof TabularResultListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
-                            ((TabularResultListResultsCommand) cmd).createMvQueryParams(),
+                            ((TabularResultListResultsCommand) cmd).createErQueryParams(),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
@@ -157,23 +155,14 @@ class TabularResultPresentationController {
             int defaultTimeToShowResultsFrom = 12
             DateTime defaultFrom = now.minusHours(defaultTimeToShowResultsFrom)
 
-            cmd.from = new DateTime(cmd.job.lastRun).isBefore(defaultFrom) ? new DateTime(cmd.job.lastRun).minusHours(defaultTimeToShowResultsFrom).toDate() : defaultFrom.toDate()
-            cmd.fromHour = cmd.from.getAt(Calendar.HOUR_OF_DAY) + ":" + cmd.from.getAt(Calendar.MINUTE);
-
-            cmd.to = new DateTime(cmd.job.lastRun).plusHours(defaultTimeToShowResultsFrom).toDate()
-            cmd.toHour = cmd.to.getAt(Calendar.HOUR_OF_DAY) + ":" + cmd.to.getAt(Calendar.MINUTE);
+            cmd.from = new DateTime(cmd.job.lastRun).isBefore(defaultFrom) ? new DateTime(cmd.job.lastRun).minusHours(defaultTimeToShowResultsFrom) : defaultFrom
+            cmd.to = new DateTime(cmd.job.lastRun).plusHours(defaultTimeToShowResultsFrom)
 
 
-            Interval timeFrame = cmd.receiveSelectedTimeFrame();
-
-            SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
-            SimpleDateFormat fmtTime = new SimpleDateFormat("hh:mm");
             redirect(action: 'ShowListResultsForJob', params: ['selectedTimeFrameInterval': '0',
                                                                'job.id'                   : cmd.job.getId(),
-                                                               'from'                     : fmtDate.format(cmd.from),
-                                                               'fromHour'                 : fmtTime.format(cmd.from),
-                                                               'to'                       : fmtDate.format(cmd.to),
-                                                               'toHour'                   : fmtTime.format(cmd.to)
+                                                               'from'                     : cmd.from,
+                                                               'to'                       : cmd.to,
             ])
         }
         Map<String, Object> modelToRender = listResultsByCommand(cmd)
@@ -238,9 +227,6 @@ class TabularResultPresentationController {
         List<Location> locations = locationDaoService.findAll().sort(false, { it.label });
         result.put('locations', locations)
 
-        // JavaScript-Utility-Stuff:
-        result.put("weekStart", MONDAY_WEEKSTART)
-
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
         Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
         for (Page eachPage : pages) {
@@ -275,7 +261,6 @@ class TabularResultPresentationController {
 
         // JavaScript-Utility-Stuff:
         result.put("dateFormat", JAVASCRIPT_DATE_FORMAT_STRING)
-        result.put("weekStart", MONDAY_WEEKSTART)
 
         // ConnectivityProfiles
         result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(true)
@@ -350,7 +335,7 @@ class TabularResultPresentationController {
                 if (cmd.selectedLocations) {
                     'in'('location.id', cmd.selectedLocations)
                 }
-                if (!cmd.selectedAllConnectivityProfiles) {
+                if (cmd.selectedConnectivities) {
                     or {
                         if (cmd.selectedConnectivityProfiles) {
                             'in'('connectivityProfile.id', cmd.selectedConnectivityProfiles)
@@ -397,7 +382,7 @@ class TabularResultPresentationController {
                 property('connectivityProfile.bandwidthUp')
                 property('connectivityProfile.latency')
                 property('connectivityProfile.packetLoss')
-                property('test_details_waterfallurl')
+                property('testDetailsWaterfallURL')
             }
         }
 

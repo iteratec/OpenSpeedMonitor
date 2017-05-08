@@ -19,11 +19,9 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
+import de.iteratec.osm.util.ParameterBindingUtility
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
-
-import java.text.SimpleDateFormat
-
 /**
  * Provides methods to get {@link PaginationListing} for pagination.
  * @author rhc
@@ -69,18 +67,14 @@ class PaginationService {
 	 * @return
 	 */
 	private String createListResultsForJobPaginationLink(TabularResultListResultsForSpecificJobCommand cmd, Integer offset){
-		SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
-		
 		String paginationLink = grailsLinkGenerator.link([
 				'controller': 'tabularResultPresentation',
 				'action': 'showListResultsForJob',
 				'params': [
 						'selectedTimeFrameInterval': 0,
 						'job.id': cmd.job.getId(),
-						'from': fmtDate.format(cmd.getFrom()),
-						'fromHour': cmd.getFromHour(),
-						'to': fmtDate.format(cmd.getTo()),
-						'toHour': cmd.getToHour(),
+						'from': ParameterBindingUtility.formatDateTimeParameter(cmd.from),
+						'to': ParameterBindingUtility.formatDateTimeParameter(cmd.to),
 						'max': cmd.getMax(),
 						'offset': offset
 					]
@@ -127,28 +121,16 @@ class PaginationService {
 	 * @return
 	 */
 	private String createListResultsPaginationLink(TabularResultListResultsCommand cmd, int offset){
-		
-		SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
-		
 		String paginationLink = grailsLinkGenerator.link([
 			'controller': 'tabularResultPresentation',
 			'action': 'listResults',
 			'params': [
 						'selectedTimeFrameInterval': 0,
-						'from': cmd.getFrom()?fmtDate.format(cmd.getFrom()):null,
-						'fromHour': cmd.getFromHour(),
-						'to': cmd.getTo()?fmtDate.format(cmd.getTo()):null,
-						'toHour': cmd.getToHour(),
+						'from': ParameterBindingUtility.formatDateTimeParameter(cmd.from),
+						'to': ParameterBindingUtility.formatDateTimeParameter(cmd.to),
 						'selectedFolder': cmd.getSelectedFolder(),
 						'selectedPages': cmd.getSelectedPages(),
 						'selectedBrowsers': cmd.getSelectedBrowsers(),
-                        'selectedAllBrowsers' : cmd.getSelectedAllBrowsers(),
-						'_selectedAllBrowsers': cmd.getSelectedAllBrowsers(),
-						'_selectedAllMeasuredEvents': cmd.getSelectedMeasuredEventIds(),
-						'selectedAllMeasuredEvents': cmd.getSelectedAllMeasuredEvents(),
-						'_selectedAllLocations': cmd.getSelectedLocations(),
-						'selectedAllLocations': cmd.getSelectedAllLocations(),
-                        'selectedAllConnectivityProfiles': cmd.getSelectedAllConnectivityProfiles(),
                         'selectedConnectivities': cmd.getSelectedConnectivityProfiles(),
                         'includeNativeConnectivity': cmd.getIncludeNativeConnectivity(),
                         'customConnectivityName': cmd.getSelectedCustomConnectivityNames(),

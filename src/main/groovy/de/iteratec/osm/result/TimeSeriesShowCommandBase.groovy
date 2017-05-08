@@ -181,8 +181,8 @@ class TimeSeriesShowCommandBase implements Validateable {
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
         viewModelToCopyTo.put('selectedConnectivities', this.selectedConnectivities)
 
-        viewModelToCopyTo.put('from', ParameterBindingUtility.ISO_DATE_TIME_FORMATTER.print(this.from))
-        viewModelToCopyTo.put('to', ParameterBindingUtility.ISO_DATE_TIME_FORMATTER.print(this.to))
+        viewModelToCopyTo.put('from', ParameterBindingUtility.formatDateTimeParameter(this.from))
+        viewModelToCopyTo.put('to', ParameterBindingUtility.formatDateTimeParameter(this.to))
 
         viewModelToCopyTo.put('chartTitle', this.chartTitle)
         viewModelToCopyTo.put('chartWidth', this.chartWidth)
