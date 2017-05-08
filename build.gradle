@@ -129,6 +129,9 @@ dependencies {
     testCompile('com.codeborne:phantomjsdriver:1.2.1') {
         transitive = false
     }
+    testCompile('com.athaydes:spock-reports:1.3.0'){
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
 
 }
 task wrapper(type: Wrapper) {
