@@ -51,7 +51,7 @@ class MeasurandUtilService {
         measurand = parseMeasurandString(measurand)
 
         def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
+        if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand) && value) {
             return ((double) value) / 1024 / 1024
         }
 
