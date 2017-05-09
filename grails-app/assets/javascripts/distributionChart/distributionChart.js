@@ -33,7 +33,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
-            drawChart(chartData);
+            draw();
         });
 
         // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
@@ -52,19 +52,15 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         assignShortLabels();
 
-        if (originalSeries === null) {
-            originalSeries = chartData.series;
+        dataTrimValue.value = getDomain()[1];
 
-            dataTrimValue.value = getDomain()[1];
-
-            // sort the violins after descending median as default
-            sortByMedian();
-            var sortedSeries = {};
-            chartData.sortingRules.desc.forEach(function (trace) {
-                sortedSeries[trace] = originalSeries[trace];
-            });
-            chartData.series = sortedSeries;
-        }
+        // sort the violins after descending median as default
+        sortByMedian();
+        var sortedSeries = {};
+        chartData.sortingRules.desc.forEach(function (trace) {
+            sortedSeries[trace] = chartData.series[trace];
+        });
+        chartData.series = sortedSeries;
 
         initFilterDropdown(chartData.filterRules);
         draw();
@@ -395,17 +391,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var journey = chartData.filterRules[journeyKey];
 
             journey.forEach( function (trace) {
-                filteredAndSortedSeries[trace] = originalSeries[trace];
+                filteredAndSortedSeries[trace] = chartData.series[trace];
             });
         } else {
             var sortingOrder = desc ? "desc" : "asc";
             chartData.sortingRules[sortingOrder].forEach( function (trace) {
-                filteredAndSortedSeries[trace] = originalSeries[trace];
+                filteredAndSortedSeries[trace] = chartData.series[trace];
             });
         }
 
         chartData.series = filteredAndSortedSeries;
-        drawChart(chartData);
+        draw();
     };
 
     var toogleFilterCheckmarks = function (listItem) {
