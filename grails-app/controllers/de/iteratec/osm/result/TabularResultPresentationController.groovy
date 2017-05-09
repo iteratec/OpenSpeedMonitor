@@ -312,6 +312,8 @@ class TabularResultPresentationController {
     }
 
     private List<List<String>> getCsvRows(TabularResultListResultsCommand cmd) {
+        Interval timeFrame = cmd.receiveSelectedTimeFrame()
+
         List<List<String>> result = EventResult.createCriteria().list {
             createAlias('jobGroup', 'jobGroup', JoinType.LEFT_OUTER_JOIN)
             createAlias('page', 'page', JoinType.LEFT_OUTER_JOIN)
@@ -321,6 +323,8 @@ class TabularResultPresentationController {
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
 
             and {
+                between("jobResultDate", timeFrame.start.toDate(), timeFrame.end.toDate())
+
                 'in'('jobGroup.id', cmd.selectedFolder)
                 if (cmd.selectedPages) {
                     'in'('page.id', cmd.selectedPages)
