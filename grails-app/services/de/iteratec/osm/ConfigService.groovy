@@ -128,19 +128,29 @@ class ConfigService {
     }
 
     /**
-     * Get method load times should be calculated to percent of
-     * users which are satisfied by that load time.
+     * The time in days internal monitoring data like health checks are stored.
      */
     Integer getInternalMonitoringStorageTimeInDays(){
         return getConfig().internalMonitoringStorageTimeInDays
     }
 
+	/**
+	 * Whether initial setup of Webpagetest server already ran.
+	 */
+	OsmConfiguration.InfrastructureSetupStatus getInfrastructureSetupRan(){
+		return getConfig().infrastructureSetupRan
+	}
+
+	void setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus state){
+		getConfig().infrastructureSetupRan = state;
+	}
+
     /**
      * Gets the name of the used database driver of running environment
      * @return {@link String} of the used database driver name
      */
-    public String getDatabaseDriverClassName() {
-        return grailsApplication.config.dataSource.driverClassName;
+    String getDatabaseDriverClassName() {
+        return grailsApplication.config.dataSource.driverClassName
     }
 
     private OsmConfiguration getConfig(){
