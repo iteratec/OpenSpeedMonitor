@@ -125,7 +125,7 @@
             }
 
             OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+              OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
 
             spinner.start();
             $.ajax({

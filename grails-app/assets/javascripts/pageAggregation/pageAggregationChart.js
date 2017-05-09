@@ -9,7 +9,7 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdentifier) {
+OpenSpeedMonitor.ChartModules.PageAggregation = (function (chartIdentifier) {
 
     var svg,
         svgDefinitions,

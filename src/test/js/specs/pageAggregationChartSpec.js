@@ -120,7 +120,7 @@ describe("GroupedBarchart Creation", function () {
     }
 
     function drawChart(data) {
-        var chart = OpenSpeedMonitor.ChartModules.PageAggregationHorizontal(id);
+        var chart = OpenSpeedMonitor.ChartModules.PageAggregation(id);
         chart.drawChart(data);
         flushAllD3Transitions();
     }

@@ -47,6 +47,6 @@
 <g:render template="/pageAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/d3/groupedBarchartHorizontal.js" />',true,'groupedBarchartHorizontal');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageAggregation/pageAggregationChart.js" />',true,'groupedBarchartHorizontal');
     });
 </asset:script>
