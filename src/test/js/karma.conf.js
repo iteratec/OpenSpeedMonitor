@@ -24,6 +24,8 @@ module.exports = function (config) {
             {pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/d3/chartLabelUtil.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/d3/chartColorProvider.js', watched: true},
+            {pattern: ASSET_PATH +'/javascripts/d3/groupedBarchartHorizontal.js', watched: true},
+            {pattern: ASSET_PATH +'/javascripts/d3/trafficLightDataProvider.js', watched: true},
             {pattern: TEST_PATH + '/specs/**/*.js', watched: true}
         ],
 
