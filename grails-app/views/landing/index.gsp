@@ -22,7 +22,7 @@
     </g:if>
     <g:if test="${!isSetupFinished}">
         <a href="/infrastructureSetup" class="btn btn-primary" id="setup-wpt-server-button">
-            <g:message code="de.iteratec.osm.ui.setupwizards.infra.continueButton" default="continueButton" />
+            <g:message code="de.iteratec.osm.ui.setupwizards.infra.continueButton" default="continue " />
         </a>
     </g:if>
 </div>

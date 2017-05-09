@@ -15,70 +15,7 @@
   }
 }
 
-.wizardStep > a {
-  border: none !important;
-  background: transparent !important;
-  pointer-events: none;
-  color: @inactiveProgressColor;
-  > i {
-    display: block;
-    padding: 0.5em;
-    background: @inactiveProgressColor;
-    color: white !important;
-    width: 2em;
-    height: 2em;
-    margin: 0 auto 5px auto;
-    border-radius: 1em;
-  }
-}
-
-@wizardStepActiveTransitionDuration: .5s;
-@wizardStepActiveTransitionTimingFunction: ease-in;
-.wizardStep.active > a {
-  transition-property: color;
-  transition-duration: @wizardStepActiveTransitionDuration;
-  transition-timing-function: @wizardStepActiveTransitionTimingFunction;
-  color: @activeProgressColor;
-  > i {
-    transition-property: background-color;
-    transition-duration: @wizardStepActiveTransitionDuration;
-    transition-timing-function: @wizardStepActiveTransitionTimingFunction;
-    background-color: @activeProgressColor !important;
-  }
-}
-
-.wizardStep.wasActive > a {
-  pointer-events: auto;
-  > i {
-    background: @activeProgressColor;
-    pointer-events: auto;
-    color: @activeProgressColor;
-  }
-}
-
-#setupWizardProgressBarContainer {
-  position: absolute;
-  left: 15px;
-  right: 15px;
-  z-index: 0;
-  height: @progressBarHeightheight;
-  top: ~"calc(15px + 5px + 2em)";
-  margin-top: -(@progressBarHeightheight / 2);
-  background-color: @inactiveProgressColor;
-  box-shadow: none;
-}
-
-#setupWizardProgressBar {
-  width: 12.5%; // initial progress
-  box-shadow: none;
-  -webkit-box-shadow: none;
-}
-
-#measurementSetupSteps {
-  margin-bottom: 30px;
-}
-
-/* --- End of wizard step indicator layout */
+/* --- Info panel layout */
 
 .panel.panel-info {
   border: none;
@@ -100,47 +37,10 @@
   bottom: 15px;
 }
 
-#createJobTabCreationButton {
-  background-color: @iteratec-magenta;
-  border-color: @iteratec-magenta-dark;
-}
-
 .infoImage {
   margin: 0 auto;
   max-height: 200px;
   max-width: 100%;
-}
-
-.chosen-container.chosen-container-single {
-  width: 100% !important; // for some reason the chosen-select element gets initialized with a width 0px
-}
-
-.failureText {
-  color: @state-danger-text !important;
-}
-
-.nav-tabs li.active a{
-  color: @activeProgressColor;
-}
-
-#newPageOrMeasuredEventInfo {
-  margin-top: 5px;
-}
-
-#serverAddressForm {
-  margin-top: 21px;
-}
-
-#serverKeyForm {
-  margin-top: 62px;
-}
-
-#inputServerKey {
-  margin-top: 40px;
-}
-
-#invalidAddress {
-  margin-top: -96px;
 }
 
 #wptKeyInfoPanel {
@@ -158,16 +58,27 @@
 #headline {
   margin-top: 20px;
   margin-left: 25px;
+  font-size: 42px;
 }
 
 #setServers {
   margin-top: -20px;
 }
 
-#card {
-  margin-left: -50px;
+body {
+  padding-left: 0;
 }
 
-#logo {
-  margin-left: -50px;
+.footer {
+  left: 0;
+  margin-bottom: 15px;
+}
+
+#inputServerKeyForm {
+  margin-top: 60px;
+}
+
+#invalidAddress {
+  margin-left: 10px;
+  margin-top: -100px;
 }

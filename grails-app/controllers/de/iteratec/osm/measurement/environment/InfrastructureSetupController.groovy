@@ -13,7 +13,7 @@ class InfrastructureSetupController {
     }
 
     def create() {
-        return [params:params,disableNavbar:true]
+        return [params:params,disableNavbar:true,disableBackToTop:true]
     }
 
     def cancel() {
@@ -22,7 +22,7 @@ class InfrastructureSetupController {
     }
 
     def save() {
-        //if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.Finished) {
+        if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.Finished) {
             List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(params.serverSelect, params.inputWptKey, params.inputServerName, params.inputServerAddress, params.inputServerKey)
             if (addedLocations.size() > 0) {
                 configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.Finished)
@@ -32,6 +32,6 @@ class InfrastructureSetupController {
                 flash.error = "An error occured"
                 forward(actionName: 'create')
             }
-        //}
+        }
     }
 }

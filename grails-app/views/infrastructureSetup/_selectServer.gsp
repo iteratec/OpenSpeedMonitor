@@ -50,47 +50,88 @@
         </div>
 
         <div class="col-sm-10">
-            <div class="form-group" id="customServerForm">
-                %{-- labels --}%
-                <div class="col-sm-3">
+
+                <form class="form-horizontal" id="customServerForm">
                     <div class="form-group">
-                        <label for="inputServerName" class="col-sm-2 control-label">
+                        <label for="inputServerName" class="col-sm-4 control-label">
                             <g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>
                         </label>
+                        <div class="col-sm-8">
+                            <g:textField name="inputServerName" class="form-control" id="inputServerName" value="${params.inputServerName}"
+                                placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default:'enterServerName')}">
+                            </g:textField>
+                        </div>
                     </div>
-                    <div class="form-group" id="serverAddressForm">
-                        <label for="inputServerAddress" class="col-sm-2 control-label">
+                    <div class="form-group">
+                        <label for="inputServerAddress" class="col-sm-4 control-label">
                             <g:message code="de.iteratec.osm.ui.setupwizards.infra.address" default="address"></g:message>
                         </label>
+                        <div class="col-sm-8">
+                            <g:textField name="inputServerAddress" class="form-control" id="inputServerAddress" value="${params.inputServerAddress}"
+                                placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default:'enterServerAddress')}">
+                            </g:textField>
+                        </div>
                     </div>
-                    <div class="form-group" id="serverKeyForm">
-                        <label for="inputServerAddress" class="col-sm-2 control-label">
+                    <div class="form-group" id="inputServerKeyForm">
+                        <label for="inputServerAddress" class="col-sm-4 control-label">
                             <g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="key"></g:message>
                         </label>
+                        <div class="col-sm-8">
+                            <g:textField name="inputServerKey" class="form-control" id="inputServerKey" value="${params.inputServerKey}">
+                            </g:textField>
+                        </div>
                     </div>
-                </div>
+                    <div class="form-group"  id="invalidAddressForm">
+                        <label for="inputServerAddress" class="col-sm-4 control-label">
+
+                        </label>
+                        <div class="col-sm-8">
+                            <span class="help-block hidden" id="invalidAddress">
+                                <font color="red"><g:message code="de.iteratec.osm.ui.setupwizards.infra.invalidAddress" default="invalidAddress"></g:message></font>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+
+                %{-- labels --}%
+                %{--<div class="col-sm-3">--}%
+                    %{--<div class="form-group">--}%
+                        %{--<label for="inputServerName" class="col-sm-2 control-label">--}%
+                            %{--<g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>--}%
+                        %{--</label>--}%
+                    %{--</div>--}%
+                    %{--<div class="form-group" id="serverAddressForm">--}%
+                        %{--<label for="inputServerAddress" class="col-sm-2 control-label">--}%
+                            %{--<g:message code="de.iteratec.osm.ui.setupwizards.infra.address" default="address"></g:message>--}%
+                        %{--</label>--}%
+                    %{--</div>--}%
+                    %{--<div class="form-group" id="serverKeyForm">--}%
+                        %{--<label for="inputServerAddress" class="col-sm-2 control-label">--}%
+                            %{--<g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="key"></g:message>--}%
+                        %{--</label>--}%
+                    %{--</div>--}%
+                %{--</div>--}%
 
                 %{-- input fields --}%
-                <div class="col-sm-8">
-                    <div class="form-group">
-                        <g:textField name="inputServerName" class="form-control" id="inputServerName" value="${params.inputServerName}"
-                                     placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default:'enterServerName')}">
-                        </g:textField>
-                    </div>
-                    <div class="form-group">
-                        <g:textField name="inputServerAddress" class="form-control" id="inputServerAddress" value="${params.inputServerAddress}"
-                                     placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default:'enterServerAddress')}">
-                        </g:textField>
-                    </div>
-                <div class="form-group">
-                    <g:textField name="inputServerKey" class="form-control" id="inputServerKey" value="${params.inputServerKey}">
-                    </g:textField>
-                </div>
-                    <span class="help-block hidden" id="invalidAddress">
-                        <font color="red"><g:message code="de.iteratec.osm.ui.setupwizards.infra.invalidAddress" default="invalidAddress"></g:message></font>
-                    </span>
-                </div>
-            </div>
+                %{--<div class="col-sm-8">--}%
+                    %{--<div class="form-group">--}%
+                        %{--<g:textField name="inputServerName" class="form-control" id="inputServerName" value="${params.inputServerName}"--}%
+                                     %{--placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default:'enterServerName')}">--}%
+                        %{--</g:textField>--}%
+                    %{--</div>--}%
+                    %{--<div class="form-group">--}%
+                        %{--<g:textField name="inputServerAddress" class="form-control" id="inputServerAddress" value="${params.inputServerAddress}"--}%
+                                     %{--placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default:'enterServerAddress')}">--}%
+                        %{--</g:textField>--}%
+                    %{--</div>--}%
+                %{--<div class="form-group">--}%
+                    %{--<g:textField name="inputServerKey" class="form-control" id="inputServerKey" value="${params.inputServerKey}">--}%
+                    %{--</g:textField>--}%
+                %{--</div>--}%
+                    %{--<span class="help-block hidden" id="invalidAddress">--}%
+                        %{--<font color="red"><g:message code="de.iteratec.osm.ui.setupwizards.infra.invalidAddress" default="invalidAddress"></g:message></font>--}%
+                    %{--</span>--}%
+                %{--</div>--}%
         </div>
     </div>
 

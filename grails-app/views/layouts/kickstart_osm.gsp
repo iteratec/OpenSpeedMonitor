@@ -48,9 +48,7 @@
             <g:pageProperty name="page.footer" />
         </g:if>
         <g:else>
-            <g:if test="${!disableNavbar}">
-                <g:render template="/layouts/footer"/>
-            </g:if>
+            <g:render template="/layouts/footer"/>
         </g:else>
 
         <!-----------------------------------------------------global modal dialogs-->

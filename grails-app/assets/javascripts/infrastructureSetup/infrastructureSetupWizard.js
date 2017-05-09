@@ -53,10 +53,11 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     }
 
     var updateInputFields = function () {
-        wptKeyInputInfo.toggleClass("hidden",serverSelectBox.val() != "WPTServer");
-        wptKeyInputFields.toggleClass("hidden",serverSelectBox.val() != "WPTServer");
-        customServerInfo.toggleClass("hidden",serverSelectBox.val() == "WPTServer");
-        customServerFields.toggleClass("hidden",serverSelectBox.val() == "WPTServer");
+        var isWptServer = serverSelectBox.val() == "WPTServer";
+        wptKeyInputInfo.toggleClass("hidden", !isWptServer);
+        wptKeyInputFields.toggleClass("hidden", !isWptServer);
+        customServerInfo.toggleClass("hidden", isWptServer);
+        customServerFields.toggleClass("hidden", isWptServer);
         validate();
     };
 
