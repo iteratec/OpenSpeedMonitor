@@ -2,10 +2,10 @@ describe("GroupedBarchart Creation", function () {
     var id = "GroupedBarchartID";
     var dataWithOneGroupAndOneMeasurand = {
         "filterRules": {
-            "OTTO_ADS-kleiderschrank": ["ADS | develop_Desktop"],
-            "OTTO_Multistep_Desktop": ["ADS | develop_Desktop"],
-            "OTTO_Multistep_Desktop_navigates": ["ADS | develop_Desktop"],
-            "Scale_Loadtest_multistep": ["ADS | develop_Desktop"]
+            "Job1": ["Page1 | Desktop"],
+            "Job2": ["Page1 | Desktop"],
+            "Job3": ["Page1 | Desktop"],
+            "Job4": ["Page1 | Desktop"]
         },
         "groupingLabel": "Page / JobGroup",
         "i18nMap": {
@@ -17,10 +17,10 @@ describe("GroupedBarchart Creation", function () {
         },
         "series": [{
             "data": [{
-                "grouping": "ADS | develop_Desktop",
+                "grouping": "Page1 | Desktop",
                 "measurand": "doc complete (Bis zum onload-Event)",
                 "originalMeasurandName": "docCompleteTimeInMillisecsUncached",
-                "value": 722.7778,
+                "value": 554.823,
                 "valueComparative": null
             }], "dimensionalUnit": "ms", "stacked": null, "yAxisLabel": "Ladezeit [ms]"
         }]
@@ -28,8 +28,8 @@ describe("GroupedBarchart Creation", function () {
 
     var dataWithTwoGroupsAndOneMeasurand = {
         "filterRules": {
-            "OTTO_ADS und HP": ["ADS_entry | develop_Desktop", "ADS_entry | develop_Smartphone"],
-            "OTTO_ADS und HP_UserAgentSetzbar": ["ADS_entry | develop_Desktop", "ADS_entry | develop_Smartphone"]
+            "Job1": ["Page1 | Desktop", "Page1 | Smartphone"],
+            "Job2": ["Page1 | Desktop", "Page1 | Smartphone"]
         },
         "groupingLabel": "Page / JobGroup",
         "i18nMap": {
@@ -41,16 +41,16 @@ describe("GroupedBarchart Creation", function () {
         },
         "series": [{
             "data": [{
-                "grouping": "ADS_entry | develop_Desktop",
+                "grouping": "Page1 | Desktop",
                 "measurand": "doc complete (Bis zum onload-Event)",
                 "originalMeasurandName": "docCompleteTimeInMillisecsUncached",
-                "value": 2217.4543,
+                "value": 1863.3596,
                 "valueComparative": null
             }, {
-                "grouping": "ADS_entry | develop_Smartphone",
+                "grouping": "Page1 | Smartphone",
                 "measurand": "doc complete (Bis zum onload-Event)",
                 "originalMeasurandName": "docCompleteTimeInMillisecsUncached",
-                "value": 4695.7555,
+                "value": 5398.5369,
                 "valueComparative": null
             }], "dimensionalUnit": "ms", "stacked": null, "yAxisLabel": "Ladezeit [ms]"
         }]
@@ -58,8 +58,8 @@ describe("GroupedBarchart Creation", function () {
 
     var dataWithTwoGroupsAndTwoMeasurands = {
         "filterRules": {
-            "OTTO_ADS und HP": ["ADS_entry | develop_Desktop", "ADS_entry | develop_Smartphone"],
-            "OTTO_ADS und HP_UserAgentSetzbar": ["ADS_entry | develop_Desktop", "ADS_entry | develop_Smartphone"]
+            "Job1": ["Page1 | Desktop", "Page1 | Smartphone"],
+            "Job2": ["Page1 | Desktop", "Page1 | Smartphone"]
         },
         "groupingLabel": "Page / JobGroup",
         "i18nMap": {
@@ -71,30 +71,30 @@ describe("GroupedBarchart Creation", function () {
         },
         "series": [{
             "data": [{
-                "grouping": "ADS_entry | develop_Desktop",
+                "grouping": "Page1 | Desktop",
                 "measurand": "doc complete time",
                 "originalMeasurandName": "docCompleteTimeInMillisecsUncached",
-                "value": 2217.4543,
+                "value": 35135.1235,
                 "valueComparative": null
             }, {
-                "grouping": "ADS_entry | develop_Smartphone",
+                "grouping": "Page1 | Smartphone",
                 "measurand": "doc complete time",
                 "originalMeasurandName": "docCompleteTimeInMillisecsUncached",
-                "value": 4695.7555,
+                "value": 4521.12588,
                 "valueComparative": null
             }], "dimensionalUnit": "ms", "stacked": null, "yAxisLabel": "Loading Time [ms]"
         }, {
             "data": [{
-                "grouping": "ADS_entry | develop_Desktop",
+                "grouping": "Page1 | Desktop",
                 "measurand": "bytes until doc complete",
                 "originalMeasurandName": "docCompleteIncomingBytesUncached",
-                "value": 0.5337830400466919,
+                "value": 0.5248963215878622,
                 "valueComparative": null
             }, {
-                "grouping": "ADS_entry | develop_Smartphone",
+                "grouping": "Page1 | Smartphone",
                 "measurand": "bytes until doc complete",
                 "originalMeasurandName": "docCompleteIncomingBytesUncached",
-                "value": 0.5223064155578613,
+                "value": 0.4852145636512224,
                 "valueComparative": null
             }], "dimensionalUnit": "MB", "stacked": null, "yAxisLabel": "Size [kb]"
         }]
@@ -145,7 +145,7 @@ describe("GroupedBarchart Creation", function () {
 
     it("should be the right value within the bar", function () {
         drawChartWithOneGroupeAndOnePage();
-        expect($(".bar").text()).toContain("" + parseFloat(722.5).toFixed(0))
+        expect($(".bar").text()).toContain("" + parseFloat(554.832).toFixed(0))
     });
 
     it("should be the right unit for times on the bar", function () {
@@ -186,5 +186,10 @@ describe("GroupedBarchart Creation", function () {
         var wholeText = $(".d3chart-legend-entry").text();
         expect(wholeText).toContain("doc complete time");
         expect(wholeText).toContain("bytes until doc complete");
-    })
+    });
+
+    it("should exist a group for every page group combination", function () {
+       drawChart(dataWithTwoGroupsAndTwoMeasurands);
+       expect($('.barGroup').length).toBe(2);
+    });
 });
