@@ -14,7 +14,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         originalSeries = null,
         width = 600,
         height = 600,
-        margin = {top: 50, right: 50, bottom: 70, left: 100},
+        margin = {top: 50, right: 0, bottom: 70, left: 100},
         maxViolinWidth = 150,
         violinWidth = null,
         mainDataResolution = 30,
@@ -86,12 +86,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var initSvg = function () {
         d3.select(svgContainer).selectAll("svg").remove();
-
+        width = svgContainer.clientWidth;
         return d3.select(svgContainer)
             .append("svg")
             .attr("class", "d3chart")
             .attr("height", height)
-            .attr("width", svgContainer.clientWidth);
+            .attr("width", width)
     };
 
     var assignShortLabels = function () {
@@ -170,15 +170,30 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var drawViolins = function (svg, domain) {
+        var violinGroup = svg.append("g");
+        createClipPathAroundViolins(svg, violinGroup);
         Object.keys(chartData.series).forEach(function (trace, i) {
             var traceData = chartData.series[trace].data;
 
-            var g = svg.append("g")
+            var g = violinGroup.append("g")
                 .attr("class", "d3chart-violin")
                 .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
             addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
+    };
+
+    var createClipPathAroundViolins = function (svg, violinGroup) {
+        var clipPathId = "violin-clip";
+        svg
+            .append("clipPath")
+            .attr("id", clipPathId)
+            .append("rect")
+            .attr("x", margin.left)
+            .attr("y", margin.top)
+            .attr("width", width - margin.left - margin.right)
+            .attr("height", height - margin.top - margin.bottom);
+        violinGroup.attr("clip-path", "url(#" + clipPathId + ")");
     };
 
     var sortSeriesDataAscending = function() {
