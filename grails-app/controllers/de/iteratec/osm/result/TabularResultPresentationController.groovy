@@ -299,17 +299,16 @@ class TabularResultPresentationController {
         DateTimeFormatter dateFormatter = ISODateTimeFormat.date()
         filename += dateFormatter.print(interval.start) + '_to_' + dateFormatter.print(interval.end) + '.csv'
 
-        response.setHeader('Content-disposition', 'attachment; filename=' + filename)
-        response.setContentType("text/csv;header=present;charset=UTF-8")
-
-        Writer responseWriter = new OutputStreamWriter(response.getOutputStream())
-
         List<String> headers = getCsvHeaders()
         List<List<String>> rows = getCsvRows(cmd)
+
+        response.setHeader('Content-disposition', 'attachment; filename=' + filename)
+        response.setContentType("text/csv;header=present;charset=UTF-8")
+        Writer responseWriter = new OutputStreamWriter(response.getOutputStream())
         csvExportService.writeCSV(headers, rows, responseWriter)
 
         response.getOutputStream().flush()
-        return null;
+        return null
     }
 
     private List<List<String>> getCsvRows(TabularResultListResultsCommand cmd) {
