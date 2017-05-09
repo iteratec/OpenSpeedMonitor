@@ -1,6 +1,4 @@
 package de.iteratec.osm.result
-
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 /**
  * <p>
  * Command of {@link TabularResultPresentationController#listResults(de.iteratec.osm.result.TabularResultListResultsCommand)} (ListResultsCommand)}.
@@ -76,7 +74,7 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
      * returns the selected connectivityProfiles by filtering all selected connectivities.
      */
     Collection<Long> getSelectedConnectivityProfiles() {
-        return selectedConnectivities.findAll { it.isLong() && ConnectivityProfile.exists(it as Long) }.collect {
+        return selectedConnectivities.findAll { it.isLong() }.collect {
             Long.parseLong(it)
         }
     }
@@ -86,7 +84,7 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
      */
     Collection<String> getSelectedCustomConnectivityNames() {
         return selectedConnectivities.findAll {
-            (!it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value) || (it.isLong() && !ConnectivityProfile.exists(it as Long))
+            !it.isLong() && it != ResultSelectionController.MetaConnectivityProfileId.Native.value
         }
     }
 

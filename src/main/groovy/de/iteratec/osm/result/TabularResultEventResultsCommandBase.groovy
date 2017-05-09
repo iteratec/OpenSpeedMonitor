@@ -53,7 +53,7 @@ class TabularResultEventResultsCommandBase implements Validateable {
         to(nullable: true, validator: { DateTime currentTo, TabularResultEventResultsCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
-            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.isBefore(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && !currentTo.isAfter(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
         max(nullable: true)
         offset(nullable: true)

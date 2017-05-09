@@ -19,15 +19,15 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
-
-import static org.junit.Assert.*
-
 /**
  * Test-suite of {@link TabularResultPresentationController}.
  *
@@ -35,244 +35,128 @@ import static org.junit.Assert.*
  * @since IT-106
  */
 @TestFor(TabularResultPresentationController)
+@Mock([ConnectivityProfile])
 class TabularResultPresentationControllerTests extends Specification {
 
     TabularResultPresentationController controllerUnderTest
 
     void setup() {
-        // The controller under test:
-        controllerUnderTest = controller;
+        controllerUnderTest = controller
 
-        // Mock relevant services:
         controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
         controllerUnderTest.pageDaoService = Stub(PageDaoService)
         controllerUnderTest.browserDaoService = Stub(BrowserDaoService)
         controllerUnderTest.locationDaoService = Stub(LocationDaoService)
     }
 
-    /**
-     * Test for {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_emptyCommandIsInvalid() {
-        when:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand();
-        then:
-        assertFalse(out.validate());
-        assertNotNull("Collections are never null", out.selectedFolder)
-        assertNotNull("Collections are never null", out.selectedPages)
-        assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", out.selectedBrowsers)
-        assertNotNull("Collections are never null", out.selectedLocations)
+    void "empty command is invalid"() {
+        when: "An empty command is initialized"
+        TabularResultListResultsCommand command = new TabularResultListResultsCommand()
+
+        then: "The command doesn't validate, but collections initialized and empty"
+        !command.validate()
+        command.selectedFolder == []
+        command.selectedPages == []
+        command.selectedMeasuredEventIds == []
+        command.selectedBrowsers == []
+        command.selectedLocations == []
     }
 
-    /**
-     * Test for  {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_BindFromEmptyRequestArgsIsInvalid() {
-        given:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand();
-        when:
-        controllerUnderTest.bindData(out, params)
-        then:
-        assertFalse(out.validate())
-        assertNotNull("Collections are never null", out.selectedFolder)
-        assertNotNull("Collections are never null", out.selectedPages)
-        assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", out.selectedBrowsers)
-        assertNotNull("Collections are never null", out.selectedLocations)
+    void "binding empty parameters is invalid"() {
+        given: "An empty command"
+        TabularResultListResultsCommand command = new TabularResultListResultsCommand()
+
+        when: "empty parameters are bound"
+        controllerUnderTest.bindData(command, params)
+
+        then: "the command doesn't validate, but collections are initialized and empty"
+        !command.validate()
+        command.selectedFolder == []
+        command.selectedPages == []
+        command.selectedMeasuredEventIds == []
+        command.selectedBrowsers == []
+        command.selectedLocations == []
     }
 
-    /**
-     * Test for  {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults() {
+    void "binding various valid parameters validates"() {
+        given: "A valid time range and data selection"
+        setDefaultParams()
+
+        when: "the parameters are bound"
+        TabularResultListResultsCommand command = new TabularResultListResultsCommand()
+        controllerUnderTest.bindData(command, params)
+
+        then: "the command validates and the correct data is bound"
+        command.validate()
+        command.from == new DateTime(2013, 8, 18, 12, 0, DateTimeZone.UTC)
+        command.to == new DateTime(2013, 8, 19, 13, 0, DateTimeZone.UTC)
+
+        command.selectedFolder == [1L]
+        command.selectedPages == [1L, 5L]
+        command.selectedMeasuredEventIds == [7L, 8L, 9L]
+        command.selectedBrowsers == [2L]
+        command.selectedLocations == [17L]
+        command.selectedTimeFrameInterval == 0
+        command.selectedConnectivityProfiles == [1L]
+        command.selectedCustomConnectivityNames == ["myconn"]
+        !command.includeNativeConnectivity
+
+        Interval timeFrame = command.receiveSelectedTimeFrame()
+        timeFrame.start == command.from
+        timeFrame.end == command.to
+    }
+
+    void "if 'to' is less or equal 'from' the command doesn't validate"(String to) {
         given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        Date expectedDateForFrom = new Date(1376776800000L)
+        setDefaultParams()
+        params.from = "2013-08-09T12:00:01.000Z"
+        params.to = to
 
-        params.fromHour = '12:00'
+        when:
+        TabularResultListResultsCommand command = new TabularResultListResultsCommand()
+        controllerUnderTest.bindData(command, params)
 
-        params.to = '19.08.2013'
-        Date expectedDateForTo = new Date(1376863200000L)
+        then:
+        !command.validate()
 
-        params.toHour = '13:00'
+        where:
+        to                         | _
+        "2013-08-09T12:00:01.000Z" | _
+        "2013-08-09T12:00:00.000Z" | _
+    }
+
+    void "the selectedTimeFrameInterval overwrites selected 'from' and 'to' times"() {
+        given:
+        int oneHourInSeconds = 60 * 60
+        setDefaultParams()
+        params.selectedTimeFrameInterval = oneHourInSeconds
+
+        when:
+        TabularResultListResultsCommand command = new TabularResultListResultsCommand()
+        controllerUnderTest.bindData(command, params)
+
+        then:
+        int nowInMillis = DateTime.now().millis
+        Interval timeFrame = command.receiveSelectedTimeFrame()
+
+        command.validate()
+        (nowInMillis - timeFrame.endMillis) < 100
+        ((nowInMillis - oneHourInSeconds * 1000) - timeFrame.startMillis) < 100
+
+
+    }
+
+
+    private setDefaultParams() {
+        params.from = '2013-08-18T12:00:00.000Z'
+        params.to = '2013-08-19T13:00:00.000Z'
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
-        params._action_listResults = 'Show'
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
         params.selectedTimeFrameInterval = 0
-        params.selectedConnectivityProfiles = []
-        params.selectedAllConnectivityProfiles = false
-        params.includeNativeConnectivity = false
-        params.customConnectivityName = "myconn"
-        params.includeCustomConnectivity = true
-
-        when:
-        // Create and fill the command:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand()
-        controllerUnderTest.bindData(out, params)
-
-        then:
-        // Verification:
-        assertTrue(out.validate())
-        assertNotNull("Collections are never null", out.selectedFolder)
-        assertNotNull("Collections are never null", out.selectedPages)
-        assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-        assertNotNull("Collections are never null", out.selectedBrowsers)
-        assertNotNull("Collections are never null", out.selectedLocations)
-
-        assertEquals(expectedDateForFrom, out.from);
-        assertEquals("12:00", out.fromHour);
-        assertEquals("13:00", out.toHour);
-
-        assertEquals(1, out.selectedFolder.size())
-        assertTrue(out.selectedFolder.contains(1L))
-
-        assertEquals(2, out.selectedPages.size())
-        assertTrue(out.selectedPages.contains(1L))
-        assertTrue(out.selectedPages.contains(5L))
-
-        assertFalse(out.selectedAllMeasuredEvents as boolean)
-        assertEquals(3, out.selectedMeasuredEventIds.size())
-        assertTrue(out.selectedMeasuredEventIds.contains(7L))
-        assertTrue(out.selectedMeasuredEventIds.contains(8L))
-        assertTrue(out.selectedMeasuredEventIds.contains(9L))
-
-        assertFalse(out.selectedAllBrowsers as boolean)
-        assertEquals(1, out.selectedBrowsers.size())
-        assertTrue(out.selectedBrowsers.contains(2L))
-
-        assertFalse(out.selectedAllLocations as boolean)
-        assertEquals(1, out.selectedLocations.size())
-        assertTrue(out.selectedLocations.contains(17L))
-
-        // Could we assume the time frame at once?
-        Interval timeFrame = out.receiveSelectedTimeFrame();
-
-        DateTime start = timeFrame.getStart();
-        DateTime end = timeFrame.getEnd();
-
-        assertEquals(2013, start.getYear())
-        assertEquals(8, start.getMonthOfYear())
-        assertEquals(18, start.getDayOfMonth())
-        assertEquals(12, start.getHourOfDay())
-        assertEquals(0, start.getMinuteOfHour())
-        assertEquals(0, start.getSecondOfMinute())
-        assertEquals(0, start.getMillisOfSecond())
-
-        assertEquals(2013, end.getYear())
-        assertEquals(8, end.getMonthOfYear())
-        assertEquals(19, end.getDayOfMonth())
-        assertEquals(13, end.getHourOfDay())
-        assertEquals(0, end.getMinuteOfHour())
-        assertEquals(59, end.getSecondOfMinute())
-        assertEquals(999, end.getMillisOfSecond())
-    }
-
-    /**
-     * Test for  {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '17.08.2013'
-        params.toHour = '13:00'
-
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_listResults = 'Show'
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
-        params.selectedTimeFrameInterval = 0
-
-        when:
-        // Create and fill the command:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand()
-        controllerUnderTest.bindData(out, params)
-
-        then:
-        // Verification:
-        assertFalse(out.validate())
-
-    }
-
-    /**
-     * Test for  {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '18.08.2013'
-        params.toHour = '11:00'
-
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_listResults = 'Show'
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
-        params.selectedTimeFrameInterval = 0
-
-        when:
-        // Create and fill the command:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand()
-        controllerUnderTest.bindData(out, params)
-
-        then:
-        // Verification:
-        assertFalse(out.validate())
-    }
-
-    /**
-     * Test for  {@link TabularResultListResultsCommand}.
-     */
-    void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute() {
-        given:
-        // Fill-in request args:
-        params.from = '18.08.2013'
-        params.fromHour = '12:00'
-
-        params.to = '18.08.2013'
-        params.toHour = '12:00'
-
-        params.selectedFolder = '1'
-        params.selectedPages = ['1', '5']
-        params.selectedMeasuredEventIds = ['7', '8', '9']
-        params.selectedBrowsers = '2'
-        params.selectedLocations = '17'
-        params._action_listResults = 'Show'
-        params.selectedAllBrowsers = false
-        params.selectedAllLocations = false
-        params.selectedAllMeasuredEvents = false
-        params.selectedTimeFrameInterval = 0
-
-        when:
-        // Create and fill the command:
-        TabularResultListResultsCommand out = new TabularResultListResultsCommand()
-        controllerUnderTest.bindData(out, params)
-
-        then:
-        // Verification:
-        assertFalse(out.validate())
+        params.selectedConnectivities= [1, "myconn"]
     }
 
 }
