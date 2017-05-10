@@ -9,38 +9,25 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var svgContainer = null,
-        chart = null,
         chartData = null,
-        originalSeries = null,
         width = 600,
         height = 600,
-        margin = {top: 50, right: 50, bottom: 70, left: 100},
+        margin = {top: 50, right: 0, bottom: 70, left: 100},
         maxViolinWidth = 150,
         violinWidth = null,
         mainDataResolution = 30,
         interpolation = 'basis',
-        toggleLogarithmicYAxisButton = null,
         dataTrimValue = null,
-        logarithmicYAxis = false,
-        headerline,
         commonLabelParts,
         colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
     var init = function () {
         svgContainer = document.querySelector("#svg-container");
-        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
-        // toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis");
 
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
-            drawChart(chartData);
+            draw();
         });
-
-        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
-        // toggleLogarithmicYAxisButton.addEventListener('click', function () {
-        //     logarithmicYAxis = !logarithmicYAxis;
-        //     drawChart(chartData);
-        // });
 
         $(window).resize(draw);
     };
@@ -52,19 +39,15 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         assignShortLabels();
 
-        if (originalSeries === null) {
-            originalSeries = chartData.series;
+        dataTrimValue.value = getDomain()[1];
 
-            dataTrimValue.value = getDomain()[1];
-
-            // sort the violins after descending median as default
-            sortByMedian();
-            var sortedSeries = {};
-            chartData.sortingRules.desc.forEach(function (trace) {
-                sortedSeries[trace] = originalSeries[trace];
-            });
-            chartData.series = sortedSeries;
-        }
+        // sort the violins after descending median as default
+        sortByMedian();
+        var sortedSeries = {};
+        chartData.sortingRules.desc.forEach(function (trace) {
+            sortedSeries[trace] = chartData.series[trace];
+        });
+        chartData.series = sortedSeries;
 
         initFilterDropdown(chartData.filterRules);
         draw();
@@ -86,12 +69,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var initSvg = function () {
         d3.select(svgContainer).selectAll("svg").remove();
-
+        width = svgContainer.clientWidth;
         return d3.select(svgContainer)
             .append("svg")
             .attr("class", "d3chart")
             .attr("height", height)
-            .attr("width", svgContainer.clientWidth);
+            .attr("width", width)
     };
 
     var assignShortLabels = function () {
@@ -143,19 +126,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .range([height - margin.bottom, margin.top])
             .domain(domain);
 
-        var logY = d3.scale.log()
-            .range([height - margin.bottom, margin.top])
-            .domain(domain);
-
-
-        var yAxis = null;
-        if (logarithmicYAxis)
-            yAxis = d3.svg.axis()
-                .scale(logY)
-                .orient('left')
-                .tickFormat(d3.format('g'));
-        else
-            yAxis = d3.svg.axis()
+        var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left");
 
@@ -170,15 +141,30 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var drawViolins = function (svg, domain) {
+        var violinGroup = svg.append("g");
+        createClipPathAroundViolins(svg, violinGroup);
         Object.keys(chartData.series).forEach(function (trace, i) {
             var traceData = chartData.series[trace].data;
 
-            var g = svg.append("g")
+            var g = violinGroup.append("g")
                 .attr("class", "d3chart-violin")
                 .attr("transform", "translate(" + (i * violinWidth + margin.left) + ",0)");
 
             addViolin(g, traceData, height - margin.bottom, violinWidth, domain);
         });
+    };
+
+    var createClipPathAroundViolins = function (svg, violinGroup) {
+        var clipPathId = "violin-clip";
+        svg
+            .append("clipPath")
+            .attr("id", clipPathId)
+            .append("rect")
+            .attr("x", margin.left)
+            .attr("y", margin.top)
+            .attr("width", width - margin.left - margin.right)
+            .attr("height", height - margin.top - margin.bottom);
+        violinGroup.attr("clip-path", "url(#" + clipPathId + ")");
     };
 
     var sortSeriesDataAscending = function() {
@@ -251,14 +237,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // x is now the vertical axis because of the violin being a 90 degree rotated histogram
-        var x = null;
-        if (logarithmicYAxis)
-            x = d3.scale.log()
-                .range([height, margin.top])
-                .domain(domain)
-                .nice();
-        else
-            x = d3.scale.linear()
+        var x = d3.scale.linear()
                   .range([height, margin.top])
                   .domain(domain)
                   .nice();
@@ -380,17 +359,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var journey = chartData.filterRules[journeyKey];
 
             journey.forEach( function (trace) {
-                filteredAndSortedSeries[trace] = originalSeries[trace];
+                filteredAndSortedSeries[trace] = chartData.series[trace];
             });
         } else {
             var sortingOrder = desc ? "desc" : "asc";
             chartData.sortingRules[sortingOrder].forEach( function (trace) {
-                filteredAndSortedSeries[trace] = originalSeries[trace];
+                filteredAndSortedSeries[trace] = chartData.series[trace];
             });
         }
 
         chartData.series = filteredAndSortedSeries;
-        drawChart(chartData);
+        draw();
     };
 
     var toogleFilterCheckmarks = function (listItem) {
