@@ -27,10 +27,7 @@
 </g:if>
 
 <div class="card">
-    %{-- bar --}%
     <h1 id="headline"><g:message code="landing.headline" default="Welcome" /></h1>
-
-    %{-- tab-content --}%
     <g:form action="save" id="setServersForm">
         <div class="tab-content">
             <div class="tab-pane active" id="setServers">

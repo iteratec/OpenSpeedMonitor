@@ -22,7 +22,7 @@ class WptServerServiceSpec extends Specification {
         setup: "the expected locations"
             mockProxyService(3)
         when: "trying to make a standard wpt-server with a valid key"
-            List<Location> addedLocations = service.tryMakeServerAndGetLocations("WPTServer","key","","")
+            List<Location> addedLocations = service.tryMakeServerAndGetLocations("WPTServer","key","","","")
         then:"it should make a server with the default wpt url and return a list with all the locations"
             WebPageTestServer.list().size() == 1
             WebPageTestServer.list()[0].label == WptServerService.WPT_URL
@@ -35,7 +35,7 @@ class WptServerServiceSpec extends Specification {
         setup: "the expected locations"
             mockProxyService(3)
         when: "trying to make a custom server with a valid key"
-            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","custom","www.custom.de")
+            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","custom","www.custom.de","")
         then:"it should make a server with the specified data and return a list with all the locations"
             WebPageTestServer.list().size() == 1
             WebPageTestServer.list()[0].label == "custom"
@@ -48,7 +48,7 @@ class WptServerServiceSpec extends Specification {
         setup: "no locations"
             mockProxyService(0)
         when: "trying to make a custom server with an invalid address"
-            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","name","")
+            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","name","","")
         then:"it should not be saved and return an empty list"
             WebPageTestServer.list().size() == 0
             addedLocations.size() == 0
@@ -58,7 +58,7 @@ class WptServerServiceSpec extends Specification {
         setup: "no locations"
             mockProxyService(0)
         when: "trying to make a custom server which is not a wpt-server"
-            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","test","www.test.de")
+            List<Location> addedLocations = service.tryMakeServerAndGetLocations("CustomServer","","test","www.test.de","")
         then:"it should not be saved and return an empty list"
             WebPageTestServer.list().size() == 0
             addedLocations.size() == 0

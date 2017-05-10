@@ -20,7 +20,6 @@ class OsmStateServiceSpec extends Specification {
     private static final String BASE_URL_PUBLIC_WEBPAGETEST_SERVER = "https://www.webpagetest.org/"
 
     def setup() {
-        createTestDataCommonToAllTests()
     }
 
     def cleanup() {
@@ -30,24 +29,17 @@ class OsmStateServiceSpec extends Specification {
         Job.list().each {Job job ->
             job.delete()
         }
-        service.measurementInfrastructureWizardAborted = false
     }
 
     void "isFirstRun method returns true with initial state data"() {
-        when: "just the webpagetest.org server and no job exist"
+        when: "no server and no job exist"
         then:"osm state is firstrun"
             service.untouched() == true
     }
 
-    void "isFirstRun method returns false with initial state data but wizard aborted"() {
-        when: "just the webpagetest.org server and no job exist but wizard was aborted"
-        service.measurementInfrastructureWizardAborted = true
-        then:"osm state is NOT firstrun"
-        service.untouched() == false
-    }
-
     void "isFirstRun method returns false with more than one wpt servers"() {
         when: "two wpt servers exist"
+        createWptServer();
         TestDataUtil.createWebPageTestServer(
             "url.of.wptserver.org",
             "url.of.wptserver.org",
@@ -60,13 +52,14 @@ class OsmStateServiceSpec extends Specification {
 
     void "isFirstRun method returns false with existing measurement jobs"() {
         when: "two wpt servers exist"
+        createWptServer();
         createMeasurementJob()
         then:"osm state is NOT firstrun"
         service.untouched() == false
     }
 
 
-    private void createTestDataCommonToAllTests(){
+    private void createWptServer(){
         TestDataUtil.createWebPageTestServer(
             "www.webpagetest.org",
             "www.webpagetest.org",
