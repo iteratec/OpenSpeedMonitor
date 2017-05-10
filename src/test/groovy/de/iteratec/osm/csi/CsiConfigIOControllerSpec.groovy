@@ -19,7 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.util.ServiceMocker
+import de.iteratec.osm.util.I18nService
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -28,9 +28,7 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import org.apache.commons.io.FileUtils
 import org.grails.plugins.testing.GrailsMockMultipartFile
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
+
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiConfigIOController)
 @Mock([CsiConfiguration, BrowserConnectivityWeight, ConnectivityProfile, Browser, Page, PageWeight, CsiDay])
@@ -53,74 +51,74 @@ class CsiConfigIOControllerSpec extends Specification{
     //################### EXPORTS ###################
 
     void "download BrowserConnectivityWeights-CSV should equal CsiConfiguration.browserConnectivityWeights"() {
-        given:
+        given: "Some BrowserConnectivityWeights exist in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
 
-        when:
+        when: "These BrowserConnectivityWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadBrowserConnectivityWeights()
 
-        then:
+        then: "The response equals these weights."
         response.contentAsString == (csvContent + "\n")
     }
 
     void "download BrowserConnectivityWeights-CSV should not create BrowserConnectivityWeights"() {
-        given:
+        given: "Some BrowserConnectivityWeights exist in db."
         int beforeAmountBrowserConnectivityWeights = BrowserConnectivityWeight.count
 
-        when:
+        when: "These BrowserConnectivityWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadBrowserConnectivityWeights()
 
-        then:
+        then: "No new BrowserConnectivityWeights got persisted in db."
         BrowserConnectivityWeight.count == beforeAmountBrowserConnectivityWeights
     }
 
     void "download PageWeights-CSV should equal CsiConfiguration.pageWeights"() {
-        given:
+        given: "Some PageWeights exist in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
 
-        when:
+        when: "These PageWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadPageWeights()
 
-        then:
+        then: "The response equals these weights."
         response.contentAsString == (csvContent + "\n")
     }
 
     void "download PageWeights-CSV should not create PageWeights"() {
-        given:
+        given: "Some PageWeights exist in db."
         int beforeAmountPageWeights = PageWeight.count
 
-        when:
+        when: "These PageWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadPageWeights()
 
-        then:
+        then: "No new PageWeights got persisted in db."
         PageWeight.count == beforeAmountPageWeights
     }
 
     void "download HourOfDay-CSV should equal CsiConfiguration.csiDay"() {
-        given:
+        given: "A CsiDay exists in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
 
-        when:
+        when: "The hour of day weights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadHourOfDayWeights()
 
-        then:
+        then: "The response equals the CsiDay."
         response.contentAsString == (csvContent + "\n")
     }
 
     void "download HourOfDay-CSV should not create CsiDay"() {
-        given:
+        given: "A CsiDay exists in db."
         int beforeAmountCsiDays = CsiDay.count
 
-        when:
+        when: "The hour of day weights get downloaded."
         params.id = csiConfigurationFilled.ident()
         controller.downloadHourOfDayWeights()
 
-        then:
+        then: "No new CsiDays got persisted in db."
         CsiDay.count == beforeAmountCsiDays
     }
 
@@ -129,98 +127,99 @@ class CsiConfigIOControllerSpec extends Specification{
     //################### UPLOADS ###################
 
     void "upload BrowserConnectivityWeights-CSV should change CsiConfiguration.browserConnectivityWeights"() {
-        given:
+        given: "No BrowserConnectivityWeights exist in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('browserConnectivityCsv', csvContent.bytes)
         request.addFile(multipartFile)
         assert csiConfigurationEmpty.browserConnectivityWeights.size() == 0
 
-        when:
+        when: "A CSV file with BrowserConnectivityWeights is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationEmpty.ident()
         controller.uploadBrowserConnectivityWeights()
 
-        then:
+        then: "The BrowserConnectivityWeights of CSV got persisted and associated to correct CsiConfiguration."
         csiConfigurationEmpty.browserConnectivityWeights.size() == 2
         csiConfigurationEmpty.browserConnectivityWeights*.weight.containsAll([45d, 12d])
     }
 
     void "upload BrowserConnectivityWeights-CSV should not create BrowserConnectivityWeights if existing"() {
-        given:
+        given: "BrowserConnectivityWeights already exist in db."
         int beforeAmountBrowserConnectivityWeights = BrowserConnectivityWeight.count
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('browserConnectivityCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
-        when:
+        when: "A CSV file with BrowserConnectivityWeights is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationFilled.ident()
         controller.uploadBrowserConnectivityWeights()
 
-        then:
+        then: "No new BrowserConnectivityWeights got persisted in db."
         BrowserConnectivityWeight.count == beforeAmountBrowserConnectivityWeights
     }
 
     void "upload PageWeights-CSV should change CsiConfiguration.pageWeights"() {
-        given:
+        given: "No PageWeights exist in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('pageCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
-        when:
+        when: "A CSV file with PageWeights is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationEmpty.ident()
         controller.uploadPageWeights()
 
-        then:
+        then: "The BrowserConnectivityWeights of CSV got persisted and associated to correct CsiConfiguration."
         csiConfigurationEmpty.pageWeights*.id.containsAll(csiConfigurationFilled.pageWeights*.id)
     }
 
     void "upload PageWeights-CSV should not create PageWeights if existing"() {
-        given:
+        given: "PageWeights already exist in db."
         int beforeAmountPageWeights = PageWeight.count
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('pageCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
-        when:
+        when: "A CSV file with PageWeights is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationFilled.ident()
         controller.uploadPageWeights()
 
-        then:
+        then: "No new PageWeights got persisted in db."
         PageWeight.count == beforeAmountPageWeights
     }
 
     void "upload HourOfDay-CSV should change CsiConfiguration.csiDay"() {
-        given:
+        given: "No CsiDays exist in db."
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('hourOfDayCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
-        when:
+        when: "A CSV file with CsiDay is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationEmpty.ident()
         controller.uploadHourOfDayWeights()
 
-        then:
+        then: "The CsiDay of CSV got persisted and associated to correct CsiConfiguration."
         csiConfigurationEmpty.csiDay == csiConfigurationFilled.csiDay
     }
 
     void "upload HourOfDay-CSV should not create CsiDay if existing"() {
-        given:
+        given: "CsiDay already exist in db."
         int beforeAmountCsiDays = CsiDay.count
         String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('hourOfDayCsv', csvContent.bytes)
         request.addFile(multipartFile)
 
-        when:
+        when: "A CSV file with CsiDay is uploaded."
         params.selectedCsiConfigurationId = csiConfigurationFilled.ident()
         controller.uploadHourOfDayWeights()
 
-        then:
+        then: "No new CsiDay got persisted in db."
         CsiDay.count == beforeAmountCsiDays
     }
 
     //################# END UPLOADS #################
 
     private createMocksCommonToAllTests() {
-        ServiceMocker.create().mockI18nService(controller.customerSatisfactionWeightService)
+        controller.customerSatisfactionWeightService.i18nService = Mock(I18nService)
+        controller.customerSatisfactionWeightService.i18nService.msg(_) >> "not relevant in these tests"
     }
 
     private void createTestDataCommonToAllTestsViaBuild() {
