@@ -9,9 +9,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var svgContainer = null,
-        chart = null,
         chartData = null,
-        originalSeries = null,
         width = 600,
         height = 600,
         margin = {top: 50, right: 0, bottom: 70, left: 100},
@@ -22,7 +20,6 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         toggleLogarithmicYAxisButton = null,
         dataTrimValue = null,
         logarithmicYAxis = false,
-        headerline,
         commonLabelParts,
         colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
