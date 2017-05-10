@@ -17,27 +17,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         violinWidth = null,
         mainDataResolution = 30,
         interpolation = 'basis',
-        toggleLogarithmicYAxisButton = null,
         dataTrimValue = null,
-        logarithmicYAxis = false,
         commonLabelParts,
         colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
     var init = function () {
         svgContainer = document.querySelector("#svg-container");
-        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
-        // toggleLogarithmicYAxisButton = document.querySelector("#toggle-logarithmic-y-axis");
 
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
             draw();
         });
-
-        // TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612])
-        // toggleLogarithmicYAxisButton.addEventListener('click', function () {
-        //     logarithmicYAxis = !logarithmicYAxis;
-        //     drawChart(chartData);
-        // });
 
         $(window).resize(draw);
     };
@@ -136,19 +126,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .range([height - margin.bottom, margin.top])
             .domain(domain);
 
-        var logY = d3.scale.log()
-            .range([height - margin.bottom, margin.top])
-            .domain(domain);
-
-
-        var yAxis = null;
-        if (logarithmicYAxis)
-            yAxis = d3.svg.axis()
-                .scale(logY)
-                .orient('left')
-                .tickFormat(d3.format('g'));
-        else
-            yAxis = d3.svg.axis()
+        var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left");
 
@@ -259,14 +237,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                   .domain([0, d3.max(data, function(d) { return d.y; })]);
 
         // x is now the vertical axis because of the violin being a 90 degree rotated histogram
-        var x = null;
-        if (logarithmicYAxis)
-            x = d3.scale.log()
-                .range([height, margin.top])
-                .domain(domain)
-                .nice();
-        else
-            x = d3.scale.linear()
+        var x = d3.scale.linear()
                   .range([height, margin.top])
                   .domain(domain)
                   .nice();
