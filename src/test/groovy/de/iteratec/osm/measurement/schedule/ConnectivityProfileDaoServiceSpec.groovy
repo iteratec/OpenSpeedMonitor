@@ -30,13 +30,13 @@ import spock.lang.Specification
 class ConnectivityProfileDaoServiceSpec extends Specification{
 
     void "findAll delivers all profiles"() {
-        when:
+        when: "4 ConnectivityProfiles exit in db."
         ConnectivityProfile.build(name: 'first')
         ConnectivityProfile.build(name: 'second')
         ConnectivityProfile.build(name: 'third')
         ConnectivityProfile.build(name: 'fourth')
 
-        then:
+        then: "findAll() retrieves them all"
         service.findAll().size() == 4
     }
 
