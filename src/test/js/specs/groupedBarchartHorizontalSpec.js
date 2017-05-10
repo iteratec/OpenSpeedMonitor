@@ -27,9 +27,10 @@ describe("GroupedBarchart Creation", function () {
     };
 
     var dataWithTwoGroupsAndOneMeasurand = {
+        //Filter rules should be distinct, to test them
         "filterRules": {
-            "Job1": ["Page1 | Desktop", "Page1 | Smartphone"],
-            "Job2": ["Page1 | Desktop", "Page1 | Smartphone"]
+            "Job1": ["Page1 | Desktop"],
+            "Job2": ["Page1 | Smartphone"]
         },
         "groupingLabel": "Page / JobGroup",
         "i18nMap": {
@@ -130,9 +131,19 @@ describe("GroupedBarchart Creation", function () {
         return copy;
     }
 
+    function createRequiredDomElements(){
+        var body = $(document.body);
+        body.append($('<div id=' + id + '></div>>'));
+        body.append($('<label class="btn btn-sm btn-default" id="inFrontButton"><input type="radio" name="mode">In Front</label>'));
+        var filterGroup = $('<div id="filter-dropdown-group" class="btn-group">')
+        filterGroup.append($('<button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Filtern <span class="caret"></span></button>'));
+        filterGroup.append($(' <ul class="dropdown-menu pull-right"><li id="customer-journey-header" class="dropdown-header">Customer Journey </li></ul>'));
+        body.append(filterGroup);
+    }
+
     beforeEach(function () {
-        $(document.body).append($('<div id=' + id + '></div>>'));
-    });
+        createRequiredDomElements();
+     });
 
     afterEach(function () {
         $("#" + id).remove();
@@ -192,4 +203,31 @@ describe("GroupedBarchart Creation", function () {
        drawChart(dataWithTwoGroupsAndTwoMeasurands);
        expect($('.barGroup').length).toBe(2);
     });
+
+    it("The inFront button should be disabled if we got multiple measurandgroups", function(){
+        drawChart(dataWithTwoGroupsAndTwoMeasurands);
+        expect($('#inFrontButton').attr("class")).toContain('disabled');
+    });
+
+    it("should be a reversed order of bars, after we clicked one of the sortiung buttons", function () {
+        drawChartWithTwoGroupsAndOnePage();
+        $('#all-bars-desc').click();
+        flushAllD3Transitions();
+        var firstDesc = $('.bar')[0];
+        $('#all-bars-asc').click();
+        var lastAsc = $('.bar')[0];
+        flushAllD3Transitions();
+        expect(firstDesc).toBe(lastAsc);
+    });
+
+    it("should be only one bar left, if we filter one of the two", function () {
+       drawChartWithTwoGroupsAndOnePage();
+       var lengthBefore = $('.bar').length;
+       $('.filterRule')[0].click();
+       flushAllD3Transitions();
+       var lengthAfter = $('.bar').length;
+       expect(lengthBefore-1).toBe(lengthAfter)
+    });
+
+
 });
