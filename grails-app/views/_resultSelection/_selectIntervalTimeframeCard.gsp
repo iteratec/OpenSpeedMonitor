@@ -44,7 +44,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
 	</div>
 	<div class="row form-group">
         <g:if test="${showComparisonInterval}">
-            <div class="hidden col-md-4 control-label comparison-initially-hidden">
+            <div class="hidden col-md-4 control-label comparison">
                 <label for="timeframe-picker" class="text-muted sub">
                     <g:message code="de.iteratec.osm.main-timeframe.label" default="Main" />
                 </label>
@@ -72,7 +72,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
             </div>
         </div>
         <%------------ initially NOT visible --%>
-        <div class="hidden comparison-initially-hidden" id="timeframe-picker-previous-container">
+        <div class="hidden comparison" id="timeframe-picker-previous-container">
             <div class="row form-group">
                 <div class="control-label col-md-4">
                     <label for="timeframe-picker-previous" class="text-muted sub">

@@ -27,7 +27,6 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
   var isSavedDashboard = OpenSpeedMonitor.urlUtils.getVar("dashboardID") !== undefined;
 
 
-
   var init = function () {
     // initialize controls with values. Either from presets, from URL, from local storage or defaults
     intervalSelectElement.val(defaultValueForInterval());
@@ -55,7 +54,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
 
   var defaultValueForStart = function () {
     if (isSavedDashboard) {
-            return timeFramePicker.getStart().toISOString();
+      return timeFramePicker.getStart().toISOString();
     }
     return OpenSpeedMonitor.urlUtils.getVar("from") ||
       clientStorage.getFromLocalStorage(clientStorageTimeFrameFromKey);
@@ -63,7 +62,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
 
   var defaultValueForEnd = function () {
     if (isSavedDashboard) {
-            return timeFramePicker.getEnd().toISOString();
+      return timeFramePicker.getEnd().toISOString();
     }
     return OpenSpeedMonitor.urlUtils.getVar("to") ||
       clientStorage.getFromLocalStorage(clientStorageTimeFrameToKey);
@@ -95,23 +94,21 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
       timeFrameSelectElement.val(manualTimeFrameSelection);
       triggerTimeFrameChanged();
     });
-    if (comparativeEnabled()){
+    if (comparativeEnabled()) {
       registerComparativeEvents();
     }
 
   };
 
   var registerComparativeEvents = function () {
-    $("#addComparativeTimeFrame").on("click", function (ev) {
-      $("#comparativeTimeFrameButton").toggleClass("hidden");
-      $(".comparison-initially-hidden").toggleClass("hidden");
-      $('#timeframe-picker').toggleClass("col-md-offset-4");
-    });
-    $("#removeComparativeTimeFrame").on("click", function (ev) {
-      $("#comparativeTimeFrameButton").toggleClass("hidden");
-        $(".comparison-initially-hidden").toggleClass("hidden");
-      $('#timeframe-picker').toggleClass("col-md-offset-4");
-    });
+    $("#addComparativeTimeFrame").on("click", toggleComparativeElements);
+    $("#removeComparativeTimeFrame").on("click", toggleComparativeElements);
+  };
+
+  var toggleComparativeElements = function () {
+    $("#comparativeTimeFrameButton").toggleClass("hidden");
+    $(".comparison").toggleClass("hidden");
+    $('#timeframe-picker').toggleClass("col-md-offset-4");
   };
 
   var setTimeFramePreselection = function (timeFrameInSecs, suppressEvent) {
@@ -123,7 +120,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     if (isNaN(timeFrameInSecs) || timeFrameInSecs <= 0) { // manual time selection
       from = defaultValueForStart();
       to = defaultValueForEnd();
-    }else {
+    } else {
       to = new Date();
       from = new Date(to.getTime() - (timeFrameInSecs * 1000));
       var oneDayInSecs = 24 * 60 * 60;
@@ -134,7 +131,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     }
 
     timeFramePicker.setRange(from, to);
-    if (comparativeEnabled()){
+    if (comparativeEnabled()) {
       setComparativeTimeFramePreselection();
     }
 
@@ -144,11 +141,11 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
 
   };
   var setComparativeTimeFramePreselection = function () {
-      var mainTimeFrame = getTimeFrame();
-      var interval = mainTimeFrame[1] - mainTimeFrame[0];
-      var toComparative = mainTimeFrame[0];
-      var fromComparative = new Date(toComparative - interval);
-      comparativeTimeFramePicker.setRange(fromComparative, toComparative);
+    var mainTimeFrame = getTimeFrame();
+    var interval = mainTimeFrame[1] - mainTimeFrame[0];
+    var toComparative = mainTimeFrame[0];
+    var fromComparative = new Date(toComparative - interval);
+    comparativeTimeFramePicker.setRange(fromComparative, toComparative);
   };
 
   var getTimeFrame = function () {
