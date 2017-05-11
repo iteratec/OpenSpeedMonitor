@@ -44,13 +44,11 @@ class QueueStatusController {
 
                 activeLocationsOfServer.each{Location location ->
 
-                    List<LocationHealthCheck> healthChecksOfLocation = healthChecks.findAll {it.location == location}
+                    LocationHealthCheck latestCheckOfLocation = healthChecks.findAll {it.location == location}[0]
 
-                    if (healthChecksOfLocation.size() == 1){
+                    if (latestCheckOfLocation){
 
-                        LocationHealthCheck healthCheck = healthChecksOfLocation[0]
-
-                        Map queueDataOfThisLocation = getQueueData(location, healthCheck)
+                        Map queueDataOfThisLocation = getQueueData(location, latestCheckOfLocation)
                         queueDataByWptServer[(wptServer.label)] << queueDataOfThisLocation
 
                     }

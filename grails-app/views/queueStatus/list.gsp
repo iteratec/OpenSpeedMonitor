@@ -13,8 +13,6 @@
           <a class="close" data-dismiss="alert">×</a>
           <g:message code="queue.noconnection.label"/>
         </div>
-        <!-- <input type="checkbox" id="autoRefresh" /> <label for="autoRefresh"><g:message code="queue.autorefresh.label"/></label>  -->
-
         <div id="allQueues">
             <g:render template="allQueues" bean="${servers}" />
         </div>
@@ -25,28 +23,6 @@
             </g:if>
 
             <asset:script type="text/javascript">
-                /*
-                function refreshQueues() {
-                        var rowVisible = []
-                        jQuery.ajax({
-                            type : 'POST',
-                            url : '${createLink(action: 'refresh')}',
-                        success: function(template) {
-                            $('#serverdown').hide();
-                            $('.datarows > tr.jobsRow').map(function (index, tr) { rowVisible[$(tr).attr('data-queue')] = $(tr).is(":visible"); });
-                            $('#allQueues').html(template);
-                            $('.datarows > tr.jobsRow').map(function (index, tr) { $(tr).toggle(rowVisible[$(tr).attr('data-queue')]); });
-                            $('abbr.timeago').timeago();
-                        },
-                        error: function() {
-                            $('#serverdown').show();
-                        }
-                    });
-                }
-
-                var timer = null;
-                */
-
                 $(document).ready(function() {
                     $('#serverdown').hide();
                     $('abbr.timeago').timeago();
@@ -67,8 +43,6 @@
                                 $('.arrow').toggleClass('fa-chevron-down', false);
                                 $('.arrow').toggleClass('fa-chevron-up', true);
 
-                                // $('.arrow', this).toggleClass('fa-chevron-down', true);
-                                // $('.arrow', this).toggleClass('fa-chevron-up', false);
                                 $(nextRow).toggle(true);
                             } else {
                                 // hide row
@@ -77,32 +51,8 @@
                                 $(nextRow).toggle(false);
                             }
                         }
-                        //return false;
                     });
-                    /*
-                    $(document).on('click', 'tr.queueRow', function () {
-                        var thisRow = this;
-                        if ($(this).next().hasClass('jobsRow')) {
-                            $('.arrow', thisRow).removeClass('fa fa-chevron-down');
-                            $('.arrow', thisRow).addClass('fa fa-chevron-up');
-                            $(this).next().hide();
-                        }
-                    });
-                    */
                     $('tr.jobsRow').hide();
-
-                    /*
-                    $('#autoRefresh').click(function () {
-                        if ($(this).prop('checked')) {
-                            refreshQueues();
-                            timer = setInterval(refreshQueues, 5000);
-                        } else {
-                            clearInterval(timer);
-                            $('tr.jobsRow').hide();
-                            $('#serverdown').hide();
-                        }
-                    });
-                    */
                 });
             </asset:script>
         </content>
