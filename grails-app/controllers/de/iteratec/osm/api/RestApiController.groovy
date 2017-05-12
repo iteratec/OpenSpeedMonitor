@@ -501,7 +501,7 @@ class RestApiController {
         if (csiConfiguration != null) {
             jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
         } else {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "CsiConfiguration with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "CsiConfiguration with id ${params.id} doesn't exist!")
             return
         }
 

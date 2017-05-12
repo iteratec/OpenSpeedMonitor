@@ -1,5 +1,6 @@
 package de.iteratec.osm.api
 
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -9,6 +10,7 @@ import spock.lang.Specification
  */
 @TestFor(RestApiInterceptor)
 @Mock([ApiKey])
+@Build(ApiKey)
 class RestApiInterceptorSpec extends Specification {
 
     RestApiInterceptor interceptorUnderTest
@@ -66,8 +68,8 @@ class RestApiInterceptorSpec extends Specification {
     }
     void "Test restApi interceptor - Invalid ApiKey leads to status of 403"(){
         setup:
-        String existingButInvalidKey = 'keyvalue'
-        new ApiKey(secretKey: existingButInvalidKey, valid: false).save(failOnError: true)
+        String existingButInvalidKey = 'key'
+        ApiKey.build(secretKey: existingButInvalidKey, valid: false)
         when:
         params.apiKey = existingButInvalidKey
         interceptorUnderTest.before()
