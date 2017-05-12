@@ -85,7 +85,57 @@
     </div>
 </div>
 
-<g:each var="booleanAttribute" in="['captureVideo', 'web10', 'noscript', 'clearcerts', 'ignoreSSL', 'standards', 'tcpdump', 'bodies', 'continuousVideo', 'keepua']">
+<g:each var="stringAttribute"  in="['option_domelement',
+                                    'option_block',
+                                    'option_f',
+                                    'option_r',
+                                    'option_notify',
+                                    'option_pingback',
+                                    'option_uastring',
+                                    'option_medianMetric',
+                                    'option_cmdline',
+                                    'option_tsview_id',
+                                    'option_custom',
+                                    'option_tester',
+                                    'option_affinity',
+                                    'option_mobileDevice',
+                                    'option_appendua',
+                                    'option_type']">
+    <g:render template="inputField" model="${['atrribute': stringAttribute, 'job': job]}" />
+</g:each>
+
+<g:each var="integerAttribute" in="['option_connections',
+                                    'option_iq',
+                                    'option_width',
+                                    'option_height',
+                                    'option_browser_width',
+                                    'option_browser_height',
+                                    'option_dpr',
+                                    'option_timelineStack']">
+    <g:render template="inputField" model="${['atrribute': integerAttribute, 'job': job]}" />
+</g:each>
+
+<g:each var="booleanAttribute" in="['captureVideo',
+                                    'web10',
+                                    'noscript',
+                                    'clearcerts',
+                                    'ignoreSSL',
+                                    'standards',
+                                    'tcpdump',
+                                    'bodies',
+                                    'continuousVideo',
+                                    'keepua',
+                                    'option_isPrivate',
+                                    'option_authType',
+                                    'option_noopt',
+                                    'option_noimages',
+                                    'option_noheaders',
+                                    'option_pngss',
+                                    'option_mobile',
+                                    'option_mv',
+                                    'option_htmlbody',
+                                    'option_timeline',
+                                    'option_lighthouse']">
 	<g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
 </g:each>
 

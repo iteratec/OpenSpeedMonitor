@@ -142,6 +142,42 @@ class Job implements Taggable {
      */
     Integer packetLoss
 
+    String  option_domelement
+    boolean option_isPrivate
+    Integer option_connections
+    String  option_block
+    boolean option_authType
+    String  option_f
+    String  option_r
+    String  option_notify
+    String  option_pingback
+    boolean option_noopt
+    boolean option_noimages
+    boolean option_noheaders
+    boolean option_pngss
+    Integer option_iq
+    boolean option_mobile
+    String  option_uastring
+    Integer option_width
+    Integer option_height
+    Integer option_browser_width
+    Integer option_browser_height
+    Integer option_dpr
+    boolean option_mv
+    String  option_medianMetric
+    String  option_cmdline
+    boolean option_htmlbody
+    String  option_tsview_id
+    String  option_custom
+    String  option_tester
+    String  option_affinity
+    boolean option_timeline
+    Integer option_timelineStack
+    String  option_mobileDevice
+    String  option_appendua
+    boolean option_lighthouse
+    String  option_type
+
     /**
      * @deprecated Use executionSchedule instead
      */
@@ -250,6 +286,42 @@ class Job implements Taggable {
         authUsername(nullable: true, maxSize: 255)
         authPassword(nullable: true, maxSize: 255, password: true)
         jobStatistic(nullable: true)
+
+        option_domelement(nullable: true)
+        //option_isPrivate(nullable: true)
+        option_connections(nullable: true)
+        option_block(nullable: true)
+        //option_authType(nullable: true)
+        option_f(nullable: true)
+        option_r(nullable: true)
+        option_notify(nullable: true)
+        option_pingback(nullable: true)
+        //option_noopt(nullable: true)
+        //option_noimages(nullable: true)
+        //option_noheaders(nullable: true)
+        //option_pngss(nullable: true)
+        option_iq(nullable: true)
+        //option_mobile(nullable: true)
+        option_uastring(nullable: true)
+        option_width(nullable: true)
+        option_height(nullable: true)
+        option_browser_width(nullable: true)
+        option_browser_height(nullable: true)
+        option_dpr(nullable: true)
+        //option_mv(nullable: true)
+        option_medianMetric(nullable: true)
+        option_cmdline(nullable: true)
+        //option_htmlbody(nullable: true)
+        option_tsview_id(nullable: true)
+        option_custom(nullable: true)
+        option_tester(nullable: true)
+        option_affinity(nullable: true)
+        //option_timeline(nullable: true)
+        option_timelineStack(nullable: true)
+        option_mobileDevice(nullable: true)
+        option_appendua(nullable: true)
+        //option_lighthouse(nullable: true)
+        option_type(nullable: true)
     }
 
     static mapping = {
