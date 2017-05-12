@@ -7,18 +7,18 @@ import spock.lang.Specification
 class ParameterBindingUtilitySpec extends Specification {
 
     void "is null if value is unset"() {
-        when:
+        when: "datetime to parse is null"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter(null, false)
 
-        then:
+        then: "null is returned"
         result == null
     }
 
     void "value simply returns joda datetime"(DateTime input, boolean fallbackToEndOfDay) {
-        when:
+        when: "datetime to parse already is a DateTime"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter(input, fallbackToEndOfDay)
 
-        then:
+        then: "this DateTime is simply returned"
         result == input
 
         where:
@@ -28,10 +28,10 @@ class ParameterBindingUtilitySpec extends Specification {
     }
 
     void "parsing ISO strings works"(String input, DateTime expected) {
-        when:
+        when: "datetime String to parse is correctly ISO formatted"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter(input, false)
 
-        then:
+        then: "a correctly parsed DateTime is returned"
         result == expected
 
         where:
@@ -41,34 +41,34 @@ class ParameterBindingUtilitySpec extends Specification {
     }
 
     void "parsed ISO strings are not affected by fallbackToEndOfDay parameter"() {
-        when:
+        when: "parseDateTimeParameter is called with a correctly ISO formatted String and fallbackToEndOfDay=true"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter("2017-03-01T12:33:44.567Z", true)
 
-        then:
+        then: "returned DateTimes time isn't set to end of day (23:59:59.999)"
         result == new DateTime(2017, 3, 1, 12, 33, 44, 567, DateTimeZone.UTC)
     }
 
     void "german date format can be parsed as fallback with start of day time"() {
-        when:
+        when: "datetime String to parse is 'german date time' formatted and fallbackToEndOfDay=false"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter("03.11.2016", false)
 
-        then:
+        then: "returned DateTimes time is set to start of day (00:00:00.000)"
         result == new DateTime(2016, 11, 3, 0, 0, 0, 0)
     }
 
     void "german date format can be parsed as fallback with end of day time"() {
-        when:
+        when: "datetime String to parse is 'german date time' formatted and fallbackToEndOfDay=true"
         DateTime result = ParameterBindingUtility.parseDateTimeParameter("03.11.2016", true)
 
-        then:
+        then: "returned DateTimes time is set to end of day (23:59:59.999)"
         result == new DateTime(2016, 11, 3, 23, 59, 59, 999)
     }
 
     void "wrong format throws exception"(input) {
-        when:
+        when: "datetime String to parse is of an invalid format"
         ParameterBindingUtility.parseDateTimeParameter(input, false)
 
-        then:
+        then: "an IllegalArgumentException is thrown"
         IllegalArgumentException e = thrown()
 
         where:
