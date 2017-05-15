@@ -23,194 +23,181 @@ import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
+import spock.lang.Specification
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
+import static spock.util.matcher.HamcrestMatchers.closeTo
+import static spock.util.matcher.HamcrestSupport.that
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
 @TestFor(CsiByEventResultsService)
 @Mock([JobGroup, CsiConfiguration])
-class CsiByEventResultsServiceTests {
-	
-	static final double DELTA = 1e-15
-	static final double expectedTargetCsi = 34d
-	static final DateTime START = new DateTime(2014,1,14,8,0,12) 
-	static final DateTime END = new DateTime(2014,1,14,9,2,0)
-	CsiByEventResultsService serviceUnderTest
-	MvQueryParams queryParamsIrrelevantCauseDbQueriesAreMocked
+@Build([EventResult, CsiConfiguration, JobGroup])
+class CsiByEventResultsServiceTests extends Specification{
 
-	def doWithSpring = {
-		meanCalcService(MeanCalcService)
-		performanceLoggingService(PerformanceLoggingService)
-	}
+    static final double DELTA = 1e-15
+    static final double EXPECTED_TARGET_CSI = 34d
+    static final DateTime START = new DateTime(2014, 1, 14, 8, 0, 12)
+    static final DateTime END = new DateTime(2014, 1, 14, 9, 2, 0)
+    CsiByEventResultsService serviceUnderTest
+    MvQueryParams queryParamsIrrelevantCauseDbQueriesAreMocked
 
-    void setUp() {
-		serviceUnderTest = service
+    def doWithSpring = {
+        meanCalcService(MeanCalcService)
+        performanceLoggingService(PerformanceLoggingService)
+    }
+
+    void setup() {
+        serviceUnderTest = service
+        initFullFunctionalSpringBeanServices()
         mocksCommonToAllTests()
-		CsiConfiguration csiConfiguration = new CsiConfiguration(label: "csi configuration", csiDay: new CsiDay())
-		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration).save(failOnError: true)
-		queryParamsIrrelevantCauseDbQueriesAreMocked = new MvQueryParams()
-		queryParamsIrrelevantCauseDbQueriesAreMocked.jobGroupIds.add(jobGroup.getId())
+        createTestDataCommonToAllTests()
     }
 
-    void tearDown() {
+    //tests////////////////////////////////////////////////////////////////////////////////////
+
+    void "get system csi without any EventResults"() {
+        given: "no EventResults match query"
+        serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> []
+        }
+        serviceUnderTest.weightingService = Stub(WeightingService){
+            getWeightedCsiValues(_, _, _) >> []
+        }
+
+        when: "EventResult based csi is calculated"
+        serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+
+        then: "an IllegalArgumentException with correct message is thrown"
+        IllegalArgumentException iae = thrown IllegalArgumentException
+        iae.message.startsWith("For the following query-params a system-csi couldn't be calculated: ")
     }
-	
-	//tests////////////////////////////////////////////////////////////////////////////////////
 
-	void testRetrieveSystemCsiByRawData_NoEventResults() {
-		//test-specific data
-		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = []
-		
-		//test-specific mocks
-		mockWeightingService(weightedCsiValuesToReturnInMock)
-		
-		//test execution
-		shouldFail(IllegalArgumentException){
-			CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
-		}
-		
-	}
-	
-    void testRetrieveSystemCsiByRawData_OneSingleEventResult() {
-		//test-specific data 
-		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
-			new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1,2,3])]
-		
-		//test-specific mocks
-		mockWeightingService(weightedCsiValuesToReturnInMock)
-		
-		//test execution
-		CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
-		
-		//assertions
-		assertNotNull(systemCsi)
-		assertEquals(12d, systemCsi.csiValueAsPercentage, DELTA)
-		assertEquals(expectedTargetCsi, systemCsi.targetCsiAsPercentage, DELTA)
-		assertEquals(systemCsi.csiValueAsPercentage - expectedTargetCsi, systemCsi.delta,  DELTA)
-		assertEquals(3, systemCsi.countOfMeasurings)
-		
+    void "get system csi with one single EventResult"() {
+        given: "one EventResult matches query"
+        serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+        }
+        serviceUnderTest.weightingService = Stub(WeightingService){
+            getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
+        }
+
+        when: "EventResult based csi is calculated"
+        CsiByEventResultsDto systemCsi = serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+
+        then: "csi is correctly calculated"
+        systemCsi != null
+        systemCsi.countOfMeasurings == 3
+        that systemCsi.csiValueAsPercentage, closeTo(12d, DELTA)
+        that systemCsi.targetCsiAsPercentage, closeTo(EXPECTED_TARGET_CSI, DELTA)
+        that systemCsi.delta, closeTo(systemCsi.csiValueAsPercentage - EXPECTED_TARGET_CSI, DELTA)
+
     }
-	
-	void testRetrieveSystemCsiByRawData_EventResultsWithDifferentWeights() {
-		//test-specific data
 
-		double valueFirstMv = 10d
-		double pageWeightFirstMv = 1d
-		double browserWeightFirstMv = 2d
-		
-		double valueSecondMv = 20d
-		double pageWeightSecondMv = 3d
-		double browserWeightSecondMv = 4d
-		
-		double valueThirdMv = 30d
-		double pageWeightThirdMv = 5d
-		double browserWeightThirdMv = 6d
-		
-		double sumOfAllWeights = (pageWeightFirstMv * browserWeightFirstMv) + (pageWeightSecondMv * browserWeightSecondMv)+ (pageWeightThirdMv  * browserWeightThirdMv)
+    void "get system csi for multiple EventResults with different weights"() {
+        given: "multiple EventResults match query and they get weighted differently in csi calculation"
+
+        double valueFirstMv = 10d
+        double pageWeightFirstMv = 1d
+        double browserWeightFirstMv = 2d
+
+        double valueSecondMv = 20d
+        double pageWeightSecondMv = 3d
+        double browserWeightSecondMv = 4d
+
+        double valueThirdMv = 30d
+        double pageWeightThirdMv = 5d
+        double browserWeightThirdMv = 6d
+
+        double csiValueFirst = valueFirstMv * pageWeightFirstMv * browserWeightFirstMv
+        double csiValieSecond = valueSecondMv * pageWeightSecondMv * browserWeightSecondMv
+        double csiValueThird = valueThirdMv * pageWeightThirdMv * browserWeightThirdMv
+        double sumOfAllWeights = (pageWeightFirstMv * browserWeightFirstMv) + (pageWeightSecondMv * browserWeightSecondMv) + (pageWeightThirdMv * browserWeightThirdMv)
+
+        double expectedCsiValue = ((csiValueFirst + csiValieSecond + csiValueThird) / sumOfAllWeights)
+        int numberOfUnderlyingEventResults = 8
+
+        serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
+            List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.buildWithoutSave()]
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> nonEmptyEventResultListNotUsedInTest
+        }
+        serviceUnderTest.weightingService = Stub(WeightingService){
+            getWeightedCsiValues(_, _, _) >> [
+                new WeightedCsiValue(
+                    weightedValue: new WeightedValue(value: valueFirstMv, weight: (pageWeightFirstMv * browserWeightFirstMv)),
+                    underlyingEventResultIds: [1, 2, 3]
+                ),
+                new WeightedCsiValue(
+                    weightedValue: new WeightedValue(value: valueSecondMv, weight: (pageWeightSecondMv * browserWeightSecondMv)),
+                    underlyingEventResultIds: [4, 5, 6, 7]
+                ),
+                new WeightedCsiValue(
+                    weightedValue: new WeightedValue(value: valueThirdMv, weight: (pageWeightThirdMv * browserWeightThirdMv)),
+                    underlyingEventResultIds: [10]
+                )
+            ]
+        }
+
+        when: "EventResult based csi is calculated"
+        CsiByEventResultsDto systemCsi = serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+
+        then: "csi is correctly calculatedrespective different weights"
+        systemCsi != null
+        systemCsi.countOfMeasurings == numberOfUnderlyingEventResults
+        that systemCsi.csiValueAsPercentage, closeTo(expectedCsiValue, DELTA)
+        that systemCsi.targetCsiAsPercentage, closeTo(EXPECTED_TARGET_CSI, DELTA)
+        that systemCsi.delta, closeTo(systemCsi.csiValueAsPercentage - EXPECTED_TARGET_CSI, DELTA)
+
+    }
 
 
-		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
-			new WeightedCsiValue(weightedValue: new WeightedValue(value: valueFirstMv, weight: (pageWeightFirstMv * browserWeightFirstMv)), underlyingEventResultIds: [1,2,3]),
-			new WeightedCsiValue(weightedValue: new WeightedValue(value: valueSecondMv, weight: (pageWeightSecondMv * browserWeightSecondMv)), underlyingEventResultIds: [4,5,6,7]),
-			new WeightedCsiValue(weightedValue: new WeightedValue(value: valueThirdMv, weight: (pageWeightThirdMv * browserWeightThirdMv)), underlyingEventResultIds: [10])]
-		int numberOfUnderlyingEventResults = 8
+    void "get system csi for system without CsiConfiguration"() {
+        given: "MvQueryParams contain JobGroup without associated CsiConfiguration"
+        JobGroup jobGroupWithoutCsiConfig = JobGroup.build(name: "rawDataJobGroup")
+        MvQueryParams queryParamsWithoutCsiConfiguration = new MvQueryParams()
+        queryParamsWithoutCsiConfiguration.jobGroupIds.add(jobGroupWithoutCsiConfig.getId())
+        serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+        }
+        serviceUnderTest.weightingService = Stub(WeightingService){
+            getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
+        }
 
-		mockWeightingService(weightedCsiValuesToReturnInMock)
-		//test execution
-		CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
-		
-		//assertions
-		assertNotNull(systemCsi)
-		assertEquals(
-			(((valueFirstMv * pageWeightFirstMv * browserWeightFirstMv) + (valueSecondMv * pageWeightSecondMv * browserWeightSecondMv) + (valueThirdMv * pageWeightThirdMv * browserWeightThirdMv)) / sumOfAllWeights),
-			systemCsi.csiValueAsPercentage, 
-			DELTA)
-		assertEquals(expectedTargetCsi, systemCsi.targetCsiAsPercentage, DELTA)
-		assertEquals(systemCsi.csiValueAsPercentage - expectedTargetCsi, systemCsi.delta,  DELTA)
-		assertEquals(numberOfUnderlyingEventResults, systemCsi.countOfMeasurings)
-		
-	}
+        when: "EventResult based csi is calculated"
+        serviceUnderTest.retrieveCsi(START, END, queryParamsWithoutCsiConfiguration, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 
+        then: "an IllegalArgumentException with correct message is thrown"
+        IllegalArgumentException iae = thrown(IllegalArgumentException)
+        iae.message.startsWith("there is no csi configuratin for jobGroup with id")
+    }
 
-	void testRetrieveSystemCsiByRawDataUsesCorrectCsiConfiguration() {
-		CsiConfiguration csiConfiguration = new CsiConfiguration(csiDay: new CsiDay(), label: "a csi configuration").save(failOnError: true)
-		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration).save(failOnError: true)
-		JobGroup jobGroup2 = new JobGroup(name: "rawDataJobGroup").save(failOnError: true)
+    //mocks//////////////////////////////////////////////////////////////////////////////
 
-		MvQueryParams paramsWithCsiConfiguration = new MvQueryParams()
-		paramsWithCsiConfiguration.jobGroupIds.add(jobGroup.getId())
-
-		MvQueryParams paramsWithoutCsiConfiguration = new MvQueryParams()
-		paramsWithoutCsiConfiguration.jobGroupIds.add(jobGroup2.getId())
-
-		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
-				new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1,2,3])]
-
-		//test-specific mocks
-		mockWeightingService(weightedCsiValuesToReturnInMock)
-
-		assertNotNull(serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set))
-
-		shouldFail(IllegalArgumentException) {
-			serviceUnderTest.retrieveCsi(START, END, paramsWithoutCsiConfiguration,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
-		}
-	}
-
-	//mocks//////////////////////////////////////////////////////////////////////////////
-
-    private mocksCommonToAllTests(){
+    private initFullFunctionalSpringBeanServices(){
         serviceUnderTest.meanCalcService = grailsApplication.mainContext.getBean('meanCalcService')
-        mockEventResultDaoService()
-        mockCsTargetGraphDaoService()
         serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
-	/**
-	 * Mocks methods of {@link EventResultDaoService}.
-	 */
-	private void mockEventResultDaoService(){
-		def eventResultDaoService = new MockFor(EventResultDaoService, true)
-		eventResultDaoService.demand.getByStartAndEndTimeAndMvQueryParams(0..10000) {
-			Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams ->
-			List<EventResult> irrelevantCauseRetrievingWeightedCsiValuesIsMockedToo = [new EventResult()]
-			return irrelevantCauseRetrievingWeightedCsiValuesIsMockedToo
-		}
-		serviceUnderTest.eventResultDaoService = eventResultDaoService.proxyInstance();
-	}
-	/**
-	 * Mocks methods of {@link WeightingService}.
-	 */
-	private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues){
-		def weightingService = new MockFor(WeightingService, true)
-		weightingService.demand.getWeightedCsiValues(1..10000) {
-			List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration unused->
-			return toReturnFromGetWeightedCsiValues
-		}
-		serviceUnderTest.weightingService = weightingService.proxyInstance()
-	}
-	/**
-	 * Mocks methods of {@link CsTargetGraphDaoService}.
-	 */
-	private void mockCsTargetGraphDaoService(){
-		def csTargetGraphDaoService = new MockFor(CsTargetGraphDaoService, true)
-		csTargetGraphDaoService.demand.getActualCsTargetGraph(1..10000) { ->
-			CsTargetGraph toReturn = new CsTargetGraph()
-			toReturn.metaClass.getPercentOfDate = {DateTime dateTime -> return expectedTargetCsi}
-			return toReturn
-		}
-		serviceUnderTest.csTargetGraphDaoService = csTargetGraphDaoService.proxyInstance()
-	}
+    private mocksCommonToAllTests() {
+        serviceUnderTest.csTargetGraphDaoService = Stub(CsTargetGraphDaoService)
+        serviceUnderTest.csTargetGraphDaoService.getActualCsTargetGraph() >> {
+            CsTargetGraph csTargetGraph = Stub(CsTargetGraph)
+            csTargetGraph.getPercentOfDate(_) >> EXPECTED_TARGET_CSI
+            return csTargetGraph
+        }
+    }
+
+    private void createTestDataCommonToAllTests() {
+        CsiConfiguration csiConfiguration = CsiConfiguration.buildWithoutSave()
+        JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration)
+        queryParamsIrrelevantCauseDbQueriesAreMocked = new MvQueryParams()
+        queryParamsIrrelevantCauseDbQueriesAreMocked.jobGroupIds.add(jobGroup.getId())
+    }
+
 }

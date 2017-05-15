@@ -19,7 +19,7 @@ import spock.lang.Specification
 @TestFor(LocationHealthCheckService)
 @Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
         OsmConfiguration, BatchActivity])
-@Build([Location, JobResult, OsmConfiguration])
+@Build([Location, JobResult, OsmConfiguration, LocationHealthCheck])
 class LocationHealthCheckServiceSpec extends Specification {
 
     private List<JobResult> jobResults
@@ -34,8 +34,8 @@ class LocationHealthCheckServiceSpec extends Specification {
     private static int INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
 
     def setup() {
-        prepareMocksCommonForAllTests()
         createTestDataCommonForAllTests()
+        prepareMocksCommonForAllTests()
     }
     static doWithConfig(c) {
         c.internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
@@ -76,14 +76,14 @@ class LocationHealthCheckServiceSpec extends Specification {
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
         DateTime now = new DateTime()
-        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1)).save(validate: false)
-        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2)).save(validate: false)
-        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3)).save(validate: false)
-        new LocationHealthCheck(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4)).save(validate: false)
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4).toDate())
 
         when: "cleanupHealthChecks is called"
         service.cleanupHealthChecks()
@@ -112,29 +112,16 @@ class LocationHealthCheckServiceSpec extends Specification {
     }
 
     private mockQueueAndJobStatusService() {
-        QueueAndJobStatusService queueAndJobStatusService = new QueueAndJobStatusService()
-        queueAndJobStatusService.metaClass.getExecutingJobResults = { Location location ->
-            return jobResults
-        }
-        queueAndJobStatusService.metaClass.getNumberOfJobsAndEventsDueToRunFromNowUntil = { Location location, Date untilWhen ->
-            return [jobs: expectedNumberOfJobResultsNextHour, events: expectedNumberOfEventResultsNextHour]
-        }
-        queueAndJobStatusService.metaClass.getNumberOfAgents = { Object locationTag, Object agentsResponse ->
-            return expectedNumberOfAgents
-        }
-        queueAndJobStatusService.metaClass.getNumberOfPendingJobsFromWptServer = { Object locationTag ->
-            return expectedNumberOfPendingJobsInWpt
-        }
-        queueAndJobStatusService.metaClass.getFinishedJobResultCountSince = { Location location, Date sinceWhen ->
-            return expectedNumberOfJobResultsLastHour
-        }
-        queueAndJobStatusService.metaClass.getEventResultCountBetween = { Location location, Date from, Date to ->
-            return expectedNumberOfEventResultsLastHour
-        }
-        queueAndJobStatusService.metaClass.getErroneousJobResultCountSince = { Location location, Date sinceWhen ->
-            return expectedNumberOfErrorsLastHour
-        }
-        service.queueAndJobStatusService = queueAndJobStatusService
+
+        service.queueAndJobStatusService = Stub(QueueAndJobStatusService)
+        service.queueAndJobStatusService.getExecutingJobResults(_) >> jobResults
+        service.queueAndJobStatusService.getNumberOfJobsAndEventsDueToRunFromNowUntil(_, _) >> [jobs: expectedNumberOfJobResultsNextHour, events: expectedNumberOfEventResultsNextHour]
+        service.queueAndJobStatusService.getNumberOfAgents(_, _) >> expectedNumberOfAgents
+        service.queueAndJobStatusService.getNumberOfPendingJobsFromWptServer(_) >> expectedNumberOfPendingJobsInWpt
+        service.queueAndJobStatusService.getFinishedJobResultCountSince(_, _) >> expectedNumberOfJobResultsLastHour
+        service.queueAndJobStatusService.getEventResultCountBetween(_, _, _) >> expectedNumberOfEventResultsLastHour
+        service.queueAndJobStatusService.getErroneousJobResultCountSince(_, _) >> expectedNumberOfErrorsLastHour
+
     }
 
 }

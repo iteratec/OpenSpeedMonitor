@@ -20,8 +20,6 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
 import grails.plugins.taggable.Taggable
-
-
 /**
  * Groups {@link Job}s for different reasons.
  * @author nkuhn

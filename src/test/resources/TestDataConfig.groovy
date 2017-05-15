@@ -10,6 +10,11 @@ testDataConfig {
             def i = 1
             label = {-> "labelIncrementedViaBuildTestDataConfig_${i++}" }
         }
+        'de.iteratec.osm.measurement.schedule.JobGroup' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+            graphiteServers = {-> []}
+        }
     }
     unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile]]
 }
