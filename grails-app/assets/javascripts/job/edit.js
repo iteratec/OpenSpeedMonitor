@@ -130,11 +130,42 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
 
     addNullProfileOptions(customConnNameForNative)
     registerConnectivityProfilesEventHandlers(customConnNameForNative)
+    registerLocationEventHandlers()
     if (connectivityProfileId == null) {
         selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative)
     }
-
 }
+
+function registerLocationEventHandlers() {
+    document.getElementById('location').onchange = CheckChromeSelection
+    document.getElementById('chkbox-option_mobile').onchange = CheckMobileSelection
+    document.getElementById('chkbox-option_customDimensions').onchange = CheckDimensionSelection
+    document.getElementById('chkbox-option_customBrowserDimensions').onchange = CheckBrowserDimensionSelection
+    CheckChromeSelection()
+    CheckMobileSelection()
+    CheckDimensionSelection()
+    CheckBrowserDimensionSelection()
+}
+
+function CheckDimensionSelection() {
+    $("#option_width").toggleClass("hidden", !this.checked);
+    $("#option_height").toggleClass("hidden", !this.checked);
+}
+
+function CheckBrowserDimensionSelection() {
+    $("#option_browser_width").toggleClass("hidden", !this.checked);
+    $("#option_browser_height").toggleClass("hidden", !this.checked);
+}
+
+function CheckMobileSelection() {
+    $("#option_mobileDevice").toggleClass("hidden", !this.checked);
+    $("#option_dpr").toggleClass("hidden", !this.checked);
+}
+
+function CheckChromeSelection() {
+    $("#chromeTabLink").toggleClass("hidden", !($("#location option:selected").text()).includes("Chrome"));
+}
+
 /**
  * Adding the following two options to connectivity profiles:
  * <ul>

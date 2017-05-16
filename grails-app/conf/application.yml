@@ -311,6 +311,11 @@ grails:
                         login: admin
                         password: password
                         driver: phantomJs
+                wpt:
+                    runtestparams:
+                        booleans:
+                        strings:
+                        integer:
     assets:
         less:
             compile: logback

@@ -121,15 +121,8 @@ class JobProcessingService {
                 bodies         : job.bodies,
                 continuousVideo: job.continuousVideo,
                 keepua         : job.keepua,
-                domelement     : job.option_domelement,
                 isPrivate      : job.option_isPrivate,
-                connections    : job.option_connections,
                 block          : job.option_block,
-                authType       : job.option_authType,
-                f              : job.option_f,
-                r              : job.option_r,
-                notify         : job.option_notify,
-                pingback       : job.option_pingback,
                 noopt          : job.option_noopt,
                 noimages       : job.option_noimages,
                 noheaders      : job.option_noheaders,
@@ -137,16 +130,11 @@ class JobProcessingService {
                 iq             : job.option_iq,
                 mobile         : job.option_mobile,
                 uastring       : job.option_uastring,
-                width          : job.option_width,
-                height         : job.option_height,
-                browser_width  : job.option_browser_width,
-                browser_height : job.option_browser_height,
                 dpr            : job.option_dpr,
                 mv             : job.option_mv,
                 medianMetric   : job.option_medianMetric,
                 cmdline        : job.option_cmdline,
                 htmlbody       : job.option_htmlbody,
-                tsview_id      : job.option_tsview_id,
                 custom         : job.option_custom,
                 tester         : job.option_tester,
                 affinity       : job.option_affinity,
@@ -155,9 +143,18 @@ class JobProcessingService {
                 mobileDevice   : job.option_mobileDevice,
                 appendua       : job.option_appendua,
                 lighthouse     : job.option_lighthouse,
-                type           : job.option_type
+                type           : job.option_type,
+                customHeaders  : job.option_customHeaders,
+                trace          : job.option_trace
         ]
-
+        if (job.option_customDimensions) {
+            parameters.width  = job.option_width
+            parameters.height = job.option_height
+        }
+        if (job.option_customBrowserDimensions) {
+            parameters.browser_width  = job.browser_width
+            parameters.browser_height = job.browser_height
+        }
         // specify connectivity
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"

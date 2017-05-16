@@ -142,15 +142,8 @@ class Job implements Taggable {
      */
     Integer packetLoss
 
-    String  option_domelement
     boolean option_isPrivate
-    Integer option_connections
     String  option_block
-    boolean option_authType
-    String  option_f
-    String  option_r
-    String  option_notify
-    String  option_pingback
     boolean option_noopt
     boolean option_noimages
     boolean option_noheaders
@@ -158,8 +151,10 @@ class Job implements Taggable {
     Integer option_iq
     boolean option_mobile
     String  option_uastring
+    boolean option_customDimensions
     Integer option_width
     Integer option_height
+    boolean option_customBrowserDimensions
     Integer option_browser_width
     Integer option_browser_height
     Integer option_dpr
@@ -167,7 +162,6 @@ class Job implements Taggable {
     String  option_medianMetric
     String  option_cmdline
     boolean option_htmlbody
-    String  option_tsview_id
     String  option_custom
     String  option_tester
     String  option_affinity
@@ -177,6 +171,8 @@ class Job implements Taggable {
     String  option_appendua
     boolean option_lighthouse
     String  option_type
+    String  option_customHeaders
+    boolean option_trace
 
     /**
      * @deprecated Use executionSchedule instead
@@ -287,15 +283,9 @@ class Job implements Taggable {
         authPassword(nullable: true, maxSize: 255, password: true)
         jobStatistic(nullable: true)
 
-        option_domelement(nullable: true)
         //option_isPrivate(nullable: true)
-        option_connections(nullable: true)
         option_block(nullable: true)
         //option_authType(nullable: true)
-        option_f(nullable: true)
-        option_r(nullable: true)
-        option_notify(nullable: true)
-        option_pingback(nullable: true)
         //option_noopt(nullable: true)
         //option_noimages(nullable: true)
         //option_noheaders(nullable: true)
@@ -312,7 +302,6 @@ class Job implements Taggable {
         option_medianMetric(nullable: true)
         option_cmdline(nullable: true)
         //option_htmlbody(nullable: true)
-        option_tsview_id(nullable: true)
         option_custom(nullable: true)
         option_tester(nullable: true)
         option_affinity(nullable: true)
@@ -322,6 +311,7 @@ class Job implements Taggable {
         option_appendua(nullable: true)
         //option_lighthouse(nullable: true)
         option_type(nullable: true)
+        option_customHeaders(nullable: true)
     }
 
     static mapping = {

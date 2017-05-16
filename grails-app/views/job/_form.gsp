@@ -37,7 +37,10 @@
     </li>
     <li>
       <a id="advancedSettingsTabLink" href="#3" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
-    </li>            
+    </li>
+      <li>
+          <a id="chromeTabLink" href="#4" data-toggle="tab"><g:message code="job.form.chrome.label" default="chrome" /></a>
+      </li>
   </ul>
   <div class="iteratec-tab-content">
     <div class="tab-pane active" id="1">
@@ -49,6 +52,9 @@
     <div class="tab-pane" id="3">
       <g:render template="advancedTab" model="${['job': job]}" />
     </div>
+      <div class="tab-pane" id="4">
+          <g:render template="chromeTab" model="${['job': job]}" />
+      </div>
   </div>
 </div>
 

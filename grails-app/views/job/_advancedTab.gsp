@@ -49,6 +49,18 @@
     </div>
 </div>
 
+<g:each var="stringAttribute"  in="['option_block',
+                                    'option_uastring',
+                                    'option_medianMetric',
+                                    'option_custom',
+                                    'option_tester',
+                                    'option_affinity',
+                                    'option_appendua',
+                                    'option_type',
+                                    'option_customHeaders']">
+    <g:render template="inputField" model="${['attribute': stringAttribute, 'job': job]}" />
+</g:each>
+
 <div class="form-group ${hasErrors(bean: job, field: 'maxDownloadTimeInMinutes', 'error')}">
     <label class="col-md-2 control-label" for="maxDownloadTimeInMinutesValue">
         <abbr title="${message(code: 'job.maxDownloadTimeInMinutes.description', args: [defaultMaxDownloadTimeInMinutes])}"
@@ -85,34 +97,8 @@
     </div>
 </div>
 
-<g:each var="stringAttribute"  in="['option_domelement',
-                                    'option_block',
-                                    'option_f',
-                                    'option_r',
-                                    'option_notify',
-                                    'option_pingback',
-                                    'option_uastring',
-                                    'option_medianMetric',
-                                    'option_cmdline',
-                                    'option_tsview_id',
-                                    'option_custom',
-                                    'option_tester',
-                                    'option_affinity',
-                                    'option_mobileDevice',
-                                    'option_appendua',
-                                    'option_type']">
-    <g:render template="inputField" model="${['atrribute': stringAttribute, 'job': job]}" />
-</g:each>
-
-<g:each var="integerAttribute" in="['option_connections',
-                                    'option_iq',
-                                    'option_width',
-                                    'option_height',
-                                    'option_browser_width',
-                                    'option_browser_height',
-                                    'option_dpr',
-                                    'option_timelineStack']">
-    <g:render template="inputField" model="${['atrribute': integerAttribute, 'job': job]}" />
+<g:each var="integerAttribute" in="['option_iq']">
+    <g:render template="inputField" model="${['attribute': integerAttribute, 'job': job]}" />
 </g:each>
 
 <g:each var="booleanAttribute" in="['captureVideo',
@@ -126,18 +112,21 @@
                                     'continuousVideo',
                                     'keepua',
                                     'option_isPrivate',
-                                    'option_authType',
                                     'option_noopt',
                                     'option_noimages',
                                     'option_noheaders',
                                     'option_pngss',
-                                    'option_mobile',
                                     'option_mv',
-                                    'option_htmlbody',
-                                    'option_timeline',
-                                    'option_lighthouse']">
+                                    'option_htmlbody']">
 	<g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
 </g:each>
+
+<g:render template="checkbox" model="${['booleanAttribute': 'option_customDimensions', 'job': job]}" />
+<g:render template="inputField" model="${['attribute': 'option_width', 'job': job]}" />
+<g:render template="inputField" model="${['attribute': 'option_height', 'job': job]}" />
+<g:render template="checkbox" model="${['booleanAttribute': 'option_customBrowserDimensions', 'job': job]}" />
+<g:render template="inputField" model="${['attribute': 'option_browser_width', 'job': job]}" />
+<g:render template="inputField" model="${['attribute': 'option_browser_height', 'job': job]}" />
 
 <div class="row fieldcontain ${hasErrors(bean: job, field: 'provideAuthenticateInformation', 'error')}">
 	<label class="col-md-2 control-label">
@@ -151,20 +140,20 @@
 	</div>
 </div>
 
-
+<p></p>
 <div class="row form-group authInfo fieldcontain ${hasErrors(bean: job, field: 'authUsername', 'error')}">
 	<label for="authUsername" class="col-md-2 control-label" for="authUsername">
 		<g:message code="script.authUser.label" default="Benutzer" />
 	</label>
 	<div class="col-md-10">
-		<g:textField name="authUsername" id="authUsername" value="${job?.authUsername}" autocomplete="off"/>
+		<g:textField class="form-control" name="authUsername" id="authUsername" value="${job?.authUsername}" autocomplete="off"/>
 	</div>
 </div>
 <div class="row form-group authInfo fieldcontain ${hasErrors(bean: job, field: 'authPassword', 'error')}">
 	<label for="authPassword" class="col-md-2 control-label">
 		<g:message code="script.authPassword.label" default="Passwort" />
 	</label>
-	<div class="col-md-10">
-		<g:textField name="authPassword" id="authPassword" value="${job?.authPassword}" />
+	<div class="col-md-1">
+		<g:textField class="form-control" name="authPassword" id="authPassword" value="${job?.authPassword}" />
 	</div>
 </div>
