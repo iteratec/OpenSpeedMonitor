@@ -4,7 +4,7 @@
 	</label>
 	<div class="col-md-10">
 		<div class="checkbox">
-			<g:checkBox id="${booleanAttribute}" name="${booleanAttribute}" value="${job?."$booleanAttribute"}" id="chkbox-${booleanAttribute}"/>
+			<g:checkBox name="${booleanAttribute}" value="${job?."$booleanAttribute"}" id="chkbox-${booleanAttribute}"/>
 		</div>
 	</div>
 </div>
