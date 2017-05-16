@@ -1,4 +1,9 @@
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.MeasuredEvent
 
 testDataConfig {
     sampleData {
@@ -15,8 +20,21 @@ testDataConfig {
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
             graphiteServers = {-> []}
         }
+        'de.iteratec.osm.report.chart.CsiAggregation' {
+            jobGroup = { -> JobGroup.build()}
+            measuredEvent = { -> MeasuredEvent.build()}
+            page = {-> Page.build()}
+            browser = {-> Browser.build()}
+            location = {->Location.build()}
+
+        }
     }
-    unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile]]
+    unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
+                            'de.iteratec.osm.report.chart.CsiAggregation': [de.iteratec.osm.measurement.schedule.JobGroup,
+                                                                            de.iteratec.osm.result.MeasuredEvent,
+                                                                            de.iteratec.osm.csi.Page,
+                                                                            de.iteratec.osm.measurement.environment.Browser,
+                                                                            de.iteratec.osm.measurement.environment.Location]]
 }
 environments {
     production {
