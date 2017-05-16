@@ -1284,10 +1284,19 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     public static User createAdminUser() {
-        def user = User.findByUsername(getConfiguredUsername())
-        if (!user) {
-            Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-            user = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+        String adminUserName = getConfiguredUsername()
+        User user = User.findByUsername(adminUserName)
+        if (!user){
+            user = User.build(
+                    username: adminUserName,
+                    password: getConfiguredPassword(),
+                    enabled: true,
+                    accountExpired: false,
+                    accountLocked: false,
+                    passwordExpired: false
+            )
+            Role adminRole = Role.build(authority: 'ROLE_ADMIN')
+            // UserRole doesn't work with build-test-data plugin :(
             new UserRole(user: user, role: adminRole).save(failOnError: true)
         }
         return user

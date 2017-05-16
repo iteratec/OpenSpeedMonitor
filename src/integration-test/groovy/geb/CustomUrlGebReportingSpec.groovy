@@ -31,4 +31,5 @@ class CustomUrlGebReportingSpec extends GebReportingSpec implements OsmTestLogin
     protected void doLogout() {
         go "/logout/index"
     }
+
 }

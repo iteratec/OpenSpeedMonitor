@@ -1,9 +1,8 @@
 package geb.de.iteratec.osm
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.security.Role
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
-import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
@@ -26,7 +25,7 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
         and: "there is an admin and an osm config in db and infrastructure setup was aborted previously"
         User.withNewTransaction {
             OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.ABORTED)
-            createAdminUser()
+            TestDataUtil.createAdminUser()
         }
 
         when: "User inserts correct data in form"
@@ -36,20 +35,6 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
         then: "User gets to landing page"
         at LandingPage
-    }
-
-    private void createAdminUser(){
-        User user = User.build(
-                username: getConfiguredUsername(),
-                password: getConfiguredPassword(),
-                enabled: true,
-                accountExpired: false,
-                accountLocked: false,
-                passwordExpired: false
-        )
-        Role adminRole = Role.build(authority: 'ROLE_ADMIN')
-        // UserRole doesn't work with build-test-data plugin :(
-        new UserRole(user: user, role: adminRole).save(failOnError: true)
     }
 
     void cleanupSpec() {

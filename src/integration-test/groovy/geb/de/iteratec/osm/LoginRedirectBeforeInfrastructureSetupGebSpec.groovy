@@ -1,9 +1,8 @@
 package geb.de.iteratec.osm
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.security.Role
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
-import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
@@ -26,7 +25,7 @@ class LoginRedirectBeforeInfrastructureSetupGebSpec extends CustomUrlGebReportin
         and: "there is an admin and an osm config in db and infrastructure setup didn't run yet"
         User.withNewTransaction {
             OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED)
-            createAdminUser()
+            TestDataUtil.createAdminUser()
         }
 
         when: "User inserts correct data in form"
@@ -36,20 +35,6 @@ class LoginRedirectBeforeInfrastructureSetupGebSpec extends CustomUrlGebReportin
 
         then: "User gets to infrastructure setup page"
         at InfrastructureSetupPage
-    }
-
-    private void createAdminUser(){
-        User user = User.build(
-                username: getConfiguredUsername(),
-                password: getConfiguredPassword(),
-                enabled: true,
-                accountExpired: false,
-                accountLocked: false,
-                passwordExpired: false
-        )
-        Role adminRole = Role.build(authority: 'ROLE_ADMIN')
-        // UserRole doesn't work with build-test-data plugin :(
-        new UserRole(user: user, role: adminRole).save(failOnError: true)
     }
 
     void cleanupSpec() {
