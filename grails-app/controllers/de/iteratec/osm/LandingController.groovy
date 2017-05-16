@@ -6,18 +6,18 @@ class LandingController {
     OsmStateService osmStateService
 
     def index() {
-        if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupStatus.Finished) {
+        if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
             if (osmStateService.untouched()) {
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.NotStarted) {
+                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED) {
                     forward(controller: 'InfrastructureSetup', action: 'index')
                 }
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.Aborted) {
+                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.ABORTED) {
                     return [isSetupFinished:false]
                 }
             }
             else {
                 OsmConfiguration config = configService.getConfig()
-                config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.Finished
+                config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.FINISHED
                 config.save(failOnError: true)
                 forward(action: 'index')
             }

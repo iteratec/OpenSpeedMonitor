@@ -1,9 +1,6 @@
 package geb.pages.de.iteratec.osm
 
-import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-
 class LoginPage extends I18nGebPage {
-
 
     static url = getUrl("/login/auth")
 
