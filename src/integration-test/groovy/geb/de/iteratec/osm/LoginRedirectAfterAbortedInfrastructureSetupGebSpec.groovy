@@ -24,7 +24,7 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
         and: "there is an admin and an osm config in db and infrastructure setup was aborted previously"
         User.withNewTransaction {
-            OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.ABORTED)
+            TestDataUtil.setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus.ABORTED)
             TestDataUtil.createAdminUser()
         }
 

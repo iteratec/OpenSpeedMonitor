@@ -1307,4 +1307,13 @@ class TestDataUtil implements OsmTestLogin {
                 status: status, maximumStages: 1, startDate: new Date(),
                 lastUpdate: new Date()).save(flush: true, failOnError: true)
     }
+
+    public static void setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus status){
+        OsmConfiguration configuration = OsmConfiguration.list()[0]
+        if (!configuration){
+            configuration = OsmConfiguration.build()
+        }
+        configuration.infrastructureSetupRan = status
+        configuration.save(failOnError: true)
+    }
 }
