@@ -141,10 +141,12 @@ function registerLocationEventHandlers() {
     document.getElementById('chkbox-option_mobile').onchange = CheckMobileSelection
     document.getElementById('chkbox-option_customDimensions').onchange = CheckDimensionSelection
     document.getElementById('chkbox-option_customBrowserDimensions').onchange = CheckBrowserDimensionSelection
+    document.getElementById('chkbox-option_timeline').onchange = CheckTimelineSelection
     CheckChromeSelection()
     CheckMobileSelection()
     CheckDimensionSelection()
     CheckBrowserDimensionSelection()
+    CheckTimelineSelection()
 }
 
 function CheckDimensionSelection() {
@@ -160,6 +162,10 @@ function CheckBrowserDimensionSelection() {
 function CheckMobileSelection() {
     $("#option_mobileDevice").toggleClass("hidden", !this.checked);
     $("#option_dpr").toggleClass("hidden", !this.checked);
+}
+
+function CheckTimelineSelection() {
+    $("#option_timelineStack").toggleClass("hidden", !this.checked);
 }
 
 function CheckChromeSelection() {

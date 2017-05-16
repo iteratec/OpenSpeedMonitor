@@ -90,4 +90,34 @@
     </g:each>
 </div>
 
+<div class="form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
+    <label for="description" class="col-md-2 control-label">
+        <g:message code="job.description.label" default="description"/>
+    </label>
+
+    <div class="col-md-10">
+        <textarea class="form-control" name="description" id="description"
+                  rows="3">${job?.description?.trim()}</textarea>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="tags" class="col-md-2 control-label">
+        <g:message code="job.tags.label" default="tags"/>
+    </label>
+
+    <div class="col-md-10">
+        <ul name="tags" id="tags">
+            <g:each in="${job?.tags}">
+                <li>${it}</li>
+            </g:each>
+        </ul>
+    </div>
+</div>
+
+<g:each var="booleanAttribute" in="['option_isPrivate']">
+    <g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
+</g:each>
+
+
 <g:render template="/_common/modals/createJobGroupModal"/>

@@ -121,7 +121,7 @@ class JobProcessingService {
                 bodies         : job.bodies,
                 continuousVideo: job.continuousVideo,
                 keepua         : job.keepua,
-                isPrivate      : job.option_isPrivate,
+                private      : job.option_isPrivate,
                 block          : job.option_block,
                 noopt          : job.option_noopt,
                 noimages       : job.option_noimages,
@@ -152,8 +152,8 @@ class JobProcessingService {
             parameters.height = job.option_height
         }
         if (job.option_customBrowserDimensions) {
-            parameters.browser_width  = job.browser_width
-            parameters.browser_height = job.browser_height
+            parameters.browser_width  = job.option_browser_width
+            parameters.browser_height = job.option_browser_height
         }
         // specify connectivity
         if (job.noTrafficShapingAtAll) {

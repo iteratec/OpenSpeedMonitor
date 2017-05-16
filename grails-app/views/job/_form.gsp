@@ -35,11 +35,14 @@
     <li>
       <a id="scriptTabLink" href="#2" data-toggle="tab"><g:message code="job.form.script.label" default="Script" /></a>
     </li>
+      <li>
+          <a id="performanceTabLink" href="#3" data-toggle="tab"><g:message code="job.form.performance.label" default="performance" /></a>
+      </li>
     <li>
-      <a id="advancedSettingsTabLink" href="#3" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
+      <a id="advancedSettingsTabLink" href="#4" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
     </li>
       <li>
-          <a id="chromeTabLink" href="#4" data-toggle="tab"><g:message code="job.form.chrome.label" default="chrome" /></a>
+          <a id="chromeTabLink" href="#5" data-toggle="tab"><g:message code="job.form.chrome.label" default="chrome" /></a>
       </li>
   </ul>
   <div class="iteratec-tab-content">
@@ -49,10 +52,13 @@
     <div class="tab-pane" id="2">
       <g:render template="scriptTab" model="${['job': job]}" />
     </div>
-    <div class="tab-pane" id="3">
+      <div class="tab-pane" id="3">
+          <g:render template="performanceTab" model="${['job': job]}" />
+      </div>
+    <div class="tab-pane" id="4">
       <g:render template="advancedTab" model="${['job': job]}" />
     </div>
-      <div class="tab-pane" id="4">
+      <div class="tab-pane" id="5">
           <g:render template="chromeTab" model="${['job': job]}" />
       </div>
   </div>
