@@ -20,11 +20,14 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
 import grails.plugins.taggable.Taggable
+import groovy.transform.EqualsAndHashCode
+
 /**
  * Groups {@link Job}s for different reasons.
  * @author nkuhn
  *
  */
+@EqualsAndHashCode
 class JobGroup implements Taggable{
 
     /**

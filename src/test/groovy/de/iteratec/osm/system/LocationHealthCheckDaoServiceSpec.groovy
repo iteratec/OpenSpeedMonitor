@@ -1,28 +1,28 @@
 package de.iteratec.osm.system
 
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
+
 @TestFor(LocationHealthCheckDaoService)
 @Mock([Location, WebPageTestServer, Browser, LocationHealthCheck])
+@Build([LocationHealthCheck, Location])
 class LocationHealthCheckDaoServiceSpec extends Specification {
 
     private static final DateTime NOW = new DateTime(DateTimeZone.UTC)
+
     private Location activeLocation1
     private Location activeLocation2
     private Location inactiveLocation
 
     def setup() {
-        createSomeTestData()
+        createLocations()
     }
 
     def cleanup() {
@@ -104,27 +104,16 @@ class LocationHealthCheckDaoServiceSpec extends Specification {
         }.size() == 1
     }
 
-    void createSomeTestData() {
-        WebPageTestServer wptserver = TestDataUtil.createWebPageTestServer("wptserver", "wptserver", true, "https://wptserver.com")
-        Browser browser = TestDataUtil.createBrowser("chrome")
-        activeLocation1 = TestDataUtil.createLocation(wptserver, "location1", browser, true)
-        activeLocation2 = TestDataUtil.createLocation(wptserver, "location2", browser, true)
-        inactiveLocation = TestDataUtil.createLocation(wptserver, "location3", browser, false)
+    void createLocations() {
+        activeLocation1 = Location.build(active: true)
+        activeLocation2 = Location.build(active: true)
+        inactiveLocation = Location.build(active: false)
     }
     LocationHealthCheck createAndSaveLocationHealthCheck(DateTime date, Location location){
-        return new LocationHealthCheck(
-                location: location,
-                date: date.toDate(),
-                numberOfAgents: 2,
-                numberOfPendingJobsInWpt: 12,
-                numberOfJobResultsLastHour: 14,
-                numberOfEventResultsLastHour: 120,
-                numberOfErrorsLastHour: 2,
-                numberOfJobResultsNextHour: 16,
-                numberOfEventResultsNextHour: 140,
-                numberOfCurrentlyPendingJobs: 20,
-                numberOfCurrentlyRunningJobs: 4
-        ).save(failOnError: true)
+        return LocationHealthCheck.build(
+            location: location,
+            date: date.toDate(),
+        )
     }
 
 }
