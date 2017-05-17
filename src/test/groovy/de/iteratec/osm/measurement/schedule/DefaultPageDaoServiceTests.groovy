@@ -18,61 +18,34 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import org.junit.Test;
-
-
-
-
-import grails.test.mixin.*
-
-import org.junit.*
-import static org.junit.Assert.*
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 /**
  * Test-suite for {@link de.iteratec.osm.measurement.schedule.dao.PageDaoService}.
  */
 @TestFor(DefaultPageDaoService)
 @Mock([Page])
-class DefaultPageDaoServiceTests {
+@Build([Page])
+class DefaultPageDaoServiceTests extends Specification {
 
-    public static final String namePage1 = 'page1'
-	public static final String namePage2 = 'page2'
-	public static final String namePage3 = 'page3'
-	public static final String namePage4 = 'page4'
+    void "find all returns all pages, also when a new is inserted"() {
+        given: "two pages"
+        Page page1 = Page.build(name: "Page1")
+        Page page2 = Page.build(name: "Page2")
 
-	PageDaoService serviceUnderTest
+        when: "the service should find all"
+        Set<Page> result = service.findAll()
 
-    @Before
-	void setUp(){
-		serviceUnderTest = service
-		createDataCommonForAllTests()
-	}
+        then: "a set with both is returned"
+        result == [page1, page2] as Set
 
-	@Test
-	void testFindAll() {
-		new Page(name: 'Page1').save(failOnError: true)
-		new Page(name: 'Page2').save(failOnError: true)
+        when: "a third page is added"
+        Page page3 = Page.build(name: "Page3")
 
-		Set<Page> result = serviceUnderTest.findAll();
-
-		assertNotNull(result);
-		assertEquals(2, result.size());
-		assertEquals(1, result.count( { it.name == 'Page1' } ));
-		assertEquals(1, result.count( { it.name == 'Page2' } ));
-
-		new Page(name: 'Page3').save(failOnError: true)
-
-		Set<Page> resultAfterAdding = serviceUnderTest.findAll();
-
-		assertNotNull(resultAfterAdding);
-		assertEquals(3, resultAfterAdding.size());
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Page1' } ));
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Page2' } ));
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Page3' } ));
-	}
-
-	private void createDataCommonForAllTests(){
-		//nothing to do yet
-	}
+        then: "it's also returned"
+        service.findAll() == [page1, page2, page3] as Set
+    }
 }
