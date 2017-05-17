@@ -18,7 +18,6 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MeasurandUtilService
-import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -207,7 +206,7 @@ class PageAggregationController extends ExceptionHandlerController {
             if (testedPagesPerJob.every { it.equals(testedPagesPerJob[0]) }) {
                 testedPages = testedPagesPerJob[0]
             } else {
-                testedPages = mergeLists(testedPagesPerJob)
+                testedPages = getOrderedPagesOfAllScripts(testedPagesPerJob)
             }
 
             testedPages.each { p ->
@@ -226,25 +225,31 @@ class PageAggregationController extends ExceptionHandlerController {
     }
 
     /**
-     * Merges multiple lists of pages by collecting all pages of each list and keeping the order
+     * Merges multiple lists of pages by collecting all pages of each list, filtering out duplicates
+     * and keeping the order
+     *
      * E.g.:
      * List1 = ["a", "b",       "c"]
      * List2 = ["a", "c",       "c"]
      * List2 = ["a", "b",       "d"]
+     *
      * Result = ["a", "b", "c", "c", "d"]
-     * @param listOfPages
+     *
+     * @param listOfPages A list of scripts where each item is a list of pages which are measured in that particular script
      * @return
      */
-    private List<Page> mergeLists(List<List<Page>> listOfPages) {
-        List<Page> result = []
+    private List<Page> getOrderedPagesOfAllScripts(List<List<Page>> listOfPages) {
+        List<Page> orderedPagesOfAllScripts = []
+        int sizeOfLongestPageList = listOfPages*.size().max()
 
-        for (int i = 0; i < listOfPages*.size().max(); i++) {
-            List<Page> l = listOfPages*.getAt(i).unique()
-            l.removeAll([null])
-            result.addAll(l)
+        sizeOfLongestPageList.times { pageStep ->
+            List<Page> pagesOfCurrentStep = listOfPages*.getAt(pageStep).flatten()
+            pagesOfCurrentStep.unique(true).removeAll([null])
+
+            orderedPagesOfAllScripts.addAll(pagesOfCurrentStep)
         }
 
-        return result
+        return orderedPagesOfAllScripts
     }
 
     /**
