@@ -144,14 +144,11 @@ class Job implements Taggable {
 
     boolean option_isPrivate
     String  option_block
-    boolean option_noimages
-    boolean option_pngss
     Integer option_iq
     boolean option_mobile
     String  option_uastring
     Integer option_dpr
     String  option_cmdline
-    boolean option_htmlbody
     String  option_custom
     String  option_tester
     boolean option_timeline
@@ -163,6 +160,10 @@ class Job implements Taggable {
     String  option_customHeaders
     boolean option_trace
     String  option_spof
+
+    String  option_takeScreenshots
+    String  option_saveBodies
+    String  option_userAgent
 
     /**
      * @deprecated Use executionSchedule instead
@@ -286,6 +287,10 @@ class Job implements Taggable {
         option_type(nullable: true)
         option_customHeaders(nullable: true)
         option_spof(nullable: true)
+
+        option_takeScreenshots(nullable: true)
+        option_saveBodies(nullable: true)
+        option_userAgent(nullable: true)
     }
 
     static mapping = {

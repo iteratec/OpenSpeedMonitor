@@ -118,32 +118,51 @@ class JobProcessingService {
                 ignoreSSL      : job.ignoreSSL,
                 standards      : job.standards,
                 tcpdump        : job.tcpdump,
-                bodies         : job.bodies,
                 continuousVideo: job.continuousVideo,
-                keepua         : job.keepua,
                 private        : job.option_isPrivate,
                 block          : job.option_block,
-                noimages       : job.option_noimages,
-                pngss          : job.option_pngss,
-                iq             : job.option_iq,
                 mobile         : job.option_mobile,
-                uastring       : job.option_uastring,
                 dpr            : job.option_dpr,
                 cmdline        : job.option_cmdline,
-                htmlbody       : job.option_htmlbody,
                 custom         : job.option_custom,
                 tester         : job.option_tester,
                 timeline       : job.option_timeline,
                 timelineStack  : job.option_timelineStack,
                 mobileDevice   : job.option_mobileDevice,
-                appendua       : job.option_appendua,
                 lighthouse     : job.option_lighthouse,
                 type           : job.option_type,
                 customHeaders  : job.option_customHeaders,
                 trace          : job.option_trace,
-                spof           : job.option_spof
+                spof           : job.option_spof,
+                bodies         : job.bodies
         ]
-        // specify connectivity
+        if (job.option_takeScreenshots == "none") {
+            parameters.noimages = true
+        }
+        else {
+            parameters.iq = job.option_iq
+        }
+        if (job.option_takeScreenshots == "full") {
+            parameters.pngss = true
+        }
+
+        if (job.option_saveBodies == "html") {
+            parameters.htmlbody = true
+        }
+        if (job.option_saveBodies == "all") {
+            parameters.bodies = true
+        }
+
+        if(job.option_userAgent == "original") {
+            parameters.keepua = true
+        }
+        if(job.option_userAgent == "append") {
+            parameters.appendua = job.option_appendua
+        }
+        if(job.option_userAgent == "overwrite") {
+            parameters.uastring = job.option_uastring
+        }
+
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"
         } else {

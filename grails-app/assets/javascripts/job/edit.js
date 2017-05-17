@@ -143,6 +143,20 @@ function registerLocationEventHandlers() {
     CheckChromeSelection()
     CheckMobileSelection()
     CheckTimelineSelection()
+
+    document.getElementById('inputField-option_takeScreenshots').onchange = UpdateScreenshotSelection
+    document.getElementById('inputField-option_userAgent').onchange = UpdateUserAgentSelection
+    UpdateScreenshotSelection()
+    UpdateUserAgentSelection()
+}
+
+function UpdateScreenshotSelection() {
+    $("#option_iq").toggleClass("hidden", $("#inputField-option_takeScreenshots").val() != "default");
+}
+
+function UpdateUserAgentSelection() {
+    $("#option_uastring").toggleClass("hidden", $("#inputField-option_userAgent").val() != "overwrite");
+    $("#option_appendua").toggleClass("hidden", $("#inputField-option_userAgent").val() != "append");
 }
 
 function CheckMobileSelection() {

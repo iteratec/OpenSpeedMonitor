@@ -3,14 +3,11 @@ databaseChangeLog = {
         addColumn(tableName: "job") {
             column(name: "option_is_private"                , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_block"                     , type: "varchar(255)")
-            column(name: "option_noimages"                  , type: "BOOLEAN")      {constraints(nullable: "false")}
-            column(name: "option_pngss"                     , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_iq"                        , type: "integer")
             column(name: "option_mobile"                    , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_uastring"                  , type: "varchar(255)")
             column(name: "option_dpr"                       , type: "integer")
             column(name: "option_cmdline"                   , type: "varchar(255)")
-            column(name: "option_htmlbody"                  , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_custom"                    , type: "varchar(255)")
             column(name: "option_tester"                    , type: "varchar(255)")
             column(name: "option_timeline"                  , type: "BOOLEAN")      {constraints(nullable: "false")}
@@ -22,6 +19,10 @@ databaseChangeLog = {
             column(name: "option_custom_headers"            , type: "varchar(255)")
             column(name: "option_trace"                     , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_spof"                      , type: "varchar(255)")
+
+            column(defaultValue: "default", name: "option_take_screenshots"           , type: "varchar(255)")
+            column(defaultValue: "none"   , name: "option_save_bodies"                , type: "varchar(255)")
+            column(defaultValue: "default", name: "option_user_agent"                 , type: "varchar(255)")
         }
     }
 }
