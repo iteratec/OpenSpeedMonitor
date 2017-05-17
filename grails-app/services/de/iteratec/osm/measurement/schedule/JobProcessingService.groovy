@@ -121,23 +121,18 @@ class JobProcessingService {
                 bodies         : job.bodies,
                 continuousVideo: job.continuousVideo,
                 keepua         : job.keepua,
-                private      : job.option_isPrivate,
+                private        : job.option_isPrivate,
                 block          : job.option_block,
-                noopt          : job.option_noopt,
                 noimages       : job.option_noimages,
-                noheaders      : job.option_noheaders,
                 pngss          : job.option_pngss,
                 iq             : job.option_iq,
                 mobile         : job.option_mobile,
                 uastring       : job.option_uastring,
                 dpr            : job.option_dpr,
-                mv             : job.option_mv,
-                medianMetric   : job.option_medianMetric,
                 cmdline        : job.option_cmdline,
                 htmlbody       : job.option_htmlbody,
                 custom         : job.option_custom,
                 tester         : job.option_tester,
-                affinity       : job.option_affinity,
                 timeline       : job.option_timeline,
                 timelineStack  : job.option_timelineStack,
                 mobileDevice   : job.option_mobileDevice,
@@ -145,16 +140,9 @@ class JobProcessingService {
                 lighthouse     : job.option_lighthouse,
                 type           : job.option_type,
                 customHeaders  : job.option_customHeaders,
-                trace          : job.option_trace
+                trace          : job.option_trace,
+                spof           : job.option_spof
         ]
-        if (job.option_customDimensions) {
-            parameters.width  = job.option_width
-            parameters.height = job.option_height
-        }
-        if (job.option_customBrowserDimensions) {
-            parameters.browser_width  = job.option_browser_width
-            parameters.browser_height = job.option_browser_height
-        }
         // specify connectivity
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"

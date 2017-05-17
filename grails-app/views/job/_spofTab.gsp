@@ -1,0 +1,1 @@
+<g:render template="inputArea" model="${['attribute': 'option_spof', 'job': job]}" />

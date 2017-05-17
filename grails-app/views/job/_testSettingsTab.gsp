@@ -1,6 +1,33 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
 <%@ page import="de.iteratec.osm.measurement.schedule.ConnectivityProfile" %>
+<%@ page import="de.iteratec.osm.measurement.environment.Location"%>
+<%@ page import="de.iteratec.osm.measurement.environment.WebPageTestServer" %>
 
+<div class="row form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
+    <label for="label" class="col-md-2 control-label">
+        <g:message code="job.label.label" default="label" /><span class="required-indicator">*</span>
+    </label>
+    <div class="col-md-5">
+        <g:textField class="form-control job-label" name="label" value="${job?.label}" />
+    </div>
+</div>
+
+<div class="row form-group ${hasErrors(bean: job, field: 'location', 'error')} required">
+    <label class="col-md-2 control-label" for="location">
+        <g:message code="job.location.label" default="location" /><span class="required-indicator">*</span>
+    </label>
+    <div class="col-md-5">
+        <select id="location" class="form-control chosen" name="location.id">
+            <g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
+                <optgroup label="${server.label}">
+                    <g:each in="${Location.findAllByWptServerAndActive(server, true)}" var="loc">
+                        <option value="${loc.id}" <g:if test="${job?.location?.id==loc.id}">selected</g:if>>${loc.uniqueIdentifierForServer ?: loc.location}</option>
+                    </g:each>
+                </optgroup>
+            </g:each>
+        </select>
+    </div>
+</div>
 
 <g:render template="checkbox" model="${['booleanAttribute': 'active', 'job': job]}"/>
 
@@ -89,35 +116,5 @@
         </div>
     </g:each>
 </div>
-
-<div class="form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
-    <label for="description" class="col-md-2 control-label">
-        <g:message code="job.description.label" default="description"/>
-    </label>
-
-    <div class="col-md-10">
-        <textarea class="form-control" name="description" id="description"
-                  rows="3">${job?.description?.trim()}</textarea>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="tags" class="col-md-2 control-label">
-        <g:message code="job.tags.label" default="tags"/>
-    </label>
-
-    <div class="col-md-10">
-        <ul name="tags" id="tags">
-            <g:each in="${job?.tags}">
-                <li>${it}</li>
-            </g:each>
-        </ul>
-    </div>
-</div>
-
-<g:each var="booleanAttribute" in="['option_isPrivate']">
-    <g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
-</g:each>
-
 
 <g:render template="/_common/modals/createJobGroupModal"/>

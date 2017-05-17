@@ -139,24 +139,10 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
 function registerLocationEventHandlers() {
     document.getElementById('location').onchange = CheckChromeSelection
     document.getElementById('chkbox-option_mobile').onchange = CheckMobileSelection
-    document.getElementById('chkbox-option_customDimensions').onchange = CheckDimensionSelection
-    document.getElementById('chkbox-option_customBrowserDimensions').onchange = CheckBrowserDimensionSelection
     document.getElementById('chkbox-option_timeline').onchange = CheckTimelineSelection
     CheckChromeSelection()
     CheckMobileSelection()
-    CheckDimensionSelection()
-    CheckBrowserDimensionSelection()
     CheckTimelineSelection()
-}
-
-function CheckDimensionSelection() {
-    $("#option_width").toggleClass("hidden", !this.checked);
-    $("#option_height").toggleClass("hidden", !this.checked);
-}
-
-function CheckBrowserDimensionSelection() {
-    $("#option_browser_width").toggleClass("hidden", !this.checked);
-    $("#option_browser_height").toggleClass("hidden", !this.checked);
 }
 
 function CheckMobileSelection() {
