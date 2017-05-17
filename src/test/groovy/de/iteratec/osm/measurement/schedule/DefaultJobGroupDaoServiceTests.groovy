@@ -62,7 +62,7 @@ class DefaultJobGroupDaoServiceTests extends Specification{
 
         when: "another JobGroup gets persisted"
         JobGroup jobGroup3 = JobGroup.build()
-        Set<JobGroup> jobGroupsAfterAdding = service.findAll();
+        Set<JobGroup> jobGroupsAfterAdding = service.findAll()
 
         then: "findAll() method provides all 3 JobGroups afterwards"
         jobGroupsAfterAdding.size() == 3

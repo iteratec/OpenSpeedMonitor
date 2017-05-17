@@ -1,156 +1,138 @@
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(JobDaoService)
-@Mock([Job, JobGroup, WebPageTestServer, Browser, Location, Script, ConnectivityProfile])
+@Build([Job, Location, ConnectivityProfile, JobGroup])
+@Mock([Job, Location, ConnectivityProfile, JobGroup])
 class JobDaoServiceSpec extends Specification {
 
-    @Shared
-    Job job1
-    @Shared
-    Job job2
-    @Shared
-    Job deletedJob
-    private WebPageTestServer wptServer
-    private Browser browser
-    private Location location
-    private JobGroup jobGroup
+    void "getAllJobs returns all jobs but deleted ones"() {
+        given: "three jobs, one marked as deleted"
+        List<Job> jobs = [Job.build(), Job.build()]
+        Job.build( deleted: true )
 
-
-    void "setup"() {
-        Script script = TestDataUtil.createScript()
-        wptServer = TestDataUtil.createUnusedWptServer()
-        browser = TestDataUtil.createBrowser("ff")
-        location = TestDataUtil.createLocation(wptServer, "uniqueLocation", this.browser, false)
-        jobGroup = TestDataUtil.createJobGroup("jobGroup")
-        job1 = TestDataUtil.createJob("job1", script, this.location, this.jobGroup, "a job", 1, false, 100)
-        job2 = TestDataUtil.createJob("job2", script, this.location, this.jobGroup, "a job", 1, false, 100)
-        deletedJob = TestDataUtil.createJob("deletedJob", script, this.location, this.jobGroup, "a deleted job", 1, false, 100)
-        deletedJob.deleted = true
-        deletedJob.save(failOnError: true, flush: true)
-    }
-
-    void "test getAllJobs"() {
         when: "all jobs requested"
         List<Job> result = service.getAllJobs()
 
         then: "deleted jobs are not in the result"
-        result.size() == 2
-        result.contains(job1)
-        result.contains(job2)
-        !result.contains(deletedJob)
+        result == jobs
     }
 
-    void "test getJobsByIds"() {
+    void "getJobsByIds returns all jobs but deleted ones"() {
+        given: "two normal jobs and a deleted"
+        Job.build()
+        Job normalJob = Job.build()
+        Job deletedJob = Job.build(deleted: true)
+
         when: "jobs requested by ids"
-        List<Job> result = service.getJobsByIds([job1.id, deletedJob.id])
+        List<Job> result = service.getJobsByIds([normalJob.id, deletedJob.id])
 
         then: "deleted jobs are not in the result"
-        result.size() == 1
-        result.contains(job1)
-        !result.contains(deletedJob)
+        result == [normalJob]
     }
 
-    void "test getJobById"() {
-        when: "job requested by id"
-        Job result = service.getJobById(job1.id)
+    void "getJobById returns null for deleted jobs"() {
+        given: "a normal job and a deleted"
+        Job normalJob = Job.build()
+        Job deletedJob = Job.build(deleted: true)
+
+        when: "jobs are requested by id"
+        Job normalResult = service.getJobById(normalJob.id)
         Job resultDeleted = service.getJobById(deletedJob.id)
 
         then: "result is job or null if job is deleted"
-        result == job1
+        normalResult == normalJob
         resultDeleted == null
     }
 
-    void "test getJobByLabel"() {
+    void "getJobByLabel returns a job by label, if it's not deleted"() {
+        given: "two normal jobs and a deleted"
+        Job.build(label: "job1")
+        Job normalJob = Job.build(label: "job2")
+        Job.build(label: "deletedJob", deleted: true)
+
+
         when: "job requested by label"
-        Job result = service.getJob(job1.label)
-        Job resultDeleted = service.getJob(deletedJob.label)
+        Job result = service.getJob("job2")
+        Job resultDeleted = service.getJob("deletedJob")
 
         then: "result is job or null if job is deleted"
-        result == job1
+        result == normalJob
         resultDeleted == null
     }
 
     void "test get active jobs"() {
-        given: "an active job"
-        job1.active = true
-        job1.save(flush: true)
+        given: "an active job, an inactive, and a deleted"
+        Job activeJob = Job.build(active: true, executionSchedule: '0 */15 * * * ? 2015')
+        Job.build()
+        Job.build(deleted: true, active: true, executionSchedule: '0 */15 * * * ? 2015')
 
         when: "active jobs requested"
         List<Job> result = service.getJobs(true)
 
         then: "result contains only active, not deleted jobs"
-        result.size() == 1
-        result.contains(job1)
-        !result.contains(job2)
-        !result.contains(deletedJob)
+        result == [activeJob]
     }
 
     void "test jobs by location"() {
-        given: "a job with different location"
-        job1.location = TestDataUtil.createLocation(wptServer, "differentLocation", browser, false)
-        job1.save(flush: true)
+        given: "two jobs with different location"
+        Location location1 = Location.build()
+        Job job1 = Job.build(location: location1)
+        Job.build(location: location1, deleted: true)
+        Job.build(location: Location.build())
 
         when: "jobs requested by location"
-        List<Job> result = service.getJobs(location)
+        List<Job> result = service.getJobs(location1)
 
         then: "result contains jobs for location which are not deleted"
-        result.size() == 1
-        !result.contains(job1)
-        result.contains(job2)
-        !result.contains(deletedJob)
+        result == [job1]
     }
 
     void "test jobs by connectivityProfile"() {
-        given: "a job with connectivityProfile"
-        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("connectivityProfile")
-        job1.connectivityProfile = connectivityProfile
-        job1.save(flush: true)
+        given: "two jobs with connectivityProfiles, one deleted"
+        ConnectivityProfile connectivityProfile = ConnectivityProfile.build()
+        Job job1 = Job.build(connectivityProfile: connectivityProfile)
+        Job.build(connectivityProfile: connectivityProfile, deleted: true)
+        Job.build(connectivityProfile: ConnectivityProfile.build())
 
         when: "jobs requested by location"
         List<Job> result = service.getJobs(connectivityProfile)
 
         then: "result contains jobs for connectivityProfile which are not deleted"
-        result.size() == 1
-        result.contains(job1)
-        !result.contains(job2)
-        !result.contains(deletedJob)
+        result == [ job1 ]
     }
 
     void "test jobs by params"() {
+        given: "two jobs with labels, one deleted"
+        Job job2 = Job.build(label: "xyz")
+        Job job1 = Job.build(label: "def")
+        Job.build(label: "abc", deleted: true)
+
         when:
         def params = [:]
         params.sort = "label"
         List<Job> result = service.getJobs(params)
 
         then:
-        result.size() == 2
-        result.contains(job1)
-        result.contains(job2)
-        !result.contains(deletedJob)
+        result == [job1, job2]
     }
 
     void "test jobs by jobGroup"() {
-        given: "a job with different jobGroup"
-        job1.jobGroup = TestDataUtil.createJobGroup("different group")
-        job1.save(flush: true)
+        given: "two jobs with jobGroups, one deleted"
+        JobGroup jobGroup = JobGroup.build()
+        Job job1 = Job.build(jobGroup: jobGroup)
+        Job.build(jobGroup: jobGroup, deleted: true)
+        Job.build(jobGroup: JobGroup.build())
 
-        when: "jobs requested by location"
+        when: "jobs requested by jobGroup"
         List<Job> result = service.getJobs(jobGroup)
 
         then: "result contains jobs for connectivityProfile which are not deleted"
-        result.size() == 1
-        !result.contains(job1)
-        result.contains(job2)
-        !result.contains(deletedJob)
+        result == [job1]
     }
 }
