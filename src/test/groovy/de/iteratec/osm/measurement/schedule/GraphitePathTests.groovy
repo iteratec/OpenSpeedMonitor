@@ -17,84 +17,57 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.report.external.GraphitePath
-
-import static org.junit.Assert.*;
-
-import grails.test.mixin.*
-
-import org.junit.*
-
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.report.external.GraphitePath
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
 @TestFor(GraphitePath)
 @Mock([GraphitePath, AggregatorType])
-class GraphitePathTests {
+@Build([GraphitePath, AggregatorType])
+class GraphitePathTests extends Specification {
 
-	@Test
-    void testCreationWithDifferentInvalidPrefixes() {
-		
-		// Test-data
-		AggregatorType validMeasurand = new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)
-		
-		// Run the tests...
-		GraphitePath out = new GraphitePath(prefix: "", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).endsWith("cannot be blank]") );
-		
-		out = new GraphitePath(prefix: "wpt..", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-		
-		out = new GraphitePath(prefix: "wpt.testdt", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
+    void "alphanumerical prefixes with trailing dot are valid"(String prefix) {
+        given: "a valid built GraphitePath"
+        GraphitePath path = GraphitePath.build()
 
-		out = new GraphitePath(prefix: "wpt", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-		
-		out = new GraphitePath(prefix: ".wpt.", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-		
-		out = new GraphitePath(prefix: ".wpt", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-		
-		out = new GraphitePath(prefix: "wpt.server.server.wpt..", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-		
-		out = new GraphitePath(prefix: "wpt.server.server.wpt", measurand: validMeasurand)
-		assertFalse( out.validate() );
-		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
-	}
-	
-	@Test
-	void testCreationWithDifferentValidPrefixes() {
-		
-		// Test-data
-		AggregatorType validMeasurand = new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)
-		
-		// Run the tests...
-		GraphitePath out = new GraphitePath(prefix: "wpt.", measurand: validMeasurand)
-		assertTrue( out.validate() );
-		
-		out = new GraphitePath(prefix: "w43p43t.", measurand: validMeasurand)
-		assertTrue( out.validate() );
-		
-		out = new GraphitePath(prefix: "wpt.server.", measurand: validMeasurand)
-		assertTrue( out.validate() );
-		
-		out = new GraphitePath(prefix: "wpt.server.server.", measurand: validMeasurand)
-		assertTrue( out.validate() );
-		
-		out = new GraphitePath(prefix: "wpt.server.server.wpt.", measurand: validMeasurand)
-		assertTrue( out.validate() );
+        when: "an invalid prefix is set"
+        path.prefix = prefix
+
+        then: "it's not valid anymore"
+        path.validate() == true
+
+        where:
+        prefix                    | _
+        "wpt."                    | _
+        "wpt.server."             | _
+        "wpt.server.server."      | _
+        "wpt.server.server.wpt."  | _
     }
+
+    void "prefixes which are not alphanumerical or without trailing dot are invalid"(String prefix) {
+        given: "a valid built GraphitePath"
+        GraphitePath path = GraphitePath.build()
+
+        when: "an invalid prefix is set"
+        path.prefix = prefix
+
+        then: "it's not valid anymore"
+        path.validate() == false
+
+        where:
+        prefix                    | _
+        ""                        | _
+        "wpt.."                   | _
+        "wpt.testdt"              | _
+        "wpt"                     | _
+        "wpt*"                    | _
+        ".wpt."                   | _
+        ".wpt"                    | _
+        "wpt.server.server.wpt.." | _
+        "wpt.server.server.wpt"   | _
+    }
+
 }
