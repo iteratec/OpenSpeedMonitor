@@ -31,7 +31,7 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  *      isn't tested here cause it is tested in class {@link de.iteratec.osm.result.SummarizedChartLegendEntriesSpec} already.
  */
 @TestFor(OsmChartProcessingService)
-class OsmChartProcessingServiceSpec extends Specification{
+class OsmChartProcessingServiceSpec extends Specification {
 
     OsmChartProcessingService serviceUnderTest
 
@@ -71,14 +71,14 @@ class OsmChartProcessingServiceSpec extends Specification{
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
-    public void setup(){
+    public void setup() {
         serviceUnderTest = service
         mocksCommonForAllTests()
     }
 
     // event csiAggregations ////////////////////////////////////////////////////////////////////////////
 
-    void "event csiAggregations, every legend part in every graph different -> no summarization"(){
+    void "event csiAggregations, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -102,7 +102,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "event csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
+
+    void "event csiAggregations, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -112,7 +113,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ]
         String expectedCommonLabel =
                 "<b>${I18N_LABEL_CSI_TYPE}</b>: ${CsiType.DOC_COMPLETE.toString()} | " +
-                "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME} | " +
+                        "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME} | " +
                         "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME}"
 
         when:
@@ -130,7 +131,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
-    void "event csiAggregations, single legend parts in some but not all graphs the same -> no summarization"(){
+
+    void "event csiAggregations, single legend parts in some but not all graphs the same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -157,7 +159,7 @@ class OsmChartProcessingServiceSpec extends Specification{
 
     // pageAggregator csiAggregations ////////////////////////////////////////////////////////////////////////////
 
-    void "page csiAggregations, every legend part in every graph different -> no summarization"(){
+    void "page csiAggregations, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -181,7 +183,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
+
+    void "page csiAggregations, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -199,14 +202,15 @@ class OsmChartProcessingServiceSpec extends Specification{
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                CsiType.DOC_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_1_NAME,
-                CsiType.DOC_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_2_NAME,
-                CsiType.VISUALLY_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_3_NAME,
-                CsiType.VISUALLY_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_4_NAME
+                CsiType.DOC_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_1_NAME,
+                CsiType.DOC_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_2_NAME,
+                CsiType.VISUALLY_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_3_NAME,
+                CsiType.VISUALLY_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_4_NAME
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
-    void "page csiAggregations, single legend parts in some but not all graphs the same -> no summarization"(){
+
+    void "page csiAggregations, single legend parts in some but not all graphs the same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -230,7 +234,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page csiAggregations, single legend parts begin with same chars but end different -> no summarization" () {
+
+    void "page csiAggregations, single legend parts begin with same chars but end different -> no summarization"() {
         given:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: ["jobGroup_Name", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -254,7 +259,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page csiAggregations, page name and jobGroup name are equal -> no summarization" () {
+
+    void "page csiAggregations, page name and jobGroup name are equal -> no summarization"() {
         given:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: ["HP", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -281,7 +287,7 @@ class OsmChartProcessingServiceSpec extends Specification{
 
 //    ########## tests for summarizeEventResultGraphs #############
 
-    void "event result, every legend part in every graph different -> no summarization"(){
+    void "event result, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -305,7 +311,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "event result, single legend part in some but not in all graphs same -> no summarization"(){
+
+    void "event result, single legend part in some but not in all graphs same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -329,7 +336,8 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "event result, some legend parts in every graph the same, some different -> summarization"(){
+
+    void "event result, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -356,7 +364,7 @@ class OsmChartProcessingServiceSpec extends Specification{
 
     }
 
-    void "event result, single legend parts begin with same chars but end different -> no summarization"(){
+    void "event result, single legend parts begin with same chars but end different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [MEASURAND_1_NAME, "JobGroup_1_Name", MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -384,19 +392,18 @@ class OsmChartProcessingServiceSpec extends Specification{
 //    ######### end of test for summarizeEventResultGraphs ########
 
 
-    void mocksCommonForAllTests(){
-        serviceUnderTest.i18nService = [
-                msg: {String msgKey, String defaultMessage = null, List objs = null ->
-                    Map i18nKeysToValues = [
-                        'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
-                        'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
-                        'job.location.label':I18N_LABEL_LOCATION,
-                        'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
-                        'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY,
-                        'de.iteratec.osm.csi.type.heading':I18N_LABEL_CSI_TYPE
-                    ]
-                    return i18nKeysToValues[msgKey]
-                }
-        ] as I18nService
+    void mocksCommonForAllTests() {
+        serviceUnderTest.i18nService = Stub(I18nService)
+        serviceUnderTest.i18nService.msg(_, _) >> { String msgKey, String defaultMessage = null, List objs = null ->
+            Map i18nKeysToValues = [
+                    'job.jobGroup.label'                         : I18N_LABEL_JOB_GROUP,
+                    'de.iteratec.osm.result.measured-event.label': I18N_LABEL_MEASURED_EVENT,
+                    'job.location.label'                         : I18N_LABEL_LOCATION,
+                    'de.iteratec.result.measurand.label'         : I18N_LABEL_MEASURAND,
+                    'de.iteratec.osm.result.connectivity.label'  : I18N_LABEL_CONNECTIVITY,
+                    'de.iteratec.osm.csi.type.heading'           : I18N_LABEL_CSI_TYPE
+            ]
+            return i18nKeysToValues[msgKey]
+        }
     }
 }
