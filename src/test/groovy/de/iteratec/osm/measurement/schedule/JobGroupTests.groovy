@@ -18,36 +18,32 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.TestDataUtil
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.junit.Test
-
-import static org.junit.Assert.assertEquals
-
+import spock.lang.Specification
 /**
  * Test-suite of {@link JobGroup}.
  */
 @TestFor(JobGroup)
-@Mock([JobGroup, CsiConfiguration, CsiDay])
-class JobGroupTests {
+@Build([JobGroup, CsiConfiguration])
+@Mock([JobGroup, CsiConfiguration])
+class JobGroupTests extends Specification {
 
-	@Test
-	public void testToString_CSI_group() {
-		JobGroup out = new JobGroup(
-				name: 'Test-Group-1');
-		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
-		out.csiConfiguration = csiConfiguration
+    void "if a CSI configuration is set in a JobGroup, it's id is printed in toString"() {
+        when: "a JobGroup with CSI configuration exists"
+        CsiConfiguration csiConfiguration = CsiConfiguration.build()
+        JobGroup group = JobGroup.build(name: 'Test-Group-1', csiConfiguration: csiConfiguration)
 
-		assertEquals('Test-Group-1 (' + csiConfiguration.ident() + ')', out.toString());
-	}
+        then: "it's toString method contains the CSI configuration's ID"
+        group.toString() == 'Test-Group-1 (' + csiConfiguration.ident() + ')'
+    }
 
-	@Test
-	public void testToString_SYSTEM_group() {
-		JobGroup out = new JobGroup(
-				name: 'Test-Group-2');
+    void "a JobGroup without CSI configuration simply returns it's name as toString"() {
+        when: "a JobGroup without CSI configuration is created"
+        JobGroup group = JobGroup.build(name: 'Test-Group-2', csiConfiguration: null)
 
-		assertEquals('Test-Group-2', out.toString());
-	}
+        then: "it's toString method simply returns its name"
+        group.toString() == 'Test-Group-2'
+    }
 }
