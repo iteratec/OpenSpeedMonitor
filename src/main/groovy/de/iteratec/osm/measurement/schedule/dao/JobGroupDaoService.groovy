@@ -46,17 +46,6 @@ public interface JobGroupDaoService {
 
 	/**
 	 * <p>
-	 * Gets a {@link Map} with an entry for every persisted {@link JobGroup}
-	 * from db.
-	 * </p>
-	 * 
-	 * @return Map with id of {@link JobGroup}s as key and the objects itself as
-	 *         value.
-	 */
-	Map<Serializable, JobGroup> getIdToObjectMap();
-
-	/**
-	 * <p>
 	 * Gets a {@link Set} of CSI related {@linkplain JobGroup job groups}.
 	 * The returned set is unmodifiable.
 	 * </p>

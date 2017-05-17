@@ -20,7 +20,6 @@ package de.iteratec.osm.measurement.environment.dao;
 import de.iteratec.osm.measurement.environment.Browser;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,14 +48,6 @@ public interface BrowserDaoService {
 	 */
 	Set<Browser> findAll();
 
-	/**
-	 * Gets a {@link Map} with an entry for every persisted {@link Browser} from
-	 * db.
-	 * 
-	 * @return Map with id of {@link Browser}s as key and the objects itself as
-	 *         value.
-	 */
-	Map<Long, Browser> getIdToObjectMap();
 	
 	/**
 	 * Searches for a {@link Browser} identified by its name/alias.

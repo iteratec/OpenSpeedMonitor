@@ -31,11 +31,6 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 class DefaultPageDaoService implements PageDaoService {
 
 	@Override
-	Map<Serializable, Page> getIdToObjectMap(){
-		return Page.list().collectEntries { Page eachPage -> [eachPage.ident(), eachPage]}
-	}
-
-	@Override
 	public Set<Page> findAll() {
 		Set<Page> result = Collections.checkedSet(new HashSet<Page>(), Page.class);
 		result.addAll(Page.list());

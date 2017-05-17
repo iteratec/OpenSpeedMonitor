@@ -48,14 +48,4 @@ public interface PageDaoService {
 	 */
 	Set<Page> findAll();
 
-	/**
-	 * <p>
-	 * Gets a {@link Map} with an entry for every persisted {@link Page} from
-	 * db.
-	 * </p>
-	 * 
-	 * @return Map with id of {@link Page}s as key and the objects itself as
-	 *         value.
-	 */
-	Map<Long, Page> getIdToObjectMap();
 }

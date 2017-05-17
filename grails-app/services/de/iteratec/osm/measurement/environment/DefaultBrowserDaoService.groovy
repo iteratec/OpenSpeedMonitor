@@ -25,16 +25,6 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 class DefaultBrowserDaoService implements BrowserDaoService {
 
 	@Override
-	Map<Serializable, Browser> getIdToObjectMap(){
-		return Browser.list().collectEntries { Browser eachBrowser ->
-			[
-				eachBrowser.ident(),
-				eachBrowser
-			]
-		}
-	}
-
-	@Override
 	public Set<Browser> findAll() {
 		Set<Browser> result = Collections.checkedSet(new HashSet<Browser>(), Browser.class);
 		result.addAll(Browser.list());

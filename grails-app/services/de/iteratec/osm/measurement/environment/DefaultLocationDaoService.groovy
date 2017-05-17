@@ -30,23 +30,10 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 class DefaultLocationDaoService implements LocationDaoService {
 
 	@Override
-	Map<Serializable, Location> getIdToObjectMap(){
-		return Location.list().collectEntries { Location eachLocation -> [
-				eachLocation.ident(),
-				eachLocation]
-		}
-	}
-
-	@Override
 	public Set<Location> findAll() {
 		Set<Location> result = Collections.checkedSet(new HashSet<Location>(), Location.class);
 		result.addAll(Location.list());
 		return Collections.unmodifiableSet(result);
 	}
-	
-	@Override
-	public Location tryToFindByWPTLocation(String wptLocation)
-	{
-		return Location.findByLocation(wptLocation);
-	}
+
 }

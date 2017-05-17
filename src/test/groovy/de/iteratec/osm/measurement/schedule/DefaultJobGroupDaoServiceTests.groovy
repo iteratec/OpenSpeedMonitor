@@ -70,27 +70,4 @@ class DefaultJobGroupDaoServiceTests extends Specification{
         jobGroupsAfterAdding.contains(jobGroup2)
         jobGroupsAfterAdding.contains(jobGroup3)
     }
-
-    void "testGetIdToObjectMap"() {
-        given: "6 existing JobGroups"
-        JobGroup group1 = JobGroup.build()
-        JobGroup group2 = JobGroup.build()
-        JobGroup group3 = JobGroup.build()
-        JobGroup group4 = JobGroup.build()
-        JobGroup group5 = JobGroup.build()
-        JobGroup group6 = JobGroup.build()
-
-        when: "getIdToObjectMap method is called"
-        Map<Long, JobGroup> idToObjectMap = service.getIdToObjectMap()
-
-        then: "a map with database id's as keys and JobGroup objects as values is returned"
-        idToObjectMap.size() == 6
-        idToObjectMap[group1.ident()] == group1
-        idToObjectMap[group2.ident()] == group2
-        idToObjectMap[group3.ident()] == group3
-        idToObjectMap[group4.ident()] == group4
-        idToObjectMap[group5.ident()] == group5
-        idToObjectMap[group6.ident()] == group6
-    }
-
 }

@@ -20,7 +20,6 @@ package de.iteratec.osm.measurement.environment.dao;
 import de.iteratec.osm.measurement.environment.Location;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,27 +47,4 @@ public interface LocationDaoService {
 	 *         {@linkplain Collection#isEmpty() empty}.
 	 */
 	Set<Location> findAll();
-
-	/**
-	 * <p>
-	 * Gets a {@link Map} with an entry for every persisted {@link Location}
-	 * from db.
-	 * </p>
-	 * 
-	 * @return Map with id of {@link Location}s as key and the objects itself as
-	 *         value.
-	 */
-	Map<Long, Location> getIdToObjectMap();
-	
-	/**
-	 * <p>
-	 * Tries to find a {@link Location} by its WPT-Location. This is the agents 
-	 * location queue name.
-	 * </p>
-	 * 
-	 * @param wptLocation The WPT-Location to search for, not <code>null</code>. 
-	 * @return The matching location or <code>null</code> if no matching one 
-	 *         was found.
-	 */
-	Location tryToFindByWPTLocation(String wptLocation);
 }
