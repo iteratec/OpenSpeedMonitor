@@ -39,10 +39,10 @@ class PageServiceTests extends Specification {
     }
 
     def "test get page name from step name"(String stepName, String expectedPageName) {
-        when:
+        when: "a step name is given"
         String pageName = serviceUnderTest.getPageNameFromStepName(stepName)
 
-        then:
+        then: "the page name should be extracted if properly delimited"
         pageName == expectedPageName
 
         where:
@@ -56,10 +56,10 @@ class PageServiceTests extends Specification {
     }
 
     def "test get page by step name"(String stepName, String expectedPageName) {
-        when:
+        when: "a step name is given"
         Page page = serviceUnderTest.getPageByStepName(stepName)
 
-        then:
+        then: "the corresponding page should be returned if properly delimited"
         page == Page.findByName(expectedPageName)
 
         where:
@@ -72,15 +72,15 @@ class PageServiceTests extends Specification {
         'HP:HP_entry'                       | Page.UNDEFINED
     }
 
-    def "test exclude pagename part"(String stepName, String expectedStepName) {
-        when:
-        String pageName = serviceUnderTest.excludePagenamePart(stepName)
+    def "test exclude pagename part"(String stepName, String expectedMeasuredEventName) {
+        when: "a step name is given"
+        String measuredEventName = serviceUnderTest.excludePagenamePart(stepName)
 
-        then:
-        pageName == expectedStepName
+        then: "the measured event name should be extracted if properly delimited"
+        measuredEventName == expectedMeasuredEventName
 
         where:
-        stepName                                |   expectedStepName
+        stepName                                |   expectedMeasuredEventName
         'stepName'                              |   'stepName'
         'pageName:::stepName'                   |   'stepName'
         'HP:::LH_Homepage'                      |   'LH_Homepage'
