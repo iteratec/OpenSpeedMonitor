@@ -52,8 +52,6 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
         initRangeFrom();
         initRangeTo();
 
-        pickerFrom.selectDate(dateFrom);
-        pickerTo.selectDate(dateTo);
         registerEvents();
         eventsEnabled = true;
     };
