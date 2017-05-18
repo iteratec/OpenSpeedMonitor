@@ -6,8 +6,8 @@ import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
 class ParameterBindingUtility {
-    final static private DateTimeFormatter FALLBACK_DATE_FORMAT = DateTimeFormat.forPattern('dd.MM.yyyy')
-    final static private DateTimeFormatter ISO_DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
+    static final private DateTimeFormatter FALLBACK_DATE_FORMAT = DateTimeFormat.forPattern('dd.MM.yyyy')
+    static final private DateTimeFormatter ISO_DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime()
 
     static DateTime parseDateTimeParameter(def value, boolean fallbackToEndOfDay) {
         if (!value) {

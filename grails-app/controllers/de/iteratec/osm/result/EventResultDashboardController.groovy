@@ -60,12 +60,11 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    public static final Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
+    public static final String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
-    public final static List<Long> AGGREGATION_INTERVALS = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
+    public static final List<Long> AGGREGATION_INTERVALS = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
     def intervals = ['not', 'hourly', 'daily', 'weekly']
