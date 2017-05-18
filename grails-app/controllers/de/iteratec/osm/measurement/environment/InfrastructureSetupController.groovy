@@ -17,15 +17,15 @@ class InfrastructureSetupController {
     }
 
     def cancel() {
-        configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.ABORTED)
+        configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.Aborted)
         redirect(controller: 'Landing', action: 'index')
     }
 
     def save() {
-        if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
+        if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.Finished) {
             List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(params.serverSelect, params.inputWptKey, params.inputServerName, params.inputServerAddress, params.inputServerKey)
             if (addedLocations.size() > 0) {
-                configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.FINISHED)
+                configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.Finished)
                 flash.success = addedLocations.size()
                 redirect(controller: 'Landing', action: 'index')
             } else {

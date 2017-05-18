@@ -65,10 +65,10 @@ class OsmConfiguration {
     /** Time in days internal monitoring data like location queues is stored. */
     Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     /** Did the infrastructure setup run already? */
-    InfrastructureSetupStatus infrastructureSetupRan = InfrastructureSetupStatus.NOT_STARTED
+    InfrastructureSetupStatus infrastructureSetupRan = InfrastructureSetupStatus.NotStarted
 
     enum InfrastructureSetupStatus {
-        NOT_STARTED, ABORTED, FINISHED
+        NotStarted, Aborted, Finished
     }
 
     static mapping = {
@@ -82,7 +82,7 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
-        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NotStarted
     }
 
     static constraints = {
@@ -96,6 +96,6 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
-        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NotStarted
     }
 }
