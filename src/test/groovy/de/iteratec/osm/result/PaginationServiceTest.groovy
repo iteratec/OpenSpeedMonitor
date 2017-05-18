@@ -44,98 +44,46 @@ class PaginationServiceTest extends Specification {
         serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator)
     }
 
-    def "test build list results pagination"() {
-        given: "a command for the tabular result list"
-        TabularResultListResultsCommand cmd = new TabularResultListResultsCommand()
-        cmd.setFrom(new DateTime(2014, 8, 8, 4, 0))
-        cmd.setTo(new DateTime(2014, 8, 8, 6, 0))
-        cmd.setSelectedFolder([2L])
-        cmd.setSelectedPages([1L])
-        cmd.setSelectedBrowsers([3L])
-        cmd.setSelectedMeasuredEventIds([])
+    def "test correct amount of pagination links for result list"() {
+        given: "a given amount of event results and a maximal amount of rows per page"
+        int eventResultsTotalRecords = 100
+        int maxRowsPerPage = 20
+        TabularResultListResultsCommand cmd = new TabularResultListResultsCommand(
+                max: maxRowsPerPage,
+        )
 
-        stubbedLinkFromService("http://example.com/eventResult/listResults?selectedTimeFrameInterval=0&from=2014-08-08T04%3A00%3A00.000Z&to=2014-08-08T06%3A00%3A00.000Z&selectedFolder=2&selectedPages=1&selectedBrowsers=3&_action_listResults=Show")
+        stubbedLinkGeneratorFromService(maxRowsPerPage)
 
-        when: "buildListResultsPagination is called"
-        PaginationListing paginationListing = serviceUnderTest.buildListResultsPagination(cmd, 100)
+        when: "the pagination links are generated"
+        PaginationListing paginationListing = serviceUnderTest.buildListResultsPagination(cmd, eventResultsTotalRecords)
 
-
-        then: "one gets the correct parameters to build the pagination for result list table"
-        Map<String, List<String>> queryParams = getQueryParams(paginationListing.getRows().get(0).pageLink)
-        paginationListing.getRows().size() == 2
-        paginationListing.getRows().get(0).pageNumber == 1
-        queryParams.get("from").get(0) == "2014-08-08T04:00:00.000Z"
-        queryParams.get("to").get(0) == "2014-08-08T06:00:00.000Z"
-        queryParams.get("selectedFolder").toString() == cmd.getSelectedFolder().toString()
-        queryParams.get("selectedPages").toString() == cmd.getSelectedPages().toString()
-        queryParams.get("selectedBrowsers").toString() == cmd.getSelectedBrowsers().toString()
+        then: "the amount of generated links is correct"
+        paginationListing.isEmpty() == false
+        paginationListing.getRows().size() == eventResultsTotalRecords / maxRowsPerPage
     }
 
-    def "test build list results for job pagination"() {
-        given: "a command for the job list"
-        TabularResultListResultsForSpecificJobCommand cmd = new TabularResultListResultsForSpecificJobCommand()
+    def "test correct amount of pagination links for job list"() {
+        given: "a given amount of event results and a maximal amount of rows per page"
+        int eventResultsTotalRecords = 100
+        int maxRowsPerPage = 20
+        TabularResultListResultsForSpecificJobCommand cmd = new TabularResultListResultsForSpecificJobCommand(
+                job: Job.build(),
+                max: maxRowsPerPage
+        )
 
-        Job job = Job.build()
-        cmd.setJob(job)
-        cmd.setFrom(new DateTime(2014, 8, 7, 4, 0))
-        cmd.setTo(new DateTime(2014, 8, 8, 4, 0))
-        cmd.setMax(50)
-        cmd.setOffset(0)
+        stubbedLinkGeneratorFromService(maxRowsPerPage)
 
-        stubbedLinkFromService("http://example.com/eventResult/showListResultsForJob?selectedTimeFrameInterval=0&job.id=1&from=2014-08-07T04%3A00%3A00.000Z&to=2014-08-08T04%3A00%3A00.000Z")
+        when: "the pagination links are generated"
+        PaginationListing paginationListing = serviceUnderTest.buildListResultsForJobPagination(cmd, eventResultsTotalRecords)
 
-        when:"when buildListResultsForJobPagination is called"
-        PaginationListing paginationListing = serviceUnderTest.buildListResultsForJobPagination(cmd, 100)
-
-
-        then: "one gets the correct parameters to build the pagination for job list table"
-        Map<String, List<String>> queryParams = getQueryParams(paginationListing.getRows().get(0).pageLink)
-
-        paginationListing.getRows().size() == 2
-        paginationListing.getRows().get(0).pageNumber == 1
-        queryParams.get("from").get(0) == "2014-08-07T04:00:00.000Z"
-        queryParams.get("to").get(0) == "2014-08-08T04:00:00.000Z"
-        queryParams.get("job.id").get(0).toString() == cmd.getJob().getId().toString()
+        then: "the amount of generated links is correct"
+        paginationListing.isEmpty() == false
+        paginationListing.getRows().size() == eventResultsTotalRecords / maxRowsPerPage
     }
 
-    private void stubbedLinkFromService(String linkAsString) {
+    private void stubbedLinkGeneratorFromService(int maxRowsPerPage) {
         serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator) {
-            link(_) >> linkAsString
-        }
-    }
-
-    /**
-     * Gives params from given url {@link String}.
-     * @param url
-     * 		URL as {@link String}
-     * @return
-     */
-    private static Map<String, List<String>> getQueryParams(String url) {
-        try {
-            Map<String, List<String>> params = new HashMap<String, List<String>>()
-            String[] urlParts = url.split("\\?")
-            if (urlParts.length > 1) {
-                String query = urlParts[1]
-                for (String param : query.split("&")) {
-                    String[] pair = param.split("=")
-                    String key = URLDecoder.decode(pair[0], "UTF-8")
-                    String value = ""
-                    if (pair.length > 1) {
-                        value = URLDecoder.decode(pair[1], "UTF-8")
-                    }
-
-                    List<String> values = params.get(key)
-                    if (values == null) {
-                        values = new ArrayList<String>()
-                        params.put(key, values)
-                    }
-                    values.add(value)
-                }
-            }
-
-            return params
-        } catch (UnsupportedEncodingException ex) {
-            throw new AssertionError(ex)
+            link(_) >> "http://example.com/eventResultList?max=${maxRowsPerPage}"
         }
     }
 }
