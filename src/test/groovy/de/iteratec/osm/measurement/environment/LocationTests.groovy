@@ -17,91 +17,44 @@
 
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.csi.TestDataUtil
-import grails.validation.ConstrainedProperty
-import org.grails.validation.MaxSizeConstraint
-import org.junit.Assert;
-
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import grails.test.mixin.Mock;
-import grails.test.mixin.TestFor;
-
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 /**
  * Test-suite for {@link Location}
  */
 @TestFor(Location)
+@Build([Location, WebPageTestServer, Browser])
 @Mock([Location, WebPageTestServer,Browser])
-class LocationTests {
+class LocationTests extends Specification {
 
-	@Test
-	void testFindAll() {
-		// Save one location
-		new Location().save(failOnError: true, validate:false)
+    void "only labels up to 150 characters are valid"() {
+        given: "a location with a valid label with 150 characters"
+        Location location = Location.build(label: "*".padLeft(150,"*"))
 
-		// look for all -> current 1
-		Assert.assertEquals(1, Location.all.size())
+        when: "the label is updated to a length og 151"
+        location.label = "*".padLeft(151,"*")
 
-		// Save another location
-		new Location().save(failOnError: true, validate:false)
-
-		// look for all -> current 2
-		Assert.assertEquals(2, Location.all.size())
-	}
-
-    @Test
-    void testLabelSize() {
-        // See
-        //     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
-        // and
-        //     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
-        // for documentation about constraint reflection.
-
-        //label increased from 50 to 150 on 30.7.2013
-        String testStringValide = "*".padLeft(150,"*")
-        String testStringInvalide = "*".padLeft(151,"*")
-        Location testLocation = new Location(active: true,
-                uniqueIdentifierForServer: "Test",
-                location: "Test",
-                label: testStringValide,
-                browser: TestDataUtil.createBrowser("Test"),
-                wptServer: TestDataUtil.createServer(),
-                dateCreated: new Date(),
-                lastUpdated: new Date())
-        assertTrue testLocation.validate()
-        testLocation.label = testStringInvalide
-        assertFalse testLocation.validate()
-
+        then: "the location doesn't validate anymore"
+        location.validate() == false
     }
-	
-	@Test
-	void testToString() {
-		WebPageTestServer server = new WebPageTestServer(label: 'Server');
-		Browser browser = new Browser(name: 'Browser');
-		Location out = new Location(label: 'LocationLabel', location: 'Location', browser: browser, wptServer: server);
-		
-		assertEquals('Location @ Server (Browser)', out.toString());
-	}
-	
-	@Test
-	void testToString_realWorldData() {
-		WebPageTestServer server = new WebPageTestServer(label: 'wpt1');
-		Browser browser = new Browser(name: 'Firefox');
-		Location out = new Location(label: 'Agent 1: Offizielles Monitoring', location: 'Agent1-wptdriver:Firefox7', browser: browser, wptServer: server);
-		
-		assertEquals('Agent1-wptdriver:Firefox7 @ wpt1 (Firefox)', out.toString());
-	}
-	
-	@Test
-	void testRemoveBrowser() {
-		WebPageTestServer server = new WebPageTestServer(label: 'wpt1');
-		Browser browser = new Browser(name: 'Chrome');
-		Location loc1 = new Location(label: 'Agent 1: Offizielles Monitoring', location: 'Agent1-wptdriver:Firefox7', uniqueIdentifierForServer: 'ServerName02-Chrome', browser: browser, wptServer: server);
-		Location loc2 = new Location(label: 'Agent 1: Offizielles Monitoring', location: 'Agent1-wptdriver:Firefox7', uniqueIdentifierForServer: 'Agent3-wptdriver:Chrome', browser: browser, wptServer: server);
 
-		assertEquals('ServerName02', loc1.removeBrowser(loc1.uniqueIdentifierForServer))
-		assertEquals('Agent3-wptdriver', loc2.removeBrowser(loc2.uniqueIdentifierForServer))		
-	}
+    void "toString includes location, WPT server and browser name, but not the location label"() {
+        given: "a WPT server, a browser, and a location associated with them"
+        WebPageTestServer server = WebPageTestServer.build(label: 'wpt1')
+        Browser browser = Browser.build(name: 'Firefox')
+        Location location = Location.build(
+                label: 'Agent 1: Offizielles Monitoring',
+                location: 'Agent1-wptdriver:Firefox7',
+                browser: browser,
+                wptServer: server
+        )
+
+        when: "toString is called"
+        String result = location.toString()
+
+        then: "the result contains the location, server and browser"
+        result == "Agent1-wptdriver:Firefox7 @ wpt1 (Firefox)"
+    }
 }
