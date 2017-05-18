@@ -71,6 +71,15 @@ class Location {
         wptServer(nullable: false)
     }
 
+    /**
+    * Removes browser.name from labelWithBrowser if it is preceded by a non-word character
+    * So if browser.name == 'Chrome' and labelWithBrowser == 'Agent3-wptdriver:Chrome', 'Agent3-wptdriver' is returned
+    */
+    String removeBrowser(String labelWithBrowser) {
+        return (!browser) ? labelWithBrowser : labelWithBrowser - ~/\W${browser.name}$/
+    }
+
+
     @Override
     String toString() {
         return this.location + ' @ ' + this.wptServer?.label + ' (' + this.browser?.name + ')'

@@ -57,4 +57,24 @@ class LocationTests extends Specification {
         then: "the result contains the location, server and browser"
         result == "Agent1-wptdriver:Firefox7 @ wpt1 (Firefox)"
     }
+
+    void "removeBrowser returns the label without the browser name"(String uniqueIdentifierForServer) {
+        given: "a location with associated browser"
+        Location location = Location.build(
+                uniqueIdentifierForServer: uniqueIdentifierForServer,
+                browser: Browser.build(name: "Chrome")
+        )
+
+        when: "The method is called on the unique identifier for server"
+        String result = location.removeBrowser(location.uniqueIdentifierForServer)
+
+        then: "The string without the browser name and joining character is returned"
+        result == "Agent3-wptdriver"
+
+        where:
+        uniqueIdentifierForServer | _
+        "Agent3-wptdriver:Chrome" | _
+        "Agent3-wptdriver-Chrome" | _
+    }
+
 }
