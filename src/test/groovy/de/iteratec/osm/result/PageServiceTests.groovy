@@ -17,128 +17,82 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import de.iteratec.osm.csi.Page
-import org.junit.*
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
+import spock.lang.Specification
 
 /**
  * Test-suite for {@link PageServiceTests}.
  */
 @TestFor(PageService)
-@Mock([Page,MeasuredEvent])
-class PageServiceTests {
+@Mock([Page])
+@Build([Page])
+class PageServiceTests extends Specification {
 
-	static final Integer pageCount = 7
-	PageService serviceUnderTest
+    PageService serviceUnderTest
 
-	@Before
-	void setUp() {
-		serviceUnderTest = service
+    def setup() {
+        serviceUnderTest = service
+        createPages()
+    }
 
-		createPages()
-		createMeasuredEvents()
-	}
+    def "test get page name from step name"(String stepName, String expectedPageName) {
+        when:
+        String pageName = serviceUnderTest.getPageNameFromStepName(stepName)
 
-	@Test
-	void testGetCachedPageMap() {
-		Map<Long, Page> dataToProof = serviceUnderTest.getCachedPageMap()
-		assertEquals(pageCount, dataToProof.size())
+        then:
+        pageName == expectedPageName
 
-		// Map may not contain a null or a value without name
-		for(Map.Entry<Long, Page> eachPage : dataToProof)
-		{
-			assertNotNull eachPage.key
-			assertNotNull eachPage.value
-			assertNotNull eachPage.value.name
-		}
-	}
+        where:
+        stepName                            | expectedPageName
+        'HP:::BV1_IE_homepage'              | 'HP'
+        'MES:::BV1_FF_Moduleinstieg'        | 'MES'
+        'XFXHVXGT:::BV1_FF_Moduleinstieg'   | 'XFXHVXGT'
+        'BV1_FF_Moduleinstieg'              | Page.UNDEFINED
+        'HP::HP_entry'                      | Page.UNDEFINED
+        'HP:HP_entry'                       | Page.UNDEFINED
+    }
 
-	@Test
-	void testGetPageMap() {
-		Map<Long, Page> dataToProof = serviceUnderTest.getPageMap()
-		assertEquals(pageCount, dataToProof.size())
+    def "test get page by step name"(String stepName, String expectedPageName) {
+        when:
+        Page page = serviceUnderTest.getPageByStepName(stepName)
 
-		// Map may not contain a null or a value without name
-		for(Map.Entry<Long, Page> eachPage : dataToProof)
-		{
-			assertNotNull eachPage.key
-			assertNotNull eachPage.value
-			assertNotNull eachPage.value.name
-		}
-	}
+        then:
+        page == Page.findByName(expectedPageName)
 
-	@Test
-	void testGetPageNameFromStepName(){
-		final String stepName_HP = 'HP:::BV1_IE_homepage'
-		final String stepName_MES = 'MES:::BV1_FF_Moduleinstieg'
-		final String stepName_unnkownPage = 'XFXHVXGT:::BV1_FF_Moduleinstieg'
-		final String stepName_noPage = 'BV1_FF_Moduleinstieg'
+        where:
+        stepName                            | expectedPageName
+        'HP:::BV1_IE_homepage'              | 'HP'
+        'MES:::BV1_FF_Moduleinstieg'        | 'MES'
+        'XFXHVXGT:::BV1_FF_Moduleinstieg'   | 'XFXHVXGT'
+        'BV1_FF_Moduleinstieg'              | Page.UNDEFINED
+        'HP::HP_entry'                      | Page.UNDEFINED
+        'HP:HP_entry'                       | Page.UNDEFINED
+    }
 
-		assertEquals('HP', serviceUnderTest.getPageNameFromStepName(stepName_HP))
-		assertEquals('MES', serviceUnderTest.getPageNameFromStepName(stepName_MES))
-		assertEquals('XFXHVXGT', serviceUnderTest.getPageNameFromStepName(stepName_unnkownPage))
-		assertEquals(Page.UNDEFINED, serviceUnderTest.getPageNameFromStepName(stepName_noPage))
-		assertEquals('HP', serviceUnderTest.getPageNameFromStepName('HP:::LH_Homepage'))
-	}
+    def "test exclude pagename part"(String stepName, String expectedStepName) {
+        when:
+        String pageName = serviceUnderTest.excludePagenamePart(stepName)
 
-	@Test
-	void testGetPageByStepName(){
-		final String stepName_HP = 'HP:::BV1_IE_homepage'
-		final String stepName_MES = 'MES:::BV1_FF_Moduleinstieg'
-		final String stepName_unnkownPage = 'XFXHVXGT:::BV1_FF_Moduleinstieg'
-		final String stepName_noPage = 'BV1_FF_Moduleinstieg'
+        then:
+        pageName == expectedStepName
 
-		final Page hp = Page.findByName('HP')
-		final Page mes = Page.findByName('MES')
-		final Page undefined = Page.findByName(Page.UNDEFINED)
+        where:
+        stepName                                |   expectedStepName
+        'stepName'                              |   'stepName'
+        'pageName:::stepName'                   |   'stepName'
+        'HP:::LH_Homepage'                      |   'LH_Homepage'
+        'HP::LH_Homepage'                       |   'HP::LH_Homepage'
+        'HP:LH_Homepage'                        |   'HP:LH_Homepage'
+    }
 
-		assertEquals(hp, serviceUnderTest.getPageByStepName(stepName_HP))
-		assertEquals(mes, serviceUnderTest.getPageByStepName(stepName_MES))
-		assertEquals(undefined, serviceUnderTest.getPageByStepName(stepName_unnkownPage))
-		assertEquals(undefined, serviceUnderTest.getPageByStepName(stepName_noPage))
-		assertEquals(hp, serviceUnderTest.getPageByStepName('HP:::LH_Homepage'))
-	}
-	
-	@Test
-	void testExcludePagenamePart(){
-		
-		final String correctDelimitter = PageService.STEPNAME_DELIMITTER
-		final String incorrectDelimitter = correctDelimitter + 'incorrect'
-		final String stepNameWithoutPage = 'step' 
-		final String stepName_withPage = "HP${correctDelimitter}${stepNameWithoutPage}"
-		final String stepName_withIncorrectDelimittedPage = 'MES${incorrectDelimitter}${stepName}'
-		
-		assertEquals(stepNameWithoutPage, serviceUnderTest.excludePagenamePart(stepNameWithoutPage))
-		assertEquals(stepNameWithoutPage, serviceUnderTest.excludePagenamePart(stepName_withPage))
-		assertEquals(stepName_withIncorrectDelimittedPage, serviceUnderTest.excludePagenamePart(stepName_withIncorrectDelimittedPage))
-		
-		assertEquals('LH_Homepage', serviceUnderTest.excludePagenamePart('HP:::LH_Homepage'))
-		
-	}
+    def createPages() {
+        List pageNames = ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', 'XFXHVXGT', Page.UNDEFINED]
 
-	private createPages(){
-		new Page(name: 'HP').save(failOnError: true)
-		new Page(name: 'MES').save(failOnError: true)
-		new Page(name: 'SE').save(failOnError: true)
-		new Page(name: 'ADS').save(failOnError: true)
-		new Page(name: 'WKBS').save(failOnError: true)
-		new Page(name: 'WK').save(failOnError: true)
-		new Page(name: Page.UNDEFINED).save(failOnError: true)
-	}
-
-	private createMeasuredEvents() {
-		String stepName_HP = 'HP:::BV1_IE_homepage'
-		new MeasuredEvent(
-				name: stepName_HP,
-				testedPage: Page.findByName('HP')
-				).save(failOnError: true)
-
-		String stepName_MES = 'MES:::BV1_FF_Moduleinstieg'
-		new MeasuredEvent(
-				name: stepName_MES,
-				testedPage: Page.findByName('MES')
-				).save(failOnError: true)
-	}
+        pageNames.each { name ->
+            Page.build(name: name)
+        }
+    }
 }
