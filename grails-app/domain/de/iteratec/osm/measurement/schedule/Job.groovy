@@ -161,9 +161,9 @@ class Job implements Taggable {
     boolean option_trace
     String  option_spof
 
-    String  option_takeScreenshots
-    String  option_saveBodies
-    String  option_userAgent
+    String  option_takeScreenshots = "default"
+    String  option_saveBodies = "none"
+    String  option_userAgent = "default"
 
     /**
      * @deprecated Use executionSchedule instead

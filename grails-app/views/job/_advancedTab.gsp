@@ -111,9 +111,9 @@
     </label>
     <div class="col-md-5">
         <select id="inputField-option_saveBodies" name="option_saveBodies" class="form-control chosen">
-            <option value="none" <g:if test="${job?.option_saveBodies=="none"}">selected</g:if>>none</option>
-            <option value="html" <g:if test="${job?.option_saveBodies=="html"}">selected</g:if>>html</option>
-            <option value="all"  <g:if test="${job?.option_saveBodies=="all" }">selected</g:if>>all</option>
+            <option value="none" <g:if test="${job?.option_saveBodies=="none"}">selected</g:if>><g:message code="job.option_saveBodies.none" default="none" /></option>
+            <option value="html" <g:if test="${job?.option_saveBodies=="html"}">selected</g:if>><g:message code="job.option_saveBodies.html" default="html" /></option>
+            <option value="all"  <g:if test="${job?.option_saveBodies=="all" }">selected</g:if>><g:message code="job.option_saveBodies.all" default="all" /></option>
         </select>
     </div>
 </div>
@@ -124,9 +124,9 @@
     </label>
     <div class="col-md-5">
         <select id="inputField-option_takeScreenshots" name="option_takeScreenshots" class="form-control chosen">
-            <option value="none"    <g:if test="${job?.option_takeScreenshots=="none"   }">selected</g:if>>none</option>
-            <option value="default" <g:if test="${job?.option_takeScreenshots=="default"}">selected</g:if>>default</option>
-            <option value="full"    <g:if test="${job?.option_takeScreenshots=="full"   }">selected</g:if>>full</option>
+            <option value="none"    <g:if test="${job?.option_takeScreenshots=="none"   }">selected</g:if>><g:message code="job.option_takeScreenshots.none" default="none" /></option>
+            <option value="default" <g:if test="${job?.option_takeScreenshots=="default"}">selected</g:if>><g:message code="job.option_takeScreenshots.default" default="default" /></option>
+            <option value="full"    <g:if test="${job?.option_takeScreenshots=="full"   }">selected</g:if>><g:message code="job.option_takeScreenshots.full" default="full" /></option>
         </select>
     </div>
 </div>
@@ -139,10 +139,10 @@
     </label>
     <div class="col-md-5">
         <select id="inputField-option_userAgent" name="option_userAgent" class="form-control chosen">
-            <option value="default"   <g:if test="${job?.option_userAgent=="default"  }">selected</g:if>>default</option>
-            <option value="original"  <g:if test="${job?.option_userAgent=="original" }">selected</g:if>>original</option>
-            <option value="append"    <g:if test="${job?.option_userAgent=="append"   }">selected</g:if>>append</option>
-            <option value="overwrite" <g:if test="${job?.option_userAgent=="overwrite"}">selected</g:if>>overwrite</option>
+            <option value="default"   <g:if test="${job?.option_userAgent=="default"  }">selected</g:if>><g:message code="job.option_userAgent.default" default="default" /></option>
+            <option value="original"  <g:if test="${job?.option_userAgent=="original" }">selected</g:if>><g:message code="job.option_userAgent.original" default="original" /></option>
+            <option value="append"    <g:if test="${job?.option_userAgent=="append"   }">selected</g:if>><g:message code="job.option_userAgent.append" default="append" /></option>
+            <option value="overwrite" <g:if test="${job?.option_userAgent=="overwrite"}">selected</g:if>><g:message code="job.option_userAgent.overwrite" default="overwrite" /></option>
         </select>
     </div>
 </div>
