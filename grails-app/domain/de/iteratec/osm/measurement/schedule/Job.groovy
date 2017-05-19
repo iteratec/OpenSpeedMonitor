@@ -84,10 +84,6 @@ class Job implements Taggable {
      */
     boolean tcpdump
     /**
-     * Save response bodies (For text resources)
-     */
-    boolean bodies
-    /**
      * Continuous Video Capture
      * Unstable/experimental, may cause tests to fail
      */
@@ -161,9 +157,13 @@ class Job implements Taggable {
     boolean option_trace
     String  option_spof
 
-    String  option_takeScreenshots = "default"
-    String  option_saveBodies = "none"
-    String  option_userAgent = "default"
+    public enum TakeScreenshots {NONE,DEFAULT,FULL};
+    public enum SaveBodies {NONE,HTML,ALL};
+    public enum UserAgent {DEFAULT,ORIGINAL,APPEND,OVERWRITE};
+
+    TakeScreenshots  option_takeScreenshots = TakeScreenshots.DEFAULT
+    SaveBodies       option_saveBodies      = SaveBodies.NONE
+    UserAgent        option_userAgent       = UserAgent.DEFAULT
 
     /**
      * @deprecated Use executionSchedule instead
@@ -219,7 +219,7 @@ class Job implements Taggable {
         ignoreSSL(nullable: true)
         standards(nullable: true)
         tcpdump(nullable: true)
-        bodies(nullable: true)
+        //bodies(nullable: true)
         continuousVideo(nullable: true)
         keepua(nullable: true)
 
@@ -287,10 +287,6 @@ class Job implements Taggable {
         option_type(nullable: true)
         option_customHeaders(nullable: true)
         option_spof(nullable: true)
-
-        option_takeScreenshots(nullable: true)
-        option_saveBodies(nullable: true)
-        option_userAgent(nullable: true)
     }
 
     static mapping = {

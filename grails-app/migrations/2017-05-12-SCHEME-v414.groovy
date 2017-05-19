@@ -1,5 +1,5 @@
 databaseChangeLog = {
-    changeSet(author: "dkl", id: "1494576018-1") {
+    changeSet(author: "dkl", id: "1494576018000-1") {
         addColumn(tableName: "job") {
             column(name: "option_is_private"                , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_block"                     , type: "varchar(255)")
@@ -20,9 +20,9 @@ databaseChangeLog = {
             column(name: "option_trace"                     , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "option_spof"                      , type: "varchar(255)")
 
-            column(defaultValue: "default", name: "option_take_screenshots"           , type: "varchar(255)")
-            column(defaultValue: "none"   , name: "option_save_bodies"                , type: "varchar(255)")
-            column(defaultValue: "default", name: "option_user_agent"                 , type: "varchar(255)")
+            column(defaultValue: "DEFAULT", name: "option_take_screenshots"           , type: "varchar(255)")
+            column(defaultValue: "NONE"   , name: "option_save_bodies"                , type: "varchar(255)")
+            column(defaultValue: "DEFAULT", name: "option_user_agent"                 , type: "varchar(255)")
         }
     }
 }

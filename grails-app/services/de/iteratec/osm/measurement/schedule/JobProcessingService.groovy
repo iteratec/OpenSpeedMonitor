@@ -133,33 +133,32 @@ class JobProcessingService {
                 type           : job.option_type,
                 customHeaders  : job.option_customHeaders,
                 trace          : job.option_trace,
-                spof           : job.option_spof,
-                bodies         : job.bodies
+                spof           : job.option_spof
         ]
-        if (job.option_takeScreenshots == "none") {
+        if (job.option_takeScreenshots == Job.TakeScreenshots.NONE) {
             parameters.noimages = true
         }
         else {
             parameters.iq = job.option_iq
         }
-        if (job.option_takeScreenshots == "full") {
+        if (job.option_takeScreenshots == Job.TakeScreenshots.FULL) {
             parameters.pngss = true
         }
 
-        if (job.option_saveBodies == "html") {
+        if (job.option_saveBodies == Job.SaveBodies.HTML) {
             parameters.htmlbody = true
         }
-        if (job.option_saveBodies == "all") {
+        if (job.option_saveBodies == Job.SaveBodies.ALL) {
             parameters.bodies = true
         }
 
-        if(job.option_userAgent == "original") {
+        if(job.option_userAgent == Job.UserAgent.ORIGINAL) {
             parameters.keepua = true
         }
-        if(job.option_userAgent == "append") {
+        if(job.option_userAgent == Job.UserAgent.APPEND) {
             parameters.appendua = job.option_appendua
         }
-        if(job.option_userAgent == "overwrite") {
+        if(job.option_userAgent == Job.UserAgent.OVERWRITE) {
             parameters.uastring = job.option_uastring
         }
 
