@@ -19,114 +19,55 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.junit.Before
-import org.junit.Test
-import static org.junit.Assert.*
-
+import spock.lang.Specification
 /**
  * Test-suite for {@link de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService}.
  */
 @TestFor(DefaultJobGroupDaoService)
 @Mock([JobGroup, CsiConfiguration, CsiDay])
-class DefaultJobGroupDaoServiceTests {
+@Build([JobGroup, CsiConfiguration])
+class DefaultJobGroupDaoServiceTests extends Specification{
 
-	public static final String nameGroup1OfType1 = 'group1type1'
-	public static final String nameGroup2OfType1 = 'group2type1'
-	public static final String nameGroup3OfType1 = 'group3type1'
-	public static final String nameGroup1OfType2 = 'group1type2'
-	public static final String nameGroup2OfType2 = 'group2type2'
-	public static final String nameGroup3OfType2 = 'group3type2'
-	JobGroupDaoService serviceUnderTest
-	
-    @Before
-	void setUp(){
-		serviceUnderTest = service
-		createDataCommonForAllTests()
-	}
-	
-	@Test
-	void testFindCSIGroups() {
-		JobGroup csiGroup1 = new JobGroup(name: 'CSI-Group1').save(failOnError: true)
-		CsiConfiguration csiConfiguration1 = TestDataUtil.createCsiConfiguration()
-		csiConfiguration1.label = 'conf1'
-		csiGroup1.csiConfiguration = csiConfiguration1
-		csiGroup1.save()
+    void "testFindCSIGroups"() {
+        given: "3 existing JobGroups, 2 csi, 1 non csi"
+        JobGroup csiGroup1 = JobGroup.build(csiConfiguration: CsiConfiguration.build())
+        JobGroup csiGroup2 = JobGroup.build(csiConfiguration: CsiConfiguration.build())
+        JobGroup nonCsiGroup = JobGroup.build()
 
-		JobGroup csiGroup2 = new JobGroup(name: 'CSI-Group2').save(failOnError: true)
-		CsiConfiguration csiConfiguration2 = TestDataUtil.createCsiConfiguration()
-		csiConfiguration2.label = 'conf2'
-		csiGroup2.csiConfiguration = csiConfiguration2
-		csiGroup2.save()
+        when: "findCSIGroups() method is called"
+        Set<JobGroup> foundCsiGroups = service.findCSIGroups()
 
-		new JobGroup(name: 'Another-Group').save(failOnError: true)
-		
-		Set<JobGroup> result = serviceUnderTest.findCSIGroups()
-		
-		assertNotNull(result);
-		assertEquals(2, result.size());
-		assertEquals(1, result.count( { it.name == 'CSI-Group1' } ));
-		assertEquals(1, result.count( { it.name == 'CSI-Group2' } ));
-	}
-	
-	@Test
-	void testFindAll() {
-		new JobGroup(name: 'Group1').save(failOnError: true)
-		new JobGroup(name: 'Group2').save(failOnError: true)
-		
-		Set<JobGroup> result = serviceUnderTest.findAll();
-		
-		assertNotNull(result);
-		assertEquals(2, result.size());
-		assertEquals(1, result.count( { it.name == 'Group1' } ));
-		assertEquals(1, result.count( { it.name == 'Group2' } ));
-		
-		new JobGroup(name: 'Group3').save(failOnError: true)
-		
-		Set<JobGroup> resultAfterAdding = serviceUnderTest.findAll();
-		
-		assertNotNull(resultAfterAdding);
-		assertEquals(3, resultAfterAdding.size());
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Group1' } ));
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Group2' } ));
-		assertEquals(1, resultAfterAdding.count( { it.name == 'Group3' } ));
-	}
-	
-	@Test
-    void testGetIdToObjectMap() {
-		
-		//create test-specific data
-		
-		//group type 1
-		JobGroup group1OfType1 = new JobGroup(name: nameGroup1OfType1).save(failOnError: true)
-		JobGroup group2OfType1 = new JobGroup(name: nameGroup2OfType1).save(failOnError: true)
-		JobGroup group3OfType1 = new JobGroup(name: nameGroup3OfType1).save(failOnError: true)
-		//group type 2
-		JobGroup group1OfType2 = new JobGroup(name: nameGroup1OfType2).save(failOnError: true)
-		JobGroup group2OfType2 = new JobGroup(name: nameGroup2OfType2).save(failOnError: true)
-		JobGroup group3OfType2 = new JobGroup(name: nameGroup3OfType2).save(failOnError: true)
-		
-		//execute test
-		
-		Map<Long, JobGroup> idToObjectMap = serviceUnderTest.getIdToObjectMap()
-		
-		//assertions
-		
-		assertEquals(
-			[
-				(group1OfType1.ident()) : group1OfType1,
-				(group2OfType1.ident()) : group2OfType1,
-				(group3OfType1.ident()) : group3OfType1,
-				(group1OfType2.ident()) : group1OfType2,
-				(group2OfType2.ident()) : group2OfType2,
-				(group3OfType2.ident()) : group3OfType2
-				], 
-			idToObjectMap)
+        then: "it returns the 2 csi JobGroups"
+        foundCsiGroups.size() == 2
+        foundCsiGroups.contains(csiGroup1)
+        foundCsiGroups.contains(csiGroup2)
+        ! foundCsiGroups.contains(nonCsiGroup)
     }
-	private void createDataCommonForAllTests(){
-		//nothing to do yet
-	}
+
+    void "testFindAll"() {
+        given: "2 arbitrary JobGroups"
+        JobGroup jobGroup1 = JobGroup.build()
+        JobGroup jobGroup2 = JobGroup.build()
+
+        when: "findAll() method is called"
+        Set<JobGroup> jobGroups = service.findAll()
+
+        then: "it provides the 2 groups"
+        jobGroups.size() == 2
+        jobGroups.contains(jobGroup1)
+        jobGroups.contains(jobGroup2)
+
+        when: "another JobGroup gets persisted"
+        JobGroup jobGroup3 = JobGroup.build()
+        Set<JobGroup> jobGroupsAfterAdding = service.findAll()
+
+        then: "findAll() method provides all 3 JobGroups afterwards"
+        jobGroupsAfterAdding.size() == 3
+        jobGroupsAfterAdding.contains(jobGroup1)
+        jobGroupsAfterAdding.contains(jobGroup2)
+        jobGroupsAfterAdding.contains(jobGroup3)
+    }
 }

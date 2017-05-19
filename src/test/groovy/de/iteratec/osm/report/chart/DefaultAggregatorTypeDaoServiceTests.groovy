@@ -2,7 +2,7 @@
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
 * 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+* Licensed under the Apache License, Version 2.0 (the "License")
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 * 
@@ -18,83 +18,97 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.*
-
-import org.junit.Before
-import org.junit.Test
-
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertEquals
-
+import spock.lang.Specification
 /**
  * Test-suite of {@link AggregatorTypeDaoService}.
  */
 @TestFor(DefaultAggregatorTypeDaoService)
 @Mock([AggregatorType])
-class DefaultAggregatorTypeDaoServiceTests {
+@Build([AggregatorType])
+class DefaultAggregatorTypeDaoServiceTests extends Specification {
 
 	AggregatorTypeDaoService serviceUnderTest
 
-	@Before
-	public void setUp() {
+	def setup() {
 		this.serviceUnderTest = service
 	}
 
-	@Test
-	public void testFindAll() {
-		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND, id: 1).save(failOnError:true);
-		new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND, id: 2).save(failOnError:true);
 
-		Set<AggregatorType> result = serviceUnderTest.findAll();
-		assertNotNull(result);
-		assertEquals(2, result.size());
-		assertEquals(1, result.count( { it.id == 1 } ));
-		assertEquals(1, result.count( { it.id == 2 } ));
 
-		new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND, id: 3).save(failOnError:true);
-		Set<AggregatorType> resultAfterAdding = serviceUnderTest.findAll();
-		assertNotNull(resultAfterAdding);
-		assertEquals(3, resultAfterAdding.size());
-		assertEquals(1, resultAfterAdding.count( { it.id == 1 } ));
-		assertEquals(1, resultAfterAdding.count( { it.id == 2 } ));
-		assertEquals(1, resultAfterAdding.count( { it.id == 3 } ));
+	void "test all created aggregator types should be returned by findAll"() {
+		when: "we create multiple AggregatorTypes"
+		AggregatorType firstAggregator = AggregatorType.build(name:"uniqueName1")
+		AggregatorType secondAggregator = AggregatorType.build(name:"uniqueName2")
 
-		try {
-			resultAfterAdding.clear();
-			fail('Set should be unmodifyable - UnsupportedOperationException expected');
-		} catch(UnsupportedOperationException expected) {
-			// was expected
-		}
+		then: "our results should contain each of them"
+		Set<AggregatorType> result = serviceUnderTest.findAll()
+		result
+		result.size() == 2
+		result.find( { it == firstAggregator } )
+		result.find( { it == secondAggregator } )
+
+
 	}
+
+	def "test that AggregatorTypes that where inserted after a first findAll call will be returned by following findAll"(){
+		when: "we call findAll and create afterwars another AggregatorType"
+		AggregatorType.build(name:"uniqueName1")
+		Set<AggregatorType> resultBefore = serviceUnderTest.findAll()
+		AggregatorType additionalAggregator = AggregatorType.build(name:"uniqueName2")
+		Set<AggregatorType> resultAfter = serviceUnderTest.findAll()
+
+		then: "our next findAll should have one more element"
+		resultBefore.size() == 1
+		resultAfter.size() == 2
+		resultAfter.find( { it == additionalAggregator } )
+	}
+
+	def "findAll result should be immutable: remove"(){
+		when: "we try to remove a object from our result"
+		AggregatorType.build()
+		def result = serviceUnderTest.findAll()
+		result.remove(result.first())
+		then: "we should face an exception"
+		thrown UnsupportedOperationException
+	}
+
+	def "findAll result should be immutable: clear"(){
+		when: "we try to clear our result"
+		AggregatorType.build()
+		serviceUnderTest.findAll().clear()
+
+		then: "we should face an exception"
+		thrown UnsupportedOperationException
+	}
+
+	def "findAll result should be immutable: add"() {
+		when:"we try to add a Object to our result"
+		AggregatorType.build(name:"1")
+		def result = serviceUnderTest.findAll()
+		result.add(AggregatorType.build(name:"2"))
+
+		then: "we should face an exception"
+		thrown UnsupportedOperationException
+	}
+
 	
-	@Test
-	public void testGetNameToObjectMap(){
-		//test-specific data
-		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND, id: 1).save(failOnError:true);
-		new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND, id: 2).save(failOnError:true);
-		new AggregatorType(name: AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, id: 3).save(failOnError:true);
-		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOM_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, id: 4).save(failOnError:true);
-		
-		//test-execution
+	def "nameToObjectMap should contain every created AggregatorType"(){
+		when: "we create 4 different AggregatorTypes"
+		def meAggregator = AggregatorType.build(name: AggregatorType.MEASURED_EVENT)
+		def paAggregator = AggregatorType.build(name: AggregatorType.PAGE)
+		def rcAggregator = AggregatorType.build(name: AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME)
+		def ruAggregator = AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOM_TIME)
+
 		Map<String, AggregatorType> nameToObjectMap = serviceUnderTest.getNameToObjectMap()
-		 
-		//assertions
-		assertEquals(4, nameToObjectMap.size())
-		
-		AggregatorType eventAggrFromMap = nameToObjectMap[AggregatorType.MEASURED_EVENT]
-		assertEquals(AggregatorType.MEASURED_EVENT, eventAggrFromMap.name)
-		assertEquals(MeasurandGroup.NO_MEASURAND, eventAggrFromMap.measurandGroup)
-		
-		AggregatorType pageAggrFromMap = nameToObjectMap[AggregatorType.PAGE]
-		assertEquals(AggregatorType.PAGE, pageAggrFromMap.name)
-		assertEquals(MeasurandGroup.NO_MEASURAND, pageAggrFromMap.measurandGroup)
-		
-		AggregatorType fullyLoadedAggrFromMap = nameToObjectMap[AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME]
-		assertEquals(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, fullyLoadedAggrFromMap.name)
-		assertEquals(MeasurandGroup.LOAD_TIMES, fullyLoadedAggrFromMap.measurandGroup)
-		
-		AggregatorType domTimeAggrFromMap = nameToObjectMap[AggregatorType.RESULT_UNCACHED_DOM_TIME]
-		assertEquals(AggregatorType.RESULT_UNCACHED_DOM_TIME, domTimeAggrFromMap.name)
-		assertEquals(MeasurandGroup.LOAD_TIMES, domTimeAggrFromMap.measurandGroup)
+
+		then:"the map should contain exactly this 4 AggregatorTypes"
+		nameToObjectMap.size() == 4
+
+		nameToObjectMap[AggregatorType.MEASURED_EVENT] == meAggregator
+		nameToObjectMap[AggregatorType.PAGE] == paAggregator
+		nameToObjectMap[AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME] == rcAggregator
+		nameToObjectMap[AggregatorType.RESULT_UNCACHED_DOM_TIME] == ruAggregator
 	}
 }

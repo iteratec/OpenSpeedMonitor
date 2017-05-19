@@ -36,7 +36,9 @@
         </div>
 
         <!-----------------------------------------------------main navigation-->
-        <g:render template="/_menu/navbar"/>
+        <g:if test="${!disableNavbar}">
+            <g:render template="/_menu/navbar"/>
+        </g:if>
 
         <!-----------------------------------------------------body-->
         <g:render template="/layouts/content_osm"/>

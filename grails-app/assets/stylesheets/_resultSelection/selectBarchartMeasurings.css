@@ -2,7 +2,6 @@
     position: relative;
     padding-top: 20px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #e5e5e5;
 }
 
 .measurandSeries .row{
@@ -21,4 +20,6 @@
 
 .control-label.removeAddMeasurands {
     text-align: left;
+    padding-left: 0;
+    color: black !important;
 }

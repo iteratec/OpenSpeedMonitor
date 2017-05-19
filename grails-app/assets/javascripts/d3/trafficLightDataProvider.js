@@ -19,7 +19,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "all_good",
           lowerBoundary: 0,
           upperBoundary: goodLoadtime,
-          fill: "green",
+          fill: "#5cb85c",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
           cssClass: "d3chart-good"
@@ -28,7 +28,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "all_ok",
           lowerBoundary: goodLoadtime,
           upperBoundary: badLoadtime,
-          fill: "yellow",
+          fill: "#f0ad4e",
           fillOpacity: trafficLightBarOpacity,
           name: "OK",
           cssClass: "d3chart-ok"
@@ -37,7 +37,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "all_bad",
           lowerBoundary: badLoadtime,
           upperBoundary: absoluteMaxValue,
-          fill: "red",
+          fill: "#d9534f",
           fillOpacity: trafficLightBarOpacity,
           name: "BAD",
           cssClass: "d3chart-bad"
@@ -49,7 +49,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "justGoodAndOk_good",
           lowerBoundary: 0,
           upperBoundary: goodLoadtime,
-          fill: "green",
+          fill: "#5cb85c",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
           cssClass: "d3chart-good"
@@ -58,7 +58,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "justGoodAndOk_ok",
           lowerBoundary: goodLoadtime,
           upperBoundary: absoluteMaxValue,
-          fill: "yellow",
+          fill: "#f0ad4e",
           fillOpacity: trafficLightBarOpacity,
           name: "OK",
           cssClass: "d3chart-ok"
@@ -70,7 +70,7 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
           id: "justGood_good",
           lowerBoundary: 0,
           upperBoundary: absoluteMaxValue,
-          fill: "green",
+          fill: "#5cb85c",
           fillOpacity: trafficLightBarOpacity,
           name: "GOOD",
           cssClass: "d3chart-good"
@@ -81,7 +81,8 @@ OpenSpeedMonitor.ChartModules.TrafficLightDataProvider = (function () {
   };
 
   return {
-    getTimeData: getTimeData
+    getTimeData: getTimeData,
+    initialBarWidth: 20
   }
 
 })();

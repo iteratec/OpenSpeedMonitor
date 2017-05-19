@@ -19,8 +19,8 @@ class EventResultDashboardPage extends I18nGebPage {
         jobGroupList { $("#folderSelectHtmlId").find("option").contextElements }
         pageList { $("#pageSelectHtmlId").find("option").contextElements }
         timeFrameSelect { $("#timeframeSelect").find("option").contextElements[0] }
-        fromDatepicker { $("#fromDatepicker") }
-        toDatepicker { $("#toDatepicker") }
+        fromDatepicker { $(".timerange-userinput-from") }
+        toDatepicker { $(".timerange-userinput-to") }
         firstViewDiv { $("#selectAggregatorUncachedHtmlId") }
         firstViewList { $("#selectAggregatorUncachedHtmlId").find("option").contextElements }
         filterJobsAccordionContent { $("#collapseTwo") }

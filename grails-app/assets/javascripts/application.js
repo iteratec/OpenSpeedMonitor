@@ -17,14 +17,14 @@
 //= require_tree bower_components/jquery
 //= require_tree bower_components/jquery-ui
 //= require_tree bower_components/bootstrap
-//= require_tree bower_components/bootstrap-datepicker
 //= require_tree bower_components/bootstrap-colorpicker/dist/js/
 //= require_tree bower_components/chosen
 //= require_tree bower_components/clipboard
-//= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require spinner
 //= require_self
+
+delete $.fn.datepicker; // so it can be replaced by air-datepicker
 
 /**
  * Global namespace for OpenSpeedMonitor application.

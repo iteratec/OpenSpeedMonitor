@@ -11,6 +11,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
+import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -19,10 +20,27 @@ import spock.lang.Specification
 
 @TestFor(RestApiController)
 @Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
+@Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
 class RestApiControllerSpec extends Specification {
+
+    public static final String LABEL_JOB_1 = "job1"
+    public static final String LABEL_JOB_2 = "job2"
+    public static final String UNIQUE_IDENTIFIER_LOCATION_1 = "location1"
+    public static final String UNIQUE_IDENTIFIER_LOCATION_2 = "location2"
+    public static final String NAME_MEASURED_EVENT_1 = "measuredEvent1"
+    public static final String NAME_MEASURED_EVENT_2 = "measuredEvent2"
     RestApiController controllerUnderTest
+
+    public static final String NAME_PAGE1 = "testPage1"
+    public static final String NAME_PAGE2 = "testPage2"
+    public static final String NAME_BROWSER1 = "browser1"
+    public static final String NAME_BROWSER2 = "browser2"
+    public static final String NAME_JOBGROUP_1_WITH_CONFIG = "jobGroup1"
+    public static final String NAME_JOBGROUP_2_WITH_CONFIG = "jobGroup2"
+    public static final String NAME_JOBGROUP_1_WITHOUT_CONFIG = "jobGroup3"
+    public static final String NAME_JOBGROUP_2_WITHOUT_CONFIG = "jobGroup4"
+
     CsiConfiguration csiConfiguration
-    String csiConfigurationLabel
     Page page1
     Page page2
     Browser browser1
@@ -31,6 +49,7 @@ class RestApiControllerSpec extends Specification {
     JobGroup jobGroupWithCsiConfiguration2
     JobGroup jobGroupWithoutCsiConfiguration1
     JobGroup jobGroupWithoutCsiConfiguration2
+
     def doWithSpring = {
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
         defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
@@ -39,36 +58,23 @@ class RestApiControllerSpec extends Specification {
         defaultLocationDaoService(DefaultLocationDaoService)
     }
 
-    void "setup"() {
+    void setup() {
+
         controllerUnderTest = controller
 
-        page1 = new Page(name: "testPage1").save(failOnError: true)
-        page2 = new Page(name: "testPage2").save(failOnError: true)
+        createTestDataCommonToAllTests()
+        initInnerServices()
 
-
-        browser1 = TestDataUtil.createBrowser("browser1")
-        browser2 = TestDataUtil.createBrowser("browser2")
-
-        csiConfigurationLabel = "csiConfiguration"
-        csiConfiguration = TestDataUtil.createCsiConfiguration()
-        csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page1])
-        csiConfiguration.save()
-
-        jobGroupWithCsiConfiguration1 = new JobGroup(csiConfiguration: csiConfiguration, name: "jobGroup1").save(failOnError: true)
-        jobGroupWithCsiConfiguration2 = new JobGroup(csiConfiguration: csiConfiguration, name: "jobGroup2").save(failOnError: true)
-        jobGroupWithoutCsiConfiguration1 = new JobGroup(csiConfiguration: null, name: "jobGroup3").save(failOnError: true)
-        jobGroupWithoutCsiConfiguration2 = new JobGroup(csiConfiguration: null, name: "jobGroup4").save(failOnError: true)
-        mockServices()
     }
 
     void "get all JobGroups as JSON, which have a csiConfiguration, when existing"() {
-        given:
+        given: "2 JobGroups exist"
         Collection<JobGroupDto> jobGroupsAsJson = JobGroupDto.create([jobGroupWithCsiConfiguration1, jobGroupWithCsiConfiguration2])
 
-        when:
+        when: "REST method to get all JobGroups is called"
         controllerUnderTest.allSystems()
 
-        then:
+        then: "it returns DTO json representation of these JobGroups"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -77,16 +83,16 @@ class RestApiControllerSpec extends Specification {
     }
 
     void "get all Steps as JSON, when existing"() {
-        given:
-        MeasuredEvent event1 = TestDataUtil.createMeasuredEvent("event1", page1)
-        MeasuredEvent event2 = TestDataUtil.createMeasuredEvent("event2", page2)
+        given: "2 MeasuredEvents exist"
+        MeasuredEvent event1 = MeasuredEvent.build()
+        MeasuredEvent event2 = MeasuredEvent.build()
 
         Collection<MeasuredEventDto> measuredEventAsJson = MeasuredEventDto.create([event1, event2])
 
-        when:
+        when: "REST method to get all MeasuredEvents is called"
         controllerUnderTest.allSteps()
 
-        then:
+        then: "it returns DTO representation of these MeasuredEvents"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -95,13 +101,13 @@ class RestApiControllerSpec extends Specification {
     }
 
     void "get all Browsers as JSON, when existing"() {
-        given:
+        given: "2 Browsers exist"
         Collection<BrowserDto> browserAsJson = BrowserDto.create([browser1, browser2])
 
-        when:
+        when: "REST method to get all Browsers is called"
         controllerUnderTest.allBrowsers()
 
-        then:
+        then: "it returns DTO representation of these Browsers"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -110,13 +116,13 @@ class RestApiControllerSpec extends Specification {
     }
 
     void "get all Pages as JSON, when existing"() {
-        given:
+        given: "2 Pages exist"
         Collection<PageDto> pagesAsJson = PageDto.create([page1, page2])
 
-        when:
+        when: "REST method to get all Pages is called"
         controllerUnderTest.allPages()
 
-        then:
+        then: "it returns DTO representation of these Pages"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -124,18 +130,17 @@ class RestApiControllerSpec extends Specification {
         resultJSON.target.size() == pagesAsJson.size()
     }
 
-    void "get all Locations as JSON, when existing"() {
-        given:
-        WebPageTestServer server = TestDataUtil.createWebPageTestServer("server1", "web.de", true, "http://internet.de")
-        Location location1 = TestDataUtil.createLocation(server, "location1", browser1, true)
-        Location location2 = TestDataUtil.createLocation(server, "location2", browser2, true)
+    void "get all Locations as JSON, when existing and active"() {
+        given: "2 active Locations exist"
+        Location location1 = Location.build(active: true, wptServer: WebPageTestServer.build(active: true))
+        Location location2 = Location.build(active: true, wptServer: WebPageTestServer.build(active: true))
 
         Collection<LocationDto> locationsAsJson = LocationDto.create([location1, location2])
 
-        when:
-        controllerUnderTest.allPages()
+        when: "REST method to get all Locations is called"
+        controllerUnderTest.allLocations()
 
-        then:
+        then: "it returns DTO representation of these Locations"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -143,16 +148,35 @@ class RestApiControllerSpec extends Specification {
         resultJSON.target.size() == locationsAsJson.size()
     }
 
+    void "get just active Locations as JSON, when active and not active existing"() {
+        given: "1 active, 1 not active and 1 active but wptServer not active Locations exist"
+        Location locationActive = Location.build(active: true, wptServer: WebPageTestServer.build(active: true))
+        Location locationNotActive = Location.build(active: false, wptServer: WebPageTestServer.build(active: true))
+        Location locationActiveButWptServerNotActive = Location.build(active: true, wptServer: WebPageTestServer.build(active: false))
+
+        Collection<LocationDto> activeLocationsAsJson = LocationDto.create([locationActive])
+
+        when: "REST method to get all Locations is called"
+        controllerUnderTest.allLocations()
+
+        then: "it returns DTO representation of just the active Location"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.has('target')
+        resultJSON.target != null
+        resultJSON.target.size() == activeLocationsAsJson.size()
+    }
+
     void "existing csiConfiguration by id as JSON"() {
-        given:
+        given: "1 CsiConfiguration exists"
         int csiConfigurationId = csiConfiguration.id
         CsiConfigurationDto jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
 
-        when:
+        when: "REST method to get the CsiConfiguration is called"
         params.id = csiConfigurationId
         controllerUnderTest.getCsiConfiguration()
 
-        then:
+        then: "it returns the DTO representation of the CsiConfiguration"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.has('target')
@@ -163,29 +187,24 @@ class RestApiControllerSpec extends Specification {
     }
 
     void "return 400 when asking for non-existing csiConfiguration"() {
-        given:
+        given: "no CsiConfiguration exists for given ID"
         int csiConfigurationId = Integer.MAX_VALUE
 
-        when:
+        when: "CsiConfiguration is queried for that ID"
         params.id = csiConfigurationId
         controllerUnderTest.getCsiConfiguration()
 
-        then:
-        response.status == 400
+        then: "response status is 404 (Not Found)"
+        response.status == 404
     }
 
     void "getting correct mappings for domain classes"() {
-        given: "some data in db"
-        WebPageTestServer server = TestDataUtil.createUnusedWptServer()
-        Location location1 = TestDataUtil.createLocation(server, "location1", browser1, true)
-        Script script = TestDataUtil.createScript("script1", "description", "unused")
-        TestDataUtil.createJob("job1", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
-        TestDataUtil.createJob("job2", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
+        given: "some domain data in db"
+        Job.build(label: LABEL_JOB_1)
+        Job.build(label: LABEL_JOB_2)
 
         when: "user requests mappings"
-        def requestMap = [:]
-        requestMap.put(requestedDomain, requestedIDs)
-        params.requestedDomains = requestMap
+        params.requestedDomains = ["${requestedDomain}": requestedIDs]
         controllerUnderTest.getNamesForIds()
 
         then: "response contains correct mappings"
@@ -198,22 +217,19 @@ class RestApiControllerSpec extends Specification {
 
         where:
         requestedDomain | requestedIDs || expectedMappings
-        "JobGroup"      | [1, 2, 3, 4] || [1: "jobGroup1", 2: "jobGroup2", 3: "jobGroup3", 4: "jobGroup4"]
-        "Job"           | [1, 2]       || [1: "job1", 2: "job2"]
+        "JobGroup"      | [1, 2, 3, 4] || [1: NAME_JOBGROUP_1_WITH_CONFIG, 2: NAME_JOBGROUP_2_WITH_CONFIG, 3: NAME_JOBGROUP_1_WITHOUT_CONFIG, 4: NAME_JOBGROUP_2_WITHOUT_CONFIG]
+        "Job"           | [1, 2]       || [1: LABEL_JOB_1, 2: LABEL_JOB_2]
     }
 
     void "getting correct ids for names"() {
         given: "some data for retrievable domain clases"
-        WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer("wptServer", "identifier", false, "http://internet.de")
-        TestDataUtil.createLocation(wptServer, "location1", browser1, false)
-        TestDataUtil.createLocation(wptServer, "location2", browser2, false)
-        TestDataUtil.createMeasuredEvent("measuredEvent1", page1)
-        TestDataUtil.createMeasuredEvent("measuredEvent2", page2)
+        Location.build(uniqueIdentifierForServer: UNIQUE_IDENTIFIER_LOCATION_1)
+        Location.build(uniqueIdentifierForServer: UNIQUE_IDENTIFIER_LOCATION_2)
+        MeasuredEvent.build(name: NAME_MEASURED_EVENT_1)
+        MeasuredEvent.build(name: NAME_MEASURED_EVENT_2)
 
         when: "user requests mappings"
-        def requestMap = [:]
-        requestMap.put(requestedDomain, requestedNames)
-        params.requestedDomains = requestMap
+        params.requestedDomains = ["${requestedDomain}": requestedNames]
         controllerUnderTest.getIdsForNames()
 
         then: "response contains correct mappings"
@@ -225,62 +241,60 @@ class RestApiControllerSpec extends Specification {
         }
 
         where:
-        requestedDomain | requestedNames                       || expectedMappings
-        "Browser"       | ["browser1", "browser2"]             || [1: "browser1", 2: "browser2"]
-        "Page"          | ["testPage1", "testPage2"]           || [1: "testPage1", 2: "testPage2"]
-        "Location"      | ["location1", "location2"]           || [1: "location1", 2: "location2"]
-        "MeasuredEvent" | ["measuredEvent1", "measuredEvent2"] || [1: "measuredEvent1", 2: "measuredEvent2"]
+        requestedDomain | requestedNames                                               || expectedMappings
+        "Browser"       | [NAME_BROWSER1, NAME_BROWSER2]                               || [1: NAME_BROWSER1, 2: NAME_BROWSER2]
+        "Page"          | [NAME_PAGE1, NAME_PAGE2]                                     || [1: NAME_PAGE1, 2: NAME_PAGE2]
+        "Location"      | [UNIQUE_IDENTIFIER_LOCATION_1, UNIQUE_IDENTIFIER_LOCATION_2] || [1: UNIQUE_IDENTIFIER_LOCATION_1, 2: UNIQUE_IDENTIFIER_LOCATION_2]
+        "MeasuredEvent" | [NAME_MEASURED_EVENT_1, NAME_MEASURED_EVENT_2]               || [1: NAME_MEASURED_EVENT_1, 2: NAME_MEASURED_EVENT_2]
     }
 
     void "getting correct mappings for domain classes with serveral domains"() {
         when: "user requests mappings"
-        def requestMap = [:]
-        requestMap.put("Browser", ["browser1", "browser2"])
-        requestMap.put("Page", ["testPage1", "testPage2"])
-        params.requestedDomains = requestMap
+        params.requestedDomains = [
+            Browser: [NAME_BROWSER1, NAME_BROWSER2],
+            Page: [NAME_PAGE1, NAME_PAGE2]
+        ]
         controllerUnderTest.getIdsForNames()
 
         then: "response contains correct mappings"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.target["Browser"].size() == 2
-        resultJSON.target["Browser"]["1"] == "browser1"
-        resultJSON.target["Browser"]["2"] == "browser2"
+        resultJSON.target["Browser"]["1"] == NAME_BROWSER1
+        resultJSON.target["Browser"]["2"] == NAME_BROWSER2
         resultJSON.target["Page"].size() == 2
-        resultJSON.target["Page"]["1"] == "testPage1"
-        resultJSON.target["Page"]["2"] == "testPage2"
+        resultJSON.target["Page"]["1"] == NAME_PAGE1
+        resultJSON.target["Page"]["2"] == NAME_PAGE2
     }
 
     void "return 400 if requested domain class does not exists"() {
         when: "user requests names for ids with bad request"
-        def requestMap = [:]
-        requestMap.put("JobGroup", [1, 2])
-        requestMap.put("wrong domain", [1, 2])
-        params.requestedDomains = requestMap
+        params.requestedDomains = [
+            JobGroup: [1, 2],
+            WrongDomain: [1, 2]
+        ]
         controllerUnderTest.getNamesForIds()
 
-        then: "response contains correct mappings"
+        then: "response status code is 400"
         response.status == 400
 
         when: "user requests ids for names with bad request"
-        requestMap = [:]
-        requestMap.put("Browser", ["browser1"])
-        requestMap.put("wrong domain", ["name"])
-        params.requestedDomains = requestMap
+        params.requestedDomains = [
+            Browser: [NAME_BROWSER1],
+            WrongDomain: ["name"]
+        ]
         controllerUnderTest.getIdsForNames()
 
-        then: "response contains correct mappings"
+        then: "response status code is 400"
         response.status == 400
     }
 
-    void "return empty map if id is not found"() {
-        when: "user requests names for non exiisting ids"
-        def requestMap = [:]
-        requestMap.put(domainName, idList)
-        params.requestedDomains = requestMap
+    void "return a map without elements for which the id is not found"() {
+        when: "user requests names for ids where some doesn't exist"
+        params.requestedDomains = ["${domainName}": idList]
         controllerUnderTest.getNamesForIds()
 
-        then: "a empty map is returned"
+        then: "a map without elements for which the id is not found is returned"
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.target[domainName] == expectedResult
@@ -288,10 +302,27 @@ class RestApiControllerSpec extends Specification {
         where:
         domainName | idList      || expectedResult
         "JobGroup" | [20, 30]    || [:]
-        "JobGroup" | [1, 20, 30] || ["1": "jobGroup1"]
+        "JobGroup" | [1, 20, 30] || ["1": NAME_JOBGROUP_1_WITH_CONFIG]
     }
 
-    private void mockServices() {
+    private void createTestDataCommonToAllTests() {
+
+        page1 = Page.build(name: NAME_PAGE1)
+        page2 = Page.build(name: NAME_PAGE2)
+
+        browser1 = Browser.build(name: NAME_BROWSER1)
+        browser2 = Browser.build(name: NAME_BROWSER2)
+
+        csiConfiguration = CsiConfiguration.build()
+
+        jobGroupWithCsiConfiguration1 = JobGroup.build(csiConfiguration: csiConfiguration, name: NAME_JOBGROUP_1_WITH_CONFIG)
+        jobGroupWithCsiConfiguration2 = JobGroup.build(csiConfiguration: csiConfiguration, name: NAME_JOBGROUP_2_WITH_CONFIG)
+        jobGroupWithoutCsiConfiguration1 = JobGroup.build(csiConfiguration: null, name: NAME_JOBGROUP_1_WITHOUT_CONFIG)
+        jobGroupWithoutCsiConfiguration2 = JobGroup.build(csiConfiguration: null, name: NAME_JOBGROUP_2_WITHOUT_CONFIG)
+
+    }
+
+    private void initInnerServices() {
         controllerUnderTest.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         controllerUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
         controllerUnderTest.browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')

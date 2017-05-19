@@ -5,7 +5,6 @@
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
     <asset:stylesheet src="/pageAggregation/show.css"/>
-
 </head>
 
 <body>
@@ -43,14 +42,15 @@
             <div class="row card-well">
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
-                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                        'fromHour'                 : fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': false,
-                                        'includeInterval'          : includeInterval]}"/>
+                              model="${[
+                                'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
+                                'showIncludeInterval': false,
+                                'showComparisonInterval': true
+                              ]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                             aggrGroupValuesUnCached: aggrGroupValuesUnCached,
-                            multipleMeasurands     : false,
-                            multipleSeries         : false
+                            multipleMeasurands     : true
                     ]"/>
                 </div>
 
@@ -87,7 +87,6 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="pngDownloader.js"/>
     <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
@@ -96,6 +95,7 @@
 
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationGuiHandling.js"/>')
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
@@ -104,15 +104,10 @@
         function drawGraph() {
 
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+            var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
-
-            spinner.start();
-            $.ajax({
-                type: 'POST',
-                data: {
+            var data = {
                     from: selectedTimeFrame[0].toISOString(),
                     to: selectedTimeFrame[1].toISOString(),
                     selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
@@ -122,7 +117,20 @@
                         return $(e).text()
                     })),
                     selectedSeries: JSON.stringify(selectedSeries)
-                },
+                };
+
+            if (comparativeTimeFrame) {
+                data.fromComparative = comparativeTimeFrame[0].toISOString();
+                data.toComparative = comparativeTimeFrame[1].toISOString();
+            }
+
+            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
+              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
+
+            spinner.start();
+            $.ajax({
+                type: 'POST',
+                data: data,
                 url: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
                 dataType: "json",
                 success: function (data) {

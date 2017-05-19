@@ -61,7 +61,7 @@ class FetchResultsFromWptserverTests extends Specification {
     private static final String LOCATION_IDENTIFIER_SINGLESTEP = 'iteratec-dev-netlab-win7:IE'
     ProxyService serviceUnderTest
 
-    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule
     public RecorderRule recorder = new RecorderRule(configuration)
 
@@ -166,7 +166,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_11Events_JustFirstView.xml')
+        File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_11Events_JustFirstView.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -195,7 +195,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml')
+        File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -225,7 +225,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml')
+        File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -250,7 +250,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithoutVideo.xml')
+        File resultXmlFile = new File('src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -275,7 +275,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml')
+        File resultXmlFile = new File('src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:

@@ -12,7 +12,7 @@
                 <!-- x axis label -->
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="x-axis-label">
-                        <g:message code="de.iteratec.osm.dimple.xAxis.label" default="x-axis label"/>
+                        <g:message code="de.iteratec.osm.barchart.xAxis.label" default="x-axis label"/>
                     </label>
 
                     <div class="col-sm-8">
@@ -22,7 +22,7 @@
                 %{-- y axis label --}%
                 <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
-                            code="de.iteratec.osm.dimple.yAxis.label"
+                            code="de.iteratec.osm.barchart.yAxis.label"
                             default="y-axis label"/></label>
 
                     <div class="col-sm-8" id="y-axis-alias-container">
@@ -32,7 +32,7 @@
                 %{-- chart width & height --}%
                 <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
-                            code="de.iteratec.osm.dimple.barchart.size.name"
+                            code="de.iteratec.osm.barchart.size.name"
                             default="Size"/></label>
 
                     <div class="col-sm-8">
@@ -62,7 +62,7 @@
                 %{--assign colors--}%
                 <div class="form-group">
                     <label class="col-sm-3 control-label"><g:message
-                            code="de.iteratec.osm.dimple.barchart.assignColors.name"
+                            code="de.iteratec.osm.barchart.assignColors.name"
                             default="Assign Colors"/></label>
 
                     <div class="col-sm-8" id="assign-color-container">
@@ -72,32 +72,32 @@
                 %{--toggle chart axes and gridlines--}%
                 <div class="form-group">
                     <label class="col-sm-3 control-label">
-                        <g:message code="de.iteratec.osm.dimple.barchart.showElements.name"
+                        <g:message code="de.iteratec.osm.barchart.showElements.name"
                                    default="Show"/>
                     </label>
                     <div class="col-sm-8" data-toggle="buttons">
                         <div class="btn-group btn-group-justified">
                             <label class="btn btn-default">
                                 <input type="checkbox" id="inputShowGridlines"><g:message
-                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showGridlines"
+                                    code="de.iteratec.osm.barchart.adjustChart.showGridlines"
                                     default="Show Gridlines"/>
                             </label>
 
                             <label class="btn btn-default">
                                 <input type="checkbox" id="inputShowYAxis"><g:message
-                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showYAxis"
+                                    code="de.iteratec.osm.barchart.adjustChart.showYAxis"
                                     default="Show y-Axis"/>
                             </label>
 
                             <label class="btn btn-default">
                                 <input type="checkbox" id="inputShowXAxis"><g:message
-                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showXAxis"
+                                    code="de.iteratec.osm.barchart.adjustChart.showXAxis"
                                     default="Show x-Axis"/>
                             </label>
 
                             <label class="btn btn-default">
                                 <input type="checkbox" id="inputShowBarLabels"><g:message
-                                    code="de.iteratec.osm.dimple.barchart.adjustChart.showBarLabels"
+                                    code="de.iteratec.osm.barchart.adjustChart.showBarLabels"
                                     default="Show Bar Labels"/>
                             </label>
                         </div>

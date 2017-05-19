@@ -29,16 +29,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 class DefaultJobGroupDaoService implements JobGroupDaoService {
 
 	@Override
-	Map<Serializable, JobGroup> getIdToObjectMap(){
-		return JobGroup.list().collectEntries { JobGroup eachJobGroup ->
-			[
-				eachJobGroup.ident(),
-				eachJobGroup
-			]
-		}
-	}
-
-	@Override
 	public Set<JobGroup> findAll() {
 		Set<JobGroup> result = Collections.checkedSet(new HashSet<JobGroup>(), JobGroup.class);
 		result.addAll(JobGroup.list());

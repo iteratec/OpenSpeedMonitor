@@ -1,27 +1,26 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import grails.buildtestdata.mixin.Build
 import grails.databinding.SimpleMapDataBindingSource
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import spock.lang.*
+import spock.lang.Specification
 
 import javax.persistence.NoResultException
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Page, JobGroup, Browser, Location])
+@Build([Page, JobGroup])
 class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
+    public static final String NAME_PAGE_1 = "homepage"
+    public static final String NAME_PAGE_2 = "category"
     def dataBinder
     ResultsRequestCommand cmd
     SimpleMapDataBindingSource requestMap
@@ -33,8 +32,6 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         createTestData()
 
-        mockServicesViaMetaClassMagic()
-
         cmd = new ResultsRequestCommand()
 
         prepareRequestParameters()
@@ -43,7 +40,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
     void "requested single page in page parameter"() {
         given: "test specific request parameters"
-        requestMap.map["page"] = "homepage"
+        requestMap.map["page"] = NAME_PAGE_1
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
@@ -52,7 +49,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         then: "command provides MvQueryParams with single page as query parameter"
         notThrown NoResultException
         queryParams.pageIds.size() == 1
-        queryParams.pageIds[0] == Page.findByName("homepage").ident()
+        queryParams.pageIds[0] == Page.findByName(NAME_PAGE_1).ident()
     }
     void "requested multiple pages in page parameter"() {
         given: "test specific request parameters"
@@ -66,13 +63,13 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         notThrown NoResultException
         queryParams.pageIds.size() == 2
         queryParams.pageIds.containsAll([
-                Page.findByName("homepage").ident(),
-                Page.findByName("category").ident()
+                Page.findByName(NAME_PAGE_1).ident(),
+                Page.findByName(NAME_PAGE_2).ident()
         ])
     }
     void "requested single page in pageId parameter"() {
         given: "test specific request parameters"
-        requestMap.map["pageId"] = Page.findByName("homepage").ident().toString()
+        requestMap.map["pageId"] = Page.findByName(NAME_PAGE_1).ident().toString()
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
@@ -81,11 +78,11 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         then: "command provides MvQueryParams with single page as query parameter"
         notThrown NoResultException
         queryParams.pageIds.size() == 1
-        queryParams.pageIds[0] == Page.findByName("homepage").ident()
+        queryParams.pageIds[0] == Page.findByName(NAME_PAGE_1).ident()
     }
     void "requested multiple pages in pageId parameter"() {
         given: "test specific request parameters"
-        requestMap.map["pageId"] = "${Page.findByName("homepage").ident()},${Page.findByName("category").ident()}"
+        requestMap.map["pageId"] = "${Page.findByName(NAME_PAGE_1).ident()},${Page.findByName(NAME_PAGE_2).ident()}"
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
@@ -95,14 +92,14 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         notThrown NoResultException
         queryParams.pageIds.size() == 2
         queryParams.pageIds.containsAll([
-                Page.findByName("homepage").ident(),
-                Page.findByName("category").ident()
+                Page.findByName(NAME_PAGE_1).ident(),
+                Page.findByName(NAME_PAGE_2).ident()
         ])
     }
     void "requested single page in page AND pageId parameter"() {
         given: "test specific request parameters"
-        requestMap.map["page"] = "homepage"
-        requestMap.map["pageId"] = Page.findByName("category").ident().toString()
+        requestMap.map["page"] = NAME_PAGE_1
+        requestMap.map["pageId"] = Page.findByName(NAME_PAGE_2).ident().toString()
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
@@ -111,11 +108,11 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         then: "command provides MvQueryParams with page respective pageId query parameter"
         notThrown NoResultException
         queryParams.pageIds.size() == 1
-        queryParams.pageIds[0] == Page.findByName("category").ident()
+        queryParams.pageIds[0] == Page.findByName(NAME_PAGE_2).ident()
     }
     void "requested single page with invalid pageId parameter"() {
         given: "test specific request parameters"
-        requestMap.map["pageId"] = "homepage"
+        requestMap.map["pageId"] = NAME_PAGE_1
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
@@ -127,15 +124,9 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
     }
 
     private createTestData() {
-        TestDataUtil.createPage("homepage")
-        TestDataUtil.createPage("category")
-        TestDataUtil.createJobGroup("my-job-group")
-    }
-
-    void mockServicesViaMetaClassMagic(){
-        MeasuredEventDaoService.metaClass.tryToFindByName = { String name->
-            return ""
-        }
+        Page.build(name: NAME_PAGE_1)
+        Page.build(name: NAME_PAGE_2)
+        JobGroup.build(name: "my-job-group")
     }
 
     private prepareRequestParameters() {

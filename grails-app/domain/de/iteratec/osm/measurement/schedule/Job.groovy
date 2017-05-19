@@ -49,7 +49,7 @@ class Job implements Taggable {
 
     boolean active;
     boolean firstViewOnly = true
-    boolean captureVideo;
+    boolean captureVideo = true
     boolean persistNonMedianResults = true;
 
     /**

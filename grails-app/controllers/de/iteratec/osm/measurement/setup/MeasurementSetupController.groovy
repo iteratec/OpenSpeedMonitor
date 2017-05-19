@@ -9,12 +9,14 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.measurement.script.ScriptService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import grails.converters.JSON
 
 class MeasurementSetupController extends ExceptionHandlerController {
+    ScriptService scriptService
     JobProcessingService jobProcessingService
 
     def index() {
@@ -32,6 +34,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
         ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(params.connectivity)
         Job job = new Job()
         job.properties = params.job
+        job.captureVideo = true
         job.executionSchedule = "0 " + job.executionSchedule // prepend seconds, user shouldn't do this
         // update properties instead of using 'new Job(params.job)' to avoid overriding default values
         job.location = location
@@ -50,6 +53,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
         if (errors.size() == 0) {
             job.active = true
             job.save(failOnError: true)
+            scriptService.createNewPagesAndMeasuredEvents(script)
             jobProcessingService.launchJobRun(job)
             redirect(controller: 'job', action: 'index')
             return

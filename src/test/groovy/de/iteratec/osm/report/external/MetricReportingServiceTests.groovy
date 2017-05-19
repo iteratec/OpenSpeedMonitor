@@ -37,15 +37,14 @@ import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-import static org.junit.Assert.assertEquals
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -53,6 +52,7 @@ import static org.junit.Assert.assertEquals
 @TestFor(MetricReportingService)
 @TestMixin(GrailsUnitTestMixin)
 @Mock([EventResult, AggregatorType, JobGroup, BatchActivity, GraphiteServer, GraphitePath, CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration, ConnectivityProfile])
+@Build([Page,MeasuredEvent,Location, Browser, JobGroup])
 class MetricReportingServiceTests extends Specification {
     MetricReportingService serviceUnderTest
     static final double DELTA = 1e-15
@@ -79,6 +79,7 @@ class MetricReportingServiceTests extends Specification {
     MeasuredEvent measuredEvent
     Browser browser
     Location location
+    TestSocket testSocket
 
     def doWithSpring = {
         batchActivityService(BatchActivityService)
@@ -88,9 +89,9 @@ class MetricReportingServiceTests extends Specification {
 
     void setup() {
         serviceUnderTest = service
-        serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
-        serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
-        serviceUnderTest.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService')
+        serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService') as ConfigService
+        serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService') as InMemoryConfigService
+        serviceUnderTest.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService') as BatchActivityService
         createTestDataCommonToAllTests()
     }
 
@@ -104,10 +105,12 @@ class MetricReportingServiceTests extends Specification {
         serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         new OsmConfiguration().save(failOnError: true)
 
-        page = new Page(name: PAGE_NAME)
-        measuredEvent = new MeasuredEvent(name: EVENT_NAME)
-        browser = new Browser(name: BROWSER_NAME)
-        location = new Location(location: LOCATION_LOCATION)
+        page = Page.build(name: PAGE_NAME)
+        measuredEvent = MeasuredEvent.build(name: EVENT_NAME)
+        browser = Browser.build(name: BROWSER_NAME)
+        location = Location.build(location: LOCATION_LOCATION)
+        testSocket = new TestSocket()
+        mockGraphiteSocketProvider(testSocket)
     }
 
     // test sending event results ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,10 +120,8 @@ class MetricReportingServiceTests extends Specification {
         int docCompleteTime = 1267i
         JobGroup jobGroup = getJobGroup(new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES), SYSTEM_NAME)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-        TestSocket testSocket = new TestSocket()
 
         //test-specific mocks
-        mockGraphiteSocketProvider(testSocket)
         mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
         mockI18nService()
 
@@ -129,9 +130,9 @@ class MetricReportingServiceTests extends Specification {
 
         then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(docCompleteTime, testSocket.sendDates[expectedKey], DELTA)
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet().first() == expectedKey
+        testSocket.sendDates[expectedKey] == docCompleteTime
     }
 
     void testSendEventResultWithDotsAndWhiteSpacesInJobGroup() {
@@ -140,21 +141,19 @@ class MetricReportingServiceTests extends Specification {
         JobGroup jobGroup = getJobGroup(new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES),
                 SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-        TestSocket testSocket = new TestSocket()
 
         //test-specific mocks
-        mockGraphiteSocketProvider(testSocket)
         mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
         mockI18nService()
 
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
+        String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
 
         then:
-        String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(docCompleteTime, testSocket.sendDates[expectedKey], DELTA)
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == docCompleteTime
     }
 
     void testSendEventResultWithWhiteSpacesInJobGroup() {
@@ -163,10 +162,8 @@ class MetricReportingServiceTests extends Specification {
         JobGroup jobGroup = getJobGroup(new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES),
                 SYSTEM_NAME_WITH_WHITESPACES)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-        TestSocket testSocket = new TestSocket()
 
         //test-specific mocks
-        mockGraphiteSocketProvider(testSocket)
         mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
         mockI18nService()
 
@@ -175,9 +172,9 @@ class MetricReportingServiceTests extends Specification {
 
         then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_WHITESPACES_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(docCompleteTime, testSocket.sendDates[expectedKey], DELTA)
+        1 == testSocket.sendDates.size()
+        expectedKey == testSocket.sendDates.keySet()[0]
+        docCompleteTime == testSocket.sendDates[expectedKey]
     }
 
     void testSendEventResultWithDotsInJobGroup() {
@@ -186,21 +183,19 @@ class MetricReportingServiceTests extends Specification {
         JobGroup jobGroup = getJobGroup(new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES),
                 SYSTEM_NAME_WITH_DOTS)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-        TestSocket testSocket = new TestSocket()
 
         //test-specific mocks
-        mockGraphiteSocketProvider(testSocket)
         mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
         mockI18nService()
 
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
+        String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
 
         then:
-        String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(docCompleteTime, testSocket.sendDates[expectedKey], DELTA)
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == docCompleteTime
     }
 
     // test sending event csi values  ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,19 +207,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> emvs = [
                 getCsiAggregation(hourly, eventAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
+
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_REPLACED}.hourly.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == (csiValuePersistedInOsm * 100)
     }
 
     void testReportEventCSIValuesOfLastHourWithWhitespacesInSystemName() {
@@ -234,19 +229,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> emvs = [
                 getCsiAggregation(hourly, eventAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.MEASURED_EVENT, SYSTEM_NAME_WITH_WHITESPACES)
+
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_WHITESPACES_REPLACED}.hourly.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportEventCSIValuesOfLastHourWithDotsInSystemName() {
@@ -256,19 +251,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> emvs = [
                 getCsiAggregation(hourly, eventAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
+
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_REPLACED}.hourly.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportEventCSIValuesOfLastHourWithDotsAndWhitespacesInSystemName() {
@@ -278,19 +273,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> emvs = [
                 getCsiAggregation(hourly, eventAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.hourly.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     // test sending page csi values  ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -302,19 +297,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(daily, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME}.daily.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastDayWithDotInSystemName() {
@@ -324,19 +319,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(daily, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE, SYSTEM_NAME_WITH_DOTS)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_REPLACED}.daily.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastDayWithWhitespaceInSystemName() {
@@ -346,19 +341,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(daily, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE, SYSTEM_NAME_WITH_WHITESPACES)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_WHITESPACES_REPLACED}.daily.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastDayWithDotsAndWhitespaceInSystemName() {
@@ -368,19 +363,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(daily, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.daily.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastDayWithoutData() {
@@ -389,16 +384,16 @@ class MetricReportingServiceTests extends Specification {
         CsiAggregationInterval daily = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
         List<CsiAggregation> pmvsWithoutData = [
                 getCsiAggregation(daily, pageAggr, null, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvsWithoutData)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
+
         then:
-        assertEquals(0, testSocket.sendDates.size())
+        testSocket.sendDates.size() == 0
     }
 
     void testReportPageCSIValuesOfLastWeek() {
@@ -408,19 +403,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(weeky, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME}.weekly.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_WEEK.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastWeekWithDotsAndWhitespacesInSystemName() {
@@ -430,19 +425,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(weeky, pageAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.weekly.${PAGE_HP_NAME}.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_WEEK.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportPageCSIValuesOfLastWeekWithoutData() {
@@ -451,16 +446,16 @@ class MetricReportingServiceTests extends Specification {
         CsiAggregationInterval weeky = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
         List<CsiAggregation> pmvs = [
                 getCsiAggregation(weeky, pageAggr, null, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.PAGE)
+
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
+
         then:
-        assertEquals(0, testSocket.sendDates.size())
+        testSocket.sendDates.size() == 0
     }
 
     // test sending shop csi values ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,19 +467,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> smvs = [
                 getCsiAggregation(daily, shopAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME}.daily.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportShopCSIValuesOfLastDayWithDotsAndWhitespacesInSystemName() {
@@ -494,19 +489,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> smvs = [
                 getCsiAggregation(daily, shopAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.daily.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_DAY.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportShopCSIValuesOfLastDayWithoutData() {
@@ -515,16 +510,16 @@ class MetricReportingServiceTests extends Specification {
         CsiAggregationInterval daily = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
         List<CsiAggregation> smvs = [
                 getCsiAggregation(daily, shopAggr, null, REPORTING_TIMESTAMP_START_OF_DAY.toDate(), '')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
+
         then:
-        assertEquals(0, testSocket.sendDates.size())
+        testSocket.sendDates.size() == 0
     }
 
     void testReportShopCSIValuesOfLastWeek() {
@@ -534,19 +529,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> smvs = [
                 getCsiAggregation(weekly, shopAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME}.weekly.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_WEEK.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportShopCSIValuesOfLastWeekWithDotsAndWhitespacesInSystemName() {
@@ -556,19 +551,19 @@ class MetricReportingServiceTests extends Specification {
         double csiValuePersistedInOsm = 0.78d
         List<CsiAggregation> smvs = [
                 getCsiAggregation(weekly, shopAggr, csiValuePersistedInOsm, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '1,2,3')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
-        then:
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.weekly.csi${DELIMITTER}${REPORTING_TIMESTAMP_START_OF_WEEK.toDate()}"
-        assertEquals(1, testSocket.sendDates.size())
-        assertEquals(expectedKey, testSocket.sendDates.keySet()[0])
-        assertEquals(csiValuePersistedInOsm * 100, testSocket.sendDates[expectedKey], DELTA)
+
+        then:
+        testSocket.sendDates.size() == 1
+        testSocket.sendDates.keySet()[0] == expectedKey
+        testSocket.sendDates[expectedKey] == csiValuePersistedInOsm * 100
     }
 
     void testReportShopCSIValuesOfLastWeekWithoutData() {
@@ -577,16 +572,16 @@ class MetricReportingServiceTests extends Specification {
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
         List<CsiAggregation> smvs = [
                 getCsiAggregation(weekly, shopAggr, null, REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), '')]
-        TestSocket testSocket = new TestSocket()
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockGraphiteSocketProvider(testSocket)
         mockJobGroupDaoService(AggregatorType.SHOP)
+
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
+
         then:
-        assertEquals(0, testSocket.sendDates.size())
+        testSocket.sendDates.size() == 0
     }
 
     //helper methods //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -611,7 +606,7 @@ class MetricReportingServiceTests extends Specification {
     }
 
     private CsiAggregation getCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, Double csByWptDocCompleteInPercent, Date started, String underlyingEventResultsByWptDocComplete) {
-        JobGroup jobGroup = new JobGroup(name: "unusedBecauseDaoServiceIsMocked")
+        JobGroup jobGroup = JobGroup.build()
         return new CsiAggregation(interval: interval, aggregator: aggregator, csByWptDocCompleteInPercent: csByWptDocCompleteInPercent, started: started, underlyingEventResultsByWptDocComplete: underlyingEventResultsByWptDocComplete,
                 jobGroup: jobGroup, measuredEvent: measuredEvent, page: page, browser: browser, location: location
         )
@@ -625,10 +620,10 @@ class MetricReportingServiceTests extends Specification {
      * @param pages
      */
     private void mockJobGroupDaoService(String measurandForGraphitePath, String jobGroupName = SYSTEM_NAME) {
-        def jobGroupDaoService = new StubFor(DefaultJobGroupDaoService, true)
-        jobGroupDaoService.demand.findCSIGroups { ->
+        def jobGroupDaoService = Stub(DefaultJobGroupDaoService)
+        jobGroupDaoService.findCSIGroups() >> {
 
-            JobGroup group = new JobGroup(name: jobGroupName)
+            JobGroup group = JobGroup.build(name: jobGroupName)
 
             GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
             graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
@@ -643,7 +638,7 @@ class MetricReportingServiceTests extends Specification {
 
             return groupSet
         }
-        serviceUnderTest.jobGroupDaoService = jobGroupDaoService.proxyInstance()
+        serviceUnderTest.jobGroupDaoService = jobGroupDaoService
     }
     /**
      * Mocks methods of {@linkplain CsiAggregationUtilService}.
@@ -651,86 +646,89 @@ class MetricReportingServiceTests extends Specification {
      * @param pages
      */
     private void mockCsiAggregationUtilService(DateTime toReturnAsStartOfInterval) {
-        def csiAggregationUtilService = new StubFor(CsiAggregationUtilService, true)
-        csiAggregationUtilService.demand.resetToStartOfActualInterval {
-            DateTime dateWithinInterval, Integer intervalInMinutes ->
-                return toReturnAsStartOfInterval
+        def csiAggregationUtilService = Stub(CsiAggregationUtilService) {
+
+
+            resetToStartOfActualInterval(_ as DateTime,_ as Integer) >> {DateTime dateWithinInterval, Integer intervalInMinutes ->
+                    return toReturnAsStartOfInterval
+            }
+            subtractOneInterval(_ as DateTime,_ as Integer) >> {DateTime toSubtractFrom, Integer intervalInMinutes ->
+                    return toReturnAsStartOfInterval
+            }
         }
-        csiAggregationUtilService.demand.subtractOneInterval {
-            DateTime toSubtractFrom, Integer intervalInMinutes ->
-                return toReturnAsStartOfInterval
-        }
-        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilService.proxyInstance()
+        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilService
     }
     /**
      * Mocks methods of {@linkplain PageCsiAggregationService}.
      */
     private void mockEventCsiAggregationService(List<CsiAggregation> toReturnFromGetHourlyCsiAggregations) {
-        def eventCsiAggregationService = new StubFor(EventCsiAggregationService, true)
-        eventCsiAggregationService.demand.getHourlyCsiAggregations {
-            Date fromDate, Date toDate, MvQueryParams mvQueryParams ->
-                return toReturnFromGetHourlyCsiAggregations
+        def eventCsiAggregationService = Stub(EventCsiAggregationService) {
+                getHourlyCsiAggregations(_ as Date,_ as Date,_ as MvQueryParams) >> {Date fromDate, Date toDate, MvQueryParams mvQueryParams ->
+                    return toReturnFromGetHourlyCsiAggregations
+                }
         }
-        serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService.proxyInstance()
+        serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService
     }
     /**
      * Mocks methods of {@linkplain PageCsiAggregationService}.
      */
     private void mockPageCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculatePageCsiAggregations) {
-        def pageCsiAggregationService = new StubFor(PageCsiAggregationService, true)
-        pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations {
-            Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
-                return toReturnFromGetOrCalculatePageCsiAggregations
+        def pageCsiAggregationService = Stub(PageCsiAggregationService) {
+            getOrCalculatePageCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval, _ as List) >> {
+                Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
+                    return toReturnFromGetOrCalculatePageCsiAggregations
+            }
         }
-        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.proxyInstance()
+        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService
     }
     /**
      * Mocks methods of {@linkplain ShopCsiAggregationService}.
      */
     private void mockShopCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculateShopCsiAggregations) {
-        def shopCsiAggregationService = new StubFor(ShopCsiAggregationService, true)
-        shopCsiAggregationService.demand.getOrCalculateShopCsiAggregations {
-            Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
-                return toReturnFromGetOrCalculateShopCsiAggregations
+        def shopCsiAggregationService = Stub(ShopCsiAggregationService) {
+            getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval, _ as List) >> {
+                Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
+                    return toReturnFromGetOrCalculateShopCsiAggregations
+            }
         }
-        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService.proxyInstance()
+        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService
     }
     /**
      * Mocks methods of {@linkplain GraphiteSocketProvider}.
      */
     private void mockGraphiteSocketProvider(GraphiteSocket toReturnFromGetSocket) {
-        def graphiteSocketProvider = new StubFor(DefaultGraphiteSocketProvider, true)
-        graphiteSocketProvider.demand.getSocket {
-            GraphiteServer server ->
+        def graphiteSocketProvider = Stub(DefaultGraphiteSocketProvider) {
+            getSocket(_ as GraphiteServer) >> { GraphiteServer server ->
                 return toReturnFromGetSocket
+            }
         }
-        serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider.proxyInstance()
+        serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider
     }
     /**
      * Mocks methods of {@linkplain GraphiteSocketProvider}.
      */
     private void mockResultCsiAggregationService(CachedView toReturnFromGetAggregatorTypeCachedViewType, int toReturnFromGetEventResultPropertyForCalculation) {
-        def resultCsiAggregationService = new StubFor(ResultCsiAggregationService, true)
-        resultCsiAggregationService.demand.getAggregatorTypeCachedViewType {
-            AggregatorType aggregator ->
-                return toReturnFromGetAggregatorTypeCachedViewType
+        def resultCsiAggregationService = Stub(ResultCsiAggregationService) {
+            getAggregatorTypeCachedViewType(_ as AggregatorType) >> {AggregatorType aggregator ->
+                    return toReturnFromGetAggregatorTypeCachedViewType
+            }
+            getEventResultPropertyForCalculation(_ as AggregatorType,_ as EventResult) >> { AggregatorType aggType, EventResult result ->
+                    return Double.valueOf(toReturnFromGetEventResultPropertyForCalculation)
+            }
         }
-        resultCsiAggregationService.demand.getEventResultPropertyForCalculation {
-            AggregatorType aggType, EventResult result ->
-                return Double.valueOf(toReturnFromGetEventResultPropertyForCalculation)
-        }
-        serviceUnderTest.resultCsiAggregationService = resultCsiAggregationService.proxyInstance()
+        serviceUnderTest.resultCsiAggregationService = resultCsiAggregationService
     }
     /**
      * Mocks methods of {@linkplain GraphiteSocketProvider}.
      */
     private void mockI18nService() {
-        def i18nService = new StubFor(I18nService, true)
-        i18nService.demand.msg {
-            String msgKey, String defaultMessage ->
-                return MEASURAND_DOCREADYTIME_NAME
+        def i18nService = Stub(I18nService) {
+            msg(_ as String, _ as String) >> {
+                String msgKey, String defaultMessage ->
+                    return MEASURAND_DOCREADYTIME_NAME
+            }
         }
-        serviceUnderTest.i18nService = i18nService.proxyInstance()
+        serviceUnderTest.i18nService = i18nService
     }
 
     /**
@@ -753,7 +751,7 @@ class MetricReportingServiceTests extends Specification {
         Map<String, Double> sendDates = [:]
 
         @Override
-        public void sendDate(GraphitePathName path, double value, Date timestamp)
+        void sendDate(GraphitePathName path, double value, Date timestamp)
                 throws NullPointerException, GraphiteComunicationFailureException {
             sendDates[path.stringValueOfPathName + DELIMITTER + timestamp.toString()] = value
         }

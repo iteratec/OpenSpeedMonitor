@@ -40,7 +40,6 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
-import org.joda.time.Days
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -101,8 +100,6 @@ class CsiDashboardController {
     public static final String WEEKLY_AGGR_GROUP_SYSTEM = 'weekly_system'
     public static final String HOURLY_MEASURED_EVENT = "measured_event"
 
-    String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
-    public final static int MONDAY_WEEKSTART = 1
     public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
                                                                 DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
                                                                 DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
@@ -272,7 +269,7 @@ class CsiDashboardController {
                     }
 
                     warnAboutLongProcessingTimeInsteadOfShowingData = cmd.shouldWarnAboutLongProcessingTime(
-                            fixTimeFrame(cmd.receiveSelectedTimeFrame(), selectedAggregationIntervallInMintues),
+                            fixTimeFrame(cmd.createTimeFrameInterval(), selectedAggregationIntervallInMintues),
                             selectedAggregationIntervallInMintues,
                             countOfSelectedBrowser)
                 }
@@ -297,111 +294,40 @@ class CsiDashboardController {
         UserspecificDashboardBase requestedDashboard = UserspecificDashboardBase.get(dashboardID)
         return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
     }
-/**
- * Gets data for the showAllCommand from a saved userspecificCsiDashboard
- * @param cmd the command where the attribute gets set
- * @param dashboardID the id of the saved userspecificCsiDashboard
- */
+    /**
+     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+     * @param cmd the command where the attribute gets set
+     * @param dashboardID the id of the saved userspecificCsiDashboard
+     */
     private void fillWithUserspecificDashboardValues(CsiDashboardShowAllCommand cmd, String dashboardID) {
         UserspecificCsiDashboard dashboard = UserspecificCsiDashboard.get(Long.parseLong(dashboardID))
-
-        cmd.with {
-            from = dashboard.fromDate
-            to = dashboard.toDate
-            fromHour = dashboard.fromHour
-            toHour = dashboard.toHour
-            aggrGroupAndInterval = dashboard.aggrGroup
-
-            if (dashboard.selectedFolder) {
-                for (item in dashboard.selectedFolder.tokenize(',')) {
-                    selectedFolder.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedPages) {
-                for (item in dashboard.selectedPages.tokenize(',')) {
-                    selectedPages.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedMeasuredEventIds) {
-                for (item in dashboard.selectedMeasuredEventIds.tokenize(',')) {
-                    selectedMeasuredEventIds.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedBrowsers) {
-                for (item in dashboard.selectedBrowsers.tokenize(',')) {
-                    selectedBrowsers.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedLocations) {
-                for (item in dashboard.selectedLocations.tokenize(',')) {
-                    selectedLocations.add(Long.parseLong(item))
-                }
-            }
-            if (dashboard.selectedCsiSystems) {
-                for (item in dashboard.selectedCsiSystems.tokenize(',')) {
-                    selectedCsiSystems.add(Long.parseLong(item))
-                }
-            }
-
-            selectedAllBrowsers = dashboard.selectedAllBrowsers
-            selectedAllLocations = dashboard.selectedAllLocations
-
-            overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
-            debug = dashboard.debug
-            selectedTimeFrameInterval = dashboard.selectedTimeFrameInterval
-            setFromHour = dashboard.setFromHour
-            setToHour = dashboard.setToHour
-            includeInterval = dashboard.includeInterval
-
-            chartTitle = dashboard.chartTitle
-            chartWidth = dashboard.chartWidth
-            chartHeight = dashboard.chartHeight
-            loadTimeMinimum = dashboard.loadTimeMinimum
-            loadTimeMaximum = dashboard.loadTimeMaximum
-            showDataMarkers = dashboard.showDataMarkers
-            showDataLabels = dashboard.showDataLabels
-            csiTypeDocComplete = dashboard.csiTypeDocComplete
-            csiTypeVisuallyComplete = dashboard.csiTypeVisuallyComplete
-            wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
-
-            selectedConnectivities = dashboard.selectedConnectivities ?: []
-            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles as boolean
-
-            if (dashboard.graphNameAliases.size() > 0) {
-                graphNameAliases = dashboard.graphNameAliases
-            }
-            if (dashboard.graphColors.size() > 0) {
-                graphColors = dashboard.graphColors
-            }
-
-            dashboardName = dashboard.dashboardName
-            publiclyVisible = dashboard.publiclyVisible
-        }
+        dashboard.fillCommand(cmd)
     }
-/**
- * <p>
- * Fills the specified map with approximate data based on {@linkplain
- * CsiAggregation measured values} correspond to the selection in
- * specified {@linkplain CsiDashboardShowAllCommand command object}.
- * </p>
- *
- * @param modelToRender
- *         The map to be filled. Previously added entries are overridden.
- *         This map should not be <code>null</code>.
- * @param cmd
- *         The command with users selections, not <code>null</code>.
- * @param withTargetGraph
- *         If <code>true</code> the CSI target graph will be added to
- *         the graphs in {@link modelToRender} else, if set to
- *         <code>false</code> not.
- */
+
+    /**
+     * <p>
+     * Fills the specified map with approximate data based on {@linkplain
+     * CsiAggregation measured values} correspond to the selection in
+     * specified {@linkplain CsiDashboardShowAllCommand command object}.
+     * </p>
+     *
+     * @param modelToRender
+     *         The map to be filled. Previously added entries are overridden.
+     *         This map should not be <code>null</code>.
+     * @param cmd
+     *         The command with users selections, not <code>null</code>.
+     * @param withTargetGraph
+     *         If <code>true</code> the CSI target graph will be added to
+     *         the graphs in {@link modelToRender} else, if set to
+     *         <code>false</code> not.
+     */
     private void fillWithAproximateCsiAggregationData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         requiresArgumentNotNull('modelToRender', modelToRender)
         requiresArgumentNotNull('cmd', cmd)
 
-        Interval timeFrame = cmd.receiveSelectedTimeFrame()
+        Interval timeFrame = cmd.createTimeFrameInterval()
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams csiAggregationsQueryParams = cmd.createMvQueryParams()
@@ -536,9 +462,6 @@ class CsiDashboardController {
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
-
-        //		csiValueMap.putAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
-        //			resetFromDate.minusDays(1), resetToDate.plusDays(1)))
 
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDate.toDate().getTime())
@@ -765,16 +688,6 @@ class CsiDashboardController {
      */
     private static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
-    //	/**
-    //	 * The {@link NumberFormat} used to format CSI values for CSV export and table view.
-    //	 */
-    //	private static final NumberFormat CSV_TABLE_CSI_VALUE_FORMAT_GERMAN = NumberFormat.getNumberInstance(Locale.GERMAN);
-    //
-    //	/**
-    //	 * The {@link NumberFormat} used to format CSI values for CSV export and table view.
-    //	 */
-    //	private static final NumberFormat CSV_TABLE_CSI_VALUE_FORMAT_DEFAULT = NumberFormat.getNumberInstance(Locale.US);
-
     /**
      * <p>
      * Creates a CSV based on the selection passed as {@link CsiDashboardShowAllCommand}.
@@ -828,11 +741,10 @@ class CsiDashboardController {
         String dashboardName = dashboardValues.dashboardName
         String username = springSecurityService.authentication.principal.getUsername()
         Boolean publiclyVisible = dashboardValues.publiclyVisible as Boolean
-        String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse data for command
-        Date fromDate = dashboardValues.from ? SIMPLE_DATE_FORMAT.parse(dashboardValues.from) : null
-        Date toDate = dashboardValues.to ? SIMPLE_DATE_FORMAT.parse(dashboardValues.to) : null
+        DateTime from = ParameterBindingUtility.parseDateTimeParameter(dashboardValues.from, false)
+        DateTime to = ParameterBindingUtility.parseDateTimeParameter(dashboardValues.to, true)
         Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
         Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
         Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")
@@ -864,17 +776,16 @@ class CsiDashboardController {
 
 
         // Create command for validation
-        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
-                toHour: dashboardValues.toHour, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
-                selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
-                selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
-                includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: from, to: to,
+                aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
+                selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds,
+                selectedBrowsers: selectedBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
+                selectedTimeFrameInterval: timeFrameInterval, includeInterval: dashboardValues.includeInterval,
                 chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
                 showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
                 csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete,
                 graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors,
-                selectedConnectivities: selectedConnectivities, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles)
+                selectedConnectivities: selectedConnectivities)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) {
@@ -897,7 +808,7 @@ class CsiDashboardController {
                 existing.delete(flush: true, failOnError: true)
             }
 
-            UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, publiclyVisible, wideScreenDiagramMontage, dashboardName, username)
+            UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, publiclyVisible, dashboardName, username)
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
@@ -1032,10 +943,6 @@ class CsiDashboardController {
     public Map<String, Object> constructStaticViewDataOfShowAll() {
         Map<String, Object> result = [:]
 
-        // AggregatorTypes
-        //		List<AggregatorType> allAggregatorTypes = aggregatorTypeDaoService.findAll().sort(false, { it.name });
-        //		result.put('aggrGroupLabels', allAggregatorTypes.collect( { it.name } ))
-        //		result.put('aggrGroupValues', allAggregatorTypes.collect( { String.valueOf( it.id) } ))
         result.put('aggrGroupLabels', AGGREGATOR_GROUP_LABELS)
         result.put('aggrGroupValues', AGGREGATOR_GROUP_VALUES)
 
@@ -1070,7 +977,6 @@ class CsiDashboardController {
 
         // JavaScript-Utility-Stuff:
         result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
-        result.put("weekStart", MONDAY_WEEKSTART)
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
         Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
@@ -1108,33 +1014,6 @@ class CsiDashboardController {
 
         // Done! :)
         return result
-    }
-
-    /**
-     * Checks if hours between given fromDate and toDate is greater than 4 months.
-     *
-     *
-     * @param fromDate TODO Doc: Inclusive? Eclusive?
-     * @param toDate TODO Doc: Inclusive? Eclusive?
-     * @return TODO Doc
-     * @deprecated TODO Currently unused -> Discuss if this range check is required or just should be done in UI.
-     */
-    @Deprecated
-    private boolean exceedsTimeframeBoundary(Date fromDate, Date toDate, CsiAggregationInterval interval) {
-        Days daysBetween = Days.daysBetween(new DateTime(fromDate), new DateTime(toDate))
-        Integer maxDays
-        switch (interval.intervalInMinutes) {
-            case CsiAggregationInterval.WEEKLY:
-                maxDays = 26 * 7
-                break
-            case CsiAggregationInterval.DAILY:
-                maxDays = 6 * 7
-                break
-            default:
-                maxDays = 2 * 7
-                break
-        }
-        return daysBetween.isGreaterThan(new Days(maxDays))
     }
 
     /**

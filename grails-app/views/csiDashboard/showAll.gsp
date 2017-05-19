@@ -314,26 +314,6 @@
                                       'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles]"/>
                 </div>
             </div>
-            <g:if test="${exceedsTimeframeBoundary}">
-                <g:if test="${selectedInterval.intervalInMinutes == 60}">
-                    <p class="text-danger"><g:message
-                            code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
-                            default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:if>
-                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
-                    <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
-                                                      default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:elseif>
-                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
-                    <p class="text-danger"><g:message
-                            code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
-                            default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:elseif>
-                <g:else>
-                    <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
-                                                      default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:else>
-            </g:if>
         </div>
     </div>
 </form>

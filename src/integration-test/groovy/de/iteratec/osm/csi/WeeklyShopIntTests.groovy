@@ -74,7 +74,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
             System.out.println('Loading CSV-data...');
             TestDataUtil.
-                    loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
+                    loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
             System.out.println('Loading CSV-data... DONE');
 
         }

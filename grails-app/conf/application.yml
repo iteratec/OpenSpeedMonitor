@@ -240,7 +240,9 @@ grails:
             logout:
                 postOnly: false
             securityConfigType: 'InterceptUrlMap'
-            interceptUrlMap: [{pattern: '/static/**',                                     access: ["permitAll"]},
+            interceptUrlMap: [
+                            {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
+                            {pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
                             {pattern: '/assets/**',                                     access: ["permitAll"]},
                             {pattern: '/assets/*',                                      access: ["permitAll"]},
@@ -295,6 +297,8 @@ grails:
                             {pattern: '/csiDashboard/validateDashboardName',            access: ["permitAll"]},
                             {pattern: '/csiDashboard/validateAndSaveDashboardValues',   access: ["permitAll"]},
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
+                            {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
+                            {pattern: '/landing/**',                                    access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
                             {pattern: '/securityInfo/mappings',                         access: ["denyAll"]},
                             {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},

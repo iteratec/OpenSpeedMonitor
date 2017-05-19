@@ -46,7 +46,7 @@ class PerformanceLoggingServiceTests extends Specification {
     /**
      * Tests whether {@link PerformanceLoggingService} logs to rootLogger with log-level {@link Level.ERROR}.
      */
-    void testLoggingOfExecutionTime() {
+    void "test logging of execution time"() {
         given: "We get access to the log output"
         String message
         Appender appender = addAppender { String m -> message = m }
@@ -72,7 +72,7 @@ class PerformanceLoggingServiceTests extends Specification {
     /**
      * Tests whether {@link PerformanceLoggingService} doesn't logs to rootLogger with log-level {@link Level.INFO}.
      */
-    void testNoLoggingOfExecutionTimeDueToLogLevel() {
+    void "No logging of execution time due to log level"() {
         given: "We get access to the log output"
         String message
         Appender appender = addAppender {

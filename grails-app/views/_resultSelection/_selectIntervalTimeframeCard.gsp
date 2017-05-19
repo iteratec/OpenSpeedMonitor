@@ -1,20 +1,21 @@
 <%@page defaultCodec="none" %>
 <%-- 
 A card with controls to select a time frame (manual, or presets like 'last 12 hours') and optionally
-a control to select an aggregation interval (if csiAggregationIntervals is set)
+a control to select an aggregation interval (if aggregationIntervals is set)
 --%>
-<div class="card form-horizontal" id="select-interval-timeframe-card">
+<div class="card form-horizontal" id="select-interval-timeframe-card" data-comparative-enabled="${showComparisonInterval ? 'true' : 'false'}">
     <h2>
-		<g:if test="${csiAggregationIntervals}">
+		<g:if test="${aggregationIntervals}">
 			<g:message code="de.iteratec.isocsi.csi.aggreator.heading"
 					   default="Aggregation"/>
 			&amp;
 		</g:if>
-		<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
+		<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Time frame" />
 	</h2>
 
-	<g:if test="${csiAggregationIntervals}">
-		<div class="form-group">
+    <%--------------------------------------------------------------------- aggregations --%>
+	<g:if test="${aggregationIntervals}">
+		<div class="row form-group">
 			<label class="col-md-4 control-label" for="selectedIntervalHtmlId">
 				<g:message
 						code="de.iteratec.isr.wptrd.labels.timeframes.interval"
@@ -23,16 +24,16 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 
 			<div class="col-md-8">
 				<g:select id="selectedIntervalHtmlId" class="form-control"
-						  name="selectedInterval" from="${csiAggregationIntervals}"
+						  name="selectedInterval" from="${aggregationIntervals}"
 						  valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
 						  value="${selectedInterval}"/>
 			</div>
 		</div>
 	</g:if>
-	<%--------------------------------------------------------------------- pre-selections --%>
-	<div class="form-group">
+	<%--------------------------------------------------------------------- time frame --%>
+	<div class="row form-group">
 		<label class="control-label col-md-4" for="timeframeSelect">
-			<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />:
+			<g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Time frame" />:
 		</label>
 		<div class="col-md-8">
 			<g:select id="timeframeSelect" class="form-control"
@@ -41,58 +42,61 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 					value="${selectedTimeFrameInterval}" />
 		</div>
 	</div>
+	<div class="row form-group">
+        <g:if test="${showComparisonInterval}">
+            <div class="hidden col-md-4 control-label comparison">
+                <label for="timeframe-picker" class="text-muted sub">
+                    <g:message code="de.iteratec.osm.main-timeframe.label" default="Main" />
+                </label>
+            </div>
+        </g:if>
+		<div class="col-md-8 col-md-offset-4" id="timeframe-picker">
+			<g:render template="/_resultSelection/timeRangePicker" model="${[
+					'nameFrom': 'from',
+					'nameTo': 'to',
+					'valueFrom': from,
+					'valueTo': to,
+					'dateFormat': dateFormat
+			]}" />
+		</div>
+    </div>
+    <%--------------------------------------------------------------------- comparative time frame --%>
+    <g:if test="${showComparisonInterval}">
+        <%------------ initially visible --%>
+        <div class="row form-group" id="comparativeTimeFrameButton">
+            <div class="col-md-8 col-md-offset-4">
+                <button type="button" id="addComparativeTimeFrame" class="btn btn-default btn-block">
+                    <i class="fa fa-plus"></i>
+                    <g:message code="de.iteratec.osm.comparative-timeframe.heading" default="Comparative time frame"/>
+                </button>
+            </div>
+        </div>
+        <%------------ initially NOT visible --%>
+        <div class="hidden comparison" id="timeframe-picker-previous-container">
+            <div class="row form-group">
+                <div class="control-label col-md-4">
+                    <label for="timeframe-picker-previous" class="text-muted sub">
+                        <g:message code="de.iteratec.osm.comparative-timeframe.label" default="Comparison" />
+                    </label>
+                    <a href="#/" id="removeComparativeTimeFrame"><i class="fa fa-times" aria-hidden="true"></i></a>
+                </div>
+                <div class="col-md-8" id="timeframe-picker-previous">
+                    <g:render template="/_resultSelection/timeRangePicker" model="${[
+                            'nameFrom': 'fromComparative',
+                            'nameTo': 'toComparative',
+                            'valueFrom': from,
+                            'valueTo': to,
+                            'dateFormat': dateFormat
+                    ]}" />
+                </div>
+            </div>
+        </div>
+    </g:if>
 
-	<%--------------------------------------------------------------------- manual start date --%>
-	<fieldset id="manual-timeframe-selection">
-		<div class="form-group">
-			<label class="col-md-4 control-label" for="fromDatepicker">
-				<g:message
-						code="de.iteratec.isr.wptrd.labels.timeframes.start"
-						default="Start" />:
-			</label>
-			<div class="col-md-8">
-				<g:render template="/_resultSelection/dateTimePicker" model="[
-						id               : 'startDateTimePicker',
-						manualTimeName   : 'setFromHour',
-						manualTimeValue  : setFromHour,
-						timeName         : 'fromHour',
-						time             : fromHour,
-						dateControlId    : 'fromDatepicker',
-						dateName         : 'from',
-						date             : from,
-						dateFormat       : dateFormat,
-						weekStart        : weekStart,
-						hideHourSelection: hideHourSelection
-				]" />
-			</div>
-		</div>
-	<%--------------------------------------------------------------------- manual end date --%>
-		<div class="form-group">
-			<label class="col-md-4 control-label" for="toDatepicker">
-				<g:message
-						code="de.iteratec.isr.wptrd.labels.timeframes.end"
-						default="End" />:
-			</label>
-			<div class="col-md-8">
-				<g:render template="/_resultSelection/dateTimePicker" model="[
-						id               : 'endDateTimePicker',
-						manualTimeName   : 'setToHour',
-						manualTimeValue  : setToHour,
-						timeName         : 'toHour',
-						time             : toHour,
-						dateControlId    : 'toDatepicker',
-						dateName         : 'to',
-						date             : to,
-						dateFormat       : dateFormat,
-						weekStart        : weekStart,
-						hideHourSelection: hideHourSelection
-				]" />
-			</div>
-		</div>
-	</fieldset>
+    <%--------------------------------------------------------------------- include actual interval checkbox (CSI)--%>
 	<g:if test="${showIncludeInterval}">
 		<div class="row">
-			<div class="col-md-offset-4 col-md-8">
+			<div class="col-md-8 col-md-offset-4">
 				<fieldset id="includeInterval">
 					<label class="checkbox-inline">
 						<g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>

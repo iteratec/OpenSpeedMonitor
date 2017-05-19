@@ -89,80 +89,41 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
      * @param cmd the command the set values
      * @param dashboardName a unique name for the dashboard
      * @param publiclyVisible true if the dashboard should be visible for all
-     * @param wideScreenDiagramMontage true if there should be optimisation for wideScreen
      * @param username the creator of the dashboard
      */
-    UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, Boolean publiclyVisible, String wideScreenDiagramMontage, String username) {
+    UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, Boolean publiclyVisible, String username) {
+        super(cmd, dashboardName, publiclyVisible, username)
 
-        this.dashboardName = dashboardName
-        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
-        this.username = username
-
-        // Get Data from command
-        fromDate = cmd.from
-        toDate = cmd.to
-        fromHour = cmd.fromHour
-        toHour = cmd.toHour
         selectedInterval = cmd.selectedInterval
-        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
-        selectedAllMeasuredEvents = cmd.selectedAllMeasuredEvents
-        selectedAllBrowsers = cmd.selectedAllBrowsers
-        selectedAllLocations = cmd.selectedAllLocations
         trimBelowLoadTimes = cmd.trimBelowLoadTimes
         trimAboveLoadTimes = cmd.trimAboveLoadTimes
         trimBelowRequestCounts = cmd.trimBelowRequestCounts
         trimAboveRequestCounts = cmd.trimAboveRequestCounts
         trimBelowRequestSizes = cmd.trimBelowRequestSizes
         trimAboveRequestSizes = cmd.trimAboveRequestSizes
-        overwriteWarningAboutLongProcessingTime = cmd.overwriteWarningAboutLongProcessingTime
-        debug = cmd.debug
-        setFromHour = cmd.setFromHour
-        setToHour = cmd.setToHour
-        selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
-        selectedConnectivities = cmd.selectedConnectivities
-        chartTitle = cmd.chartTitle
-        chartWidth = cmd.chartWidth
-        chartHeight = cmd.chartHeight
-        loadTimeMinimum = cmd.loadTimeMinimum
-        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
-        showDataMarkers = cmd.showDataMarkers
-        showDataLabels = cmd.showDataLabels
-        graphNameAliases = cmd.graphNameAliases
-        graphColors = cmd.graphColors
+        selectedAggrGroupValuesCached = cmd.selectedAggrGroupValuesCached.join(",")
+        selectedAggrGroupValuesUnCached = cmd.selectedAggrGroupValuesUnCached.join(",")
+    }
 
-        // generate Strings for db
-        String selectedFolderString = ""
-        String selectedPagesString = ""
-        String selectedMeasuredEventIdsString = ""
-        String selectedBrowsersString = ""
-        String selectedLocationsString = ""
-        String selectedAggrGroupValuesCachedString = ""
-        String selectedAggrGroupValuesUnCachedString = ""
+    void fillCommand(EventResultDashboardShowAllCommand cmd) {
+        super.fillCommand(cmd)
+        cmd.selectedInterval = selectedInterval
+        cmd.trimBelowLoadTimes = trimBelowLoadTimes
+        cmd.trimAboveLoadTimes = trimAboveLoadTimes
+        cmd.trimBelowRequestCounts = trimBelowRequestCounts
+        cmd.trimAboveRequestCounts = trimAboveRequestCounts
+        cmd.trimBelowRequestSizes = trimBelowRequestSizes
+        cmd.trimAboveRequestSizes = trimAboveRequestSizes
 
-        // generate Strings for db
-        cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
-        // trim last comma
-        if(selectedFolderString.length() > 0) selectedFolderString = selectedFolderString.substring(0, selectedFolderString.length()-1)
-        cmd.selectedPages.each {p -> selectedPagesString += p + ","}
-        if(selectedPagesString.length() > 0) selectedPagesString = selectedPagesString.substring(0, selectedPagesString.length()-1)
-        cmd.selectedMeasuredEventIds.each {m -> selectedMeasuredEventIdsString += m + ","}
-        if(selectedMeasuredEventIdsString.length() > 0) selectedMeasuredEventIdsString = selectedMeasuredEventIdsString.substring(0, selectedMeasuredEventIdsString.length()-1)
-        cmd.selectedBrowsers.each {b -> selectedBrowsersString += b + ","}
-        if(selectedBrowsersString.length() > 0) selectedBrowsersString = selectedBrowsersString.substring(0, selectedBrowsersString.length()-1)
-        cmd.selectedLocations.each {l -> selectedLocationsString += l + ","}
-        if(selectedLocationsString.length() > 0) selectedLocationsString = selectedLocationsString.substring(0, selectedLocationsString.length()-1)
-        cmd.selectedAggrGroupValuesCached.each {a -> selectedAggrGroupValuesCachedString += a + ","}
-        if(selectedAggrGroupValuesCachedString.length() > 0) selectedAggrGroupValuesCachedString = selectedAggrGroupValuesCachedString.substring(0, selectedAggrGroupValuesCachedString.length()-1)
-        cmd.selectedAggrGroupValuesUnCached.each {a -> selectedAggrGroupValuesUnCachedString += a + ","}
-        if(selectedAggrGroupValuesUnCachedString.length() > 0) selectedAggrGroupValuesUnCachedString = selectedAggrGroupValuesUnCachedString.substring(0, selectedAggrGroupValuesUnCachedString.length()-1)
-
-        selectedFolder = selectedFolderString
-        selectedPages = selectedPagesString
-        selectedMeasuredEventIds = selectedMeasuredEventIdsString
-        selectedBrowsers = selectedBrowsersString
-        selectedLocations = selectedLocationsString
-        selectedAggrGroupValuesCached = selectedAggrGroupValuesCachedString
-        selectedAggrGroupValuesUnCached = selectedAggrGroupValuesUnCachedString
+        if (selectedAggrGroupValuesCached) {
+            for (item in selectedAggrGroupValuesCached.tokenize(',')) {
+                cmd.selectedAggrGroupValuesCached.add(item)
+            }
+        }
+        if (selectedAggrGroupValuesUnCached) {
+            for (item in selectedAggrGroupValuesUnCached.tokenize(',')) {
+                cmd.selectedAggrGroupValuesUnCached.add(item)
+            }
+        }
     }
 }

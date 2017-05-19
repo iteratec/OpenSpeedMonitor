@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
@@ -42,7 +43,6 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.util.Holders
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -67,92 +67,6 @@ import static org.junit.Assert.assertNotNull
  */
 @TestMixin(GrailsUnitTestMixin)
 class TestDataUtil implements OsmTestLogin {
-    /**
-     * <p>
-     * Removes all entries from the database.  The hole action is one hibernate-transaction which gets flushed afterwards.
-     * </p>
-     *
-     * <p>
-     * <em>Note:</em> The remove-operations are flushed immediately.
-     * </p>
-     *
-     * @since IT-43
-     */
-    public static void cleanUpDatabase() {
-        getAllDomainClasses().each { domainClass ->
-
-            Job.withTransaction { TransactionStatus status ->
-
-                removeAssociatedDomainsFromCollections(domainClass)
-                domainClass.list()*.delete(flush: true)
-
-                status.flush()
-            }
-
-        }
-    }
-
-    public static void removeAssociatedDomainsFromCollections(domainClass) {
-        if (domainClass == GraphitePath.class) {
-            GraphiteServer.list().each {
-                it.graphitePaths = []
-                it.save(failOnError: true)
-            }
-        } else if (domainClass == TimeToCsMapping.class ||
-                domainClass == BrowserConnectivityWeight.class ||
-                domainClass == PageWeight.class ||
-                domainClass == CsiConfiguration.class) {
-            CsiConfiguration.list().each {
-                it.timeToCsMappings = []
-                it.browserConnectivityWeights = []
-                it.pageWeights = []
-                it.save(failOnError: true)
-            }
-        }
-
-
-    }
-
-    public static int getCountOfAllObjectsInDatabase() {
-        int count = 0
-        getAllDomainClasses().each { domainClass ->
-            count += domainClass.list().size()
-        }
-        return count
-    }
-
-    public static List getAllDomainClasses() {
-        return [
-                GraphitePath.class,
-                GraphiteServer.class,
-                CsTargetGraph.class,
-                CsTargetValue.class,
-                CustomerFrustration.class,
-                TimeToCsMapping.class,
-                PageWeight.class,
-                BrowserConnectivityWeight.class,
-                OsmConfiguration.class,
-                CsiAggregation.class,
-                EventResult.class,
-                JobResult.class,
-                Job.class,
-                Script.class,
-                JobGroup.class,
-                CsiConfiguration.class,
-                CsiDay.class,
-                Location.class,
-                Browser.class,
-                BrowserAlias.class,
-                WebPageTestServer.class,
-                MeasuredEvent.class,
-                Page.class,
-                AggregatorType.class,
-                CsiAggregationInterval.class,
-                CsiAggregationUpdateEvent.class,
-                ConnectivityProfile.class,
-                MeasuredEvent.class
-        ]
-    }
 
     static ConnectivityProfile createConnectivityProfile(String profileName) {
         ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
@@ -396,11 +310,16 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths) {
+    static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths, Boolean reportHealthMetrics, String healthMetricsReportPrefix) {
         new GraphiteServer(
-                serverAdress: '',
+                serverAdress: serverAdress,
                 port: port,
-                graphitePaths: paths
+                graphitePaths: paths,
+                reportHealthMetrics: reportHealthMetrics,
+                healthMetricsReportPrefix: healthMetricsReportPrefix,
+                webappUrl: "https://my-graphite.webapp.com",
+                webappProtocol: Protocol.HTTPS,
+                webappPathToRenderingEngine: "/render"
         ).save(failOnError: true)
     }
 
@@ -1365,10 +1284,19 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     public static User createAdminUser() {
-        def user = User.findByUsername(getConfiguredUsername())
-        if (!user) {
-            Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-            user = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+        String adminUserName = getConfiguredUsername()
+        User user = User.findByUsername(adminUserName)
+        if (!user){
+            user = User.build(
+                    username: adminUserName,
+                    password: getConfiguredPassword(),
+                    enabled: true,
+                    accountExpired: false,
+                    accountLocked: false,
+                    passwordExpired: false
+            )
+            Role adminRole = Role.build(authority: 'ROLE_ADMIN')
+            // UserRole doesn't work with build-test-data plugin :(
             new UserRole(user: user, role: adminRole).save(failOnError: true)
         }
         return user
@@ -1378,5 +1306,14 @@ class TestDataUtil implements OsmTestLogin {
         new BatchActivity(name: name, domain: "irrelevant domain", activity: Activity.UPDATE,
                 status: status, maximumStages: 1, startDate: new Date(),
                 lastUpdate: new Date()).save(flush: true, failOnError: true)
+    }
+
+    public static void setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus status){
+        OsmConfiguration configuration = OsmConfiguration.list()[0]
+        if (!configuration){
+            configuration = OsmConfiguration.build()
+        }
+        configuration.infrastructureSetupRan = status
+        configuration.save(failOnError: true)
     }
 }

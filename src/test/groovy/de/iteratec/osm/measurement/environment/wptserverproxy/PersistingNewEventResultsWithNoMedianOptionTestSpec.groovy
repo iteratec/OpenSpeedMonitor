@@ -102,7 +102,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     void testCreatedEventsAfterListeningToMultistepResultAndPersistNonMedian() {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', true)
@@ -150,7 +150,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     void testCreatedEventsAfterListeningToMultistepResultAndPersistOnlyMedian() {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', false)
@@ -191,7 +191,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     void testCreatedEventsAfterListeningToSinglestepResultAndPersistNonMedian() {
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_5Runs_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         deleteResults()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', true)
@@ -233,7 +233,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     void testCreatedEventsAfterListeningToSinglestepResultAndPersistOnlyMedian() {
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_5Runs_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', false)
         deleteResults()

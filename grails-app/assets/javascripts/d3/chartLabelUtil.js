@@ -49,7 +49,7 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
 
     };
 
-    var appendUniqueLabels = function () {
+    var appendUniqueLabels = function (hideMeasurand) {
 
         seriesData.forEach(function (series) {
             series.label = "";
@@ -59,7 +59,7 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
             if (uniqueEntries.uniqueJobGroups.length > 1) {
                 series.label += series.jobGroup + delimitter
             }
-            if (uniqueEntries.uniqueMeasurands.length > 1) {
+            if (!hideMeasurand && uniqueEntries.uniqueMeasurands.length > 1) {
                 series.label += series.measurand + delimitter
             }
             series.label = cutTrailingDelimitter(series.label)
@@ -73,9 +73,9 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
         }
         return toCutFrom;
     };
-    var getCommonLabelParts = function () {
+    var getCommonLabelParts = function (omitMeasurands) {
         var commonPartsHeader = ""
-        if (uniqueEntries.uniqueMeasurands.length == 1) {
+        if (uniqueEntries.uniqueMeasurands.length == 1 && !omitMeasurands) {
             var measurandString = i18nData['measurand'] || "Measurand";
             commonPartsHeader += measurandString + ": " + uniqueEntries.uniqueMeasurands[0] + delimitter
         }

@@ -1,7 +1,7 @@
 <g:each var="wptServer" in="${servers}">
 	<div class="card">
 	<h2>${wptServer.key}</h2>
-	
+
 	<g:if test="${wptServer.value instanceof String}">
 		<p>Error: ${wptServer.value}</p>
 	</g:if>
@@ -33,7 +33,7 @@
 			<g:each var="location" in="${wptServer.value}">
 				<tr class="queueRow">
 					<td>
-						<abbr title="${message(code: "queue.label.label")}: ${location.label}">${location.id}</abbr>
+						<abbr title="${message(code: "queue.label.label")}: ${location.label} | ${message(code: "de.iteratec.osm.location.queue.date.label")}: ${location.dateOfOsmQueueData}">${location.id}</abbr>
 					</td>
 					<td>
 						${location.agents}
@@ -44,7 +44,7 @@
 					<td>
 						<g:if test="${location.pendingJobs > 0}">
 								<a href="#" class="jobDetail" data-status="100">
-									<span class="arrow glyphicon glyphicon-chevron-up"></span>
+									<span class="arrow fa fa-chevron-down"></span>
 						</g:if>
 						${location.pendingJobs}
 						<g:if test="${location.pendingJobs > 0}">
@@ -54,7 +54,7 @@
 					<td>
 						<g:if test="${location.runningJobs > 0}">
 								<a href="#" class="jobDetail" data-status="101">
-									<span class="arrow glyphicon glyphicon-chevron-up"></span>
+									<span class="arrow fa fa-chevron-down"></span>
 						</g:if>
 						${location.runningJobs}
 						<g:if test="${location.runningJobs > 0}">
@@ -81,7 +81,7 @@
 					<tr class="jobsRow" data-queue="${location.id}">
 						<td colspan="10">
 						<g:each var="job" in="${location.executingJobs}">
-              <strong>${job.key.label}</strong>
+                            <strong>Job: <span class="text-info">${job.key.label}</span></strong>
 							<table>
 							<thead>
 							 <tr>

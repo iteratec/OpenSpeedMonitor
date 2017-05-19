@@ -67,32 +67,7 @@ class DefaultBrowserDaoServiceTests {
 		assertEquals(1, resultAfterAdding.count( { it.name == 'FindAllBrowser2' } ));
 		assertEquals(1, resultAfterAdding.count( { it.name == 'FindAllBrowser3' } ));
 	}
-	
-	@Test
-    void testGetIdToObjectMap() {
-		
-		//create test-specific data
-		
-		Browser browser1 = new Browser(name: nameBrowser1).save(failOnError: true)
-		Browser browser2 = new Browser(name: nameBrowser2).save(failOnError: true)
-		Browser browser3 = new Browser(name: nameBrowser3).save(failOnError: true)
-		Browser browser4 = new Browser(name: nameBrowser4).save(failOnError: true)
-		
-		//execute test
-		
-		Map<Long, Browser> idToObjectMap = serviceUnderTest.getIdToObjectMap()
-		
-		//assertions
-		
-		assertEquals(
-			[
-				(browser1.ident()) : browser1,
-				(browser2.ident()) : browser2,
-				(browser3.ident()) : browser3,
-				(browser4.ident()) : browser4
-				], 
-			idToObjectMap)
-    }
+
 	private void createDataCommonForAllTests(){
 		//nothing to do yet
 	}

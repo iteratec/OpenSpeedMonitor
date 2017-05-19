@@ -82,7 +82,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_CsiRelevant.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -144,7 +144,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_WithPageName_CsiRelevant.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -206,7 +206,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -279,7 +279,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames_WithPageName.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -353,7 +353,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -388,7 +388,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_2Run.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -492,7 +492,7 @@ class PersistingNewEventResultsTests {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -524,7 +524,7 @@ class PersistingNewEventResultsTests {
     void testError_FailureInStep() {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_Error_Failure_In_Step.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 

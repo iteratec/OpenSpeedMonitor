@@ -17,44 +17,30 @@
 
 package de.iteratec.osm.result
 
-import static org.junit.Assert.*
+import spock.lang.Specification
 
-import org.junit.Test
-
-import de.iteratec.osm.result.MvQueryParams;
 
 /**
  * Test-suite for {@link MvQueryParams}.
- * 
+ *
  * @author mze
  */
-class MvQueryParamsTests {
+class MvQueryParamsTests extends Specification {
 
-	@Test
-	public void testDefaultConstructor() {
-		MvQueryParams queryParams = new MvQueryParams();
+    def "test to string"() {
+        given: "some query parameters"
+        MvQueryParams queryParams = new MvQueryParams()
+        queryParams.jobGroupIds.addAll([8, 9])
+        queryParams.measuredEventIds.addAll([38, 77])
+        queryParams.pageIds.addAll([1, 3, 8])
+        queryParams.browserIds.addAll([7])
+        queryParams.locationIds.addAll([99, 101])
+        queryParams.connectivityProfileIds.addAll([1, 2, 4])
 
-		assertNotNull(queryParams.jobGroupIds)
-		assertNotNull(queryParams.measuredEventIds)
-		assertNotNull(queryParams.pageIds)
-		assertNotNull(queryParams.browserIds)
-		assertNotNull(queryParams.locationIds)
-        assertNotNull(queryParams.connectivityProfileIds)
-	}
+        when: "the to string method is called"
+        String queryParamsString = queryParams.toString()
 
-	@Test
-	public void testToString() {
-		MvQueryParams out = new MvQueryParams();
-		out.jobGroupIds.addAll([8, 9]);
-		out.measuredEventIds.addAll([38, 77]);
-		out.pageIds.addAll([1, 3, 8]);
-		out.browserIds.addAll([7]);
-		out.locationIds.addAll([99, 101]);
-        out.connectivityProfileIds.addAll([1,2,4])
-
-		assertEquals(
-				'jobGroupIds=[8, 9], pageIds=[1, 3, 8], measuredEventIds=[38, 77], browserIds[7], locationIds=[99, 101], connectivityProfileIds=[1, 2, 4]',
-				out.toString()
-        )
-	}
+        then: "the returned string should be equal to the expected one"
+        queryParamsString == 'jobGroupIds=[8, 9], pageIds=[1, 3, 8], measuredEventIds=[38, 77], browserIds[7], locationIds=[99, 101], connectivityProfileIds=[1, 2, 4]'
+    }
 }

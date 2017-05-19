@@ -42,7 +42,7 @@ class JobProcessingQuartzHandlerJob {
      * This map contains a {@link ReentrantLock} for each measurement job run to poll results for.
      * As key a combination of {@link Job} and {@link de.iteratec.osm.result.JobResult#testId} is used.
      */
-    static private pollingLocks = [:]
+    static private final pollingLocks = [:]
 
     /**
      * Entrypoint for all the dynamically scheduled and unscheduled quartz triggers
@@ -94,10 +94,7 @@ class JobProcessingQuartzHandlerJob {
     }
 
     private void handlePolling(Job job, String testId){
-        String lockKey = getLockKeyFor(job, testId)
-        if (!pollingLocks[lockKey]){
-            pollingLocks[lockKey] = new ReentrantLock();
-        }
+        String lockKey = getOrCreateLockKeyFor(job, testId)
         if (pollingLocks[lockKey].tryLock()) {
             try{
                 performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", 1) {
@@ -123,9 +120,23 @@ class JobProcessingQuartzHandlerJob {
      * @param testId
      *          The {@link de.iteratec.osm.result.JobResult#testId} of the job run to remove the polling lock from.
      */
-    static void removePollingLock(Job job, String testId){
+    static synchronized void removePollingLock(Job job, String testId){
         String lockKey = getLockKeyFor(job, testId)
         pollingLocks.remove(lockKey)
+    }
+
+    /**
+     * Creates the pollingLocks key for the given job and testId and creates the pollingLock if necessary
+     * @param job The job to create the lock for
+     * @param testId The testID to create the job for
+     * @return The lockKey, a key for the pollingLocks map
+     */
+    private static synchronized String getOrCreateLockKeyFor(Job job, String testId) {
+        String lockKey = getLockKeyFor(job, testId)
+        if (!pollingLocks[lockKey]){
+            pollingLocks[lockKey] = new ReentrantLock()
+        }
+        return lockKey
     }
 
     private static String getLockKeyFor(Job job, String testId) {

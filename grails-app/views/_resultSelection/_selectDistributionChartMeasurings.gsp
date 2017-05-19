@@ -7,7 +7,7 @@
     <div id="measurandSeries">
         <div class="row form-group">
             <label class="col-sm-3 control-label" for="selectedMeasurandSeries">
-                <g:message code="de.iteratec.osm.dimple.barchart.measurands"
+                <g:message code="de.iteratec.osm.barchart.measurands"
                            default="Measurands:"/>
             </label>
 

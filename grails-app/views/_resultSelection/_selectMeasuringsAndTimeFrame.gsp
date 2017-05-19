@@ -7,7 +7,7 @@ A row with the three cards: selectIntervalTimeframeCard, selectJobGroupCard, and
                   model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
                             'fromHour': fromHour, 'to': to, 'toHour': toHour,
                             'dateFormat': dateFormat, 'weekStart': weekStart,
-                            'csiAggregationIntervals': csiAggregationIntervals,
+                            'aggregationIntervals': aggregationIntervals,
                             'selectedInterval': selectedInterval]}"/>
     </div>
     <g:render template="/_resultSelection/selectMeasurings"

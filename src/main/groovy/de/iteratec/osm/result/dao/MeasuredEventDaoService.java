@@ -17,13 +17,10 @@
 
 package de.iteratec.osm.result.dao;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import de.iteratec.osm.csi.Page;
 import de.iteratec.osm.result.MeasuredEvent;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * <p>
@@ -51,30 +48,6 @@ public interface MeasuredEventDaoService {
 	 */
 	Set<MeasuredEvent> findAll();
 
-	/**
-	 * <p>
-	 * Gets {@link MeasuredEvent}s from db which test one of the given pages.
-	 * </p>
-	 * 
-	 * @param pages
-	 *            {@link Page}s that returned {@link MeasuredEvent}s must test.
-	 * 
-	 * @return All {@link MeasuredEvent}s that test one of the given
-	 *         {@link Page}s.
-	 */
-	List<MeasuredEvent> getEventsFor(List<Page> pages);
-
-	/**
-	 * <p>
-	 * Gets a {@link Map} with an entry for every persisted
-	 * {@link MeasuredEvent} from db.
-	 * </p>
-	 * 
-	 * @return Map with id of {@link MeasuredEvent}s as key and the objects
-	 *         itself as value.
-	 */
-	Map<Long, MeasuredEvent> getIdToObjectMap();
-	
 	/**
 	 * <p>
 	 * Tries to find a {@link MeasuredEvent} by its name.

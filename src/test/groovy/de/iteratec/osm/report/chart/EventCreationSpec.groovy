@@ -17,14 +17,13 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.api.ApiKey
-import de.iteratec.osm.api.CreateEventCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
-import grails.test.mixin.*
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import grails.validation.ValidationException
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.joda.time.Duration
 import spock.lang.Specification
 
 /**
@@ -32,19 +31,18 @@ import spock.lang.Specification
  */
 @TestFor(EventDaoService)
 @Mock([Event, JobGroup])
-class EventCreationSpec extends Specification{
+@Build([JobGroup])
+class EventCreationSpec extends Specification {
 
     EventDaoService serviceUnderTest
 
     static JobGroup group1, group2
 
-    void setup(){
+    void setup() {
         serviceUnderTest = service
         //test data common to all tests
-        JobGroup.withTransaction {
-            group1 = new JobGroup(name: 'JobGroup1').save(failOnError: true)
-            group2 = new JobGroup(name: 'JobGroup2').save(failOnError: true)
-        }
+        group1 = JobGroup.build()
+        group2 = JobGroup.build()
     }
 
     void "successful creation of event"() {
@@ -131,6 +129,7 @@ class EventCreationSpec extends Specification{
         //test written event
         Event.list().size() == 0
     }
+
     void "creation of event should fail cause eventTimestamp is null"() {
         setup:
         //test specific data
@@ -153,6 +152,7 @@ class EventCreationSpec extends Specification{
         //test written event
         Event.list().size() == 0
     }
+
     void "creation of event should fail cause globallyVisible is null"() {
         setup:
         //test specific data
