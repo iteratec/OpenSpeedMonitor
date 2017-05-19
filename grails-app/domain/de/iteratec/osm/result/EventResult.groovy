@@ -142,12 +142,12 @@ class EventResult implements CsiValue {
      * This result was measured with a predefined connectivity profile.
      *
      */
-    ConnectivityProfile connectivityProfile;
+    ConnectivityProfile connectivityProfile
     /**
      * If this is not null this result was measured with a connectivity configured in {@link Job}.
      *
      */
-    String customConnectivityName;
+    String customConnectivityName
     /**
      * True if this result was measured without traffic shaping at all.
      */
@@ -303,22 +303,22 @@ class EventResult implements CsiValue {
      * 			The associated {@link JobResult} of the given {@link EventResult}s
      * @return The created URL <code>null</code> if not possible to build up an URL
      */
-    public URL buildTestDetailsURL(JobResult jobRun, String waterfallAnchor) {
-        URL resultURL = null;
-        String urlString = null;
+    URL buildTestDetailsURL(JobResult jobRun, String waterfallAnchor) {
+        URL resultURL = null
+        String urlString = null
 
         if (jobRun) {
             urlString = jobRun.getWptServerBaseurl() + TEST_DETAILS_STATIC_URL + waterfallAnchor
-            urlString = urlString.replace("{testid}", jobRun.getTestId());
-            urlString = urlString.replace("{wptRun}", this.numberOfWptRun.toString());
-            urlString = urlString.replace("{cachedType}", (this.cachedView.toString() == "CACHED" ? "1" : "0"));
-            resultURL = new URL(urlString);
+            urlString = urlString.replace("{testid}", jobRun.getTestId())
+            urlString = urlString.replace("{wptRun}", this.numberOfWptRun.toString())
+            urlString = urlString.replace("{cachedType}", (this.cachedView.toString() == "CACHED" ? "1" : "0"))
+            resultURL = new URL(urlString)
         }
 
-        return resultURL;
+        return resultURL
     }
 
-    public String toString() {
+    String toString() {
         return "id=${this.id}\n" +
                 "\t\twptStatus=${this.wptStatus}\n" +
                 "\t\tmedianValue=${this.medianValue}\n" +

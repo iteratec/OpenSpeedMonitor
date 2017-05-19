@@ -15,6 +15,9 @@ testDataConfig {
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
             connectivityProfile = { -> ConnectivityProfile.build() }
         }
+        'de.iteratec.osm.result.EventResult' {
+            connectivityProfile = { -> ConnectivityProfile.build() }
+        }
         'de.iteratec.osm.csi.CsiConfiguration' {
             def i = 1
             label = {-> "labelIncrementedViaBuildTestDataConfig_${i++}" }
@@ -30,10 +33,10 @@ testDataConfig {
             page = {-> Page.build()}
             browser = {-> Browser.build()}
             location = {->Location.build()}
-
         }
     }
     unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
+                            'de.iteratec.osm.result.EventResult': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
                             'de.iteratec.osm.report.chart.CsiAggregation': [de.iteratec.osm.measurement.schedule.JobGroup,
                                                                             de.iteratec.osm.result.MeasuredEvent,
                                                                             de.iteratec.osm.csi.Page,
