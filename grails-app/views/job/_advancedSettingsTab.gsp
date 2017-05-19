@@ -33,8 +33,7 @@
 		</li>
 	</ul>
 </div>
-
-<div class="col-md-10">
+<div class="col-md-6">
 	<div class="tab-content">
 		<div id="AdvancedContent" class="tab-pane active">
 			<g:render template="advancedTab" model="${['job': job]}" />
@@ -56,4 +55,21 @@
 		</div>
 	</div>
 </div>
+
+	<div class="col-sm-3">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<i class="fa fa-info-circle" aria-hidden="true"></i>
+				<g:message code="default.info.title" default="Information"/>
+			</div>
+
+			<div class="panel-body">
+				<p><g:message code="job.description" /></p>
+				<img class="infoImage thumbnail" id="infoImage"
+					 src="${resource(dir: 'images', file: 'api.png')}"
+					 alt="API"/>
+			</div>
+		</div>
+	</div>
+
 </div>

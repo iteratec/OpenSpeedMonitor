@@ -137,35 +137,35 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
 }
 
 function registerLocationEventHandlers() {
-    document.getElementById('location').onchange = CheckChromeSelection
-    document.getElementById('chkbox-option_mobile').onchange = CheckMobileSelection
-    document.getElementById('chkbox-option_timeline').onchange = CheckTimelineSelection
-    CheckChromeSelection()
-    CheckMobileSelection()
-    CheckTimelineSelection()
+    $("#location").on("change",CheckChromeSelection);
+    $("#chkbox-option_mobile").on("change",CheckMobileSelection);
+    $("#chkbox-option_timeline").on("change",CheckTimelineSelection);
+    CheckChromeSelection();
+    CheckMobileSelection();
+    CheckTimelineSelection();
 
-    document.getElementById('inputField-option_takeScreenshots').onchange = UpdateScreenshotSelection
-    document.getElementById('inputField-option_userAgent').onchange = UpdateUserAgentSelection
-    UpdateScreenshotSelection()
-    UpdateUserAgentSelection()
+    $("#inputField-option_takeScreenshots").on("change",UpdateScreenshotSelection);
+    $("#inputField-option_userAgent").on("change",UpdateUserAgentSelection);
+    UpdateScreenshotSelection();
+    UpdateUserAgentSelection();
 }
 
 function UpdateScreenshotSelection() {
-    $("#option_iq").toggleClass("hidden", $("#inputField-option_takeScreenshots").val() != "default");
+    $("#option_iq").toggleClass("hidden", $("#inputField-option_takeScreenshots").val() != "DEFAULT");
 }
 
 function UpdateUserAgentSelection() {
-    $("#option_uastring").toggleClass("hidden", $("#inputField-option_userAgent").val() != "overwrite");
-    $("#option_appendua").toggleClass("hidden", $("#inputField-option_userAgent").val() != "append");
+    $("#option_uastring").toggleClass("hidden", $("#inputField-option_userAgent").val() != "OVERWRITE");
+    $("#option_appendua").toggleClass("hidden", $("#inputField-option_userAgent").val() != "APPEND");
 }
 
 function CheckMobileSelection() {
-    $("#option_mobileDevice").toggleClass("hidden", !this.checked);
-    $("#option_dpr").toggleClass("hidden", !this.checked);
+    $("#option_mobileDevice").toggleClass("hidden", !$("#chkbox-option_mobile").prop("checked"));
+    $("#option_dpr").toggleClass("hidden", !$("#chkbox-option_mobile").prop("checked"));
 }
 
 function CheckTimelineSelection() {
-    $("#option_timelineStack").toggleClass("hidden", !this.checked);
+    $("#option_timelineStack").toggleClass("hidden", !$("#chkbox-option_timeline").prop("checked"));
 }
 
 function CheckChromeSelection() {

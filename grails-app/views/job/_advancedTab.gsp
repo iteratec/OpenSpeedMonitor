@@ -1,21 +1,9 @@
 <div class="form-group ${hasErrors(bean: job, field: 'firstViewOnly', 'error')}">
-    <label for="chkbox-first-view" class="col-md-2 control-label">
-        <g:message code="job.firstView.label" default="first view"/>
-    </label>
-
-    <div class="col-md-10">
-        <div class="checkbox">
-            <input type="checkbox" id="chkbox-first-view" checked disabled>
-        </div>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: job, field: 'firstViewOnly', 'error')}">
-    <label for="chkbox-repeated-view" class="col-md-2 control-label">
+    <label for="chkbox-repeated-view" class="col-md-3 control-label">
         <g:message code="job.repeatedView.label" default="repeated view"/>
     </label>
 
-    <div class="col-md-10">
+    <div class="col-md-9">
         <div class="checkbox">
             <g:checkBox name="repeatedView" value="${job && !job.firstViewOnly ? true : false}" id="chkbox-repeated-view"/>
         </div>
@@ -29,22 +17,22 @@
 </g:each>
 
 <div class="form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
-    <label for="description" class="col-md-2 control-label">
+    <label for="description" class="col-md-3 control-label">
         <g:message code="job.description.label" default="description"/>
     </label>
 
-    <div class="col-md-10">
+    <div class="col-md-9">
         <textarea class="form-control" name="description" id="description"
                   rows="3">${job?.description?.trim()}</textarea>
     </div>
 </div>
 
 <div class="form-group">
-    <label for="tags" class="col-md-2 control-label">
+    <label for="tags" class="col-md-3 control-label">
         <g:message code="job.tags.label" default="tags"/>
     </label>
 
-    <div class="col-md-10">
+    <div class="col-md-9">
         <ul name="tags" id="tags">
             <g:each in="${job?.tags}">
                 <li>${it}</li>
@@ -54,7 +42,7 @@
 </div>
 
 <div class="form-group ${hasErrors(bean: job, field: 'maxDownloadTimeInMinutes', 'error')}">
-    <label class="col-md-2 control-label" for="maxDownloadTimeInMinutesValue">
+    <label class="col-md-3 control-label" for="maxDownloadTimeInMinutesValue">
         <abbr title="${message(code: 'job.maxDownloadTimeInMinutes.description', args: [defaultMaxDownloadTimeInMinutes])}"
               data-placement="bottom" rel="tooltip">
             <g:message code="job.maxDownloadTimeInMinutes.label" default="maxDownloadTimeInMinutes"/>
@@ -62,7 +50,7 @@
         <span class="required-indicator">*</span>
     </label>
 
-    <div class="col-md-8">
+    <div class="col-md-9">
         <span id="maxDownloadTimeInMinutes">
             <g:set var="isEditable" value="${job?.maxDownloadTimeInMinutes != defaultMaxDownloadTimeInMinutes}"/>
             <input type="text" class="form-control ${isEditable ? '' : 'non-editable'}"
@@ -80,12 +68,13 @@
 </div>
 
 <div class="form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
-    <label class="col-md-2 control-label" for="runs"><g:message
+    <label class="col-md-3 control-label" for="runs"><g:message
             code="job.runs.label" default="runs"/> <span
             class="required-indicator">*</span>
     </label>
-    <div class="col-md-8">
-        <g:textField class="form-control" name="runs" value="${job?.runs ?: 1}"/>
+    <div class="col-md-9">
+        %{--<g:textField class="form-control" name="runs" value="${job?.runs ?: 1}"/>--}%
+        <input id="runs" class="text short" min="1" max="9" name="runs" value="${job?.runs ?: 1}" required="" type="number"/>
     </div>
 </div>
 
@@ -106,10 +95,10 @@
 </g:each>
 
 <div id="option_saveBodies" class="form-group ${hasErrors(bean: job, field: option_saveBodies, 'error')}">
-    <label for="inputField-option_saveBodies" class="col-md-2 control-label">
+    <label for="inputField-option_saveBodies" class="col-md-3 control-label">
         <g:message code="job.option_saveBodies.label" default="option_saveBodies" />
     </label>
-    <div class="col-md-5">
+    <div class="col-md-3">
         <select id="inputField-option_saveBodies" name="option_saveBodies" class="form-control chosen">
             <option value="NONE" <g:if test="${job?.option_saveBodies==de.iteratec.osm.measurement.schedule.Job.SaveBodies.NONE}">selected</g:if>><g:message code="job.option_saveBodies.none" default="none" /></option>
             <option value="HTML" <g:if test="${job?.option_saveBodies==de.iteratec.osm.measurement.schedule.Job.SaveBodies.HTML}">selected</g:if>><g:message code="job.option_saveBodies.html" default="html" /></option>
@@ -119,10 +108,10 @@
 </div>
 
 <div id="option_takeScreenshots" class="form-group ${hasErrors(bean: job, field: option_takeScreenshots, 'error')}">
-    <label for="inputField-option_takeScreenshots" class="col-md-2 control-label">
+    <label for="inputField-option_takeScreenshots" class="col-md-3 control-label">
         <g:message code="job.option_takeScreenshots.label" default="option_takeScreenshots" />
     </label>
-    <div class="col-md-5">
+    <div class="col-md-3">
         <select id="inputField-option_takeScreenshots" name="option_takeScreenshots" class="form-control chosen">
             <option value="NONE"    <g:if test="${job?.option_takeScreenshots==de.iteratec.osm.measurement.schedule.Job.TakeScreenshots.NONE   }">selected</g:if>><g:message code="job.option_takeScreenshots.none" default="none" /></option>
             <option value="DEFAULT" <g:if test="${job?.option_takeScreenshots==de.iteratec.osm.measurement.schedule.Job.TakeScreenshots.DEFAULT}">selected</g:if>><g:message code="job.option_takeScreenshots.default" default="default" /></option>
@@ -134,10 +123,10 @@
 <g:render template="inputField" model="${['attribute': 'option_iq', 'job': job]}" />
 
 <div id="option_userAgent" class="form-group ${hasErrors(bean: job, field: option_userAgent, 'error')}">
-    <label for="inputField-option_userAgent" class="col-md-2 control-label">
+    <label for="inputField-option_userAgent" class="col-md-3 control-label">
         <g:message code="job.option_userAgent.label" default="option_userAgent" />
     </label>
-    <div class="col-md-5">
+    <div class="col-md-3">
         <select id="inputField-option_userAgent" name="option_userAgent" class="form-control chosen">
             <option value="DEFAULT"   <g:if test="${job?.option_userAgent==de.iteratec.osm.measurement.schedule.Job.UserAgent.DEFAULT  }">selected</g:if>><g:message code="job.option_userAgent.default" default="default" /></option>
             <option value="ORIGINAL"  <g:if test="${job?.option_userAgent==de.iteratec.osm.measurement.schedule.Job.UserAgent.ORIGINAL }">selected</g:if>><g:message code="job.option_userAgent.original" default="original" /></option>

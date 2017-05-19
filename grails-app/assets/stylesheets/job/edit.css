@@ -16,6 +16,12 @@
     color: #999;
 }
 
+.infoImage {
+    margin: 0 auto;
+    max-height: 200px;
+    max-width: 100%;
+}
+
 .popover {
     max-width: 600px;
     width: auto;
