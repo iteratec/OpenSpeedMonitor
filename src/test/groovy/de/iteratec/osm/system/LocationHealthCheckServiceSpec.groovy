@@ -4,34 +4,34 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
+
 @TestFor(LocationHealthCheckService)
-@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup, OsmConfiguration, BatchActivity])
+@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
+        OsmConfiguration, BatchActivity])
+@Build([Location, JobResult, OsmConfiguration, LocationHealthCheck])
 class LocationHealthCheckServiceSpec extends Specification {
 
-    List<JobResult> jobResults
-    int expectedNumberOfAgents = 2
-    int expectedNumberOfJobResultsNextHour = 3
-    int expectedNumberOfEventResultsNextHour = 9
-    int expectedNumberOfPendingJobsInWpt = 0
-    int expectedNumberOfJobResultsLastHour = 2
-    int expectedNumberOfEventResultsLastHour = 6
-    int expectedNumberOfErrorsLastHour
+    private List<JobResult> jobResults
+    private int expectedNumberOfAgents = 2
+    private int expectedNumberOfJobResultsNextHour = 3
+    private int expectedNumberOfEventResultsNextHour = 9
+    private int expectedNumberOfPendingJobsInWpt = 0
+    private int expectedNumberOfJobResultsLastHour = 2
+    private int expectedNumberOfEventResultsLastHour = 6
+    private int expectedNumberOfErrorsLastHour
     private Location location
-    public static final INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
+    private static int INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
 
     def setup() {
         createTestDataCommonForAllTests()
@@ -55,7 +55,7 @@ class LocationHealthCheckServiceSpec extends Specification {
         )
         GPathResult getTestersResponseMockedInThisTest = null
 
-        when: "runHealthCheckForLocation is called with a location"
+        when: "runHealthCheckForLocation is called with a location and no graphite server exists"
         service.runHealthCheckForLocation(locationWithXmlNode, getTestersResponseMockedInThisTest)
         List<LocationHealthCheck> locationHealthChecks = LocationHealthCheck.list()
 
@@ -76,14 +76,14 @@ class LocationHealthCheckServiceSpec extends Specification {
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
         DateTime now = new DateTime()
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-1)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-2)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-3)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS-4)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3)).save(validate: false)
-        new LocationHealthCheck(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4)).save(validate: false)
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3).toDate())
+        LocationHealthCheck.build(date: now.plusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+1).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+2).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+3).toDate())
+        LocationHealthCheck.build(date: now.minusDays(INTERNAL_MONITORING_STORAGETIME_IN_DAYS+4).toDate())
 
         when: "cleanupHealthChecks is called"
         service.cleanupHealthChecks()
@@ -93,45 +93,35 @@ class LocationHealthCheckServiceSpec extends Specification {
         locationHealthChecks.size() == 4
     }
 
-    public void createTestDataCommonForAllTests() {
-        location = TestDataUtil.createLocation()
-        Script script = TestDataUtil.createScript()
-        JobGroup jobGroup = TestDataUtil.createJobGroup("jobGroup")
-        Job job = TestDataUtil.createJob("job", script, this.location, jobGroup)
+    private void createTestDataCommonForAllTests() {
+        location = Location.build()
         jobResults = []
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 100)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 100)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 101)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 200)
-        jobResults << TestDataUtil.createJobResult("testid", new Date(), job, this.location, 200)
-        TestDataUtil.createOsmConfig()
+        2.times {
+            jobResults << JobResult.build(httpStatusCode: 100)
+        }
+        jobResults << JobResult.build(httpStatusCode: 101)
+        2.times {
+            jobResults << JobResult.build(httpStatusCode: 200)
+        }
+        OsmConfiguration.build()
     }
 
 
-    void prepareMocksCommonForAllTests(){
-        QueueAndJobStatusService queueAndJobStatusService = new QueueAndJobStatusService()
-        queueAndJobStatusService.metaClass.getExecutingJobResults = { Location location ->
-            return jobResults
-        }
-        queueAndJobStatusService.metaClass.getNumberOfJobsAndEventsDueToRunFromNowUntil = { Location location, Date untilWhen ->
-            return [jobs: expectedNumberOfJobResultsNextHour, events: expectedNumberOfEventResultsNextHour]
-        }
-        queueAndJobStatusService.metaClass.getNumberOfAgents = { Object locationTag, Object agentsResponse ->
-            return expectedNumberOfAgents
-        }
-        queueAndJobStatusService.metaClass.getNumberOfPendingJobsFromWptServer = { Object locationTag ->
-            return expectedNumberOfPendingJobsInWpt
-        }
-        queueAndJobStatusService.metaClass.getFinishedJobResultCountSince = { Location location, Date sinceWhen ->
-            return expectedNumberOfJobResultsLastHour
-        }
-        queueAndJobStatusService.metaClass.getEventResultCountBetween = { Location location, Date from, Date to ->
-            return expectedNumberOfEventResultsLastHour
-        }
-        queueAndJobStatusService.metaClass.getErroneousJobResultCountSince = { Location location, Date sinceWhen ->
-            return expectedNumberOfErrorsLastHour
-        }
-        service.queueAndJobStatusService = queueAndJobStatusService
+    private void prepareMocksCommonForAllTests(){
+        mockQueueAndJobStatusService()
+    }
+
+    private mockQueueAndJobStatusService() {
+
+        service.queueAndJobStatusService = Stub(QueueAndJobStatusService)
+        service.queueAndJobStatusService.getExecutingJobResults(_) >> jobResults
+        service.queueAndJobStatusService.getNumberOfJobsAndEventsDueToRunFromNowUntil(_, _) >> [jobs: expectedNumberOfJobResultsNextHour, events: expectedNumberOfEventResultsNextHour]
+        service.queueAndJobStatusService.getNumberOfAgents(_, _) >> expectedNumberOfAgents
+        service.queueAndJobStatusService.getNumberOfPendingJobsFromWptServer(_) >> expectedNumberOfPendingJobsInWpt
+        service.queueAndJobStatusService.getFinishedJobResultCountSince(_, _) >> expectedNumberOfJobResultsLastHour
+        service.queueAndJobStatusService.getEventResultCountBetween(_, _, _) >> expectedNumberOfEventResultsLastHour
+        service.queueAndJobStatusService.getErroneousJobResultCountSince(_, _) >> expectedNumberOfErrorsLastHour
+
     }
 
 }

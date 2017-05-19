@@ -17,13 +17,11 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import static org.junit.Assert.assertEquals
-import grails.test.mixin.Mock
-
-import org.junit.*
-
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 /**
  * Utility class for parsing and validating placeholders used in Scripts and Jobs
@@ -31,30 +29,52 @@ import de.iteratec.osm.measurement.script.Script
  * @author dri
  */
 @Mock([Script])
-class PlaceholdersUtilityTests {
-	/**
-	 * This test checks the script templating mechanism.
-	 * It creates a template containing two variables but only supplies data
-	 * for the first variable. Expected behavior: The first variable is replaced
-	 * with the supplied data, the second variable with an empty string.
-	 */
-	@Test
-	void testGetParsedNavigationScript() {
-		String template = 'navigate ${targeturl} ${aksdhasjkdhsajkdh}'
-		Map variables = [targeturl: 'http://example.com']
-		
-		Script script = new Script(
-			label: 'Testskript',
-			description: 'Beschreibung',
-			navigationScript: template,
-			validationRequest: 'foo'
-		);
-		script.save(failOnError: true);
-		
-		String targeturl = 'http://example.com'
-		String evaluatedTemplateOneVar = "navigate ${targeturl} "
-		String evaluatedTemplateNoVar = "navigate  "
-		assertEquals(evaluatedTemplateOneVar, PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, variables));
-		assertEquals(evaluatedTemplateNoVar, PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, null));
-	}
+@Build(Script)
+class PlaceholdersUtilityTests extends Specification{
+
+    public static final String NAV_SCRIPT_USING_VARS = 'setEventName ${eventName}\nnavigate ${targeturl}'
+
+    void "parametrized navigationScript parsing given all used variables"() {
+        given: "a script using multiple variables"
+        Map fullScriptVariableMap = [
+            targeturl: 'http://example.com',
+            eventName: 'HOMEPAGE'
+        ]
+        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+
+        when: "this script get parsed with a variable map containing all variables"
+        String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, fullScriptVariableMap)
+
+        then: "all variables in the script got replaced correctly"
+        parsedWithVariables == 'setEventName HOMEPAGE\nnavigate http://example.com'
+    }
+
+    void "parametrized navigationScript parsing given just some of the used variables"() {
+        given: "a script using multiple variables"
+        Map incompleteScriptVariableMap = [
+                targeturl: 'http://example.com',
+        ]
+        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+
+        when: "this script get parsed with a variable map containing just one of two variables"
+        String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, incompleteScriptVariableMap)
+
+        then: "no exception was thrown, the variables contained in variable map got replaced  respective map values, the rest " +
+                "got replaced with empty String"
+        parsedWithVariables == 'setEventName \nnavigate http://example.com'
+    }
+
+    void "parametrized navigationScript parsing given no variables"() {
+        given: "a script using multiple variables"
+        Map emptyScriptVariableMap = [:]
+        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+
+        when: "this script get parsed with an empty variable map"
+        String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, emptyScriptVariableMap)
+
+        then: "no exception was thrown and all variables got replaced with empty String"
+        parsedWithVariables == 'setEventName \nnavigate '
+    }
+
+
 }

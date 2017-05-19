@@ -108,26 +108,6 @@ class DefaultMeasuredEventDaoServiceTests extends Specification {
 //
 //    }
 
-	void "Service method getIdToObjectMap() provides an id to object map of all persisted MeasuredEvents"() {
-
-		setup: "Create test-specific MeasuredEvents."
-        Page hp = Page.findByName(nameHp)
-		MeasuredEvent event1 = createMeasuredEvents('event1', hp)
-		MeasuredEvent event2 = createMeasuredEvents('event2', hp)
-		MeasuredEvent event3 = createMeasuredEvents('event3', hp)
-		MeasuredEvent event4 = createMeasuredEvents('event4', hp)
-
-        when: "Service method getIdToObjectMap() is called."
-        Map<Long, MeasuredEvent> idToObjectMap = serviceUnderTest.getIdToObjectMap()
-
-	    then: "The response is an id to object map representing all persisted MeasuredEvents."
-        idToObjectMap == [
-                (event1.ident()) : event1,
-                (event2.ident()) : event2,
-                (event3.ident()) : event3,
-                (event4.ident()) : event4
-            ]
-	}
 
     //helper methods///////////////////////////////////////////////////////////
 	

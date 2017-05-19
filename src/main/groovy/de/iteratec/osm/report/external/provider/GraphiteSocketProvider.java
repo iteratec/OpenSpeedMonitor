@@ -45,7 +45,8 @@ public interface GraphiteSocketProvider {
 	}
 
 	/**
-	 * Returns a {@link GraphiteSocket} for given server
+	 * Returns a {@link GraphiteSocket} for given server. Protocol
+     * of returned socket is UDP or TCP respective {@link GraphiteServer#reportProtocol}.
 	 * 
 	 * @param server
 	 *            the server to connect to

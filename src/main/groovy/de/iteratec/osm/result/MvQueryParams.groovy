@@ -22,16 +22,6 @@ package de.iteratec.osm.result
  * Assembles params which are used to query {@link CsiAggregation}s via tag.
  * </p>
  *
- * <p>
- * TODO mze-2013-08-06 (architecture): A note on collections usage: 
- * Mostly the best way to deal with collections is to modify them by 
- * "yourself" only (in the corresponding class). In a simple class like this
- * the collections contents (!) may be modified from outside, 
- * BUT a collections should never be "settable" from outside, so suggest 
- * to make the setter private and fill the collections instead of 
- * setting them! :)
- * </p>
- *
  * @author nkuhn
  * @author mze
  */

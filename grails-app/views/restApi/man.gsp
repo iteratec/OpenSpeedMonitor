@@ -492,7 +492,11 @@
                        </dd>
                        <dt>csiConfiguration</dt>
                        <dd>
-                           MANDATORY<br>The name of the csiConfiguration to use for calculation
+                           OPTIONAL<br>The name of the csiConfiguration to use for calculation. If omitted a system has to be given instead.
+                       </dd>
+                       <dt>system</dt>
+                       <dd>
+                           OPTIONAL<br>The name of the measurement system to use for calculation. If omitted a csiConfiguration has to be given instead.
                        </dd>
                       </dl>
 

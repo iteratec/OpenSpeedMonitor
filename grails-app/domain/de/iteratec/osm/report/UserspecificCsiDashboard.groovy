@@ -18,7 +18,6 @@
 package de.iteratec.osm.report
 
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
-
 /**
  * UserspecificCsiDashboard
  * A domain class describes the data object and it's mapping to the database
@@ -45,6 +44,8 @@ class UserspecificCsiDashboard extends UserspecificDashboardBase{
      */
     String selectedCsiSystems = ""
 
+    boolean overwriteWarningAboutLongProcessingTime = false
+
     boolean csiTypeDocComplete
     boolean csiTypeVisuallyComplete
 
@@ -58,69 +59,27 @@ class UserspecificCsiDashboard extends UserspecificDashboardBase{
     }
 
     UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, Boolean publiclyVisible,
-                             String wideScreenDiagramMontage, String dashboardName, String username) {
-        this.publiclyVisible = publiclyVisible
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
-        this.dashboardName = dashboardName
-        this.username = username
-
-        // Get data from command
-        debug = cmd.debug
-        fromDate = cmd.from
-        toDate = cmd.to
-        fromHour = cmd.fromHour
-        toHour = cmd.toHour
+                             String dashboardName, String username) {
+        super(cmd, dashboardName, publiclyVisible, username)
         aggrGroup = cmd.aggrGroupAndInterval
-        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         includeInterval = cmd.includeInterval
-        setFromHour = cmd.setFromHour
-        setToHour = cmd.setToHour
-        selectedAllMeasuredEvents = cmd.selectedAllMeasuredEvents
-        selectedAllBrowsers = cmd.selectedAllBrowsers
-        selectedAllLocations = cmd.selectedAllLocations
-        graphNameAliases = cmd.graphNameAliases
-        graphColors = cmd.graphColors
-        selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
-        selectedConnectivities = cmd.selectedConnectivities
-
-        // Create strings for db
-        String selectedFolderString = ""
-        String selectedPagesString = ""
-        String selectedMeasuredEventIdsString = ""
-        String selectedBrowsersString = ""
-        String selectedLocationsString = ""
-        String selectedCsiSystemsString = ""
-
-        // generate Strings for db
-        cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
-        // trim last comma
-        if(selectedFolderString.length() > 0) selectedFolderString = selectedFolderString.substring(0, selectedFolderString.length()-1)
-
-        cmd.selectedPages.each {f -> selectedPagesString += f + ","}
-        if(selectedPagesString.length() > 0) selectedPagesString = selectedPagesString.substring(0, selectedPagesString.length()-1)
-        cmd.selectedMeasuredEventIds.each {f -> selectedMeasuredEventIdsString += f + ","}
-        if(selectedMeasuredEventIdsString.length() > 0) selectedMeasuredEventIdsString = selectedMeasuredEventIdsString.substring(0, selectedMeasuredEventIdsString.length()-1)
-        cmd.selectedBrowsers.each {f -> selectedBrowsersString += f + ","}
-        if(selectedBrowsersString.length() > 0) selectedBrowsersString = selectedBrowsersString.substring(0, selectedBrowsersString.length()-1)
-        cmd.selectedLocations.each {f -> selectedLocationsString += f + ","}
-        if(selectedLocationsString.length() > 0) selectedLocationsString = selectedLocationsString.substring(0, selectedLocationsString.length()-1)
-        cmd.selectedCsiSystems.each {f -> selectedCsiSystemsString += f + ","}
-        if(selectedCsiSystemsString.length() > 0) selectedCsiSystemsString = selectedCsiSystemsString.substring(0, selectedCsiSystemsString.length()-1)
-
-        selectedFolder = selectedFolderString
-        selectedPages = selectedPagesString
-        selectedMeasuredEventIds = selectedMeasuredEventIdsString
-        selectedBrowsers = selectedBrowsersString
-        selectedLocations = selectedLocationsString
-        selectedCsiSystems = selectedCsiSystemsString
-        chartTitle = cmd.chartTitle
-        chartWidth = cmd.chartWidth
-        chartHeight = cmd.chartHeight
-        loadTimeMinimum = cmd.loadTimeMinimum
-        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
-        showDataMarkers = cmd.showDataMarkers
-        showDataLabels = cmd.showDataLabels
+        selectedCsiSystems = cmd.selectedCsiSystems.join(",")
+        overwriteWarningAboutLongProcessingTime = cmd.overwriteWarningAboutLongProcessingTime
         csiTypeDocComplete = cmd.csiTypeDocComplete
         csiTypeVisuallyComplete = cmd.csiTypeVisuallyComplete
+    }
+
+    void fillCommand(CsiDashboardShowAllCommand cmd) {
+        super.fillCommand(cmd)
+        cmd.aggrGroupAndInterval = aggrGroup
+        cmd.includeInterval = includeInterval
+        if (selectedCsiSystems) {
+            for (item in selectedCsiSystems.tokenize(',')) {
+                cmd.selectedCsiSystems.add(Long.parseLong(item))
+            }
+        }
+        cmd.overwriteWarningAboutLongProcessingTime = overwriteWarningAboutLongProcessingTime
+        cmd.csiTypeVisuallyComplete = csiTypeVisuallyComplete
+        cmd.csiTypeDocComplete = csiTypeDocComplete
     }
 }

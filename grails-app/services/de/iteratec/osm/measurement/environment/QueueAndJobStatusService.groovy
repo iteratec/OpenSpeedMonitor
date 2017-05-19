@@ -42,6 +42,11 @@ import org.quartz.CronExpression
 @Transactional
 class QueueAndJobStatusService {
 
+    /**
+     * If a wpt agents last check time exceeds this value it is assumed not to be an active agent.
+     */
+    public static final int AGENTS_CHECKTIME_THRESHOLD_IN_MINUTES = 30
+
     HttpRequestService httpRequestService
     I18nService i18nService
     JobService jobService
@@ -51,10 +56,9 @@ class QueueAndJobStatusService {
 
     /**
      * Retrieves only those locations for the given WebPageTestServer from the database which are also returned
-     * when querying getLocations.php
+     * when querying getLocations.php and who are active in osm database.
      *
-     * @return A list of maps. Each map's key is the retrieved Location and its value is the <location> tag in the XML
-     *  	response returned by getLocations.php
+     * @return A list of {@link LocationWithXmlNode}.
      */
     List<LocationWithXmlNode> getActiveLocations(WebPageTestServer wptServer) {
         GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
@@ -66,7 +70,7 @@ class QueueAndJobStatusService {
                 browsersForLocation.each { Browser currentBrowser ->
                     String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
                     Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, uniqueIdentfierForServer)
-                    if (location)
+                    if (location && location.active)
                         locations << new LocationWithXmlNode(
                                 location: location,
                                 locationXmlNode: locationTagInXml
@@ -165,13 +169,18 @@ class QueueAndJobStatusService {
     }
 
     /**
-     * Retrieve number of agents from getTester.php which match a location returned by getLocations.php
+     * Retrieve number of active agents from getTester.php which match a location returned by getLocations.php
      */
-    Integer getNumberOfAgents(Object locationTag, Object agentsResponse) {
-        Object agentLocation = agentsResponse.data.location.find { agentLocationTag ->
-            agentLocationTag.id.text() == locationTag.location.text()
+    Integer getNumberOfAgents(GPathResult locationTagFromGetLocations, GPathResult getTestersResponse) {
+        GPathResult locationTagFromGetTesters = getTestersResponse.data.location.find { locationTagFromGetTesters ->
+            locationTagFromGetTesters.id.text() == locationTagFromGetLocations.location.text()
         }
-        return agentLocation?.testers.size()
+        if (locationTagFromGetTesters == null){
+            String message = "Location '${locationTagFromGetLocations.location.text()}' couldn't be found in getTesters response."
+            log.error(message)
+            throw new IllegalArgumentException(message)
+        }
+        return getNumberOfActiveLocations(locationTagFromGetTesters)
     }
 
     Integer getNumberOfPendingJobsFromWptServer(Object locationTag) {
@@ -232,7 +241,11 @@ class QueueAndJobStatusService {
             Map<String, Integer> locationsAndTesterCount = getActiveLocationsAndTesterCount(server)
 
             locationsAndTesterCount.each { locString, agentCount ->
-                ScheduleChartData locationChartData = new ScheduleChartData(name: locString, discountedJobsLabel: discountedJobsLabel, agentCount: agentCount)
+                ScheduleChartData locationChartData = new ScheduleChartData(
+                    name: locString,
+                    discountedJobsLabel: discountedJobsLabel,
+                    agentCount: agentCount
+                )
 
                 // collect all Jobs
                 List<Job> jobs = []
@@ -248,7 +261,13 @@ class QueueAndJobStatusService {
 
                         // Add jobs which are going to run in given interval to the list
                         // otherwise the job is added to the list of discounted jobs
-                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + job.location.browser.name + ")", durationInSeconds: seconds, linkId: job.id)
+                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(
+                            executionDates: jobService.getExecutionDatesInInterval(job, start, end),
+                            name: job.label,
+                            description: "(" + job.location.browser.name + ")",
+                            durationInSeconds: seconds,
+                            linkId: job.id
+                        )
                         if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
                             locationChartData.addJob(scheduleChartJob)
                         } else {
@@ -274,40 +293,35 @@ class QueueAndJobStatusService {
     private Map<String, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
         Map<String, Integer> result = new HashMap<>();
 
-        GPathResult gPathResult = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
+        GPathResult getTestersResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
 
-        gPathResult.data.location.each { locationTagInXml ->
-            int agents = 0
+        getTestersResponse.data.location.each { GPathResult locationTagInXml ->
+
             String currentLocation = locationTagInXml.id
-
             if (currentLocation) {
-                locationTagInXml.testers.tester.each { t ->
-                    agents++
-                }
-
-                if (agents == 0 || minOneTesterHasLastCheckUnderThreshold(locationTagInXml)) {
-                    result.put(currentLocation, agents)
-                }
+                result.put(currentLocation, getNumberOfActiveLocations(locationTagInXml))
             }
+
         }
 
         return result;
     }
 
     /**
-     * Checks if at least one tester has 'last check' under a threshold
-     * @param locationTagInXML
-     * @return true , if at least one tester has 'last check' under threshold
+     * Gets number of active locations in given locationTagInGetTestersXml.
+     * A location is defined as active if its elapsed time in minutes is smaller
+     * {@link #AGENTS_CHECKTIME_THRESHOLD_IN_MINUTES}.
+     * @param locationTagInGetTestersXml
+     * @return
      */
-    private boolean minOneTesterHasLastCheckUnderThreshold(def locationTagInXML) {
-        boolean result = false
-
-        locationTagInXML.testers.tester.each { t ->
-            if (Integer.parseInt(t.elapsed.toString()) < 20000) // TODO adjust value
-                result = true
+    static Integer getNumberOfActiveLocations(GPathResult locationTagInGetTestersXml){
+        Integer numberOfActiveLocations = 0
+        if(locationTagInGetTestersXml?.testers?.tester?.size() > 0){
+            numberOfActiveLocations = locationTagInGetTestersXml.testers.tester.find{ tester ->
+                Integer.parseInt(tester.elapsed.toString()) < AGENTS_CHECKTIME_THRESHOLD_IN_MINUTES
+            }.size()
         }
-
-        return result
+        return numberOfActiveLocations
     }
 
 }

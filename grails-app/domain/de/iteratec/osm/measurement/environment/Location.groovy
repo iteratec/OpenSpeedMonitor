@@ -71,20 +71,17 @@ class Location {
         wptServer(nullable: false)
     }
 
-    static mapping = {
-        //locations cascade: "all-delete-orphan"
-    }
-
     /**
-     * Removes browser.name from labelWithBrowser if it is preceded by a non-word character
-     * So if browser.name == 'Chrome' and labelWithBrowser == 'Agent3-wptdriver:Chrome', 'Agent3-wptdriver' is returned
-     */
-    public String removeBrowser(String labelWithBrowser) {
+    * Removes browser.name from labelWithBrowser if it is preceded by a non-word character
+    * So if browser.name == 'Chrome' and labelWithBrowser == 'Agent3-wptdriver:Chrome', 'Agent3-wptdriver' is returned
+    */
+    String removeBrowser(String labelWithBrowser) {
         return (!browser) ? labelWithBrowser : labelWithBrowser - ~/\W${browser.name}$/
     }
 
-    @Override	// Override toString for a nicer / more descriptive UI
-    public String toString() {
+
+    @Override
+    String toString() {
         return this.location + ' @ ' + this.wptServer?.label + ' (' + this.browser?.name + ')'
     }
 }

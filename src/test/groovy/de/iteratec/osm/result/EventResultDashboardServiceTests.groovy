@@ -699,9 +699,6 @@ class EventResultDashboardServiceTests extends Specification {
      */
     private void mockJobGroupDaoService() {
         def jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
-        jobGroupDaoService.metaClass.getIdToObjectMap = { ->
-            return [1: JobGroup.get(1), 2: JobGroup.get(2)]
-        }
         serviceUnderTest.jobGroupDaoService = jobGroupDaoService
     }
     /**
@@ -709,9 +706,6 @@ class EventResultDashboardServiceTests extends Specification {
      */
     private void mockPageDaoService() {
         def pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
-        pageDaoService.metaClass.getIdToObjectMap = { ->
-            return [1: Page.get(1), 2: Page.get(2)]
-        }
         serviceUnderTest.pageDaoService = pageDaoService
     }
     /**
@@ -719,9 +713,6 @@ class EventResultDashboardServiceTests extends Specification {
      */
     private void mockBrowserDaoService() {
         def browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
-        browserDaoService.metaClass.getIdToObjectMap = { ->
-            return [1: Browser.get(1), 2: Browser.get(2)]
-        }
         serviceUnderTest.browserDaoService = browserDaoService
     }
     /**
@@ -729,21 +720,11 @@ class EventResultDashboardServiceTests extends Specification {
      */
     private void mockLocationDaoService() {
         def locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
-        locationDaoService.metaClass.getIdToObjectMap = { ->
-            return [1: Location.get(1), 2: Location.get(2)]
-        }
         serviceUnderTest.locationDaoService = locationDaoService
     }
 
     private mockAggregatorTypeDaoService() {
         def aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
-        aggregatorTypeDaoService.metaClass.getNameToObjectMap = { ->
-            Map<String, AggregatorType> map = [
-                    (AggregatorType.RESULT_CACHED_DOM_TIME)  : AggregatorType.findByName(AggregatorType.RESULT_CACHED_DOM_TIME),
-                    (AggregatorType.RESULT_UNCACHED_DOM_TIME): AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOM_TIME)
-            ]
-            return map
-        }
         serviceUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoService
     }
 }

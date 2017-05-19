@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -33,6 +34,7 @@ import org.joda.time.DateTimeZone
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import spock.lang.Specification
 
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.is
@@ -44,8 +46,9 @@ import static org.junit.Assert.assertThat
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiAggregationDaoService)
-@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, AggregatorType, JobGroup, MeasuredEvent, Page, Browser, Location])
-class CsiAggregationDaoServiceSpec {
+@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, AggregatorType])
+@Build([CsiAggregation])
+class CsiAggregationDaoServiceSpec extends Specification {
 
     CsiAggregationDaoService serviceUnderTest
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
@@ -55,8 +58,7 @@ class CsiAggregationDaoServiceSpec {
         csiAggregationUtilService(CsiAggregationUtilService)
     }
 
-    @Before
-    public void setUp() {
+    def setup() {
 
         serviceUnderTest = service
 
@@ -69,56 +71,29 @@ class CsiAggregationDaoServiceSpec {
         eventAggregator = new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
     }
 
-    @After
-    public void tearDown() {
-        // Tear down logic here
-    }
-
-    @Test
-    public void testGetUpdateEvents() {
-
-        //create test-specific data
-
+    def "test getUpdateEvents"() {
+        given:
         Date timestamp1 = new DateTime(2014, 6, 25, 0, 1, 0).toDate()
         Date timestamp2 = new DateTime(2014, 6, 25, 0, 2, 0).toDate()
         Date timestamp3 = new DateTime(2014, 6, 25, 0, 3, 0).toDate()
-        new CsiAggregationUpdateEvent(
-                dateOfUpdate: timestamp1,
-                csiAggregationId: 1,
-                updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
-        ).save(failOnError: true)
-        new CsiAggregationUpdateEvent(
-                dateOfUpdate: timestamp2,
-                csiAggregationId: 1,
-                updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
-        ).save(failOnError: true)
-        new CsiAggregationUpdateEvent(
-                dateOfUpdate: timestamp3,
-                csiAggregationId: 1,
-                updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
-        ).save(failOnError: true)
-
-        //execute tests and assertions
-
+        new CsiAggregationUpdateEvent( dateOfUpdate: timestamp1, csiAggregationId: 1, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED ).save(failOnError: true)
+        new CsiAggregationUpdateEvent( dateOfUpdate: timestamp2, csiAggregationId: 1, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED ).save(failOnError: true)
+        new CsiAggregationUpdateEvent( dateOfUpdate: timestamp3, csiAggregationId: 1, updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED ).save(failOnError: true)
         List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
-        assertThat(updateEvents.size(), is(3))
-
         List<CsiAggregationUpdateEvent> updateEventsThatRequireRecalculation = updateEvents.findAll {
             it.updateCause.requiresRecalculation
         }
-        assertThat(updateEventsThatRequireRecalculation.size(), is(1))
-
         List<CsiAggregationUpdateEvent> updateEventsThatDoesNotRequireRecalculation = updateEvents.findAll {
             !it.updateCause.requiresRecalculation
         }
-        assertThat(updateEventsThatDoesNotRequireRecalculation.size(), is(2))
+
+        expect:
+        updateEventsThatRequireRecalculation.size() == 1
+        updateEventsThatDoesNotRequireRecalculation.size() == 2
     }
 
-    @Test
-    public void testGetUpdateEventsForSpecificCsiAggregations() {
-
-        //create test-specific data
-
+    def "test getUpdateEvents for specific csiAggregations"() {
+        given:
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
@@ -133,30 +108,26 @@ class CsiAggregationDaoServiceSpec {
         def mvWithOneEvent = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
         createUpdateEventForCsiAggregation(mvWithOneEvent, false, false)
 
-        // proof test-specific data
-
-        List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
-        assertThat(updateEvents.size(), is(6))
-        assertThat(CsiAggregation.get(1).started, is(date_20140928))
-        assertThat(CsiAggregation.get(2).started, is(date_20140929))
-        assertThat(CsiAggregation.get(3).started, is(date_20140930))
-
-        //execute tests and assertions
-
-        assertThat(serviceUnderTest.getUpdateEvents([mvWithFiveEvents.ident()]).size(), is(5))
-        assertThat(serviceUnderTest.getUpdateEvents([mvWithoutEvents.ident()]).size(), is(0))
-        assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident()]).size(), is(1))
-        assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident(), mvWithFiveEvents.ident(), mvWithoutEvents.ident()]).size(), is(6))
-
-        List<CsiAggregation> emptyList = []
-        assertThat(serviceUnderTest.getUpdateEvents(emptyList*.ident()).size(), is(0))
-
+        expect:
+        serviceUnderTest.getUpdateEvents(mvWithFiveEvents*.id).size() == 5
+        serviceUnderTest.getUpdateEvents(mvWithoutEvents*.id).size() == 0
+        serviceUnderTest.getUpdateEvents(mvWithOneEvent*.id).size() == 1
+        serviceUnderTest.getUpdateEvents([mvWithOneEvent.id, mvWithFiveEvents.id, mvWithoutEvents.id]).size() == 6
     }
 
-    @Test
-    public void testGetOpenHourlyEventCsiAggregationsWhosIntervalExpiredForAtLeast() {
+    def "test getUpdateEvents with an empty list"(){
+        given: "some data that hopefully won't change our result"
+        Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
+        def mvWithFiveEvents = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
+        createUpdateEventForCsiAggregation(mvWithFiveEvents, true, false)
+        createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
 
-        //create test-specific data
+        expect:
+        serviceUnderTest.getUpdateEvents([]).size() == 0
+    }
+
+    def 'test getOpenHourlyEventCsiAggregationsWhosIntervalExpiredForAtLeast with non expired'() {
+        given:
         Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
@@ -165,35 +136,67 @@ class CsiAggregationDaoServiceSpec {
         createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
         List<CsiAggregation> openAndExpired
 
-        //test specific mocks, test executions and assertions
-
-        //no ones are expired
+        when:
         mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC))
         openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(0))
-        //some are expired and some not
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 9, 15, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(45)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(16)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(15)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928_0800))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928_0800))
-        //all expired
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 11, 30, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(30)
-        assertThat(openAndExpired.size(), is(3))
-
+        then:
+        openAndExpired.size() == 0
     }
 
-    @Test
-    public void testGetOpenDailyPageCsiAggregationsWhosIntervalExpiredForAtLeast() {
+    def 'test getOpenHourlyEventCsiAggregationsWhosIntervalExpiredForAtLeast with some expired'() {
+        given:
+        Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0800)
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0900)
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 9, 15, 0, DateTimeZone.UTC))
 
-        //create test-specific data
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(45)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(16)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(15)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928_0800
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928_0800
+    }
+
+    def 'test getOpenHourlyEventCsiAggregationsWhosIntervalExpiredForAtLeast with all expired'() {
+        given:
+        Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0800)
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0900)
+        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
+        List<CsiAggregation> openAndExpired
+
+        when:
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 11, 30, 0, DateTimeZone.UTC))
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(30)
+
+        then:
+        openAndExpired.size() == 3
+    }
+
+    def "test GetOpenDailyPageCsiAggregationsWhosIntervalExpiredForAtLeast with non expired"() {
+        given:
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
@@ -202,33 +205,66 @@ class CsiAggregationDaoServiceSpec {
         createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
-        //test specific mocks, test executions and assertions
-
-        //no ones are expired
+        when:
         mockCsiAggregationUtilService(new DateTime(2014, 9, 26, 0, 0, 0, DateTimeZone.UTC))
         openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(0))
-        //some are expired and some not
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(500)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(302)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928))
-        //all expired
-        mockCsiAggregationUtilService(new DateTime(2014, 10, 1, 5, 30, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(3))
 
+        then:
+        openAndExpired.size() == 0
     }
 
-    @Test
-    public void testGetOpenWeeklyPageCsiAggregationsWhosIntervalExpiredForAtLeast() {
+    def "test GetOpenDailyPageCsiAggregationsWhosIntervalExpiredForAtLeast with some expired"() {
+        given:
+        Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(500)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(302)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928
+    }
+
+    def "test GetOpenDailyPageCsiAggregationsWhosIntervalExpiredForAtLeast with all expired"() {
+        given:
+        Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        List<CsiAggregation> openAndExpired
+
+        when:
+        mockCsiAggregationUtilService(new DateTime(2014, 10, 1, 5, 30, 0, DateTimeZone.UTC))
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
+        then:
+        openAndExpired.size() == 3
+    }
+
+    def "testGetOpenWeeklyPageCsiAggregationsWhosIntervalExpiredForAtLeast with non expired"() {
 
         //create test-specific data
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
@@ -239,34 +275,67 @@ class CsiAggregationDaoServiceSpec {
         createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
         List<CsiAggregation> openAndExpired
 
-        //test specific mocks, test executions and assertions
-
-        //no ones are expired
+        when:
         mockCsiAggregationUtilService(new DateTime(2014, 9, 11, 23, 59, 59, DateTimeZone.UTC))
         openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(0))
-        //some are expired and some not
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(1000)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140905))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(100)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140905))
-        //all expired
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 27, 5, 30, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(3))
+        then:
+        openAndExpired.size() == 0
     }
 
-    @Test
-    public void testGetDailyOpenShopCsiAggregationsWhosIntervalExpiredForAtLeast() {
+    def "testGetOpenWeeklyPageCsiAggregationsWhosIntervalExpiredForAtLeast with some expired"() {
 
         //create test-specific data
+        Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(1000)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140905
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(100)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140905
+    }
+
+    def "testGetOpenWeeklyPageCsiAggregationsWhosIntervalExpiredForAtLeast with all expired"() {
+        given:
+        Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
+        List<CsiAggregation> openAndExpired
+
+        when:
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 27, 5, 30, 0, DateTimeZone.UTC))
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
+        then:
+        openAndExpired.size() == 3
+    }
+
+    def "testGetDailyOpenShopCsiAggregationsWhosIntervalExpiredForAtLeast with non expired"() {
+        given:
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
@@ -275,35 +344,118 @@ class CsiAggregationDaoServiceSpec {
         createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
-        //test specific mocks, test executions and assertions
-
-        //no ones are expired
+        when:
         mockCsiAggregationUtilService(new DateTime(2014, 9, 26, 0, 0, 0, DateTimeZone.UTC))
         openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(0))
-        //some are expired and some not
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(500)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(302)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140928))
-        //all expired
-        mockCsiAggregationUtilService(new DateTime(2014, 10, 1, 5, 30, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(3))
+        then:
+        openAndExpired.size() == 0
 
     }
 
-    @Test
-    public void testGetOpenWeeklyShopCsiAggregationsWhosIntervalExpiredForAtLeast() {
+    def "testGetDailyOpenShopCsiAggregationsWhosIntervalExpiredForAtLeast with some expired"() {
+        given:
+        Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140930)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
 
-        //create test-specific data
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(500)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(302)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140928
+    }
+
+    def "testGetDailyOpenShopCsiAggregationsWhosIntervalExpiredForAtLeast with al expired"() {
+        given:
+        Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, shopAggregator, false, date_20140930)
+        List<CsiAggregation> openAndExpired
+
+        when:
+        mockCsiAggregationUtilService(new DateTime(2014, 10, 1, 5, 30, 0, DateTimeZone.UTC))
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
+        then:
+        openAndExpired.size() == 3
+    }
+
+    def "testGetOpenWeeklyShopCsiAggregationsWhosIntervalExpiredForAtLeast with none expired"() {
+        given:
+        Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140919)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 11, 23, 59, 59, DateTimeZone.UTC))
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
+        then:
+        openAndExpired.size() == 0
+    }
+
+    def "testGetOpenWeeklyShopCsiAggregationsWhosIntervalExpiredForAtLeast with some expired"() {
+        given:
+        Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
+        Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140919)
+        List<CsiAggregation> openAndExpired
+        mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(1000)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
+        then:
+        openAndExpired.size() == 0
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140905
+
+        when:
+        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(100)
+        then:
+        openAndExpired.size() == 1
+        openAndExpired[0].started == date_20140905
+    }
+
+    def "testGetOpenWeeklyShopCsiAggregationsWhosIntervalExpiredForAtLeast with all expired"() {
+        given:
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
@@ -312,84 +464,46 @@ class CsiAggregationDaoServiceSpec {
         createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140919)
         List<CsiAggregation> openAndExpired
 
-        //test specific mocks, test executions and assertions
-
-        //no ones are expired
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 11, 23, 59, 59, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(0)
-        assertThat(openAndExpired.size(), is(0))
-        //some are expired and some not
-        mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(1000)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(301)
-        assertThat(openAndExpired.size(), is(0))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140905))
-        openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(100)
-        assertThat(openAndExpired.size(), is(1))
-        assertThat(openAndExpired[0].started, equalTo(date_20140905))
-        //all expired
+        when:
         mockCsiAggregationUtilService(new DateTime(2014, 9, 27, 5, 30, 0, DateTimeZone.UTC))
         openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
-        assertThat(openAndExpired.size(), is(3))
+        then:
+        openAndExpired.size() == 3
     }
 
-    @Test
-    public void testGetLatestUpdateEvent() {
-        //create test-specific data
+    def "test getLatestUpdateEvent"() {
+        given:
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
         CsiAggregation csiAggregation = createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140905)
-        new CsiAggregationUpdateEvent(
-                dateOfUpdate: date_20140905,
-                csiAggregationId: csiAggregation.ident(),
+        new CsiAggregationUpdateEvent( dateOfUpdate: date_20140905,
+                csiAggregationId: csiAggregation.id,
                 updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
         ).save(failOnError: true)
 
         new CsiAggregationUpdateEvent(
                 dateOfUpdate: date_20140912,
-                csiAggregationId: csiAggregation.ident(),
+                csiAggregationId: csiAggregation.id,
                 updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
         ).save(failOnError: true)
 
         new CsiAggregationUpdateEvent(
                 dateOfUpdate: date_20140919,
-                csiAggregationId: csiAggregation.ident(),
+                csiAggregationId: csiAggregation.id,
                 updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
         ).save(failOnError: true)
 
-        // Test execution
-        CsiAggregationUpdateEvent updateEvent = serviceUnderTest.getLatestUpdateEvent(csiAggregation.ident())
+        when:
+        CsiAggregationUpdateEvent updateEvent = serviceUnderTest.getLatestUpdateEvent(csiAggregation.id)
 
-        // assertions
-        assertEquals(date_20140919, updateEvent.dateOfUpdate)
-        assertEquals(CsiAggregationUpdateEvent.UpdateCause.OUTDATED, updateEvent.updateCause)
+        then:
+        date_20140919 == updateEvent.dateOfUpdate
+        CsiAggregationUpdateEvent.UpdateCause.OUTDATED == updateEvent.updateCause
     }
 
     private CsiAggregation createAndSaveCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, boolean closedAndCalculated, Date started) {
-        double valueNotOfInterestInTheseTests = 42d
-        String resultIdsNotOfInterestInTheseTests = '4,2'
-        JobGroup jobGroup = new JobGroup(name: "unusedJobGroup").save(validate: false)
-        MeasuredEvent measuredEvent = new MeasuredEvent(name: "unusedMeasuredEvent").save(validate: false)
-        Page page = new Page(name: "unusedPage").save(validate: false)
-        Browser browser = new Browser(name: "unusedBrowser").save(validate: false)
-        Location location = new Location(name: "unusedLocation").save(validate: false)
-        return new CsiAggregation(
-                started: started,
-                interval: interval,
-                aggregator: aggregator,
-                jobGroup: jobGroup,
-                measuredEvent: measuredEvent,
-                page: page,
-                browser: browser,
-                location: location,
-                csByWptDocCompleteInPercent: valueNotOfInterestInTheseTests,
-                underlyingEventResultsByWptDocComplete: resultIdsNotOfInterestInTheseTests,
-                closedAndCalculated: closedAndCalculated
-        ).save(failOnError: true)
+        return CsiAggregation.build(interval: interval,aggregator: aggregator,closedAndCalculated: closedAndCalculated, started: started)
     }
 
     private void createUpdateEventForCsiAggregation(CsiAggregation csiAggregation, boolean calculated, boolean withData) {
@@ -409,9 +523,8 @@ class CsiAggregationDaoServiceSpec {
     }
 
     private void mockCsiAggregationUtilService(DateTime utcNowToReturn) {
-
-        CsiAggregationUtilService mvuService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
-        mvuService.metaClass.getNowInUtc = { -> return utcNowToReturn }
+        CsiAggregationUtilService mvuService = Spy(CsiAggregationUtilService)//still need some methods, so we use a spy
+        mvuService.getNowInUtc() >> {return utcNowToReturn }
         serviceUnderTest.csiAggregationUtilService = mvuService
     }
 }

@@ -67,23 +67,4 @@ class DefaultLocationDaoServiceTests extends Specification {
         resultAfterAdding.count({ it.label == 'Agent2' }) == 1
         resultAfterAdding.count({ it.label == 'Agent3' }) == 1
     }
-
-    void "test getIdToObjectMap"() {
-
-        given:
-        Location location1 = new Location(label: nameLocation1).save(failOnError: true, validate: false)
-        Location location2 = new Location(label: nameLocation2).save(failOnError: true, validate: false)
-        Location location3 = new Location(label: nameLocation3).save(failOnError: true, validate: false)
-        Location location4 = new Location(label: nameLocation4).save(failOnError: true, validate: false)
-
-        when:
-        Map<Long, Location> idToObjectMap = serviceUnderTest.getIdToObjectMap()
-
-        then:
-        [(location1.ident()): location1,
-         (location2.ident()): location2,
-         (location3.ident()): location3,
-         (location4.ident()): location4
-        ] == idToObjectMap
-    }
 }

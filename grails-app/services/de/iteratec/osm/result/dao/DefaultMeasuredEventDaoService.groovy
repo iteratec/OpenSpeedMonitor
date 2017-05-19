@@ -31,23 +31,6 @@ import de.iteratec.osm.result.MeasuredEvent
 class DefaultMeasuredEventDaoService implements MeasuredEventDaoService {
 
     @Override
-    List<MeasuredEvent> getEventsFor(List<Page> pages) {
-        if (!pages)
-            return []
-        def query = MeasuredEvent.where { testedPage in pages }
-        return query.list()
-    }
-
-    @Override
-    Map<Serializable, MeasuredEvent> getIdToObjectMap() {
-        return MeasuredEvent.list().collectEntries { MeasuredEvent eachMeasuredEvent ->
-            [
-                    eachMeasuredEvent.ident(),
-                    eachMeasuredEvent]
-        }
-    }
-
-    @Override
     public Set<MeasuredEvent> findAll() {
         Set<MeasuredEvent> result = Collections.checkedSet(new HashSet<MeasuredEvent>(), MeasuredEvent.class);
         result.addAll(MeasuredEvent.list());

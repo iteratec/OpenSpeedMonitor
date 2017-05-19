@@ -1,7 +1,9 @@
 package de.iteratec.osm.csi
 
+import grails.test.mixin.Mock
 import spock.lang.Specification
 
+@Mock([CsiDay])
 class CsiDaySpec extends Specification {
 
     CsiDay dayToTest

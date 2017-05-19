@@ -3,7 +3,13 @@
  must be imported in the corresponding LESS stylesheet of the chart
 */
 
+@import "../variables-corporate";
 
-.d3chart {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// use bootstrap defined font properties in d3chart explicitly to get the right styles when downloading the PNG
+.d3chart * {
+  font-family: @font-family-base;
+  font-size: @font-size-base;
+  color: @text-color;
+  line-height: @line-height-base;
 }

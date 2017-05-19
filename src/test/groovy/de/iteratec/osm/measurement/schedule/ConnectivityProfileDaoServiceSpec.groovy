@@ -17,29 +17,27 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.csi.TestDataUtil
-import grails.test.mixin.*
-import org.junit.*
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
-
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(ConnectivityProfileDaoService)
 @Mock([ConnectivityProfile])
+@Build(ConnectivityProfile)
 class ConnectivityProfileDaoServiceSpec extends Specification{
-    ConnectivityProfileDaoService serviceUnderTest
-    void setup(){
-        serviceUnderTest = service
-    }
-    void "findAll delivers all profiles"() {
-        when:
-        TestDataUtil.createConnectivityProfile('first')
-        TestDataUtil.createConnectivityProfile('second')
-        TestDataUtil.createConnectivityProfile('third')
-        TestDataUtil.createConnectivityProfile('fourth')
 
-        then:
-        serviceUnderTest.findAll().size() == 4
+    void "findAll delivers all profiles"() {
+        when: "4 ConnectivityProfiles exit in db."
+        ConnectivityProfile.build(name: 'first')
+        ConnectivityProfile.build(name: 'second')
+        ConnectivityProfile.build(name: 'third')
+        ConnectivityProfile.build(name: 'fourth')
+
+        then: "findAll() retrieves them all"
+        service.findAll().size() == 4
     }
+
 }

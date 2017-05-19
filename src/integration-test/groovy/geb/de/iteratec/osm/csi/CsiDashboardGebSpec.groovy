@@ -95,9 +95,8 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph for \"Hourly mean per measured step\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "01.06.2016")
-        selectDateInDatepicker(toDatepicker, "11.06.2016")
+        selectDateInDatepicker(fromDatepicker, "01.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "11.06.2016 23:59")
         jobGroupList[0].click()
         pageList[0].click()
         basedOnVisuallyCompleteButton.click()
@@ -391,9 +390,10 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker.click()
-        datePicker << Keys.chord(Keys.CONTROL, "a")
-        datePicker << Keys.chord(Keys.DELETE)
-        datePicker << Keys.chord(Keys.ESCAPE)
+        datePicker << Keys.chord(Keys.END)
+        25.times {
+            datePicker << Keys.chord(Keys.BACK_SPACE)
+        }
         datePicker << date
     }
 

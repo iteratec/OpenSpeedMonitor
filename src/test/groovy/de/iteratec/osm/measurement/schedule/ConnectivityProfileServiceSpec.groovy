@@ -17,97 +17,65 @@
 
 package de.iteratec.osm.measurement.schedule
 
-
-import grails.test.mixin.*
-import org.junit.*
-import org.springframework.context.i18n.LocaleContextHolder
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
 @TestFor(ConnectivityProfileService)
 class ConnectivityProfileServiceSpec extends Specification{
+    static int validBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN
+    static int invalidBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN - 1
+    static int validBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN
+    static int invalidBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN - 1
+    static int validLatency = ConnectivityProfile.LATENCY_MIN
+    static int invalidLatency = ConnectivityProfile.LATENCY_MIN - 1
+    static int validPlr = ConnectivityProfile.PLR_MIN
+    static int invalidPlr = ConnectivityProfile.PLR_MIN - 1
 
-    ConnectivityProfileService serviceUnderTest
-
-    void setup(){
-        //eclipse doesn't know injected service object, so we help ;)
-        serviceUnderTest = service
-        //mocks common to all tests
-        LocaleContextHolder.metaClass.static.getLocale = {
-            return Locale.GERMAN
-        }
-    }
     void "get custom name for connectivity without packet loss"() {
-        when:
+        when: "all attributes but packet loss are set"
         int bwDown = 50000
         int bwUp = 6000
         int latency = 50
         int plr = 0
 
-        then:
-        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency)'
+        then: "a readable name without packetloss is generated"
+        service.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency)'
     }
+
     void "get custom name for connectivity with packet loss"() {
-        when:
+        when: "all attributes including packet loss are set"
         int bwDown = 50000
         int bwUp = 6000
         int latency = 50
         int plr = 5
 
-        then:
-        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency, 5% PLR)'
+        then: "a readable name including packetloss is generated"
+        service.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency, 5% PLR)'
     }
-    void "validation of invalid connectivity attributes"(){
-        when:
-        int validBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN
-        int invalidBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN - 1
-        int validBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN
-        int invalidBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN - 1
-        int validLatency = ConnectivityProfile.LATENCY_MIN
-        int invalidLatency = ConnectivityProfile.LATENCY_MIN - 1
-        int validPlr = ConnectivityProfile.PLR_MIN
-        int invalidPlr = ConnectivityProfile.PLR_MIN - 1
 
+    void "invalid connectivity attributes throw an exception"(Integer bwDown, Integer bwUp, Integer latency, Integer plr) {
+        when: "an invalid argument is used vor validation"
+        service.validateConnectivityAttributes(bwDown, bwUp, latency, plr)
 
-        then:
-        //should fail cause of null values
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(null, validBwUp, validLatency, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, null, validLatency, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, validBwUp, null, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, validBwUp, validLatency, null)
-        }
-        //should fail cause of invalid values
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(invalidBwDown, validBwUp, validLatency, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, invalidBwUp, validLatency, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, validBwUp, invalidLatency, validPlr)
-        }
-        shouldFail(IllegalArgumentException){
-            serviceUnderTest.validateConnectivityAttributes(validBwDown, validBwUp, validLatency, invalidPlr)
-        }
+        then: "an IllegalArgumentException is thrown"
+        thrown(IllegalArgumentException)
 
+        where:
+        bwDown        | bwUp        | latency        | plr
+        null          | validBwUp   | validLatency   | validPlr
+        validBwDown   | null        | validLatency   | validPlr
+        validBwDown   | validBwUp   | null           | validPlr
+        validBwDown   | validBwUp   | validLatency   | null
+        invalidBwDown | validBwUp   | validLatency   | validPlr
+        validBwDown   | invalidBwUp | validLatency   | validPlr
+        validBwDown   | validBwUp   | invalidLatency | validPlr
+        validBwDown   | validBwUp   | validLatency   | invalidPlr
     }
-    void "validation of valid connectivity attributes"(){
-        when:
-        int validBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN
-        int validBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN
-        int validLatency = ConnectivityProfile.LATENCY_MIN
-        int validPlr = ConnectivityProfile.PLR_MIN
 
-        then:
-        serviceUnderTest.validateConnectivityAttributes(validBwDown, validBwUp, validLatency, validPlr)
+    void "validation of valid connectivity attributes" () {
+        when: "valid connectivity attributes are chosen"
+
+        then: "they are recognized as valid"
+        service.validateConnectivityAttributes(validBwDown, validBwUp, validLatency, validPlr)
     }
 }

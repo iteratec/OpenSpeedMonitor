@@ -209,7 +209,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
 
         //create test-specific data
         String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
+        File file = new File("src/test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
 
         //mocking of inner services
@@ -234,7 +234,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
 
         //create test-specific data
         String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
+        File file = new File("src/test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
@@ -259,7 +259,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
 
         //create test-specific data
         String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
+        File file = new File("src/test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server2);
@@ -330,7 +330,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
      * <li>various tests</li>
      * </ul>
      * @param nameOfResultXmlFile
-     * 			Name of the result-xml-file from webpagetest (testdata from test/resources/).
+     * 			Name of the result-xml-file from webpagetest (testdata from src/test/resources/).
      * @param expectedValues
      * 			Map with expected values for assertions.
      * 			Structure of the map:<br>
@@ -341,7 +341,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
      */
     private void listenToResultAndProofCreatedDomains(String nameOfResultXmlFile, Map expectedValues) {
         //test specific data
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 

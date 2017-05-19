@@ -214,6 +214,5 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [PUT: "securedViaApiKeyHandleOldJobResults"]
 		}
-
 	}
 }

@@ -29,7 +29,6 @@ class OsmConfiguration {
     static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
     static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
-    static final Integer DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS = -1
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
     static final Integer DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS = 30
@@ -65,6 +64,12 @@ class OsmConfiguration {
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
     /** Time in days internal monitoring data like location queues is stored. */
     Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+    /** Did the infrastructure setup run already? */
+    InfrastructureSetupStatus infrastructureSetupRan = InfrastructureSetupStatus.NOT_STARTED
+
+    enum InfrastructureSetupStatus {
+        NOT_STARTED, ABORTED, FINISHED
+    }
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
@@ -77,6 +82,7 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
     }
 
     static constraints = {
@@ -90,5 +96,6 @@ class OsmConfiguration {
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
+        infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
     }
 }

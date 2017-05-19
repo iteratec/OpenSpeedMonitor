@@ -1,6 +1,7 @@
 //= require /bower_components/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
+//= require /d3/chartColorProvider
 //= require_self
 
 "use strict";
@@ -10,12 +11,14 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) {
 
     var svg,
+        chartData = [],
+        svgContainer = $("#" + chartIdentifier),
         topMargin = 50,
         outerMargin = 25,
         barHeight = 40,
         barPadding = 10,
         valueMarginInBar = 4,
-        colorPalette = d3.scale.category20(),
+        colorProvider = OpenSpeedMonitor.ChartColorProvider(),
         width,
         absoluteMaxValue = 0,
         xScale,
@@ -34,29 +37,37 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     var initChart = function () {
 
         $("#chart-card").removeClass("hidden");
-        width = parseInt($("#" + chartIdentifier).width(), 10);
 
         svg = d3.select("#" + chartIdentifier).append("svg")
-            .attr("class", "d3chart")
-            .attr("width", width);
+            .attr("class", "d3chart");
 
         headerLine = svg.append("g");
         allBarsGroup = svg.append("g");
         trafficLightBars = svg.append("g");
-        xScale = d3.scale.linear().range([0, width - outerMargin * 2 - barPadding])
-
+        $(window).resize(draw);
     };
 
     var drawChart = function (barchartData) {
         if (svg === undefined) {
             initChart();
         }
-
         initChartData(barchartData);
-        drawBars(barchartData.series);
+        chartData = barchartData;
+        draw();
+    };
+
+    var draw = function() {
+        updateSvgWidth();
+        xScale = d3.scale.linear().range([0, svg.attr("width") - outerMargin * 2 - barPadding])
+
+        drawBars(chartData.series);
         var headerData = [{headerText: commonLabelParts}];
         drawHeader(headerData);
         drawTrafficLight();
+    };
+
+    var updateSvgWidth = function () {
+        svg.attr("width", svgContainer.width());
     };
 
     var drawHeader = function (headerData) {
@@ -140,54 +151,43 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             });
 
         var innerG = innerData.enter().append("g").attr("class", "inner");
+        var colorscale = colorProvider.getColorscaleForMeasurandGroup(unitName);
         // bar
         innerG.append("rect")
             .attr("transform", "translate(" + barPadding + ", 0)")
             .attr("height", barHeight)
             .attr("width", initialBarWidth)
             .attr("fill", function (d, i) {
-                return colorPalette(0);
-            })
-            .attr("opacity", function (d, index) {
-                return index * 0.5 + 0.4;
-            })
-            .call(updateRect);
+                return colorscale( (i+1) % 2 );
+            });
+
         // value text
         innerG.append("text")
             .attr("class", "d3chart-value")
             .attr("y", barHeight / 2)
-            .attr("dy", ".35em") //vertical align middle
-            .attr("text-anchor", "end")
-            .call(updateText);
+            .text(function (d) {
+                var label = d.label ? d.label + ": " : "";
+                return label + (Math.round(d.value)) + " " + unitName;
+            });
 
         // exit //////////////////////////////////////////////////////////////////////////////////
         outerData.exit().remove();
         innerData.exit().remove();
 
         // update //////////////////////////////////////////////////////////////////////////////
-        innerG.selectAll("rect").call(updateRect);
-        innerG.selectAll("text").call(updateText);
+        innerData.selectAll("rect")
+            .transition().duration(transitionDuration)
+            .attr("width", function (d) {
+                return xScale(d.value)
+            });
 
-    };
-
-    var updateText = function (selection) {
-        selection
-            .text(function (d) {
-                var label = d.label ? d.label + ": " : "";
-                return label + (Math.round(d.value)) + " " + unitName;
-            })
+        innerData.selectAll("text")
+            .transition().duration(transitionDuration)
             .attr("x", function (d) {
                 var width = this.getBBox().width;
                 return Math.max(width + valueMarginInBar, xScale(d.value));
             });
-    };
-    var updateRect = function (selection) {
-        selection
-            .transition()
-            .duration(transitionDuration)
-            .attr("width", function (d) {
-                return xScale(d.value)
-            });
+
     };
 
     var drawTrafficLight = function () {
@@ -259,6 +259,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
                 return xScale(d.upperBoundary - d.lowerBoundary);
             });
 
+        trafficLight
+            .select("text")
+            .transition()
+            .duration(transitionDuration)
+            .attr("x", function (d) {
+                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+            });
     };
 
     initChart();

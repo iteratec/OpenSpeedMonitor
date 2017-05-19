@@ -66,7 +66,7 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 
 			System.out.println('Loading CSV-data...');
 			TestDataUtil.
-					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
+					loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
 			System.out.println('Loading CSV-data... DONE');
 
 			System.out.println('Create some common test-data... DONE');
@@ -89,7 +89,7 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 
 
 	/**
-	 * The target weekly page-values were taken from the old excel-evaluation: .\test\resources\SR_2.44.0_Kundenzufriedenheit.xlsx.
+	 * The target weekly page-values were taken from a manual pre osm excel sheet.
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
 	 * Calculating weekly page-values via {@link PageCsiAggregationService} should provide (nearly) the same results!
 	 */

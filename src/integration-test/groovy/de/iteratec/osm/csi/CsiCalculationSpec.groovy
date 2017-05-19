@@ -122,7 +122,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
             TestDataUtil.createOsmConfig()
 
             String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml'
-            File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+            File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
             xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
             TestDataUtil.createCsiAggregationIntervals()

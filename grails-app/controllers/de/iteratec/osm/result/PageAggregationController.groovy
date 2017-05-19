@@ -3,10 +3,10 @@ package de.iteratec.osm.result
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.dimple.BarchartDTO
-import de.iteratec.osm.dimple.BarchartDatum
-import de.iteratec.osm.dimple.BarchartSeries
-import de.iteratec.osm.dimple.GetBarchartCommand
+import de.iteratec.osm.barchart.BarchartDTO
+import de.iteratec.osm.barchart.BarchartDatum
+import de.iteratec.osm.barchart.BarchartSeries
+import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -14,7 +14,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -89,7 +88,7 @@ class PageAggregationController extends ExceptionHandlerController {
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
 
-        List allEventResults = EventResult.createCriteria().list {
+        List eventResultAverages = EventResult.createCriteria().list {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
@@ -102,8 +101,26 @@ class PageAggregationController extends ExceptionHandlerController {
             }
         }
 
+        Map comparativeEventResultAverages = null
+        if (cmd.fromComparative && cmd.toComparative) {
+            comparativeEventResultAverages = EventResult.createCriteria().list {
+                'in'('page', allPages)
+                'in'('jobGroup', allJobGroups)
+                'between'('jobResultDate', cmd.fromComparative.toDate(), cmd.toComparative.toDate())
+                projections {
+                    groupProperty('page')
+                    groupProperty('jobGroup')
+                    allMeasurands.each { m ->
+                        avg(m)
+                    }
+                }
+            }?.collectEntries({ it ->
+                [("${it[0].name} | ${it[1].name}".toString()): it.takeRight(it.size()-2)]
+            })
+        }
+
         // return if no data is available
-        if (!allEventResults) {
+        if (!eventResultAverages && !comparativeEventResultAverages) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
@@ -113,6 +130,8 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
+        barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
+        barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
@@ -120,12 +139,16 @@ class PageAggregationController extends ExceptionHandlerController {
                     yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
-                allEventResults.each { datum ->
+                eventResultAverages.each { datum ->
+                    def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
+                    def key = "${datum[0]} | ${datum[1]?.name}".toString()
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
-                            value: datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 2],
-                            grouping: "${datum[0]} | ${datum[1]?.name}"
+                            originalMeasurandName: currentMeasurand,
+                            value: measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand),
+                            valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                            grouping: key
                         )
                     )
                 }
@@ -183,7 +206,7 @@ class PageAggregationController extends ExceptionHandlerController {
             if (testedPagesPerJob.every { it.equals(testedPagesPerJob[0]) }) {
                 testedPages = testedPagesPerJob[0]
             } else {
-                testedPages = mergeLists(testedPagesPerJob)
+                testedPages = getOrderedPagesOfAllScripts(testedPagesPerJob)
             }
 
             testedPages.each { p ->
@@ -202,25 +225,31 @@ class PageAggregationController extends ExceptionHandlerController {
     }
 
     /**
-     * Merges multiple lists of pages by collecting all pages of each list and keeping the order
+     * Merges multiple lists of pages by collecting all pages of each list, filtering out duplicates
+     * and keeping the order
+     *
      * E.g.:
      * List1 = ["a", "b",       "c"]
      * List2 = ["a", "c",       "c"]
      * List2 = ["a", "b",       "d"]
+     *
      * Result = ["a", "b", "c", "c", "d"]
-     * @param listOfPages
+     *
+     * @param listOfPages A list of scripts where each item is a list of pages which are measured in that particular script
      * @return
      */
-    private List<Page> mergeLists(List<List<Page>> listOfPages) {
-        List<Page> result = []
+    private List<Page> getOrderedPagesOfAllScripts(List<List<Page>> listOfPages) {
+        List<Page> orderedPagesOfAllScripts = []
+        int sizeOfLongestPageList = listOfPages*.size().max()
 
-        for (int i = 0; i < listOfPages*.size().max(); i++) {
-            List<Page> l = listOfPages*.getAt(i).unique()
-            l.removeAll([null])
-            result.addAll(l)
+        sizeOfLongestPageList.times { pageStep ->
+            List<Page> pagesOfCurrentStep = listOfPages*.getAt(pageStep).flatten()
+            pagesOfCurrentStep.unique(true).removeAll([null])
+
+            orderedPagesOfAllScripts.addAll(pagesOfCurrentStep)
         }
 
-        return result
+        return orderedPagesOfAllScripts
     }
 
     /**

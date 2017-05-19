@@ -27,7 +27,7 @@ class ResultXmlProcessingSpec extends Specification{
 
     void "WptResultXmls isMedian determines whether a step is the median step correctly - MULTISTEP_FORK_ITERATEC | 1 run"() {
 		when: "the xml is parsed"
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
 		then: "isMedian works as expected"
 		resultXml.isMedian(0, CachedView.UNCACHED, 0)
@@ -36,7 +36,7 @@ class ResultXmlProcessingSpec extends Specification{
     }
 	void "WptResultXmls isMedian determines whether a step is the median step correctly - MULTISTEP_FORK_ITERATEC | 5 runs"() {
         when: "the xml is parsed"
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
         then: "isMedian works as expected"
 		resultXml.isMedian(0, CachedView.UNCACHED, 0) == false
@@ -58,7 +58,7 @@ class ResultXmlProcessingSpec extends Specification{
 	}
 	void "WptResultXmls isMedian determines whether a step is the median step correctly - BEFORE_MULTISTEP | 1 run"() {
         when: "the xml is parsed"
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
         then: "isMedian works as expected"
 		resultXml.isMedian(0,CachedView.UNCACHED, 0)
@@ -66,7 +66,7 @@ class ResultXmlProcessingSpec extends Specification{
 	}
 	void "WptResultXmls isMedian determines whether a step is the median step correctly - BEFORE_MULTISTEP | 5 runs"() {
         when: "the xml is parsed"
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
         then: "isMedian works as expected"
 		resultXml.isMedian(0, CachedView.UNCACHED, 0) == false
@@ -83,9 +83,9 @@ class ResultXmlProcessingSpec extends Specification{
 	}
     void "WptResultXmls getBwDown works as expected - BEFORE_MULTISTEP and MULTISTEP_FORK_ITERATEC"(){
         when: "the xml results are parsed"
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
         then: "getBwDown works as expected"
         resultXmlSinglestep.getBwDown() == 6000
@@ -93,9 +93,9 @@ class ResultXmlProcessingSpec extends Specification{
     }
     void "WptResultXmls getBwUp works as expected - BEFORE_MULTISTEP and MULTISTEP_FORK_ITERATEC"(){
         when: "the xml results are parsed"
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
         then: "getBwUp works as expected"
         resultXmlSinglestep.getBwUp() == 512
@@ -103,9 +103,9 @@ class ResultXmlProcessingSpec extends Specification{
     }
     void "WptResultXmls getLatency works as expected - BEFORE_MULTISTEP and MULTISTEP_FORK_ITERATEC"(){
         when: "the xml results are parsed"
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
         then: "getLatency works as expected"
         resultXmlSinglestep.getLatency() == 50
@@ -113,7 +113,7 @@ class ResultXmlProcessingSpec extends Specification{
     }
     void "WptResultXmls getPlr works as expected - BEFORE_MULTISTEP and MULTISTEP_FORK_ITERATEC"(){
         when: "the xml results are parsed"
-        GPathResult result = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${resultXml}"))
+        GPathResult result = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/${resultXml}"))
         WptResultXml parsedResultXml = new WptResultXml(result)
         then: "getPlr works as expected"
         parsedResultXml.getPacketLossRate() == expectedPlr
@@ -124,7 +124,7 @@ class ResultXmlProcessingSpec extends Specification{
     }
     void "WptResultXmls getTeststepCount works as expected"() {
         when: "the xml results are parsed"
-        GPathResult result = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${resultXml}"))
+        GPathResult result = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/${resultXml}"))
         WptResultXml parsedResultXml = new WptResultXml(result)
         then: "getTeststepCount works as expected"
         parsedResultXml.getTestStepCount() == expectedNumberOfSteps
@@ -141,7 +141,7 @@ class ResultXmlProcessingSpec extends Specification{
     }
     void "WptResultXmls get created with correct wptserver version from xml files"() {
         when: "the xml results are parsed"
-        GPathResult result = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${resultXml}"))
+        GPathResult result = new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/${resultXml}"))
         WptResultXml parsedResultXml = new WptResultXml(result)
         then: "getTeststepCount works as expected"
         parsedResultXml.version == expectedWptResultVersion

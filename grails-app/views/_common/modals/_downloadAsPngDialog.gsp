@@ -49,20 +49,19 @@
     </div>
 </div>
 
-<asset:script>
+<asset:script type="text/javascript">
     $(window).load(function () {
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" />', true, 'pngDownloader')
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/bower_components/saveSvgAsPng/saveSvgAsPng.js"/>', true, 'pngDownloader')
     });
 
     function downloadPNG(chartContainerID) {
-        var svgNode = d3.select("#" + chartContainerID + " svg").node();
+        var svgNode = document.querySelector("#" + chartContainerID + " svg");
         var filename = $("#inputFilename").val();
         filename = filename.endsWith(".png") ? filename : filename += ".png";
         var width = $("#pngWidth").val();
         var height = $("#pngHeight").val();
 
-
-        downloadAsPNG(svgNode, filename, width, height);
+        saveSvgAsPng(svgNode, filename, {width: width, height: height});
         $('#downloadAsPngModal').modal('hide');
     }
     

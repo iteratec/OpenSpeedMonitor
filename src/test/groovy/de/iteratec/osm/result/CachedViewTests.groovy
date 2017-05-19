@@ -17,17 +17,13 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.CachedView;
+import spock.lang.Specification
 
-import static org.junit.Assert.*
-import org.junit.Test
+class CachedViewTests extends Specification {
 
-class CachedViewTests {
-
-	@Test
-	public void testIsCached() {
-		assertTrue(CachedView.CACHED.isCached());
-		assertFalse(CachedView.UNCACHED.isCached());
-	}
-
+    void "test is cached for event result"() {
+        expect:
+        CachedView.CACHED.isCached() == true
+        CachedView.UNCACHED.isCached() == false
+    }
 }

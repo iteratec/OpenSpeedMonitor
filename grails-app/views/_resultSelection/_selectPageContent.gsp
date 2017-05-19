@@ -23,8 +23,7 @@
                   value="${selectedMeasuredEventIds}"
                   multiple="true"/>
         <label class="checkbox-inline">
-            <g:checkBox name="selectedAllMeasuredEvents"
-                        checked="${selectedAllMeasuredEvents}" value="${true}"/>
+            <input type="checkbox" id="selectedAllMeasuredEvents" ${selectedMeasuredEventIds ? '' : 'checked'} />
             <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllMeasuredEvents.label"
                        default="Select all measured steps"/>
         </label>

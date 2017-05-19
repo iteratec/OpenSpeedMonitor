@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "`dirname $0`/../../"
 ./gradlew integrationTest --tests de.**.
-firefox build/reports/tests/index.html
+xdg-open build/spock-reports/index.html

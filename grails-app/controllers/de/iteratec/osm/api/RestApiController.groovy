@@ -428,7 +428,8 @@ class RestApiController {
     public Map<String, Object> translateToCustomerSatisfaction(TranslateCustomerSatisfactionCommand cmd) {
 
         if (cmd.loadTimeInMillisecs == null || cmd.pageName == null || (cmd.csiConfiguration == null && cmd.system == null)) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'Params loadTimeInMillisecs AND pageName AND csiConfiguration must be set.\n')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
+                    'Params loadTimeInMillisecs AND pageName AND (csiConfiguration or system) must be set.\n')
             return
         } else {
             Page page = Page.findByName(cmd.pageName)
@@ -501,7 +502,7 @@ class RestApiController {
         if (csiConfiguration != null) {
             jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
         } else {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "CsiConfiguration with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "CsiConfiguration with id ${params.id} doesn't exist!")
             return
         }
 

@@ -29,9 +29,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import groovy.util.slurpersupport.GPathResult
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  *
  */
@@ -66,7 +64,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(true)
         mockMetricReportingService(false)
@@ -89,7 +87,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(true)
@@ -112,7 +110,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)
@@ -133,7 +131,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)

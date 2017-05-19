@@ -199,11 +199,11 @@ Since version 3 Grails is based on Spring Boot and so can be run easily **in emb
 
 From project root on Linux/MAC:
 
-    ./gradlew prod bootRun
+    ./gradlew -Dgrails.env=prod bootRun
 
 or on Windows:
 
-    ./gradlew.bat prod bootRun
+    ./gradlew.bat -Dgrails.env=prod bootRun
 
 Created war file can be deployed to servlet container of choice.
 See [grails build documentation][10] for details.

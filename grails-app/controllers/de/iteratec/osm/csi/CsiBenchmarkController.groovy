@@ -1,7 +1,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.dimple.GetBarchartCommand
+import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.AggregatorType
@@ -13,9 +13,7 @@ import de.iteratec.osm.result.ResultCsiAggregationService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import groovy.json.internal.Dates
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 import org.springframework.http.HttpStatus
 
 class CsiBenchmarkController extends ExceptionHandlerController {

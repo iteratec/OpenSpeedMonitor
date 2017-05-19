@@ -13,7 +13,7 @@ class MeasurandUtilService {
     I18nService i18nService
 
     String getDimensionalUnit(String measurand) {
-        measurand = parseMeasurandString(measurand)
+        measurand = convertToMeasurandUncached(measurand)
 
         def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
         if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
@@ -23,14 +23,14 @@ class MeasurandUtilService {
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
             return "#"
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return "kb"
+            return "MB"
         } else {
             return ""
         }
     }
 
     String getAxisLabel(String measurand) {
-        measurand = parseMeasurandString(measurand)
+        measurand = convertToMeasurandUncached(measurand)
 
         def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
         if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
@@ -40,19 +40,30 @@ class MeasurandUtilService {
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS).contains(measurand)) {
             return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.yAxisLabel", "Amount")
         } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand)) {
-            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [kb]")
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.yAxisLabel", "Size [MB]")
         } else {
             return ""
         }
 
     }
 
+    def normalizeValue(def value, String measurand) {
+        measurand = convertToMeasurandUncached(measurand)
+
+        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
+        if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand) && value) {
+            return ((double) value) / 1024 / 1024
+        }
+
+        return value
+    }
+
     String getI18nMeasurand(String measurand) {
-        measurand = parseMeasurandString(measurand)
+        measurand = convertToMeasurandUncached(measurand)
         return i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand)
     }
 
-    private String parseMeasurandString(String measurand) {
+    private static String convertToMeasurandUncached(String measurand) {
         if (!measurand.endsWith("Uncached") && !measurand.endsWith("Cached")) measurand += "Uncached"
         else if (measurand.endsWith("Cached")) measurand = measurand.replace("Cached", "Uncached")
         return measurand

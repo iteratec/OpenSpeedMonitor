@@ -13,7 +13,7 @@ class CsvExportService {
     /**
      * The {@link org.joda.time.format.DateTimeFormat} used for CSV export and table view.
      */
-    static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss");
+    static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
     /**
      * Writes given data as csv file to target.
@@ -29,7 +29,7 @@ class CsvExportService {
                 new CsvPreference.Builder(CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE).useEncoder(new DefaultCsvEncoder()).build()
         )
 
-        csvWriter.writeHeader(headers.toArray(new String[headers.size()]));
+        csvWriter.writeHeader(headers.toArray(new String[headers.size()]))
 
         rows.each { row ->
             csvWriter.writeRow(row)

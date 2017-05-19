@@ -1,35 +1,28 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
+import de.iteratec.osm.measurement.schedule.JobGroup
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ResultSelectionController)
 @Mock([JobGroup])
+@Build([JobGroup])
 class ResultSelectionControllerSpec extends Specification {
     JobGroup jobGroup1
     JobGroup jobGroup2
     JobGroup jobGroup3
 
     def setup() {
-        jobGroup1 = TestDataUtil.createJobGroup("jobGroup1")
-        jobGroup2 = TestDataUtil.createJobGroup("jobGroup2")
-        jobGroup3 = TestDataUtil.createJobGroup("jobGroup3")
-    }
-
-    def cleanup() {
+        jobGroup1 = JobGroup.build(name: "jobGroup1")
+        jobGroup2 = JobGroup.build(name: "jobGroup2")
+        jobGroup3 = JobGroup.build(name: "jobGroup3")
     }
 
     void "get an error if the timeframe is invalid"(def from, def to) {

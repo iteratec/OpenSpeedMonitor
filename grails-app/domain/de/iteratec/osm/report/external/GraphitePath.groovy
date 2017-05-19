@@ -32,7 +32,6 @@ import org.grails.databinding.BindUsing
  * @see AggregatorType
  */
 class GraphitePath {
-    // TODO mze-20131203: Rename to GraphitePathConfig
     @BindUsing({ obj, source -> source['prefix'] })
     String prefix
     AggregatorType measurand

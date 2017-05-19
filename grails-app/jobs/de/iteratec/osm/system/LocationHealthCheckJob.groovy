@@ -2,13 +2,14 @@ package de.iteratec.osm.system
 
 class LocationHealthCheckJob {
 
+    public static final int FREQUENCY_IN_MINUTES = 30
     LocationHealthCheckService locationHealthCheckService
 
     static triggers = {
         /**
          * Every 30 minutes.
          */
-        cron(name: 'locationHealthCheckJob', cronExpression: '0 */30 * ? * *')
+        cron(name: 'locationHealthCheckJob', cronExpression: "0 */${FREQUENCY_IN_MINUTES} * ? * *")
     }
 
     /**
