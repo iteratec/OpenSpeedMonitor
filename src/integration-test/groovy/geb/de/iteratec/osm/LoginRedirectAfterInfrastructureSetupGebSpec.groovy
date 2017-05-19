@@ -43,7 +43,7 @@ class LoginRedirectAfterInfrastructureSetupGebSpec extends CustomUrlGebReporting
 
         and: "there is an admin and an osm config in db and infrastructure setup already ran"
         User.withNewTransaction {
-            TestDataUtil.setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus.Finished)
+            TestDataUtil.setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus.FINISHED)
             TestDataUtil.createAdminUser()
         }
 
