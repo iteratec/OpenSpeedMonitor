@@ -17,14 +17,7 @@
 
 package de.iteratec.osm.report.ui
 
-import de.iteratec.osm.report.ui.PaginationListing
-import de.iteratec.osm.report.ui.PaginationListingRow
-import grails.test.mixin.TestFor
 import spock.lang.Specification
-
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 
 /**
  * Test-suite of {@link PaginationListing}.

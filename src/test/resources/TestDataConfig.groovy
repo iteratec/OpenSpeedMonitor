@@ -11,6 +11,10 @@ testDataConfig {
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
             connectivityProfile = { -> ConnectivityProfile.build() }
         }
+        'de.iteratec.osm.result.EventResult' {
+            // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
+            connectivityProfile = { -> ConnectivityProfile.build() }
+        }
         'de.iteratec.osm.csi.CsiConfiguration' {
             def i = 1
             label = {-> "labelIncrementedViaBuildTestDataConfig_${i++}" }
