@@ -19,6 +19,8 @@ package de.iteratec.osm.report.ui
 
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 import static org.junit.Assert.*;
 
@@ -29,32 +31,26 @@ import org.junit.Test;
  * 
  * @author rhc
  */
-class PaginationListingTest {
-	
-	@Test
-	public void testDesign(){
-		//A row
-		PaginationListingRow row1 = new PaginationListingRow(1, "www.example.de/params")
-		
-		//Run tests
-		PaginationListing out = new PaginationListing()
-		
-		assertTrue(out.getRows().isEmpty())
-		assertTrue(out.isEmpty())
-		
-		out.addRow(row1, 0, 10, 100, "www.example.de/paramsPreviousLink", "www.example.de/paramsNextLink")
-		
-		assertFalse(out.getRows().isEmpty())
-		assertFalse(out.isEmpty())
-		assertEquals(1, out.getRows().size())
-		
-		//A second row
-		PaginationListingRow row2 = new PaginationListingRow(1, "www.example.de/params")
-		
-		out.addRow(row2, 0, 10, 100, "www.example.de/paramsPreviousLink", "www.example.de/paramsNextLink")
-		
-		assertFalse(out.getRows().isEmpty());
-		assertFalse(out.isEmpty());
-		assertEquals(2, out.getRows().size());
+
+class PaginationListingTest extends Specification {
+
+	void "test add row" (def count){
+        setup:
+        PaginationListing out = new PaginationListing()
+        PaginationListingRow row = new PaginationListingRow(1, "www.example.de/params")
+
+		when: "count amount of rows are added"
+		count.times {out.addRow(row, 0, 10, 100, "www.example.de/paramsPreviousLink", "www.example.de/paramsNextLink" )}
+
+		then: "there are all available"
+		out.getRows().isEmpty() == false
+		out.getRows().size() == count
+
+		where:
+		count| _
+		1    | _
+		2    | _
+		3    | _
+		4    | _
 	}
 }
