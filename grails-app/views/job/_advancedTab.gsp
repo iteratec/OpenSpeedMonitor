@@ -51,30 +51,7 @@
     </label>
 
     <div class="col-md-9">
-        <span id="maxDownloadTimeInMinutes">
-            <g:set var="isEditable" value="${job?.maxDownloadTimeInMinutes != defaultMaxDownloadTimeInMinutes}"/>
-            <input type="text" class="form-control ${isEditable ? '' : 'non-editable'}"
-                   name="maxDownloadTimeInMinutes"
-                   value="${job?.maxDownloadTimeInMinutes}" id="maxDownloadTimeInMinutesValue"
-                   placeholder="${defaultMaxDownloadTimeInMinutes}"
-                ${isEditable ? '' : 'readonly'}/>
-            <g:message code="job.maxDownloadTimeInMinutes.label.unit"/>
-
-            <a href="#" style="${isEditable ? 'display: none' : ''}">
-                <g:message code="job.maxDownloadTimeInMinutes.change" default="Ändern"/>
-            </a>
-        </span>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
-    <label class="col-md-3 control-label" for="runs"><g:message
-            code="job.runs.label" default="runs"/> <span
-            class="required-indicator">*</span>
-    </label>
-    <div class="col-md-9">
-        %{--<g:textField class="form-control" name="runs" value="${job?.runs ?: 1}"/>--}%
-        <input id="runs" class="text short" min="1" max="9" name="runs" value="${job?.runs ?: 1}" required="" type="number"/>
+        <g:textField class="form-control" name="maxDownloadTimeInMinutes" value="${job?.maxDownloadTimeInMinutes}" id="inputField-maxDownloadTimeInMinutes"/>
     </div>
 </div>
 
@@ -83,6 +60,16 @@
                                     'option_customHeaders']">
     <g:render template="inputField" model="${['attribute': stringAttribute, 'job': job]}" />
 </g:each>
+
+<div class="form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
+    <label class="col-md-3 control-label" for="runs"><g:message
+            code="job.runs.label" default="runs"/> <span
+            class="required-indicator">*</span>
+    </label>
+    <div class="col-md-2">
+        <input id="runs" class="text short form-control" min="1" max="9" name="runs" value="${job?.runs ?: 1}" required="" type="number"/>
+    </div>
+</div>
 
 <g:each var="booleanAttribute" in="['web10',
                                     'noscript',
