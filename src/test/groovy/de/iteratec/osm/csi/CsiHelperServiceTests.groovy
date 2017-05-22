@@ -19,123 +19,44 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MethodToMock
 import de.iteratec.osm.util.OsmCookieService
-import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.TestFor
-import org.junit.Before
-import org.junit.Test
-
-import static org.hamcrest.Matchers.is
-import static org.junit.Assert.assertThat
+import spock.lang.Specification
 
 /**
  * Test-suite of {@link CsiHelperService}.
  */
 @TestFor(CsiHelperService)
-class CsiHelperServiceTests {
-	
-	CsiHelperService serviceUnderTest
-	ServiceMocker mocker
-	
-	@Before
-	void setUp() {
-		serviceUnderTest=service
-		mocker = ServiceMocker.create()
-		//mocks common for all tests
-		mocker.mockService(
-				I18nService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: 'not the concern of these tests')])
-	}
+class CsiHelperServiceTests extends Specification {
 
-	@Test
-	void testGetDefaultCsiChartTitle(){
-		
-		//test specific data
-		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
-		final String expectedMainUrlUnderTest = 'www.example.com'
-		
-		//test specific mocks
-		mocker.mockService(
-				ConfigService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: expectedMainUrlUnderTest)])
-		mocker.mockService(
-				OsmCookieService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: expectedDefaultTitleFromCookie)])
-		
-		//test execution and assertions
-		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromCookie} ${expectedMainUrlUnderTest}".toString()))
-	}
-	@Test
-	void testGetDefaultCsiChartTitleWithNullAsMainUrlUnderTest(){
-		
-		//test specific data
-		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
-		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
-		final String expectedMainUrlUnderTest = 'www.example.com'
-		
-		//test specific mocks
-		mocker.mockService(
-				ConfigService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: null)])
-		mocker.mockService(
-				OsmCookieService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: expectedDefaultTitleFromCookie)])
-		
-		//test execution and assertions
-		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromCookie}".toString()))
-	}
-	@Test
-	void testGetDefaultCsiChartTitleWithNullAsDefaultTitleFromCookie(){
-		
-		//test specific data
-		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
-		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
-		final String expectedMainUrlUnderTest = 'www.example.com'
-		
-		//test specific mocks
-		mocker.mockService(
-				ConfigService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: expectedMainUrlUnderTest)])
-		mocker.mockService(
-				OsmCookieService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: null)])
-		mocker.mockService(
-			I18nService.class, 
-			serviceUnderTest,
-			[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: expectedDefaultTitleFromI18n)])
-		//test execution and assertions
-		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromI18n} ${expectedMainUrlUnderTest}".toString()))
-	}
-	@Test
-	void testGetDefaultCsiChartTitleWithNullAsDefaultTitleFromCookieAndMainUrlUnderTest(){
-		
-		//test specific data
-		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
-		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
-		final String expectedMainUrlUnderTest = 'www.example.com'
-		
-		//test specific mocks
-		mocker.mockService(
-				ConfigService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: null)])
-		mocker.mockService(
-				OsmCookieService.class,
-				serviceUnderTest,
-				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: null)])
-		mocker.mockService(
-			I18nService.class,
-			serviceUnderTest,
-			[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: expectedDefaultTitleFromI18n)])
-		//test execution and assertions
-		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is(expectedDefaultTitleFromI18n))
+	void "check getCsiChartDefaultTitle"(String fromConfig, String fromCookie, String fromI18n, int expectedI18nInterations, String expectedOutcome){
+		setup: "init Mocks and specify wanted invocations"
+		ConfigService configService = Mock(ConfigService){
+			1 * getMainUrlUnderTest() >> fromConfig
+		}
+		OsmCookieService osmCookieService = Mock(OsmCookieService){
+			1 * getBase64DecodedCookieValue(_) >> fromCookie
+		}
+		I18nService i18nService = Mock(I18nService){
+			expectedI18nInterations * msg(_,_) >> fromI18n
+		}
+
+		when: "mocks are set"
+		service.configService = configService
+		service.osmCookieService = osmCookieService
+		service.i18nService = i18nService
+
+		then: "chart default title is built accordingly"
+		service.getCsiChartDefaultTitle().equals(expectedOutcome)
+
+		where:
+		fromConfig | fromCookie | fromI18n | expectedI18nInterations | expectedOutcome
+		"config"   | "cookie"   | "i18n"   | 0                       | "cookie config"
+		"config"   | null       | null     | 1                       | "null config"
+		null       | "cookie"   | null     | 0                       | "cookie"
+		null       | null       | "i18n"   | 1                       | "i18n"
+		"config"   | "cookie"   | null     | 0                       | "cookie config"
+		"config"   | null       | "i18n"   | 1                       | "i18n config"
+		null       | "cookie"   | "i18n"   | 0                       | "cookie"
 	}
 }
