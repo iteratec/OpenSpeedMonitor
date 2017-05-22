@@ -109,10 +109,6 @@ class EventCsiAggregationService {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
         }
 
-        if (validateMvQueryParams(mvQueryParams) == false) {
-            throw new IllegalArgumentException("QuerParams for Event-CsiAggregations aren't valid: ${mvQueryParams}")
-        }
-
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
 
@@ -202,20 +198,6 @@ class EventCsiAggregationService {
         toBeCalculated.save(failOnError: true)
         csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated
-    }
-
-    /**
-     * Proofs whether all attributes of mvQueryParams are initialized, non <code>null</code>.
-     * @param mvQueryParams
-     * @return
-     */
-    private Boolean validateMvQueryParams(MvQueryParams mvQueryParams) {
-        mvQueryParams.jobGroupIds != null &&
-                mvQueryParams.browserIds != null &&
-                mvQueryParams.locationIds != null &&
-                mvQueryParams.measuredEventIds != null &&
-                mvQueryParams.pageIds != null ?
-                true : false
     }
 
     /**
