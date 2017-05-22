@@ -17,110 +17,60 @@
 
 package de.iteratec.osm
 
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import grails.test.runtime.FreshRuntime
-import org.junit.Before
+import spock.lang.Specification
 
-import static org.hamcrest.Matchers.is
-import static org.junit.Assert.assertThat
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@FreshRuntime
 @TestFor(ConfigService)
+@Build([OsmConfiguration])
 @Mock([OsmConfiguration])
-class ConfigServiceSpec {
-	
-	ConfigService serviceUnderTest
-	InMemoryConfigService inMemoryConfigService
+class ConfigServiceSpec extends Specification {
+	static final Integer DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES = 60
+	static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
+	static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
+	static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
 
-	def doWithSpring = {
-		inMemoryConfigService(InMemoryConfigService)
-	}
-	@Before
-	void setUp(){
-		serviceUnderTest = service
-		inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
-	}
+	void "one config is fine"(){
+		when: "only one config has been saved with a value"
+		OsmConfiguration.build(detailDataStorageTimeInWeeks: 4)
 
-    void testFailingGettingDetailDataStorageTime() {
-		//test-specific data
-		int firstStorageTimeInWeeks = 4
-		int secondStorageTimeInWeeks = 8 
-		int thirdStorageTimeInWeeks = 12
-		//test executions and assertions
-		
-		//no conf
-		shouldFail (IllegalStateException) {
-			serviceUnderTest.getDetailDataStorageTimeInWeeks()
-		}
-		new OsmConfiguration(
-			detailDataStorageTimeInWeeks: firstStorageTimeInWeeks, 
-			defaultMaxDownloadTimeInMinutes: 60,
-			minDocCompleteTimeInMillisecs: 250,
-			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
-		new OsmConfiguration(
-			detailDataStorageTimeInWeeks: secondStorageTimeInWeeks, 
-			defaultMaxDownloadTimeInMinutes: 60,
-			minDocCompleteTimeInMillisecs: 250,
-			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
-		// two confs
-		shouldFail (IllegalStateException) {
-			serviceUnderTest.getDetailDataStorageTimeInWeeks()
-		}
-    }
-	void testSuccessfulGettingDetailDataStorageTime() {
-		//test-specific data
-		int firstStorageTimeInWeeks = 4
-		int secondStorageTimeInWeeks = 8
-		int thirdStorageTimeInWeeks = 12
-		//test executions and assertions
-		OsmConfiguration conf = new OsmConfiguration(
-			detailDataStorageTimeInWeeks: firstStorageTimeInWeeks,
-			defaultMaxDownloadTimeInMinutes: 60,
-			minDocCompleteTimeInMillisecs: 250,
-			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
-		assertThat(serviceUnderTest.getDetailDataStorageTimeInWeeks(), is(firstStorageTimeInWeeks))
-		
-		conf.detailDataStorageTimeInWeeks = secondStorageTimeInWeeks
-		conf.save(failOnError: true)
-		assertThat(serviceUnderTest.getDetailDataStorageTimeInWeeks(), is(secondStorageTimeInWeeks))
-		
-		conf.detailDataStorageTimeInWeeks = thirdStorageTimeInWeeks
-		conf.save(failOnError: true)
-		assertThat(serviceUnderTest.getDetailDataStorageTimeInWeeks(), is(thirdStorageTimeInWeeks))
-	}
-	
-	void testSuccessfulGettingMeasurementsGenerallyEnabled() {
-		//test-specific data
-		OsmConfiguration conf = new OsmConfiguration().save(failOnError: true) //config with default values
-		Boolean defaultMeasurementActivation = false
-		//test executions and assertions
-		assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(defaultMeasurementActivation))
-		inMemoryConfigService.activateMeasurementsGenerally()
-		assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
-	}
-	
-	void testSuccessfulGettingInitialChartHeight() {
-		//test-specific data
-		Integer expectedInitialChartHeight = 720
-		OsmConfiguration conf = new OsmConfiguration(initialChartHeightInPixels: expectedInitialChartHeight).save(failOnError: true)
-		//test executions and assertions
-		assertThat(serviceUnderTest.getInitialChartHeightInPixels(), is(expectedInitialChartHeight))
+		then: "config service hat its values including the defaults"
+		service.getDetailDataStorageTimeInWeeks() == 4
+		service.getDefaultMaxDownloadTimeInMinutes() == DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
+		service.getMinDocCompleteTimeInMillisecs() == DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+		service.getMaxDocCompleteTimeInMillisecs() == DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+		service.getInitialChartHeightInPixels() == DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 	}
 
-    void testActivatingMeasurements(){
-        //test-specific data
-        OsmConfiguration conf = new OsmConfiguration().save(failOnError: true)
-        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(false))
-        //test execution
-		inMemoryConfigService.activateMeasurementsGenerally()
-        // assertions
-        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
-        //test execution
-		inMemoryConfigService.activateMeasurementsGenerally()
-        // assertions
-        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
-    }
+	void "more than one config is bad"(){
+		given: "two configs have been saved"
+		2.times {OsmConfiguration.build()}
+
+		when: "trying to access any value from config service"
+		service.getDetailDataStorageTimeInWeeks()
+
+		then: "an illegalStateExpection should be thrown"
+		thrown(IllegalStateException)
+	}
+
+	void "values in config can be changed"(int from, int to){
+		given: "value in config has been set"
+		OsmConfiguration conf = OsmConfiguration.build(detailDataStorageTimeInWeeks: from)
+
+		when: "value is changed in config"
+		conf.detailDataStorageTimeInWeeks = to
+
+		then: "config service has the new value"
+		service.getDetailDataStorageTimeInWeeks() == to
+
+		where:
+		from | to
+		1    | 2
+		3    | 4
+		5    | 1
+	}
 }
