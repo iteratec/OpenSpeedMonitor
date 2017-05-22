@@ -22,7 +22,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -72,7 +71,6 @@ class CsiDashboardControllerTests extends Specification {
         controllerUnderTest.pageDaoService = Stub(PageDaoService)
         controllerUnderTest.measuredEventDaoService = Stub(MeasuredEventDaoService)
         controllerUnderTest.browserService = Stub(BrowserService)
-        controllerUnderTest.locationDaoService = Stub(LocationDaoService)
         controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
         controllerUnderTest.userspecificDashboardService = Stub(UserspecificDashboardService) {
             getListOfAvailableCsiDashboards() >> []
@@ -545,9 +543,6 @@ class CsiDashboardControllerTests extends Specification {
         Location location3 = new Location(label: 'Location3', location: 'locationC', browser: browser1, wptServer: server1) {
             Long getId() { return 103L }
         }
-        controllerUnderTest.locationDaoService.findAll() >> {
-            [location2, location1, location3] as Set
-        }
 
         when:
         Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
@@ -600,9 +595,6 @@ class CsiDashboardControllerTests extends Specification {
         }
         Location location3 = new Location(label: 'Location3', location: 'duplicatedLocation', browser: browser2, wptServer: server1) {
             Long getId() { return 103L }
-        }
-        controllerUnderTest.locationDaoService.findAll() >> {
-            [location2, location1, location3] as Set
         }
 
         when:

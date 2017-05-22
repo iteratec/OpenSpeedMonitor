@@ -54,7 +54,6 @@ class RestApiControllerSpec extends Specification {
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
         defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
         defaultPageDaoService(DefaultPageDaoService)
-        defaultLocationDaoService(DefaultLocationDaoService)
         browserService(BrowserService)
     }
 
@@ -326,7 +325,6 @@ class RestApiControllerSpec extends Specification {
         controllerUnderTest.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         controllerUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
         controllerUnderTest.pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
-        controllerUnderTest.locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
         controllerUnderTest.jobDaoService = new JobDaoService()
     }
 }

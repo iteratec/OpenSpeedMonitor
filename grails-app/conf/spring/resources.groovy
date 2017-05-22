@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-import de.iteratec.osm.measurement.environment.DefaultLocationDaoService
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
@@ -27,6 +26,5 @@ beans = {
     jobGroupDaoService(DefaultJobGroupDaoService)
     pageDaoService(DefaultPageDaoService)
     measuredEventDaoService(DefaultMeasuredEventDaoService)
-    locationDaoService(DefaultLocationDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
 }

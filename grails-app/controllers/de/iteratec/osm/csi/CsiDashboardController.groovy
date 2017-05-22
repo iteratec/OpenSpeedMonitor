@@ -21,7 +21,6 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -67,7 +66,6 @@ class CsiDashboardController {
     PageDaoService pageDaoService
     MeasuredEventDaoService measuredEventDaoService
     BrowserService browserService
-    LocationDaoService locationDaoService
     I18nService i18nService
 
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
@@ -962,7 +960,7 @@ class CsiDashboardController {
         result.put('browsers', browsers)
 
         // Locations
-        List<Location> locations = locationDaoService.findAll().
+        List<Location> locations = Location.list().
                 sort(false, { Location it -> it.getWptServer().label }).
                 sort(false, { Location it -> it.getBrowser().name }).
                 sort(false, { Location it -> it.location })

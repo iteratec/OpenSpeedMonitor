@@ -22,7 +22,6 @@ import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -56,7 +55,6 @@ class TabularResultPresentationController {
     PageDaoService pageDaoService
     MeasuredEventDaoService measuredEventDaoService
     BrowserService browserService
-    LocationDaoService locationDaoService
 
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
@@ -222,7 +220,7 @@ class TabularResultPresentationController {
         result.put('browsers', browsers)
 
         // Locations
-        List<Location> locations = locationDaoService.findAll().sort(false, { it.label });
+        List<Location> locations = Location.list().sort(false, { it.label })
         result.put('locations', locations)
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:

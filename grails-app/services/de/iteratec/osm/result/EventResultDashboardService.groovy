@@ -22,7 +22,6 @@ import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -52,7 +51,6 @@ public class EventResultDashboardService {
     BrowserService browserService
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
-    LocationDaoService locationDaoService
     ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
     EventResultDaoService eventResultDaoService
@@ -85,14 +83,10 @@ public class EventResultDashboardService {
     /**
      * Fetches all {@link Location}s from Database.
      *
-     * <p>
-     * 	Proxy for {@link LocationDaoService}
-     * </p>
-     *
      * @return all {@link Location} ordered by their label.
      */
     public List<Location> getAllLocations() {
-        return locationDaoService.findAll().sort(false, { it.label.toLowerCase() });
+        return Location.list().sort(false, { it.label.toLowerCase() });
     }
 
     /**

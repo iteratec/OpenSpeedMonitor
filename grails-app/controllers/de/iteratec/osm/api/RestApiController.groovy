@@ -28,7 +28,6 @@ import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -75,7 +74,6 @@ class RestApiController {
     PageDaoService pageDaoService;
     MeasuredEventDaoService measuredEventDaoService;
     BrowserService browserService
-    LocationDaoService locationDaoService;
     CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
     LinkGenerator grailsLinkGenerator
@@ -213,7 +211,7 @@ class RestApiController {
      * @see Location
      */
     public Map<String, Object> allLocations() {
-        Collection<Location> locations = locationDaoService.findAll()
+        Collection<Location> locations = Location.list()
         if(params.showInactive != 'true') {
             locations = locations.findAll {
                 it.active && it.wptServer.active
