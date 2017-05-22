@@ -14,17 +14,12 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-
-
-import de.iteratec.osm.measurement.environment.DefaultBrowserDaoService
 import de.iteratec.osm.measurement.environment.DefaultLocationDaoService
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-
-
 // Place your Spring DSL code here
 
 beans = {
@@ -32,7 +27,6 @@ beans = {
     jobGroupDaoService(DefaultJobGroupDaoService)
     pageDaoService(DefaultPageDaoService)
     measuredEventDaoService(DefaultMeasuredEventDaoService)
-    browserDaoService(DefaultBrowserDaoService)
     locationDaoService(DefaultLocationDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
 }

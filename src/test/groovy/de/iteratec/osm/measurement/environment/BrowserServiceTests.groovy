@@ -17,11 +17,9 @@
 
 package de.iteratec.osm.measurement.environment
 
-import grails.test.mixin.*
-
-import org.junit.*
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
-
 /**
  * Test-suite for {@link BrowserService}.
  */
@@ -85,43 +83,26 @@ class BrowserServiceTests extends Specification{
 		nonExistentAlias.name == "undefined"
 	}
 
-	void "test get cached browser map"() {
-		when:
-		Map<Long, Browser> dataToProve = serviceUnderTest.getCachedBrowserMap()
 
-		then:
-		dataToProve.size() == browserCount
+	void testFindAll() {
+		new Browser(name: 'FindAllBrowser1').save(validate: false)
+		new Browser(name: 'FindAllBrowser2').save(validate: false)
 
-		// Check if for all browsers relevant data was placed instead of null
-		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
-		{
-			eachEntry.key != null
-			eachEntry.value != null
-			eachEntry.value.name != null
-		}
+		Set<Browser> result = serviceUnderTest.findAll()
 
-		// subsequent call should return equal result:
-		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getCachedBrowserMap()
-		subsequentRetrievedData == dataToProve
-	}
+		assertNotNull(result);
+		assertEquals(2, result.size());
+		assertEquals(1, result.count( { it.name == 'FindAllBrowser1' } ));
+		assertEquals(1, result.count( { it.name == 'FindAllBrowser2' } ));
 
-	void "test getBrowserMap"() {
-		when:
-		Map<Long, Browser> dataToProve = serviceUnderTest.getBrowserMap()
+		new Browser(name: 'FindAllBrowser3').save(validate: false)
 
-		then:
-		dataToProve.size() == browserCount
+		Set<Browser> resultAfterAdding = serviceUnderTest.findAll()
 
-		// Check if for all browsers relevant data was placed instead of null
-		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
-		{
-			eachEntry.key != null
-			eachEntry.value != null
-			eachEntry.value.name != null
-		}
-
-		// subsequent call should return equal result:
-		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getBrowserMap()
-		subsequentRetrievedData == dataToProve
+		assertNotNull(resultAfterAdding);
+		assertEquals(3, resultAfterAdding.size());
+		assertEquals(1, resultAfterAdding.count( { it.name == 'FindAllBrowser1' } ));
+		assertEquals(1, resultAfterAdding.count( { it.name == 'FindAllBrowser2' } ));
+		assertEquals(1, resultAfterAdding.count( { it.name == 'FindAllBrowser3' } ));
 	}
 }

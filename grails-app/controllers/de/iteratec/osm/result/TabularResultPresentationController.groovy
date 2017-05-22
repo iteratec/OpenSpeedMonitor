@@ -20,8 +20,8 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -40,8 +40,6 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
-import java.text.SimpleDateFormat
-
 /**
  * <p>
  * UI controller for {@link de.iteratec.osm.result.EventResult} depending stuff.
@@ -57,7 +55,7 @@ class TabularResultPresentationController {
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     MeasuredEventDaoService measuredEventDaoService
-    BrowserDaoService browserDaoService
+    BrowserService browserService
     LocationDaoService locationDaoService
 
     EventResultDaoService eventResultDaoService
@@ -220,7 +218,7 @@ class TabularResultPresentationController {
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
-        List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name });
+        List<Browser> browsers = browserService.findAll().sort(false, { it.name });
         result.put('browsers', browsers)
 
         // Locations

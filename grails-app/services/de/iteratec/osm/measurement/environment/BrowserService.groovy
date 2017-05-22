@@ -16,46 +16,15 @@
 */
 
 package de.iteratec.osm.measurement.environment
-
 import grails.transaction.Transactional
-import org.joda.time.DateTime
-import org.joda.time.Duration
 
-
-/**
- * @deprecated Move database access to {@link de.iteratec.osm.measurement.environment.dao.BrowserDaoService}.
- */
-@Deprecated
 @Transactional
 class BrowserService {
 
-    Map<Long, Browser> browsermap
-    private DateTime lastFetchOfBrowsermap = new DateTime(1980, 1, 1, 0, 0)
-
-    /**
-     * Returns a map of Browsers in db with id's of Browsers as keys.
-     * @param ageToleranceInHours
-     * @return id to object-map
-     * 			[Browser1.id: Browser1,
-     * 			Browser2.id: Browser2,
-     * 			...
-     * 			BrowserN.id: BrowserN]
-     */
-    Map<Long, Browser> getCachedBrowserMap(Integer ageToleranceInHours) {
-        Duration durationSinceLastFetch = new Duration(lastFetchOfBrowsermap.getMillis(), new DateTime().getMillis())
-        if (!browsermap || durationSinceLastFetch.getStandardHours() > ageToleranceInHours) {
-            browsermap = getBrowserMap()
-            lastFetchOfBrowsermap = new DateTime()
-        }
-        return browsermap
-    }
-
-    Map<Long, Browser> getBrowserMap() {
-        Map<Long, Browser> browsers = [:]
-        Browser.list().each {
-            browsers[it.ident()] = it
-        }
-        return browsers
+    Set<Browser> findAll() {
+        Set<Browser> result = Collections.checkedSet(new HashSet<Browser>(), Browser.class)
+        result.addAll(Browser.list())
+        return Collections.unmodifiableSet(result)
     }
 
     List<Browser> findAllByNameOrAlias(List<String> browserNameOrAlias) {

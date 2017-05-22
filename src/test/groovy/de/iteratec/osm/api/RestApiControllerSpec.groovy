@@ -53,9 +53,9 @@ class RestApiControllerSpec extends Specification {
     def doWithSpring = {
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
         defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
-        defaultBrowserDaoService(DefaultBrowserDaoService)
         defaultPageDaoService(DefaultPageDaoService)
         defaultLocationDaoService(DefaultLocationDaoService)
+        browserService(BrowserService)
     }
 
     void setup() {
@@ -325,7 +325,6 @@ class RestApiControllerSpec extends Specification {
     private void initInnerServices() {
         controllerUnderTest.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         controllerUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
-        controllerUnderTest.browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
         controllerUnderTest.pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
         controllerUnderTest.locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
         controllerUnderTest.jobDaoService = new JobDaoService()

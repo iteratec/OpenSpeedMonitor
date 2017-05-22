@@ -19,8 +19,8 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -66,7 +66,7 @@ class CsiDashboardController {
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     MeasuredEventDaoService measuredEventDaoService
-    BrowserDaoService browserDaoService
+    BrowserService browserService
     LocationDaoService locationDaoService
     I18nService i18nService
 
@@ -958,7 +958,7 @@ class CsiDashboardController {
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
-        List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name })
+        List<Browser> browsers = browserService.findAll().sort(false, { it.name })
         result.put('browsers', browsers)
 
         // Locations

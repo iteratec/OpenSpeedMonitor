@@ -19,9 +19,9 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -42,7 +42,6 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
-
 /**
  * <p>
  * Test-suite of {@link CsiDashboardController} and 
@@ -72,7 +71,7 @@ class CsiDashboardControllerTests extends Specification {
         controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
         controllerUnderTest.pageDaoService = Stub(PageDaoService)
         controllerUnderTest.measuredEventDaoService = Stub(MeasuredEventDaoService)
-        controllerUnderTest.browserDaoService = Stub(BrowserDaoService)
+        controllerUnderTest.browserService = Stub(BrowserService)
         controllerUnderTest.locationDaoService = Stub(LocationDaoService)
         controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
         controllerUnderTest.userspecificDashboardService = Stub(UserspecificDashboardService) {
@@ -531,7 +530,7 @@ class CsiDashboardControllerTests extends Specification {
         Browser browser1 = new Browser(name: 'Browser1') {
             Long getId() { return 11L }
         }
-        controllerUnderTest.browserDaoService.findAll() >> {
+        controllerUnderTest.browserService.findAll() >> {
             [browser1] as Set
         }
 
@@ -586,7 +585,7 @@ class CsiDashboardControllerTests extends Specification {
         Browser browser2 = new Browser(name: 'Browser2') {
             Long getId() { return 12L }
         }
-        controllerUnderTest.browserDaoService.findAll() >> {
+        controllerUnderTest.browserService.findAll() >> {
             [browser1, browser2] as Set
         }
 

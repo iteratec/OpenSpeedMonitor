@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -35,7 +35,7 @@ class ResultCsiAggregationService {
 
     /** injected by grails */
     CsiAggregationUtilService csiAggregationUtilService
-    BrowserDaoService browserDaoService
+    BrowserService browserService
     CsiAggregationDaoService csiAggregationDaoService
     EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService

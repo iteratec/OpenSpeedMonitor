@@ -26,8 +26,8 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -74,7 +74,7 @@ class RestApiController {
     JobGroupDaoService jobGroupDaoService;
     PageDaoService pageDaoService;
     MeasuredEventDaoService measuredEventDaoService;
-    BrowserDaoService browserDaoService;
+    BrowserService browserService
     LocationDaoService locationDaoService;
     CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
@@ -185,7 +185,7 @@ class RestApiController {
      * @see Browser
      */
     public Map<String, Object> allBrowsers() {
-        Set<Browser> browsers = browserDaoService.findAll();
+        Set<Browser> browsers = browserService.findAll()
         Set<BrowserDto> browsersAsJson = BrowserDto.create(browsers)
         return sendObjectAsJSON(browsersAsJson, params.pretty && params.pretty == 'true');
     }
@@ -303,7 +303,7 @@ class RestApiController {
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserService);
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some of the requests arguments caused an error: ' + nre.getMessage())
             return
@@ -372,7 +372,7 @@ class RestApiController {
         MvQueryParams queryParams = null;
         try {
             performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "construct query params", 1){
-                queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+                queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserService);
             }
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguements could not be found: ' + nre.getMessage())
@@ -1000,7 +1000,7 @@ public class ResultsRequestCommand {
      */
     public MvQueryParams createMvQueryParams(
             MeasuredEventDaoService measuredEventDaoService,
-            BrowserDaoService browserDaoService
+            BrowserService browserService
     ) throws IllegalStateException, NoResultException {
 
         if (!this.validate()) {
@@ -1016,7 +1016,7 @@ public class ResultsRequestCommand {
 
         addStepQueryData(measuredEventDaoService, result)
 
-        addBrowserQueryData(browserDaoService, result)
+        addBrowserQueryData(browserService, result)
 
         addLocationQueryData(result)
 
@@ -1078,7 +1078,7 @@ public class ResultsRequestCommand {
         }
     }
 
-    private addBrowserQueryData(BrowserDaoService browserDaoService, MvQueryParams result){
+    private addBrowserQueryData(BrowserService browserService, MvQueryParams result){
         if (browserId) {
             browserId.tokenize(",").each { singlebrowserId ->
                 if (!singlebrowserId.isLong()){
@@ -1091,7 +1091,7 @@ public class ResultsRequestCommand {
                 result.browserIds.add(theBrowser.getId());
             }
         }else if (browser) {
-            Browser theBrowser = browserDaoService.tryToFindByNameOrAlias(browser);
+            Browser theBrowser = browserService.findByNameOrAlias(browser);
             if (theBrowser == null) {
                 throw new NoResultException("Can not find browser named: " + browser);
             }

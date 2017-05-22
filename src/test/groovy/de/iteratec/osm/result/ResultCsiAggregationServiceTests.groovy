@@ -20,9 +20,9 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -45,7 +45,6 @@ import static org.junit.Assert.*
 class ResultCsiAggregationServiceTests  extends Specification{
 
     ResultCsiAggregationService serviceUnderTest
-    BrowserDaoService browserDaoServiceMock
 
     List<EventResult> results = []
 
@@ -65,7 +64,7 @@ class ResultCsiAggregationServiceTests  extends Specification{
         serviceUnderTest = service;
 
         /** DAO Services **/
-        serviceUnderTest.browserDaoService = Stub(BrowserDaoService);
+        serviceUnderTest.browserService = Stub(BrowserService)
 
         //DB Call Find By should explicit be tested
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService)

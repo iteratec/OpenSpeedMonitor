@@ -20,8 +20,8 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
@@ -49,7 +49,7 @@ import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 @Transactional
 public class EventResultDashboardService {
 
-    BrowserDaoService browserDaoService
+    BrowserService browserService
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     LocationDaoService locationDaoService
@@ -129,14 +129,14 @@ public class EventResultDashboardService {
      * Fetches all {@link Browser}s from Database.
      *
      * <p>
-     * 	Proxy for {@link BrowserDaoService}
+     * 	Proxy for {@link BrowserService}
      * </p>
      *
      * @return all {@link Browser} ordered by their name.
      */
     public List<Browser> getAllBrowser() {
 
-        return browserDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        return browserService.findAll().sort(false, { it.name.toLowerCase() });
     }
 
     /**
