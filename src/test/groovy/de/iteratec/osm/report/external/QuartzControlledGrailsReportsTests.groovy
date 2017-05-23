@@ -59,7 +59,7 @@ import static de.iteratec.osm.report.chart.MeasurandGroup.NO_MEASURAND
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
 @Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity, ConnectivityProfile])
-@Build([JobGroup])
+@Build([JobGroup, CsiAggregation, GraphiteServer])
 class QuartzControlledGrailsReportsTests extends Specification{
 
     static final String jobGroupWithServersName = 'csiGroupWithServers'
@@ -99,13 +99,12 @@ class QuartzControlledGrailsReportsTests extends Specification{
         serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService') as InMemoryConfigService
         serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         new OsmConfiguration().save(failOnError: true)
-        serviceMocker = ServiceMocker.create()
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockBatchActivityService()
     }
 
-    void testWritingHourlyCsiCsiAggregationsToGraphite() {
+    void "writing hourly CsiAggregations to Graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: HOURLY).save()
         AggregatorType event = new AggregatorType(name: MEASURED_EVENT, measurandGroup: NO_MEASURAND)
@@ -118,36 +117,39 @@ class QuartzControlledGrailsReportsTests extends Specification{
         mockPageCsiAggregationService([], HOURLY)
         mockShopCsiAggregationService([], HOURLY)
 
-        when:
+        when: "we report the CSI value of the last hour"
         DateTime cronjobStartsAt = hourlyDateExpectedToBeSent.plusMinutes(20)
         serviceUnderTest.reportEventCSIValuesOfLastHour(cronjobStartsAt)
+
         Integer sentInTotal = 2
-
-        then:
-        //assertions: just for JobGroups with GraphiteServers data is sent
         List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
-        sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}.size() == 0
-        sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }.size() == sent.size()
-
-        //assertions: two CsiAggregations were sent in total
-        Assert.assertEquals(sentInTotal, sent.size())
-        //assertions: all CsiAggregations were sent with correct Path
-        sent.findAll {
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithoutServername = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithServerName = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedPath = sent.findAll {
             it.path.stringValueOfPathName == ( pathPrefix + '.' + jobGroupWithServersName +
                     '.hourly.' + pageName + '.' + eventName + '.' + browserName + '.' + locationLocation + '.csi' )
-        }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct timestamp
-        sent.findAll { it.timestamp == (hourlyDateExpectedToBeSent.toDate()) }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct values
-        sent.findAll { it.value == (firstHourlyValueToSend * 100) }.size() == 1
-        sent.findAll { it.value == (secondHourlyValueToSend * 100) }.size() == 1
+        }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedTimeStamp = sent.findAll { it.timestamp == (hourlyDateExpectedToBeSent.toDate()) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithFirstValue = sent.findAll { it.value == (firstHourlyValueToSend * 100) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithSecondValue = sent.findAll { it.value == (secondHourlyValueToSend * 100) }
+
+
+        then: "only the expected SentDates should appear"
+        allSentDatesWithoutServername.size() == 0
+        allSentDatesWithServerName.size() == sent.size()
+
+        sentInTotal ==  sent.size()
+        allSentDatesWithExpectedPath.size() == sentInTotal
+        allSentDatesWithExpectedTimeStamp.size() == sentInTotal
+        allSentDatesWithFirstValue.size() == 1
+        allSentDatesWithSecondValue.findAll { it.value == (secondHourlyValueToSend * 100) }.size() == 1
     }
 
     @Test
-    void testWritingDailyPageCsiCsiAggregationsToGraphite() {
+    void "writing daily PageCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: DAILY).save()
-        AggregatorType aggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: NO_MEASURAND)
+        AggregatorType aggregator = new AggregatorType(name: PAGE, measurandGroup: NO_MEASURAND)
 
         CsiAggregation firstDpmv = getCsiAggregation(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
         CsiAggregation secondDpmv = getCsiAggregation(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
@@ -157,33 +159,35 @@ class QuartzControlledGrailsReportsTests extends Specification{
         mockPageCsiAggregationService([firstDpmv, secondDpmv], DAILY)
         mockShopCsiAggregationService([], DAILY)
 
-        when:
+        when: "we report PageCSIValue of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
         serviceUnderTest.reportPageCSIValuesOfLastDay(cronjobStartsAt)
         int sentInTotal = 2
         List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
-
-        then:
-        //assertions: just for JobGroups with GraphiteServers data is sent
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+" }.size() == 0
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }.size() == sent.size()
-        //assertions: two CsiAggregations were sent in total
-        sent.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct Path
-        sent.findAll {
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithoutServername = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithServerName = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedPath =         sent.findAll {
             it.path.stringValueOfPathName == ( pathPrefix + '.' + jobGroupWithServersName + '.daily.' + pageName + '.csi' )
-        }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct timestamp
-        sent.findAll { dailyDateExpectedToBeSent.toDate() == it.timestamp }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct values
-        sent.findAll { it.value == (firstDailyValueToSend * 100) }.size() == 1
-        sent.findAll { it.value == (secondDailyValueToSend * 100) }.size() == 1
+        }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedTimeStamp = sent.findAll { dailyDateExpectedToBeSent.toDate() == it.timestamp }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithFirstValue = sent.findAll { it.value == (firstDailyValueToSend * 100) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithSecondValue = sent.findAll { it.value == (secondDailyValueToSend * 100) }
+
+
+        then: "only the expected SentDates should appear"
+        allSentDatesWithoutServername.size() == 0
+        allSentDatesWithServerName.size() == sent.size()
+        sent.size() == sentInTotal
+        allSentDatesWithExpectedPath.size() == sentInTotal
+        allSentDatesWithExpectedTimeStamp.size() == sentInTotal
+        allSentDatesWithFirstValue.size() == 1
+        allSentDatesWithSecondValue.size() == 1
     }
 
-    void testWritingDailyShopCsiCsiAggregationsToGraphite() {
+    void "writing daily ShopCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: DAILY).save()
-        AggregatorType aggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: NO_MEASURAND)
+        AggregatorType aggregator = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
         CsiAggregation firstDsmv = getCsiAggregation(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
         CsiAggregation secondDsmv = getCsiAggregation(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
@@ -193,33 +197,34 @@ class QuartzControlledGrailsReportsTests extends Specification{
         mockPageCsiAggregationService([], DAILY)
         mockShopCsiAggregationService([firstDsmv, secondDsmv], DAILY)
 
-        when:
+        when: "we report ShopCSIValues of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
         serviceUnderTest.reportShopCSIValuesOfLastDay(cronjobStartsAt)
+        int sentInTotal = 2
         List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
-        Integer sentInTotal = 2
-
-        then:
-        //assertions: just for JobGroups with GraphiteServers data is sent
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+" }.size() == 0
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }.size() == sent.size()
-        //assertions: two CsiAggregations were sent in total
-        sent.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct Path
-        sent.findAll {
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithoutServername = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithServerName = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedPath = sent.findAll {
             it.path.stringValueOfPathName == ( pathPrefix + '.' + jobGroupWithServersName + '.daily.csi' )
-        }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct timestamp
-        sent.findAll { dailyDateExpectedToBeSent.toDate() == it.timestamp }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct values
-        sent.findAll { it.value == (firstDailyValueToSend * 100) }.size() == 1
-        sent.findAll { it.value == (secondDailyValueToSend * 100) }.size() == 1
+        }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedTimeStamp = sent.findAll { dailyDateExpectedToBeSent.toDate() == it.timestamp }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithFirstValue = sent.findAll { it.value == (firstDailyValueToSend * 100) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithSecondValue = sent.findAll { it.value == (secondDailyValueToSend * 100) }
+
+        then: "only the expected SentDates should appear"
+        allSentDatesWithoutServername.size() == 0
+        allSentDatesWithServerName.size() == sent.size()
+        sent.size() == sentInTotal
+        allSentDatesWithExpectedPath.size() == sentInTotal
+        allSentDatesWithExpectedTimeStamp.size() == sentInTotal
+        allSentDatesWithFirstValue.size() == 1
+        allSentDatesWithSecondValue.size() == 1
     }
 
-    void testWritingWeeklyPageCsiCsiAggregationsToGraphite() {
+    void "writing weekly PageCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: WEEKLY).save()
-        AggregatorType aggregator = new AggregatorType(name: AggregatorType.PAGE,measurandGroup: NO_MEASURAND)
+        AggregatorType aggregator = new AggregatorType(name: PAGE,measurandGroup: NO_MEASURAND)
 
         CsiAggregation firstWpmv = getCsiAggregation(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
         CsiAggregation secondWpmv = getCsiAggregation(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
@@ -229,34 +234,35 @@ class QuartzControlledGrailsReportsTests extends Specification{
         mockPageCsiAggregationService([firstWpmv, secondWpmv], WEEKLY)
         mockShopCsiAggregationService([], WEEKLY)
 
-        when:
+        when: "we report PageCSIValues of the last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
         serviceUnderTest.reportPageCSIValuesOfLastWeek(cronjobStartsAt)
-        List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
         Integer sentInTotal = 2
-
-        then:
-        //assertions: just for JobGroups with GraphiteServers data is sent
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+" }.size() == 0
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }.size() == sent.size()
-        //assertions: two CsiAggregations were sent in total
-        sent.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct Path
-        sent.findAll {
+        List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithoutServername = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithServerName = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedPath = sent.findAll {
             it.path.stringValueOfPathName == ( pathPrefix + '.' + jobGroupWithServersName + '.weekly.' + pageName + '.csi' )
-        }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct timestamp
-        sent.findAll { weeklyDateExpectedToBeSent.toDate() == it.timestamp }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct values
-        sent.findAll { it.value == (firstWeeklyValueToSend * 100) }.size() == 1
-        sent.findAll { it.value == (secondWeeklyValueToSend * 100) }.size() == 1
+        }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedTimeStamp = sent.findAll { weeklyDateExpectedToBeSent.toDate() == it.timestamp }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithFirstValue = sent.findAll { it.value == (firstWeeklyValueToSend * 100) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithSecondValue = sent.findAll { it.value == (secondWeeklyValueToSend * 100) }
+
+        then: "only the expected SentDates should appear"
+        allSentDatesWithoutServername.size() == 0
+        allSentDatesWithServerName.size() == sent.size()
+        sent.size() == sentInTotal
+        allSentDatesWithExpectedPath.size() == sentInTotal
+        allSentDatesWithExpectedTimeStamp.size() == sentInTotal
+        allSentDatesWithFirstValue.size() == 1
+        allSentDatesWithSecondValue.size() == 1
     }
 
 
-    void testWritingWeeklyShopCsiCsiAggregationsToGraphite() {
+    void "writing WeeklyShopCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes:WEEKLY).save()
-        AggregatorType aggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: NO_MEASURAND)
+        AggregatorType aggregator = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
         CsiAggregation firstWsmv = getCsiAggregation(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
         CsiAggregation secondWsmv = getCsiAggregation(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
@@ -266,25 +272,28 @@ class QuartzControlledGrailsReportsTests extends Specification{
         mockPageCsiAggregationService([], WEEKLY)
         mockShopCsiAggregationService([firstWsmv, secondWsmv], WEEKLY)
 
-        when:
+        when: "we report ShopCSIValues of last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
         serviceUnderTest.reportShopCSIValuesOfLastWeek(cronjobStartsAt)
         List<MockedGraphiteSocket.SentDate> sent = graphiteSocketUsedInTests.sentDates
         Integer sentInTotal = 2
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithoutServername = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+"}
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithServerName = sent.findAll {it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedPath = sent.findAll {
+            it.path.stringValueOfPathName == ( pathPrefix + '.' + jobGroupWithServersName + '.weekly.csi')
+        }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithExpectedTimeStamp = sent.findAll { weeklyDateExpectedToBeSent.toDate() == it.timestamp }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithFirstValue = sent.findAll { it.value == (firstWeeklyValueToSend * 100) }
+        List<MockedGraphiteSocket.SentDate> allSentDatesWithSecondValue = sent.findAll { it.value == (secondWeeklyValueToSend * 100) }
 
-        then:
-        //assertions: just for JobGroups with GraphiteServers data is sent
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithoutServersName}.+" }.size() == 0
-        sent.findAll { it.path.stringValueOfPathName =~ ".+${jobGroupWithServersName}.+" }.size() == sent.size()
-        //assertions: two CsiAggregations were sent in total
+        then: "only the expected SentDates should appear"
+        allSentDatesWithoutServername.size() == 0
+        allSentDatesWithServerName.size() == sent.size()
         sent.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct Path
-        sent.findAll { it.path.stringValueOfPathName == (pathPrefix + '.' + jobGroupWithServersName + '.weekly.csi') }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct timestamp
-        sent.findAll { weeklyDateExpectedToBeSent.toDate() == it.timestamp }.size() == sentInTotal
-        //assertions: all CsiAggregations were sent with correct values
-        sent.findAll { it.value == (firstWeeklyValueToSend * 100) }.size() == 1
-        sent.findAll { it.value == (secondWeeklyValueToSend * 100) }.size() == 1
+        allSentDatesWithExpectedPath.size() == sentInTotal
+        allSentDatesWithExpectedTimeStamp.size() == sentInTotal
+        allSentDatesWithFirstValue.size() == 1
+        allSentDatesWithSecondValue.size() == 1
     }
 
     //mocks of inner services///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -365,17 +374,14 @@ class QuartzControlledGrailsReportsTests extends Specification{
         GraphitePath pathPage = new GraphitePath(prefix: pathPrefix, measurand: page)
         GraphitePath pathShop = new GraphitePath(prefix: pathPrefix, measurand: shop)
 
-        GraphiteServer serverWithPaths = new GraphiteServer()
-        serverWithPaths.setServerAdress('127.0.0.1')
-        serverWithPaths.setPort(2003)
-        serverWithPaths.setGraphitePaths([pathEvent, pathPage, pathShop])
-        serverWithPaths.reportCsiAggregationsToGraphiteServer = true
+        GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePaths: [pathEvent,pathPage,pathShop],
+                reportCsiAggregationsToGraphiteServer: true)
 
         return [serverWithPaths]
     }
 
     static getCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, Double value, DateTime valueForStated, String resultIds) {
-        CsiAggregation hmv = new CsiAggregation()
+        CsiAggregation hmv = CsiAggregation.buildWithoutSave()
         hmv.started = valueForStated.toDate()
         hmv.interval = interval
         hmv.aggregator = aggregator
