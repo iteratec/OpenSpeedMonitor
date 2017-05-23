@@ -17,11 +17,7 @@
 
 package de.iteratec.osm.result
 
-import org.joda.time.DateTime
-import org.joda.time.Duration
-
 import de.iteratec.osm.csi.Page
-
 /**
  * DB-access and caching for {@link Page}s.
  * @author nkuhn
@@ -42,7 +38,7 @@ class PageService {
      */
     Page getPageByStepName(String stepName) {
         Page page = Page.findByName(getPageNameFromStepName(stepName))
-        return page ? page : Page.findByName(Page.UNDEFINED)
+        return page ? page : Page.findOrCreateByName(Page.UNDEFINED)
     }
     /**
      * Gets pagename-part from given stepName. If no pagename-part exist {@link Page#UNDEFINED} is returned.
