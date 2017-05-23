@@ -115,10 +115,10 @@ class PersistingNewEventResultsTests extends Specification {
         Page.build(name: "Produkt")
         Page.build(name: "Suche")
 
-        when:
+        when: "service listens to XML of a WPT multistep fork (2.18)"
         service.listenToResult(xmlResult, wptServer)
 
-        then:
+        then: "the correct measured events and event results are created; pages are associated if provided"
 
         MeasuredEvent.list()*.name as Set == ['Seite laden', 'Artikel suchen', 'Artikel-Detailseite laden',
                                               'Produkt auswaehlen', 'Produkt in Warenkorb legen',
@@ -166,7 +166,7 @@ class PersistingNewEventResultsTests extends Specification {
         service.listenToResult(xmlResult, wptServer)
         List<EventResult> eventResults = EventResult.list()
 
-        then: "There are 15 EventResults with visually complete and cs values"
+        then: "there are 15 EventResults with visually complete and cs values"
         eventResults.size() == 15
         !eventResults.any { it.visuallyCompleteInMillisecs == null }
         !eventResults.any { it.csByWptVisuallyCompleteInPercent == null }
@@ -180,10 +180,10 @@ class PersistingNewEventResultsTests extends Specification {
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job.build(label: "FF_Otto_multistep")
 
-        when:
+        when: "the service listens to results from a WPT server > 2.19 with multistep"
         service.listenToResult(xmlResult, wptServer)
 
-        then:
+        then: "all event results are created and the new URL format is used to create the waterfall URL"
         List<EventResult> eventResults = EventResult.list()
         eventResults.size() == 8
         !eventResults.any { it.getTestDetailsWaterfallURL() == null }
@@ -212,10 +212,10 @@ class PersistingNewEventResultsTests extends Specification {
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString())
         Job.build(label: "testjob")
 
-        when:
+        when: "the service tries to persist results for an XML result with failed step"
         service.persistResultsForAllTeststeps(xmlResult)
 
-        then:
+        then: "it throws an exception and doesn't create any measured events"
         OsmResultPersistanceException exception = thrown()
         MeasuredEvent.list().size() == 0
     }
