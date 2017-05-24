@@ -37,7 +37,6 @@ class WptServerService {
             }
             catch (Exception e) {
                 log.error("An error occured while saving the wpt server '${server.label}'.", e)
-                System.out.println(e);
                 return [];
             }
             return tryFetchLocations(server);
@@ -55,7 +54,6 @@ class WptServerService {
         }
         catch (Exception e) {
             log.error("An error occured while fetching locations from wpt server '${server.label}'.", e)
-            System.out.println(e);
             server.delete()
             return [];
         }

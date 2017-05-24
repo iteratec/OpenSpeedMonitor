@@ -12,12 +12,6 @@ import spock.lang.Specification
 @Mock([WebPageTestServer,Location])
 class WptServerServiceSpec extends Specification {
 
-    def setup() {
-    }
-
-    def cleanup() {
-    }
-
     void "test with working wpt-server"() {
         setup: "the expected locations"
             mockProxyService(3)
