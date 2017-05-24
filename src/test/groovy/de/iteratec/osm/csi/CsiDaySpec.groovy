@@ -40,47 +40,44 @@ class CsiDaySpec extends Specification {
     }
 
     void "test set a new wight for hour"() {
-        given:
-        Double newWeight = 12.0
-        assert dayToTest.hour3Weight != newWeight
+        given: "a new weight"
+            Double newWeight = 12.0
+            assert dayToTest.hour3Weight != newWeight
 
-        when:
-        dayToTest.setHourWeight(3, newWeight)
+        when: "the new weight is set"
+            dayToTest.setHourWeight(3, newWeight)
 
-        then:
-        assert dayToTest.hour3Weight == newWeight
+        then: "CsiDay has the correct weight"
+            dayToTest.hour3Weight == newWeight
     }
 
     void "test get weight for hour"() {
-        given:
-        Double expectedWeight = 0.1
+        when: "getting hour weight"
+            Double weightForHour1 = dayToTest.getHourWeight(1)
 
-        when:
-        Double weightForHour1 = dayToTest.getHourWeight(1)
-
-        then:
-        assert expectedWeight == weightForHour1
+        then: "the hour has the correct weight"
+            weightForHour1 == 0.1
     }
 
     void "test copyDay creates a valid copy" () {
-        when:
-        CsiDay copy = CsiDay.copyDay(dayToTest)
+        when: "copying a CsiDay"
+            CsiDay copy = CsiDay.copyDay(dayToTest)
 
-        then:
-        assert copy.properties == dayToTest.properties
-        assert copy.validate()
+        then: "the copy has the same properties and is valid"
+            copy.properties == dayToTest.properties
+            copy.validate()
     }
 
     void "test change weight in copy does not effect source day"() {
-        given:
-        CsiDay copy = CsiDay.copyDay(dayToTest)
-        Double newWeight = 12.0
+        given: "a copy and a new weight"
+            CsiDay copy = CsiDay.copyDay(dayToTest)
+            Double newWeight = 12.0
 
-        when:
-        copy.setHourWeight(3, newWeight)
+        when: "changing the copy"
+            copy.setHourWeight(3, newWeight)
 
-        then:
-        assert copy.getHourWeight(3) == newWeight
-        assert dayToTest.getHourWeight(3) != newWeight
+        then: "the original CsiDay is unchanged"
+            copy.getHourWeight(3) == newWeight
+            dayToTest.getHourWeight(3) != newWeight
     }
 }

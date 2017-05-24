@@ -27,11 +27,11 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 class ChartEntrySpec extends Specification{
 
-   def "chart Entry getter and setter test" () {
-       when:
+   def "chart Entry initialisation test" () {
+       when: "ChartEntry is created"
        ChartEntry chartEntry = new ChartEntry(name: "Test", weight: 5)
 
-       then:
+       then: "it has been initialised"
        chartEntry.name == "Test"
        chartEntry.weight == 5.0
    }

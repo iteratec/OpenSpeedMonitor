@@ -25,37 +25,37 @@ class DefaultTimeToCsMappingServiceSpec extends Specification{
 
 
     void "test copyDefaultMappingToPage to empty csiConfiguration" () {
-        when:
+        when: "copying DefaultMappingToPage"
         service.copyDefaultMappingToPage(page1, DEFAULT_TTCS_MAPPING_1_NAME, csiConfiguration)
 
-        then:
+        then: "csiConfiguration contains default mappings and the page"
         TimeToCsMapping.count == 5
         csiConfiguration.timeToCsMappings.size() == 5
         csiConfiguration.timeToCsMappings.every {it.page == page1}
     }
 
     void "test copyDefaultMappingToPage overwrite existing mapping" () {
-        given:
+        given: "DefaultMappings copied to two pages"
         service.copyDefaultMappingToPage(page1, DEFAULT_TTCS_MAPPING_1_NAME, csiConfiguration)
         service.copyDefaultMappingToPage(page2, DEFAULT_TTCS_MAPPING_2_NAME, csiConfiguration)
 
-        when:
+        when: "copying DefaultMapping to first page again"
         service.copyDefaultMappingToPage(page1, DEFAULT_TTCS_MAPPING_1_NAME, csiConfiguration)
 
-        then:
+        then: "csiConfiguration still has two sets of pages and default mappings"
         TimeToCsMapping.count == 10
         csiConfiguration.timeToCsMappings.size() == 10
         csiConfiguration.timeToCsMappings.findAll{it.page == page1}.size() == 5
     }
 
     void "test copyDefaultMappingToPage add TimeToCsMappings to other page"() {
-        given:
+        given: "a csiConfiguration with a page and default mappings"
         service.copyDefaultMappingToPage(page1, DEFAULT_TTCS_MAPPING_1_NAME, csiConfiguration)
 
-        when:
+        when: "copying DefaultMappingToPage to another page"
         service.copyDefaultMappingToPage(page2, DEFAULT_TTCS_MAPPING_1_NAME, csiConfiguration)
 
-        then:
+        then: "csiConfiguration has two sets of pages and default mappings"
         TimeToCsMapping.count == 10
         csiConfiguration.timeToCsMappings.size() == 10
         csiConfiguration.timeToCsMappings.findAll{it.page == page1}.size() == 5

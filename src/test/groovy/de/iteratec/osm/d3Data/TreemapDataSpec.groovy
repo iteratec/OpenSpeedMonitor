@@ -32,10 +32,10 @@ import org.junit.*
 class TreemapDataSpec extends Specification {
 
     def "initialisation test" () {
-        when:
+        when: "new TreemapData is created"
         TreemapData treemapData = new TreemapData()
 
-        then:
+        then: "the treemapData has been initialised"
         treemapData.children.size() == 0
         !treemapData.zeroWeightLabel.isEmpty()
         !treemapData.dataName.isEmpty()
@@ -43,14 +43,14 @@ class TreemapDataSpec extends Specification {
     }
 
     def "addNode adds chart entry to list"() {
-        given:
+        given: "an entry"
         TreemapData treemapData = new TreemapData()
         ChartEntry entry = new ChartEntry()
 
-        when:
+        when: "the entry is added to TreemapData"
         treemapData.addNode(entry)
 
-        then:
+        then: "TreemapData contains the entry"
         treemapData.children.size() == 1
         treemapData.children[0] == entry
     }

@@ -32,34 +32,34 @@ class BrowserConnectivityWeightSpec extends Specification {
     }
 
     void "test nullable"() {
-        when:
+        when: "not initialised"
         BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight()
 
-        then:
+        then: "BrowserConnectivityWeight does not validate"
         !browserConnectivityWeight.validate()
     }
 
     void "test only browser not valid"() {
-        when:
+        when: "invalid browser"
         BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(browser: new Browser())
 
-        then:
+        then: "BrowserConnectivityWeight does not validate"
         !browserConnectivityWeight.validate()
     }
 
     void "test only connectivity not valid"() {
-        when:
+        when: "invalid ConnectivityProfile"
         BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivity: new ConnectivityProfile())
 
-        then:
+        then: "BrowserConnectivityWeight does not validate"
         !browserConnectivityWeight.validate()
     }
 
     void "all fields defined valid"() {
-        when:
+        when: "initialised"
         BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(browser: new Browser(), connectivity: new ConnectivityProfile(), weight: 12.5)
 
-        then:
+        then: "BrowserConnectivityWeight does validate"
         browserConnectivityWeight.validate()
     }
 }

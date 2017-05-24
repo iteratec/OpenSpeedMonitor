@@ -16,10 +16,10 @@ class JobGroupWeightSpec extends Specification {
     }
 
     void "test jobGroupWeight has to have a jobGroup with csiConfiguration"() {
-        when:
+        when: "creating a jobGroupWeight with a jobGroup without a csiConfiguration"
         JobGroupWeight jobGroupWeight = new JobGroupWeight(jobGroup: jobGroup, weight: 12.0)
 
-        then:
+        then: "the jobGroupWeight does not validate"
         !jobGroupWeight.validate()
     }
 }

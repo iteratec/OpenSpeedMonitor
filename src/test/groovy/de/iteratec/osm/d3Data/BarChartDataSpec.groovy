@@ -28,24 +28,24 @@ import spock.lang.Specification
 class BarChartDataSpec extends Specification{
 
     def "bar chart data object initialised with labels and an empty list"() {
-        when:
+        when: "new BarChartData is created"
         BarChartData barChartData = new BarChartData()
 
-        then:
+        then: "it is initialised"
         !barChartData.xLabel.isEmpty()
         !barChartData.yLabel.isEmpty()
         barChartData.bars.isEmpty()
     }
 
     def "addDatum adds a chart entry object to list of bars" () {
-        given:
+        given: "some entry"
         BarChartData barChartData = new BarChartData()
         ChartEntry chartEntry = new ChartEntry()
 
-        when:
+        when: "the entry is added to barChartData"
         barChartData.addDatum(chartEntry)
 
-        then:
+        then: "barChartData contains that entry"
         barChartData.bars.size() == 1
         barChartData.bars[0] == chartEntry
     }

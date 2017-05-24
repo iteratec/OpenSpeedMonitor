@@ -29,10 +29,10 @@ import spock.lang.Specification
 class ScheduleChartDataSpec extends Specification{
 
     def "initialisation test" () {
-        when:
+        when: "ScheduleChartData is created"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
 
-        then:
+        then: "the ScheduleChartData has been initialised"
         !scheduleChartData.name.isEmpty()
         !scheduleChartData.discountedJobsLabel.isEmpty()
         scheduleChartData.jobs.size() == 0
@@ -43,7 +43,7 @@ class ScheduleChartDataSpec extends Specification{
     }
 
     def "addJob adds schedule chart job to list" () {
-        given:
+        given: "some jobs with dates"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
         List executionDates = new ArrayList<>()
         DateTime date1 = new DateTime()
@@ -56,11 +56,11 @@ class ScheduleChartDataSpec extends Specification{
         ScheduleChartJob job = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 60)
         ScheduleChartJob job2 = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 120)
 
-        when:
+        when: "thejobs are added to ScheduleChartData"
         scheduleChartData.addJob(job)
         scheduleChartData.addJob(job2)
 
-        then:
+        then: "the ScheduleChartData contains the correct jobs and dates"
         scheduleChartData.jobs.size() == 2
         scheduleChartData.jobs[0] == job
         scheduleChartData.allExecutionDates.size() == job.executionDates.size() + job2.executionDates.size()
@@ -75,14 +75,14 @@ class ScheduleChartDataSpec extends Specification{
     }
 
     def "addDiscountedJob adds job to list" () {
-        given:
+        given: "a job"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
         String job = "Job"
 
-        when:
+        when: "the job is added as DiscountedJob"
         scheduleChartData.addDiscountedJob(job)
 
-        then:
+        then: "ScheduleChartData contains the job"
         scheduleChartData.discountedJobs.size() == 1
         scheduleChartData.discountedJobs[0] == job
     }
