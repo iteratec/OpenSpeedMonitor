@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.script
 
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import grails.test.mixin.*
@@ -31,7 +32,7 @@ class ScriptParserTestSpec extends Specification {
     PageService pageService
 
     void "Script without setEventName commands results in MISSING_SETEVENTNAME_STATEMENT errors"() {
-        when:
+        when: "a script without setEventName is parsed"
         ScriptParser parser = new ScriptParser(pageService, """
                 ignoreErrors	1
                 combineSteps
@@ -54,7 +55,7 @@ class ScriptParserTestSpec extends Specification {
                 execAndWait	document.getElementById('idOfLogoutButton').click();
                         """)
 
-        then:
+        then: "a MISSING_SETEVENTNAME_STATEMENT error occurs"
         parser.errors.size() == 8
         parser.errors.each { error ->
             error == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
@@ -62,10 +63,10 @@ class ScriptParserTestSpec extends Specification {
     }
 
     void "Empty script is handled correctly"() {
-        when:
+        when: "script is empty"
         ScriptParser parser = new ScriptParser(pageService, '')
 
-        then:
+        then: "the parsers does nothing"
         parser.measuredEventsCount == 0
         parser.eventNames.size() == 0
         parser.steps == []
@@ -74,20 +75,20 @@ class ScriptParserTestSpec extends Specification {
 
 
     void "Missing PageCommand after setEventName command results in error"() {
-        when:
+        when: "a script without PageCommand after setEventName is parsed"
         ScriptParser parser = new ScriptParser(pageService, 'setEventName 456')
 
-        then:
+        then: "a DANGLING_SETEVENTNAME_STATEMENT and a NO_STEPS_FOUND error occurs"
         parser.errors.size() == 2
         parser.errors*.type.contains(ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT)
         parser.errors*.type.contains(ScriptEventNameCmdWarningType.NO_STEPS_FOUND)
     }
 
     void "PageViewCommandOnlyScript results in warning"() {
-        when:
+        when: "a script with only a navigate command is parsed"
         ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com')
 
-        then:
+        then: "a MISSING_SETEVENTNAME_STATEMENT warning occurs"
         parser.errors.size() == 1
         parser.errors[0].type == ScriptEventNameCmdWarningType.MISSING_SETEVENTNAME_STATEMENT
         parser.measuredEventsCount == 1
@@ -97,7 +98,7 @@ class ScriptParserTestSpec extends Specification {
 
 
     void "GlobalLogDataZeroScript results in error"() {
-        when:
+        when: "a page with no steps is parsed"
         ScriptParser parser = new ScriptParser(pageService, """
                     void testGlobalLogDataZeroScript() {
                 logData 0
@@ -112,7 +113,7 @@ class ScriptParserTestSpec extends Specification {
                 navigate http://testsite.de
                             """)
 
-        then:
+        then: "a NO_STEPS_FOUND error occurs"
         parser.measuredEventsCount == 0
         parser.steps == []
         parser.eventNames.size() == 3
@@ -120,6 +121,8 @@ class ScriptParserTestSpec extends Specification {
         parser.errors[0].type == ScriptEventNameCmdWarningType.NO_STEPS_FOUND
     }
 
+    //see ticket IT-1723
+    @Ignore
     void "alternatingLogData01Script results in warning" () {
         when:
 		ScriptParser parser = new ScriptParser(pageService, """
@@ -150,11 +153,11 @@ class ScriptParserTestSpec extends Specification {
         parser.measuredEventsCount == 2
         parser.steps == [5, 7, 18, 20]
         parser.eventNames.size() == 3
-        parser.warnings.size() == 0
+        parser.warnings.size() == 1
     }
 
     void "allPageLoadEvents includes logData0 events" () {
-        when:
+        when: "a script with logData0 events is parsed"
         ScriptParser parser = new ScriptParser(pageService, """
                 //schritt 1
                 logData 0
@@ -178,7 +181,7 @@ class ScriptParserTestSpec extends Specification {
                 navigate http://testsite.de
                             """)
 
-        then:
+        then: "allPageLoadEvents includes those events"
         parser.allPageLoadEvents == 6
     }
 }

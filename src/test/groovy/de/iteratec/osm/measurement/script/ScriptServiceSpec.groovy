@@ -22,12 +22,6 @@ class ScriptServiceSpec extends Specification {
         pageService(PageService)
     }
 
-    def setup() {
-    }
-
-    def cleanup() {
-    }
-
     void "don't create new pages if they already exist"() {
 
         setup: "there are two pages and script parser declares these two existing pages"
