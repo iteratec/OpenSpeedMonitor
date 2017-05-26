@@ -22,29 +22,29 @@ class CsiSystemSpec extends Specification {
     }
 
     void "test empty CsiSystem is invalid"() {
-        when:
-        CsiSystem system = new CsiSystem(label: "csiSystem")
+        when: "an empty CsiSystem is created"
+            CsiSystem system = new CsiSystem(label: "csiSystem")
 
-        then:
-        !system.validate()
+        then: "it does not validate"
+            !system.validate()
     }
 
     void "test a valid csiSystem"() {
-        when:
-        CsiSystem system = new CsiSystem(label: "csiSystem")
-        system.addToJobGroupWeights(weight1)
-        system.addToJobGroupWeights(weight2)
+        when: "a valid CsiSystem is created"
+            CsiSystem system = new CsiSystem(label: "csiSystem")
+            system.addToJobGroupWeights(weight1)
+            system.addToJobGroupWeights(weight2)
 
-        then:
-        system.validate()
+        then: "it validates"
+            system.validate()
     }
 
     void "test csiSystem contains only one jobGroupWeight then system is invalid"() {
-        when:
-        CsiSystem system = new CsiSystem(label: "csiSytesm")
-        system.addToJobGroupWeights(weight1)
+        when: "a CsiSystem  with only one jobGroupWeight"
+            CsiSystem system = new CsiSystem(label: "csiSytesm")
+            system.addToJobGroupWeights(weight1)
 
-        then:
-        !system.validate()
+        then: "it does not validate"
+            !system.validate()
     }
 }

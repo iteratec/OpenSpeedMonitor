@@ -62,11 +62,11 @@ class CsTargetGraphTests extends Specification {
                 pointTwo: csTargetNow).save(failOnError: true)
     }
 
-    def "testPercentCalculationByDate"() {
-        when:
+    def "test percent calculation by date"() {
+        when: "calculating target cs of a date"
         CsTargetGraph testGraph = CsTargetGraph.findByLabel(graphLabel)
 
-        then:
+        then: "the error should be less than tolerableDeviationDueToRounding"
         Math.abs(testGraph.getPercentOfDate(fourMonthsAgo) - 80d) < tolerableDeviationDueToRounding
         Math.abs(testGraph.getPercentOfDate(now.minusMonths(3)) - 82.5d) < tolerableDeviationDueToRounding
         Math.abs(testGraph.getPercentOfDate(now.minusMonths(2)) - 85d) < tolerableDeviationDueToRounding

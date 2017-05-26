@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.*
 import org.junit.Assert
 import org.junit.Before
@@ -25,33 +26,32 @@ import org.junit.Test
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
+import spock.lang.Specification
 
 /**
  * Test-suite of {@link OsmConfigCacheService}.
  */
 @TestFor(OsmConfigCacheService)
+@Build([OsmConfiguration])
 @Mock([OsmConfiguration])
-class OsmConfigCacheServiceTests {
+class OsmConfigCacheServiceTests extends Specification {
 
-    static transactional = false
-    OsmConfigCacheService serviceUnderTest
-
-    def doWithSpring = {
-        configService(ConfigService)
+    void setup() {
+        OsmConfiguration.build()
+        service.configService = new ConfigService()
     }
 
-    @Before
-    void setUp() {
-        serviceUnderTest = service
-        serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
-
-        // creating configuration with default values
-        new OsmConfiguration().save(failOnError: true)
+    void "test accessing cached configs min doc complete time"() {
+        when: "getting cached min doc complete time"
+            Integer time = service.getCachedMinDocCompleteTimeInMillisecs(24)
+        then: "the result should be 250ms"
+            time == 250
     }
 
-    @Test
-    void testAccessingCachedConfigs() {
-        Assert.assertEquals(250, serviceUnderTest.getCachedMinDocCompleteTimeInMillisecs(24))
-        Assert.assertEquals(180000, serviceUnderTest.getCachedMaxDocCompleteTimeInMillisecs(24))
+    void "test accessing cached configs max doc complete time"() {
+        when: "getting cached max doc complete time"
+            Integer time = service.getCachedMaxDocCompleteTimeInMillisecs(24)
+        then: "the result should be 3m"
+            time == 180000
     }
 }
