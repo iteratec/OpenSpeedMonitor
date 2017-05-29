@@ -147,7 +147,7 @@ class PersistingNewEventResultsTests extends Specification {
 
         where:
         fileName                                                     | productPageName | searchPageName | jobLabel
-        "MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml"              | Page.UNDEFINED  | Page.UNDEFINED | "http://www.example.de.de - Multiple steps with event names + dom elements"
+        "MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml"              | Page.UNDEFINED  | Page.UNDEFINED | "3Runs_6Events"
         "MULTISTEP_FORK_ITERATEC_3Runs_6EventNames_WithPageName.xml" | "Produkt"       | "Suche"        | "example.de - Multiple steps with event names + dom elements"
     }
 
