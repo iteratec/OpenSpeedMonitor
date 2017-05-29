@@ -85,7 +85,6 @@ class EventResultDashboardServiceTests extends Specification {
         performanceLoggingService(PerformanceLoggingService)
         csiAggregationUtilService(CsiAggregationUtilService)
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
-        defaultPageDaoService(DefaultPageDaoService)
         i18nService(I18nService)
         defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
         browserSerivce(BrowserService)
@@ -107,7 +106,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
-        mockPageDaoService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -137,7 +135,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
-        mockPageDaoService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -185,7 +182,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
-        mockPageDaoService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -227,7 +223,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockEventResultDaoService()
         mockPerformanceLoggingService()
         mockJobGroupDaoService()
-        mockPageDaoService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -270,7 +265,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockPerformanceLoggingService()
         mockCsiAggregationUtilService()
         mockJobGroupDaoService()
-        mockPageDaoService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -307,7 +301,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockPerformanceLoggingService()
         mockCsiAggregationUtilService()
         mockJobGroupDaoService()
-        mockPageDaoService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -687,13 +680,6 @@ class EventResultDashboardServiceTests extends Specification {
     private void mockJobGroupDaoService() {
         def jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         serviceUnderTest.jobGroupDaoService = jobGroupDaoService
-    }
-    /**
-     * Mocks {@linkplain EventCsiAggregationService#pageDaoService}.
-     */
-    private void mockPageDaoService() {
-        def pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
-        serviceUnderTest.pageDaoService = pageDaoService
     }
 
     private mockAggregatorTypeDaoService() {

@@ -24,13 +24,11 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.CsvExportService
 import org.hibernate.sql.JoinType
@@ -52,8 +50,6 @@ class TabularResultPresentationController {
     private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
 
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    MeasuredEventDaoService measuredEventDaoService
     BrowserService browserService
 
     EventResultDaoService eventResultDaoService
@@ -208,11 +204,11 @@ class TabularResultPresentationController {
         result.put('csiGroups', jobGroupDaoService.findAll().sort(false, { it.name }))
 
         // Pages
-        List<Page> pages = pageDaoService.findAll().sort(false, { it.name });
+        List<Page> pages = Page.list().sort(false, { it.name })
         result.put('pages', pages)
 
         // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name });
+        List<MeasuredEvent> measuredEvents = MeasuredEvent.findAll().sort(false, { it.name });
         result.put('measuredEvents', measuredEvents)
 
         // Browsers

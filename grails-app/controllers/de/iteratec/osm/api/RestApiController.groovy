@@ -30,14 +30,12 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -71,8 +69,6 @@ class RestApiController {
     public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 
     JobGroupDaoService jobGroupDaoService;
-    PageDaoService pageDaoService;
-    MeasuredEventDaoService measuredEventDaoService;
     BrowserService browserService
     CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
@@ -169,8 +165,7 @@ class RestApiController {
      * @see MeasuredEvent
      */
     public Map<String, Object> allSteps() {
-        Set<MeasuredEvent> events = measuredEventDaoService.findAll();
-        Set<MeasuredEventDto> eventsAsJson = MeasuredEventDto.create(events)
+        Set<MeasuredEventDto> eventsAsJson = MeasuredEventDto.create(MeasuredEvent.list())
         return sendObjectAsJSON(eventsAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -197,7 +192,7 @@ class RestApiController {
      * @see Page
      */
     public Map<String, Object> allPages() {
-        Set<Page> pages = pageDaoService.findAll();
+        Set<Page> pages = Page.list()
         Set<PageDto> pagesAsJson = PageDto.create(pages)
         return sendObjectAsJSON(pagesAsJson, params.pretty && params.pretty == 'true');
     }
@@ -301,7 +296,7 @@ class RestApiController {
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserService);
+            queryParams = cmd.createMvQueryParams(browserService);
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some of the requests arguments caused an error: ' + nre.getMessage())
             return
@@ -370,7 +365,7 @@ class RestApiController {
         MvQueryParams queryParams = null;
         try {
             performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "construct query params", 1){
-                queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserService);
+                queryParams = cmd.createMvQueryParams(browserService)
             }
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguements could not be found: ' + nre.getMessage())
@@ -997,7 +992,6 @@ public class ResultsRequestCommand {
      *         event, location) could not be found.
      */
     public MvQueryParams createMvQueryParams(
-            MeasuredEventDaoService measuredEventDaoService,
             BrowserService browserService
     ) throws IllegalStateException, NoResultException {
 
@@ -1012,7 +1006,7 @@ public class ResultsRequestCommand {
 
         addPageQueryData(result)
 
-        addStepQueryData(measuredEventDaoService, result)
+        addStepQueryData(result)
 
         addBrowserQueryData(browserService, result)
 
@@ -1053,7 +1047,7 @@ public class ResultsRequestCommand {
 
     }
 
-    private addStepQueryData(MeasuredEventDaoService measuredEventDaoService, MvQueryParams result){
+    private addStepQueryData(MvQueryParams result){
         if (stepId) {
             stepId.tokenize(",").each { singleStepId ->
                 if (!singleStepId.isLong()){
@@ -1067,7 +1061,7 @@ public class ResultsRequestCommand {
             }
         }else if (step) {
             step.tokenize(",").each { singleStepName ->
-                MeasuredEvent theStep = measuredEventDaoService.tryToFindByName(singleStepName);
+                MeasuredEvent theStep = MeasuredEvent.findByName(singleStepName)
                 if (theStep == null) {
                     throw new NoResultException("Can not find step named: " + singleStepName);
                 }

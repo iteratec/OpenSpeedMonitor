@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -50,7 +49,6 @@ public class EventResultDashboardService {
 
     BrowserService browserService
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
     ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
     EventResultDaoService eventResultDaoService
@@ -136,14 +134,10 @@ public class EventResultDashboardService {
     /**
      * Fetches all {@link Page}s from Database.
      *
-     * <p>
-     * 	Proxy for {@link PageDaoService}
-     * </p>
-     *
      * @return all {@link Page} ordered by their name.
      */
     public List<Page> getAllPages() {
-        return pageDaoService.findAll().sort(false, { it.name.toLowerCase() })
+        return Page.list().sort(false, { it.name.toLowerCase() })
     }
 
     /**

@@ -23,7 +23,6 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -32,7 +31,6 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
@@ -63,8 +61,6 @@ import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 class CsiDashboardController {
 
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    MeasuredEventDaoService measuredEventDaoService
     BrowserService browserService
     I18nService i18nService
 
@@ -948,11 +944,11 @@ class CsiDashboardController {
         result.put('folders', jobGroupDaoService.findCSIGroups().sort(false, { it.name }))
 
         // Pages
-        List<Page> pages = pageDaoService.findAll().sort(false, { it.name })
+        List<Page> pages = Page.list().sort(false, { it.name })
         result.put('pages', pages)
 
         // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name })
+        List<MeasuredEvent> measuredEvents = MeasuredEvent.list().sort(false, { it.name })
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
