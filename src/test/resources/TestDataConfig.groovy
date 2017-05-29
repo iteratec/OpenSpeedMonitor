@@ -34,6 +34,10 @@ testDataConfig {
             browser = {-> Browser.build()}
             location = {->Location.build()}
         }
+        'de.iteratec.osm.measurement.environment.Browser' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
     }
     unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
                             'de.iteratec.osm.result.EventResult': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
