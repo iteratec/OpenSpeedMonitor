@@ -78,7 +78,7 @@ class LocationPersisterService implements iLocationListener {
             }
         }
 
-        deactivateLocations(wptserverForLocation, locationIdentifiersForWptServer)
+        deactivateNotMatchingLocations(wptserverForLocation, locationIdentifiersForWptServer)
 
         log.info("Location.count after creating non-existent= ${Location.count()}")
 
@@ -86,15 +86,15 @@ class LocationPersisterService implements iLocationListener {
     }
 
     /**
-     * Deactivates all stored locations which no longer exist for given webPageTestServer
+     * Deactivates all stored locations which do not match the passed identifiers
      * @param webPageTestServer the webPageTestServer
-     * @param uniqueIdentifiersForServer the locationIdentifiers for the webPageTestServer
+     * @param uniqueIdentifiersToKeepActive the locationIdentifiers for the webPageTestServer which should not be deactivated
      */
-    void deactivateLocations(WebPageTestServer webPageTestServer, List<String> uniqueIdentifiersForServer) {
-        if (uniqueIdentifiersForServer) {
+    void deactivateNotMatchingLocations(WebPageTestServer webPageTestServer, List<String> uniqueIdentifiersToKeepActive) {
+        if (uniqueIdentifiersToKeepActive) {
             List<Location> locationsToDeactivate = Location.createCriteria().list {
                 eq('wptServer', webPageTestServer)
-                not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersForServer) }
+                not { 'in'('uniqueIdentifierForServer', uniqueIdentifiersToKeepActive) }
                 eq('active', true)
             }
             locationsToDeactivate.each { currentLocation ->
