@@ -23,6 +23,7 @@ function doOnDomReady(newJob,
                       connectivityProfileId,
                       noTrafficShapingAtAll,
                       tagsLink) {
+    registerEventHandlers();
 
     $("ul[name='tags']").tagit({select: true, tagSource: tagsLink});
     $("ul[name='jobGroupTags']").tagit({select: true, tagSource: tagsLink});
@@ -48,25 +49,6 @@ function doOnDomReady(newJob,
 
     fixChosen();
 
-    var cronExpression = $('#execution-schedule').val();
-    jQuery.ajax({
-        type: 'POST',
-        data: 'value=' + cronExpression,
-        url: nextExecutionLink,
-        success: function (data, textStatus) {
-            $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
-            );
-            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
-            $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(cronExpression.substr(cronExpression.indexOf(' ') + 1)) : ''
-            );
-
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-        }
-    });
-
     // trigger change event if user input received
     $("#execution-schedule-shown").keyup(function () {
         $("#execution-schedule-shown").change();
@@ -78,7 +60,7 @@ function initializeSelects() {
     var chosenOptions = {
         disable_search_threshold: 10,
         no_results_text: '',
-        width: "35em",
+        width: "100%",
         search_contains: true
     };
     if ($('select#jobgroup').size() > 0) {
@@ -128,48 +110,148 @@ jQuery.fn.visibilityToggle = function () {
  */
 function prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
 
-    addNullProfileOptions(customConnNameForNative)
-    registerConnectivityProfilesEventHandlers(customConnNameForNative)
-    registerLocationEventHandlers()
+    addNullProfileOptions(customConnNameForNative);
+    registerConnectivityProfilesEventHandlers(customConnNameForNative);
     if (connectivityProfileId == null) {
-        selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative)
+        selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative);
     }
 }
 
-function registerLocationEventHandlers() {
-    $("#location").on("change",CheckChromeSelection);
-    $("#chkbox-option_mobile").on("change",CheckMobileSelection);
-    $("#chkbox-option_timeline").on("change",CheckTimelineSelection);
-    CheckChromeSelection();
-    CheckMobileSelection();
-    CheckTimelineSelection();
+var inputUserAgent =  $("#inputField-userAgent");
+var inputEmulateMobile = $("#chkbox-emulateMobile");
 
-    $("#inputField-option_takeScreenshots").on("change",UpdateScreenshotSelection);
-    $("#inputField-option_userAgent").on("change",UpdateUserAgentSelection);
-    UpdateScreenshotSelection();
-    UpdateUserAgentSelection();
+var predefinedCronSelectBox = $("#selectExecutionSchedule");
+var cronStringInputField = $("#executionSchedule");
+var cronInputHelpBlock = $("#cronInputHelpBlock");
+
+function registerEventHandlers() {
+    $("#location").on("change",toggleChromeTab);
+    inputEmulateMobile.on("change",toggleMobileOptions);
+    $("#chkbox-captureTimeline").on("change",toggleTimelineOptions);
+    toggleChromeTab();
+    toggleMobileOptions();
+    toggleTimelineOptions();
+
+    $("#inputField-takeScreenshots").on("change",toggleScreenshotOptions);
+    inputUserAgent.on("change",toggleUserAgentOptions);
+    toggleScreenshotOptions();
+    toggleUserAgentOptions();
+    
+    $('#inputField-JobLabel').on('blur',updateJobName);
+
+    $("#runs").on("change",toggleMedianOptions);
+    toggleMedianOptions();
+
+    $("#provideAuthenticateInformation").on("change",toggleAuthOptions);
+    toggleAuthOptions();
+
+    predefinedCronSelectBox.change(updateCronStringFromPredefined);
+    cronStringInputField.keyup(validateCronExpression);
+    var initValue = cronStringInputField.val();
+    if (initValue) {
+        // check if init value is a predefined cron string
+        if (isPredefinedCronString(initValue)) {
+            predefinedCronSelectBox.val(initValue);
+            predefinedCronSelectBox.trigger("chosen:updated");
+        } else {
+            predefinedCronSelectBox.val("");
+            cronStringInputField.val(initValue);
+        }
+    } /*else {
+        console.log("reset");
+        // set default value.
+        predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
+        updateCronStringFromPredefined();
+    }*/
+    validateCronExpression();
+
+    cronStringInputField.on('blur',updateCronInfo);
+    cronStringInputField.on('focus',updateCronInfo);
 }
 
-function UpdateScreenshotSelection() {
-    $("#option_iq").toggleClass("hidden", $("#inputField-option_takeScreenshots").val() != "DEFAULT");
+var updateCronInfo = function() {
+    $("#cronInfoPanel").toggleClass("hidden");
 }
 
-function UpdateUserAgentSelection() {
-    $("#option_uastring").toggleClass("hidden", $("#inputField-option_userAgent").val() != "OVERWRITE");
-    $("#option_appendua").toggleClass("hidden", $("#inputField-option_userAgent").val() != "APPEND");
+var isPredefinedCronString = function (cronString) {
+    return predefinedCronSelectBox.find("option").is(function (index, elem) {
+        return $(elem).val() === cronString;
+    });
 }
 
-function CheckMobileSelection() {
-    $("#option_mobileDevice").toggleClass("hidden", !$("#chkbox-option_mobile").prop("checked"));
-    $("#option_dpr").toggleClass("hidden", !$("#chkbox-option_mobile").prop("checked"));
+var updateCronStringFromPredefined = function () {
+    var selectedValue = predefinedCronSelectBox.val();
+    cronStringInputField.prop("readonly", !!selectedValue);
+    if (!!selectedValue) {
+        cronStringInputField.val(selectedValue);
+    }
+    validateCronExpression();
 }
 
-function CheckTimelineSelection() {
-    $("#option_timelineStack").toggleClass("hidden", !$("#chkbox-option_timeline").prop("checked"));
+var validateCronExpression = function () {
+    $.ajax({
+        url: OpenSpeedMonitor.urls.cronExpressionNextExecution,
+        data: { cronExpression: cronStringInputField.val()},
+        dataType: "text",
+        type: 'GET',
+        success: function (data) {
+            processCronExpressionValidation(true, prettyCron.toString(cronStringInputField.val()));
+        },
+        error: function (e, status) {
+            if (status === "error") {
+                processCronExpressionValidation(false, e.responseText);
+            } else {
+                console.error(e);
+            }
+        }
+    });
 }
 
-function CheckChromeSelection() {
+var processCronExpressionValidation = function (isValid, helpText) {
+    cronInputValid = isValid;
+    cronInputHelpBlock.text(helpText);
+    //validateInputs();
+}
+
+function toggleAuthOptions() {
+    if (!$("#provideAuthenticateInformation").prop("checked")) {
+        $("#authUsername").attr("disabled","");
+        $("#authPassword").attr("disabled","");
+    }
+    else {
+        $("#authUsername").removeAttr("disabled");
+        $("#authPassword").removeAttr("disabled");
+    }
+}
+
+function toggleMedianOptions() {
+    $("#persistNonMedianResults").toggleClass("hidden", $("#runs").val() == 1);
+}
+
+function toggleScreenshotOptions() {
+    $("#imageQuality").toggleClass("hidden", $("#inputField-takeScreenshots").val() !== "DEFAULT");
+}
+
+function toggleUserAgentOptions() {
+    $("#userAgentString").toggleClass("hidden", inputUserAgent.val() !== "OVERWRITE");
+    $("#appendUserAgent").toggleClass("hidden", inputUserAgent.val() !== "APPEND");
+}
+
+function toggleMobileOptions() {
+    $("#mobileDevice").toggleClass("hidden", !inputEmulateMobile.prop("checked"));
+    $("#devicePixelRation").toggleClass("hidden", !inputEmulateMobile.prop("checked"));
+}
+
+function toggleTimelineOptions() {
+    $("#javascriptCallstack").toggleClass("hidden", !$("#chkbox-captureTimeline").prop("checked"));
+}
+
+function toggleChromeTab() {
     $("#chromeTabLink").toggleClass("hidden", !($("#location option:selected").text()).includes("Chrome"));
+}
+
+function updateJobName() {
+    $("#JobName").text($("#inputField-JobLabel").val());
 }
 
 /**

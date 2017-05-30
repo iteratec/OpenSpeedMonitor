@@ -1,6 +1,9 @@
 <div class="form-group ${hasErrors(bean: job, field: booleanAttribute, 'error')}">
-	<label for="chkbox-${booleanAttribute}" class="col-md-4 control-label">
-		<g:message code="job.${booleanAttribute}.label" default="${booleanAttribute}" />
+	<label class="col-md-4 control-label" for="${booleanAttribute}">
+		<abbr title="${message(code: "job.${booleanAttribute}.description")}"
+			  data-placement="bottom" rel="tooltip">
+			<g:message code="job.${booleanAttribute}.label" default="${booleanAttribute}"/>
+		</abbr>
 	</label>
 	<div class="col-md-8">
 		<div class="checkbox">

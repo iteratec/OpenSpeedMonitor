@@ -119,47 +119,47 @@ class JobProcessingService {
                 standards      : job.standards,
                 tcpdump        : job.tcpdump,
                 continuousVideo: job.continuousVideo,
-                private        : job.option_isPrivate,
-                block          : job.option_block,
-                mobile         : job.option_mobile,
-                dpr            : job.option_dpr,
-                cmdline        : job.option_cmdline,
-                custom         : job.option_custom,
-                tester         : job.option_tester,
-                timeline       : job.option_timeline,
-                timelineStack  : job.option_timelineStack,
-                mobileDevice   : job.option_mobileDevice,
-                lighthouse     : job.option_lighthouse,
-                type           : job.option_type,
-                customHeaders  : job.option_customHeaders,
-                trace          : job.option_trace,
-                spof           : job.option_spof
+                private        : job.isPrivate,
+                block          : job.urlsToBlock,
+                mobile         : job.emulateMobile,
+                dpr            : job.devicePixelRation,
+                cmdline        : job.cmdlineOptions,
+                custom         : job.customMetrics,
+                tester         : job.tester,
+                timeline       : job.captureTimeline,
+                timelineStack  : job.javascriptCallstack,
+                mobileDevice   : job.mobileDevice,
+                lighthouse     : job.performLighthouseTest,
+                type           : job.optionalTestTypes,
+                customHeaders  : job.customHeaders,
+                trace          : job.trace,
+                spof           : job.spof
         ]
-        if (job.option_takeScreenshots == Job.TakeScreenshots.NONE) {
+        if (job.takeScreenshots == Job.TakeScreenshots.NONE) {
             parameters.noimages = true
         }
-        else {
-            parameters.iq = job.option_iq
-        }
-        if (job.option_takeScreenshots == Job.TakeScreenshots.FULL) {
+        else if (job.takeScreenshots == Job.TakeScreenshots.FULL) {
             parameters.pngss = true
         }
+        else {
+            parameters.iq = job.imageQuality
+        }
 
-        if (job.option_saveBodies == Job.SaveBodies.HTML) {
+        if (job.saveBodies == Job.SaveBodies.HTML) {
             parameters.htmlbody = true
         }
-        if (job.option_saveBodies == Job.SaveBodies.ALL) {
+        else if (job.saveBodies == Job.SaveBodies.ALL) {
             parameters.bodies = true
         }
 
-        if(job.option_userAgent == Job.UserAgent.ORIGINAL) {
+        if(job.userAgent == Job.UserAgent.ORIGINAL) {
             parameters.keepua = true
         }
-        if(job.option_userAgent == Job.UserAgent.APPEND) {
-            parameters.appendua = job.option_appendua
+        else if(job.userAgent == Job.UserAgent.APPEND) {
+            parameters.appendua = job.appendUserAgent
         }
-        if(job.option_userAgent == Job.UserAgent.OVERWRITE) {
-            parameters.uastring = job.option_uastring
+        else if(job.userAgent == Job.UserAgent.OVERWRITE) {
+            parameters.uastring = job.userAgentString
         }
 
         if (job.noTrafficShapingAtAll) {

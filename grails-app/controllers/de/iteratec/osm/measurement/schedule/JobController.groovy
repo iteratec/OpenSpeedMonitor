@@ -116,10 +116,14 @@ class JobController {
         job.firstViewOnly = true
         job.persistNonMedianResults = false
         job.captureVideo = true
+        job.isPrivate = true
+
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
 
+
     def save() {
+        params.executionSchedule = "0 " + params.executionSchedule
         def tagParam = params.remove('tags')
         Job job = new Job(params)
         setVariablesOnJob(params.variables, job)
@@ -154,10 +158,13 @@ class JobController {
     def edit() {
         Job job = Job.get(params.id)
         redirectIfNotFound(job, params.id)
-        return [job: job] << getStaticModelPartForEditOrCreateView()
+        System.out.println(job.executionSchedule)
+        return [job: job] << getStaticModelPartForEditOrCreateViewWithJob(job)
     }
 
     def update() {
+        params.executionSchedule = "0 " + params.executionSchedule
+
         Job job = Job.get(params.id)
 
         if ((params.executionSchedule != null) && (!(CronExpression.isValidExpression(params.executionSchedule)))) {
@@ -408,9 +415,20 @@ class JobController {
         return [
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
                 connectivites                  : ConnectivityProfile.findAllByActive(true),
-                customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+                customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
+                isPrivate                      : true
         ]
     }
+
+    Map getStaticModelPartForEditOrCreateViewWithJob(Job job) {
+        return [
+                defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
+                connectivites                  : ConnectivityProfile.findAllByActive(true),
+                customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
+                executionSchedule              : job.executionSchedule.substring(2)
+        ]
+    }
+
 
     def getTagsForJobs() {
         List<Long> jobIds = params["jobIds"].tokenize(',[]\"')*.toLong()

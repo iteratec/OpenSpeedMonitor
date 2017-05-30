@@ -138,32 +138,32 @@ class Job implements Taggable {
      */
     Integer packetLoss
 
-    boolean option_isPrivate
-    String  option_block
-    Integer option_iq
-    boolean option_mobile
-    String  option_uastring
-    Integer option_dpr
-    String  option_cmdline
-    String  option_custom
-    String  option_tester
-    boolean option_timeline
-    Integer option_timelineStack
-    String  option_mobileDevice
-    String  option_appendua
-    boolean option_lighthouse
-    String  option_type
-    String  option_customHeaders
-    boolean option_trace
-    String  option_spof
+    boolean isPrivate = true
+    String  urlsToBlock
+    Integer imageQuality
+    boolean emulateMobile
+    String  userAgentString
+    Integer devicePixelRation
+    String  cmdlineOptions
+    String  customMetrics
+    String  tester
+    boolean captureTimeline
+    Integer javascriptCallstack
+    String  mobileDevice
+    String  appendUserAgent
+    boolean performLighthouseTest
+    String  optionalTestTypes
+    String  customHeaders
+    boolean trace
+    String  spof
 
-    public enum TakeScreenshots {NONE,DEFAULT,FULL};
-    public enum SaveBodies {NONE,HTML,ALL};
-    public enum UserAgent {DEFAULT,ORIGINAL,APPEND,OVERWRITE};
+    enum TakeScreenshots {NONE,DEFAULT,FULL}
+    enum SaveBodies {NONE,HTML,ALL}
+    enum UserAgent {DEFAULT,ORIGINAL,APPEND,OVERWRITE}
 
-    TakeScreenshots  option_takeScreenshots = TakeScreenshots.DEFAULT
-    SaveBodies       option_saveBodies      = SaveBodies.NONE
-    UserAgent        option_userAgent       = UserAgent.DEFAULT
+    TakeScreenshots  takeScreenshots = TakeScreenshots.DEFAULT
+    SaveBodies       saveBodies      = SaveBodies.NONE
+    UserAgent        userAgent       = UserAgent.DEFAULT
 
     /**
      * @deprecated Use executionSchedule instead
@@ -219,7 +219,6 @@ class Job implements Taggable {
         ignoreSSL(nullable: true)
         standards(nullable: true)
         tcpdump(nullable: true)
-        //bodies(nullable: true)
         continuousVideo(nullable: true)
         keepua(nullable: true)
 
@@ -274,19 +273,19 @@ class Job implements Taggable {
         authPassword(nullable: true, maxSize: 255, password: true)
         jobStatistic(nullable: true)
 
-        option_block(nullable: true)
-        option_iq(nullable: true)
-        option_uastring(nullable: true)
-        option_dpr(nullable: true)
-        option_cmdline(nullable: true)
-        option_custom(nullable: true)
-        option_tester(nullable: true)
-        option_timelineStack(nullable: true)
-        option_mobileDevice(nullable: true)
-        option_appendua(nullable: true)
-        option_type(nullable: true)
-        option_customHeaders(nullable: true)
-        option_spof(nullable: true)
+        urlsToBlock(nullable: true)
+        imageQuality(nullable: true)
+        userAgentString(nullable: true)
+        devicePixelRation(nullable: true)
+        cmdlineOptions(nullable: true)
+        customMetrics(nullable: true)
+        tester(nullable: true)
+        javascriptCallstack(nullable: true)
+        mobileDevice(nullable: true)
+        appendUserAgent(nullable: true)
+        optionalTestTypes(nullable: true)
+        customHeaders(nullable: true)
+        spof(nullable: true)
     }
 
     static mapping = {

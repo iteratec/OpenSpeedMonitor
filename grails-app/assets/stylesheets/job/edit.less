@@ -2,6 +2,8 @@
 *= require tagit.css
 *= require_self
 */
+@import "../variables-corporate";
+
 #placeholderCandidates {
     display: inline-block;
 }
@@ -37,16 +39,16 @@
 }
 
 input[type="text"], textarea {
-    width: 35em !important;
+    //width: 35em !important;
     box-sizing: border-box;
 }
 
 #tags {
-    width: 32em;
+    //width: 32em;
 }
 
 #tags input {
-    width: 31em !important;
+    //width: 24em !important;
 }
 
 #placeholderCandidates {
@@ -63,4 +65,16 @@ input[type="text"], textarea {
 
 .modal-dialog {
     width: 800px;
+}
+
+.panel.panel-info {
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+.panel-heading {
+    text-align: center;
+    color: darken(@iteratec-gray-lighter, 60%);
+    background-color: @iteratec-gray-lighter;
+    border: none;
+}
 }

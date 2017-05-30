@@ -96,15 +96,7 @@
                 });
                 $( window).load(function(){
 
-                    //for advanced tab: should be included to doOnDomReady() function
-                    $('#provideAuthenticateInformation').click(function () {
-                        $('.authInfo').toggle($(this).prop('checked'));
-                        document.getElementById('authPassword').setAttribute('type', 'password');
-                    });
-                    $('.authInfo').toggle($('#provideAuthenticateInformation').prop('checked'));
-                    if ($('#provideAuthenticateInformation').prop('checked')) {
-                        document.getElementById('authPassword').setAttribute('type', 'password');
-                    }
+                    document.getElementById('authPassword').setAttribute('type', 'password');
 
                     window.addEventListener("CodeMirrorManifestArrived",function(){
                         var editor = OpenSpeedMonitor.script.codemirrorEditor.init({
