@@ -26,7 +26,6 @@
     </div>
 </div>
 
-<g:render template="inputFieldTooltip" model="${['attribute': 'maxDownloadTimeInMinutes', 'job': job]}"/>
 <g:render template="inputField" model="${['attribute': 'tester', 'job': job]}"/>
 <g:render template="inputFieldTooltip" model="${['attribute': 'optionalTestTypes', 'job': job]}"/>
 
