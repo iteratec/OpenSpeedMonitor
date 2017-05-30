@@ -41,7 +41,7 @@ public enum CachedView {
      * A WPT first view result; the browsers cache have been cleared before,
      * all date was loaded from the web-server.
      */
-            UNCACHED;
+    UNCACHED;
 
     static transients = ['cached'];
 
