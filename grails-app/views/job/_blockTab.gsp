@@ -1,4 +1,4 @@
-<div id="urlsToBlock" class="form-group ${hasErrors(bean: job, field: urlsToBlock, 'error')}">
+<div id="urlsToBlock" class="form-group">
     <label for="inputField-urlsToBlock" class="col-md-3 control-label">
         <g:message code="job.urlsToBlock.label" default="urlsToBlock" />
     </label>

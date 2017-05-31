@@ -1,4 +1,4 @@
-<div class="form-group ${hasErrors(bean: job, field: booleanAttribute, 'error')}">
+<div class="form-group">
 	<label class="col-md-4 control-label" for="${booleanAttribute}">
 		<abbr title="${message(code: "job.${booleanAttribute}.description")}"
 			  data-placement="bottom" rel="tooltip">

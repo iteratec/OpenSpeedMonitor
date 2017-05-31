@@ -1,4 +1,4 @@
-<div class="form-group ${hasErrors(bean: job, field: booleanAttribute, 'error')}">
+<div class="form-group">
 	<label for="chkbox-${booleanAttribute}" class="col-md-4 control-label">
 		<g:message code="job.${booleanAttribute}.label" default="${booleanAttribute}" />
 	</label>

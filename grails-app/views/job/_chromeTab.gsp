@@ -3,7 +3,7 @@
 <g:render template="checkbox" model="${['booleanAttribute': 'trace', 'job': job]}" />
 <g:render template="checkbox" model="${['booleanAttribute': 'captureTimeline', 'job': job]}" />
 
-<div id="javascriptCallstack" class="form-group ${hasErrors(bean: job, field: javascriptCallstack, 'error')}">
+<div id="javascriptCallstack" class="form-group ${hasErrors(bean: job, field: javascriptCallstack, 'has-error')}">
     <label for="inputField-javascriptCallstack" class="col-md-4 control-label">
         <g:message code="job.javascriptCallstack.label" default="javascriptCallstack" />
     </label>

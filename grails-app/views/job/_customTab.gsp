@@ -1,4 +1,4 @@
-<div id="customMetrics" class="form-group ${hasErrors(bean: job, field: customMetrics, 'error')}">
+<div id="customMetrics" class="form-group ${hasErrors(bean: job, field: customMetrics, 'has-error')}">
     <label for="inputField-customMetrics" class="col-md-3 control-label">
         <g:message code="job.customMetrics.label" default="customMetrics" />
     </label>

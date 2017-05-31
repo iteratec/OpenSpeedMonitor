@@ -1,7 +1,7 @@
 <g:render template="checkboxTooltip" model="${['booleanAttribute': 'firstViewOnly', 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'isPrivate', 'job': job]}"/>
 
-<div class="form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
+<div class="form-group required">
     <label for="description" class="col-md-4 control-label">
         <g:message code="job.description.label" default="description"/>
     </label>
@@ -29,7 +29,7 @@
 <g:render template="inputField" model="${['attribute': 'tester', 'job': job]}"/>
 <g:render template="inputFieldTooltip" model="${['attribute': 'optionalTestTypes', 'job': job]}"/>
 
-<div id="customHeaders" class="form-group ${hasErrors(bean: job, field: customHeaders, 'error')}">
+<div id="customHeaders" class="form-group">
     <label class="col-md-4 control-label" for="customHeaders">
         <abbr title="${message(code: "job.customHeaders.description")}"
               data-placement="bottom" rel="tooltip">
@@ -41,7 +41,7 @@
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
+<div class="form-group ${hasErrors(bean: job, field: 'runs', 'has-error')} required">
     <label class="col-md-4 control-label" for="runs">
         <g:message code="job.runs.label" default="runs"/>
     </label>
@@ -72,7 +72,7 @@
 <g:render template="checkbox" model="${['booleanAttribute': 'standards', 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'tcpdump', 'job': job]}"/>
 
-<div id="saveBodies" class="form-group ${hasErrors(bean: job, field: saveBodies, 'error')}">
+<div id="saveBodies" class="form-group">
 
     <label class="col-md-4 control-label" for="saveBodies">
         <abbr title="${message(code: "job.saveBodies.description")}"
@@ -96,7 +96,7 @@
     </div>
 </div>
 
-<div id="takeScreenshots" class="form-group ${hasErrors(bean: job, field: takeScreenshots, 'error')}">
+<div id="takeScreenshots" class="form-group">
     <label for="inputField-takeScreenshots" class="col-md-4 control-label">
         <g:message code="job.takeScreenshots.label" default="takeScreenshots"/>
     </label>
@@ -118,7 +118,7 @@
 
 <g:render template="inputField" model="${['attribute': 'imageQuality', 'job': job]}"/>
 
-<div id="userAgent" class="form-group ${hasErrors(bean: job, field: userAgent, 'error')}">
+<div id="userAgent" class="form-group">
 
     <label class="col-md-4 control-label" for="userAgent">
         <abbr title="${message(code: "job.userAgent.description")}"

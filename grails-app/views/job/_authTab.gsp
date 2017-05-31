@@ -1,4 +1,4 @@
-<div class="row fieldcontain ${hasErrors(bean: job, field: 'provideAuthenticateInformation', 'error')}">
+<div class="row fieldcontain">
     <label class="col-md-4 control-label">
         <g:message code="script.authentication.label" default="Authenfizierung" />
     </label>
@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div style="margin-top: 15px" class="row form-group fieldcontain ${hasErrors(bean: job, field: 'authUsername', 'error')}">
+<div style="margin-top: 15px" class="row form-group fieldcontain">
     <label for="authUsername" class="col-md-4 control-label" for="authUsername">
         <g:message code="script.authUser.label" default="Benutzer" />
     </label>
@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div class="row form-group fieldcontain ${hasErrors(bean: job, field: 'authPassword', 'error')}">
+<div class="row form-group fieldcontain">
     <label for="authPassword" class="col-md-4 control-label">
         <g:message code="script.authPassword.label" default="Passwort" />
     </label>

@@ -1,4 +1,4 @@
-<div id="spof" class="form-group ${hasErrors(bean: job, field: spof, 'error')}">
+<div id="spof" class="form-group">
     <label for="inputField-spof" class="col-md-3 control-label">
         <g:message code="job.spof.label" default="spof" />
     </label>

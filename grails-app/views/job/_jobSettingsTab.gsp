@@ -7,7 +7,7 @@
 
     <div class="row">
 
-    <div class="form-group ${hasErrors(bean: job, field: active, 'error')}">
+    <div class="form-group">
         <label for="chkbox-active" class="col-md-3 control-label">
             <g:message code="job.active.label" default="active"/>
         </label>
@@ -20,7 +20,7 @@
     </div>
 
 
-    <div class="form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
+    <div class="form-group ${hasErrors(bean: job, field: 'label', 'has-error')} required">
         <label for="label" class="col-md-3 control-label">
             <g:message code="job.label.label" default="label"/><span class="required-indicator">*</span>
         </label>
@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div class="form-group ${hasErrors(bean: job, field: 'location', 'error')} required">
+    <div class="form-group ${hasErrors(bean: job, field: 'location', 'has-error')} required">
         <label class="col-md-3 control-label" for="location">
             <g:message code="job.location.label" default="location"/><span class="required-indicator">*</span>
         </label>
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <div class="form-group ${hasErrors(bean: job, field: 'jobGroup', 'error')} required">
+    <div class="form-group ${hasErrors(bean: job, field: 'jobGroup', 'has-error')} required">
         <label class="col-md-3 control-label" for="jobGroup">
             <g:message code="job.jobGroup.label" default="jobGroup"/>
             <span class="required-indicator">*</span>
@@ -99,7 +99,7 @@
             </div>
         </div>
         <g:each var="attribute" in="['bandwidthDown', 'bandwidthUp', 'latency', 'packetLoss']">
-            <div class="form-group ${hasErrors(bean: job, field: attribute, 'error')}">
+            <div class="form-group ${hasErrors(bean: job, field: attribute, 'has-error')}">
                 <label class="col-md-3 control-label" for="${attribute}">
                     <g:message code="connectivityProfile.${attribute}.label"
                                default="${attribute}"/>
