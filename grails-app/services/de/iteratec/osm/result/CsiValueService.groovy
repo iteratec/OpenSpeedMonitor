@@ -35,21 +35,24 @@ class CsiValueService {
      * @return
      * @see CsiConfigCacheService
      */
-    public boolean isCsiRelevant(CsiValue csiValue){
+    boolean isCsiRelevant(CsiValue csiValue){
         switch (csiValue){
-            case {it instanceof EventResult}: return isCsiRelevant(csiValue as EventResult)
-            case {it instanceof CsiAggregation}: return isCsiRelevant(csiValue as CsiAggregation)
-            default:return false
+            case {it instanceof EventResult}:
+                return isCsiRelevant((EventResult) csiValue)
+            case {it instanceof CsiAggregation}:
+                return isCsiRelevant((CsiAggregation) csiValue)
+            default:
+                return false
         }
     }
 
-    public boolean isCsiRelevant(EventResult eventResult) {
+    boolean isCsiRelevant(EventResult eventResult) {
         return eventResult.csByWptDocCompleteInPercent && eventResult.docCompleteTimeInMillisecs &&
                 (eventResult.docCompleteTimeInMillisecs >= osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
                         eventResult.docCompleteTimeInMillisecs <= osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
     }
 
-    public boolean isCsiRelevant(CsiAggregation csiAggregation) {
+    boolean isCsiRelevant(CsiAggregation csiAggregation) {
         return csiAggregation.isCalculated() && csiAggregation.csByWptDocCompleteInPercent != null
     }
 }
