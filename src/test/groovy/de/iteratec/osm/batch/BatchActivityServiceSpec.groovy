@@ -17,51 +17,43 @@
 
 package de.iteratec.osm.batch
 
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import org.junit.*
-
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestFor(BatchActivityService)
 @Mock(BatchActivity)
 class BatchActivityServiceSpec extends Specification {
 
-    BatchActivityService serviceUnderTest = service
-
-    void "testGetBatchActivity"() {
+    void "get batch activity returns a real BatchActivityUpdater when observe is true"() {
         given:
         String name = "BatchActivityCreateTest"
         Class aClass = this.class
         Activity activity = Activity.CREATE
 
         when: "We order a BatchActivityUpdater from this service"
-        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, true)
+        BatchActivityUpdater updater = service.getActiveBatchActivity(aClass, activity, name, 1, true)
 
         then: "The underlying BatchActivity should be persisted"
         BatchActivity.count() == 1
-        serviceUnderTest.runningBatch(aClass,name, activity)
+        service.runningBatch(aClass,name, activity)
 
         cleanup:
         updater.cancel()
     }
 
-    void "testGetBatchActivityDummy"() {
+    void "get batch activity returns a dummy BatchActivityUpdater when observe is false"() {
         given:
         String name = "BatchActivityCreateTest"
         Class aClass = this.class
         Activity activity = Activity.CREATE
 
         when: "We order a BatchActivityUpdaterDummy from this service"
-        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, false)
+        BatchActivityUpdater updater = service.getActiveBatchActivity(aClass, activity, name, 1, false)
 
         then: "The should'nt be a real BatchActivity"
-        !serviceUnderTest.runningBatch(aClass,name, activity)
+        BatchActivity.count() == 0
+        !service.runningBatch(aClass,name, activity)
 
         cleanup:
         updater.cancel()
