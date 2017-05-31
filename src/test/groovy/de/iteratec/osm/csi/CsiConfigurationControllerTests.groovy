@@ -17,133 +17,137 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.util.PerformanceLoggingService
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
 @TestFor(CsiConfigurationController)
 @Mock([CsiConfiguration, CsiDay, JobGroup])
+@Build([CsiConfiguration, CsiDay, JobGroup])
 class CsiConfigurationControllerTests extends Specification {
-
-    CsiConfiguration config1
-    CsiConfiguration config2
 
     def doWithSpring = {
         performanceLoggingService(PerformanceLoggingService)
     }
 
-    void setup() {
-        CsiDay testDay = new CsiDay(name: "testDay")
-        (0..23).each {
-            testDay.setHourWeight(it, it)
-        }
-        CsiDay testDay2 = new CsiDay(name: "testDay2")
-        (0..23).each {
-            testDay2.setHourWeight(it, (24 - it))
-        }
-        config1 = new CsiConfiguration(label: "config1", csiDay: testDay)
-        config2 = new CsiConfiguration(label: "config2", csiDay: testDay2)
-        config1.save(failOnError: true)
-        config2.save(failOnError: true)
+    void "saving a CSI configuration as copy results in one configuration more"() {
+        given: "a CSI configuration"
+        CsiConfiguration.build(label: "CSI Configuration")
+        int numberOfConfigurationsBeforeCopy = CsiConfiguration.count
 
-        I18nService i18nService = Mock(I18nService)
-        controller.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
-        controller.i18nService = i18nService
-    }
-
-    void "test saveCopy"() {
-        given:
-        String labelOfCopy = "ConfigCopy"
-        int configCountBeforeCopy = CsiConfiguration.count
-
-        when:
-        params.label = labelOfCopy
-        params.sourceCsiConfigLabel = "config1"
-
+        when: "this CSI configuration gets saved as copy"
+        params.sourceCsiConfigLabel = "CSI Configuration"
+        params.label = "CSI Configuration Copy"
         controller.saveCopy()
-        CsiConfiguration copy = CsiConfiguration.findByLabel(labelOfCopy)
 
-        then:
-        CsiConfiguration.count == configCountBeforeCopy + 1
-        CsiConfiguration.findAllByLabel(labelOfCopy).size() == 1
-        copy.label == labelOfCopy
-        copy.label != config1.label
+        then: "there is exactly one CSI configuration more"
+        CsiConfiguration.count == numberOfConfigurationsBeforeCopy + 1
     }
 
-    void "test deleteCsiConfiguration"() {
-        given:
-        int csiConfigurationCountBeforeDeleting = CsiConfiguration.count
+    void "copied CSI configuration has the same attributes as the original one"() {
+        given: "a CSI configuration"
+        CsiDay csiDay = CsiDay.build()
+        CsiConfiguration.build(
+                label: "CSI Configuration",
+                description: "Description of this CSI configuration",
+                csiDay: csiDay
+        )
 
-        when:
-        params.label = config1.label
+        when: "this CSI configuration gets saved as copy"
+        params.label = "CSI Configuration Copy"
+        params.sourceCsiConfigLabel = "CSI Configuration"
+        controller.saveCopy()
+
+        then: "both configurations have the same attributes"
+        CsiConfiguration copyOfCsiConfiguration = CsiConfiguration.findByLabel("CSI Configuration Copy")
+        copyOfCsiConfiguration.label == "CSI Configuration Copy"
+        copyOfCsiConfiguration.description == "Description of this CSI configuration"
+        copyOfCsiConfiguration.csiDay.hour0Weight == csiDay.hour0Weight
+        copyOfCsiConfiguration.csiDay.hour2Weight == csiDay.hour2Weight
+        copyOfCsiConfiguration.csiDay.hour7Weight == csiDay.hour7Weight
+        copyOfCsiConfiguration.csiDay.hour13Weight == csiDay.hour13Weight
+        copyOfCsiConfiguration.csiDay.hour19Weight == csiDay.hour19Weight
+    }
+
+    void "after deleting a CSI configuration there is one less"() {
+        given: "two CSI configurations"
+        CsiConfiguration.build()
+        CsiConfiguration.build(label: "CSI Configuration to delete")
+
+        when: "one gets deleted"
+        params.label = "CSI Configuration to delete"
         controller.deleteCsiConfiguration()
 
-        then:
-        CsiConfiguration.count == csiConfigurationCountBeforeDeleting - 1
+        then: "there is exactly one left"
+        CsiConfiguration.count == 1
     }
 
     void "test deleteCsiConfiguration when jobGroup using this configuration"() {
-        given:
-        int csiConfigurationCountBeforeDeleting = CsiConfiguration.count
-        JobGroup jobGroup = new JobGroup(name: "jobGroup", csiConfiguration: config1)
-        jobGroup.save()
+        given: "two CSI configurations and one Job Group connected to one CSI configuration"
+        CsiConfiguration.build()
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(label: "CSI Configuration to delete")
+        JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration)
 
-        when:
-        params.label = config1.label
+        when: "the CSI configuration connected to the Job Group gets deleted"
+        params.label = "CSI Configuration to delete"
         controller.deleteCsiConfiguration()
 
-        then:
-        CsiConfiguration.count == csiConfigurationCountBeforeDeleting - 1
+        then: "the CSI configuration attribute of the Job Group is null"
+        CsiConfiguration.count == 1
         jobGroup.csiConfiguration == null
     }
 
-    void "test exception is thrown when configuration not exists"() {
-        when:
-        params.label = "doesNotExist"
+    void "an exception is thrown when configuration does not exist"() {
+        given: "two CSI configurations"
+        CsiConfiguration.build(label: "CSI Configuration One")
+        CsiConfiguration.build(label: "CSI Configuration Two")
+
+        when: "one tries to delete one which doesn't exist"
+        params.label = "CSI Configuration doesn't exist"
         controller.deleteCsiConfiguration()
 
-        then:
+        then: "an IllegalArgumentException gets thrown"
         thrown(IllegalArgumentException)
     }
 
-    void "test exception is thrown if an attempt is made to delete the last csiConfiguration"() {
-        given:
-        CsiConfiguration.findByLabel(config2.label).delete()
+    void "an exception is thrown if one tries to delete the last csiConfiguration"() {
+        given: "exactly one CSI configuration"
+        CsiConfiguration.build(label: "CSI Configuration to delete")
 
-        when:
-        params.label = config1.label
+        when: "one tries to delete this configuration"
+        params.label = "CSI Configuration to delete"
         controller.deleteCsiConfiguration()
 
-        then:
+        then: "an IllegalStateException gets thrown"
         thrown(IllegalStateException)
     }
 
-    void "test validateDelition if all correct"() {
-        when:
-        controller.validateDeletion()
-        def jsonResponse = response.json
+    void "JSON response is empty when deletion of CSI configuration is allowed"() {
+        given: "two CSI configurations"
+        CsiConfiguration.build()
+        CsiConfiguration.build()
 
-        then:
-        jsonResponse.errorMessages.isEmpty()
+        when: "validation to delete a configuration is called"
+        controller.validateDeletion()
+
+        then: "is the JSON response empty"
+        response.json.errorMessages.isEmpty()
     }
 
-    void "test validateDeletion if only one csiConfiguration is left"() {
-        given:
-        CsiConfiguration.findByLabel(config2.label).delete()
+    void "JSON response contains an error message when deletion of CSI configuration is not allowed"() {
+        given: "only one CSI configuration"
+        controller.i18nService = Mock(I18nService)
+        CsiConfiguration.build()
 
-        when:
+        when: "validation to delete a configuration is called"
         controller.validateDeletion()
-        def jsonResponse = response.json
-        List errorMessages = jsonResponse.errorMessages as List
+        List errorMessages = response.json.errorMessages as List
 
-        then:
+        then: "contains the JSON response one error message"
         errorMessages.size() == 1
     }
-
 }
