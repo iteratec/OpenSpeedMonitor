@@ -177,7 +177,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml) {
+    protected JobResult persistNewJobRun(Job job, WptResultXml resultXml) {
 
         String testId = resultXml.getTestId()
 
@@ -188,23 +188,23 @@ class ResultPersisterService implements iResultListener {
 
         Integer jobRunStatus = resultXml.getStatusCodeOfWholeTest()
         Date testCompletion = resultXml.getCompletionDate()
-        jobConfig.lastRun = testCompletion
-        jobConfig.merge(failOnError: true)
+        job.lastRun = testCompletion
+        job.merge(failOnError: true)
 
         JobResult result = new JobResult(
-                job: jobConfig,
+                job: job,
                 date: testCompletion,
                 testId: testId,
                 httpStatusCode: jobRunStatus,
-                jobConfigLabel: jobConfig.label,
-                jobConfigRuns: jobConfig.runs,
-                wptServerLabel: jobConfig.location.wptServer.label,
-                wptServerBaseurl: jobConfig.location.wptServer.baseUrl,
-                locationLabel: jobConfig.location.label,
-                locationLocation: jobConfig.location.location,
-                locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
-                locationBrowser: jobConfig.location.browser.name,
-                jobGroupName: jobConfig.jobGroup.name,
+                jobConfigLabel: job.label,
+                jobConfigRuns: job.runs,
+                wptServerLabel: job.location.wptServer.label,
+                wptServerBaseurl: job.location.wptServer.baseUrl,
+                locationLabel: job.location.label,
+                locationLocation: job.location.location,
+                locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
+                locationBrowser: job.location.browser.name,
+                jobGroupName: job.jobGroup.name,
                 testAgent: resultXml.getTestAgent(),
                 wptVersion: resultXml.version.toString()
         )
