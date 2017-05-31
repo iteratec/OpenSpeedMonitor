@@ -1,7 +1,7 @@
 databaseChangeLog = {
     changeSet(author: "dkl", id: "1494576018000-1") {
         addColumn(tableName: "job") {
-            column(name: "is_private"                , type: "BOOLEAN")      {constraints(nullable: "false")}
+            column(defaultValueBoolean: "true",name: "is_private",type: "BOOLEAN"){constraints(nullable: "false")}
             column(name: "urls_to_block"             , type: "varchar(255)")
             column(name: "image_quality"             , type: "integer")
             column(name: "emulate_mobile"            , type: "BOOLEAN")      {constraints(nullable: "false")}

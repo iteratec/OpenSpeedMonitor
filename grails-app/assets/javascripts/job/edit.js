@@ -164,6 +164,7 @@ function registerEventHandlers() {
         updateCronStringFromPredefined();
     }*/
     validateCronExpression();
+    updateCronStringFromPredefined();
 
     cronStringInputField.on('blur',updateCronInfo);
     cronStringInputField.on('focus',updateCronInfo);

@@ -42,8 +42,8 @@
 </div>
 
 <div class="form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
-    <label class="col-md-4 control-label" for="runs"><g:message
-            code="job.runs.label" default="runs"/>
+    <label class="col-md-4 control-label" for="runs">
+        <g:message code="job.runs.label" default="runs"/>
     </label>
 
     <div class="col-md-2">

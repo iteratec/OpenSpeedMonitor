@@ -158,7 +158,6 @@ class JobController {
     def edit() {
         Job job = Job.get(params.id)
         redirectIfNotFound(job, params.id)
-        System.out.println(job.executionSchedule)
         return [job: job] << getStaticModelPartForEditOrCreateViewWithJob(job)
     }
 
