@@ -5,7 +5,7 @@
     </label>
 
     <div class="col-xs-6">
-        <input style="max-width: 400px;" type="text" class="form-control" name="${attribute}" value="${job?."$attribute"}"
+        <input type="text" class="form-control" name="${attribute}" value="${job?."$attribute"}"
                id="inputField-${attribute}"/>
     </div>
 </div>

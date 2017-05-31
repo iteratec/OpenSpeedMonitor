@@ -7,7 +7,7 @@
     </label>
 
     <div class="col-md-6">
-        <textarea style="max-width: 400px;" class="form-control" name="description" id="description"
+        <textarea  class="form-control" name="description" id="description"
                   rows="3">${job?.description?.trim()}</textarea>
     </div>
 </div>
@@ -18,7 +18,7 @@
     </label>
 
     <div class="col-md-6">
-            <ul style="max-width: 400px;" name="tags" id="tags">
+            <ul  name="tags" id="tags">
                 <g:each in="${job?.tags}">
                     <li>${it}</li>
                 </g:each>
@@ -37,7 +37,7 @@
         </abbr>
     </label>
     <div class="col-md-6">
-        <textarea style="max-width: 400px;" class="form-control" name="customHeaders" rows="3" id="inputField-customHeaders">${job?.customHeaders?.trim()}</textarea>
+        <textarea  class="form-control" name="customHeaders" rows="3" id="inputField-customHeaders">${job?.customHeaders?.trim()}</textarea>
     </div>
 </div>
 
@@ -82,7 +82,7 @@
     </label>
 
     <div class="col-md-6">
-        <select style="max-width: 400px;" id="inputField-saveBodies" name="saveBodies" class="form-control chosen">
+        <select  id="inputField-saveBodies" name="saveBodies" class="form-control chosen">
         <option value="NONE"
                 <g:if test="${job?.saveBodies == de.iteratec.osm.measurement.schedule.Job.SaveBodies.NONE}">selected</g:if>><g:message
                 code="job.saveBodies.none" default="none"/></option>
@@ -102,7 +102,7 @@
     </label>
 
     <div class="col-md-6">
-        <select style="max-width: 400px;" id="inputField-takeScreenshots" name="takeScreenshots" class="form-control chosen">
+        <select  id="inputField-takeScreenshots" name="takeScreenshots" class="form-control chosen">
         <option value="NONE"
                 <g:if test="${job?.takeScreenshots == de.iteratec.osm.measurement.schedule.Job.TakeScreenshots.NONE}">selected</g:if>><g:message
                 code="job.takeScreenshots.none" default="none"/></option>
@@ -128,7 +128,7 @@
     </label>
 
     <div class="col-md-6">
-        <select style="max-width: 400px;" id="inputField-userAgent" name="userAgent" class="form-control chosen">
+        <select  id="inputField-userAgent" name="userAgent" class="form-control chosen">
         <option value="DEFAULT"
                 <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.DEFAULT}">selected</g:if>><g:message
                 code="job.userAgent.default" default="default"/></option>
