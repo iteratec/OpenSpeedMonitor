@@ -19,7 +19,6 @@ package de.iteratec.osm.measurement.script
 
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import grails.test.mixin.*
@@ -73,7 +72,6 @@ class ScriptParserTestSpec extends Specification {
         parser.warnings == []
     }
 
-
     void "Missing PageCommand after setEventName command results in error"() {
         when: "a script without PageCommand after setEventName is parsed"
         ScriptParser parser = new ScriptParser(pageService, 'setEventName 456')
@@ -95,7 +93,6 @@ class ScriptParserTestSpec extends Specification {
         parser.steps.size() == 2
         parser.eventNames.size() == 0
     }
-
 
     void "GlobalLogDataZeroScript results in error"() {
         when: "a page with no steps is parsed"
@@ -121,42 +118,7 @@ class ScriptParserTestSpec extends Specification {
         parser.errors[0].type == ScriptEventNameCmdWarningType.NO_STEPS_FOUND
     }
 
-    //see ticket IT-1723
-    @Ignore
-    void "alternatingLogData01Script results in warning" () {
-        when:
-		ScriptParser parser = new ScriptParser(pageService, """
-                //schritt 1
-                logData 0
-                exec dsasda
-                navigate http://testsite.de
-                logData 1
-                setEventName	eventA
-                navigate http://testsite.de
-                //schritt 2
-                logData 0
-                exec dsasda
-                navigate http://testsite.de
-                setEventName	eventA
-                navigate http://testsite.de
-                //schritt 3
-                logData 0
-                exec dsasda
-                navigate http://testsite.de
-                logData 1
-                setEventName	eventA
-                navigate http://testsite.de
-                            """)
-
-
-        then:
-        parser.measuredEventsCount == 2
-        parser.steps == [5, 7, 18, 20]
-        parser.eventNames.size() == 3
-        parser.warnings.size() == 1
-    }
-
-    void "allPageLoadEvents includes logData0 events" () {
+    void "allPageLoadEvents includes logData0 events"() {
         when: "a script with logData0 events is parsed"
         ScriptParser parser = new ScriptParser(pageService, """
                 //schritt 1
