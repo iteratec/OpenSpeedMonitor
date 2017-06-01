@@ -70,12 +70,12 @@ class JobResult {
     String jobConfigLabel
     Integer jobConfigRuns
 
-    boolean firstViewOnly;
-    boolean captureVideo;
-    boolean downloadResultXml;
-    boolean downloadDetails;
-    Integer frequencyInMin;
-    Integer maxDownloadAttempts;
+    boolean firstViewOnly
+    boolean captureVideo
+    boolean downloadResultXml
+    boolean downloadDetails
+    Integer frequencyInMin
+    Integer maxDownloadAttempts
 
     //from Script
     String scriptUrl
@@ -177,7 +177,7 @@ class JobResult {
      *
      */
     public EventResult findEventResult(MeasuredEvent event, CachedView view, Integer run) {
-        Collection<EventResult> results = this.getEventResults();
+        Collection<EventResult> results = this.getEventResults()
         return results.find { it.measuredEvent == event && it.cachedView == view && it.numberOfWptRun == run }
     }
     /**
@@ -198,7 +198,7 @@ class JobResult {
             }
         }
 
-        return results;
+        return results
     }
     /**
      * Returns the median {@link EventResult} of the uncached view for one {@link MeasuredEvent}.
@@ -211,7 +211,7 @@ class JobResult {
      *
      */
     public EventResult findMedianUncachedEventResult(MeasuredEvent event) {
-        Collection<EventResult> results = this.getEventResults();
+        Collection<EventResult> results = this.getEventResults()
         return results.find {
             it.measuredEvent == event && it.cachedView == CachedView.UNCACHED && it.medianValue == true
         }
@@ -230,19 +230,19 @@ class JobResult {
      * @since IT-78
      */
     public URL tryToGetTestsDetailsURL() {
-        URL result = null;
+        URL result = null
 
-        String wptServerBaseurl = this.wptServerBaseurl;
-        String testId = this.testId;
+        String wptServerBaseurl = this.wptServerBaseurl
+        String testId = this.testId
 
         if (wptServerBaseurl &&
                 testId &&
                 !testId.isEmpty() &&
                 !testId.equals('-1')) {
-            result = new URL(wptServerBaseurl + (wptServerBaseurl.endsWith('/') ? '' : '/') + 'result/' + testId);
+            result = new URL(wptServerBaseurl + (wptServerBaseurl.endsWith('/') ? '' : '/') + 'result/' + testId)
         }
 
-        return result;
+        return result
     }
 
     /**
