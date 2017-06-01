@@ -27,28 +27,21 @@ import spock.lang.Specification
 @Build([JobResult, EventResult])
 class JobResultTest extends Specification {
 
-    def "find all event results connected to a job result"() {
-        given:
-        JobResult.build(testId: "TestJob2")
-        JobResult expectedResult = JobResult.build(testId: "TestJob")
+    def "find all job results connected to an event result"() {
+        given: "two event results and linked to two different job results"
+        EventResult.build(jobResult: JobResult.build(testId: "Job Result not to find"))
 
-        EventResult.build(jobResult: expectedResult)
-        EventResult searchCondition = EventResult.build(jobResult: expectedResult)
+        JobResult expectedJobResult = JobResult.build(testId: "Job Result to find")
+        EventResult eventResultToSearchFor = EventResult.build(jobResult: expectedJobResult)
 
-        // Create dependencies
-//        expectedResult.save([failOnError: true, validate: false])
+        when: "one searches for all event results linked to a particular job result"
+        List eventResultsLinkedToExpectedJobResult = JobResult.list().findAll {
+            it.getEventResults().contains(eventResultToSearchFor)
+        }
 
-
-//        when:
-//        List jobResultsContainingDesiredEventResult = JobResult.list().findAll {
-//            it.getEventResults().contains(searchCondition)
-//        }
-//
-//        then:
-//        jobResultsContainingDesiredEventResult.size() == 1
-
-        expect:
-        searchCondition.jobResult.testId == expectedResult.testId
+        then: "one gets only the event results which are linked to that particular job result"
+        eventResultsLinkedToExpectedJobResult.size() == 1
+        eventResultToSearchFor.jobResult.testId == expectedJobResult.testId
     }
 
     def "get the correct test details url when the WPT server base url ends with a slash"() {
