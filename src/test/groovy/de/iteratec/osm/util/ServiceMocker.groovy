@@ -109,21 +109,6 @@ class ServiceMocker {
 		}
 		serviceToMockIn.osmConfigCacheService = osmConfigCacheService
 	}
-	/**
-	 * Mocks {@link EventResultService}.
-	 * @param serviceToMockIn
-	 * 		Grails-Service with the service to mock as instance-variable.
-	 */
-	void mockEventResultService(serviceToMockIn){
-		def eventResultService = new EventResultService()
-		eventResultService.metaClass.isCsiRelevant = {EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
-			return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
-			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
-			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
-
-		}
-		serviceToMockIn.eventResultService = eventResultService
-	}
 
 	/**
 	 * Mocks methods in {@link CsiAggregationUtilService}.

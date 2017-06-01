@@ -34,7 +34,6 @@ import org.joda.time.DateTime
 @Transactional
 class EventCsiAggregationService {
 
-    EventResultService eventResultService
     PerformanceLoggingService performanceLoggingService
     JobService jobService
     OsmConfigCacheService osmConfigCacheService
