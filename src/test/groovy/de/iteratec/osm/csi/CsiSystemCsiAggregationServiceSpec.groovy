@@ -266,10 +266,10 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         then:
         int expectedAfterSize = beforeList.size()
         afterList.size() == expectedAfterSize
-        int expectedAfterEventSize = JobGroupWeight.findAllByJobGroup(eventResult.jobResult.job.jobGroup)*.csiSystem.unique(false).size()
+        int expectedAfterEventSize = 2
         beforeEventList.empty
         afterEventList.size() == expectedAfterEventSize
-
+        afterEventList*.updateCause.unique() == [CsiAggregationUpdateEvent.UpdateCause.OUTDATED]
     }
 
     // mocks
