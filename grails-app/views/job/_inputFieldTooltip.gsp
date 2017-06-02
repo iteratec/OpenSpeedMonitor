@@ -1,8 +1,8 @@
 <div id="${attribute}" class="form-group ${hasErrors(bean: job, field: attribute, 'has-error')}">
     <label class="col-md-4 control-label" for="${attribute}">
-        <abbr title="${message(code: "job.${attribute}.description")}"
+        <abbr title="${description}"
               data-placement="bottom" rel="tooltip">
-            <g:message code="job.${attribute}.label" default="${attribute}"/>
+            ${label}
         </abbr>
     </label>
 

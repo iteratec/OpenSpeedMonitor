@@ -1,6 +1,6 @@
 <div class="form-group">
 	<label for="chkbox-${booleanAttribute}" class="col-md-4 control-label">
-		<g:message code="job.${booleanAttribute}.label" default="${booleanAttribute}" />
+		${label}
 	</label>
 	<div class="col-md-8">
 		<div class="checkbox">

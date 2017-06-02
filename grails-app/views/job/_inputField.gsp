@@ -1,7 +1,6 @@
 <div id="${attribute}" class="form-group ${hasErrors(bean: job, field: attribute, 'has-error')}">
     <label for="inputField-${attribute}" class="col-md-4 control-label">
-        <g:message code="job.${attribute}.label" default="${attribute}"/>
-
+        ${label}
     </label>
 
     <div class="col-xs-6">

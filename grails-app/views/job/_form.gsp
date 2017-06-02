@@ -6,25 +6,25 @@
 <div class="tabbable" style="margin-top: 1em;">
   <ul class="nav nav-tabs">
     <li class="active">
-      <a id="jobSettingsTabLink" href="#jobSettingsTab" data-toggle="tab"><g:message code="job.form.testSettings.label" default="Test Settings" /></a>
+      <a id="jobSettingsTabLink" href="#jobSettingsTab" data-toggle="tab"><g:message code="job.form.testSettings.label" default="Job Settings"/></a>
     </li>
     <li>
-      <a id="scriptTabLink" href="#scriptTab" data-toggle="tab"><g:message code="job.form.script.label" default="Script" /></a>
+      <a id="scriptTabLink" href="#scriptTab" data-toggle="tab"><g:message code="job.form.script.label" default="Script"/></a>
     </li>
-      <li>
-          <a id="advancedSettingsTabLink" href="#advancedSettingsTab" data-toggle="tab"><g:message code="job.form.advanced.label" default="performance" /></a>
-      </li>
+    <li>
+      <a id="advancedSettingsTabLink" href="#advancedSettingsTab" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced Settings"/></a>
+    </li>
   </ul>
   <div class="iteratec-tab-content">
     <div class="tab-pane active" id="jobSettingsTab" style="margin-top:20px">
-	      <g:render template="jobSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
+      <g:render template="jobSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
     <div class="tab-pane" id="scriptTab" style="margin-top:20px">
-          <g:render template="scriptTab" model="${['job': job]}" />
+      <g:render template="scriptTab" model="${['job': job]}" />
     </div>
-      <div class="tab-pane" id="advancedSettingsTab" style="margin-top:20px">
-          <g:render template="advancedSettingsTab" model="${['job': job]}" />
-      </div>
+    <div class="tab-pane" id="advancedSettingsTab" style="margin-top:20px">
+      <g:render template="advancedSettingsTab" model="${['job': job]}" />
+    </div>
   </div>
 </div>
 
