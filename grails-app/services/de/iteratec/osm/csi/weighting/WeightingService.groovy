@@ -267,7 +267,7 @@ class WeightingService {
             return 0
         } else {
             PageWeight pageWeight = pageWeights.find { it.page == pageOfCsiValue }
-            return pageWeight.weight
+            return pageWeight ? pageWeight.weight : 0
         }
 
     }
