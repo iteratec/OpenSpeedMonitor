@@ -1,6 +1,6 @@
 package de.iteratec.osm.dao
 
-import grails.orm.HibernateCriteriaBuilder
+import grails.gorm.CriteriaBuilder
 
 /**
  * Aggregates query criterias for a Domain Class.
@@ -39,7 +39,7 @@ class CriteriaAggregator {
     }
 
     private def runQuery(String method, Map criteriaRestrictions, Closure additionalCriteria=null) {
-        HibernateCriteriaBuilder criteriaBuilder = forClass.createCriteria()
+        CriteriaBuilder criteriaBuilder = forClass.createCriteria()
         def critClosures = criteriaClosures // Bizarre that criteriaClosures won't evaluate properly inside the "$method" closure, but it won't so this works around that issue
         criteriaBuilder."$method" (criteriaRestrictions){
             critClosures.each{closure ->

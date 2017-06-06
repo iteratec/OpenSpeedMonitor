@@ -121,7 +121,7 @@ class EventResultDashboardServiceTests extends Specification {
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
         then:
         assertEquals(1, resultGraphs.size())
@@ -160,10 +160,10 @@ class EventResultDashboardServiceTests extends Specification {
          * Removed page name and location to match the result of summarizeLabel @Link
          */
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
         }
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+            it.label == "Uncached ${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
         }
         then:
         assertEquals(2, resultGraphs.size())
@@ -204,11 +204,11 @@ class EventResultDashboardServiceTests extends Specification {
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Uncached ${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Uncached ${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
         then:
         assertEquals(1, resultGraphs.size())
@@ -244,11 +244,11 @@ class EventResultDashboardServiceTests extends Specification {
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
         then:
         assertEquals(1, resultGraphs.size())
@@ -284,7 +284,7 @@ class EventResultDashboardServiceTests extends Specification {
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
         }
 
         then:
@@ -323,10 +323,10 @@ class EventResultDashboardServiceTests extends Specification {
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
+            it.label == "Cached ${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
         }
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+            it.label == "Uncached ${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
         }
 
         then:

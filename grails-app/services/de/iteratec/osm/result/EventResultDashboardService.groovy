@@ -333,7 +333,12 @@ public class EventResultDashboardService {
 
         Map<String, AggregatorType> aggregatorTypeMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'get aggr-type-lookup-map', 2) {
-            aggregatorTypeMap = aggregatorTypeDaoService.getNameToObjectMap()
+            aggregatorTypeMap = AggregatorType.list().collectEntries { AggregatorType eachAggregatorType ->
+                [
+                        eachAggregatorType.name,
+                        eachAggregatorType
+                ]
+            }
         }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', 2) {
@@ -381,8 +386,8 @@ public class EventResultDashboardService {
 
     private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<String, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
 
-        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "", null);
-        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "", null);
+        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null);
+        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null);
 
         List<OsmChartGraph> graphs = []
 
