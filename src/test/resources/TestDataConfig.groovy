@@ -7,6 +7,10 @@ import de.iteratec.osm.result.MeasuredEvent
 
 testDataConfig {
     sampleData {
+        'de.iteratec.osm.measurement.schedule.ConnectivityProfile' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
         'de.iteratec.osm.measurement.schedule.Job' {
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
             connectivityProfile = { -> ConnectivityProfile.build() }
@@ -31,6 +35,10 @@ testDataConfig {
             location = {->Location.build()}
         }
         'de.iteratec.osm.measurement.environment.Browser' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.csi.Page' {
             def i = 1
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
         }
