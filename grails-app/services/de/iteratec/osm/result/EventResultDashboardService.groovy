@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -54,7 +53,6 @@ public class EventResultDashboardService {
     EventResultDaoService eventResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService
-    AggregatorTypeDaoService aggregatorTypeDaoService
     ConnectivityProfileDaoService connectivityProfileDaoService
     OsmChartProcessingService osmChartProcessingService
 

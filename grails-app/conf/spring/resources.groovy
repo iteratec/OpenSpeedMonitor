@@ -16,12 +16,10 @@
 */
 
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 // Place your Spring DSL code here
 
 beans = {
-    aggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
     jobGroupDaoService(DefaultJobGroupDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
 }

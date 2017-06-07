@@ -86,7 +86,6 @@ class EventResultDashboardServiceTests extends Specification {
         csiAggregationUtilService(CsiAggregationUtilService)
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
         i18nService(I18nService)
-        defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
         browserSerivce(BrowserService)
     }
 
@@ -265,7 +264,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockPerformanceLoggingService()
         mockCsiAggregationUtilService()
         mockJobGroupDaoService()
-        mockAggregatorTypeDaoService()
 
         //test-specific data
         ErQueryParams queryParams = new ErQueryParams();
@@ -301,7 +299,6 @@ class EventResultDashboardServiceTests extends Specification {
         mockPerformanceLoggingService()
         mockCsiAggregationUtilService()
         mockJobGroupDaoService()
-        mockAggregatorTypeDaoService()
 
         //test-specific data
         ErQueryParams queryParams = new ErQueryParams();
@@ -680,10 +677,5 @@ class EventResultDashboardServiceTests extends Specification {
     private void mockJobGroupDaoService() {
         def jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         serviceUnderTest.jobGroupDaoService = jobGroupDaoService
-    }
-
-    private mockAggregatorTypeDaoService() {
-        def aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
-        serviceUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoService
     }
 }
