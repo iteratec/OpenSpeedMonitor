@@ -18,13 +18,12 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.joda.time.DateTime
-
 /**
  * Provides methods for calculating and retrieving {@link CsiAggregation}s with {@link AggregatorType#getName()}=={@link AggregatorType}.
  * @author nkuhn
@@ -37,7 +36,7 @@ class CsiSystemCsiAggregationService {
     PerformanceLoggingService performanceLoggingService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
-    WeightingService weightingService
+    CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
     /**
@@ -210,8 +209,8 @@ class CsiSystemCsiAggregationService {
             List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
             if (shopCsiAggregations.size() > 0) {
-                weightedCsiValues = weightingService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
-                weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
+                weightedCsiValues = csiValueService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
+                weightedCsiValuesVisuallyComplete = csiValueService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
             }
 
             if (weightedCsiValues.size() > 0) {

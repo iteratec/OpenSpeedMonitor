@@ -24,9 +24,9 @@ import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.MeanCalcService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -38,7 +38,7 @@ import org.joda.time.DateTime
 class CsiByEventResultsService {
 	
 	EventResultDaoService eventResultDaoService
-	WeightingService weightingService
+    CsiValueService csiValueService
 	MeanCalcService meanCalcService
 	CsTargetGraphDaoService csTargetGraphDaoService
     PerformanceLoggingService performanceLoggingService
@@ -75,7 +75,7 @@ class CsiByEventResultsService {
                 }
             }
             performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] weight event results', 2){
-                weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors, csiConfiguration)
+                weightedCsiValues = csiValueService.getWeightedCsiValues(eventResults, weightFactors, csiConfiguration)
             }
         }
 

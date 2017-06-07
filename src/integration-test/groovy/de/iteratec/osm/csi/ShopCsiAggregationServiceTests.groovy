@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -26,6 +25,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -83,7 +83,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
     def cleanup() {
         // undo mocked service
-        shopCsiAggregationService.weightingService = grailsApplication.mainContext.getBean('weightingService')
+        shopCsiAggregationService.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
     }
 
     void "test findAll"() {
@@ -119,7 +119,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
 
         //mocking inner services
-        mockWeightingService(weightedCsiValuesToReturnInMock, [])
+        mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
         List<CsiAggregation> mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
@@ -157,7 +157,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 10d, weight: 2d), underlyingEventResultIds: [4]),
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 13d, weight: 1d), underlyingEventResultIds: [5, 6])]
 
-        mockWeightingService(weightedCsiValuesToReturnInMock, [])
+        mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
         List<CsiAggregation> mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
@@ -188,7 +188,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //mocking inner services
-        mockWeightingService([], [])
+        mockCsiValueService([], [])
 
         //precondition
 
@@ -211,16 +211,10 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
      * Mocks methods of {@link WeightingService}.
      */
 
-    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = new WeightingService()
-        weightingService.metaClass.getWeightedCsiValues = {
-            List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
-                return toReturnFromGetWeightedCsiValues
+    private void mockCsiValueService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
+        shopCsiAggregationService.csiValueService = Stub(CsiValueService){
+            getWeightedCsiValues(_, _, _) >> toReturnFromGetWeightedCsiValues
+            getWeightedCsiValuesByVisuallyComplete(_, _, _) >> toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        weightingService.metaClass.getWeightedCsiValuesByVisuallyComplete = {
-            List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
-                return toReturnFromGetWeightedCsiValuesByVisuallyComplete
-        }
-        shopCsiAggregationService.weightingService = weightingService
     }
 }

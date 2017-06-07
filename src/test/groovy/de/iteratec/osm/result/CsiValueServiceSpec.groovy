@@ -17,18 +17,17 @@
 
 package de.iteratec.osm.result
 
-import grails.buildtestdata.mixin.Build
-import grails.test.mixin.*
-import spock.lang.Specification
 import de.iteratec.osm.OsmConfigCacheService
-import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiValue
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 @TestFor(CsiValueService)
-@Mock([EventResult, CsiAggregation])
+@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent])
 @Build([EventResult, CsiAggregation])
 class CsiValueServiceSpec extends Specification {
 
@@ -46,19 +45,17 @@ class CsiValueServiceSpec extends Specification {
 
     void setup() {
         serviceUnderTest = service
-
         serviceUnderTest.osmConfigCacheService = Stub(OsmConfigCacheService) {
             getCachedMaxDocCompleteTimeInMillisecs (_) >> { return MAX_DOC_COMPLETE }
             getCachedMinDocCompleteTimeInMillisecs (_) >> { return MIN_DOC_COMPLETE }
         }
-
         eventResult = EventResult.build(csByWptDocCompleteInPercent: 50, docCompleteTimeInMillisecs: 300)
         csiAggregation = CsiAggregation.build(csByWptDocCompleteInPercent: 50.0)
     }
 
     void "Different functionality is applied respective polymorphism of CsiValue implementations"() {
         setup:
-        serviceUnderTest.metaClass.isCsiRelevant = { EventResult eventResult->
+        serviceUnderTest.metaClass.isCsiRelevant = { EventResult eventResult ->
             return true
         }
         serviceUnderTest.metaClass.isCsiRelevant = { CsiAggregation csiAggregation ->
@@ -66,8 +63,8 @@ class CsiValueServiceSpec extends Specification {
         }
 
         when:
-        CsiValue csiAgg = new CsiAggregation()
-        CsiValue eventResult = new EventResult()
+        CsiValue csiAgg = CsiAggregation.buildWithoutSave()
+        CsiValue eventResult = EventResult.buildWithoutSave()
 
         then:
         !serviceUnderTest.isCsiRelevant(csiAgg)
@@ -131,33 +128,27 @@ class CsiValueServiceSpec extends Specification {
     }
 
     void "CsiAggregations not calculated are irrelevant"() {
-        when: "CSI aggregation is not calculated"
-        csiAggregation = Stub(CsiAggregation) {
-            isCalculated() >> false
-        }
+        given: "CSI aggregation is not calculated"
+        csiAggregation.metaClass.isCalculated = {-> return false }
 
-        then: "is this CSI aggregation not relevant"
+        expect: "is this CSI aggregation not relevant"
         !serviceUnderTest.isCsiRelevant(csiAggregation)
     }
 
     void "Csi relevant CsiAggregation is recognized as relevant"() {
-        when: "CSI aggregation is calculated"
-        csiAggregation = Stub(CsiAggregation) {
-            isCalculated() >> true
-        }
+        given: "CSI aggregation is calculated"
+        csiAggregation.metaClass.isCalculated = {-> return true }
 
-        then: "is this CSI aggregation relevant"
+        expect: "is this CSI aggregation relevant"
         serviceUnderTest.isCsiRelevant(csiAggregation)
     }
 
     void "CsiAggregation without csByWptDocCompleteInPercent is irrelevant"() {
-        when: "CSI aggregation is calculated but csByWptDocCompleteInPercent is null"
-        csiAggregation = Stub(CsiAggregation) {
-            isCalculated() >> true
-            getCsByWptDocCompleteInPercent() >> null
-        }
+        given: "CSI aggregation is calculated but csByWptDocCompleteInPercent is null"
+        csiAggregation.metaClass.isCalculated = {-> return true }
+        csiAggregation.metaClass.getCsByWptDocCompleteInPercent = {-> return null }
 
-        then: "is this CSI aggregation not relevant"
+        expect: "is this CSI aggregation not relevant"
         !serviceUnderTest.isCsiRelevant(csiAggregation)
     }
 }

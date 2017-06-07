@@ -23,6 +23,7 @@ import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -42,7 +43,7 @@ class ShopCsiAggregationService {
     JobService jobService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
-    WeightingService weightingService
+    CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     
     /**
@@ -198,8 +199,8 @@ class ShopCsiAggregationService {
             List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
             if (pageCsiAggregations.size() > 0) {
-                weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
-                weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
+                weightedCsiValuesDocComplete = csiValueService.getWeightedCsiValues(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
+                weightedCsiValuesVisuallyComplete = csiValueService.getWeightedCsiValuesByVisuallyComplete(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
             }
             if (weightedCsiValuesDocComplete.size() > 0) {
                 toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesDocComplete*.weightedValue)
