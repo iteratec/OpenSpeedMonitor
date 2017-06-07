@@ -6,7 +6,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 * 
-* 	http://www.apache.org/licenses/LICENSE-2.0
+* http://www.apache.org/licenses/LICENSE-2.0
 * 
 * Unless required by applicable law or agreed to in writing, software 
 * distributed under the License is distributed on an "AS IS" BASIS, 
@@ -17,237 +17,170 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.util.ServiceMocker
-import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import grails.test.mixin.Mock
+import grails.buildtestdata.mixin.Build
+import spock.lang.Specification
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
 
-import static org.hamcrest.Matchers.is
-import static org.hamcrest.Matchers.lessThan
-import static org.junit.Assert.assertThat
+import static spock.util.matcher.HamcrestMatchers.closeTo
 
 /**
  * Helper classes for these tests.
  */
-class ExpectedCustomerSatisfaction{
+class ExpectedCustomerSatisfaction {
     Integer loadTimeInMillisec
     Double customerSatisfaction
 }
-class DeviationToBuildMeanFrom {
-    Double deviation = 0.0d
-    Integer runs = 0i
-}
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
 @TestFor(TimeToCsMappingService)
-@Mock([Page, TimeToCsMapping])
-class TimeToCsMappingServiceTests {
+@Mock([Page, CsiConfiguration, TimeToCsMapping])
+@Build([Page, CsiConfiguration])
+class TimeToCsMappingServiceTests extends Specification {
 
     TimeToCsMappingService serviceUnderTest
-    ServiceMocker mocker
 
-    static final String FRUSTRATIONS_CSV = 'customerFrustrations.csv'
-    static final String MAPPINGS_CSV = 'timeToCsMappings.csv'
-    static final String EXPECTED_CUSTOMER_SATISFACTION_CSV = 'expectedValues.csv'
-    List<TimeToCsMapping> mappings
-    CsiConfiguration csiConfiguration
     static Map<String, List<Double>> frustrations
     static Map<String, List<ExpectedCustomerSatisfaction>> expectedCustomerSatisfactions
 
-    /** Expected values got calculated BY_RANK so there should be no difference (apart from Java's double rounding inaccuracy) */
-    final double TOLARABLE_DELTA_BY_RANK = 0.000001
-    /** Single values calculated BY_MAPPING may deviate by this from expected ones (calculated BY_RANK) */
-    final double TOLARABLE_DELTA_BY_MAPPING = 2 // should be reached with more complete test dataset: 0.9
-    /** Mean of values calculated BY_MAPPING may deviate by this from expected ones (calculated BY_RANK) */
-    final double TOLARABLE_MEAN_DELTA_BY_MAPPING = 0.5 // should be reached with more complete test dataset: 0.132
+    Collection<TimeToCsMapping> mappings
+    CsiConfiguration csiConfiguration
 
-    @Test
-    void testUndefinedPage() {
-        //test specific mocks
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, mappings.get(0), frustrations)
-        //test execution
-        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: Page.UNDEFINED))
-        //assertions
-        assertThat(csCalculated, is(null))
-    }
-
-    @Test
-    void testNoTransformationPossibleForPage() {
-        //test specific mocks
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, [], [100])
-
-        //test executions and assertions
-        mocker.mockConfigService(serviceUnderTest, 60, CsiTransformation.BY_MAPPING)
-        Double csCalculatedByMapping = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: "new"))
-        assertThat(csCalculatedByMapping, is(null))
-
-        mocker.mockConfigService(serviceUnderTest, 60, CsiTransformation.BY_RANK)
-        Double csCalculatedByRank = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: 'HP'))
-        assertThat(csCalculatedByRank, is(null))
-    }
-
-    @Test
-    void testGetCustomerSatisfactionInPercentViaMapping() {
-
-        def differences = [:].withDefault{[]}
-
-        // run test for each pageAggregator
-        expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
-
-            //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
-            expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
-
-                Page page = new Page(name: pageName)
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
-                Double difference = Math.abs(csCalculated - expected.customerSatisfaction)
-
-                //could be used for detailed analyze of differences between BY_RANK and BY_MAPPING:
-                //differences[pageName].add([difference, expected.loadTimeInMillisec, expected.customerSatisfaction, csCalculated])
-                assertThat(difference, lessThan(TOLARABLE_DELTA_BY_MAPPING))
-
-            }
-
-        }
-    }
-
-    @Test
-    void testGetCustomerSatisfactionPercentRank() {
-
-        // run test for each pageAggregator
-        expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
-
-            //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
-            expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
-
-                Page page = new Page(name: pageName)
-
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(expected.loadTimeInMillisec, page)
-                Double difference = Math.abs(csCalculated - expected.customerSatisfaction)
-                assertThat(difference, lessThan(TOLARABLE_DELTA_BY_RANK))
-
-            }
-
-        }
-    }
-
-    @Test
-    void meanDeviationByRank() {
-
-        Double totalDeviation = 0.0
-        int runs = 0
-
-        // run test for each pageAggregator
-        expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
-
-            //test specific mocks and test execution
-            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
-            expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
-
-                Page page = new Page(name: pageName)
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(expected.loadTimeInMillisec, page)
-                totalDeviation += Math.abs(csCalculated - expected.customerSatisfaction)
-                runs++
-
-            }
-
-        }
-
-        //assertions
-        Double meanDeviation = totalDeviation / runs
-        assertThat(meanDeviation, lessThan(TOLARABLE_DELTA_BY_RANK))
-
-    }
-
-    @Test
-    void meanDeviationByMapping() {
-
-        Map<String, DeviationToBuildMeanFrom> deviationsByPage = [:].withDefault { new DeviationToBuildMeanFrom() }
-
-        // run test for each pageAggregator
-        expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
-
-            //test specific mocks and test execution
-            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
-            expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
-
-                Page page = new Page(name: pageName)
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
-                deviationsByPage[pageName].deviation += Math.abs(csCalculated - expected.customerSatisfaction)
-                deviationsByPage[pageName].runs++
-
-            }
-
-        }
-
-        //assertions
-        deviationsByPage.each { String pageName, DeviationToBuildMeanFrom deviationCsiMethods->
-            Double meanDeviation = deviationCsiMethods.deviation / deviationCsiMethods.runs
-            assertThat(meanDeviation, lessThan(TOLARABLE_MEAN_DELTA_BY_MAPPING))
-        }
-    }
-
-    @Test
-    void testValidFrustrationsExistFor() {
-
-        //test data
-        Page page = new Page(name: "HP_entry")
-
-        //with valid frustrations for pageAggregator
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
-        assertThat(service.validFrustrationsExistFor(page), is(true))
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100, 200])
-        assertThat(service.validFrustrationsExistFor(page), is(true))
-
-        //without frustrations for pageAggregator
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [])
-        assertThat(service.validFrustrationsExistFor(page), is(false))
-
-        //with invalid frustrations for pageAggregator: just one frustration
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100])
-        assertThat(service.validFrustrationsExistFor(page), is(false))
-
-        //with invalid frustrations for pageAggregator: just one frustration
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [1000, 1000, 1000, 1000])
-        assertThat(service.validFrustrationsExistFor(page), is(false))
-
-        //with valid frustrations but null as pageAggregator
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
-        assertThat(service.validFrustrationsExistFor(null), is(false))
-
-        //with valid frustrations but UNDEFINED pageAggregator
-        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations)
-        assertThat(service.validFrustrationsExistFor(new Page(name: Page.UNDEFINED)), is(false))
-
-    }
-
-    @Before
-    void setUp() {
-
+    def setup() {
         serviceUnderTest = service
 
-        // mocks common for all tests
-        mocker = ServiceMocker.create()
-
         csiConfigurationSetup()
-
+        frustrationsSetup()
+        parseExpectedValues()
     }
 
-    void csiConfigurationSetup() {
-        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${MAPPINGS_CSV}")
+    def "an undefined page has no customer satisfaction"() {
+        given: "an undefined page"
+        Page undefinedPage = Page.build(name: Page.UNDEFINED)
+
+        when: "the customer satisfaction of this page gets calculated"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, undefinedPage)
+
+        then: "the customer satisfaction is null"
+        csCalculated == null
+    }
+
+    def "cs calculation is null when no transformation is possible for a page"() {
+        setup:
+        serviceUnderTest = Spy(TimeToCsMappingService)
+        serviceUnderTest.noTransformationPossibleFor(_, _) >> true
+
+        when:
+        Double csCalculatedByMapping = serviceUnderTest.getCustomerSatisfactionInPercent(2000, Page.build())
+
+        then:
+        csCalculatedByMapping == null
+    }
+
+    def "get customer satisfaction (cs) in percent via mapping"() {
+        given: "a page and a loading time to cs mapping"
+        Page page = Page.build(name: "HP_entry")
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
+
+        when: "the cs for a loading time gets calculated via the given mapping"
+        def csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(loadTimeInMillisecs, page, csiConfiguration)
+
+        then: "the cs is close enough to the expected one"
+        csCalculated closeTo(expectedCustomerSatisfaction, 1.2)
+
+        where:
+        loadTimeInMillisecs | expectedCustomerSatisfaction
+        4036                | 50d
+        1980                | 73.5d
+        3793                | 50d
+        6675                | 15.5d
+        2541                | 66.33165829000001d
+        2173                | 73.5d
+        2178                | 73.5d
+        2047                | 73.5d
+        2272                | 73d
+        6630                | 17d
+    }
+
+    def "get customer satisfaction (cs) in percent via the rank"() {
+        given: "a page and loading times"
+        Page page = Page.build(name: "HP_entry")
+        serviceUnderTest.timeToCsMappingCacheService = Stub(TimeToCsMappingCacheService) {
+            getCustomerFrustrations(_) >> frustrations.get("HP_entry")
+        }
+
+        when: "the cs for a loading time gets calculated via the ranking in the loading times"
+        def csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(loadTimeInMillisecs, page)
+
+        then: "the cs is close enough to the expected one"
+        csCalculated closeTo(expectedCustomerSatisfaction, 0.000001)
+
+        where:
+        loadTimeInMillisecs | expectedCustomerSatisfaction
+        4036                | 50d
+        1980                | 73.5d
+        3793                | 50d
+        6675                | 15.5d
+        2541                | 66.33165829000001d
+        2173                | 73.5d
+        2178                | 73.5d
+        2047                | 73.5d
+        2272                | 73d
+        6630                | 17d
+    }
+
+    def "isValid is true if page is neither null nor undefined"() {
+        given:
+        Page page = name ? Page.build(name: name) : null
+
+        when:
+        def state = serviceUnderTest.isValid(page)
+
+        then:
+        state == expectedState
+
+        where:
+        name            | expectedState
+        "Page"          | true
+        Page.UNDEFINED  | false
+        null            | false
+    }
+
+    def "valid frustrations exist for a page"() {
+        given: "a page"
+        Page page = Page.build(name: pageName)
+        serviceUnderTest.timeToCsMappingCacheService = Stub(TimeToCsMappingCacheService) {
+            getCustomerFrustrations(_) >> frustrationList
+        }
+
+        when: "the page gets validated and checked for a valid frustrations list"
+        def validFrustrationsExists = serviceUnderTest.validFrustrationsExistFor(page)
+
+        then: "the expected result should be obtained"
+        validFrustrationsExists == expectedValidation
+
+        where: "valid/invalid pages and valid/invalid frustration lists are used"
+        expectedValidation  | pageName          | frustrationList
+        true                | "Page"            | [1000, 2000]
+        true                | "Page"            | [1000, 1000, 2000]
+        false               | "Page"            | [1000, 1000]
+        false               | "Page"            | [1000]
+        false               | "Page"            | []
+        false               | Page.UNDEFINED    | [1000, 2000]
+        false               | Page.UNDEFINED    | [1000, 1000, 2000]
+        false               | Page.UNDEFINED    | [1000, 1000]
+        false               | Page.UNDEFINED    | [1000]
+        false               | Page.UNDEFINED    | []
+    }
+
+    def csiConfigurationSetup() {
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/timeToCsMappings.csv")
         mappings = []
 
         int lineCounter = 0
         new FileInputStream(csvFile).eachLine { line ->
-
             if (lineCounter >= 1) {
-
                 List tokenized = line.tokenize(';')
                 String pageName = tokenized[0]
                 Integer loadTimeInMilliSecs = Integer.parseInt(tokenized[1])
@@ -260,50 +193,38 @@ class TimeToCsMappingServiceTests {
                                 customerSatisfaction: customerSatisfaction,
                                 mappingVersion: 1
                         ).save(failOnError: true))
-
             }
             lineCounter++
-
         }
-
         csiConfiguration = new CsiConfiguration(label: "TestCsi",
-                                                description: "For Testing",
-                                                timeToCsMappings: mappings)
+                description: "For Testing",
+                timeToCsMappings: mappings)
     }
 
-    @BeforeClass
-    static void frustrationsSetup() {
-
-        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${FRUSTRATIONS_CSV}")
-        frustrations = [:].withDefault{[]}
+    def frustrationsSetup() {
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/customerFrustrations.csv")
+        frustrations = [:].withDefault { [] }
 
         int lineCounter = 0
         new FileInputStream(csvFile).eachLine { line ->
             if (lineCounter >= 1) {
-
                 def tokenized = line.tokenize(';')
                 String pageName = tokenized[0]
                 Integer customerFrustration = Integer.parseInt(tokenized[1])
 
                 frustrations[pageName].add(customerFrustration)
-
             }
             lineCounter++
         }
-
     }
 
-    @BeforeClass
-    static void parseExpectedValues() {
-
-        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/${EXPECTED_CUSTOMER_SATISFACTION_CSV}")
-        expectedCustomerSatisfactions = [:].withDefault{[]}
+    def parseExpectedValues() {
+        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/expectedValues.csv")
+        expectedCustomerSatisfactions = [:].withDefault { [] }
 
         int lineCounter = 0
         new FileInputStream(csvFile).eachLine { line ->
-
             if (lineCounter >= 1) {
-
                 def tokenized = line.tokenize(';')
                 String pageName = tokenized[0]
                 Integer loadTimeInMillisec = Integer.parseInt(tokenized[1])
@@ -315,12 +236,9 @@ class TimeToCsMappingServiceTests {
                                 customerSatisfaction: customerSatisfaction
                         )
                 )
-
             }
             lineCounter++
-
         }
-
     }
 }
 
