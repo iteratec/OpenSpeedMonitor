@@ -17,13 +17,10 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.OsmConfigCacheService
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -35,10 +32,7 @@ import org.joda.time.DateTime
 class EventCsiAggregationService {
 
     PerformanceLoggingService performanceLoggingService
-    JobService jobService
-    OsmConfigCacheService osmConfigCacheService
     CsiAggregationDaoService csiAggregationDaoService
-    WeightingService weightingService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     CsiValueService csiValueService
 
@@ -90,7 +84,6 @@ class EventCsiAggregationService {
                 true,
                 newResult.connectivityProfile)
         calcCsiAggregationForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
-
     }
 
     /**

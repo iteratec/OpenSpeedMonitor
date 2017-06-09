@@ -42,6 +42,10 @@ testDataConfig {
             def i = 1
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
         }
+        'de.iteratec.osm.csi.Page' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
     }
     unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
                             'de.iteratec.osm.result.EventResult': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
