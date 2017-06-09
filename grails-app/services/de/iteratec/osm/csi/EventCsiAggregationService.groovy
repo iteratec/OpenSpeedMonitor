@@ -22,7 +22,10 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CsiValueService
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional

@@ -34,7 +34,6 @@ class CsiSystemCsiAggregationService {
     ShopCsiAggregationService shopCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
-    CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
     CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
@@ -54,23 +53,6 @@ class CsiSystemCsiAggregationService {
             aggregator == AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
         }
         return query.list()
-    }
-    /**
-     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
-     * @param fromDate
-     * @param toDate
-     * @param targetInterval
-     * @param csiSystems
-     * @return
-     */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<CsiSystem> csiSystems) {
-        List<CsiAggregation> result = []
-        if (csiSystems.empty) {
-            return result
-        }
-
-        result = csiAggregationDaoService.getMvs(fromDate, toDate, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM), csiSystems)
-        return result
     }
 
     /**

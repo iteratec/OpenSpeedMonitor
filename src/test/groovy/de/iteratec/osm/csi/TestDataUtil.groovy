@@ -21,10 +21,7 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
-import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
@@ -36,20 +33,21 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import org.joda.time.DateTime
-import org.springframework.transaction.TransactionStatus
 
 import java.util.regex.Pattern
 
 import static org.junit.Assert.assertNotNull
-
 /**
  * <p>
  * A test-utility to load data from customers CSV-files
@@ -58,7 +56,7 @@ import static org.junit.Assert.assertNotNull
  *
  * <p>
  * <em>DEV-Note:</em>
- * Because this utility is used in both, unit and integration tests, it must 
+ * Because this utility is used in both, unit and integration tests, it must
  * be placed in the productive source folder.
  * </p>
  *
@@ -66,7 +64,15 @@ import static org.junit.Assert.assertNotNull
  * @since IT-8
  */
 @TestMixin(GrailsUnitTestMixin)
+@Build([CsiSystem, JobGroup, CsiConfiguration])
 class TestDataUtil implements OsmTestLogin {
+
+    static CsiSystem buildCsiSystem() {
+        return CsiSystem.buildWithoutSave()
+                .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
+                .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
+                .save(flush: true, failOnError: true)
+    }
 
     static ConnectivityProfile createConnectivityProfile(String profileName) {
         ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
