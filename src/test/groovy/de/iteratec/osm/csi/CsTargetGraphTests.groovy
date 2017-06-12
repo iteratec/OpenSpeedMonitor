@@ -17,60 +17,35 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.*
-
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.junit.*
 import spock.lang.Specification
 
-/**
- * Test-suite of {@link CsTargetGraph}.
- */
+import static spock.util.matcher.HamcrestMatchers.closeTo
+import static spock.util.matcher.HamcrestSupport.that
+
 @TestFor(CsTargetGraph)
+@Build([CsTargetValue, CsTargetGraph])
 @Mock([CsTargetValue, CsTargetGraph])
 class CsTargetGraphTests extends Specification {
-
-    DateTime now
-    DateTime fourMonthsAgo
-    static final String graphLabel = 'myGraph'
-    static final Double tolerableDeviationDueToRounding = 0.2
-
-    void "setup"() {
-        // now = 17.07.2013 - 16:28:35
-        now = new DateTime(1374071315000L, DateTimeZone.UTC)
-        fourMonthsAgo = now.minusMonths(4)
-
-        Date nowAsDate = now.toDate()
-        assert nowAsDate
-
-        Date fourMonthsAgoDate = fourMonthsAgo.toDate()
-        assert fourMonthsAgoDate
-
-        CsTargetValue csTargetNow = new CsTargetValue(
-                date: nowAsDate,
-                csInPercent: 90).save(failOnError: true)
-
-        CsTargetValue csTargetTwoMonthsAgo = new CsTargetValue(
-                date: fourMonthsAgoDate,
-                csInPercent: 80).save(failOnError: true)
-
-        new CsTargetGraph(
-                label: graphLabel,
-                defaultVisibility: true,
-                pointOne: csTargetTwoMonthsAgo,
-                pointTwo: csTargetNow).save(failOnError: true)
-    }
+    final static double error = 0.01
 
     def "test percent calculation by date"() {
-        when: "calculating target cs of a date"
-        CsTargetGraph testGraph = CsTargetGraph.findByLabel(graphLabel)
+        setup:
+        DateTime endDate = new DateTime(2013, 7, 17, 16, 28, 35)
+        DateTime endDate120DaysAgo = endDate.minusDays(120)
+        CsTargetGraph targetGraph = CsTargetGraph.build(
+                pointOne: CsTargetValue.build(date: endDate120DaysAgo.toDate(), csInPercent: 80),
+                pointTwo: CsTargetValue.build(date: endDate.toDate(), csInPercent: 90)
+        )
 
-        then: "the error should be less than tolerableDeviationDueToRounding"
-        Math.abs(testGraph.getPercentOfDate(fourMonthsAgo) - 80d) < tolerableDeviationDueToRounding
-        Math.abs(testGraph.getPercentOfDate(now.minusMonths(3)) - 82.5d) < tolerableDeviationDueToRounding
-        Math.abs(testGraph.getPercentOfDate(now.minusMonths(2)) - 85d) < tolerableDeviationDueToRounding
-        Math.abs(testGraph.getPercentOfDate(now.minusMonths(1)) - 87.5d) < tolerableDeviationDueToRounding
-        Math.abs(testGraph.getPercentOfDate(now) - 90d) < tolerableDeviationDueToRounding
+        expect: "thhe target graph can calculate the correct value for a given date in range"
+        that targetGraph.getPercentOfDate(endDate120DaysAgo), closeTo(80d, error)
+        that targetGraph.getPercentOfDate(endDate.minusDays(90)), closeTo(82.5d, error)
+        that targetGraph.getPercentOfDate(endDate.minusDays(60)), closeTo(85d, error)
+        that targetGraph.getPercentOfDate(endDate.minusDays(30)), closeTo(87.5d, error)
+        that targetGraph.getPercentOfDate(endDate), closeTo(90d, error)
     }
 }
