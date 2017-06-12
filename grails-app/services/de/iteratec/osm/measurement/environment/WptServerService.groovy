@@ -1,32 +1,29 @@
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import grails.transaction.Transactional
 
 @Transactional
 class WptServerService {
+
     ProxyService proxyService
 
-    static final String WPT_URL = "www.webpagetest.org"
+    static final String OFFICIAL_WPT_URL = "www.webpagetest.org"
 
-    List<Location> tryMakeServerAndGetLocations(String serverSelect, String inputWPTKey, String inputServerName, String inputServerAddress,String inputServerKey) {
+    List<Location> tryMakeServerAndGetLocations(String serverSelect, String serverName, String serverUrl, String serverApiKey) {
         WebPageTestServer server = new WebPageTestServer()
         server.active = true
-        if (serverSelect == "WPTServer") {
-            server.label = WPT_URL
-            server.proxyIdentifier = WPT_URL
-            server.baseUrl = "http://"+WPT_URL
-            server.apiKey = inputWPTKey
+        if (serverSelect == OFFICIAL_WPT_URL) {
+            server.label = OFFICIAL_WPT_URL
+            server.proxyIdentifier = OFFICIAL_WPT_URL
+            server.baseUrl = "http://${OFFICIAL_WPT_URL}"
+            server.apiKey = serverApiKey
         }
         else {
-            server.label = inputServerName
-            server.proxyIdentifier = inputServerName
-            server.baseUrl = inputServerAddress
-            server.apiKey = inputServerKey
-            if (!server.baseUrl.contains("://")) {
-                server.baseUrl = "http://" + server.baseUrl
-            }
+            server.label = serverName
+            server.proxyIdentifier = serverName
+            server.baseUrl = serverUrl.startsWith("http://") || serverUrl.startsWith("https://") ? serverUrl : "http://${serverUrl}"
+            server.apiKey = serverApiKey
         }
 
         if (server.validate()) {
@@ -42,7 +39,7 @@ class WptServerService {
             return tryFetchLocations(server);
         }
         else {
-            log.error("WebPagetest server '${server.label}'couldn't be saved cause of validation errors")
+            log.error("WebPagetest server '${server.label}' couldn't be saved cause of validation errors: ${server.errors}")
             return [];
         }
     }

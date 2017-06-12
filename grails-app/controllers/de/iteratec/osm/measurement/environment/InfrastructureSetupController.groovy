@@ -13,7 +13,10 @@ class InfrastructureSetupController {
     }
 
     def create() {
-        return [params:params,disableNavbar:true,disableBackToTop:true]
+        params['serverCreationOptions'] = [wptServerService.OFFICIAL_WPT_URL, "custom"]
+        params['disableNavbar'] = true
+        params['disableBackToTop'] = true
+        return params
     }
 
     def cancel() {
@@ -21,9 +24,14 @@ class InfrastructureSetupController {
         redirect(controller: 'Landing', action: 'index')
     }
 
-    def save() {
+    def save(String serverSelect, String serverName, String serverUrl, String serverApiKey) {
         if (configService.getInfrastructureSetupRan() != OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
-            List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(params.serverSelect, params.inputWptKey, params.inputServerName, params.inputServerAddress, params.inputServerKey)
+            List<Location> addedLocations = wptServerService.tryMakeServerAndGetLocations(
+                serverSelect,
+                serverName,
+                serverUrl,
+                serverApiKey
+            )
             if (addedLocations.size() > 0) {
                 configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.FINISHED)
                 flash.success = addedLocations.size()
