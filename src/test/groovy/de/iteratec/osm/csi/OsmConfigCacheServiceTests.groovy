@@ -17,17 +17,13 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.OsmConfigCacheService
-import grails.buildtestdata.mixin.Build
-import grails.test.mixin.*
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.OsmConfiguration
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
-
 /**
  * Test-suite of {@link OsmConfigCacheService}.
  */
@@ -36,9 +32,12 @@ import spock.lang.Specification
 @Mock([OsmConfiguration])
 class OsmConfigCacheServiceTests extends Specification {
 
+    def doWithSpring = {
+        configService(ConfigService)
+    }
+
     void setup() {
         OsmConfiguration.build()
-        service.configService = new ConfigService()
     }
 
     void "test accessing cached configs min doc complete time"() {
