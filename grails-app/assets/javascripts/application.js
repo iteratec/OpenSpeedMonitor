@@ -22,6 +22,7 @@
 //= require_tree bower_components/clipboard
 //= require kickstart/checkboxes
 //= require spinner
+//= require bower_components/bootstrap-validator/js/validator
 //= require_self
 
 delete $.fn.datepicker; // so it can be replaced by air-datepicker
