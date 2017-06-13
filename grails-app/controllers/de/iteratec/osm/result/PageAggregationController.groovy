@@ -19,6 +19,7 @@ import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MeasurandUtilService
 import org.springframework.http.HttpStatus
+import grails.converters.JSON;
 
 class PageAggregationController extends ExceptionHandlerController {
     public final
@@ -142,26 +143,42 @@ class PageAggregationController extends ExceptionHandlerController {
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    barchartSeries.data.add(
-                        new BarchartDatum(
-                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
-                            originalMeasurandName: currentMeasurand,
-                            value: measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand),
-                            valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
-                            grouping: key
+                    def value = measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
+                    if (value) {
+                        barchartSeries.data.add(
+                                new BarchartDatum(
+                                        measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
+                                        originalMeasurandName: currentMeasurand,
+                                        value: value,
+                                        valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                                        grouping: key
+                                )
                         )
-                    )
+                    }
                 }
             }
-
             barchartDTO.series.add(barchartSeries)
         }
+        System.out.println(barchartDTO.series[0].data.size())
 
 //      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
-        ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+        boolean hasData = false;
+        barchartDTO.series.each {series ->
+            series.data.each {datum ->
+                if (datum.value) {
+                    hasData = true;
+                }
+            }
+        }
+        if (!hasData) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "no data")
+        }
+        else {
+            ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+        }
     }
 
     @RestAction

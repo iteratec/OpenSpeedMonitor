@@ -135,6 +135,7 @@
                 dataType: "json",
                 success: function (data) {
                     spinner.stop();
+                    $("#chart-card").removeClass("hidden");
                     if (!$("#error-div").hasClass("hidden"))
                         $("#error-div").addClass("hidden");
 
@@ -149,9 +150,16 @@
                 },
                 error: function (e) {
                     spinner.stop();
-                    $("#error-div").removeClass("hidden");
-                    $("#chart-card").removeClass("hidden");
-                    $("#error-message").html(e.responseText);
+                    if (e.responseText == "no data") {
+                        $("#error-div").addClass("hidden");
+                        $("#chart-card").removeClass("hidden");
+                        $('#warning-no-data').show();
+                    }
+                    else {
+                        $("#error-div").removeClass("hidden");
+                        $("#chart-card").removeClass("hidden");
+                        $("#error-message").html(e.responseText);
+                    }
                 }
             });
         }
