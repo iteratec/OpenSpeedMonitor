@@ -215,8 +215,14 @@ class ScriptParser {
 
 	private PageService pageService
 
+	Map<String, String> getNewMeasuredEvents() {
+		return newMeasuredEvents
+	}
 
-	/**
+	Set<String> getNewPages() {
+		return newPages
+	}
+/**
 	 * Parse the given navigationScript
 	 * @param navigationScript Must be not null
 	 */

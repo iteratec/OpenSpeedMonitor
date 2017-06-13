@@ -69,7 +69,7 @@ class ScriptController {
 			render(view: 'create', model: [script: script,pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
 			return
 		}
-		scriptService.createNewPagesAndMeasuredEvents(script)
+		scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
 		def flashMessageArgs = [getScriptI18n(), script.label]
 		flash.message = message(code: 'default.created.message', args: flashMessageArgs)
 		redirect(action: "list")
@@ -125,7 +125,7 @@ class ScriptController {
 			render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts:   getListOfArchivedScripts(s)])
 			return
 		}
-		scriptService.createNewPagesAndMeasuredEvents(s)
+		scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, s.navigationScript))
 		archivedScript.save(failOnError:true, flush:true)
 
 		flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
