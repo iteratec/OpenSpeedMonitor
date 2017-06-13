@@ -85,20 +85,23 @@ class PageComparisonController extends ExceptionHandlerController {
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
-                series.data << datum1
+                if (datum1.value) {
+                    series.data << datum1
+                }
             }
             if (result2) {
                 datum2.value = result2 ? result2[2] : null
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name
-                series.data << datum2
+                if (datum2.value) {
+                    series.data << datum2
+                }
             }
-            if (series.data) {
+            if (series.data.size() > 0) {
                 dto.series << series
             }
         }
-
         ControllerUtils.sendObjectAsJSON(response, dto)
     }
 }
