@@ -31,16 +31,16 @@ class MatrixViewDataSpec extends Specification {
         when: "new MatrixViewData is created"
         MatrixViewData matrixViewData = new MatrixViewData()
 
-        then: "the MatrixViewData is empty"
+        then: "the MatrixViewData has been initialised correctly"
         matrixViewData.entries.size() == 0
         matrixViewData.columnNames.size() == 0
         matrixViewData.rowNames.size() == 0
 
-        !matrixViewData.columnLabel.isEmpty()
-        !matrixViewData.rowLabel.isEmpty()
-        !matrixViewData.weightLabel.isEmpty()
-        !matrixViewData.colorBrightLabel.isEmpty()
-        !matrixViewData.colorDarkLabel.isEmpty()
+        matrixViewData.columnLabel == MatrixViewData.DEFAULT_COLUMN_LABEL
+        matrixViewData.rowLabel == MatrixViewData.DEFAULT_ROW_LABEL
+        matrixViewData.weightLabel == MatrixViewData.DEFAULT_WEIGHT_LABEL
+        matrixViewData.colorBrightLabel == MatrixViewData.DEFAULT_COLOR_BRIGHT_LABEL
+        matrixViewData.colorDarkLabel == MatrixViewData.DEFAULT_COLOR_DARK_LABEL
     }
 
     def "addNode adds chart entry to list"() {

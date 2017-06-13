@@ -22,9 +22,6 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestMixin(GrailsUnitTestMixin)
 class ScheduleChartDataSpec extends Specification{
 
@@ -32,13 +29,13 @@ class ScheduleChartDataSpec extends Specification{
         when: "ScheduleChartData is created"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
 
-        then: "the ScheduleChartData has been initialised"
-        !scheduleChartData.name.isEmpty()
-        !scheduleChartData.discountedJobsLabel.isEmpty()
+        then: "the ScheduleChartData has been initialised correctly"
+        scheduleChartData.name == ScheduleChartData.DEFAULT_NAME
+        scheduleChartData.discountedJobsLabel == ScheduleChartData.DEFAULT_DISCOUNTED_JOBS_LABEL
         scheduleChartData.jobs.size() == 0
         scheduleChartData.discountedJobs.size() == 0
-        scheduleChartData.agentCount == 0;
-        scheduleChartData.allExecutionDates.size() == 0;
+        scheduleChartData.agentCount == 0
+        scheduleChartData.allExecutionDates.size() == 0
         scheduleChartData.allEndDates.size() == 0
     }
 
@@ -56,7 +53,7 @@ class ScheduleChartDataSpec extends Specification{
         ScheduleChartJob job = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 60)
         ScheduleChartJob job2 = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 120)
 
-        when: "thejobs are added to ScheduleChartData"
+        when: "the jobs are added to ScheduleChartData"
         scheduleChartData.addJob(job)
         scheduleChartData.addJob(job2)
 

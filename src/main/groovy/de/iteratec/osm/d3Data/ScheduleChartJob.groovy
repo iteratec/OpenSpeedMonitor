@@ -8,6 +8,10 @@ import org.joda.time.DateTime
  * and the duration (in minutes) the job requires on each execution date
  */
 class ScheduleChartJob {
+    public static final String DEFAULT_NAME = "Job"
+    public static final String DEFAULT_DESCRIPTION = "description"
+    public static final int DEFAULT_DURATION = 60
+    public static final int DEFAULT_LINK_ID = 0
     String name
     String description
     List<DateTime> executionDates
@@ -15,10 +19,10 @@ class ScheduleChartJob {
     long linkId
 
     ScheduleChartJob() {
-        name = "Job"
-        description = "description"
+        name = DEFAULT_NAME
+        description = DEFAULT_DESCRIPTION
         executionDates = new ArrayList<>()
-        durationInSeconds = 60
-        linkId = 0
+        durationInSeconds = DEFAULT_DURATION
+        linkId = DEFAULT_LINK_ID
     }
 }

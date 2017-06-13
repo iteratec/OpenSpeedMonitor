@@ -31,9 +31,9 @@ class BarChartDataSpec extends Specification{
         when: "new BarChartData is created"
         BarChartData barChartData = new BarChartData()
 
-        then: "it is initialised"
-        !barChartData.xLabel.isEmpty()
-        !barChartData.yLabel.isEmpty()
+        then: "the BarChartData has been initialised correctly"
+        barChartData.xLabel == BarChartData.DEFAULT_X_LABEL
+        barChartData.yLabel == BarChartData.DEFAULT_Y_LABEL
         barChartData.bars.isEmpty()
     }
 
@@ -45,7 +45,7 @@ class BarChartDataSpec extends Specification{
         when: "the entry is added to barChartData"
         barChartData.addDatum(chartEntry)
 
-        then: "barChartData contains that entry"
+        then: "barChartData contains the correct entry"
         barChartData.bars.size() == 1
         barChartData.bars[0] == chartEntry
     }

@@ -33,10 +33,10 @@ class ScheduleChartJobSpec extends Specification{
         when: "a ScheduleChartJob is created"
         ScheduleChartJob scheduleChartJob = new ScheduleChartJob()
 
-        then: "the ScheduleChartJob has been initialised"
-        scheduleChartJob.durationInSeconds != 0
+        then: "the ScheduleChartJob has been initialised correctly"
+        scheduleChartJob.durationInSeconds == ScheduleChartJob.DEFAULT_DURATION
         scheduleChartJob.executionDates.size() == 0
-        !scheduleChartJob.name.isEmpty()
-        !scheduleChartJob.description.isEmpty()
+        scheduleChartJob.name == ScheduleChartJob.DEFAULT_NAME
+        scheduleChartJob.description == ScheduleChartJob.DEFAULT_DESCRIPTION
     }
 }

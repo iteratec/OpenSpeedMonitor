@@ -33,8 +33,8 @@ class MultiLineChartSpec extends Specification{
 
         then: "the theMultiLineChart has been initialised"
         multiLineChart.lines.size() == 0
-        !multiLineChart.xLabel.isEmpty()
-        !multiLineChart.yLabel.isEmpty()
+        multiLineChart.xLabel == MultiLineChart.DEFAULT_X_LABEL
+        multiLineChart.yLabel == MultiLineChart.DEFAULT_Y_LABEL
     }
 
     def "addLine adds line to list of lines"() {
@@ -42,7 +42,7 @@ class MultiLineChartSpec extends Specification{
         MultiLineChart multiLineChart = new MultiLineChart()
         MultiLineChartLineData line = new MultiLineChartLineData()
 
-        when: "the line is added to multiLineChart"
+        when: "the line is added to the multiLineChart"
         multiLineChart.addLine(line)
 
         then: "the multiLineChart contains the line"

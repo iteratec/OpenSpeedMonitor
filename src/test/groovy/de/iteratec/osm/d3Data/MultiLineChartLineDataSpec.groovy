@@ -34,7 +34,7 @@ class MultiLineChartLineDataSpec extends Specification{
        then: "the MultiLineChartLineData has been initialised"
        lineData.xPoints.size() == 0
        lineData.yPoints.size() == 0
-       !lineData.name.isEmpty()
+       lineData.name == MultiLineChartLineData.DEFAULT_NAME
    }
 
     def "addDataPoint adds dataPoint and keeps right order" () {

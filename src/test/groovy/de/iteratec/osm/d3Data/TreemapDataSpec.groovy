@@ -37,9 +37,9 @@ class TreemapDataSpec extends Specification {
 
         then: "the treemapData has been initialised"
         treemapData.children.size() == 0
-        !treemapData.zeroWeightLabel.isEmpty()
-        !treemapData.dataName.isEmpty()
-        !treemapData.weightName.isEmpty()
+        treemapData.zeroWeightLabel == TreemapData.DEFAULT_ZERO_WEIGHT_LABEL
+        treemapData.dataName == TreemapData.DEFAULT_DATA_NAME
+        treemapData.weightName == TreemapData.DEFAULT_WEIGHT_NAME
     }
 
     def "addNode adds chart entry to list"() {
@@ -47,10 +47,10 @@ class TreemapDataSpec extends Specification {
         TreemapData treemapData = new TreemapData()
         ChartEntry entry = new ChartEntry()
 
-        when: "the entry is added to TreemapData"
+        when: "the entry is added to the TreemapData"
         treemapData.addNode(entry)
 
-        then: "TreemapData contains the entry"
+        then: "the TreemapData contains the entry"
         treemapData.children.size() == 1
         treemapData.children[0] == entry
     }

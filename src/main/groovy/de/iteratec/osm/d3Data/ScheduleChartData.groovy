@@ -6,6 +6,8 @@ import org.joda.time.DateTime
  * A classification for a schedule chart
  */
 class ScheduleChartData {
+    public static final String DEFAULT_NAME = "Location"
+    public static final String DEFAULT_DISCOUNTED_JOBS_LABEL = "discounted Jobs"
     String name
     List<ScheduleChartJob> jobs
     // Sorted List
@@ -20,14 +22,14 @@ class ScheduleChartData {
     int agentCount
 
     ScheduleChartData() {
-        name = "Location"
+        name = DEFAULT_NAME
         jobs = new ArrayList<>()
 
         startDate = new DateTime()
         endDate = new DateTime()
 
         discountedJobs = new ArrayList<>()
-        discountedJobsLabel = "discounted Jobs"
+        discountedJobsLabel = DEFAULT_DISCOUNTED_JOBS_LABEL
 
         allExecutionDates = new ArrayList<>()
         allEndDates = new ArrayList<>()

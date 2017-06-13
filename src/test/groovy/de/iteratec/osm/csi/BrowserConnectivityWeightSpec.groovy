@@ -19,47 +19,35 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
 @TestFor(BrowserConnectivityWeight)
+@Build([Browser,ConnectivityProfile])
 class BrowserConnectivityWeightSpec extends Specification {
 
-    void "setup"() {
+    void "BrowserConnectivityWeight without attributes is invalid"() {
+        expect:
+        !new BrowserConnectivityWeight().validate()
     }
 
-    void "test nullable"() {
-        when: "not initialised"
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight()
-
-        then: "BrowserConnectivityWeight does not validate"
-        !browserConnectivityWeight.validate()
+    void "BrowserConnectivityWeight with just a Browser is invalid"() {
+        expect:
+        !new BrowserConnectivityWeight(browser: Browser.build()).validate()
     }
 
-    void "test only browser not valid"() {
-        when: "invalid browser"
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(browser: new Browser())
-
-        then: "BrowserConnectivityWeight does not validate"
-        !browserConnectivityWeight.validate()
+    void "BrowserConnectivityWeight with just a ConnectivityProfile is invalid"() {
+        expect:
+        !new BrowserConnectivityWeight(connectivity: ConnectivityProfile.build()).validate()
     }
 
-    void "test only connectivity not valid"() {
-        when: "invalid ConnectivityProfile"
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivity: new ConnectivityProfile())
-
-        then: "BrowserConnectivityWeight does not validate"
-        !browserConnectivityWeight.validate()
-    }
-
-    void "all fields defined valid"() {
-        when: "initialised"
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(browser: new Browser(), connectivity: new ConnectivityProfile(), weight: 12.5)
-
-        then: "BrowserConnectivityWeight does validate"
-        browserConnectivityWeight.validate()
+    void "BrowserConnectivityWeight with all required values is valid"() {
+        expect:
+        new BrowserConnectivityWeight(
+            browser: Browser.build(),
+            connectivity: ConnectivityProfile.build(),
+            weight: 12.5
+        ).validate()
     }
 }
