@@ -157,13 +157,28 @@ class Job implements Taggable {
     boolean trace
     String  spof
 
-    enum TakeScreenshots {NONE,DEFAULT,FULL}
-    enum SaveBodies {NONE,HTML,ALL}
-    enum UserAgent {DEFAULT,ORIGINAL,APPEND,OVERWRITE}
+    enum TakeScreenshots {
+        NONE,
+        DEFAULT,
+        FULL
+    }
 
-    TakeScreenshots  takeScreenshots = TakeScreenshots.DEFAULT
-    SaveBodies       saveBodies      = SaveBodies.NONE
-    UserAgent        userAgent       = UserAgent.DEFAULT
+    enum SaveBodies {
+        NONE,
+        HTML,
+        ALL
+    }
+
+    enum UserAgent {
+        DEFAULT,
+        ORIGINAL,
+        APPEND,
+        OVERWRITE
+    }
+
+    TakeScreenshots takeScreenshots = TakeScreenshots.DEFAULT
+    SaveBodies saveBodies = SaveBodies.NONE
+    UserAgent userAgent = UserAgent.DEFAULT
 
     /**
      * @deprecated Use executionSchedule instead
