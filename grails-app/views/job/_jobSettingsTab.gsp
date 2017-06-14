@@ -26,7 +26,8 @@
             </label>
 
             <div class="col-md-8">
-                <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}" defaultValue="Name"/>
+                <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}"
+                             placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}" />
             </div>
         </div>
 

@@ -136,7 +136,7 @@ function registerEventHandlers() {
     toggleScreenshotOptions();
     toggleUserAgentOptions();
     
-    $('#inputField-JobLabel').on('blur',updateJobName);
+    $('#inputField-JobLabel').on('keyup',updateJobName);
     updateJobName();
 
     $("#runs").on("change",toggleMedianOptions);
@@ -252,10 +252,8 @@ function toggleChromeTab() {
 }
 
 function updateJobName() {
-    if (!$("#inputField-JobLabel").val()) {
-        $("#inputField-JobLabel").val("New Jobname");
-    }
-    $("#JobName").text($("#inputField-JobLabel").val());
+    var inputField = $("#inputField-JobLabel");
+    $("#JobName").text(inputField.val() || inputField.attr('placeholder') || "New Job");
 }
 
 /**
