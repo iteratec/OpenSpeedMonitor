@@ -33,34 +33,20 @@ import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
 @TestFor(CsiAggregationUtilService)
 class CsiAggregationUtilServiceTests extends Specification {
 
-    @Shared
-    DateTime midnightLastDayOfSummertime = new DateTime(2013, 10, 27, 0, 0, 0)
-    @Shared
-    DateTime twoHoursBeforeEndOfSummertime = midnightLastDayOfSummertime.plusHours(1)
-    @Shared
-    DateTime oneHourBeforeEndOfSummertime = midnightLastDayOfSummertime.plusHours(2)
-    @Shared
-    DateTime noonLastDayOfSummertime = new DateTime(2013, 10, 27, 12, 0, 0)
-    @Shared
-    DateTime oneHourAfterNoonLastDayOfSummertime = noonLastDayOfSummertime.plusHours(1)
-    @Shared
-    DateTime threeDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(3)
-    @Shared
-    DateTime tenDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(10)
-    @Shared
-    DateTime fourDaysAfterEndOfSummertime = midnightLastDayOfSummertime.plusDays(4)
-    @Shared
-    DateTime elevenDaysAfterEndOfSummertime = midnightLastDayOfSummertime.plusDays(11)
-    @Shared
-    DateTime twoDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(2)
-    @Shared
-    DateTime midnightFirstDayAfterSummertime = midnightLastDayOfSummertime.plusDays(1)
-    @Shared
-    DateTime midnightSecondDayAfterSummertime = midnightLastDayOfSummertime.plusDays(2)
-    @Shared
-    DateTime exactlyEndOfSummertime = midnightLastDayOfSummertime.plusHours(3)
-    @Shared
-    DateTime oneHourAfterEndOfSummertime = midnightLastDayOfSummertime.plusHours(4)
+    static DateTime midnightLastDayOfSummertime = new DateTime(2013, 10, 27, 0, 0, 0)
+    static DateTime twoHoursBeforeEndOfSummertime = midnightLastDayOfSummertime.plusHours(1)
+    static DateTime oneHourBeforeEndOfSummertime = midnightLastDayOfSummertime.plusHours(2)
+    static DateTime noonLastDayOfSummertime = new DateTime(2013, 10, 27, 12, 0, 0)
+    static DateTime oneHourAfterNoonLastDayOfSummertime = noonLastDayOfSummertime.plusHours(1)
+    static DateTime threeDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(3)
+    static DateTime tenDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(10)
+    static DateTime fourDaysAfterEndOfSummertime = midnightLastDayOfSummertime.plusDays(4)
+    static DateTime elevenDaysAfterEndOfSummertime = midnightLastDayOfSummertime.plusDays(11)
+    static DateTime twoDaysBeforeEndOfSummertime = midnightLastDayOfSummertime.minusDays(2)
+    static DateTime midnightFirstDayAfterSummertime = midnightLastDayOfSummertime.plusDays(1)
+    static DateTime midnightSecondDayAfterSummertime = midnightLastDayOfSummertime.plusDays(2)
+    static DateTime exactlyEndOfSummertime = midnightLastDayOfSummertime.plusHours(3)
+    static DateTime oneHourAfterEndOfSummertime = midnightLastDayOfSummertime.plusHours(4)
     CsiAggregationUtilService serviceUnderTest
 
     def setup() {

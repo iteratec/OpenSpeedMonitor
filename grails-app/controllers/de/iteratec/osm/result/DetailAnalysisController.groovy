@@ -2,7 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.api.MicroserviceType
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -20,8 +19,7 @@ class DetailAnalysisController {
     EventResultDashboardService eventResultDashboardService
     DetailAnalysisPersisterService detailAnalysisPersisterService
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
-    public final static int MONDAY_WEEKSTART = 1
+    public final static String JS_DATE_FORMAT = 'dd.mm.yyyy'
 
     def intervals = ['not', 'hourly', 'daily', 'weekly']
 
@@ -57,7 +55,7 @@ class DetailAnalysisController {
         if (osmUrl && microServiceUrl && apiKey) {
             try {
                 if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-                def timeFrame = cmd.getSelectedTimeFrame()
+                def timeFrame = cmd.createTimeFrameInterval()
                 String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&toDate=${timeFrame.endMillis}&fromDate=${timeFrame.startMillis}&" + request.queryString
                 def detailDataWebPageAsString = (microServiceUrl + "detailAnalysisDashboard/show" + queryString).toURL().openConnection().with { conn ->
                     if (responseCode != 200) {
@@ -86,29 +84,14 @@ class DetailAnalysisController {
     }
 
     private Map constructStaticViewDataOfShowAll() {
-        Map<String, Object> result = [:]
-
-        // JobGroups
-        List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
-        result.put('folders', jobGroups)
-
-        // Pages
-        List<Page> pages = eventResultDashboardService.getAllPages()
-        result.put('pages', pages)
-
-        // JavaScript-Utility-Stuff:
-        result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
-        result.put("weekStart", MONDAY_WEEKSTART)
-
-        result.put("selectedChartType", 0);
-        result.put("warnAboutExceededPointsPerGraphLimit", false);
-
-        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
-
-        result.put('persistenceOfDetailAnalysisDataEnabled', grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true')
-
-        // Done! :)
-        return result;
+        boolean detailAnalysisEnabled = grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true'
+        return[
+            'folders': eventResultDashboardService.getAllJobGroups(),
+            'pages': eventResultDashboardService.getAllPages(),
+            'dateFormat': JS_DATE_FORMAT,
+            'tagToJobGroupNameMap': jobGroupDaoService.getTagToJobGroupNameMap(),
+            'persistenceOfDetailAnalysisDataEnabled': detailAnalysisEnabled
+        ]
     }
 
     def sendFetchAssetsAsBatchCommand(DetailAnalysisDashboardShowCommand cmd) {
@@ -116,14 +99,13 @@ class DetailAnalysisController {
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
-        Interval timeFrame = cmd.getSelectedTimeFrame();
+        Interval timeFrame = cmd.createTimeFrameInterval()
         def jobGroupList = []
         cmd.selectedFolder.each {
             jobGroupList.add(JobGroup.findById(it).name)
         }
 
-        List<JobResult> jobResults = []
-        jobResults = JobResult.createCriteria().list {
+        List<JobResult> jobResults = JobResult.createCriteria().list {
             if (cmd.selectedFolder) inList("jobGroupName", jobGroupList)
             between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
         }

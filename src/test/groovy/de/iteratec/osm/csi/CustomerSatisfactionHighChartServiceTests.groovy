@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import asset.pipeline.grails.LinkGenerator
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -29,17 +30,16 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.apache.commons.lang.time.DateUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
-import spock.lang.Shared
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
-import static org.junit.Assert.assertNotNull
 
 /**
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
@@ -47,25 +47,18 @@ import static org.junit.Assert.assertNotNull
 @TestFor(CustomerSatisfactionHighChartService)
 @Mock([AggregatorType, CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
         Script, WebPageTestServer])
+@Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval, AggregatorType])
 class CustomerSatisfactionHighChartServiceTests extends Specification {
 
-    @Shared
     CsiAggregationInterval hourly
-    @Shared
     CsiAggregationInterval weekly
 
-    @Shared
     AggregatorType measuredEventAggregator
-    @Shared
     AggregatorType pageAggregator
-    @Shared
     AggregatorType shopAggregator
 
-    @Shared
     Date now
-    @Shared
     Date tomorrow
-    @Shared
     Date fourMonthsAgo
 
     /**
@@ -82,59 +75,34 @@ class CustomerSatisfactionHighChartServiceTests extends Specification {
      * <em>Note:</em>
      * @see #createCsiAggregations()
      */
-    @Shared
     List<CsiAggregation> csiAggregationForEventHourlyList = []
-    @Shared
     List<CsiAggregation> csiAggregationForPageWeeklyList = []
-    @Shared
     List<CsiAggregation> csiAggregationForShopWeeklyList = []
-    @Shared
     List<CsiAggregation> csiAggregationForShopWeeklyWithNullList = []
-    @Shared
     List<CsiAggregation> csiAggregationListWithValuesLowerThanOne = []
-    @Shared
     List<CsiAggregation> csiAggregationListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
 
-    @Shared
     List<String> expectedJobLabels = ['job1', 'job2']
 
-    @Shared
     List<String> expectedJobGroupNames = ['group1', 'group2']
-    @Shared
     List<String> expectedPageNames = ['page1', 'page2']
-    @Shared
     List<String> expectedMeasuredEventNames = ['event1', 'event2']
-    @Shared
     List<String> expectedBrowserNames = ['browser1', 'browser2']
-    @Shared
     List<String> expectedLocationNames = ['location1', 'location2']
-    @Shared
     List<String> expectedCsiTypes = [CsiType.DOC_COMPLETE.toString(), CsiType.VISUALLY_COMPLETE.toString()]
 
-    @Shared
     String graphLabel
-    @Shared
     Double tolerableDeviationDueToRounding
 
-    @Shared
     JobGroup jobGroup1
-    @Shared
     JobGroup jobGroup2
-    @Shared
     MeasuredEvent measuredEvent1
-    @Shared
     MeasuredEvent measuredEvent2
-    @Shared
     Page page1
-    @Shared
     Page page2
-    @Shared
     Browser browser1
-    @Shared
     Browser browser2
-    @Shared
     Location location1
-    @Shared
     Location location2
 
     CustomerSatisfactionHighChartService serviceUnderTest
@@ -511,64 +479,42 @@ class CustomerSatisfactionHighChartServiceTests extends Specification {
     }
 
     private void createAggregatorTypesAndIntervals() {
-        hourly = new CsiAggregationInterval(
-                intervalInMinutes: CsiAggregationInterval.HOURLY
-        ).save(failOnError: true, validate: false)
-        weekly = new CsiAggregationInterval(
-                intervalInMinutes: CsiAggregationInterval.WEEKLY
-        ).save(failOnError: true, validate: false)
-        measuredEventAggregator = new AggregatorType(
-                name: AggregatorType.MEASURED_EVENT
-        ).save(failOnError: true, validate: false)
-        pageAggregator = new AggregatorType(
-                name: AggregatorType.PAGE
-        ).save(failOnError: true, validate: false)
-        shopAggregator = new AggregatorType(
-                name: AggregatorType.SHOP
-        ).save(failOnError: true, validate: false)
+        hourly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.HOURLY)
+        weekly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.WEEKLY)
+        measuredEventAggregator = AggregatorType.build(name: AggregatorType.MEASURED_EVENT)
+        pageAggregator = AggregatorType.build(name: AggregatorType.PAGE)
+        shopAggregator = AggregatorType.build(name: AggregatorType.SHOP)
     }
 
     private void createJobs() {
-        new Job(
-                label: expectedJobLabels[0]
-        ).save(failOnError: true, validate: false)
-        new Job(
-                label: expectedJobLabels[1]
-        ).save(failOnError: true, validate: false)
+        Job.build(label: expectedJobLabels[0])
+        Job.build(label: expectedJobLabels[1])
     }
 
     private void createPages() {
-        page1 = new Page(
-                name: expectedPageNames[0],
-                weight: 1.0
-        ).save(failOnError: true)
+        page1 = Page.build(name: expectedPageNames[0])
 
-        page2 = new Page(
-                name: expectedPageNames[1],
-                weight: 1.0
-        ).save(failOnError: true)
-        assertNotNull(Page.findByName(expectedPageNames[0]))
-        assertNotNull(Page.findByName(expectedPageNames[1]))
+        page2 = Page.build(name: expectedPageNames[1])
     }
 
     private void createJobGroups() {
-        jobGroup1 = new JobGroup(id: 1, name: expectedJobGroupNames[0]).save(validate: false)
-        jobGroup2 = new JobGroup(id: 2, name: expectedJobGroupNames[1]).save(validate: false)
+        jobGroup1 = JobGroup.build(name: expectedJobGroupNames[0])
+        jobGroup2 = JobGroup.build(name: expectedJobGroupNames[1])
     }
 
     private void createMeasuredEvents() {
-        measuredEvent1 = new MeasuredEvent(id: 1, name: expectedMeasuredEventNames[0]).save(validate: false)
-        measuredEvent2 = new MeasuredEvent(id: 2, name: expectedMeasuredEventNames[1]).save(validate: false)
+        measuredEvent1 = MeasuredEvent.build(name: expectedMeasuredEventNames[0])
+        measuredEvent2 = MeasuredEvent.build(name: expectedMeasuredEventNames[1])
     }
 
     private void createBrowsers() {
-        browser1 = new Browser(id: 1, name: expectedBrowserNames[0]).save(validate: false)
-        browser2 = new Browser(id: 2, name: expectedBrowserNames[1]).save(validate: false)
+        browser1 = Browser.build(name: expectedBrowserNames[0])
+        browser2 = Browser.build(name: expectedBrowserNames[1])
     }
 
     private void createLocations() {
-        location1 = new Location(id: 1, location: expectedLocationNames[0]).save(validate: false)
-        location2 = new Location(id: 2, location: expectedLocationNames[1]).save(validate: false)
+        location1 = Location.build(location: expectedLocationNames[0])
+        location2 = Location.build(location: expectedLocationNames[1])
     }
 
     private void createCsiAggregations() {
@@ -791,31 +737,35 @@ class CustomerSatisfactionHighChartServiceTests extends Specification {
 
 
     void mockServicesCommonForAllTests() {
-
         // We simply a modified version of the original service here, because
         // we expect only URL generation to be called and expect that
         // the service under test don't care about the URL itself.
-        serviceUnderTest.eventResultDashboardService = grailsApplication.mainContext.getBean('eventResultDashboardService')
-        serviceUnderTest.eventResultDashboardService.metaClass.tryToBuildTestsDetailsURL = { CsiAggregation mv ->
-            return new URL('http://measuredvalue.example.com/' + mv.id);
+        serviceUnderTest.eventResultDashboardService = Stub(EventResultDashboardService) {
+            tryToBuildTestsDetailsURL(_ as CsiAggregation) >> { CsiAggregation csiAggregation ->
+                return new URL('http://measuredvalue.example.com/' + csiAggregation.id)
+            }
         }
-        serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        serviceUnderTest.csiAggregationUtilService = Spy(CsiAggregationUtilService)
         mockGenerator = ServiceMocker.create()
-        mockGenerator.mockCsTargetGraphDaoService(serviceUnderTest, graphLabel)
-        mockGenerator.mockLinkGenerator(serviceUnderTest, 'http://www.iteratec.de')
-        serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
-        serviceUnderTest.osmChartProcessingService.i18nService = [
-                msg: { String msgKey, String defaultMessage = null, List objs = null ->
-                    Map i18nKeysToValues = [
-                            'job.jobGroup.label'                         : I18N_LABEL_JOB_GROUP,
-                            'de.iteratec.osm.result.measured-event.label': I18N_LABEL_MEASURED_EVENT,
-                            'job.location.label'                         : I18N_LABEL_LOCATION,
-                            'de.iteratec.result.measurand.label'         : I18N_LABEL_MEASURAND,
-                            'de.iteratec.osm.result.connectivity.label'  : I18N_LABEL_CONNECTIVITY
-                    ]
-                    return i18nKeysToValues[msgKey]
-                }
-        ] as I18nService
+        serviceUnderTest.csTargetGraphDaoService = Stub(CsTargetGraphDaoService) {
+            getActualCsTargetGraph() >> CsTargetGraph.findByLabel(graphLabel)
 
+        }
+        serviceUnderTest.grailsLinkGenerator = Mock(LinkGenerator) {
+            link(_ as Map) >> "http://www.iteratec.de"
+        }
+        serviceUnderTest.osmChartProcessingService = Spy(OsmChartProcessingService)
+        serviceUnderTest.osmChartProcessingService.i18nService = Stub(I18nService) {
+            msg(_ as String, _ as String, _ as List) >> { String msgKey, String defaultMessage = null, List objs = null ->
+                Map i18nKeysToValues = [
+                        'job.jobGroup.label'                         : I18N_LABEL_JOB_GROUP,
+                        'de.iteratec.osm.result.measured-event.label': I18N_LABEL_MEASURED_EVENT,
+                        'job.location.label'                         : I18N_LABEL_LOCATION,
+                        'de.iteratec.result.measurand.label'         : I18N_LABEL_MEASURAND,
+                        'de.iteratec.osm.result.connectivity.label'  : I18N_LABEL_CONNECTIVITY
+                ]
+                return i18nKeysToValues[msgKey]
+            }
+        }
     }
 }
