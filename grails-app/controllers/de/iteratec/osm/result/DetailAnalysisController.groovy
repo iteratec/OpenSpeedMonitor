@@ -57,7 +57,7 @@ class DetailAnalysisController {
         if (osmUrl && microServiceUrl && apiKey) {
             try {
                 if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-                def timeFrame = cmd.getSelectedTimeFrame()
+                def timeFrame = cmd.createTimeFrameInterval()
                 String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&toDate=${timeFrame.endMillis}&fromDate=${timeFrame.startMillis}&" + request.queryString
                 def detailDataWebPageAsString = (microServiceUrl + "detailAnalysisDashboard/show" + queryString).toURL().openConnection().with { conn ->
                     if (responseCode != 200) {
@@ -116,7 +116,7 @@ class DetailAnalysisController {
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
-        Interval timeFrame = cmd.getSelectedTimeFrame();
+        Interval timeFrame = cmd.createTimeFrameInterval()
         def jobGroupList = []
         cmd.selectedFolder.each {
             jobGroupList.add(JobGroup.findById(it).name)
