@@ -55,8 +55,7 @@ class DetailAnalysisController {
         if (osmUrl && microServiceUrl && apiKey) {
             try {
                 if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-                def timeFrame = cmd.createTimeFrameInterval()
-                String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&toDate=${timeFrame.endMillis}&fromDate=${timeFrame.startMillis}&" + request.queryString
+                String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&" + request.queryString
                 def detailDataWebPageAsString = (microServiceUrl + "detailAnalysisDashboard/show" + queryString).toURL().openConnection().with { conn ->
                     if (responseCode != 200) {
                         throw new HTTPException(responseCode)
