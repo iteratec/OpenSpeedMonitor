@@ -6,7 +6,7 @@
             class="required-indicator">*</span>
     </label>
 
-    <div class="col-md-9">
+    <div class="col-md-4">
         <g:select class="form-control chosen" name="script.id" id="script" from="${Script.list()}"
                   value="${job?.script?.id}" optionValue="label" optionKey="id"
                   onchange="updateScriptEditHref('${createLink(controller: 'script', action: 'edit')}', \$(this).val());"/>

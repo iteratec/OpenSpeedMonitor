@@ -14,9 +14,6 @@
 <section id="${mode}-job" class="first">
     <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
     <g:render template="messages"/>
-%{--<p>--}%
-%{--<g:message code="default.form.asterisk" default="Fields marked with an asterisk (*) are required."/>--}%
-%{--</p>--}%
     <g:form resource="${entity}" method="post" role="form" class="form-horizontal">
 
         <g:hiddenField name="id" value="${entity?.id}"/>

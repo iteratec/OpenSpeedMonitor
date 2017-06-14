@@ -18,7 +18,6 @@
 //= require bower_components/tagit/js/tag-it.min.js
 //= require_self
 function doOnDomReady(newJob,
-                      nextExecutionLink,
                       customConnNameForNative,
                       connectivityProfileId,
                       noTrafficShapingAtAll,
