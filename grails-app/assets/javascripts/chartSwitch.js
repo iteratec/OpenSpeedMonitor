@@ -92,7 +92,18 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         } else {
             if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = -1;
             if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
-            if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached";
+            var measurand = "docCompleteTimeInMillisecsUncached";
+            if ($("#selectedAggrGroupValuesUnCached").val()) {
+                measurand = $("#selectedAggrGroupValuesUnCached").val();
+            }
+            if ($("#measurand").val()) {
+                measurand = $("#measurand").val();
+            }
+            if ($("#selectAggregatorUncachedHtmlId").val()) {
+                measurand = $("#selectAggregatorUncachedHtmlId").val();
+            }
+            if (updatedMap["selectedAggrGroupValuesUnCached"] == null) updatedMap["selectedAggrGroupValuesUnCached"] = measurand;
+            if (updatedMap["measurand"] == null) updatedMap["measurand"] = "{\"values\":[\"" + measurand + "\"]}";
         }
         var params = $.param(updatedMap, true);
         var showLinks = false;
