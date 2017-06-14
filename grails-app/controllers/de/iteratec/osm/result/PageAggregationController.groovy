@@ -1,12 +1,13 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
+import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -19,7 +20,6 @@ import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MeasurandUtilService
 import org.springframework.http.HttpStatus
-import grails.converters.JSON;
 
 class PageAggregationController extends ExceptionHandlerController {
     public final
@@ -35,6 +35,8 @@ class PageAggregationController extends ExceptionHandlerController {
     PageService pageService
     MeasurandUtilService measurandUtilService
     FilteringAndSortingDataService filteringAndSortingDataService
+    OsmConfigCacheService osmConfigCacheService
+
 
     def index() {
         redirect(action: 'show')
@@ -93,6 +95,11 @@ class PageAggregationController extends ExceptionHandlerController {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                'docCompleteTimeInMillisecs',
+                osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+            )
             projections {
                 groupProperty('page')
                 groupProperty('jobGroup')

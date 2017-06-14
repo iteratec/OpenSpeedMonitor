@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
@@ -19,6 +20,7 @@ class PageComparisonController extends ExceptionHandlerController {
 
     MeasurandUtilService measurandUtilService
     I18nService i18nService
+    OsmConfigCacheService osmConfigCacheService
 
     def index() { redirect(action: 'show') }
 
@@ -52,6 +54,11 @@ class PageComparisonController extends ExceptionHandlerController {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                    'docCompleteTimeInMillisecs',
+                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+            )
             projections {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
