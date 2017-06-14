@@ -1,5 +1,6 @@
 package de.iteratec.osm.dao
 
+import grails.gorm.CriteriaBuilder
 import grails.orm.HibernateCriteriaBuilder
 
 /**
