@@ -21,6 +21,10 @@ import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 /**
  * Tests persistence of wpt infrastructure domains like locations, browsers, WebPagetestserver, etc
  * while new EventResults get persisted.
@@ -212,8 +216,8 @@ class WptInfrastructurePersistenceWithIncomingResultsTests extends Specification
             validFrustrationsExistFor(_) >> true
         }
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
-            getCachedMinDocCompleteTimeInMillisecs(_) >> 250
-            getCachedMaxDocCompleteTimeInMillisecs(_) >> 180000
+            getCachedMinDocCompleteTimeInMillisecs(_) >> DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+            getCachedMaxDocCompleteTimeInMillisecs(_) >> DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
         }
     }
 

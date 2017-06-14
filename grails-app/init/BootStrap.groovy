@@ -46,6 +46,9 @@ import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 class BootStrap {
 
     EventCsiAggregationService eventCsiAggregationService
@@ -136,8 +139,8 @@ class BootStrap {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 12,
                 defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000,
+                minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
+                maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
                 maxDataStorageTimeInMonths: 13,
                 csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)

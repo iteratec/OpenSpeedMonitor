@@ -24,9 +24,10 @@ import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-/**
- * Test-suite of {@link OsmConfigCacheService}.
- */
+
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 @TestFor(OsmConfigCacheService)
 @Build([OsmConfiguration])
 @Mock([OsmConfiguration])
@@ -43,14 +44,14 @@ class OsmConfigCacheServiceTests extends Specification {
     void "test accessing cached configs min doc complete time"() {
         when: "getting cached min doc complete time"
             Integer time = service.getCachedMinDocCompleteTimeInMillisecs(24)
-        then: "the result should be 250ms"
-            time == 250
+        then: "the result should be 10ms"
+            time == DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
     }
 
     void "test accessing cached configs max doc complete time"() {
         when: "getting cached max doc complete time"
             Integer time = service.getCachedMaxDocCompleteTimeInMillisecs(24)
         then: "the result should be 3m"
-            time == 180000
+            time == DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
     }
 }

@@ -47,7 +47,10 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 
 import java.util.regex.Pattern
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
 import static org.junit.Assert.assertNotNull
+
 /**
  * <p>
  * A test-utility to load data from customers CSV-files
@@ -841,7 +844,7 @@ class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
      * Creates an OsmConfiguration and persists it.
-     * This method uses default values for minDocCompleteTimeInMillisecs (250), maxDocCompleteTimeInMillisecs (180000).
+     * This method uses default values for minDocCompleteTimeInMillisecs and maxDocCompleteTimeInMillisecs.
      * </p>
      */
     public static void createOsmConfig() {
@@ -849,8 +852,8 @@ class TestDataUtil implements OsmTestLogin {
             new OsmConfiguration(
                     detailDataStorageTimeInWeeks: 2,
                     defaultMaxDownloadTimeInMinutes: 60,
-                    minDocCompleteTimeInMillisecs: 250,
-                    maxDocCompleteTimeInMillisecs: 180000,
+                    minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
+                    maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
                     initialChartHeightInPixels: 400,
                     maxDataStorageTimeInMonths: 12,
                     csiTransformation: CsiTransformation.BY_MAPPING,

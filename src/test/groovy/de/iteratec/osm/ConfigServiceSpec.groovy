@@ -22,17 +22,15 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
+
 @TestFor(ConfigService)
 @Build([OsmConfiguration])
 @Mock([OsmConfiguration])
 class ConfigServiceSpec extends Specification {
-    static final Integer DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES = 60
-    static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
-    static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
-    static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
 
     void "one config is fine"() {
         when: "only one config has been saved with a value"

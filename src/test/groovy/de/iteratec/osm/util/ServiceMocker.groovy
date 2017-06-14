@@ -43,6 +43,9 @@ import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 /**
  * <p>
  * Mocks grails-Services.
@@ -99,11 +102,11 @@ class ServiceMocker {
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
 		def osmConfigCacheService = new OsmConfigCacheService()
-		Integer minTimeToExpect = 250
+		Integer minTimeToExpect = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
 		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
 			return minTimeToExpect
 		}
-		Integer maxTimeToExpect = 180000
+		Integer maxTimeToExpect = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
 		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
 			return maxTimeToExpect
 		}
