@@ -955,19 +955,25 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         actualBarchartData.series = clone(actualBarchartData.originalSeries);
         if (journeyKey && filterRules[journeyKey]) {
 
-            // remove elements not in customer Journey from each series
-            actualBarchartData.series.forEach(function (series) {
-                series.data = series.data.filter(function (element) {
-                    return filterRules[journeyKey].indexOf(element.grouping) >= 0;
-                });
-            });
-            // remove series containing no data after first filter
-            actualBarchartData.series = actualBarchartData.series.filter(function (series) {
-                return series.data.length > 0;
-            });
+            removeElementsNotInCustomerJourney(journeyKey);
+            removeEmptySeries();
             descending = true;
         }
         drawAllBars()
+    };
+
+    var removeElementsNotInCustomerJourney = function(journeyKey){
+        actualBarchartData.series.forEach(function (series) {
+            series.data = series.data.filter(function (element) {
+                return filterRules[journeyKey].indexOf(element.grouping) >= 0;
+            });
+        });
+    };
+
+    var removeEmptySeries = function(){
+        actualBarchartData.series = actualBarchartData.series.filter(function (series) {
+            return series.data.length > 0;
+        });
     };
 
     var toogleFilterCheckmarks = function (listItem) {
