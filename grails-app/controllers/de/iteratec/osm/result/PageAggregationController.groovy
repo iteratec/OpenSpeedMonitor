@@ -159,6 +159,7 @@ class PageAggregationController extends ExceptionHandlerController {
             }
             barchartDTO.series.add(barchartSeries)
         }
+        System.out.println(barchartDTO.series[0].data.size())
 
 //      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
