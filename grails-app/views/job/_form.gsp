@@ -16,13 +16,13 @@
     </li>
   </ul>
   <div class="iteratec-tab-content">
-    <div class="tab-pane active" id="jobSettingsTab" style="margin-top:20px">
+    <div class="tab-pane active" id="jobSettingsTab" >
       <g:render template="jobSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
-    <div class="tab-pane" id="scriptTab" style="margin-top:20px">
+    <div class="tab-pane" id="scriptTab" >
       <g:render template="scriptTab" model="${['job': job]}" />
     </div>
-    <div class="tab-pane" id="advancedSettingsTab" style="margin-top:20px">
+    <div class="tab-pane" id="advancedSettingsTab" >
       <g:render template="advancedSettingsTab" model="${['job': job]}" />
     </div>
   </div>

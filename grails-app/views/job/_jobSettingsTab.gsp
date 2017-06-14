@@ -26,7 +26,7 @@
             </label>
 
             <div class="col-md-8">
-                <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}"/>
+                <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}" defaultValue="Name"/>
             </div>
         </div>
 
@@ -58,9 +58,9 @@
             <div class="col-md-8">
                 <g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
                           value="${job?.jobGroup?.id}" optionValue="name" optionKey="id"/>
-                <a id="jobGroupModalLink" href="#jobGroupModal" role="button" class="btn btn-xs"
-                   data-toggle="modal"><g:message
-                        code="default.button.create.new" default="Create New"default="Create New"/></a>
+                <a  id="jobGroupModalLink" href="#jobGroupModal" role="button" class="btn btn-xs" data-toggle="modal">
+                    <i  id="button_create_jobGroup" class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a>
             </div>
         </div>
 

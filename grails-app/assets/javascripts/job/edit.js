@@ -137,6 +137,7 @@ function registerEventHandlers() {
     toggleUserAgentOptions();
     
     $('#inputField-JobLabel').on('blur',updateJobName);
+    updateJobName();
 
     $("#runs").on("change",toggleMedianOptions);
     toggleMedianOptions();
@@ -251,6 +252,9 @@ function toggleChromeTab() {
 }
 
 function updateJobName() {
+    if (!$("#inputField-JobLabel").val()) {
+        $("#inputField-JobLabel").val("New Jobname");
+    }
     $("#JobName").text($("#inputField-JobLabel").val());
 }
 

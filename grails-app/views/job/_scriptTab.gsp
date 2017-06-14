@@ -24,11 +24,13 @@
 
 <g:render template="/script/codemirror"
           model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}"/>
-<g:if test="${mode == 'edit'}">
-    <button class="btn btn-default" type="button" id="copyToClipboard"><g:message code="job.script.copyToClipboard"
-                                                                                  default="Copy To Clipboard"/></button>
-    <a href="" target="_blank" id="editScriptLink">
-        <button style="float: right;" class="btn btn-default" type="button" id="edit"><g:message code="job.script.edit"
-                                                                                                 default="Edit script"/></button>
-    </a>
-</g:if>
+
+<button class="btn btn-default" id="script_button_copyToClipboard"  type="button" id="copyToClipboard">
+    <g:message code="job.script.copyToClipboard" default="Copy To Clipboard"/>
+</button>
+<a href="" target="_blank" id="editScriptLink">
+    <button id="script_button_edit"  class="btn btn-default" type="button" id="edit">
+        <g:message code="job.script.edit" default="Edit script"/>
+    </button>
+</a>
+
