@@ -59,7 +59,7 @@ import static de.iteratec.osm.report.chart.MeasurandGroup.NO_MEASURAND
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
 @Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity, ConnectivityProfile])
-@Build([JobGroup, CsiAggregation, GraphiteServer])
+@Build([JobGroup, CsiAggregation, GraphiteServer, Page, JobGroup, MeasuredEvent, Location, Browser])
 class QuartzControlledGrailsReportsTests extends Specification{
 
     static final String jobGroupWithServersName = 'csiGroupWithServers'
@@ -381,18 +381,18 @@ class QuartzControlledGrailsReportsTests extends Specification{
     }
 
     static getCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, Double value, DateTime valueForStated, String resultIds) {
-        CsiAggregation hmv = CsiAggregation.buildWithoutSave()
-        hmv.started = valueForStated.toDate()
-        hmv.interval = interval
-        hmv.aggregator = aggregator
-        hmv.csByWptDocCompleteInPercent = value
-        hmv.underlyingEventResultsByWptDocComplete = resultIds
-        hmv.page = new Page(name: pageName)
-        hmv.jobGroup = new JobGroup(name: jobGroupWithoutServersName)
-        hmv.measuredEvent = new MeasuredEvent(name: eventName)
-        hmv.browser = new Browser(name: browserName)
-        hmv.location = new Location(location: locationLocation)
-        return hmv
+        return CsiAggregation.buildWithoutSave(
+            started: valueForStated.toDate(),
+            interval: interval,
+            aggregator: aggregator,
+            csByWptDocCompleteInPercent: value,
+            underlyingEventResultsByWptDocComplete: resultIds,
+            page: Page.buildWithoutSave(name: pageName),
+            jobGroup: JobGroup.buildWithoutSave(name: jobGroupWithoutServersName),
+            measuredEvent: MeasuredEvent.buildWithoutSave(name: eventName),
+            browser: Browser.buildWithoutSave(name: browserName),
+            location: Location.buildWithoutSave(location: locationLocation)
+        )
     }
 
 }
