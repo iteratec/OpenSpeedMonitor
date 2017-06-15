@@ -33,7 +33,7 @@ buildscript {
     }
 }
 
-version "4.2.0_beta"
+version "4.2.0_beta_2"
 group "OpenSpeedMonitor"
 
 apply plugin: "eclipse"
@@ -214,6 +214,7 @@ task bowerSyncJavascript(type: Sync) {
     include "air-datepicker/dist/js/datepicker.min.js"
     include "air-datepicker/dist/js/i18n/datepicker.en.js"
     include "air-datepicker/dist/js/i18n/datepicker.de.js"
+    include "bootstrap-validator/js/validator.js"
     dependsOn bowerInstall
 }
 

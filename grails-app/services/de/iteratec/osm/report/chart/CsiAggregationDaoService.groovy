@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.measurement.environment.Browser
@@ -28,7 +27,6 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.joda.time.DateTime
-
 /**
  * Contains only methods that query {@link CsiAggregation}s from database. Doesn't contain any dependencies to other domains or
  * service-logic.
@@ -54,30 +52,6 @@ class CsiAggregationDaoService {
      */
     public CsiAggregation tryToFindById(long databaseId) {
         return CsiAggregation.get(databaseId);
-    }
-
-    /**
-     * Gets all {@link CsiAggregation}s from db respective given arguments.
-     *
-     * @param fromDate
-     * @param toDate
-     * @param interval
-     * @param aggregator
-     * @param connectivityProfiles
-     * @return
-     */
-    List<CsiAggregation> getMvs(
-            Date fromDate,
-            Date toDate,
-            CsiAggregationInterval interval,
-            AggregatorType aggregator,
-            List<CsiSystem> csiSystems
-    ) {
-        toDate = fromDate == toDate ? toDate + interval.intervalInMinutes : toDate
-        List<CsiAggregation> result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
-        result.findAll {
-            csiSystems.contains(it.csiSystem)
-        }
     }
 
     /**

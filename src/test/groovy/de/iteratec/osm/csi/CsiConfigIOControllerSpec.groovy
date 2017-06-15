@@ -52,7 +52,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download BrowserConnectivityWeights-CSV should equal CsiConfiguration.browserConnectivityWeights"() {
         given: "Some BrowserConnectivityWeights exist in db."
-        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")).normalize()
 
         when: "These BrowserConnectivityWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
@@ -76,7 +76,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download PageWeights-CSV should equal CsiConfiguration.pageWeights"() {
         given: "Some PageWeights exist in db."
-        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/PAGE_weights.csv")).normalize()
 
         when: "These PageWeights get downloaded."
         params.id = csiConfigurationFilled.ident()
@@ -100,7 +100,7 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void "download HourOfDay-CSV should equal CsiConfiguration.csiDay"() {
         given: "A CsiDay exists in db."
-        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv"))
+        String csvContent = FileUtils.readFileToString(new File("src/test/resources/CsiData/HOUROFDAY_weights.csv")).normalize()
 
         when: "The hour of day weights get downloaded."
         params.id = csiConfigurationFilled.ident()

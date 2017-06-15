@@ -19,10 +19,6 @@ package de.iteratec.osm
 
 import org.joda.time.DateTime
 import org.joda.time.Duration
-
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.OsmConfiguration
-
 /**
  * Provides cached configs from {@link OsmConfiguration}.
  * @author nkuhn
@@ -39,7 +35,7 @@ class OsmConfigCacheService {
     Integer maxDocCompleteTimeInMillisecs
     private DateTime lastFetchOfMaxDocCompleteTimeInMillisecs = new DateTime(1980,1,1,0,0)
 
-	Integer getCachedMinDocCompleteTimeInMillisecs(Double ageToleranceInHours) {
+	Integer getCachedMinDocCompleteTimeInMillisecs(Double ageToleranceInHours = 24) {
 		Duration durationSinceLastFetch = new Duration(lastFetchOfMinDocCompleteTimeInMillisecs.getMillis(), new DateTime().getMillis())
 		if(!minDocCompleteTimeInMillisecs || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
 			minDocCompleteTimeInMillisecs = configService.getMinDocCompleteTimeInMillisecs()
@@ -48,7 +44,7 @@ class OsmConfigCacheService {
 		return minDocCompleteTimeInMillisecs
 	}
 	
-	Integer getCachedMaxDocCompleteTimeInMillisecs(Double ageToleranceInHours) {
+	Integer getCachedMaxDocCompleteTimeInMillisecs(Double ageToleranceInHours = 24) {
 		Duration durationSinceLastFetch = new Duration(lastFetchOfMaxDocCompleteTimeInMillisecs.getMillis(), new DateTime().getMillis())
 		if(!maxDocCompleteTimeInMillisecs || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
 			maxDocCompleteTimeInMillisecs = configService.getMaxDocCompleteTimeInMillisecs()

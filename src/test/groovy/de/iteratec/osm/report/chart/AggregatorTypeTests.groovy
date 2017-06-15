@@ -17,31 +17,32 @@
 
 package de.iteratec.osm.report.chart
 
-import static org.junit.Assert.*
+import spock.lang.Specification
+
 import grails.test.mixin.TestFor;
 
-import org.junit.Test
-
-import de.iteratec.osm.report.chart.AggregatorType;
 
 @TestFor(AggregatorType)
-class AggregatorTypeTests {
+class AggregatorTypeTests extends Specification{
 
-	@Test
-	public void testIsCached_MEASURED_EVENT() {
+	void testIsCached_MEASURED_EVENT() {
+		given:
 		AggregatorType out = new AggregatorType(name: AggregatorType.MEASURED_EVENT);
-		assertFalse(out.isCached());
+		expect:
+		!out.isCached()
 	}
 	
-	@Test
-	public void testIsCached_RESULT_UNCACHED_DOC_COMPLETE_TIME() {
+	void testIsCached_RESULT_UNCACHED_DOC_COMPLETE_TIME() {
+		given:
 		AggregatorType out = new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME);
-		assertFalse(out.isCached());
+		expect:
+		!out.isCached()
 	}
 	
-	@Test
-	public void testIsCached_RESULT_RESULT_CACHED_DOC_COMPLETE_TIME() {
+	void testIsCached_RESULT_RESULT_CACHED_DOC_COMPLETE_TIME() {
+		given:
 		AggregatorType out = new AggregatorType(name: AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME);
-		assertTrue(out.isCached());
+		expect:
+		out.isCached()
 	}
 }

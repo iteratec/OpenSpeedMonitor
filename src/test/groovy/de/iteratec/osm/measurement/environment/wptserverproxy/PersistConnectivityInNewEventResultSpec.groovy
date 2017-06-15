@@ -18,7 +18,6 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
@@ -28,44 +27,41 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.PageService
+import de.iteratec.osm.report.external.MetricReportingService
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
+
 /**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
+ * These Tests check that EventResults written when new result xml arrives get same Internet Connectivity as
+ * assigned measurement Job. This is tested for multistep and single step results.
+ *
+ * Internet Connectivities can be:
+ *      * A predefined ConnectivityProfile
+ *      * A custom connectivity
+ *      * Native Connectivity (no traffic shaping)
+ *
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(ResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+        MeasuredEvent, JobGroup, Script, ConnectivityProfile])
+@Build([Job, Location, WebPageTestServer, MeasuredEvent, ConnectivityProfile])
 class PersistConnectivityInNewEventResultSpec extends Specification {
 
-    public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'
+    static WebPageTestServer WPT_SERVER
 
-    public static
-    final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml'
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1 = 'otto_homepage'
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2 = 'otto_search_shoes'
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boot'
+    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY = 'MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml'
+    public static final String RESULT_XML_SINGLESTEP_1RUN_2EVENTS_FVONLY = 'BEFORE_MULTISTEP_1Run_WithVideo.xml'
 
-    public static
-    final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'BEFORE_MULTISTEP_1Run_WithVideo.xml'
-    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
+    public static Job MULTISTEP_JOB
+    public static Job SINGLESTEP_JOB
 
-    public static Page UNDEFINED_PAGE
-    public static final String LABEL_MULTISTEP_JOB = 'FF_Otto_multistep'
-    public static final String LABEL_SINGLESTEP_JOB = 'IE_otto_hp_singlestep'
-    public static final String NAME_PREDEFINED_CONNECTIVITY_PROFILE = 'DSL 6.000'
-
-    ResultPersisterService serviceUnderTest
-    ServiceMocker mocker
     def doWithSpring = {
         pageService(PageService)
         performanceLoggingService(PerformanceLoggingService)
@@ -73,185 +69,181 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     }
 
     void setup() {
-
-        serviceUnderTest = service
-
         createTestDataCommonForAllTests()
         createMocksCommonForAllTests()
+    }
+
+    void "Every written EventResult of MULTISTEP_1RUN_3EVENTS test get assigned to Jobs connectivity profile correctly."() {
+
+        setup: "Result xml and matching Job with predefined connectivity profile in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlResultFile))
+        setPredefinedConnectivity(MULTISTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 3
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Connectivity profile of Job is assigned to every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every{it.connectivityProfile == MULTISTEP_JOB.connectivityProfile}
+        allResults.every{it.customConnectivityName == null}
+        allResults.every {it.noTrafficShapingAtAll == false}
+
+    }
+
+    void "Every written EventResult of MULTISTEP_1RUN_3EVENTS test get custom connectivity of Job."() {
+
+        setup: "Result xml and matching Job with custom connectivity in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
+        setCustomConnectivity(MULTISTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 3
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Custom connectivity of Job is set for every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every{it.connectivityProfile == null}
+        allResults.every{it.noTrafficShapingAtAll == false}
+        allResults.every{it.customConnectivityName == MULTISTEP_JOB.customConnectivityName}
+
+    }
+
+    void "Every written EventResult of MULTISTEP_1RUN_3EVENTS test get native connectivity of Job."() {
+
+        setup: "Result xml and matching Job with native connectivity in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
+        setNativeConnectivity(MULTISTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 3
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Native connectivity of Job is set for every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every {it.connectivityProfile == null}
+        allResults.every {it.customConnectivityName == null}
+        allResults.every {it.noTrafficShapingAtAll == true}
+
+    }
+
+    void "Every written EventResult of SINGLESTEP_1RUN_2EVENTS test get assigned to Jobs connectivity profile correctly."() {
+
+        setup: "Result xml and matching Job with predefined connectivity profile in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_2EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
+        setPredefinedConnectivity(SINGLESTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 2
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Connectivity profile of Job is assigned to every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every{it.connectivityProfile == SINGLESTEP_JOB.connectivityProfile}
+        allResults.every{it.customConnectivityName == null}
+        allResults.every {it.noTrafficShapingAtAll == false}
+
+    }
+
+    void "Every written EventResult of SINGLESTEP_1RUN_2EVENTS test get custom connectivity of Job."() {
+
+        setup: "Result xml and matching Job with custom connectivity in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_2EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
+        setCustomConnectivity(SINGLESTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 2
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Custom connectivity of Job is set for every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every{it.connectivityProfile == null}
+        allResults.every{it.noTrafficShapingAtAll == false}
+        allResults.every{it.customConnectivityName == SINGLESTEP_JOB.customConnectivityName}
+
+    }
+
+    void "Every written EventResult of SINGLESTEP_1RUN_2EVENTS test get native connectivity of Job."() {
+
+        setup: "Result xml and matching Job with native connectivity in place."
+        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_2EVENTS_FVONLY}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
+        setNativeConnectivity(SINGLESTEP_JOB)
+        int numberRuns = 1
+        int numberSteps = 2
+
+        when: "ResultPersisterService listens to result xml."
+        service.listenToResult(xmlResult, WPT_SERVER)
+
+        then: "Native connectivity of Job is set for every new EventResult."
+        List<EventResult> allResults = EventResult.getAll()
+        allResults.size() == numberRuns * numberSteps
+        allResults.every {it.connectivityProfile == null}
+        allResults.every {it.customConnectivityName == null}
+        allResults.every {it.noTrafficShapingAtAll == true}
 
     }
 
     void createTestDataCommonForAllTests() {
-        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
-        WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
-        Browser ff = TestDataUtil.createBrowser('Firefox')
-        Browser ie = TestDataUtil.createBrowser('IE')
-        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-win7:Firefox', ff, true)
-        Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
-        UNDEFINED_PAGE = TestDataUtil.createUndefinedPage()
 
-        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
-        TestDataUtil.createJob(LABEL_MULTISTEP_JOB, testScript, locationFirefox, jobGroup, '', 1, false, 60)
-        TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, UNDEFINED_PAGE)
-        TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, UNDEFINED_PAGE)
-        TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3, UNDEFINED_PAGE)
-        TestDataUtil.createJob(LABEL_SINGLESTEP_JOB, testScript, locationIe, jobGroup, '', 1, false, 60)
-        TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME, UNDEFINED_PAGE)
-        TestDataUtil.createConnectivityProfile(NAME_PREDEFINED_CONNECTIVITY_PROFILE)
+        WPT_SERVER = WebPageTestServer.build()
+
+        MULTISTEP_JOB = Job.build(
+            label: 'FF_Otto_multistep',
+            location: Location.build(wptServer: WPT_SERVER, uniqueIdentifierForServer: 'iteratec-dev-hetzner-win7:Firefox')
+        )
+        SINGLESTEP_JOB = Job.build(
+            label: 'IE_otto_hp_singlestep',
+            location: Location.build(wptServer: WPT_SERVER, uniqueIdentifierForServer: 'NewYork:IE 11')
+        )
+
     }
 
     void createMocksCommonForAllTests() {
-        mocker = ServiceMocker.create()
-        mocker.mockProxyService(serviceUnderTest)
-        serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
-        serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
-            // not the concern of this test
+        service.csiValueService = Stub(CsiValueService){
+            isCsiRelevant(_) >> false
         }
-        mocker.mockTTCsMappingService(serviceUnderTest)
-        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
+        service.metricReportingService = Mock(MetricReportingService)
     }
 
-    // multistep ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void "MULTISTEP: persisting predefined connectivity profile in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlResultFile))
-        TestDataUtil.setPredefinedConnectivityForJob(
-                ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
-                Job.findByLabel(LABEL_MULTISTEP_JOB)
-        )
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 3
-        allResults[0].connectivityProfile.name == NAME_PREDEFINED_CONNECTIVITY_PROFILE
-        allResults[0].customConnectivityName == null
-        allResults[1].connectivityProfile.name == NAME_PREDEFINED_CONNECTIVITY_PROFILE
-        allResults[1].customConnectivityName == null
-        allResults[2].connectivityProfile.name == NAME_PREDEFINED_CONNECTIVITY_PROFILE
-        allResults[2].customConnectivityName == null
-
+    private void setPredefinedConnectivity(Job job) {
+        job.connectivityProfile = ConnectivityProfile.build()
     }
 
-    void "MULTISTEP: persisting custom connectivity in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
-        Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
-        TestDataUtil.setCustomConnectivityForJob(multistepJob)
-        multistepJob.refresh()
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 3
-        allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == multistepJob.customConnectivityName
-        allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == multistepJob.customConnectivityName
-        allResults[2].connectivityProfile == null
-        allResults[2].customConnectivityName == multistepJob.customConnectivityName
-
+    private void setCustomConnectivity(Job job) {
+        job.connectivityProfile = null
+        job.noTrafficShapingAtAll = false
+        job.customConnectivityProfile = true
+        job.customConnectivityName = 'Custom (6.000/512 Kbps, 40ms, 0% PLR)'
+        job.bandwidthDown = 6000
+        job.bandwidthUp = 512
+        job.latency = 40
+        job.packetLoss = 0
     }
-
-    void "MULTISTEP: persisting native connectivity in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
-        Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
-        TestDataUtil.setNativeConnectivityForJob(multistepJob)
-        multistepJob.refresh()
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 3
-        allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == null
-        allResults[0].noTrafficShapingAtAll == true
-        allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == null
-        allResults[1].noTrafficShapingAtAll == true
-        allResults[2].connectivityProfile == null
-        allResults[2].customConnectivityName == null
-        allResults[2].noTrafficShapingAtAll == true
-
-    }
-
-    // singlestep ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
-    void "SINGLESTEP: persisting predefined connectivity profile in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
-        TestDataUtil.setPredefinedConnectivityForJob(
-                ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
-                Job.findByLabel(LABEL_SINGLESTEP_JOB)
-        )
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 2
-        allResults[0].connectivityProfile.name == NAME_PREDEFINED_CONNECTIVITY_PROFILE
-        allResults[0].customConnectivityName == null
-        allResults[1].connectivityProfile.name == NAME_PREDEFINED_CONNECTIVITY_PROFILE
-        allResults[1].customConnectivityName == null
-
-    }
-    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
-    void "SINGLESTEP: persisting custom connectivity in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
-        Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
-        TestDataUtil.setCustomConnectivityForJob(multistepJob)
-        multistepJob.refresh()
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 2
-        allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == multistepJob.customConnectivityName
-        allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == multistepJob.customConnectivityName
-
-    }
-    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
-    void "SINGLESTEP: persisting native connectivity in event result"() {
-        setup:
-        File xmlResultFile = new File("src/test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
-        Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
-        TestDataUtil.setNativeConnectivityForJob(multistepJob)
-        multistepJob.refresh()
-
-        when:
-        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
-
-        then:
-        List<EventResult> allResults = EventResult.getAll()
-        allResults.size() == 2
-        allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == null
-        allResults[0].noTrafficShapingAtAll == true
-        allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == null
-        allResults[1].noTrafficShapingAtAll == true
-
+    private void setNativeConnectivity(Job job){
+        job.connectivityProfile = null
+        job.noTrafficShapingAtAll = true
+        job.customConnectivityProfile = false
+        job.customConnectivityName = null
+        job.bandwidthDown = null
+        job.bandwidthUp = null
+        job.latency = null
+        job.packetLoss = null
     }
 
 }

@@ -18,13 +18,12 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.joda.time.DateTime
-
 /**
  * Provides methods for calculating and retrieving {@link CsiAggregation}s with {@link AggregatorType#getName()}=={@link AggregatorType}.
  * @author nkuhn
@@ -35,9 +34,8 @@ class CsiSystemCsiAggregationService {
     ShopCsiAggregationService shopCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
-    CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
-    WeightingService weightingService
+    CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
     /**
@@ -56,23 +54,6 @@ class CsiSystemCsiAggregationService {
         }
         return query.list()
     }
-    /**
-     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
-     * @param fromDate
-     * @param toDate
-     * @param targetInterval
-     * @param csiSystems
-     * @return
-     */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<CsiSystem> csiSystems) {
-        List<CsiAggregation> result = []
-        if (csiSystems.empty) {
-            return result
-        }
-
-        result = csiAggregationDaoService.getMvs(fromDate, toDate, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM), csiSystems)
-        return result
-    }
 
     /**
      * Marks {@link CsiAggregation}s which depend from param newResult and who's interval contains newResult as outdated.
@@ -85,8 +66,9 @@ class CsiSystemCsiAggregationService {
 
         JobGroup jobGroupOfResult = newResult.jobResult.job.jobGroup
 
-        List<JobGroupWeight> affectedJobGroupWeights = JobGroupWeight.findAllByJobGroup(jobGroupOfResult)
-        List<CsiSystem> affectedCsiSystems = affectedJobGroupWeights*.csiSystem.unique(false)
+        List<CsiSystem> affectedCsiSystems = CsiSystem.where {
+            jobGroupWeights*.jobGroup.contains(jobGroupOfResult)
+        }.findAll()
 
         if (affectedCsiSystems && jobGroupOfResult.csiConfiguration != null) {
             List<Long> outdatedCsiAggregationIds = ensurePresence(start, interval, affectedCsiSystems)
@@ -210,8 +192,8 @@ class CsiSystemCsiAggregationService {
             List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
             if (shopCsiAggregations.size() > 0) {
-                weightedCsiValues = weightingService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
-                weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
+                weightedCsiValues = csiValueService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
+                weightedCsiValuesVisuallyComplete = csiValueService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
             }
 
             if (weightedCsiValues.size() > 0) {

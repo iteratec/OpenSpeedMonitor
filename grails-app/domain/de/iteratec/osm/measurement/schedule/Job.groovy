@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
 import grails.plugins.taggable.Taggable
@@ -84,10 +85,6 @@ class Job implements Taggable {
      */
     boolean tcpdump
     /**
-     * Save response bodies (For text resources)
-     */
-    boolean bodies
-    /**
      * Continuous Video Capture
      * Unstable/experimental, may cause tests to fail
      */
@@ -142,12 +139,54 @@ class Job implements Taggable {
      */
     Integer packetLoss
 
+    boolean isPrivate = true
+    String  urlsToBlock
+    Integer imageQuality
+    boolean emulateMobile
+    String  userAgentString
+    Integer devicePixelRation
+    String  cmdlineOptions
+    String  customMetrics
+    String  tester
+    boolean captureTimeline
+    Integer javascriptCallstack
+    String  mobileDevice
+    String  appendUserAgent
+    boolean performLighthouseTest
+    String  optionalTestTypes
+    String  customHeaders
+    boolean trace
+    String  spof
+
+    enum TakeScreenshots {
+        NONE,
+        DEFAULT,
+        FULL
+    }
+
+    enum SaveBodies {
+        NONE,
+        HTML,
+        ALL
+    }
+
+    enum UserAgent {
+        DEFAULT,
+        ORIGINAL,
+        APPEND,
+        OVERWRITE
+    }
+
+    TakeScreenshots takeScreenshots = TakeScreenshots.DEFAULT
+    SaveBodies saveBodies = SaveBodies.NONE
+    UserAgent userAgent = UserAgent.DEFAULT
+
     /**
      * @deprecated Use executionSchedule instead
      */
     @Deprecated
     Integer frequencyInMin;
-    Integer maxDownloadTimeInMinutes
+    Integer maxDownloadTimeInMinutes = OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
 
     /**
      * Set to label of this job's script if script
@@ -178,7 +217,6 @@ class Job implements Taggable {
 
     static constraints = {
         label(maxSize: 255, blank: false, unique: true)
-        script(nullable: true, blank:false)
         location(nullable: false)
         lastRun(nullable: true)
         jobGroup(nullable: false)
@@ -196,9 +234,12 @@ class Job implements Taggable {
         ignoreSSL(nullable: true)
         standards(nullable: true)
         tcpdump(nullable: true)
-        bodies(nullable: true)
         continuousVideo(nullable: true)
         keepua(nullable: true)
+
+        script(nullable: true, validator: { script, instance ->
+            return script != null || instance.deleted
+        })
 
         connectivityProfile(nullable: true, validator: { profile, instance ->
 
@@ -229,7 +270,7 @@ class Job implements Taggable {
         latency(nullable: true, min: -2147483648, max: 2147483647)
         packetLoss(nullable: true, min: -2147483648, max: 2147483647)
         frequencyInMin(nullable: true, min: -2147483648, max: 2147483647)
-        maxDownloadTimeInMinutes(range: 10..240)
+        maxDownloadTimeInMinutes(nullable: true, range: 10..240)
         eventNameIfUnknown(nullable: true, maxSize: 255)
         variables(nullable: true)
 
@@ -250,6 +291,20 @@ class Job implements Taggable {
         authUsername(nullable: true, maxSize: 255)
         authPassword(nullable: true, maxSize: 255, password: true)
         jobStatistic(nullable: true)
+
+        urlsToBlock(nullable: true)
+        imageQuality(nullable: true)
+        userAgentString(nullable: true)
+        devicePixelRation(nullable: true)
+        cmdlineOptions(nullable: true)
+        customMetrics(nullable: true)
+        tester(nullable: true)
+        javascriptCallstack(nullable: true)
+        mobileDevice(nullable: true)
+        appendUserAgent(nullable: true)
+        optionalTestTypes(nullable: true)
+        customHeaders(nullable: true)
+        spof(nullable: true)
     }
 
     static mapping = {

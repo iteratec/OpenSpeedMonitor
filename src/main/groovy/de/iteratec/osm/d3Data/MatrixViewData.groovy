@@ -5,6 +5,12 @@ package de.iteratec.osm.d3Data
  */
 class MatrixViewData {
     // Sets of all columns and rows
+    public static final String DEFAULT_COLUMN_LABEL = "horizontal Label"
+    public static final String DEFAULT_ROW_LABEL = "vertical Label"
+    public static final String DEFAULT_WEIGHT_LABEL = "weight Label"
+    public static final String DEFAULT_COLOR_BRIGHT_LABEL = "less"
+    public static final String DEFAULT_COLOR_DARK_LABEL = "more"
+    public static final String DEFAULT_ZERO_WEIGHT_LABEL = "0"
     Set<String> columnNames
     Set<String> rowNames
 
@@ -31,12 +37,12 @@ class MatrixViewData {
         weightMin = Integer.MAX_VALUE
         weightMax = Integer.MIN_VALUE
 
-        columnLabel = "horizontal Label"
-        rowLabel = "vertical Label"
-        weightLabel = "weight Label"
-        colorBrightLabel = "less"
-        colorDarkLabel = "more"
-        zeroWeightLabel = "0"
+        columnLabel = DEFAULT_COLUMN_LABEL
+        rowLabel = DEFAULT_ROW_LABEL
+        weightLabel = DEFAULT_WEIGHT_LABEL
+        colorBrightLabel = DEFAULT_COLOR_BRIGHT_LABEL
+        colorDarkLabel = DEFAULT_COLOR_DARK_LABEL
+        zeroWeightLabel = DEFAULT_ZERO_WEIGHT_LABEL
     }
 
     /**
@@ -49,10 +55,10 @@ class MatrixViewData {
 
 
         double entryWeight = entry.weight
-        if(entryWeight < weightMin) {
+        if (entryWeight < weightMin) {
             weightMin = entryWeight
         }
-        if(entryWeight > weightMax ) {
+        if (entryWeight > weightMax) {
             weightMax = entryWeight
         }
 

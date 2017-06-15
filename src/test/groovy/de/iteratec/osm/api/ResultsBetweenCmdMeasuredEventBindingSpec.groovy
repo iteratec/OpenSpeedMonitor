@@ -44,7 +44,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "command provides MvQueryParams with single page as query parameter"
         notThrown NoResultException
@@ -57,7 +57,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "command provides MvQueryParams with multiple pages as query parameter"
         notThrown NoResultException
@@ -73,7 +73,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "command provides MvQueryParams with single page as query parameter"
         notThrown NoResultException
@@ -86,7 +86,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "command provides MvQueryParams with multiple pages as query parameter"
         notThrown NoResultException
@@ -103,7 +103,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "command provides MvQueryParams with page respective pageId query parameter"
         notThrown NoResultException
@@ -116,7 +116,7 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
 
         when: "get bound to command"
         dataBinder.bind(cmd, requestMap)
-        MvQueryParams queryParams = cmd.createMvQueryParams(null, null)
+        MvQueryParams queryParams = cmd.createMvQueryParams(null)
 
         then: "an exception occurs"
         NoResultException ex = thrown()

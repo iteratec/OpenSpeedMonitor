@@ -202,7 +202,7 @@ class CsiConfigurationController {
     def deleteCsiConfiguration() {
         CsiConfiguration configToDelete = CsiConfiguration.findByLabel(params.label)
 
-        if (CsiConfiguration.count <= 1) {
+        if (onlyOneConfigurationIsLeft()) {
             throw new IllegalStateException("There has to be a csiConfiguration left after deleting")
         } else if (!configToDelete) {
             throw new IllegalArgumentException("There is no csiConfiguration with label: " + params.label)
@@ -224,15 +224,18 @@ class CsiConfigurationController {
      *  there is at least one other csiConfiguration left after deleting
      */
     def validateDeletion() {
-        int csiConfigurationCount = CsiConfiguration.count()
         List<String> errorMessages = new ArrayList<>()
 
-        if (csiConfigurationCount <= 1) {
-            errorMessages.add(i18nService.msg("de.iteratec.osm.csiConfiguration.deleteLastCsiConfigurationError", "es muessen mindenst zwei CsiConfigurations vorhanden sein"))
+        if (onlyOneConfigurationIsLeft()) {
+            errorMessages.add(i18nService.msg("de.iteratec.osm.csiConfiguration.deleteLastCsiConfigurationError", "There has to be at least one csiConfiguration left after deleting."))
         }
 
         def jsonResponse = [errorMessages: errorMessages]
         render jsonResponse as JSON
+    }
+
+    def onlyOneConfigurationIsLeft() {
+        return CsiConfiguration.count() <= 1
     }
 
     /**

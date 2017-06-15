@@ -17,86 +17,54 @@
 
 package de.iteratec.osm.result
 
-import static org.junit.Assert.*
-import org.junit.*
-
-import java.sql.SQLException;
-import grails.test.mixin.*
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.script.Script
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import grails.buildtestdata.mixin.Build
+import spock.lang.Specification
 
 @TestFor(JobResult)
-@Mock([JobResult, Job, Page,EventResult, Location, JobGroup, Script, Browser, WebPageTestServer, MeasuredEvent])
-class JobResultTest {
+@Mock([JobResult, EventResult])
+@Build([JobResult, EventResult])
+class JobResultTest extends Specification {
 
-	@Test
-	public void testFindBy_EventResult() {
-		// Create test data
-		JobResult shouldNotBeFound = new JobResult(testId: "TestJob2").save([failOnError: true, validate: false]);
-		JobResult expectedResult = new JobResult(testId: "TestJob").save([failOnError: true, validate: false]);
+    def "find all job results connected to an event result"() {
+        given: "two event results and linked to two different job results"
+        EventResult.build(jobResult: JobResult.build(testId: "Job Result not to find"))
 
-		EventResult dummyData = new EventResult( jobResult: expectedResult ).save([failOnError: true, validate: false]);
-		EventResult searchCondition = new EventResult( jobResult: expectedResult ).save([failOnError: true, validate: false]);
+        JobResult expectedJobResult = JobResult.build(testId: "Job Result to find")
+        EventResult eventResultToSearchFor = EventResult.build(jobResult: expectedJobResult)
 
-		// Create dependencies
-		expectedResult.save([failOnError: true, validate: false]);
+        when: "one searches for all event results linked to a particular job result"
+        List eventResultsLinkedToExpectedJobResult = JobResult.list().findAll {
+            it.getEventResults().contains(eventResultToSearchFor)
+        }
 
-		// Check database
-		assertEquals(1, (JobResult.list().findAll{it.getEventResults().contains(searchCondition)}).size());
+        then: "one gets only the event results which are linked to that particular job result"
+        eventResultsLinkedToExpectedJobResult.size() == 1
+        eventResultToSearchFor.jobResult.testId == expectedJobResult.testId
+    }
 
-		// Run test:
-		assertEquals(expectedResult.testId, searchCondition.jobResult.testId);
-	}
+    def "get the correct test details url when the WPT server base url ends with a slash"() {
+        given:
+        JobResult jobResult = JobResult.build(wptServerBaseurl: 'https://wpt.example.com/', testId: "TestJob2")
 
-	/* Invalid test since JobResult does not have a eventResults-list anymore
-	@Test
-	public void testFindBy_EventResultInconsistentDB() {
-		// Create test data
-		JobResult inconsistentElement = new JobResult(testId: "TestJob2").save([failOnError: true, validate: false]);
-		JobResult consistentElement = new JobResult(testId: "TestJob").save([failOnError: true, validate: false]);
+        expect:
+        jobResult.tryToGetTestsDetailsURL().toString() == 'https://wpt.example.com/result/TestJob2'
+    }
 
-		EventResult invalidUse = new EventResult().save([failOnError: true, validate: false]);
+    def "get the correct test details url when the WPT server base url ends without a slash"() {
+        given:
+        JobResult jobResult = JobResult.build(wptServerBaseurl: 'https://wpt.example.com', testId: "TestJob3")
 
-		// Create dependencies
-		consistentElement.eventResults.add(invalidUse)
-		consistentElement.save([failOnError: true, validate: false]);
+        expect:
+        jobResult.tryToGetTestsDetailsURL().toString() == 'https://wpt.example.com/result/TestJob3'
+    }
 
-		// -- This is the inconsistency: Never two job-results should reference the same event-result!
-		inconsistentElement.eventResults.add(invalidUse)
-		inconsistentElement.save([failOnError: true, validate: false]);
+    def "test details url is null when noe WPT server base url is given"() {
+        given:
+        JobResult jobResult = JobResult.build()
 
-		// Check if inconsistency really exists:
-		assertEquals(2, (JobResult.list().findAll{it.getEventResults().contains(invalidUse)}).size());
-
-		// Run test:
-		//This should test findJobResultByEventResult(), but function doesn't exist anymore
-		try {
-			//new JobResultService().findJobResultByEventResult(invalidUse);
-			fail("SQLException expected")
-		} catch(SQLException expected) {}
-	}
-	//*/
-
-	@Test
-	public void testTryToGetTestsDetailsURL_withURL_wptServerBaseurl_endsWithSlash() {
-		JobResult out = new JobResult(wptServerBaseurl: 'https://wpt.example.com/', testId: "TestJob2");
-		assertEquals('https://wpt.example.com/result/TestJob2', String.valueOf(out.tryToGetTestsDetailsURL()));
-	}
-	
-	@Test
-	public void testTryToGetTestsDetailsURL_withURL_wptServerBaseurl_doNotendsWithSlash() {
-		JobResult out = new JobResult(wptServerBaseurl: 'https://wpt.example.com', testId: "TestJob3");
-		assertEquals('https://wpt.example.com/result/TestJob3', String.valueOf(out.tryToGetTestsDetailsURL()));
-	}
-	
-	@Test
-	public void testTryToGetTestsDetailsURL_URL_not_available() {
-		JobResult out = new JobResult(testId: "TestJob2");
-		assertNull(out.tryToGetTestsDetailsURL());
-	}
+        expect:
+        jobResult.tryToGetTestsDetailsURL() == null
+    }
 }

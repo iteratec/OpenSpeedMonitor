@@ -6,13 +6,14 @@ package de.iteratec.osm.d3Data
 class MultiLineChartLineData {
     // X and Y Points.
     // xPoints[i] belongs to yPoints[i]
+    public static final String DEFAULT_NAME = "Line"
     List<Double> xPoints
     List<Double> yPoints
     String name
     long id
 
     MultiLineChartLineData() {
-        name = "Line"
+        name = DEFAULT_NAME
         xPoints = new ArrayList<>()
         yPoints = new ArrayList<>()
     }

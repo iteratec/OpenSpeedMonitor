@@ -28,11 +28,12 @@ import spock.lang.Specification
 class MatrixViewEntrySpec extends Specification {
 
     def "initialisation test" () {
-        when:
+        when: "a new MatrixViewEntry is created"
         MatrixViewEntry matrixViewEntry = new MatrixViewEntry()
 
-        then:
-        !matrixViewEntry.columnName.isEmpty()
-        !matrixViewEntry.rowName.isEmpty()
+        then: "the MatrixViewEntry has been initialised correctly"
+        matrixViewEntry.columnName == MatrixViewEntry.DEFAULT_COLUMN_NAME
+        matrixViewEntry.rowName == MatrixViewEntry.DEFAULT_ROW_NAME
+        matrixViewEntry.weight == MatrixViewEntry.DEFAULT_CELL_WEIGHT
     }
 }

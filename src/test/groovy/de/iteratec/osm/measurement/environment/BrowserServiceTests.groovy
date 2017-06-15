@@ -17,111 +17,68 @@
 
 package de.iteratec.osm.measurement.environment
 
-import grails.test.mixin.*
-
-import org.junit.*
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
  * Test-suite for {@link BrowserService}.
  */
 @TestFor(BrowserService)
+@Build([Browser])
 @Mock([Browser, BrowserAlias])
-class BrowserServiceTests extends Specification{
+class BrowserServiceTests extends Specification {
 
-	static final String nonExistentBrowserName = "myBrowsername"
-	static final String nonExistentBrowserAlias = "myBrowseralias"
-	static final String existentBrowserName = "IE"
-	static final String existentBrowserAlias = "Internet Explorer"
-	static final int browserCount = 3
+    void "find by name or alias returns correct browsers"(String nameOrAlias, String expectedBrowserName) {
+        given: "Two browsers with aliases"
+        Browser.build(name: "Firefox")
+                .addToBrowserAliases(alias: "FF")
+                .addToBrowserAliases(alias: "Firefox7").save()
+        Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
 
-	BrowserService serviceUnderTest
+        when: "a browser should be found by name or alias"
+        def browser = service.findByNameOrAlias(nameOrAlias)
 
-	void "setup"(){
-		serviceUnderTest = service
+        then: "the corresponding browser or the undefined one is found"
+        browser.name == expectedBrowserName
 
-		// Test data
-		//undefined browser
-		String browserName="undefined"
-		new Browser(name: browserName)
-				.addToBrowserAliases(alias: "undefined")
-				.save(failOnError: true)
+        where:
+        nameOrAlias         | expectedBrowserName
+        "Internet Explorer" | "IE"
+        "IE"                | "IE"
+        "Firefox"           | "Firefox"
+        "FF"                | "Firefox"
+        "Firefox7"          | "Firefox"
+        "Chrome"            | Browser.UNDEFINED
+    }
 
-		//IE
-		browserName="IE"
-		new Browser(name: browserName)
-				.addToBrowserAliases(alias: "IE")
-				.addToBrowserAliases(alias: "IE8")
-				.addToBrowserAliases(alias: "Internet Explorer")
-				.addToBrowserAliases(alias: "Internet Explorer 8")
-				.save(failOnError: true)
+    void "findAll by name or alias returns correct browsers"() {
+        given: "Three browsers and aliases"
+        Browser.build(name: "Firefox")
+                .addToBrowserAliases(alias: "FF")
+                .addToBrowserAliases(alias: "Firefox7").save()
+        Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
+        Browser.build(name: "Edge")
 
-		//FF
-		browserName="Firefox"
-		new Browser(name: browserName)
-				.addToBrowserAliases(alias: "FF")
-				.addToBrowserAliases(alias: "FF7")
-				.addToBrowserAliases(alias: "Firefox")
-				.addToBrowserAliases(alias: "Firefox7")
-				.save(failOnError: true)
-	}
-	
-	void "test Find By Name Or Alias"() {
-		when:
-		Browser existentName = serviceUnderTest.findByNameOrAlias(existentBrowserName)
-		Browser nonExistentName = serviceUnderTest.findByNameOrAlias(nonExistentBrowserName)
-		Browser existentAlias= serviceUnderTest.findByNameOrAlias(existentBrowserAlias)
-		Browser nonExistentAlias = serviceUnderTest.findByNameOrAlias(nonExistentBrowserAlias)
+        when: "all browsers should be found by name or alias"
+        def browser = service.findAllByNameOrAlias(["FF", "IE", "Chrome"])
 
-		then:
-		existentName != null
-		nonExistentName != null
-		existentAlias != null
-		nonExistentAlias != null
+        then: "the corresponding browser or the undefined one is found"
+        browser*.name == ["Firefox", "IE", Browser.UNDEFINED]
+    }
 
-		existentName.name == existentBrowserName
-		nonExistentName.name == "undefined"
-		existentAlias.name == existentBrowserName
-		nonExistentAlias.name == "undefined"
-	}
+    void "find all returns all browsers"() {
+        given: "three browsers and the undefined"
+        Browser.build(name: "Firefox")
+        Browser.build(name: "IE")
+        Browser.build(name: "Edge")
+        Browser.build(name: Browser.UNDEFINED)
 
-	void "test get cached browser map"() {
-		when:
-		Map<Long, Browser> dataToProve = serviceUnderTest.getCachedBrowserMap()
+        when: "find all is called"
+        def browsers = service.findAll()
 
-		then:
-		dataToProve.size() == browserCount
-
-		// Check if for all browsers relevant data was placed instead of null
-		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
-		{
-			eachEntry.key != null
-			eachEntry.value != null
-			eachEntry.value.name != null
-		}
-
-		// subsequent call should return equal result:
-		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getCachedBrowserMap()
-		subsequentRetrievedData == dataToProve
-	}
-
-	void "test getBrowserMap"() {
-		when:
-		Map<Long, Browser> dataToProve = serviceUnderTest.getBrowserMap()
-
-		then:
-		dataToProve.size() == browserCount
-
-		// Check if for all browsers relevant data was placed instead of null
-		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
-		{
-			eachEntry.key != null
-			eachEntry.value != null
-			eachEntry.value.name != null
-		}
-
-		// subsequent call should return equal result:
-		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getBrowserMap()
-		subsequentRetrievedData == dataToProve
-	}
+        then: "all browsers are returned, including the undefined"
+        browsers*.name as Set == ["Firefox", "IE", "Edge", Browser.UNDEFINED] as Set
+    }
 }

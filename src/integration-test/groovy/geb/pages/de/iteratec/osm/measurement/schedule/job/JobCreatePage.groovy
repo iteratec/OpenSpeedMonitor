@@ -1,6 +1,7 @@
 package geb.pages.de.iteratec.osm.measurement.schedule.job
 
 import geb.pages.de.iteratec.osm.I18nGebPage
+import org.openqa.selenium.Keys
 
 class JobCreatePage extends I18nGebPage {
 
@@ -8,6 +9,21 @@ class JobCreatePage extends I18nGebPage {
 
     static at = {
         title == "Create Job"
+    }
+
+    void selectCustomCronString(String customCronString) {
+        executionPlanSelect.click()
+        executionPlanSelect.find("option").find{ it.value() == "" }.click()
+        executionScheduleInput.value(Keys.chord(Keys.CONTROL, "A") + Keys.BACK_SPACE)
+        executionScheduleInput << customCronString
+    }
+
+    void selectScript(String scriptName) {
+        scriptSelect.click()
+        waitFor {
+            scriptSelect.isDisplayed()
+        }
+        scriptSelect.find("li").find { it.text() == scriptName }.click()
     }
 
     public void scrollBottom(){
@@ -34,7 +50,7 @@ class JobCreatePage extends I18nGebPage {
         tags << tagToAdd
         jobSettingsTab.click()
         waitFor {
-            cronString.displayed
+            executionScheduleInput.displayed
         }
     }
 
@@ -49,13 +65,15 @@ class JobCreatePage extends I18nGebPage {
     static content = {
         nameText{$("input",name:"label")}
         location{$("#location_chosen")}
-        cronString{$("#execution-schedule-shown")}
+        executionScheduleInput {$("#executionSchedule")}
         tags{$("#tags").find("input")}
         jobGroup{$("#jobgroup_chosen")}
         connection{$("#connectivityProfile_chosen")}
         createButton{$("input",name:"_action_save")}
-        jobSettingsTab{$("#jobSettingsLink")}
+        jobSettingsTab{$("#jobSettingsTabLink")}
         scriptTab{$("#scriptTabLink")}
         advancedSettingsTab{$("#advancedSettingsTabLink")}
+        executionPlanSelect{$("#selectExecutionSchedule")}
+        scriptSelect{$("#script_chosen")}
     }
 }

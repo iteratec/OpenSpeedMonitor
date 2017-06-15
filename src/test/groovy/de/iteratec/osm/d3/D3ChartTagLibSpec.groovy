@@ -38,13 +38,13 @@ class D3ChartTagLibSpec extends Specification {
     }
 
     def "HTML provided by taglib iteratec:multiLineChart returns container with correct identifier"() {
-        given:
+        given: "a chart identifier"
         String identifier = "ChartIdentifier"
 
-        when:
+        when: "HTML is provided by taglib iteratec:multiLineChart"
         String testHTML = applyTemplate("""<iteratec:multiLineChart chartIdentifier ="${identifier}"/>""")
 
-        then:
+        then: "the chart container from the HTML has the correct identifier"
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         testHtmlAsNode.size() == 1
         def chartContainerNode = testHtmlAsNode.getAt(0)
@@ -53,27 +53,27 @@ class D3ChartTagLibSpec extends Specification {
     }
 
     def "HTML provided by taglib iteratec:multiLineChart creates modal filling container for modal dialog"() {
-        given:
+        given: "a chart identifier"
         String identifier = "ChartIdentifier"
 
-        when:
+        when: "HTML is provided by taglib iteratec:multiLineChart with modal argument"
         String testHTML = applyTemplate("""<iteratec:multiLineChart chartIdentifier ="${identifier}"
                                             modal="true" />""")
 
-        then:
+        then: "the chart container has class col-md-12"
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         def chartContainerNode = testHtmlAsNode.getAt(0)
         chartContainerNode.attributes['class'] == "col-md-12"
     }
 
     def "HTML provided by taglib iteratec:barChart returns svg container with correct identifier"() {
-        given:
+        given: "a chart identifier"
         String identifier = "ChartIdentifier"
 
-        when:
+        when: "HTML is provided by taglib iteratec:barChart"
         String testHTML = applyTemplate("""<iteratec:barChart chartIdentifier ="${identifier}"/>""")
 
-        then:
+        then: "the svg container from the HTML has the correct identifier"
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         testHtmlAsNode.size() == 1
         def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(0).childNodes().getAt(0)
@@ -81,13 +81,13 @@ class D3ChartTagLibSpec extends Specification {
     }
 
     def "HTML provided by taglib iteratec:treemap returns three containers with correct identifiers"() {
-        given:
+        given: "a chart identifier"
         String identifier = "ChartIdentifier"
 
-        when:
+        when: "HTML is provided by taglib iteratec:treemap"
         String testHTML = applyTemplate("""<iteratec:treemap chartIdentifier ="${identifier}"/>""")
 
-        then:
+        then: "the containers from the HTML have the correct identifiers"
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         testHtmlAsNode.childNodes().size() == 1
         def chartContainerNode = testHtmlAsNode.childNodes().getAt(0)
@@ -101,13 +101,13 @@ class D3ChartTagLibSpec extends Specification {
     }
 
     def "HTML provided by taglib iteratec:scheduleChart returns container with correct identifier"() {
-        given:
+        given: "a chart identifier"
         String identifier = "ChartIdentifier"
 
-        when:
+        when: "HTML is provided by taglib iteratec:scheduleChart"
         String testHTML = applyTemplate("""<iteratec:scheduleChart chartIdentifier ="${identifier}"/>""")
 
-        then:
+        then: "the chart container from the HTML has the correct identifier"
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         def formContainer = testHtmlAsNode.childNodes().getAt(0)
         def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(2)

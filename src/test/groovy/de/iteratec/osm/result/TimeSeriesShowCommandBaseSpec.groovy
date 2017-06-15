@@ -167,16 +167,30 @@ class TimeSeriesShowCommandBaseSpec extends Specification {
         command.selectedLocations == []
     }
 
-    void "command is invalid without pages"() {
+    void "command is invalid without pages and measured events"() {
         given:
         Map params = getDefaultParams()
         params.selectedPages = []
+        params.selectedMeasuredEventIds = []
 
         when:
         dataBinder.bind(command, params as SimpleMapDataBindingSource)
 
         then:
         !command.validate()
+    }
+
+    void "command is valid without pages but with measured events"() {
+        given:
+        Map params = getDefaultParams()
+        params.selectedPages = []
+        params.selectedMeasuredEventIds = ["1", "2"]
+
+        when:
+        dataBinder.bind(command, params as SimpleMapDataBindingSource)
+
+        then:
+        command.validate()
     }
 
     void "command does not include native or custom if only numbers are set"() {

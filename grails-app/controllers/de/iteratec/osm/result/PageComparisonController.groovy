@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
@@ -19,6 +20,7 @@ class PageComparisonController extends ExceptionHandlerController {
 
     MeasurandUtilService measurandUtilService
     I18nService i18nService
+    OsmConfigCacheService osmConfigCacheService
 
     def index() { redirect(action: 'show') }
 
@@ -52,6 +54,11 @@ class PageComparisonController extends ExceptionHandlerController {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                    'docCompleteTimeInMillisecs',
+                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+            )
             projections {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
@@ -85,20 +92,23 @@ class PageComparisonController extends ExceptionHandlerController {
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
-                series.data << datum1
+                if (datum1.value) {
+                    series.data << datum1
+                }
             }
             if (result2) {
                 datum2.value = result2 ? result2[2] : null
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name
-                series.data << datum2
+                if (datum2.value) {
+                    series.data << datum2
+                }
             }
-            if (series.data) {
+            if (series.data.size() > 0) {
                 dto.series << series
             }
         }
-
         ControllerUtils.sendObjectAsJSON(response, dto)
     }
 }

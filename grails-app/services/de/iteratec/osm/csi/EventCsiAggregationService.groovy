@@ -17,15 +17,15 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.OsmConfigCacheService
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CsiValueService
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
@@ -34,12 +34,8 @@ import org.joda.time.DateTime
 @Transactional
 class EventCsiAggregationService {
 
-    EventResultService eventResultService
     PerformanceLoggingService performanceLoggingService
-    JobService jobService
-    OsmConfigCacheService osmConfigCacheService
     CsiAggregationDaoService csiAggregationDaoService
-    WeightingService weightingService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     CsiValueService csiValueService
 
@@ -91,7 +87,6 @@ class EventCsiAggregationService {
                 true,
                 newResult.connectivityProfile)
         calcCsiAggregationForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
-
     }
 
     /**
@@ -107,10 +102,6 @@ class EventCsiAggregationService {
         List<CsiAggregation> calculatedMvs = []
         if (fromDate > toDate) {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
-        }
-
-        if (validateMvQueryParams(mvQueryParams) == false) {
-            throw new IllegalArgumentException("QuerParams for Event-CsiAggregations aren't valid: ${mvQueryParams}")
         }
 
         DateTime toDateTime = new DateTime(toDate)
@@ -202,20 +193,6 @@ class EventCsiAggregationService {
         toBeCalculated.save(failOnError: true)
         csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated
-    }
-
-    /**
-     * Proofs whether all attributes of mvQueryParams are initialized, non <code>null</code>.
-     * @param mvQueryParams
-     * @return
-     */
-    private Boolean validateMvQueryParams(MvQueryParams mvQueryParams) {
-        mvQueryParams.jobGroupIds != null &&
-                mvQueryParams.browserIds != null &&
-                mvQueryParams.locationIds != null &&
-                mvQueryParams.measuredEventIds != null &&
-                mvQueryParams.pageIds != null ?
-                true : false
     }
 
     /**

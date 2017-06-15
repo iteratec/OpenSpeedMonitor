@@ -70,12 +70,12 @@ class JobResult {
     String jobConfigLabel
     Integer jobConfigRuns
 
-    boolean firstViewOnly;
-    boolean captureVideo;
-    boolean downloadResultXml;
-    boolean downloadDetails;
-    Integer frequencyInMin;
-    Integer maxDownloadAttempts;
+    boolean firstViewOnly
+    boolean captureVideo
+    boolean downloadResultXml
+    boolean downloadDetails
+    Integer frequencyInMin
+    Integer maxDownloadAttempts
 
     //from Script
     String scriptUrl
@@ -176,8 +176,8 @@ class JobResult {
      * @return EventResult
      *
      */
-    public EventResult findEventResult(MeasuredEvent event, CachedView view, Integer run) {
-        Collection<EventResult> results = this.getEventResults();
+     EventResult findEventResult(MeasuredEvent event, CachedView view, Integer run) {
+        Collection<EventResult> results = this.getEventResults()
         return results.find { it.measuredEvent == event && it.cachedView == view && it.numberOfWptRun == run }
     }
     /**
@@ -186,19 +186,14 @@ class JobResult {
      * @return list < EventResult >
      *
      */
-    public List<EventResult> getEventResults() {
-        // Note: Grails uses the grails.gorm.CriteriaBuilder in test-mode,
-        // but the HibernateCriteriaBuilder in productive mode!?
-        // -> different types! Why ever... so we use def-declaration here.
-        def criteria = EventResult.createCriteria()
-
-        List results = criteria.list {
+     List<EventResult> getEventResults() {
+        List results = EventResult.createCriteria().list {
             jobResult {
                 eq("id", this.id)
             }
         }
 
-        return results;
+        return results
     }
     /**
      * Returns the median {@link EventResult} of the uncached view for one {@link MeasuredEvent}.
@@ -210,8 +205,8 @@ class JobResult {
      * @return null only if event isn't measured within this JobResult
      *
      */
-    public EventResult findMedianUncachedEventResult(MeasuredEvent event) {
-        Collection<EventResult> results = this.getEventResults();
+     EventResult findMedianUncachedEventResult(MeasuredEvent event) {
+        Collection<EventResult> results = this.getEventResults()
         return results.find {
             it.measuredEvent == event && it.cachedView == CachedView.UNCACHED && it.medianValue == true
         }
@@ -229,27 +224,27 @@ class JobResult {
      *         been executed successfully, <code>null</code> else.
      * @since IT-78
      */
-    public URL tryToGetTestsDetailsURL() {
-        URL result = null;
+     URL tryToGetTestsDetailsURL() {
+        URL result = null
 
-        String wptServerBaseurl = this.wptServerBaseurl;
-        String testId = this.testId;
+        String wptServerBaseurl = this.wptServerBaseurl
+        String testId = this.testId
 
         if (wptServerBaseurl &&
                 testId &&
                 !testId.isEmpty() &&
                 !testId.equals('-1')) {
-            result = new URL(wptServerBaseurl + (wptServerBaseurl.endsWith('/') ? '' : '/') + 'result/' + testId);
+            result = new URL(wptServerBaseurl + (wptServerBaseurl.endsWith('/') ? '' : '/') + 'result/' + testId)
         }
 
-        return result;
+        return result
     }
 
     /**
      * Returns a status message matching the integer value stored in statusCode
      * such as 'Pending' for statusCode 100 and so forth
      */
-    public String getStatusCodeMessage() {
+     String getStatusCodeMessage() {
         def state = [0: 'Failure', 100: 'Pending', 101: 'Running', 200: 'Finished', 400: 'Error', 404: 'Not found', 504: 'Timeout']
         def str = state[httpStatusCode]
         return str ?: 'Unknown'

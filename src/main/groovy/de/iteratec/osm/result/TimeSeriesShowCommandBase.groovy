@@ -144,8 +144,8 @@ class TimeSeriesShowCommandBase implements Validateable {
         selectedFolder(nullable: false, validator: { Collection currentCollection, TimeSeriesShowCommandBase cmd ->
             if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
-        selectedPages(nullable: false, validator: { Collection currentCollection, TimeSeriesShowCommandBase cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedPage']
+        selectedPages(nullable: true, validator: { Collection currentCollection, TimeSeriesShowCommandBase cmd ->
+            if (!currentCollection && !cmd.selectedMeasuredEventIds) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedPage']
         })
         selectedBrowsers(nullable: true)
         selectedMeasuredEventIds(nullable: true)

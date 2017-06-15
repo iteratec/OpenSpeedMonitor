@@ -19,7 +19,8 @@
                 </label>
 
                 <div class="col-sm-7">
-                    <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
+                    <iteratec:optGroupedSelect id="selectedAggrGroupValuesUnCached"
+                                               dataMap="${aggrGroupValuesUnCached}"
                                                class="firstMeasurandSelect form-control"
                                                name="selectedAggrGroupValuesUnCached"
                                                optionKey="value" optionValue="value"

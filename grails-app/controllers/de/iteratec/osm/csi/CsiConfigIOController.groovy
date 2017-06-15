@@ -19,22 +19,17 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import grails.converters.JSON
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.web.multipart.MultipartFile
-
 /**
  * Provides Actions for Download and Upload of csi configurations like weighting or mapping data.
  */
 class CsiConfigIOController {
 
-    PageDaoService pageDaoService
-    BrowserDaoService browserDaoService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
 
     // export ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

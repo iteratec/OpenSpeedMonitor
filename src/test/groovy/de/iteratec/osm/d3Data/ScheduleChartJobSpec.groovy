@@ -30,13 +30,13 @@ import static org.junit.Assert.fail
 class ScheduleChartJobSpec extends Specification{
 
     def "initialisation test"() {
-        when:
+        when: "a ScheduleChartJob is created"
         ScheduleChartJob scheduleChartJob = new ScheduleChartJob()
 
-        then:
-        scheduleChartJob.durationInSeconds != 0
+        then: "the ScheduleChartJob has been initialised correctly"
+        scheduleChartJob.durationInSeconds == ScheduleChartJob.DEFAULT_DURATION
         scheduleChartJob.executionDates.size() == 0
-        !scheduleChartJob.name.isEmpty()
-        !scheduleChartJob.description.isEmpty()
+        scheduleChartJob.name == ScheduleChartJob.DEFAULT_NAME
+        scheduleChartJob.description == ScheduleChartJob.DEFAULT_DESCRIPTION
     }
 }

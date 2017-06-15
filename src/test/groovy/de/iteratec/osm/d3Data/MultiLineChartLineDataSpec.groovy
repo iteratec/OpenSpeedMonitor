@@ -28,28 +28,28 @@ import spock.lang.Specification
 class MultiLineChartLineDataSpec extends Specification{
 
    def "MultiLineChartLineData initialisation test"() {
-       when:
+       when: "new MultiLineChartLineData is created"
        MultiLineChartLineData lineData = new MultiLineChartLineData()
 
-       then:
+       then: "the MultiLineChartLineData has been initialised"
        lineData.xPoints.size() == 0
        lineData.yPoints.size() == 0
-       !lineData.name.isEmpty()
+       lineData.name == MultiLineChartLineData.DEFAULT_NAME
    }
 
     def "addDataPoint adds dataPoint and keeps right order" () {
-        given:
+        given: "some data points"
         MultiLineChartLineData lineData = new MultiLineChartLineData()
         double x1 = 12.0
         double x2 = 24.5
         double y1 = 7.4
         double y2 = 1.0
 
-        when:
+        when: "the data points are added to MultiLineChartLineData"
         lineData.addDataPoint(x1, y1)
         lineData.addDataPoint(x2, y2)
 
-        then:
+        then: "the MultiLineChartLineData contains the correct coordinates"
         lineData.xPoints.size() == 2
         lineData.yPoints.size() == 2
         lineData.xPoints[0] == x1

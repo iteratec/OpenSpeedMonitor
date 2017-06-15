@@ -8,8 +8,6 @@ import grails.transaction.Transactional
 class OsmStateService {
 
     public boolean untouched() {
-        List<WebPageTestServer> wptServers = WebPageTestServer.list()
-        int countJobs = Job.count()
-        return wptServers.size() == 0 && countJobs == 0
+        return WebPageTestServer.count() == 0 && Job.count() == 0
     }
 }

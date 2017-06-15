@@ -17,87 +17,78 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
-import org.junit.Test
 import spock.lang.Specification
 
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.assertThat
-
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestFor(DbCleanupService)
 @Mock([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity])
+@Build([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent])
 class DbCleanupServiceSpec extends Specification{
-    static transactional = false
 
-    DbCleanupService serviceUnderTest
-    ServiceMocker mocker
-
-    DateTime executionDateBeforeCleanUpDate = new DateTime(2014,2,9,0,0,0)
-    DateTime executionDateAfterCleanUpDate = new DateTime()
+    static final Date OLDER_12_MONTHS = new DateTime(2014,2,9,0,0,0).toDate()
+    static final Date NEWER_12_MONTHS = new DateTime().toDate()
 
     void setup() {
-        serviceUnderTest = service
-        mocker = ServiceMocker.create()
-        mocker.mockBatchActivityService(serviceUnderTest)
-//        serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this tests
+        service.batchActivityService = Stub(BatchActivityService){
+            getActiveBatchActivity(_, _, _) >> { Class c, Activity activity, String name, int maxStages, boolean observe ->
+                return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages, 5000)
+            }
+        }
     }
 
-    @Test
-    void testDeleteResultsDataBefore() {
+    void "JobResults and EventResults before given Date get deleted correctly"() {
 
-        given:
-            JobResult jobResultWithBeforeCleanupDate = new JobResult(testId: 'test1', date: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
-            JobResult jobResultWithAfterCleanupDate = new JobResult(testId: 'test2', date: executionDateAfterCleanUpDate.toDate()).save(validate: false)
+        given: "JobResults/EventResults older and newer 12 months ago exist."
+        EventResult.build(jobResult: JobResult.build(date: OLDER_12_MONTHS), jobResultDate: OLDER_12_MONTHS)
+        EventResult.build(jobResult: JobResult.build(date: NEWER_12_MONTHS), jobResultDate: NEWER_12_MONTHS)
 
-            new EventResult(jobResult: jobResultWithBeforeCleanupDate, jobResultDate: jobResultWithBeforeCleanupDate.date).save(validate: false)
+        when: "deleteResultsDataBefore is called with toDeleteBefore 12 months ago."
+        Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
+        service.deleteResultsDataBefore(twelveMonthsAgo)
 
-            new EventResult(jobResult: jobResultWithAfterCleanupDate, jobResultDate: jobResultWithAfterCleanupDate.date).save(validate: false)
+        then: "JobResults/EventResults older 12 months got deleted, the rest still exists."
+        EventResult.list().size() == 1
+        !EventResult.findByJobResultDate(OLDER_12_MONTHS)
+        EventResult.findByJobResultDate(NEWER_12_MONTHS)
 
-            CsiAggregation csiAggregationWithBeforeCleanupDate = new CsiAggregation(started: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
-            new CsiAggregationUpdateEvent(csiAggregationId: csiAggregationWithBeforeCleanupDate.id).save(validate: false)
+        JobResult.list().size() == 1
+        !JobResult.findByDate(OLDER_12_MONTHS)
+        JobResult.findByDate(NEWER_12_MONTHS)
 
-            CsiAggregation csiAggregationWithAfterCleanupDate = new CsiAggregation(started: executionDateAfterCleanUpDate.toDate()).save(validate: false)
-            new CsiAggregationUpdateEvent(csiAggregationId: csiAggregationWithAfterCleanupDate.id).save(validate: false)
+    }
 
-            assertThat(JobResult.list().size(), is(2))
-            assertThat(EventResult.list().size(), is(2))
+    void "CsiAggregations and corresponding CsiAggregationUpdateEvents before given Date get deleted correctly"() {
 
-            assertThat(CsiAggregation.list().size(), is(2))
-            assertThat(CsiAggregationUpdateEvent.list().size(), is(2))
-        when: "delete all {@link JobResult}s, {@link EventResult}s, {@link HttpArchive}s, " +
-                "{@link CsiAggregation}s, {@link CsiAggregationUpdateEvent}s older then one year (12 months)\n"
-            serviceUnderTest.deleteResultsDataBefore(new DateTime().minusMonths(12).toDate())
-            serviceUnderTest.deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(new DateTime().minusMonths(12).toDate())
-        then:
-            assertThat(EventResult.list().size(), is(1))
-            //check that the correct EventResult is deleted
-            assertThat(EventResult.findByJobResultDate(executionDateBeforeCleanUpDate.toDate()), is(nullValue()))
-            assertThat(EventResult.findByJobResultDate(executionDateAfterCleanUpDate.toDate()), is(notNullValue()))
+        given: "CsiAggregations and CsiAggregationUpdateEvent older and newer 12 months ago exist."
+        CsiAggregation csiAggregationOlder12Months = CsiAggregation.build(started: OLDER_12_MONTHS)
+        CsiAggregationUpdateEvent.build(csiAggregationId: csiAggregationOlder12Months.id)
 
-            assertThat(JobResult.list().size(), is(1))
-            //check that the correct JobResult is deleted
-            assertThat(JobResult.findById(jobResultWithBeforeCleanupDate.ident()), is(nullValue()))
-            assertThat(JobResult.findById(jobResultWithAfterCleanupDate.ident()), is(notNullValue()))
+        CsiAggregation csiAggregationNewer12Months = CsiAggregation.build(started: NEWER_12_MONTHS)
+        CsiAggregationUpdateEvent.build(csiAggregationId: csiAggregationNewer12Months.id)
 
-            assertThat(CsiAggregationUpdateEvent.list().size(), is(1))
-            //check that the correct CsiAggregationUpdateEvent is deleted
-            assertThat(CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationWithBeforeCleanupDate.ident()), is(nullValue()))
-            assertThat(CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationWithAfterCleanupDate.ident()), is(notNullValue()))
+        when: "deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore is called with toDeleteBefore 12 months ago."
+        Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
+        service.deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(twelveMonthsAgo)
 
-            assertThat(CsiAggregation.list().size(), is(1))
-            //check that the correct CsiAggregation is deleted
-            assertThat(CsiAggregation.findByStarted(executionDateBeforeCleanUpDate.toDate()), is(nullValue()))
-            assertThat(CsiAggregation.findByStarted(executionDateAfterCleanUpDate.toDate()), is(notNullValue()))
+        then: "CsiAggregations and CsiAggregationUpdateEvent older 12 months got deleted, the rest still exists."
+        CsiAggregation.list().size() == 1
+        !CsiAggregation.findByStarted(OLDER_12_MONTHS)
+        CsiAggregation.findByStarted(NEWER_12_MONTHS)
+
+        CsiAggregationUpdateEvent.list().size() == 1
+        !CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationOlder12Months.ident())
+        CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationNewer12Months.ident())
+
     }
 }

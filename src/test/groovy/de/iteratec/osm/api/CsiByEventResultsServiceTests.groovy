@@ -17,12 +17,15 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.api.dto.CsiByEventResultsDto
-import de.iteratec.osm.csi.*
+import de.iteratec.osm.csi.CsTargetGraph
+import de.iteratec.osm.csi.CsTargetGraphDaoService
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.MeanCalcService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -67,7 +70,7 @@ class CsiByEventResultsServiceTests extends Specification{
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> []
         }
-        serviceUnderTest.weightingService = Stub(WeightingService){
+        serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> []
         }
 
@@ -84,7 +87,7 @@ class CsiByEventResultsServiceTests extends Specification{
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
         }
-        serviceUnderTest.weightingService = Stub(WeightingService){
+        serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
         }
 
@@ -127,7 +130,7 @@ class CsiByEventResultsServiceTests extends Specification{
             List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.buildWithoutSave()]
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> nonEmptyEventResultListNotUsedInTest
         }
-        serviceUnderTest.weightingService = Stub(WeightingService){
+        serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [
                 new WeightedCsiValue(
                     weightedValue: new WeightedValue(value: valueFirstMv, weight: (pageWeightFirstMv * browserWeightFirstMv)),
@@ -165,7 +168,7 @@ class CsiByEventResultsServiceTests extends Specification{
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
         }
-        serviceUnderTest.weightingService = Stub(WeightingService){
+        serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
         }
 
