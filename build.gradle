@@ -33,7 +33,7 @@ buildscript {
     }
 }
 
-version "4.2.0_beta"
+version "4.2.0_beta_2"
 group "OpenSpeedMonitor"
 
 apply plugin: "eclipse"
