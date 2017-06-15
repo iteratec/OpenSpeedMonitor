@@ -19,7 +19,7 @@
                     <a id="show-infos" href="#3" data-toggle="tab">show infos</a>
                 </li>
             </ul>
-            <div class="iteratec-tab-content">
+            <div class="tab-content">
                 <div class="tab-pane active" id="1">
 
                 </div>
