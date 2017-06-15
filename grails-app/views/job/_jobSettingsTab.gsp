@@ -22,7 +22,8 @@
 
         <div class="form-group ${hasErrors(bean: job, field: 'label', 'has-error')} required">
             <label for="label" class="col-md-3 control-label">
-                <g:message code="job.label.label" default="Name"/><span class="required-indicator">*</span>
+                <g:message code="job.label.label" default="Name"/>
+                <span class="required-indicator">*</span>
             </label>
 
             <div class="col-md-7">
@@ -33,7 +34,8 @@
 
         <div class="form-group ${hasErrors(bean: job, field: 'location', 'has-error')} required">
             <label class="col-md-3 control-label" for="location">
-                <g:message code="job.location.label" default="Location"/><span class="required-indicator">*</span>
+                <g:message code="job.location.label" default="Location"/>
+                <span class="required-indicator">*</span>
             </label>
 
             <div class="col-md-7">
@@ -64,7 +66,7 @@
                 <a id="jobGroupModalLink" href="#jobGroupModal" data-toggle="modal"
                    title="Create New Job Group" role="button" class="btn btn-link col-md-2">
                     <i id="button_create_jobGroup" class="fa fa-plus" aria-hidden="true"></i>
-                    Create New
+                    <g:message code="default.button.create.new" default="Create New"/>
                 </a>
             </div>
         </div>

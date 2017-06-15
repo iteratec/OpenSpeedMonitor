@@ -25,4 +25,9 @@ databaseChangeLog = {
             column(defaultValue: "DEFAULT", name: "user_agent"                 , type: "varchar(255)")
         }
     }
+
+    changeSet(author: "sburnicki", id: "1494576018000-2") {
+        dropNotNullConstraint(columnDataType: "int", columnName: "max_download_time_in_minutes", tableName: "job")
+        addDefaultValue(columnDataType: "int", columnName: "max_download_time_in_minutes", defaultValueComputed: "60", tableName: "job")
+    }
 }

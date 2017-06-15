@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
 import grails.plugins.taggable.Taggable
@@ -185,7 +186,7 @@ class Job implements Taggable {
      */
     @Deprecated
     Integer frequencyInMin;
-    Integer maxDownloadTimeInMinutes
+    Integer maxDownloadTimeInMinutes = OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
 
     /**
      * Set to label of this job's script if script
@@ -216,7 +217,6 @@ class Job implements Taggable {
 
     static constraints = {
         label(maxSize: 255, blank: false, unique: true)
-        script(nullable: true, blank:false)
         location(nullable: false)
         lastRun(nullable: true)
         jobGroup(nullable: false)
@@ -236,6 +236,10 @@ class Job implements Taggable {
         tcpdump(nullable: true)
         continuousVideo(nullable: true)
         keepua(nullable: true)
+
+        script(nullable: true, validator: { script, instance ->
+            return script != null || instance.deleted
+        })
 
         connectivityProfile(nullable: true, validator: { profile, instance ->
 
@@ -266,7 +270,7 @@ class Job implements Taggable {
         latency(nullable: true, min: -2147483648, max: 2147483647)
         packetLoss(nullable: true, min: -2147483648, max: 2147483647)
         frequencyInMin(nullable: true, min: -2147483648, max: 2147483647)
-        maxDownloadTimeInMinutes(range: 10..240)
+        maxDownloadTimeInMinutes(nullable: true, range: 10..240)
         eventNameIfUnknown(nullable: true, maxSize: 255)
         variables(nullable: true)
 
