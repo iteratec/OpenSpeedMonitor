@@ -6,6 +6,9 @@ import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+
 /**
  * <p>
  * Command of DetailAnalysisDashboardController
@@ -31,7 +34,7 @@ class DetailAnalysisDashboardShowCommand implements Validateable {
     /**
      * A predefined time frame.
      */
-    int selectedTimeFrameInterval = 3 * 24 * 60 * 60
+    int selectedTimeFrameInterval = Duration.of(3, ChronoUnit.DAYS).getSeconds()
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}

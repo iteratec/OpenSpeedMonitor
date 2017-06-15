@@ -158,7 +158,7 @@
 
             <div style="margin-left: 0px" class="col-sm-4 form-group">
                 <input type="text" class="form-control" id="executionSchedule" name="executionSchedule"
-                       value="${executionSchedule}" data-help-panel-id="cronInfoPanel">
+                       value="${executionSchedule ?: "0 * * * ? *"}" data-help-panel-id="cronInfoPanel">
                 <span id="cronInputHelpBlock" class="help-block"></span>
             </div>
         </div>
