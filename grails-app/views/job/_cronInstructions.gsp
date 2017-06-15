@@ -1,5 +1,5 @@
 <g:message code="job.cronInstructions.explainingtext"/>
-<table cellspacing="8">
+<table>
     <tr>
         <th align="left">Field Name</th>
         <th align="left">&nbsp;</th>
@@ -61,8 +61,10 @@
         <td align="left"><code>, - * /</code></td>
     </tr>
 </table>
-<em><g:message code="job.cronInstructions.note.header"/>:<br></em> <g:message code="job.cronInstructions.note.text"/><br>
-<a
-    href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html"
-    target="_blank"><g:message code="job.cronInstructions.moreInformation" />
-</a>
+<p>
+    <g:message code="job.cronInstructions.note.text"/>
+    <a href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html"
+       target="_blank">
+        <g:message code="job.cronInstructions.moreInformation" default="More information."/>
+    </a>
+</p>

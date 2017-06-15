@@ -157,7 +157,7 @@
 
             <div style="margin-left: 0px" class="col-sm-5 form-group">
                 <input type="text" class="form-control" id="executionSchedule" name="executionSchedule"
-                       value="${executionSchedule}">
+                       value="${executionSchedule}" data-help-panel-id="cronInfoPanel">
                 <span id="cronInputHelpBlock" class="help-block"></span>
             </div>
         </div>
@@ -166,19 +166,18 @@
 
 </div>
 
-<div class="col-md-5">
-    <div class="panel panel-info hidden" id="cronInfoPanel">
+<div class="col-md-6">
+    <div class="panel panel-info hidden help-panel" id="cronInfoPanel">
         <div class="panel-heading">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <g:message code="default.info.title" default="Information" default="Information"/>
+            <g:message code="default.info.title" default="Information"/>
         </div>
 
         <div class="panel-body">
-            <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createJob.description" encodeAs="raw" args="[
-                    link(url: 'http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html', target: '_blank') {
-                        message(code: 'job.cronInstructions.moreInformation', default: 'Quartz Doku')
-                    }
-            ]" default="Please define a name and the execution plan of the measurement job. &lt;br&gt; \\"/></p>
+            <p>
+                <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob.description"
+                           default="The execution plan can be assigned manually as a Cron expression."/>
+            </p>
             <g:render template="/job/cronInstructions"></g:render>
         </div>
     </div>

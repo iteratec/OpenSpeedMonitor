@@ -166,19 +166,23 @@ function registerEventHandlers() {
     validateCronExpression();
     updateCronStringFromPredefined();
 
-    cronStringInputField.on('blur',updateCronInfo);
-    cronStringInputField.on('focus',updateCronInfo);
+    $("input, select", $("#jobSettingsTab")).on('focus', showHelpPanel);
+    $("#jobSettingsTab .chosen").on('chosen:showing_dropdown', showHelpPanel);
 }
 
-var updateCronInfo = function() {
-    $("#cronInfoPanel").toggleClass("hidden");
-}
+var showHelpPanel = function() {
+    $(".help-panel").toggleClass("hidden", true);
+    var helpPanelId = $(this).data("help-panel-id");
+    if (helpPanelId) {
+        $("#" + helpPanelId).toggleClass("hidden", false);
+    }
+};
 
 var isPredefinedCronString = function (cronString) {
     return predefinedCronSelectBox.find("option").is(function (index, elem) {
         return $(elem).val() === cronString;
     });
-}
+};
 
 var updateCronStringFromPredefined = function () {
     var selectedValue = predefinedCronSelectBox.val();
@@ -187,7 +191,7 @@ var updateCronStringFromPredefined = function () {
         cronStringInputField.val(selectedValue);
     }
     validateCronExpression();
-}
+};
 
 var validateCronExpression = function () {
     $.ajax({
@@ -206,7 +210,7 @@ var validateCronExpression = function () {
             }
         }
     });
-}
+};
 
 var processCronExpressionValidation = function (isValid, helpText) {
     cronInputValid = isValid;
