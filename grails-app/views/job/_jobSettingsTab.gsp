@@ -27,7 +27,7 @@
 
             <div class="col-md-8">
                 <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}"
-                             placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}" />
+                             placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}"/>
             </div>
         </div>
 
@@ -57,11 +57,16 @@
             </label>
 
             <div class="col-md-8">
-                <g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
-                          value="${job?.jobGroup?.id}" optionValue="name" optionKey="id"/>
-                <a  id="jobGroupModalLink" href="#jobGroupModal" role="button" class="btn btn-xs" data-toggle="modal">
-                    <i  id="button_create_jobGroup" class="fa fa-plus-circle" aria-hidden="true"></i>
-                </a>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <a id="jobGroupModalLink" href="#jobGroupModal" data-toggle="modal"
+                           title="Create New Job Group" role="button">
+                            <i id="button_create_jobGroup" class="fa fa-plus" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
+                              value="${job?.jobGroup?.id}" optionValue="name" optionKey="id"/>
+                </div>
             </div>
         </div>
 
@@ -87,7 +92,8 @@
 
             <div class="form-group">
                 <label class="col-md-3 control-label" for="customConnectivityName">
-                    <g:message code="job.customConnectivityProfile.label" default="Name of custom connectivity profile"/>
+                    <g:message code="job.customConnectivityProfile.label"
+                               default="Name of custom connectivity profile"/>
                 </label>
 
                 <div class="col-md-8">
@@ -95,7 +101,8 @@
                                  value="${job?.customConnectivityName}" readonly="readonly"/>
                     <label class="checkbox-inline">
                         <g:checkBox name="setCustomConnNameManually" id="setCustomConnNameManually"></g:checkBox>
-                        <g:message code="job.customConnectivityProfile.setnamemanually.label" default="Set name manually"/>
+                        <g:message code="job.customConnectivityProfile.setnamemanually.label"
+                                   default="Set name manually"/>
                     </label>
                 </div>
             </div>
@@ -126,7 +133,8 @@
                             <g:message code="de.iteratec.isocsi.custom" default="Custom"/>
                         </option>
                     </optgroup>
-                    <optgroup label="${message(code: 'de.iteratec.osm.result.predefined.linktext', default: 'Predefined')}">
+                    <optgroup
+                            label="${message(code: 'de.iteratec.osm.result.predefined.linktext', default: 'Predefined')}">
                         <option value="0 * * * ? *" selected>
                             <g:message code="de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly"
                                        default="Every hour"/>
@@ -148,7 +156,8 @@
             </div>
 
             <div style="margin-left: 0px" class="col-sm-5 form-group">
-                <input type="text" class="form-control" id="executionSchedule" name="executionSchedule" value="${executionSchedule}">
+                <input type="text" class="form-control" id="executionSchedule" name="executionSchedule"
+                       value="${executionSchedule}">
                 <span id="cronInputHelpBlock" class="help-block"></span>
             </div>
         </div>
@@ -161,13 +170,15 @@
     <div class="panel panel-info hidden" id="cronInfoPanel">
         <div class="panel-heading">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <g:message code="default.info.title" default="Information"default="Information"/>
+            <g:message code="default.info.title" default="Information" default="Information"/>
         </div>
 
         <div class="panel-body">
             <p><g:message code="de.iteratec.osm.setupMeasurementWizard.createJob.description" encodeAs="raw" args="[
-                    link(url: 'http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html', target: '_blank') { message(code:'job.cronInstructions.moreInformation', default:'Quartz Doku')}
-            ]"default="Please define a name and the execution plan of the measurement job. &lt;br&gt; \\"/></p>
+                    link(url: 'http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html', target: '_blank') {
+                        message(code: 'job.cronInstructions.moreInformation', default: 'Quartz Doku')
+                    }
+            ]" default="Please define a name and the execution plan of the measurement job. &lt;br&gt; \\"/></p>
             <g:render template="/job/cronInstructions"></g:render>
         </div>
     </div>
