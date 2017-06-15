@@ -14,7 +14,7 @@
 <section id="${mode}-job" class="first">
     <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
     <g:render template="messages"/>
-    <g:form resource="${entity}" method="post" role="form" class="form-horizontal">
+     <g:form resource="${entity}" method="post" role="form" class="form-horizontal" data-toggle="validator">
 
         <g:hiddenField name="id" value="${entity?.id}"/>
         <g:hiddenField name="version" value="${entity?.version}"/>
@@ -64,7 +64,7 @@
     <asset:script type="text/javascript">
 
         function getExecutionScheduleSetButInactiveLabel() {
-            return '${message(code:'job.executionScheduleSetButInactive.label', default: '(currently not active)')}';
+            return '${message(code: 'job.executionScheduleSetButInactive.label', default: '(currently not active)')}';
                 }
                 function promptForDuplicateName() {
                     var newName = prompt(
@@ -85,7 +85,7 @@
         ${job.label == null},
                             "${g.createLink(action: 'nextExecution')}",
                             '${customConnNameForNative}',
-        ${job.connectivityProfile?job.connectivityProfile.id:'null'},
+        ${job.connectivityProfile ? job.connectivityProfile.id : 'null'},
         ${job.noTrafficShapingAtAll},
                             "${g.createLink(action: 'tags')}"
                     );
@@ -122,11 +122,11 @@
                         $('#script').change();
                     });
                     OpenSpeedMonitor.postLoader.loadJavascript(
-                        '<g:assetPath src="codemirror/codemirrorManifest.js" />',
+                        '<g:assetPath src="codemirror/codemirrorManifest.js"/>',
                         true
                     )
                    OpenSpeedMonitor.postLoader.loadStylesheet(
-                        '<g:assetPath src="codemirror/codemirrorManifest.css" />',
+                        '<g:assetPath src="codemirror/codemirrorManifest.css"/>',
                         true
                     )
 

@@ -10,7 +10,8 @@
         <g:select class="form-control chosen" name="script.id" id="script" from="${[[id: "", label: ""]] + Script.list()}"
                   value="${job?.script?.id ?: ""}" optionValue="label" optionKey="id"
                   data-placeholder="${message(code: 'job.script.choose', default: 'Choose a script')}"
-                  onchange="updateScriptEditHref('${createLink(controller: 'script', action: 'edit')}', \$(this).val());"/>
+                  onchange="updateScriptEditHref('${createLink(controller: 'script', action: 'edit')}', \$(this).val());"
+                  required="required" />
     </div>
 </div>
 
