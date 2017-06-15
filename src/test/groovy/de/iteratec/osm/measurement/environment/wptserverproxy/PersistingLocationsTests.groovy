@@ -19,24 +19,22 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserAlias
+import de.iteratec.osm.measurement.environment.BrowserService
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
+import spock.lang.Specification
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
@@ -46,253 +44,102 @@ import static org.junit.Assert.assertTrue
  *
  */
 @TestFor(LocationPersisterService)
+@Build([WebPageTestServer, Location, Browser])
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
-class PersistingLocationsTests {
+class PersistingLocationsTests extends Specification{
 
-    WebPageTestServer server1, server2
-
-    JobGroup undefinedJobGroup;
-
-    Browser undefinedBrowser;
-
-    LocationPersisterService serviceUnderTest
-
-    @Before
-    void setUp() {
-
-        serviceUnderTest = service
-
-        server1 = new WebPageTestServer(
-                label: "TestServer 1",
-                proxyIdentifier: "TestServer1",
-                baseUrl: "http://wptUnitTest.dev.hh.iteratec.local",
-                active: true,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true, validate: false)
-
-        server2 = new WebPageTestServer(
-                label: "TestServer 2",
-                proxyIdentifier: "TestServer2",
-                baseUrl: "http://wptUnitTest2.dev.hh.iteratec.local",
-                active: 1,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true, validate: false)
-
-        undefinedJobGroup = new JobGroup(
-                name: JobGroup.UNDEFINED_CSI
-        );
-        undefinedJobGroup.save(failOnError: true);
-
-        //creating test-data common to all tests
-        createPages()
-        createBrowsers()
-
+    def doWithSpring = {
+        browserService(BrowserService)
     }
 
-    @After
-    void tearDown() {
-    }
-
-    // tests///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Tests the persisting of {@link Location}s while listening to incoming {@link EventResult}s.
-     */
-    @Test
-    void testSavingOfLocations() {
-
-        //mocking of inner services
-
-        mockBrowserService()
-
-        //create test-specific data
-
-        Integer locationCount = Location.findAll().size()
+    void "when listening to a WPT location respons, missing locations are added for this server"() {
+        setup:
         def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
+        WebPageTestServer wptServer1 = WebPageTestServer.build()
+        WebPageTestServer wptServer2 = WebPageTestServer.build()
 
-        //test execution and assertions
+        when: "the service listens for new locations for one server"
+        service.listenToLocations(result, wptServer1)
 
-        serviceUnderTest.listenToLocations(result, server1)
-        assertTrue(Location.findAll().size() > locationCount)
+        then: "all 5 are added"
+        Location.count() == 5
 
-        locationCount = Location.findAll().size()
-        serviceUnderTest.listenToLocations(result, server1)
-        assertEquals(locationCount, Location.findAll().size())
+        when: "the services sees the same locations for the same server"
+        Location.count() == 5
+        Location.findAllByWptServer(wptServer1).size() == 5
+        Location.findAllByWptServer(wptServer2).size() == 0
 
-        serviceUnderTest.listenToLocations(result, server2)
-        assertTrue(Location.findAll().size() > locationCount)
+        then: "they are not added again"
+        Location.count() == 5
+        Location.findAllByWptServer(wptServer1).size() == 5
+        Location.findAllByWptServer(wptServer2).size() == 0
+
+        when: "the service sees these locations, but for another server"
+        service.listenToLocations(result, wptServer2)
+
+        then: "they are added for the other server"
+        Location.count() == 10
+        Location.findAllByWptServer(wptServer1).size() == 5
+        Location.findAllByWptServer(wptServer2).size() == 5
     }
 
-    /**
-     * Tests the update of {@link Location}s identifier while listening to incoming locationResponeses.
-     */
-    @Test
-    void testUpdateOfLocationIdentifier() {
-
-        //mocking of inner services
-
-        mockBrowserService()
-
-        //create test-specific data
-
-        Integer locationCount = Location.findAll().size()
+    void "new locations is created for new browser in location response"() {
+        setup:
         def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
+        WebPageTestServer wptServer = WebPageTestServer.build()
+        ["Chrome", "IE", "Firefox", "Canary"].each { name -> Browser.build(name: name) }
 
+        when: "the service listens for new locations"
+        service.listenToLocations(result, wptServer)
 
-        new Location(
-                active: true,
-                location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
-                label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
-                browser: undefinedBrowser,//z.B. Firefox
-                wptServer: server1,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true);
+        then: "all locations are added"
+        Location.count() == 5
 
-        //test execution and assertions
-
-        serviceUnderTest.listenToLocations(result, server1)
-        assertTrue(Location.findAll().size() > locationCount)
-
-        locationCount = Location.findAll().size()
-        serviceUnderTest.listenToLocations(result, server1)
-        assertEquals(locationCount, Location.findAll().size())
-
-        serviceUnderTest.listenToLocations(result, server2)
-        assertTrue(Location.findAll().size() > locationCount)
-    }
-
-    /**
-     * Tests the persisting of {@link Location}s while listening to incoming {@link EventResult}s.
-     * Should create a new Location with the right Browser
-     */
-    @Test
-    void testUpdatingOfLocationsBrowser() {
-
-        //mocking of inner services
-
-        mockBrowserService()
-
-        //create test-specific data
-
-        Integer locationCount = Location.findAll().size()
-        assertEquals(0, locationCount);
-
-        def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
-        GPathResult result = new XmlSlurper().parse(file)
-
-        Integer newLocationCount = result.data.location.size();
-        //test execution and assertions
-
-
-        serviceUnderTest.listenToLocations(result, server1)
-        assertEquals(newLocationCount, Location.findAll().size());
-
-        //Modifing Result
+        when: "the services listens to a new result with a different browser"
         result.data.location.each { xmlResult ->
-
             if (xmlResult.Browser == "Chrome") {
-                xmlResult.Browser = Browser.UNDEFINED;
+                xmlResult.Browser = "Canary"
             }
-
         }
+        service.listenToLocations(result, wptServer)
 
-        serviceUnderTest.listenToLocations(result, server1)
-        assertEquals(newLocationCount + 1, Location.findAll().size());
-
-        assertEquals(1, Location.findAllByBrowser(Browser.findByName(Browser.UNDEFINED)).size())
-
+        then: "a new browser and location are created"
+        Location.count() == 6
+        Location.findAllByBrowser(Browser.findByName("Canary")).size() == 1
     }
 
-    @Test
-    void testDeactivateLocations() {
-        // create a active location and one to deactivate
-        Browser browser1 = Browser.list()[0]
-        Browser browser2 = Browser.list()[1]
+    void "existing location gets deactivated if not existing in location response"() {
+        setup:
+        def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
+        GPathResult result = new XmlSlurper().parse(file)
+        WebPageTestServer wptServer = WebPageTestServer.build(active: true)
+        Location.build(uniqueIdentifierForServer: "sampleLocation", wptServer: wptServer, active: true)
 
-        TestDataUtil.createLocation(server1, "location:${browser1.name}", browser1, true)
-        TestDataUtil.createLocation(server1, "location:${browser2.name}", browser2, true)
+        when: "the service listens for new locations"
+        service.listenToLocations(result, wptServer)
 
-        assertEquals(2, Location.count())
-        assertEquals([true, true], Location.list()*.active)
-
-        List<String> identifiers = ["location:${browser1.name}"]
-
-        // test execution
-        serviceUnderTest.deactivateLocations(server1, identifiers)
-
-        assertEquals(true, Location.findByBrowser(browser1).active)
-        assertEquals(false, Location.findByBrowser(browser2).active)
+        then: "all locations are added, with the existing one being deactivated"
+        Location.count() == 6
+        !Location.findByUniqueIdentifierForServer("sampleLocation").active
     }
 
-    // mocks ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void "deactivation of not matching locations for WPT server"() {
+        given: "three active locations"
+        WebPageTestServer wptServer = WebPageTestServer.build(active: true)
+        Location.build(uniqueIdentifierForServer: "location1", active: true, wptServer: wptServer)
+        Location.build(uniqueIdentifierForServer: "location2", active: true, wptServer: wptServer)
+        Location.build(uniqueIdentifierForServer: "location3", active: true, wptServer: wptServer)
 
-    private void mockBrowserService() {
-        def browserService = new MockFor(BrowserService, true)
-        browserService.demand.findAllByNameOrAlias(0..100) { List<String> browserNameOrAlias ->
-            //not the concern of this test
-            def result = []
-            browserNameOrAlias.each { nameOrAlias ->
-                if (nameOrAlias.startsWith("IE"))
-                    result << Browser.findByName('IE');
-                else if (nameOrAlias.startsWith("FF") || nameOrAlias.startsWith("Firefox"))
-                    result << Browser.findByName('FF');
-                else if (nameOrAlias.startsWith("Chrome"))
-                    result << Browser.findByName('Chrome');
-                else {
-                    result << Browser.findByName(Browser.UNDEFINED);
-                }
-            }
-            return result
-        }
-        serviceUnderTest.browserService = browserService.proxyInstance()
+        when: "the service should deactivate all locations but the passed ones"
+        service.deactivateNotMatchingLocations(wptServer, ["location1", "location3"])
+
+        then: "the two locations are still active, but the other was deactivated"
+        Location.count() == 3
+        Location.findByUniqueIdentifierForServer("location1").active
+        !Location.findByUniqueIdentifierForServer("location2").active
+        Location.findByUniqueIdentifierForServer("location3").active
     }
 
-    // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private createBrowsers() {
-        String browserName = Browser.UNDEFINED
-        undefinedBrowser = new Browser(name: browserName)
-                .addToBrowserAliases(alias: Browser.UNDEFINED)
-                .save(failOnError: true)
-
-        browserName = "IE"
-        new Browser(name: browserName)
-                .addToBrowserAliases(alias: "IE")
-                .addToBrowserAliases(alias: "IE8")
-                .addToBrowserAliases(alias: "Internet Explorer")
-                .addToBrowserAliases(alias: "Internet Explorer 8")
-                .save(failOnError: true)
-        browserName = "FF"
-        new Browser(name: browserName)
-                .addToBrowserAliases(alias: "FF")
-                .addToBrowserAliases(alias: "FF7")
-                .addToBrowserAliases(alias: "Firefox")
-                .addToBrowserAliases(alias: "Firefox7")
-                .save(failOnError: true)
-
-        browserName = "Chrome"
-        new Browser(name: browserName)
-                .addToBrowserAliases(alias: "Chrome")
-                .save(failOnError: true)
-    }
-
-    private static createPages() {
-        ['HP', 'MES', Page.UNDEFINED].each { pageName ->
-            Double weight = 0
-            switch (pageName) {
-                case 'HP': weight = 6; break
-                case 'MES': weight = 9; break
-                case 'SE': weight = 36; break
-                case 'ADS': weight = 43; break
-                case 'WKBS': weight = 3; break
-                case 'WK': weight = 3; break
-            }
-            new Page(name: pageName).save(failOnError: true)
-        }
-    }
 }

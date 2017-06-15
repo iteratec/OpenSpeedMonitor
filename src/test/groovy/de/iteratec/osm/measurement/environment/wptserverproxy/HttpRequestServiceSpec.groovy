@@ -17,42 +17,38 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-import static org.junit.Assert.*
-import static org.hamcrest.Matchers.*
-
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import org.junit.*
-
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestFor(HttpRequestService)
-@TestMixin(GrailsUnitTestMixin)
 class HttpRequestServiceSpec extends Specification{
 
     void "add trailing slash if missing"(String url, String expectedResult) {
-        when:
+        when: "the services should remove the trailing slash"
         String trailingSlashAdded = service.addTrailingSlashIfMissing(url)
 
-        then:
-        assertThat(trailingSlashAdded, is(expectedResult))
+        then: "it is actually removed, if it existed"
+        trailingSlashAdded == expectedResult
 
         where:
-        url << ['http://my-url.com', 'http://my-url.com/details', 'http://my-url.com/']
-        expectedResult << ['http://my-url.com/', 'http://my-url.com/details/', 'http://my-url.com/']
+        url                         | expectedResult
+        'http://my-url.com'         | 'http://my-url.com/'
+        'http://my-url.com/details' | 'http://my-url.com/details/'
+        'http://my-url.com/'        | 'http://my-url.com/'
     }
+
     void "remove leading slash if existing"(String urlPart, String expectedResult){
-        when:
+        when: "the services should remove the leading slash"
         String leadingSlashRemoved = service.removeLeadingSlashIfExisting(urlPart)
 
-        then:
-        assertThat(leadingSlashRemoved, is(expectedResult))
+        then: "it is actually removed, if it existed"
+        leadingSlashRemoved == expectedResult
 
         where:
-        urlPart << ['/my-url-part/', 'my-url-part/', '/my-url-part/with/more/than/one/parts', 'my-url-part/with/more/than/one/parts']
-        expectedResult << ['my-url-part/', 'my-url-part/', 'my-url-part/with/more/than/one/parts', 'my-url-part/with/more/than/one/parts']
+        urlPart                                 | expectedResult
+        '/my-url-part/'                         | 'my-url-part/'
+        'my-url-part/'                          | 'my-url-part/'
+        '/my-url-part/with/more/than/one/parts' | 'my-url-part/with/more/than/one/parts'
+        'my-url-part/with/more/than/one/parts'  | 'my-url-part/with/more/than/one/parts'
     }
 }

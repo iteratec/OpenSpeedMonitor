@@ -19,9 +19,9 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -34,7 +34,7 @@ class PageCsiAggregationService {
     PerformanceLoggingService performanceLoggingService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
-    WeightingService weightingService
+    CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
     /**
@@ -227,8 +227,8 @@ class PageCsiAggregationService {
             List<WeightedCsiValue> weightedCsiValuesByVisuallyComplete = []
             if (hourlyCsiAggregationsForCsiAggregationToCalculate.size() > 0) {
                 CsiConfiguration csiConfiguration = targetCsiGroup.csiConfiguration
-                weightedCsiValuesByDocComplete = weightingService.getWeightedCsiValues(hourlyCsiAggregationsForCsiAggregationToCalculate, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
-                weightedCsiValuesByVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(hourlyCsiAggregationsForCsiAggregationToCalculate, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
+                weightedCsiValuesByDocComplete = csiValueService.getWeightedCsiValues(hourlyCsiAggregationsForCsiAggregationToCalculate, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
+                weightedCsiValuesByVisuallyComplete = csiValueService.getWeightedCsiValuesByVisuallyComplete(hourlyCsiAggregationsForCsiAggregationToCalculate, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
                 log.debug("weightedCsiValuesByDocComplete.size()=${weightedCsiValuesByDocComplete.size()}")
                 log.debug("weightedCsiValuesByVisuallyComplete.size()=${weightedCsiValuesByVisuallyComplete.size()}")
             }

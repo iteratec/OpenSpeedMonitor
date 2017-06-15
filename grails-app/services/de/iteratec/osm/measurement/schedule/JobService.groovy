@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.util.ParameterBindingUtility
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.time.TimeCategory
@@ -148,18 +149,10 @@ class JobService {
     Map<String, Object> createTimeSeriesParamsFor(Job job) {
         Map<String, Object> params = createCommonParams(job)
         params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
-        params["_overwriteWarningAboutLongProcessingTime"] = ""
-        params["&overwriteWarningAboutLongProcessingTime"] = "on"
         params["_action_showAll"] = "Anzeigen"
-        params["_selectedAllMeasuredEvents"] = ""
-        params["selectedAllMeasuredEvents"] = "on"
         params["selectedBrowsers"] = "$job.location.browserId"
-        params["_selectedAllBrowsers"] = ""
         params["selectedLocations"] = "$job.location.id"
-        params["_selectedAllLocations"] = ""
         params["selectedConnectivities"] = "${job.noTrafficShapingAtAll?'native':job.connectivityProfileId?:job.customConnectivityName}"
-        params["_selectedAllConnectivityProfiles"] = ""
-        params["_includeNativeConnectivity"] = ""
         params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
         return params
     }
@@ -179,16 +172,9 @@ class JobService {
         Map params = [:]
         params["selectedInterval"] = "-1"
         params["selectedTimeFrameInterval"] = "0"
-        Date fromDate = job.lastRun - 7
-        params["from"] = fromDate.format('dd.MM.yyyy')
-        params["fromHour"] = fromDate.format('HH:mm')
-        Date toDate
-        use(TimeCategory) {
-            toDate = job.lastRun + 1.minute
-            // We add one minute because our time selection doesn't count seconds, so otherwise we could miss the last run
-        }
-        params["to"] = toDate.format('dd.MM.yyyy')
-        params["toHour"] = toDate.format('HH:mm')
+        DateTime lastRun = new DateTime(job.lastRun)
+        params["from"] = ParameterBindingUtility.formatDateTimeParameter(lastRun.minusDays(7))
+        params["to"] = ParameterBindingUtility.formatDateTimeParameter(lastRun.plusMinutes(1))
         params["selectedFolder"] = "$job.jobGroupId"
         return params
     }

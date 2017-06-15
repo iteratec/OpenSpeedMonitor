@@ -1,5 +1,6 @@
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -7,8 +8,16 @@ import de.iteratec.osm.result.MeasuredEvent
 
 testDataConfig {
     sampleData {
+        'de.iteratec.osm.measurement.schedule.ConnectivityProfile' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
         'de.iteratec.osm.measurement.schedule.Job' {
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
+            connectivityProfile = { -> ConnectivityProfile.build() }
+            script = { -> Script.build() }
+        }
+        'de.iteratec.osm.result.EventResult' {
             connectivityProfile = { -> ConnectivityProfile.build() }
         }
         'de.iteratec.osm.csi.CsiConfiguration' {
@@ -26,15 +35,36 @@ testDataConfig {
             page = {-> Page.build()}
             browser = {-> Browser.build()}
             location = {->Location.build()}
-
+        }
+        'de.iteratec.osm.measurement.environment.Browser' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.csi.Page' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.csi.Page' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
         }
     }
-    unitAdditionalBuild = ['de.iteratec.osm.measurement.schedule.Job': [de.iteratec.osm.measurement.schedule.ConnectivityProfile],
-                            'de.iteratec.osm.report.chart.CsiAggregation': [de.iteratec.osm.measurement.schedule.JobGroup,
-                                                                            de.iteratec.osm.result.MeasuredEvent,
-                                                                            de.iteratec.osm.csi.Page,
-                                                                            de.iteratec.osm.measurement.environment.Browser,
-                                                                            de.iteratec.osm.measurement.environment.Location]]
+    unitAdditionalBuild = [
+            'de.iteratec.osm.measurement.schedule.Job' : [
+                    de.iteratec.osm.measurement.schedule.ConnectivityProfile,
+                    de.iteratec.osm.measurement.script.Script
+            ],
+            'de.iteratec.osm.result.EventResult' : [
+                    de.iteratec.osm.measurement.schedule.ConnectivityProfile
+            ],
+            'de.iteratec.osm.report.chart.CsiAggregation': [
+                    de.iteratec.osm.measurement.schedule.JobGroup,
+                    de.iteratec.osm.result.MeasuredEvent,
+                    de.iteratec.osm.csi.Page,
+                    de.iteratec.osm.measurement.environment.Browser,
+                    de.iteratec.osm.measurement.environment.Location
+            ]
+    ]
 }
 environments {
     production {

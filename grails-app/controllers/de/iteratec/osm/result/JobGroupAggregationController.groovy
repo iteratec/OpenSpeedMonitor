@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
@@ -27,6 +28,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     MeasurandUtilService measurandUtilService
+    OsmConfigCacheService osmConfigCacheService
 
     def index() {
         redirect(action: 'show')
@@ -74,6 +76,11 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         List allEventResults = EventResult.createCriteria().list {
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                    'docCompleteTimeInMillisecs',
+                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+            )
             projections {
                 groupProperty('jobGroup')
                 allMeasurands.each { m ->

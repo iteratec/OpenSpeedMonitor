@@ -22,28 +22,25 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
 @TestMixin(GrailsUnitTestMixin)
 class ScheduleChartDataSpec extends Specification{
 
     def "initialisation test" () {
-        when:
+        when: "ScheduleChartData is created"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
 
-        then:
-        !scheduleChartData.name.isEmpty()
-        !scheduleChartData.discountedJobsLabel.isEmpty()
+        then: "the ScheduleChartData has been initialised correctly"
+        scheduleChartData.name == ScheduleChartData.DEFAULT_NAME
+        scheduleChartData.discountedJobsLabel == ScheduleChartData.DEFAULT_DISCOUNTED_JOBS_LABEL
         scheduleChartData.jobs.size() == 0
         scheduleChartData.discountedJobs.size() == 0
-        scheduleChartData.agentCount == 0;
-        scheduleChartData.allExecutionDates.size() == 0;
+        scheduleChartData.agentCount == 0
+        scheduleChartData.allExecutionDates.size() == 0
         scheduleChartData.allEndDates.size() == 0
     }
 
     def "addJob adds schedule chart job to list" () {
-        given:
+        given: "some jobs with dates"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
         List executionDates = new ArrayList<>()
         DateTime date1 = new DateTime()
@@ -56,11 +53,11 @@ class ScheduleChartDataSpec extends Specification{
         ScheduleChartJob job = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 60)
         ScheduleChartJob job2 = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 120)
 
-        when:
+        when: "the jobs are added to ScheduleChartData"
         scheduleChartData.addJob(job)
         scheduleChartData.addJob(job2)
 
-        then:
+        then: "the ScheduleChartData contains the correct jobs and dates"
         scheduleChartData.jobs.size() == 2
         scheduleChartData.jobs[0] == job
         scheduleChartData.allExecutionDates.size() == job.executionDates.size() + job2.executionDates.size()
@@ -75,14 +72,14 @@ class ScheduleChartDataSpec extends Specification{
     }
 
     def "addDiscountedJob adds job to list" () {
-        given:
+        given: "a job"
         ScheduleChartData scheduleChartData = new ScheduleChartData()
         String job = "Job"
 
-        when:
+        when: "the job is added as DiscountedJob"
         scheduleChartData.addDiscountedJob(job)
 
-        then:
+        then: "ScheduleChartData contains the job"
         scheduleChartData.discountedJobs.size() == 1
         scheduleChartData.discountedJobs[0] == job
     }

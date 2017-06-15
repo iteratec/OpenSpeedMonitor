@@ -35,8 +35,6 @@ import org.joda.time.Interval
  * in this class will cause a NullPointerException to be thrown. 
  * </p>
  *
- * @TODO TODO mze-2013-07-12: Name possibly not matching. This service seems to
- *       handle intervals calculations and not measured values explicitly!?
  */
 class CsiAggregationUtilService {
 

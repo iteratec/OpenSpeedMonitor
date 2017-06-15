@@ -17,41 +17,41 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.OsmConfigCacheService
-import grails.test.mixin.*
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.OsmConfiguration
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
-/**
- * Test-suite of {@link OsmConfigCacheService}.
- */
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 @TestFor(OsmConfigCacheService)
+@Build([OsmConfiguration])
 @Mock([OsmConfiguration])
-class OsmConfigCacheServiceTests {
-
-    static transactional = false
-    OsmConfigCacheService serviceUnderTest
+class OsmConfigCacheServiceTests extends Specification {
 
     def doWithSpring = {
         configService(ConfigService)
     }
 
-    @Before
-    void setUp() {
-        serviceUnderTest = service
-        serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
-
-        // creating configuration with default values
-        new OsmConfiguration().save(failOnError: true)
+    void setup() {
+        OsmConfiguration.build()
     }
 
-    @Test
-    void testAccessingCachedConfigs() {
-        Assert.assertEquals(250, serviceUnderTest.getCachedMinDocCompleteTimeInMillisecs(24))
-        Assert.assertEquals(180000, serviceUnderTest.getCachedMaxDocCompleteTimeInMillisecs(24))
+    void "test accessing cached configs min doc complete time"() {
+        when: "getting cached min doc complete time"
+            Integer time = service.getCachedMinDocCompleteTimeInMillisecs(24)
+        then: "the result should be 10ms"
+            time == DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+    }
+
+    void "test accessing cached configs max doc complete time"() {
+        when: "getting cached max doc complete time"
+            Integer time = service.getCachedMaxDocCompleteTimeInMillisecs(24)
+        then: "the result should be 3m"
+            time == DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
     }
 }

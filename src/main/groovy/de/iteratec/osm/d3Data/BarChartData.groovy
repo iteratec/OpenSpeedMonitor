@@ -5,14 +5,16 @@ package de.iteratec.osm.d3Data
  * A bar chart consists of a specified amount of ChartEntries containing a name and a weight
  */
 class BarChartData {
+    public static final String DEFAULT_X_LABEL = "x-Axis"
+    public static final String DEFAULT_Y_LABEL = "y-Axis"
     List<ChartEntry> bars
     String xLabel
     String yLabel
 
     def BarChartData(){
         bars = new ArrayList<>()
-        xLabel = "x-Axis"
-        yLabel = "y-Axis"
+        xLabel = DEFAULT_X_LABEL
+        yLabel = DEFAULT_Y_LABEL
     }
 
     def addDatum(ChartEntry c){

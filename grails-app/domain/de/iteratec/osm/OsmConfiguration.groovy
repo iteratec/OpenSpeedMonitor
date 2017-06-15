@@ -26,7 +26,7 @@ class OsmConfiguration {
 
     static final Integer DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS = 2
     static final Integer DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES = 60
-    static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
+    static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 10
     static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
@@ -48,9 +48,15 @@ class OsmConfiguration {
     Integer detailDataStorageTimeInWeeks = DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS
     /** Maximum time in minutes osm polls result of a job run. If no result with status >= 200 returned within this time run is marked as failed */
     Integer defaultMaxDownloadTimeInMinutes = DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
-    /** {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation} */
+    /**
+     * {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation}.
+     * Also they are ignore in several Dashboards because they represent meausrement faults.
+     */
     Integer minDocCompleteTimeInMillisecs = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-    /** {@link EventResult}s with a loadTimeInMillisecs greater than this won't be factored in csi-{@link CsiAggregation} */
+    /**
+     * {@link EventResult}s with a loadTimeInMillisecs greater than this won't be factored in csi-{@link CsiAggregation}
+     * Also they are ignore in several Dashboards because they represent meausrement faults.
+     */
     Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS

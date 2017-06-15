@@ -1,12 +1,13 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
+import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -34,6 +35,8 @@ class PageAggregationController extends ExceptionHandlerController {
     PageService pageService
     MeasurandUtilService measurandUtilService
     FilteringAndSortingDataService filteringAndSortingDataService
+    OsmConfigCacheService osmConfigCacheService
+
 
     def index() {
         redirect(action: 'show')
@@ -92,6 +95,11 @@ class PageAggregationController extends ExceptionHandlerController {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                'docCompleteTimeInMillisecs',
+                osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+            )
             projections {
                 groupProperty('page')
                 groupProperty('jobGroup')
@@ -142,18 +150,20 @@ class PageAggregationController extends ExceptionHandlerController {
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    barchartSeries.data.add(
-                        new BarchartDatum(
-                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
-                            originalMeasurandName: currentMeasurand,
-                            value: measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand),
-                            valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
-                            grouping: key
+                    def value = measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
+                    if (value) {
+                        barchartSeries.data.add(
+                                new BarchartDatum(
+                                        measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
+                                        originalMeasurandName: currentMeasurand,
+                                        value: value,
+                                        valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                                        grouping: key
+                                )
                         )
-                    )
+                    }
                 }
             }
-
             barchartDTO.series.add(barchartSeries)
         }
 
@@ -161,7 +171,20 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
-        ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+        boolean hasData = false;
+        barchartDTO.series.each {series ->
+            series.data.each {datum ->
+                if (datum.value) {
+                    hasData = true;
+                }
+            }
+        }
+        if (!hasData) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "no data")
+        }
+        else {
+            ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+        }
     }
 
     @RestAction

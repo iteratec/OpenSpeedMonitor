@@ -26,19 +26,16 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -72,10 +69,7 @@ class RestApiController {
     public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 
     JobGroupDaoService jobGroupDaoService;
-    PageDaoService pageDaoService;
-    MeasuredEventDaoService measuredEventDaoService;
-    BrowserDaoService browserDaoService;
-    LocationDaoService locationDaoService;
+    BrowserService browserService
     CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
     LinkGenerator grailsLinkGenerator
@@ -171,8 +165,7 @@ class RestApiController {
      * @see MeasuredEvent
      */
     public Map<String, Object> allSteps() {
-        Set<MeasuredEvent> events = measuredEventDaoService.findAll();
-        Set<MeasuredEventDto> eventsAsJson = MeasuredEventDto.create(events)
+        Set<MeasuredEventDto> eventsAsJson = MeasuredEventDto.create(MeasuredEvent.list())
         return sendObjectAsJSON(eventsAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -185,7 +178,7 @@ class RestApiController {
      * @see Browser
      */
     public Map<String, Object> allBrowsers() {
-        Set<Browser> browsers = browserDaoService.findAll();
+        Set<Browser> browsers = browserService.findAll()
         Set<BrowserDto> browsersAsJson = BrowserDto.create(browsers)
         return sendObjectAsJSON(browsersAsJson, params.pretty && params.pretty == 'true');
     }
@@ -199,7 +192,7 @@ class RestApiController {
      * @see Page
      */
     public Map<String, Object> allPages() {
-        Set<Page> pages = pageDaoService.findAll();
+        Set<Page> pages = Page.list()
         Set<PageDto> pagesAsJson = PageDto.create(pages)
         return sendObjectAsJSON(pagesAsJson, params.pretty && params.pretty == 'true');
     }
@@ -213,7 +206,7 @@ class RestApiController {
      * @see Location
      */
     public Map<String, Object> allLocations() {
-        Collection<Location> locations = locationDaoService.findAll()
+        Collection<Location> locations = Location.list()
         if(params.showInactive != 'true') {
             locations = locations.findAll {
                 it.active && it.wptServer.active
@@ -303,7 +296,7 @@ class RestApiController {
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+            queryParams = cmd.createMvQueryParams(browserService);
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some of the requests arguments caused an error: ' + nre.getMessage())
             return
@@ -372,7 +365,7 @@ class RestApiController {
         MvQueryParams queryParams = null;
         try {
             performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "construct query params", 1){
-                queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
+                queryParams = cmd.createMvQueryParams(browserService)
             }
         } catch (NoResultException nre) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguements could not be found: ' + nre.getMessage())
@@ -999,8 +992,7 @@ public class ResultsRequestCommand {
      *         event, location) could not be found.
      */
     public MvQueryParams createMvQueryParams(
-            MeasuredEventDaoService measuredEventDaoService,
-            BrowserDaoService browserDaoService
+            BrowserService browserService
     ) throws IllegalStateException, NoResultException {
 
         if (!this.validate()) {
@@ -1014,9 +1006,9 @@ public class ResultsRequestCommand {
 
         addPageQueryData(result)
 
-        addStepQueryData(measuredEventDaoService, result)
+        addStepQueryData(result)
 
-        addBrowserQueryData(browserDaoService, result)
+        addBrowserQueryData(browserService, result)
 
         addLocationQueryData(result)
 
@@ -1055,7 +1047,7 @@ public class ResultsRequestCommand {
 
     }
 
-    private addStepQueryData(MeasuredEventDaoService measuredEventDaoService, MvQueryParams result){
+    private addStepQueryData(MvQueryParams result){
         if (stepId) {
             stepId.tokenize(",").each { singleStepId ->
                 if (!singleStepId.isLong()){
@@ -1069,7 +1061,7 @@ public class ResultsRequestCommand {
             }
         }else if (step) {
             step.tokenize(",").each { singleStepName ->
-                MeasuredEvent theStep = measuredEventDaoService.tryToFindByName(singleStepName);
+                MeasuredEvent theStep = MeasuredEvent.findByName(singleStepName)
                 if (theStep == null) {
                     throw new NoResultException("Can not find step named: " + singleStepName);
                 }
@@ -1078,7 +1070,7 @@ public class ResultsRequestCommand {
         }
     }
 
-    private addBrowserQueryData(BrowserDaoService browserDaoService, MvQueryParams result){
+    private addBrowserQueryData(BrowserService browserService, MvQueryParams result){
         if (browserId) {
             browserId.tokenize(",").each { singlebrowserId ->
                 if (!singlebrowserId.isLong()){
@@ -1091,7 +1083,7 @@ public class ResultsRequestCommand {
                 result.browserIds.add(theBrowser.getId());
             }
         }else if (browser) {
-            Browser theBrowser = browserDaoService.tryToFindByNameOrAlias(browser);
+            Browser theBrowser = browserService.findByNameOrAlias(browser);
             if (theBrowser == null) {
                 throw new NoResultException("Can not find browser named: " + browser);
             }

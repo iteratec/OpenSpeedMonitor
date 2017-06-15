@@ -39,19 +39,20 @@ class CsiAggregationUpdateService {
 	CsiSystemCsiAggregationService csiSystemCsiAggregationService
 	CsiAggregationUtilService csiAggregationUtilService
 
-    /**
-     *
-     * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResultId.
-     * Marks weekly {@link CsiAggregation}s which depend from param newResult as CsiAggregation.Calculated.Not.
-     *
-     * @param eventResultId
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void createOrUpdateDependentMvs(long eventResultId) {
-        EventResult erToUpdateCsiAggregationsFor = EventResult.get(eventResultId)
-        if (erToUpdateCsiAggregationsFor) createOrUpdateDependentMvs(erToUpdateCsiAggregationsFor)
-    }
-	
+	/**
+	 *
+	 * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResultId.
+	 * Marks weekly {@link CsiAggregation}s which depend from param newResult as CsiAggregation.Calculated.Not.
+	 *
+	 * @param eventResultId
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	void createOrUpdateDependentMvs(long eventResultId) {
+		EventResult erToUpdateCsiAggregationsFor = EventResult.get(eventResultId)
+		if (erToUpdateCsiAggregationsFor) createOrUpdateDependentMvs(erToUpdateCsiAggregationsFor)
+	}
+
+
 	/**
 	 * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResult.
 	 * Marks weekly {@link CsiAggregation}s which depend from param newResult as CsiAggregation.Calculated.Not.

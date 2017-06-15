@@ -18,455 +18,172 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.ConfigService
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import grails.buildtestdata.mixin.Build
+import spock.lang.Specification
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import de.iteratec.osm.OsmConfigCacheService
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.ServiceMocker
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.junit.Test
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNull
 
-/**
- * Tests the updating of hourly event-{@link CsiAggregation}s when a new {@link EventResult} is coming in.
- */
-@TestMixin(GrailsUnitTestMixin)
 @TestFor(EventCsiAggregationService)
-@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, CsiAggregationInterval,
-        AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, CsiAggregationUpdateEvent,
-        ConnectivityProfile, CsiConfiguration])
-class UpdateEventResultDependentCsiAggregationsTests {
+@Mock([EventResult, AggregatorType, CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult, CsiAggregation])
+@Build([EventResult, AggregatorType, CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult])
+class UpdateEventResultDependentCsiAggregationsTests extends Specification {
 
-    static final double DELTA = 1e-15
-    static final DateTime resultsExecutionTime = new DateTime(2012, 1, 1, 0, 0, 0, DateTimeZone.UTC)
-    static final String measuredEventName = 'HP:::BV1 - Step 01'
-    static final String pageNameHp = 'HP'
-    static final String browserName = 'IE'
-    static final String locationLocation = 'myLocation'
-    static final String serverLabel = 'server 1 - wpt server'
-    static final String labelJobOfCsiGroup1 = 'HP-Job of csiGroup1'
-    static final String labelJobOfCsiGroup2 = 'HP-Job of csiGroup2'
-    static final String testIdOfJobRunCsiGroup1 = 'testId1'
-    static final String testIdOfJobRunCsiGroup2 = 'testId2'
-    static final String group1Name = 'group1'
-    static final String group2Name = 'group2'
+    static final DateTime eventResultDateTime = new DateTime(DateTimeZone.UTC)
 
-    CsiAggregationInterval hourly
-    AggregatorType measuredEvent
-    ConnectivityProfile connectivityProfile
-
-    EventCsiAggregationService serviceUnderTest
-    ServiceMocker mockGenerator
+    CsiAggregationInterval hourlyCsiAggregationInterval
 
     def doWithSpring = {
         performanceLoggingService(PerformanceLoggingService)
         csiValueService(CsiValueService)
-        configService(ConfigService)
-        connectivityProfileService(ConnectivityProfileService)
-        osmConfigCacheService(OsmConfigCacheService)
     }
 
-    void setUp() {
-        Job.metaClass.static.performQuartzScheduling << { Boolean active ->
+    def setup() {
+        AggregatorType.build(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND)
+        hourlyCsiAggregationInterval = CsiAggregationInterval.build(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY)
 
+        mockNonRelevantServices()
+    }
+
+    def "calculate CSI aggregations of the first event result"() {
+        given: "an event result with given customer satisfactions (based on doc and visually complete)"
+        EventResult eventResult = createEventResults(1).first()
+        eventResult.csByWptDocCompleteInPercent = 50
+        eventResult.csByWptVisuallyCompleteInPercent = 40
+
+        when: "the hourly csi aggregation gets calculated"
+        service.createOrUpdateHourlyValue(eventResultDateTime, eventResult)
+
+        then: "it is equal to the given customer satisfactions of the event result"
+        List<CsiAggregation> listOfCsiAggregations = service.findAll(eventResultDateTime.toDate(), eventResultDateTime.toDate(), hourlyCsiAggregationInterval)
+        listOfCsiAggregations.size() == 1
+        listOfCsiAggregations.first().csByWptDocCompleteInPercent == 50
+        listOfCsiAggregations.first().csByWptVisuallyCompleteInPercent == 40
+    }
+
+    def "calculate new CSI aggregation with new incoming event results"() {
+        given: "two event results where the first is the base for the given csi"
+        List<EventResult> eventResults = createEventResults(2)
+
+        EventResult eventResult = eventResults[0]
+        eventResult.csByWptDocCompleteInPercent = firstDocCompleteInPercent
+        eventResult.csByWptVisuallyCompleteInPercent = firstVisuallyCompleteInPercent
+
+        service.createOrUpdateHourlyValue(eventResultDateTime, eventResult)
+
+
+        when: "the second event result goes into the calculation of the csi aggregation"
+        EventResult newEventResult = eventResults[1]
+        newEventResult.csByWptDocCompleteInPercent = secondDocCompleteInPercent
+        newEventResult.csByWptVisuallyCompleteInPercent = secondVisuallyCompleteInPercent
+
+        service.createOrUpdateHourlyValue(eventResultDateTime, newEventResult)
+
+        then: "the mean of both customer satisfactions is the new csi aggregation"
+        List<CsiAggregation> listOfCsiAggregations = service.findAll(eventResultDateTime.toDate(), eventResultDateTime.toDate(), hourlyCsiAggregationInterval)
+        listOfCsiAggregations.size() == 1
+        listOfCsiAggregations[0].csByWptDocCompleteInPercent == expectedDocCompleteInPercent
+        listOfCsiAggregations[0].csByWptVisuallyCompleteInPercent == expectedVisuallyCompleteInPercent
+
+        where: "some customer satisfactions are given"
+        firstDocCompleteInPercent   | firstVisuallyCompleteInPercent    | secondDocCompleteInPercent | secondVisuallyCompleteInPercent  | expectedDocCompleteInPercent  | expectedVisuallyCompleteInPercent
+        50                          | 40                                | 20                         | 10                               | (50 + 20) / 2                 | (40 + 10) / 2
+        50                          | 40                                | null                       | null                             | 50                            | 40
+        null                        | null                              | 20                         | 10                               | 20                            | 10
+
+    }
+
+    def "calculate csi aggregations for event results from different job groups"() {
+        given: "five event results from different job groups with customer satisfactions"
+        List<EventResult> eventResults = createEventResults(5)
+
+        JobResult jobResult_1 = JobResult.build()
+        JobResult jobResult_2 = JobResult.build()
+        JobGroup jobGroup_1 = JobGroup.build()
+        JobGroup jobGroup_2 = JobGroup.build()
+
+        List relevantAttributesForTest = [
+                [jobResult: jobResult_1, csByWptDocCompleteInPercent: 50, csByWptVisuallyCompleteInPercent: 40, jobGroup: jobGroup_1],
+                [jobResult: jobResult_1, csByWptDocCompleteInPercent: 60, csByWptVisuallyCompleteInPercent: 50, jobGroup: jobGroup_1],
+                [jobResult: jobResult_2, csByWptDocCompleteInPercent: 20, csByWptVisuallyCompleteInPercent: 10, jobGroup: jobGroup_2],
+                [jobResult: jobResult_2, csByWptDocCompleteInPercent: 30, csByWptVisuallyCompleteInPercent: 20, jobGroup: jobGroup_2],
+                [jobResult: jobResult_2, csByWptDocCompleteInPercent: 40, csByWptVisuallyCompleteInPercent: 30, jobGroup: jobGroup_2]
+        ]
+
+        relevantAttributesForTest.eachWithIndex { attributes, index ->
+            attributes.each { key, value ->
+                eventResults[index][key] = value
+            }
         }
 
-        serviceUnderTest = service
+        when: "the csi aggregation gets updated with each event result"
+        eventResults.each { eventResult ->
+            service.createOrUpdateHourlyValue(eventResultDateTime, eventResult)
+        }
 
-        //mocks common for all tests
-        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
-        mockGenerator = ServiceMocker.create()
-        mockGenerator.mockOsmConfigCacheService(serviceUnderTest)
-        mockGenerator.mockEventResultService(serviceUnderTest)
-        mockGenerator.mockCsiAggregationUpdateEventDaoService(serviceUnderTest)
-        serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
-        serviceUnderTest.csiValueService.osmConfigCacheService = grailsApplication.mainContext.getBean('osmConfigCacheService')
-        serviceUnderTest.csiValueService.osmConfigCacheService.configService = grailsApplication.mainContext.getBean('configService')
-        createTestDataForAllTests()
-        initializeFields()
+        then: "a csi aggregation gets calculated for each job group"
+        List<CsiAggregation> listOfCsiAggregations = service.findAll(eventResultDateTime.toDate(), eventResultDateTime.toDate(), hourlyCsiAggregationInterval)
+        listOfCsiAggregations.size() == 2
 
+        List<CsiAggregation> listOfCsiAggregationsForJobGroup_1 = listOfCsiAggregations.findAll {
+            it.jobGroupId == jobGroup_1.id
+        }
+        listOfCsiAggregationsForJobGroup_1.size() == 1
+        listOfCsiAggregationsForJobGroup_1[0].csByWptDocCompleteInPercent == (50 + 60) / 2
+        listOfCsiAggregationsForJobGroup_1[0].csByWptVisuallyCompleteInPercent == (40 + 50) / 2
+
+        List<CsiAggregation> listOfCsiAggregationsForJobGroup_2 = listOfCsiAggregations.findAll {
+            it.jobGroupId == jobGroup_2.id
+        }
+        listOfCsiAggregationsForJobGroup_2.size() == 1
+        listOfCsiAggregationsForJobGroup_2[0].csByWptDocCompleteInPercent == (20 + 30 + 40) / 3
+        listOfCsiAggregationsForJobGroup_2[0].csByWptVisuallyCompleteInPercent == (10 + 20 + 30) / 3
     }
 
-    void tearDown() {
-        deleteTestData()
-    }
-
-    //tests////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Tests the update of dependent hourly event-{@link CsiAggregation}s.
-     */
-    @Test
-    void testUpdateDependentCsiAggregations() {
-
-        //create test-specific data
-        JobResult run = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
-        EventResult result1 = createNewResult(run, 50, null, JobGroup.findByName(group1Name))
-        EventResult result2 = createNewResult(run, 60, 60, JobGroup.findByName(group1Name))
-        EventResult result3 = createNewResult(run, 70, 70, JobGroup.findByName(group1Name))
-        EventResult result4 = createNewResult(run, 80, 80, JobGroup.findByName(group1Name))
-        EventResult result5 = createNewResult(run, 90, 90, JobGroup.findByName(group1Name))
-
-        mockGenerator.mockOsmConfigCacheService(result1)
-        mockGenerator.mockOsmConfigCacheService(result2)
-        mockGenerator.mockOsmConfigCacheService(result3)
-        mockGenerator.mockOsmConfigCacheService(result4)
-        mockGenerator.mockOsmConfigCacheService(result5)
-
-        //execute test
-
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1)
-
-        //assertions (and following executions of tested method)
-
-        List<CsiAggregation> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly, result1.connectivityProfile)
-        Integer countEvents = 1
-        assertEquals(countEvents, hourlyMvs.size())
-
-        CsiAggregation calculated = hourlyMvs[0]
-        Double expectedCsByDocComplete = 50
-        proofHourlyCsiAggregation(calculated, true, 1, expectedCsByDocComplete, null)
-
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result2)
-        expectedCsByDocComplete = (50 + 60) / 2
-        proofHourlyCsiAggregation(calculated, true, 2, expectedCsByDocComplete, 60 / 2)
-
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result3)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result4)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result5)
-        expectedCsByDocComplete = (50 + 60 + 70 + 80 + 90) / 5
-        Double expectedCsByVisuallyComplete = (60 + 70 + 80 + 90) / 5
-        proofHourlyCsiAggregation(calculated, true, 5, expectedCsByDocComplete, expectedCsByVisuallyComplete)
-
-    }
-
-    /**
-     * Tests the update of dependent hourly event-{@link CsiAggregation}s for different CSI-{@link JobGroup}s.
-     */
-    @Test
-    void testUpdateDependentCsiAggregationsForMultipleCsiGroups() {
-        //create test-specific data
-
-        JobResult runOfJobOfCsiGroup1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
-        JobResult runOfJobOfCsiGroup2 = JobResult.findByTestId(testIdOfJobRunCsiGroup2)
-        JobGroup group1 = JobGroup.findByName(group1Name)
-        JobGroup group2 = JobGroup.findByName(group2Name)
-        Long jobGroup1Id = group1.ident()
-        Long jobGroup2Id = group2.ident()
-        EventResult result1OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 80, null, group1)
-        EventResult result2OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 90, 90, group1)
-        EventResult result1OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 10, 10, group2)
-        EventResult result2OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 20, 20, group2)
-        EventResult result3OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 30, 30, group2)
-
-        //execute test
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1OfCsiGroup1)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result2OfCsiGroup1)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1OfCsiGroup2)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result2OfCsiGroup2)
-        serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result3OfCsiGroup2)
-
-        //assertions
-
-        List<CsiAggregation> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly)
-        Integer countEvents = 2
-        assertEquals(countEvents, hourlyMvs.size())
-
-        List<CsiAggregation> hourlyMvsOfGroup1 = hourlyMvs.findAll { it.jobGroupId == jobGroup1Id }
-        assertEquals(1, hourlyMvsOfGroup1.size())
-        proofHourlyCsiAggregation(hourlyMvsOfGroup1[0], true, 2, 85, 45)
-
-        List<CsiAggregation> hourlyMvsOfGroup2 = hourlyMvs.findAll { it.jobGroupId == jobGroup2Id }
-        assertEquals(1, hourlyMvsOfGroup2.size())
-        proofHourlyCsiAggregation(hourlyMvsOfGroup2[0], true, 3, 20, 20)
-
-    }
-
-    /**
-     * Executes assertions to proof calculated {@link CsiAggregation}.
-     * @param hourlyCsiAggregation
-     * {@link CsiAggregation} to proof
-     * @param expectedCalculatedState
-     * 			Calculated-state of calculated {@link CsiAggregation} to expect.
-     * @param expectedResultCount
-     * 			Count of {@link EventResult}s of calculated {@link CsiAggregation} to expect.
-     * @param expectedByDocComplete
-     * 			Double-value of calculated {@link CsiAggregation} to expect.
-     */
-    private void proofHourlyCsiAggregation(
-            CsiAggregation hourlyCsiAggregation,
-            boolean expectedCalculatedState,
-            Integer expectedResultCount,
-            Double expectedByDocComplete,
-            Double expectedByVisuallyComplete
-    ) {
-
-        assertEquals(resultsExecutionTime.toDate(), hourlyCsiAggregation.started)
-        assertEquals(hourly.intervalInMinutes, hourlyCsiAggregation.interval.intervalInMinutes)
-        assertEquals(measuredEvent.name, hourlyCsiAggregation.aggregator.name)
-        assertEquals(expectedCalculatedState, hourlyCsiAggregation.isCalculated())
-        assertEquals(expectedResultCount, hourlyCsiAggregation.countUnderlyingEventResultsByWptDocComplete())
-        assertEquals(expectedByDocComplete, hourlyCsiAggregation.csByWptDocCompleteInPercent, DELTA)
-        if (expectedByVisuallyComplete != null) {
-            assertEquals(expectedByVisuallyComplete, hourlyCsiAggregation.csByWptVisuallyCompleteInPercent, DELTA)
-        } else {
-            assertNull(hourlyCsiAggregation.csByWptVisuallyCompleteInPercent)
+    def mockNonRelevantServices() {
+        service.csiAggregationUpdateEventDaoService = Mock(CsiAggregationUpdateEventDaoService)
+        service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
+            getMinDocCompleteTimeInMillisecs(_) >> 200
+            getCachedMaxDocCompleteTimeInMillisecs(_) >> 20000
         }
     }
 
-    /**
-     * Creates a new {@link EventResult} and persists it.
-     * @param jobResult
-     * @param csByDocComplete
-     * @return
-     */
-    private EventResult createNewResult(JobResult jobResult, Integer csByDocComplete, Integer csByVisuallyComplete, JobGroup jobGroup) {
-        MeasuredEvent event = MeasuredEvent.findByName(measuredEventName)
-        Browser browser = Browser.findByName(browserName)
-        EventResult returnValue = new EventResult(
-                numberOfWptRun: 1,
-                cachedView: CachedView.UNCACHED,
-                medianValue: true,
-                docCompleteBytesIn: 1,
-                docCompleteRequests: 1,
-                docCompleteTimeInMillisecs: 1000,
-                domTimeInMillisecs: 1,
-                firstByteInMillisecs: 1,
-                fullyLoadedBytesIn: 1,
-                fullyLoadedRequests: 1,
-                fullyLoadedTimeInMillisecs: 1,
-                loadTimeInMillisecs: 1,
-                startRenderInMillisecs: 1,
-                downloadAttempts: 1,
-                firstStatusUpdate: resultsExecutionTime.toDate(),
-                lastStatusUpdate: resultsExecutionTime.toDate(),
-                wptStatus: 0,
-                validationState: 'validationState',
-                csByWptDocCompleteInPercent: csByDocComplete,
-                csByWptVisuallyCompleteInPercent: csByVisuallyComplete,
-                jobResult: jobResult,
-                jobResultDate: jobResult.date,
-                jobResultJobConfigId: jobResult.job.ident(),
-                jobGroup: jobGroup,
-                measuredEvent: event,
-                page: event.testedPage,
-                browser: browser,
-                location: jobResult.job.location,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: connectivityProfile,
-                customConnectivityName: null,
-                noTrafficShapingAtAll: false).save(failOnError: true)
+    def createEventResults(amount) {
+        JobGroup jobGroup = JobGroup.build()
+        JobResult jobResult = JobResult.build()
+        Page page = Page.build()
+        MeasuredEvent measuredEvent = MeasuredEvent.build(testedPage: page)
+        Browser browser = Browser.build()
+        Location location = Location.build()
+        ConnectivityProfile connectivityProfile = ConnectivityProfile.build()
 
-        jobResult.save(failOnError: true)
-        mockGenerator.mockOsmConfigCacheService(returnValue)
+        List<EventResult> eventResults = []
 
-        return returnValue
-    }
+        amount.times {
+            eventResults.push(
+                    EventResult.build(
+                            docCompleteTimeInMillisecs: 2000,
+                            jobGroup: jobGroup,
+                            jobResult: jobResult,
+                            page: page,
+                            measuredEvent: measuredEvent,
+                            browser: browser,
+                            location: location,
+                            connectivityProfile: connectivityProfile
+                    )
+            )
+        }
 
-    //testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void createTestDataForAllTests() {
-        createConnectivityProfile()
-        createOsmConfiguration()
-        createCsiAggregationIntervals()
-        createAggregatorTypes()
-        createPages()
-        createBrowsers()
-        createServer()
-        createLocations()
-        createJobGroups()
-        createJobConfigRunAndResult()
-        createMeasuredEvents()
-    }
-
-    private void initializeFields() {
-        hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-        measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-    }
-
-    private void createConnectivityProfile() {
-        connectivityProfile = TestDataUtil.createConnectivityProfile("conn1")
-        connectivityProfile.connectivityProfileService = grailsApplication.mainContext.getBean('connectivityProfileService')
-    }
-
-    private void createOsmConfiguration() {
-        OsmConfiguration.findAll() ?: new OsmConfiguration(
-                detailDataStorageTimeInWeeks: 2,
-                defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000
-        ).save(failOnError: true)
-    }
-
-    private void createJobGroups() {
-        //create CsiConfiguration for JobGroups
-        List<Page> allPages = [new Page(name: 'HP'), new Page(name: 'ADS')]
-        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
-        csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(allPages)
-        //create JobGroups
-        JobGroup.findByName(group1Name) ?: new JobGroup(
-                name: group1Name,
-                csiConfiguration: csiConfiguration).save(failOnError: true)
-        JobGroup.findByName(group2Name) ?: new JobGroup(
-                name: group2Name,
-                csiConfiguration: csiConfiguration).save(failOnError: true)
-    }
-
-    private void createAggregatorTypes() {
-        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-    }
-
-    private void createCsiAggregationIntervals() {
-        new CsiAggregationInterval(
-                name: "hourly",
-                intervalInMinutes: CsiAggregationInterval.HOURLY
-        ).save(failOnError: true)
-    }
-
-    private void createPages() {
-        new Page(name: pageNameHp).save(failOnError: true)
-    }
-
-    private void createBrowsers() {
-        new Browser(name: browserName)
-                .addToBrowserAliases(alias: "IE")
-                .addToBrowserAliases(alias: "IE8")
-                .addToBrowserAliases(alias: "Internet Explorer")
-                .addToBrowserAliases(alias: "Internet Explorer 8")
-                .save(failOnError: true)
-    }
-
-    private void createServer() {
-        WebPageTestServer server1
-        server1 = new WebPageTestServer(
-                baseUrl: 'http://server1.wpt.server.de',
-                active: true,
-                label: serverLabel,
-                proxyIdentifier: 'server 1 - wpt server',
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true)
-    }
-
-    private void createLocations() {
-        WebPageTestServer server1 = WebPageTestServer.findByLabel(serverLabel)
-        Browser browser = Browser.findByName(browserName)
-        new Location(
-                active: true,
-                location: locationLocation,
-                label: 'physNetLabAgent01 - FF up to date',
-                browser: browser,
-                wptServer: server1,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true)
-    }
-
-    private void createJobConfigRunAndResult() {
-        //job
-        Job job1, job2
-        Page homepage = Page.findByName(pageNameHp)
-        Location agent = Location.findByLocation(locationLocation)
-        JobGroup csiGroup1 = JobGroup.findByName(group1Name)
-        JobGroup csiGroup2 = JobGroup.findByName(group2Name)
-        Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
-        job1 = new Job(
-                active: false,
-                label: labelJobOfCsiGroup1,
-                description: 'job1',
-                location: agent,
-                frequencyInMin: 5,
-                runs: 1,
-                jobGroup: csiGroup1,
-                script: script,
-                maxDownloadTimeInMinutes: 60,
-                customConnectivityProfile: false,
-                connectivityProfile: connectivityProfile,
-                noTrafficShapingAtAll: false
-        ).save(failOnError: true)
-
-        job2 = new Job(
-                active: false,
-                label: labelJobOfCsiGroup2,
-                description: 'job2',
-                location: agent,
-                frequencyInMin: 5,
-                runs: 1,
-                jobGroup: csiGroup2,
-                script: script,
-                maxDownloadTimeInMinutes: 60,
-                customConnectivityProfile: false,
-                connectivityProfile: connectivityProfile,
-                noTrafficShapingAtAll: false
-        ).save(failOnError: true)
-
-        //wptjobrun
-        new JobResult(
-                job: job1,
-                date: resultsExecutionTime.toDate(),
-                testId: testIdOfJobRunCsiGroup1,
-                description: '',
-                jobConfigLabel: job1.label,
-                jobConfigRuns: job1.runs,
-                frequencyInMin: 5,
-                locationLocation: locationLocation,
-                locationBrowser: browserName,
-                httpStatusCode: 200,
-                testedPage: homepage,
-                jobGroupName: group1Name
-        ).save(failOnError: true)
-        new JobResult(
-                job: job2,
-                date: resultsExecutionTime.toDate(),
-                testId: testIdOfJobRunCsiGroup2,
-                description: '',
-                jobConfigLabel: job2.label,
-                jobConfigRuns: job2.runs,
-                frequencyInMin: 5,
-                locationLocation: locationLocation,
-                locationBrowser: browserName,
-                httpStatusCode: 200,
-                testedPage: homepage,
-                jobGroupName: group2Name
-        ).save(failOnError: true)
-    }
-
-    private void createMeasuredEvents() {
-        Page homepage = Page.findByName(pageNameHp)
-        new MeasuredEvent(name: measuredEventName, testedPage: homepage).save(failOnError: true)
-    }
-    /**
-     * Deleting testdata.
-     */
-    private void deleteTestData() {
-        OsmConfiguration.list()*.delete(flush: true)
-        CsiAggregation.list()*.delete(flush: true)
-        CsiDay.list()*.delete(flush: true)
-        EventResult.list()*.delete(flush: true)
-        JobResult.list()*.delete(flush: true)
-        Job.list()*.delete(flush: true)
-        Location.list()*.delete(flush: true)
-        Browser.list()*.delete(flush: true)
-        WebPageTestServer.list()*.delete(flush: true)
-        Page.list()*.delete(flush: true)
-        JobGroup.list()*.delete(flush: true)
+        return eventResults
     }
 }

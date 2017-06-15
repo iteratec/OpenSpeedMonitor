@@ -19,86 +19,70 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.TimeSeriesShowCommandBaseSpec
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import grails.buildtestdata.mixin.Build
+import grails.plugins.taggable.TagLink
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
 
-/**
- * <p>
- * Test-suite of {@link CsiDashboardController} and 
- * {@link CsiDashboardShowAllCommand}.
- * </p> 
- *
- * @author mze
- * @since IT-74
- */
 @TestFor(CsiDashboardController)
-@Mock([ConnectivityProfile, CsiSystem, CsiConfiguration])
+@Build([Location, JobGroup, Page, Browser, CsiConfiguration, MeasuredEvent])
+@Mock([Location, JobGroup, Page, Browser, ConnectivityProfile, CsiSystem, TagLink, CsiConfiguration])
 class CsiDashboardControllerTests extends Specification {
 
     DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime()
     CsiDashboardController controllerUnderTest
     CsiDashboardShowAllCommand command
 
+    def doWithSpring = {
+        eventResultDashboardService(EventResultDashboardService)
+        browserService(BrowserService)
+    }
+
     void setup() {
-
-        // The controller under test:
         controllerUnderTest = controller
-
-        // Mock relevant services:
         command = new CsiDashboardShowAllCommand()
-        command.csiAggregationUtilService = Spy(CsiAggregationUtilService)
 
-        controllerUnderTest.jobGroupDaoService = Stub(JobGroupDaoService)
-        controllerUnderTest.pageDaoService = Stub(PageDaoService)
-        controllerUnderTest.measuredEventDaoService = Stub(MeasuredEventDaoService)
-        controllerUnderTest.browserDaoService = Stub(BrowserDaoService)
-        controllerUnderTest.locationDaoService = Stub(LocationDaoService)
-        controllerUnderTest.eventResultDashboardService = Stub(EventResultDashboardService)
-        controllerUnderTest.userspecificDashboardService = Stub(UserspecificDashboardService) {
-            getListOfAvailableCsiDashboards() >> []
-        }
-        controllerUnderTest.configService = Stub(ConfigService) {
+        controller.csiHelperService = Mock(CsiHelperService)
+        controller.userspecificDashboardService = Mock(UserspecificDashboardService)
+        controller.configService = Stub(ConfigService) {
             getInitialChartHeightInPixels() >> 400
         }
-        controllerUnderTest.csiHelperService = Stub(CsiHelperService) {
-            getCsiChartDefaultTitle() >> 'not relevant for these tests'
+        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
+            findAll() >> { JobGroup.findAll() }
+            findCSIGroups() >> { JobGroup.findAllByCsiConfigurationIsNotNull() }
         }
+        command.csiAggregationUtilService = Spy(CsiAggregationUtilService)
     }
 
     void "command without bound parameters is invalid"() {
-        expect:
+        expect: "an empty command doesn't validate"
         !command.validate()
     }
 
     void "command bound with default parameters is valid"() {
-        given:
+        given: "a default parameter set"
         setDefaultParams()
 
-        when:
+        when: "the controller binds the data to"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the correct data is bound"
         command.validate()
         command.aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedCsiSystems == [] as Set
@@ -109,13 +93,14 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "command with different aggregation group and interval values is valid"(String value) {
-        given:
+        given: "the default parameters and the aggregation group and interval"
         setDefaultParams()
         params.aggrGroupAndInterval = value
-        when:
+
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is valid, with the correct aggregation group und interval set"
         command.validate()
         command.aggrGroupAndInterval == value
 
@@ -128,14 +113,14 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "command aggregation by system is invalid without selected CSI system"(String aggrGroupAndInterval) {
-        given:
+        given: "default parameters and aggregation by system, but no selected CSI system"
         setDefaultParams()
         params.aggrGroupAndInterval = aggrGroupAndInterval
 
-        when:
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is not valid"
         !command.validate()
 
         where:
@@ -145,15 +130,15 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "command aggregation by system is valid with selected CSI system"(String aggrGroupAndInterval) {
-        given:
+        given: "default parameters and aggregation by system and CSI systems"
         setDefaultParams()
         params.aggrGroupAndInterval = aggrGroupAndInterval
         params.selectedCsiSystems = ['1', '2']
 
-        when:
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is valid and has the right selected CSI systems"
         command.validate()
         command.selectedCsiSystems == [1L, 2L] as Set
 
@@ -164,15 +149,15 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "selected folder must be set for aggregation by measured event, page or shop"(String aggrGroupAndInterval) {
-        given:
+        given: "aggregatiuon by measured event, page, or shop, but no selected job groups/folders"
         setDefaultParams()
         params.selectedFolder = []
         params.aggrGroupAndInterval = aggrGroupAndInterval
 
-        when:
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is invalid"
         !command.validate()
 
         where:
@@ -185,16 +170,16 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "selected folder may be empty for aggregation by system"(String aggrGroupAndInterval) {
-        given:
+        given: "aggregation by system, no folders, but a selected CSI system"
         setDefaultParams()
         params.selectedFolder = []
         params.selectedCsiSystems = "1"
         params.aggrGroupAndInterval = aggrGroupAndInterval
 
-        when:
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is valid"
         command.validate()
 
         where:
@@ -204,15 +189,15 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "selected pages must be set for aggregation by measured event or page"(String aggrGroupAndInterval) {
-        given:
+        given: "aggregation by measured event or page, but no selected pages"
         setDefaultParams()
         params.selectedPages = []
         params.aggrGroupAndInterval = aggrGroupAndInterval
 
-        when:
+        when: "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is invalid"
         !command.validate()
 
         where:
@@ -223,16 +208,16 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "selected pages may be empty for aggregation by shop or system"(String aggrGroupAndInterval) {
-        given:
+        given: "aggregation by shop or system, no selected pages, but a selected system"
         setDefaultParams()
         params.selectedPages = []
         params.selectedCsiSystems = "1"
         params.aggrGroupAndInterval = aggrGroupAndInterval
 
-        when:
+        when:  "the controller binds the parameters"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then:  "the command is valid"
         command.validate()
 
         where:
@@ -244,28 +229,28 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "command is invalid if neither csiTypeDocComplete nor csiTypeVisuallyComplete is set"() {
-        given:
+        given: "parameters where neither csiTypeDocComplete nor csiTypeVisuallyComplete is set"
         setDefaultParams()
         params.csiTypeVisuallyComplete = false
         params.csiTypeDocComplete = false
 
-        when:
+        when: "the controller binds the data"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is not valid"
         !command.validate()
     }
 
     void "command is valid if either csiTypeDocComplete or csiTypeVisuallyComplete is set"(visually, docComplete) {
-        given:
+        given: "parameter with either csiTypeDocComplete or csiTypeVisuallyComplete set"
         setDefaultParams()
         params.csiTypeVisuallyComplete = visually
         params.csiTypeDocComplete = docComplete
 
-        when:
+        when: "the controller binds the data"
         controllerUnderTest.bindData(command, params)
 
-        then:
+        then: "the command is valid"
         command.validate()
 
         where:
@@ -321,11 +306,11 @@ class CsiDashboardControllerTests extends Specification {
         params.includeInterval = true
 
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the interval is the same as bound"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -347,11 +332,11 @@ class CsiDashboardControllerTests extends Specification {
         params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the interval is adjusted by the aggregation interval"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -364,9 +349,9 @@ class CsiDashboardControllerTests extends Specification {
 
     void "create time frame excluding actual interval for small chosen interval with daily aggregation"(String aggregationGroup) {
         given:
-        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
-        DateTime fromDate = new DateTime(2015, 4, 19, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDate = new DateTime(2015, 4, 19, 12, 0, 0)
         DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
         setDefaultParams()
         params.from = ISO_FORMAT.print(fromDate)
@@ -375,12 +360,11 @@ class CsiDashboardControllerTests extends Specification {
         params.includeInterval = false
         command.csiAggregationUtilService.isInActualInterval(_, _) >> true
 
-
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the interval is adjusted for daily aggregation"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -402,11 +386,11 @@ class CsiDashboardControllerTests extends Specification {
         params.includeInterval = true
 
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the interval is the same as set in the parameters"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -428,11 +412,11 @@ class CsiDashboardControllerTests extends Specification {
         params.includeInterval = true
 
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the time frame is the same as in the parameters"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -454,11 +438,11 @@ class CsiDashboardControllerTests extends Specification {
         params.aggrGroupAndInterval = aggregationGroup
         params.includeInterval = false
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the time frame is adjusted for weekly aggregation intervals"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -471,9 +455,9 @@ class CsiDashboardControllerTests extends Specification {
 
     void "create time frame excluding actual interval for small chosen interval with weekly aggregation"(String aggregationGroup) {
         given:
-        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 12, 0, 0)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
-        DateTime fromDate = new DateTime(2015, 4, 16, 12, 0, 0, DateTimeZone.UTC)
+        DateTime fromDate = new DateTime(2015, 4, 16, 12, 0, 0)
         DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         setDefaultParams()
         params.from = ISO_FORMAT.print(fromDate)
@@ -483,11 +467,11 @@ class CsiDashboardControllerTests extends Specification {
         command.csiAggregationUtilService.isInActualInterval(_, _) >> true
 
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the time frame is adjusted for weekly intervals"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -509,11 +493,11 @@ class CsiDashboardControllerTests extends Specification {
         params.includeInterval = true
 
 
-        when:
+        when: "the command creates the time frame interval"
         controllerUnderTest.bindData(command, params)
         Interval interval = command.createTimeFrameInterval()
 
-        then:
+        then: "the time frame is the same as in the parameters"
         command.validate()
         interval.start == fromDateExpected
         interval.end == toDateExpected
@@ -525,35 +509,21 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "construct view data of show all"() {
-        given:
-        createDefaultDaoMockData()
+        setup:
+        2.times { JobGroup.build(name: "Group${it + 1}", csiConfiguration: CsiConfiguration.build()) }
+        Browser.build(id: 11L, name: "Browser1")
+        List<Page> pages = (1..3).collect { Page.build(name: "Page${it}") }
+        MeasuredEvent measuredEvent1 = MeasuredEvent.build(name: "MeasuredEvent1", testedPage: pages[2])
+        MeasuredEvent measuredEvent2 = MeasuredEvent.build(name: "MeasuredEvent2", testedPage: pages[1])
+        MeasuredEvent measuredEvent3 = MeasuredEvent.build(name: "MeasuredEvent3", testedPage: pages[0])
+        MeasuredEvent measuredEvent4 = MeasuredEvent.build(name: "MeasuredEvent4", testedPage: pages[1])
+        Browser browser = Browser.build(name: "Browser1")
+        List<Location> locations = (1..3).collect { Location.build(label: "Location${it}", browser: browser) }
 
-        Browser browser1 = new Browser(name: 'Browser1') {
-            Long getId() { return 11L }
-        }
-        controllerUnderTest.browserDaoService.findAll() >> {
-            [browser1] as Set
-        }
-
-        WebPageTestServer server1 = new WebPageTestServer(label: 'server1')
-
-        Location location1 = new Location(label: 'Location1', location: 'locationA', browser: browser1, wptServer: server1) {
-            Long getId() { return 101L }
-        }
-        Location location2 = new Location(label: 'Location2', location: 'locationB', browser: browser1, wptServer: server1) {
-            Long getId() { return 102L }
-        }
-        Location location3 = new Location(label: 'Location3', location: 'locationC', browser: browser1, wptServer: server1) {
-            Long getId() { return 103L }
-        }
-        controllerUnderTest.locationDaoService.findAll() >> {
-            [location2, location1, location3] as Set
-        }
-
-        when:
+        when: "the controller creates static view data"
         Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
 
-        then:
+        then: "all relevant domain data is included in the result"
         result != null
         result.size() == 14
 
@@ -566,81 +536,46 @@ class CsiDashboardControllerTests extends Specification {
         result["locations"]*.getLabel() == ["Location1", "Location2", "Location3"]
         result["dateFormat"] == CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
         result["eventsOfPages"] == [
-                (1L): [1003L] as Set,
-                (2L): [1002L, 1004L] as Set,
-                (3L): [1001L] as Set
+                (pages[0].id): [measuredEvent3.id] as Set,
+                (pages[1].id): [measuredEvent2.id, measuredEvent4.id] as Set,
+                (pages[2].id): [measuredEvent1.id] as Set
         ]
         result["locationsOfBrowsers"] == [
-                (11L): [101L, 102L, 103L] as Set
+                (browser.id): locations*.id as Set
         ]
     }
 
 
     void "construct view data of show all with duplicated location strings"() {
-        given:
-        createDefaultDaoMockData()
+        given: "multiple locations with the same 'location' property"
+        Browser browser1 = Browser.build(name: "Browser1")
+        Browser browser2 = Browser.build(name: "Browser2")
+        Location location1 =Location.build(label: "Location1", location: 'duplicatedLocation', browser: browser1)
+        Location location2 =Location.build(label: "Location2", location: 'duplicatedLocation', browser: browser2)
+        Location location3 =Location.build(label: "Location3", location: 'duplicatedLocation', browser: browser2)
 
-        Browser browser1 = new Browser(name: 'Browser1') {
-            Long getId() { return 11L }
-        }
-        Browser browser2 = new Browser(name: 'Browser2') {
-            Long getId() { return 12L }
-        }
-        controllerUnderTest.browserDaoService.findAll() >> {
-            [browser1, browser2] as Set
-        }
-
-        WebPageTestServer server1 = new WebPageTestServer(label: 'server1')
-        WebPageTestServer server2 = new WebPageTestServer(label: 'server2')
-
-        Location location1 = new Location(label: 'Location1', location: 'duplicatedLocation', browser: browser1, wptServer: server1) {
-            Long getId() { return 101L }
-        }
-        Location location2 = new Location(label: 'Location2', location: 'duplicatedLocation', browser: browser2, wptServer: server2) {
-            Long getId() { return 102L }
-        }
-        Location location3 = new Location(label: 'Location3', location: 'duplicatedLocation', browser: browser2, wptServer: server1) {
-            Long getId() { return 103L }
-        }
-        controllerUnderTest.locationDaoService.findAll() >> {
-            [location2, location1, location3] as Set
-        }
-
-        when:
-        // Run the test:
+        when: "the controller constructs stativ view data"
         Map<String, Object> result = controllerUnderTest.constructStaticViewDataOfShowAll()
-        then:
-        result != null
-        result.size() == 14
 
-        result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
-        result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
-        result["folders"]*.getName() == ["Group1", "Group2"]
-        result["pages"]*.getName() == ["Page1", "Page2", "Page3"]
-        result["measuredEvents"]*.getName() == ["MeasuredEvent1", "MeasuredEvent2", "MeasuredEvent3", "MeasuredEvent4"]
-        result["browsers"]*.getName() == ["Browser1", "Browser2"]
-        result["locations"]*.getLabel() == ["Location1", "Location3", "Location2"]
-        result["dateFormat"] == CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART
-        result["eventsOfPages"] == [
-                (1L): [1003L] as Set,
-                (2L): [1002L, 1004L] as Set,
-                (3L): [1001L] as Set
-        ]
+        then: "all locations and browsers are included in the result"
+        result != null
+        result["browsers"]*.getName() as Set == ["Browser1", "Browser2"] as Set
+        result["locations"]*.getLabel() as Set == ["Location1", "Location3", "Location2"] as Set
         result["locationsOfBrowsers"] == [
-                (11L): [101L] as Set,
-                (12L): [102L, 103L] as Set
+                (browser1.id): [location1.id] as Set,
+                (browser2.id): [location2.id, location3.id] as Set
         ]
     }
 
     void "command properties are correctly copied to map"() {
-        given:
+        given: "a valid command"
         setDefaultCommandProperties()
 
-        when:
+        when: "the data should be copied to a model map"
         Map<String, Object> result = [:]
         command.copyRequestDataToViewModelMap(result)
 
-        then:
+        then: "the command is valid and the result contains the bound information"
         command.validate()
         result != null
         result.size() == 25
@@ -653,47 +588,31 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "invalid request causes error message by passing command back to page"() {
-        given:
+        given: "parameters without a 'from' value"
         setDefaultParams()
         params.from = null
 
-        when:
+        when: "the parameters are bound to the command"
         controllerUnderTest.bindData(command, params)
         Map<String, Object> result = controllerUnderTest.showAll(command)
 
-        then:
+        then: "the command is invalid and part of the result"
         !command.validate()
         result["command"] == command
     }
 
 
-    void "empty request does not cause error message and passes command back to page"() {
-        given:
-        // We leave 'params' 'empty' here (only grails additions are present! => first and empty request!
-        params.action = 'showAll'
-        params.controller = 'csiDashboard'
-
-        when:
-        controllerUnderTest.bindData(command, params)
-        Map<String, Object> model = controllerUnderTest.showAll(command)
-
-        then:
-        !command.validate()
-        !model['command']
-    }
-
     void "empty request does not cause error message with language and passes command back to page"() {
-        given:
-        // We leave 'params' 'empty' here (only grails additions are present! => first and empty request!
+        given: "parameters with no form data specified"
         params.lang = 'de'
         params.action = 'showAll'
         params.controller = 'csiDashboard'
 
-        when:
+        when: "the parameters are bound to the command"
         controllerUnderTest.bindData(command, params)
         Map<String, Object> model = controllerUnderTest.showAll(command)
 
-        then:
+        then: "the command is not valid"
         !command.validate()
         !model['command']
     }
@@ -709,11 +628,11 @@ class CsiDashboardControllerTests extends Specification {
     }
 
     void "get control name throws for non existent CSI type"() {
-        when:
+        when: "the control name for a not existant CSI type is requested"
         CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
 
-        then:
-        IllegalArgumentException e = thrown()
+        then: "an exception is thrown"
+        thrown(IllegalArgumentException)
     }
 
     private setDefaultParams() {
@@ -738,40 +657,4 @@ class CsiDashboardControllerTests extends Specification {
         command.csiTypeVisuallyComplete = true
         command.csiTypeDocComplete = false
     }
-
-    private createDefaultDaoMockData() {
-        controllerUnderTest.jobGroupDaoService.findCSIGroups() >> {
-            [new JobGroup(name: 'Group2'), new JobGroup(name: 'Group1')] as Set
-        }
-
-        Page page1 = new Page(name: 'Page1', weight: 0) {
-            Long getId() { return 1L }
-        }
-        Page page2 = new Page(name: 'Page3', weight: 0.25d) {
-            Long getId() { return 2L }
-        }
-        Page page3 = new Page(name: 'Page2', weight: 0.5d) {
-            Long getId() { return 3L }
-        }
-        controllerUnderTest.pageDaoService.findAll() >> {
-            [page1, page2, page3] as Set
-        }
-
-        MeasuredEvent measuredEvent1 = new MeasuredEvent(name: 'MeasuredEvent1', testedPage: page3) {
-            Long getId() { return 1001L }
-        }
-        MeasuredEvent measuredEvent2 = new MeasuredEvent(name: 'MeasuredEvent2', testedPage: page2) {
-            Long getId() { return 1002L }
-        }
-        MeasuredEvent measuredEvent3 = new MeasuredEvent(name: 'MeasuredEvent3', testedPage: page1) {
-            Long getId() { return 1003L }
-        }
-        MeasuredEvent measuredEvent4 = new MeasuredEvent(name: 'MeasuredEvent4', testedPage: page2) {
-            Long getId() { return 1004L }
-        }
-        controllerUnderTest.measuredEventDaoService.findAll() >> {
-            [measuredEvent3, measuredEvent1, measuredEvent2, measuredEvent4] as Set
-        }
-    }
-
 }

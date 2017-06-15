@@ -21,7 +21,6 @@ body {
   left: 50px;
   right: 0;
   bottom: 0;
-  height: 5rem;
   padding: 15px 0 0 0;
 }
 
@@ -209,18 +208,6 @@ h1 {
   z-index: 3;
   opacity: 0.8;
   background-color: #ffffff;
-}
-
-.iteratec-tab-content {
-  overflow: visible; // prevent chosen plugin to make a scrollbar in navtab
-}
-
-.iteratec-tab-content > .tab-pane {
-  display: none;
-}
-
-.iteratec-tab-content > .active {
-  display: block;
 }
 
 // Dashboard selection summary
@@ -475,4 +462,8 @@ a.btn.disabled {
   &:focus {
     border-color: @state-danger-text;
   }
+}
+
+.no-left-gutter {
+  padding-left: 0;
 }

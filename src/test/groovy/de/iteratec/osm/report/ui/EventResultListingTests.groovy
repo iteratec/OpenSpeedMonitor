@@ -17,15 +17,11 @@
 
 package de.iteratec.osm.report.ui
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import de.iteratec.osm.csi.Page;
-import de.iteratec.osm.result.CachedView;
-import de.iteratec.osm.result.EventResult;
-import de.iteratec.osm.result.JobResult;
-import de.iteratec.osm.result.MeasuredEvent;
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 /**
  * Test-suite of {@link de.iteratec.osm.report.ui.EventResultListing}.
@@ -33,55 +29,29 @@ import de.iteratec.osm.result.MeasuredEvent;
  * @author mze
  * @since IT-106
  */
-class EventResultListingTests {
-	
-	@Test
-	public void testDesign()
-	{
-		// Create some data:
-		EventResult eventResult = new EventResult();
-		eventResult.firstByteInMillisecs = 10; 
-		eventResult.startRenderInMillisecs = 11;
-		eventResult.domTimeInMillisecs = 12;
-		eventResult.docCompleteIncomingBytes = 13;
-		eventResult.docCompleteRequests = 14;
-		eventResult.docCompleteTimeInMillisecs = 15;
-		eventResult.fullyLoadedIncomingBytes = 16;
-		eventResult.fullyLoadedRequestCount = 17;
-		eventResult.fullyLoadedTimeInMillisecs = 18;
-		eventResult.cachedView = CachedView.CACHED;
-		
-		MeasuredEvent measuredEvent = new MeasuredEvent();
-		measuredEvent.name = 'HelloEvent';
-		measuredEvent.testedPage = new Page(name:'HelloPage');
-		eventResult.measuredEvent = measuredEvent;
-		
-		JobResult jobResult = new JobResult();
-		jobResult.date = new Date(1383574075000L); // 04.11.2013 - 15:07:55
-		jobResult.jobConfigLabel = 'HelloLabel';
-		
-		// A row: 
-		EventResultListingRow row1 = new EventResultListingRow(jobResult, eventResult); 
-		
-		// Run tests:
+@Build([EventResult, JobResult])
+@Mock([EventResult, JobResult])
+class EventResultListingTests extends Specification {
+
+	void "add rows to event result listing" (int count){
+		setup:
+		EventResult eventResult = EventResult.build()
+		JobResult jobResult = JobResult.build()
+		EventResultListingRow row = new EventResultListingRow(jobResult, eventResult)
 		EventResultListing out = new EventResultListing();
-		
-		assertTrue(out.getRows().isEmpty());
-		assertTrue(out.isEmpty());
-		
-		out.addRow(row1);
-		
-		assertFalse(out.getRows().isEmpty());
-		assertFalse(out.isEmpty());
-		assertEquals(1, out.getRows().size());
-		
-		// A second row (we don't care about the equal content here):
-		EventResultListingRow row2 = new EventResultListingRow(jobResult, eventResult);
-		
-		out.addRow(row2);
-		
-		assertFalse(out.getRows().isEmpty());
-		assertFalse(out.isEmpty());
-		assertEquals(2, out.getRows().size());
+
+		when: "x amount of rows are added"
+		count.times { out.addRow(row)}
+
+		then: "they are all available"
+		out.getRows().isEmpty() == false
+		out.getRows().size() == count
+
+		where:
+		count| _
+		1    | _
+		2    | _
+		3    | _
+		4    | _
 	}
 }

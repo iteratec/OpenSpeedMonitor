@@ -28,24 +28,24 @@ import spock.lang.Specification
 class MultiLineChartSpec extends Specification{
 
     def "MultiLineChart initialisation test" () {
-        when:
+        when: "a new MultiLineChart is created"
         MultiLineChart multiLineChart = new MultiLineChart()
 
-        then:
+        then: "the theMultiLineChart has been initialised"
         multiLineChart.lines.size() == 0
-        !multiLineChart.xLabel.isEmpty()
-        !multiLineChart.yLabel.isEmpty()
+        multiLineChart.xLabel == MultiLineChart.DEFAULT_X_LABEL
+        multiLineChart.yLabel == MultiLineChart.DEFAULT_Y_LABEL
     }
 
     def "addLine adds line to list of lines"() {
-        given:
+        given: "a line"
         MultiLineChart multiLineChart = new MultiLineChart()
         MultiLineChartLineData line = new MultiLineChartLineData()
 
-        when:
+        when: "the line is added to the multiLineChart"
         multiLineChart.addLine(line)
 
-        then:
+        then: "the multiLineChart contains the line"
         multiLineChart.lines.size() == 1
         multiLineChart.lines[0] == line
     }

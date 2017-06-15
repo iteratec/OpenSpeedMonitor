@@ -37,16 +37,12 @@ class TimeToCsMappingService {
      * @param Page page
      * @return Calculated customer-satisfaction or null if page is undefined or no calculation specification exists for it.
      */
-    public Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null) {
-
-        if (page.isUndefinedPage() || noTransformationPossibleFor(page,csiConfiguration)) {
-            return null;
+    Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null) {
+        if (page.isUndefinedPage() || noTransformationPossibleFor(page, csiConfiguration)) {
+            return null
         } else {
-
             return transformLoadTime(docReadyTimeInMilliSecs, page, csiConfiguration)
-
         }
-
     }
 
     private double transformLoadTime(int docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
@@ -62,12 +58,12 @@ class TimeToCsMappingService {
         return cs
     }
 
-    private boolean noTransformationPossibleFor(Page page, CsiConfiguration csiConfiguration) {
+    boolean noTransformationPossibleFor(Page page, CsiConfiguration csiConfiguration) {
         Boolean notPossible = true
         CsiTransformation csiTransformation = configService.getCsiTransformation()
         if (csiTransformation == CsiTransformation.BY_RANK && validFrustrationsExistFor(page)) {
             notPossible = false
-        } else if (csiTransformation == CsiTransformation.BY_MAPPING && csiConfiguration != null && validMappingsExistFor(page,csiConfiguration)) {
+        } else if (csiTransformation == CsiTransformation.BY_MAPPING && csiConfiguration != null && validMappingsExistFor(page, csiConfiguration)) {
             notPossible = false
         }
         return notPossible
@@ -82,7 +78,7 @@ class TimeToCsMappingService {
      * @param page
      * @return
      */
-    public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
+    Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
         List<TimeToCsMapping> mappingsForPage = csiConfiguration.getTimeToCsMappingByPage(page)
 
         Integer loadtimeIncrement = 20
@@ -126,7 +122,7 @@ class TimeToCsMappingService {
      * @param Page page
      * @return Calculated customer-satisfaction.
      */
-    public Double getCustomerSatisfactionPercentRank(Integer docReadyTimeInMilliSecs, Page page) {
+    Double getCustomerSatisfactionPercentRank(Integer docReadyTimeInMilliSecs, Page page) {
         List<Integer> frustrationLoadtimesForPage = timeToCsMappingCacheService.getCustomerFrustrations(page)
         Double rank
         Integer smaller
@@ -153,7 +149,7 @@ class TimeToCsMappingService {
      * {@link Page} frustration load times should be read for.
      * @return Frustration load times from db/cache for given page.
      */
-    public List<Integer> getCachedFrustrations(Page page) {
+    List<Integer> getCachedFrustrations(Page page) {
         return timeToCsMappingCacheService.getCustomerFrustrations(page)
     }
 
@@ -162,11 +158,11 @@ class TimeToCsMappingService {
      * @param page
      * @return true if more than one different frustration timings exist for given {@link Page} page. false otherwise. false if page is null or undefinde page, too.
      */
-    public Boolean validFrustrationsExistFor(Page page) {
+    Boolean validFrustrationsExistFor(Page page) {
         return isValid(page) && getCachedFrustrations(page).unique(false).size() > 1
     }
 
-    public Boolean validMappingsExistFor(Page page, CsiConfiguration csiConfiguration) {
+    Boolean validMappingsExistFor(Page page, CsiConfiguration csiConfiguration) {
         return isValid(page) && !csiConfiguration.getTimeToCsMappingByPage(page).isEmpty()
     }
 
@@ -174,12 +170,14 @@ class TimeToCsMappingService {
         return page != null && !page.isUndefinedPage()
     }
 
-    public MultiLineChart getPageMappingsAsChart(int maxLoadTime, CsiConfiguration csiConfiguration) {
+    MultiLineChart getPageMappingsAsChart(int maxLoadTime, CsiConfiguration csiConfiguration) {
         String xLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.xAxisLabel", "ms")
         String yLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.yAxisLabel", "Kundenzufriedenheit in %")
         MultiLineChart multiLineChart = new MultiLineChart(xLabel: xLabel, yLabel: yLabel)
 
-        Collection<TimeToCsMapping> allTimeToCsMappings = csiConfiguration.timeToCsMappings.findAll { it.loadTimeInMilliSecs <= maxLoadTime }
+        Collection<TimeToCsMapping> allTimeToCsMappings = csiConfiguration.timeToCsMappings.findAll {
+            it.loadTimeInMilliSecs <= maxLoadTime
+        }
         Map<String, MultiLineChartLineData> map = new HashMap<>()
 
         allTimeToCsMappings.each { mapping ->
@@ -190,28 +188,8 @@ class TimeToCsMappingService {
         }
 
         // sort and add
-        map.values().sort{a,b -> a.name.compareTo(b.name)}.each{e -> multiLineChart.addLine(e)}
+        map.values().sort { a, b -> a.name.compareTo(b.name) }.each { e -> multiLineChart.addLine(e) }
 
         return multiLineChart
     }
-
-    public getPageMappingAsChartData(Page page) {
-        List<Integer> frustrations = getCachedFrustrations(page)
-        Integer countFrustrations = frustrations.size()
-        frustrations.sort()
-        int lastFloor = 0
-        List<Integer> frustrationsSinceLastCount = []
-        frustrations.each { frustration ->
-            double actualFloor = Math.floor(frustration / 100)
-            if (actualFloor > lastFloor) {
-                lastFloor = actualFloor
-            }
-        }
-        int loadTimeInMillisecs = 100
-        while (loadTimeInMillisecs < 12000) {
-
-            loadTimeInMillisecs += 100
-        }
-    }
-
 }

@@ -20,18 +20,15 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.CsvExportService
 import org.hibernate.sql.JoinType
@@ -39,8 +36,6 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
-
-import java.text.SimpleDateFormat
 
 /**
  * <p>
@@ -55,10 +50,7 @@ class TabularResultPresentationController {
     private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
 
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    MeasuredEventDaoService measuredEventDaoService
-    BrowserDaoService browserDaoService
-    LocationDaoService locationDaoService
+    BrowserService browserService
 
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
@@ -212,19 +204,19 @@ class TabularResultPresentationController {
         result.put('csiGroups', jobGroupDaoService.findAll().sort(false, { it.name }))
 
         // Pages
-        List<Page> pages = pageDaoService.findAll().sort(false, { it.name });
+        List<Page> pages = Page.list().sort(false, { it.name })
         result.put('pages', pages)
 
         // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name });
+        List<MeasuredEvent> measuredEvents = MeasuredEvent.findAll().sort(false, { it.name });
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
-        List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name });
+        List<Browser> browsers = browserService.findAll().sort(false, { it.name });
         result.put('browsers', browsers)
 
         // Locations
-        List<Location> locations = locationDaoService.findAll().sort(false, { it.label });
+        List<Location> locations = Location.list().sort(false, { it.label })
         result.put('locations', locations)
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:

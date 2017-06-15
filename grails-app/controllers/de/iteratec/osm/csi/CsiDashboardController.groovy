@@ -19,12 +19,10 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -33,7 +31,6 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
@@ -64,10 +61,7 @@ import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 class CsiDashboardController {
 
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    MeasuredEventDaoService measuredEventDaoService
-    BrowserDaoService browserDaoService
-    LocationDaoService locationDaoService
+    BrowserService browserService
     I18nService i18nService
 
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
@@ -950,19 +944,19 @@ class CsiDashboardController {
         result.put('folders', jobGroupDaoService.findCSIGroups().sort(false, { it.name }))
 
         // Pages
-        List<Page> pages = pageDaoService.findAll().sort(false, { it.name })
+        List<Page> pages = Page.list().sort(false, { it.name })
         result.put('pages', pages)
 
         // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name })
+        List<MeasuredEvent> measuredEvents = MeasuredEvent.list().sort(false, { it.name })
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
-        List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name })
+        List<Browser> browsers = browserService.findAll().sort(false, { it.name })
         result.put('browsers', browsers)
 
         // Locations
-        List<Location> locations = locationDaoService.findAll().
+        List<Location> locations = Location.list().
                 sort(false, { Location it -> it.getWptServer().label }).
                 sort(false, { Location it -> it.getBrowser().name }).
                 sort(false, { Location it -> it.location })

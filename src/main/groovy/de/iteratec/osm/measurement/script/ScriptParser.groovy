@@ -215,8 +215,14 @@ class ScriptParser {
 
 	private PageService pageService
 
+	Map<String, String> getNewMeasuredEvents() {
+		return newMeasuredEvents
+	}
 
-	/**
+	Set<String> getNewPages() {
+		return newPages
+	}
+/**
 	 * Parse the given navigationScript
 	 * @param navigationScript Must be not null
 	 */
@@ -451,7 +457,7 @@ class ScriptParser {
 	public List<Page> getTestedPages(){
 		List<Page> testedPages = []
 		this.eventNames.each {eventName ->
-			testedPages << ( MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))?.testedPage ?: Page.findByName(Page.UNDEFINED) )
+			testedPages << ( MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))?.testedPage ?: Page.findOrCreateByName(Page.UNDEFINED) )
 		}
 		return testedPages
 	}

@@ -12,7 +12,7 @@
 		<bwUp>512</bwUp>
 		<latency>50</latency>
 		<plr>0</plr>
-		<label>http://www.example.de.de - Multiple steps with event names + dom elements</label>
+		<label>3Runs_6Events</label>
 		<completed>Thu, 25 Apr 2013 09:52:21 +0000</completed>
 		<runs>3</runs>
 		<successfulFVRuns>3</successfulFVRuns>

@@ -46,6 +46,9 @@ import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+
 class BootStrap {
 
     EventCsiAggregationService eventCsiAggregationService
@@ -136,8 +139,8 @@ class BootStrap {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 12,
                 defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000,
+                minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
+                maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
                 maxDataStorageTimeInMonths: 13,
                 csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
@@ -232,7 +235,7 @@ class BootStrap {
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.LOAD_TIMES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
 
@@ -247,7 +250,7 @@ class BootStrap {
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.LOAD_TIMES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
 

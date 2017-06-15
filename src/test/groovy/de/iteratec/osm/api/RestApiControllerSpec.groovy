@@ -1,16 +1,20 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.api.dto.*
-import de.iteratec.osm.csi.*
-import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
-import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
 import grails.test.mixin.Mock
@@ -52,10 +56,7 @@ class RestApiControllerSpec extends Specification {
 
     def doWithSpring = {
         defaultJobGroupDaoService(DefaultJobGroupDaoService)
-        defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
-        defaultBrowserDaoService(DefaultBrowserDaoService)
-        defaultPageDaoService(DefaultPageDaoService)
-        defaultLocationDaoService(DefaultLocationDaoService)
+        browserService(BrowserService)
     }
 
     void setup() {
@@ -324,10 +325,6 @@ class RestApiControllerSpec extends Specification {
 
     private void initInnerServices() {
         controllerUnderTest.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
-        controllerUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
-        controllerUnderTest.browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
-        controllerUnderTest.pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
-        controllerUnderTest.locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
         controllerUnderTest.jobDaoService = new JobDaoService()
     }
 }

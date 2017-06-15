@@ -20,16 +20,13 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -49,16 +46,13 @@ import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 @Transactional
 public class EventResultDashboardService {
 
-    BrowserDaoService browserDaoService
+    BrowserService browserService
     JobGroupDaoService jobGroupDaoService
-    PageDaoService pageDaoService
-    LocationDaoService locationDaoService
     ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
     EventResultDaoService eventResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService
-    AggregatorTypeDaoService aggregatorTypeDaoService
     ConnectivityProfileDaoService connectivityProfileDaoService
     OsmChartProcessingService osmChartProcessingService
 
@@ -79,20 +73,16 @@ public class EventResultDashboardService {
      * @return all {@link MeasuredEvent} ordered by their name.
      */
     public List<MeasuredEvent> getAllMeasuredEvents() {
-        return MeasuredEvent.findAll().sort(false, { it.name.toLowerCase() });
+        return MeasuredEvent.findAll().sort(false, { it.name.toLowerCase() })
     }
 
     /**
      * Fetches all {@link Location}s from Database.
      *
-     * <p>
-     * 	Proxy for {@link LocationDaoService}
-     * </p>
-     *
      * @return all {@link Location} ordered by their label.
      */
     public List<Location> getAllLocations() {
-        return locationDaoService.findAll().sort(false, { it.label.toLowerCase() });
+        return Location.list().sort(false, { it.label.toLowerCase() })
     }
 
     /**
@@ -105,7 +95,7 @@ public class EventResultDashboardService {
      * @return all {@link ConnectivityProfile} ordered by their toString() representation.
      */
     public List<ConnectivityProfile> getAllConnectivityProfiles() {
-        return ConnectivityProfile.findAllByActive(true).sort(false, { it.name.toLowerCase() });
+        return ConnectivityProfile.findAllByActive(true).sort(false, { it.name.toLowerCase() })
     }
 
     /**
@@ -118,7 +108,7 @@ public class EventResultDashboardService {
         List<Map<String, String>> result = [].withDefault { [:] }
         result.addAll(getAllConnectivityProfiles().collect { ["id": it.id, "name": it.toString()] })
 
-        if(includeNative)  {
+        if (includeNative) {
             result.add(["id": ResultSelectionController.MetaConnectivityProfileId.Native.value, "name": ResultSelectionController.MetaConnectivityProfileId.Native.value])
         }
 
@@ -129,27 +119,23 @@ public class EventResultDashboardService {
      * Fetches all {@link Browser}s from Database.
      *
      * <p>
-     * 	Proxy for {@link BrowserDaoService}
+     * 	Proxy for {@link BrowserService}
      * </p>
      *
      * @return all {@link Browser} ordered by their name.
      */
     public List<Browser> getAllBrowser() {
 
-        return browserDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        return browserService.findAll().sort(false, { it.name.toLowerCase() })
     }
 
     /**
      * Fetches all {@link Page}s from Database.
      *
-     * <p>
-     * 	Proxy for {@link PageDaoService}
-     * </p>
-     *
      * @return all {@link Page} ordered by their name.
      */
     public List<Page> getAllPages() {
-        return pageDaoService.findAll().sort(false, { it.name.toLowerCase() })
+        return Page.list().sort(false, { it.name.toLowerCase() })
     }
 
     /**
@@ -163,7 +149,7 @@ public class EventResultDashboardService {
      *
      */
     public List<JobGroup> getAllJobGroups() {
-        return jobGroupDaoService.findAll().sort(false, { it.name.toLowerCase() });
+        return jobGroupDaoService.findAll().sort(false, { it.name.toLowerCase() })
     }
 
     /**
@@ -269,7 +255,7 @@ public class EventResultDashboardService {
 
             eventResults.each { EventResult eventResult ->
 
-                String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
+                String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
 
                 URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
 
@@ -311,7 +297,7 @@ public class EventResultDashboardService {
     }
 
     private boolean isInBounds(EventResult eventResult, AggregatorType aggregatorType, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
-        String name = aggregatorType.getName().replace("Uncached", "").replace("cached", "") //TODO make this pretty
+        String name = aggregatorType.getName().replace("Uncached", "").replace("Cached", "") //TODO make this pretty
         Number lt = gtBoundary[name]
         Number gt = ltBoundary[name]
 
@@ -333,7 +319,7 @@ public class EventResultDashboardService {
                     if (isCachedViewEqualToAggregatorTypesView(eventResult, resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator))) {
                         Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
                         if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
-                            String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
+                            String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                             eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}${UNIQUE_STRING_DELIMITTER}${connectivity}"] << value
@@ -345,7 +331,12 @@ public class EventResultDashboardService {
 
         Map<String, AggregatorType> aggregatorTypeMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'get aggr-type-lookup-map', 2) {
-            aggregatorTypeMap = aggregatorTypeDaoService.getNameToObjectMap()
+            aggregatorTypeMap = AggregatorType.list().collectEntries { AggregatorType eachAggregatorType ->
+                [
+                        eachAggregatorType.name,
+                        eachAggregatorType
+                ]
+            }
         }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', 2) {
@@ -376,7 +367,7 @@ public class EventResultDashboardService {
 
                 performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
 
-                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[3]}";
+                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[3]}"
                     countValues = value.size()
                     if (countValues > 0) {
                         sum = 0
@@ -393,8 +384,8 @@ public class EventResultDashboardService {
 
     private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<String, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
 
-        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "", null);
-        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "", null);
+        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null)
+        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null)
 
         List<OsmChartGraph> graphs = []
 
@@ -427,11 +418,11 @@ public class EventResultDashboardService {
 
                 if (tokenizedGraphLabel[0].endsWith("Uncached")) {
                     if (!repeatedViewEnding.isEmpty()) {
-                        measurand = repeatedViewEnding + " " + measurand;
+                        measurand = repeatedViewEnding + " " + measurand
                     }
                 } else {
                     if (!firstViewEnding.isEmpty()) {
-                        measurand = firstViewEnding + " " + measurand;
+                        measurand = firstViewEnding + " " + measurand
                     }
                 }
 
@@ -479,17 +470,17 @@ public class EventResultDashboardService {
      * </p>
      *
      * @param mv
-     *         The measured value for which an URL should be build;
+     *         The measured value for which an URL should be build
      *         not <code>null</code>.
      * @return The created URL or <code>null</code> if not possible to
      *         build up an URL.
      */
     public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
-        URL result = null;
-        List<Long> eventResultIds = mv.underlyingEventResultsByWptDocCompleteAsList;
+        URL result = null
+        List<Long> eventResultIds = mv.underlyingEventResultsByWptDocCompleteAsList
 
         if (!eventResultIds.isEmpty()) {
-            String testsDetaialsURLAsString = grailsLinkGenerator.link([
+            String testsDetailsURLAsString = grailsLinkGenerator.link([
                     'controller': 'highchartPointDetails',
                     'action'    : 'listAggregatedResults',
                     'absolute'  : true,
@@ -497,11 +488,11 @@ public class EventResultDashboardService {
                             'csiAggregationId'                       : String.valueOf(mv.id),
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(eventResultIds.size())
                     ]
-            ]);
-            result = testsDetaialsURLAsString ? new URL(testsDetaialsURLAsString) : null;
+            ])
+            result = testsDetailsURLAsString ? new URL(testsDetailsURLAsString) : null
         }
 
-        return result;
+        return result
     }
 
     /**
@@ -526,11 +517,11 @@ public class EventResultDashboardService {
                     'params'    : [
                             'eventResultId': String.valueOf(result.id)
                     ]
-            ]);
-            resultUrl = testsDetailsURLAsString ? new URL(testsDetailsURLAsString) : null;
+            ])
+            resultUrl = testsDetailsURLAsString ? new URL(testsDetailsURLAsString) : null
         }
 
-        return resultUrl;
+        return resultUrl
     }
 
     public URL buildTestsDetailsURL(String jobGroupId, String measuredEventId, String pageId, String browserId, String locationId, AggregatorType aggregatorType, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
@@ -554,27 +545,27 @@ public class EventResultDashboardService {
                             'aggregatorTypeNameOrNull'               : aggregatorType.isCachedCriteriaApplicable() ? aggregatorType.getName() : '',
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(lastKnownCountOfAggregatedResults)
                     ]
-            ]);
-            result = testsDetailsURLAsString ? new URL(testsDetailsURLAsString) : null;
+            ])
+            result = testsDetailsURLAsString ? new URL(testsDetailsURLAsString) : null
 
         }
 
-        return result;
+        return result
     }
 
     private TreeMap addToPointMap(Map resultMap, String resultName, Long timeStamp, Integer value) {
         Map pointMap = resultMap.get(resultName)
         if (pointMap == null) {
-            pointMap = new TreeMap<Long, Double>();
+            pointMap = new TreeMap<Long, Double>()
         }
         pointMap.put(timeStamp, value)
         return pointMap
     }
 
     private boolean isEventResultMachingQueryParams(EventResult eventResult, MvQueryParams queryParams) {
-        boolean eins = (queryParams.getMeasuredEventIds().contains(eventResult.measuredEvent.id) || queryParams.getMeasuredEventIds().isEmpty());
-        boolean zwei = (queryParams.getPageIds().contains(eventResult.measuredEvent.testedPage.id) || queryParams.getPageIds().isEmpty());
-        return eins && zwei;
+        boolean eins = (queryParams.getMeasuredEventIds().contains(eventResult.measuredEvent.id) || queryParams.getMeasuredEventIds().isEmpty())
+        boolean zwei = (queryParams.getPageIds().contains(eventResult.measuredEvent.testedPage.id) || queryParams.getPageIds().isEmpty())
+        return eins && zwei
     }
 
     private boolean isCachedViewEqualToAggregatorTypesView(EventResult eventResult, CachedView aggregatorTypeCachedView) {

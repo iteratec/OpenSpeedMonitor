@@ -266,7 +266,7 @@
 					</PageSpeedData>
 				</testStep>
 				<testStep>
-					<eventName>HP:::Artikel suchen</eventName>
+					<eventName>Suche:::Artikel suchen</eventName>
 					<run>1</run>
 					<URL />
 					<loadTime>2123</loadTime>
@@ -388,7 +388,7 @@
 					</PageSpeedData>
 				</testStep>
 				<testStep>
-					<eventName>HP:::Produkt ausw.aehlen</eventName>
+					<eventName>Produkt:::Produkt auswaehlen</eventName>
 					<run>1</run>
 					<URL />
 					<loadTime>2218</loadTime>
@@ -633,7 +633,7 @@
 					</PageSpeedData>
 				</testStep>
 				<testStep>
-					<eventName>HP:::Artikel suchen</eventName>
+					<eventName>Suche:::Artikel suchen</eventName>
 					<run>1</run>
 					<URL />
 					<loadTime>931</loadTime>
@@ -755,7 +755,7 @@
 					</PageSpeedData>
 				</testStep>
 				<testStep>
-					<eventName>HP:::Produkt auswaehlen</eventName>
+					<eventName>Produkt:::Produkt auswaehlen</eventName>
 					<run>2</run>
 					<URL />
 					<loadTime>1270</loadTime>
@@ -2292,7 +2292,7 @@
 						<date>1366883366</date>
 					</testStep>
 					<testStep>
-						<eventName>HP:::Produkt auswaehlen</eventName>
+						<eventName>Produkt:::Produkt auswaehlen</eventName>
 						<URL />
 						<loadTime>2001</loadTime>
 						<TTFB>174</TTFB>

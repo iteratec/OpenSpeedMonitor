@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
@@ -36,6 +37,7 @@ class DistributionChartController extends ExceptionHandlerController {
     FilteringAndSortingDataService filteringAndSortingDataService
     PerformanceLoggingService performanceLoggingService
     MeasurandUtilService measurandUtilService
+    OsmConfigCacheService osmConfigCacheService
 
     def index() {
         redirect(action: 'show')
@@ -86,6 +88,11 @@ class DistributionChartController extends ExceptionHandlerController {
                 'in'('page', allPages)
                 'in'('jobGroup', allJobGroups)
                 'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+                'between'(
+                    'docCompleteTimeInMillisecs',
+                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
+                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+                )
             }
         }
 

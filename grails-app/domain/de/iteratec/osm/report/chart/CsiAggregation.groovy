@@ -100,7 +100,7 @@ class CsiAggregation implements CsiValue {
     @BindUsing({
         obj, source -> source['underlyingEventResultsByWptDocComplete']
     })
-    String underlyingEventResultsByWptDocComplete
+    String underlyingEventResultsByWptDocComplete = ''
 
     static transients = ['underlyingEventResultsByWptDocCompleteAsList', 'latestUpdateEvent', 'calculated']
 
@@ -130,7 +130,7 @@ class CsiAggregation implements CsiValue {
         csiSystem(nullable: true)
     }
     static mapping = {
-        underlyingEventResultsByWptDocComplete(type: 'text')
+        underlyingEventResultsByWptDocComplete(defaultValue: '',type: 'text')
         closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
         started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
         interval(index: 'started_and_iVal_and_aggr_idx')
