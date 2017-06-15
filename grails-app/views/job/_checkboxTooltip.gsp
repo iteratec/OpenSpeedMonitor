@@ -1,6 +1,9 @@
 <div class="form-group">
-	<label for="chkbox-${booleanAttribute}" class="col-md-4 control-label">
-		${label}
+	<label class="col-md-4 control-label" for="${booleanAttribute}">
+		<abbr title="${description}"
+			  data-placement="bottom" rel="tooltip">
+			${label}
+		</abbr>
 	</label>
 	<div class="col-md-8">
 		<div class="checkbox">

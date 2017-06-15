@@ -118,12 +118,50 @@ class JobProcessingService {
                 ignoreSSL      : job.ignoreSSL,
                 standards      : job.standards,
                 tcpdump        : job.tcpdump,
-                bodies         : job.bodies,
                 continuousVideo: job.continuousVideo,
-                keepua         : job.keepua
+                private        : job.isPrivate,
+                block          : job.urlsToBlock,
+                mobile         : job.emulateMobile,
+                dpr            : job.devicePixelRation,
+                cmdline        : job.cmdlineOptions,
+                custom         : job.customMetrics,
+                tester         : job.tester,
+                timeline       : job.captureTimeline,
+                timelineStack  : job.javascriptCallstack,
+                mobileDevice   : job.mobileDevice,
+                lighthouse     : job.performLighthouseTest,
+                type           : job.optionalTestTypes,
+                customHeaders  : job.customHeaders,
+                trace          : job.trace,
+                spof           : job.spof
         ]
+        if (job.takeScreenshots == Job.TakeScreenshots.NONE) {
+            parameters.noimages = true
+        }
+        else if (job.takeScreenshots == Job.TakeScreenshots.FULL) {
+            parameters.pngss = true
+        }
+        else {
+            parameters.iq = job.imageQuality
+        }
 
-        // specify connectivity
+        if (job.saveBodies == Job.SaveBodies.HTML) {
+            parameters.htmlbody = true
+        }
+        else if (job.saveBodies == Job.SaveBodies.ALL) {
+            parameters.bodies = true
+        }
+
+        if(job.userAgent == Job.UserAgent.ORIGINAL) {
+            parameters.keepua = true
+        }
+        else if(job.userAgent == Job.UserAgent.APPEND) {
+            parameters.appendua = job.appendUserAgent
+        }
+        else if(job.userAgent == Job.UserAgent.OVERWRITE) {
+            parameters.uastring = job.userAgentString
+        }
+
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"
         } else {
