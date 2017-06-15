@@ -3,7 +3,7 @@
 
 <h1 id="JobName">${job?.label}</h1>
 
-<div class="tabbable" style="margin-top: 1em;">
+<div class="tabbable">
   <ul class="nav nav-tabs">
     <li class="active">
       <a id="jobSettingsTabLink" href="#jobSettingsTab" data-toggle="tab"><g:message code="job.form.testSettings.label" default="Job Settings"/></a>
@@ -15,7 +15,7 @@
       <a id="advancedSettingsTabLink" href="#advancedSettingsTab" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced Settings"/></a>
     </li>
   </ul>
-  <div class="iteratec-tab-content">
+  <div class="tab-content">
     <div class="tab-pane active" id="jobSettingsTab" >
       <g:render template="jobSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
