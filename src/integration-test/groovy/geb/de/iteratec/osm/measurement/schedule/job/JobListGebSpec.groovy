@@ -91,8 +91,10 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         when: "The user fills out all necessary data and submits"
         createPage.setLocation(location2Name)
         createPage.nameText << job4Name
-        createPage.cronString << "10/20 * * * ? *"
+        createPage.selectCustomCronString("10/20 * * * ? *")
         createPage.addTag(job4Tag)
+        createPage.scriptTab.click()
+        createPage.selectScript(script1Name)
 
         createPage.clickCreateButton()
 
