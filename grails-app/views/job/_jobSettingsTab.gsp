@@ -12,7 +12,7 @@
                 <g:message code="job.active.label" default="Active"/>
             </label>
 
-            <div class="col-md-5">
+            <div class="col-md-7">
                 <div class="checkbox">
                     <g:checkBox name="active" value="${job?.active}" id="chkbox-active"/>
                 </div>
@@ -25,7 +25,7 @@
                 <g:message code="job.label.label" default="Name"/><span class="required-indicator">*</span>
             </label>
 
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <g:textField class="form-control job-label" id="inputField-JobLabel" name="label" value="${job?.label}"
                              placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}"/>
             </div>
@@ -36,7 +36,7 @@
                 <g:message code="job.location.label" default="Location"/><span class="required-indicator">*</span>
             </label>
 
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <select id="location" class="form-control" name="location.id">
                     <g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
                         <optgroup label="${server.label}">
@@ -56,17 +56,16 @@
                 <span class="required-indicator">*</span>
             </label>
 
-            <div class="col-md-8">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <a id="jobGroupModalLink" href="#jobGroupModal" data-toggle="modal"
-                           title="Create New Job Group" role="button">
-                            <i id="button_create_jobGroup" class="fa fa-plus" aria-hidden="true"></i>
-                        </a>
-                    </span>
-                    <g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
-                              value="${job?.jobGroup?.id}" optionValue="name" optionKey="id"/>
-                </div>
+            <div class="col-md-7">
+                <g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
+                          value="${job?.jobGroup?.id}" optionValue="name" optionKey="id"/>
+            </div>
+            <div class="col-md-2 no-left-gutter">
+                <a id="jobGroupModalLink" href="#jobGroupModal" data-toggle="modal"
+                   title="Create New Job Group" role="button" class="btn btn-link col-md-2">
+                    <i id="button_create_jobGroup" class="fa fa-plus" aria-hidden="true"></i>
+                    Create New
+                </a>
             </div>
         </div>
 
@@ -76,7 +75,7 @@
                 <span class="required-indicator">*</span>
             </label>
 
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <g:select id="connectivityProfile" class="chosen"
                           data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
                           name="connectivityProfile.id" from="${connectivites}" optionKey="id"
@@ -96,7 +95,7 @@
                                default="Name of custom connectivity profile"/>
                 </label>
 
-                <div class="col-md-8">
+                <div class="col-md-7">
                     <g:textField class="form-control" name="customConnectivityName" id="custom-connectivity-name"
                                  value="${job?.customConnectivityName}" readonly="readonly"/>
                     <label class="checkbox-inline">
@@ -113,7 +112,7 @@
                                    default="null"/>
                     </label>
 
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <g:textField class="form-control" name="${attribute}" id="custom-${attribute}"
                                      value="${job?."$attribute"}"/>
                     </div>
@@ -155,7 +154,7 @@
                 </select>
             </div>
 
-            <div style="margin-left: 0px" class="col-sm-5 form-group">
+            <div style="margin-left: 0px" class="col-sm-4 form-group">
                 <input type="text" class="form-control" id="executionSchedule" name="executionSchedule"
                        value="${executionSchedule}" data-help-panel-id="cronInfoPanel">
                 <span id="cronInputHelpBlock" class="help-block"></span>

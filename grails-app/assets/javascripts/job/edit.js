@@ -157,12 +157,7 @@ function registerEventHandlers() {
             predefinedCronSelectBox.val("");
             cronStringInputField.val(initValue);
         }
-    } /*else {
-        console.log("reset");
-        // set default value.
-        predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
-        updateCronStringFromPredefined();
-    }*/
+    }
     validateCronExpression();
     updateCronStringFromPredefined();
 
@@ -213,10 +208,9 @@ var validateCronExpression = function () {
 };
 
 var processCronExpressionValidation = function (isValid, helpText) {
-    cronInputValid = isValid;
     cronInputHelpBlock.text(helpText);
-    //validateInputs();
-}
+    cronStringInputField.parent().toggleClass("has-error", !isValid);
+};
 
 function toggleAuthOptions() {
     if (!$("#provideAuthenticateInformation").prop("checked")) {
@@ -420,34 +414,6 @@ function getCustomConnNameFromDom() {
     var plrOrEmpty = packetLossValue ? packetLossValue : "[plr]";
 
     return "Custom (" + bwDownOrEmpty + "/" + bwUpOrEmpty + " Kbps, " + latencyOrEmpty + "ms, " + plrOrEmpty + "% PLR)";
-}
-
-
-function toggleCronInstructions() {
-    var cronInstructions = document.querySelector('#cron-instructions');
-    cronInstructions.style.display == "none" ?
-        cronInstructions.style.display = "inline" : cronInstructions.style.display = "none";
-}
-function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {
-    jQuery.ajax({
-        type: 'POST',
-        data: 'value=' + execScheduleWithSeconds,
-        url: nextExecutionLink,
-        success: function (data, textStatus) {
-
-            $('#execution-schedule').val(execScheduleWithSeconds);
-            $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
-            );
-            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
-            $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(execScheduleWithSeconds.substr(execScheduleWithSeconds.indexOf(' ') + 1)) : ''
-            );
-
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-        }
-    });
 }
 
 function createJobGroup(createJobGroupUrl) {
