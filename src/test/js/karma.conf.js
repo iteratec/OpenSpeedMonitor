@@ -67,10 +67,21 @@ module.exports = function (config) {
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
+        customLaunchers: {
+            ChromeHeadlessForDocker: {
+                base: 'ChromeHeadless',
+                flags: [
+                    '--disable-web-security',
+                    '--disable-gpu',
+                    '--no-sandbox'
+                ],
+                displayName: 'Chrome Headless for docker'
+            }
+        },
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['ChromeHeadless'],
+        browsers: ['ChromeHeadlessForDocker'],
 
 
         // Continuous Integration mode
