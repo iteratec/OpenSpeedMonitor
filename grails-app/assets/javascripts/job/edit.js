@@ -127,9 +127,11 @@ function registerEventHandlers() {
     $("#location").on("change",toggleChromeTab);
     inputEmulateMobile.on("change",toggleMobileOptions);
     $("#chkbox-captureTimeline").on("change",toggleTimelineOptions);
+    $("#chkbox-trace").on("change",toggleTraceOptions);
     toggleChromeTab();
     toggleMobileOptions();
     toggleTimelineOptions();
+    toggleTraceOptions();
 
     $("#inputField-takeScreenshots").on("change",toggleScreenshotOptions);
     inputUserAgent.on("change",toggleUserAgentOptions);
@@ -243,6 +245,10 @@ function toggleMobileOptions() {
 
 function toggleTimelineOptions() {
     $("#javascriptCallstack").toggleClass("hidden", !$("#chkbox-captureTimeline").prop("checked"));
+}
+
+function toggleTraceOptions() {
+    $("#traceCategories").toggleClass("hidden", !$("#chkbox-trace").prop("checked"));
 }
 
 function toggleChromeTab() {

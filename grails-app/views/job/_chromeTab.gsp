@@ -1,6 +1,17 @@
 <g:render template="inputField" model="${['attribute': 'cmdlineOptions','label': "${message(code: 'job.cmdlineOptions.label', default: 'Commandline Options')}", 'job': job]}" />
 <g:render template="checkbox" model="${['booleanAttribute': 'performLighthouseTest','label': "${message(code: 'job.performLighthouseTest.label', default: 'Perform Lighthouse Test')}", 'job': job]}" />
 <g:render template="checkbox" model="${['booleanAttribute': 'trace','label': "${message(code: 'job.trace.label', default: 'Capture Chrome Trace')}", 'job': job]}" />
+%{--<g:render template="inputField" model="${['attribute': 'traceCategories','label': "${message(code: 'job.traceCategories.label', default: 'traceCategories')}", 'job': job]}" />--}%
+
+<div id="traceCategories" class="form-group">
+    <label for="inputField-traceCategories" class="col-md-4 control-label">
+        <g:message code="job.traceCategories.label" default="Trace Categories"/>
+    </label>
+    <div class="col-md-6">
+        <textarea  class="form-control" name="traceCategories" rows="3" id="inputField-traceCategories">${job?.traceCategories?.trim()}</textarea>
+    </div>
+</div>
+
 <g:render template="checkbox" model="${['booleanAttribute': 'captureTimeline','label': "${message(code: 'job.captureTimeline.label', default: 'Capture The Dev Tools Timeline')}", 'job': job]}" />
 
 <div id="javascriptCallstack" class="form-group ${hasErrors(bean: job, field: javascriptCallstack, 'has-error')}">

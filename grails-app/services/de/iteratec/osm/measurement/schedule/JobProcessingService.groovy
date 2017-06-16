@@ -133,6 +133,7 @@ class JobProcessingService {
                 type           : job.optionalTestTypes,
                 customHeaders  : job.customHeaders,
                 trace          : job.trace,
+                traceCategories: job.traceCategories,
                 spof           : job.spof
         ]
         if (job.takeScreenshots == Job.TakeScreenshots.NONE) {

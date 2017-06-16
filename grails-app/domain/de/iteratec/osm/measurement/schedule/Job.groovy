@@ -156,6 +156,7 @@ class Job implements Taggable {
     String  optionalTestTypes
     String  customHeaders
     boolean trace
+    String  traceCategories = "blink,v8,cc,gpu,blink.net,netlog,disabled-by-default-v8.runtime_stats"
     String  spof
 
     enum TakeScreenshots {
@@ -304,6 +305,7 @@ class Job implements Taggable {
         appendUserAgent(nullable: true)
         optionalTestTypes(nullable: true)
         customHeaders(nullable: true)
+        traceCategories(nullable: true)
         spof(nullable: true)
     }
 
