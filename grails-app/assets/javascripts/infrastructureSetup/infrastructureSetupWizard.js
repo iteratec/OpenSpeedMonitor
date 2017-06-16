@@ -20,7 +20,9 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     var init = function () {
         serverSelectBox.change(updateInputFields);
         finishButton.click(function () {
-            spinner.start();
+            if (!finishButton.hasClass("disabled")) {
+                spinner.start();
+            }
         });
         form.validator({
           feedback: {
@@ -41,10 +43,13 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
         lastCustomServerUrl = serverUrlField.val();
         serverNameField.val(OFFICIAL_WPT_URL);
         serverUrlField.val('http://' + OFFICIAL_WPT_URL);
+        document.getElementById("serverApiKey").required = true;
         form.validator('validate');
       } else {
         serverNameField.val(lastCustomServerName);
         serverUrlField.val(lastCustomServerUrl);
+          document.getElementById("serverApiKey").required = false;
+        form.validator('validate');
       }
 
       serverNameField.prop('disabled', isOfficialWptServer);

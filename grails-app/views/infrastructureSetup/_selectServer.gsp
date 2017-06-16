@@ -4,17 +4,26 @@
 
         %{------------------------------------------------------------------------------ select server type--}%
         <div class="panel-body">
-            <g:message code="de.iteratec.osm.ui.setupwizards.infra.selectServer" default="Select server type:"></g:message>
+            <g:message code="de.iteratec.osm.ui.setupwizards.infra.selectServer"
+                       default="Select server type:"></g:message>
         </div>
-        <g:select name = "serverSelect"
-                  class="form-control chosen-select"
-                  from="${serverCreationOptions}"
-                  id="serverSelect"
-                  value="${serverSelect}"
-                  valueMessagePrefix="de.iteratec.osm.ui.setupwizards.infra">
-        </g:select>
-        <div style="line-height:100%;">
-            <br>
+
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+
+            <div class="col-md-6">
+                <g:select style="margin-bottom: 10px" name="serverSelect"
+                          class="form-control chosen-select"
+                          from="${serverCreationOptions}"
+                          id="serverSelect"
+                          value="${serverSelect}"
+                          valueMessagePrefix="de.iteratec.osm.ui.setupwizards.infra">
+                </g:select>
+                <div style="line-height:100%;">
+                    <br>
+                </div>
+            </div>
         </div>
 
         %{------------------------------------------------------------------------------ setup wpt server --}%
@@ -23,44 +32,54 @@
                 <label for="serverName" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>
                 </label>
+
                 <div class="col-md-6">
                     <input name="serverName" class="form-control" id="serverName" value="${serverName}"
-                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default:'enter server name')}"
-                           required data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingName', default: 'Please set a name.')}"/>
+                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default: 'enter server name')}"
+                           required
+                           data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingName', default: 'Please set a name.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
             </div>
         </div>
+
         <div class="form-group has-feedback">
             <div class="row">
                 <label for="serverUrl" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.address" default="URL"></g:message>:
                 </label>
+
                 <div class="col-md-6">
                     <input name="serverUrl" class="form-control" id="serverUrl" value="${serverUrl}"
-                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default:'Enter server URL')}"
-                           type="url" required data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
+                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default: 'Enter server URL')}"
+                           type="url" required
+                           data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
             </div>
         </div>
+
         <div class="form-group">
             <div class="row" id="serverApiKey">
                 <label for="serverApiKey" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="API key"></g:message>:
                 </label>
-                <div class="col-md-6">
 
-                    <g:textField name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}">
-                    </g:textField>
+                <div class="col-md-6">
+                    <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}"
+                           required
+                           data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-md-offset-2 col-md-6" id="apiKeyPrompt">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.keyPrompt"></g:message>
@@ -80,7 +99,8 @@
                 </div>
 
                 <div class="panel-body">
-                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.keyInfo" default="Apply for a key on this website"></g:message>
+                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.keyInfo"
+                               default="Apply for a key on this website"></g:message>
                     <img class="infoImage thumbnail" id="keyApplicationImg"
                          src="${resource(dir: 'images', file: 'WPT.png')}"
                          alt="Key Application"/>
@@ -97,7 +117,8 @@
                 </div>
 
                 <div class="panel-body">
-                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.customInfo" default="Setup your own server"></g:message>
+                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.customInfo"
+                               default="Setup your own server"></g:message>
                 </div>
             </div>
         </div>
@@ -114,7 +135,7 @@
             <g:message code="script.versionControl.cancel.button" default="Cancel"/>
         </a>
         %{-- done button --}%
-        <button class="btn btn-primary" type="submit" id="finishButton" >
+        <button class="btn btn-primary" type="submit" id="finishButton">
             <g:message code="de.iteratec.osm.ui.setupwizards.infra.submit" default="submit"></g:message>
         </button>
     </div>
