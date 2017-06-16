@@ -1,19 +1,20 @@
 <div class="row form-horizontal">
 
-    <div class="col-md-8">
+    <div class="col-md-7">
 
         %{------------------------------------------------------------------------------ select server type--}%
-        <div class="panel-body">
-            <g:message code="de.iteratec.osm.ui.setupwizards.infra.selectServer"
-                       default="Select server type:"></g:message>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-body">
+                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.selectServer"
+                               default="Select server type:"></g:message>
+                </div>
+            </div>
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-            </div>
-
-            <div class="col-md-6">
-                <g:select style="margin-bottom: 10px" name="serverSelect"
+            <div class="col-md-8">
+                <g:select style="margin-bottom: 10px;margin-left: 10px" name="serverSelect"
                           class="form-control chosen-select"
                           from="${serverCreationOptions}"
                           id="serverSelect"
