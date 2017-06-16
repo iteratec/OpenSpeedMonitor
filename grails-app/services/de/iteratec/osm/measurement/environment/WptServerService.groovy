@@ -22,7 +22,7 @@ class WptServerService {
         else {
             server.label = serverName
             server.proxyIdentifier = serverName
-            server.baseUrl = serverUrl.startsWith("http://") || serverUrl.startsWith("https://")|| serverUrl.startsWith("localhost:") ? serverUrl : "http://${serverUrl}"
+            server.baseUrl = serverUrl.startsWith("http://") || serverUrl.startsWith("https://") ? serverUrl : "http://${serverUrl}"
             server.apiKey = serverApiKey
         }
 

@@ -1,5 +1,5 @@
 <div class="row form-horizontal">
-    <div class="col-md-7" style="margin-left: 10px">
+    <div class="col-md-7" id="all_inputs" >
         %{------------------------------------------------------------------------------ select server type--}%
         <div class="row">
             <div class="col-md-12">
@@ -12,12 +12,12 @@
 
         <div class="row">
             <div class="col-md-8">
-                <g:select style="margin-bottom: 25px;margin-left: 10px" name="serverSelect"
-                          class="form-control chosen-select"
-                          from="${serverCreationOptions}"
-                          id="serverSelect"
-                          value="${serverSelect}"
-                          valueMessagePrefix="de.iteratec.osm.ui.setupwizards.infra">
+                <g:select  name="serverSelect"
+                           class="form-control chosen-select"
+                           from="${serverCreationOptions}"
+                           id="serverSelect"
+                           value="${serverSelect}"
+                           valueMessagePrefix="de.iteratec.osm.ui.setupwizards.infra">
                 </g:select>
             </div>
         </div>
@@ -31,7 +31,7 @@
 
                 <div class="col-md-6">
                     <input name="serverName" class="form-control" id="serverName" value="${serverName}"
-                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default: 'enter server name')}"
+                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default: 'e.g. My WPT Server')}"
                            required
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingName', default: 'Please set a name.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
@@ -51,7 +51,7 @@
 
                 <div class="col-md-6">
                     <input name="serverUrl" class="form-control" id="serverUrl" value="${serverUrl}"
-                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default: 'Enter server URL')}"
+                           placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default: 'e.g. http://wpt.mycompany.org')}"
                            type="url" required
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
@@ -126,7 +126,7 @@
         %{-- cancel button --}%
         <a class="btn btn-default" href="/InfrastructureSetup/cancel" data-toggle="modal" id="cancelSetup">
             <i class="fa fa-times" aria-hidden="true"></i>
-            <g:message code="script.versionControl.cancel.button" default="Cancel"/>
+            <g:message code="script.versionControl.cancel.button" default=" Cancel"/>
         </a>
         %{-- done button --}%
         <button class="btn btn-primary" type="submit" id="finishButton">
