@@ -1184,6 +1184,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             datePicker << Keys.chord(Keys.BACK_SPACE)
         }
         datePicker << date
+        datePicker << Keys.chord(Keys.ESCAPE) // close datepicker if open
     }
 
     private void initChartData() {
