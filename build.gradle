@@ -52,7 +52,6 @@ ext {
     karmaConfig = 'src/test/js/karma.conf.js'
 
     seleniumVersion = "2.53.1"
-    phantomJsVersion = '2.1.1'
 }
 
 repositories {
@@ -126,9 +125,6 @@ dependencies {
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
-    testCompile('com.codeborne:phantomjsdriver:1.2.1') {
-        transitive = false
-    }
     testCompile('com.athaydes:spock-reports:1.3.0'){
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
