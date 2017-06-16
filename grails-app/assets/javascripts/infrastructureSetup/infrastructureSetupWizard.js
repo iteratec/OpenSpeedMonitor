@@ -12,7 +12,7 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     var finishButton = $("#finishButton");
     var serverNameField = $("#serverName");
     var serverUrlField = $("#serverUrl");
-    var apiKeyPrompt = $('#apiKeyPrompt')
+    var apiKeyPrompt = $('#apiKeyPrompt');
     var lastCustomServerName, lastCustomServerUrl;
 
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");

@@ -1,7 +1,5 @@
 <div class="row form-horizontal">
-
-    <div class="col-md-7">
-
+    <div class="col-md-7" style="margin-left: 10px">
         %{------------------------------------------------------------------------------ select server type--}%
         <div class="row">
             <div class="col-md-12">
@@ -14,16 +12,13 @@
 
         <div class="row">
             <div class="col-md-8">
-                <g:select style="margin-bottom: 10px;margin-left: 10px" name="serverSelect"
+                <g:select style="margin-bottom: 25px;margin-left: 10px" name="serverSelect"
                           class="form-control chosen-select"
                           from="${serverCreationOptions}"
                           id="serverSelect"
                           value="${serverSelect}"
                           valueMessagePrefix="de.iteratec.osm.ui.setupwizards.infra">
                 </g:select>
-                <div style="line-height:100%;">
-                    <br>
-                </div>
             </div>
         </div>
 
