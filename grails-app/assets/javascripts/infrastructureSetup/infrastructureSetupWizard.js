@@ -48,7 +48,7 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
       } else {
         serverNameField.val(lastCustomServerName);
         serverUrlField.val(lastCustomServerUrl);
-          document.getElementById("serverApiKey").required = false;
+        document.getElementById("serverApiKey").required = false;
         form.validator('validate');
       }
 

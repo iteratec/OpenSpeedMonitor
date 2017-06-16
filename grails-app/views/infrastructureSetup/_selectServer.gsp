@@ -64,15 +64,13 @@
         </div>
 
         <div class="form-group">
-            <div class="row" id="serverApiKey">
+            <div class="row" id="row_serverApiKey">
                 <label for="serverApiKey" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="API key"></g:message>:
                 </label>
 
                 <div class="col-md-6">
-                    <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}"
-                           required
-                           data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
+                    <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}" required/>
                 </div>
             </div>
 
