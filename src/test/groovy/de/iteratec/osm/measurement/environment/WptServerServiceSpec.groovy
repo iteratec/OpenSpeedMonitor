@@ -86,7 +86,7 @@ class WptServerServiceSpec extends Specification {
         List<Location> addedLocations = service.tryMakeServerAndGetLocations(
             "custom",
             "name",
-            "invalidUrl",
+            "?invalidUrl?",
             ""
         )
         then: "It should not be saved and tryMakeServerAndGetLocations returns an empty list of Locations."
