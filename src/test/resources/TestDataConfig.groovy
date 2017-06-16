@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 testDataConfig {
     sampleData {
@@ -47,6 +48,9 @@ testDataConfig {
         'de.iteratec.osm.csi.Page' {
             def i = 1
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.measurement.environment.WebPageTestServer' {
+            baseUrl = {-> "http://wptserver/" }
         }
     }
     unitAdditionalBuild = [

@@ -1,7 +1,6 @@
 <g:render template="inputField" model="${['attribute': 'cmdlineOptions','label': "${message(code: 'job.cmdlineOptions.label', default: 'Commandline Options')}", 'job': job]}" />
 <g:render template="checkbox" model="${['booleanAttribute': 'performLighthouseTest','label': "${message(code: 'job.performLighthouseTest.label', default: 'Perform Lighthouse Test')}", 'job': job]}" />
 <g:render template="checkbox" model="${['booleanAttribute': 'trace','label': "${message(code: 'job.trace.label', default: 'Capture Chrome Trace')}", 'job': job]}" />
-%{--<g:render template="inputField" model="${['attribute': 'traceCategories','label': "${message(code: 'job.traceCategories.label', default: 'traceCategories')}", 'job': job]}" />--}%
 
 <div id="traceCategories" class="form-group">
     <label for="inputField-traceCategories" class="col-md-4 control-label">

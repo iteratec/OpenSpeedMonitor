@@ -20,8 +20,6 @@ databaseChangeLog = {
             column(name: "trace"                     , type: "BOOLEAN")      {constraints(nullable: "false")}
             column(name: "spof"                      , type: "varchar(255)")
 
-            column(defaultValue: "blink,v8,cc,gpu,blink.net,netlog,disabled-by-default-v8.runtime_stats", name: "trace_categories", type: "varchar(255)")
-
             column(defaultValue: "DEFAULT", name: "take_screenshots"           , type: "varchar(255)")
             column(defaultValue: "NONE"   , name: "save_bodies"                , type: "varchar(255)")
             column(defaultValue: "DEFAULT", name: "user_agent"                 , type: "varchar(255)")
