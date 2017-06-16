@@ -12,7 +12,7 @@ reportOnTestFailureOnly = true
 
 driver = {
     ChromeOptions options = new ChromeOptions()
-    options.addArguments('--headless', '--disable-gpu', '--lang=en-us', '--window-size=1000x1000')
+    options.addArguments('--headless', '--disable-gpu', '--no-sandbox', '--lang=en-us', '--window-size=1000x1000')
     def driverInstance = new ChromeDriver(options)
     driverInstance
 }
