@@ -24,7 +24,7 @@
 
         %{------------------------------------------------------------------------------ setup wpt server --}%
         <div class="form-group has-feedback">
-            <div class="row">
+            <div class="">
                 <label for="serverName" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>
                 </label>
@@ -38,13 +38,13 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="">
                 <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
             </div>
         </div>
 
         <div class="form-group has-feedback">
-            <div class="row">
+            <div class="">
                 <label for="serverUrl" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.address" default="URL"></g:message>:
                 </label>
@@ -58,13 +58,13 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="">
                 <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
             </div>
         </div>
 
         <div class="form-group">
-            <div class="row" id="row_serverApiKey">
+            <div class="" id="row_serverApiKey">
                 <label for="serverApiKey" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="API key"></g:message>:
                 </label>
@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="">
                 <div class="col-md-offset-2 col-md-6" id="apiKeyPrompt">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.keyPrompt"></g:message>
                 </div>
