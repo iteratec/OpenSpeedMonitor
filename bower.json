@@ -33,7 +33,7 @@
     "later": "^1.2.0",
     "prettycron": "^0.10.0",
     "spin.js": "spin-js#^2.0.1",
-    "tagit": "*",
+    "tagit": "https://github.com/aehlke/tag-it.git",
     "codemirror": "^5.19.0",
     "file-saver": "^1.3.3",
     "StickyTableHeaders": "0.1.19",
