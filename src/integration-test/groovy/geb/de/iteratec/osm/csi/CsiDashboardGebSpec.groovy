@@ -92,7 +92,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Hourly mean per measured step\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         selectDateInDatepicker(fromDatepicker, "01.06.2016 00:00")
@@ -122,7 +122,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "NotUsedBrowser leads to no data"() {
         given: "User selects NotUsedBrowser"
         waitFor { browserTab.click() }
@@ -139,7 +139,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph is shown for correct Browser"() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -165,7 +165,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph is shown for \"Select all Browsers\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -191,7 +191,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "NotUsedLocation leads to no data"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -209,7 +209,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph is shown for correct Location"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -236,7 +236,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph is shown for \"Select all Locations\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -305,7 +305,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph is shown for \"Select all Connectivity Profiles\""() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
