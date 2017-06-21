@@ -26,7 +26,7 @@
         <div class="form-group has-feedback">
             <div class="">
                 <label for="serverName" class="col-md-2 control-label">
-                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>
+                    <g:message code="de.iteratec.osm.ui.setupwizards.infra.name" default="name"></g:message>:
                 </label>
 
                 <div class="col-md-6">
@@ -36,10 +36,6 @@
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingName', default: 'Please set a name.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
                 </div>
-            </div>
-
-            <div class="">
-                <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
             </div>
         </div>
 
@@ -52,25 +48,29 @@
                 <div class="col-md-6">
                     <input name="serverUrl" class="form-control" id="serverUrl" value="${serverUrl}"
                            placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default: 'e.g. http://wpt.mycompany.org')}"
-                           type="url" required
+                           type="url" required pattern="((https?:\/\/)[\-a-zA-Z\d]+(\.[a-zA-Z\d]+)*)(:\d+)?(\/[a-zA-Z&=\d_?]+)*\/?"
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
                     <span class="fa form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
 
             <div class="">
-                <div class="col-md-offset-2 col-md-6 help-block with-errors"></div>
+                <div id = "serverUrl_errors" class="col-md-offset-2 col-md-6 help-block with-errors">
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group has-feedback">
             <div class="" id="row_serverApiKey">
                 <label for="serverApiKey" class="col-md-2 control-label">
                     <g:message code="de.iteratec.osm.ui.setupwizards.infra.key" default="API key"></g:message>:
                 </label>
 
                 <div class="col-md-6">
-                    <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}" required/>
+                    <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}"
+                           data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingKey', default: 'Please set a key.')}"
+                           required/>
+                    <span class="fa form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
 

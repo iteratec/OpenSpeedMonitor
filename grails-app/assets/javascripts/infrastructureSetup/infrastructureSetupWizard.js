@@ -44,12 +44,10 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
         serverNameField.val(OFFICIAL_WPT_URL);
         serverUrlField.val('http://' + OFFICIAL_WPT_URL);
         document.getElementById("serverApiKey").required = true;
-        form.validator('validate');
       } else {
         serverNameField.val(lastCustomServerName);
         serverUrlField.val(lastCustomServerUrl);
         document.getElementById("serverApiKey").required = false;
-        form.validator('validate');
       }
 
       serverNameField.prop('disabled', isOfficialWptServer);
@@ -57,7 +55,7 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
       wptKeyInputInfo.toggleClass("hidden", !isOfficialWptServer);
       customServerInfo.toggleClass("hidden", isOfficialWptServer);
       apiKeyPrompt.toggleClass("hidden", !isOfficialWptServer);
-
+      form.validator('validate');
     };
 
     init();
