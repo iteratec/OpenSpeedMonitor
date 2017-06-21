@@ -29,7 +29,7 @@ import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ParameterBindingUtility
-import de.iteratec.osm.util.TreeMapOfTreeMaps
+
 import grails.converters.JSON
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
@@ -456,10 +456,10 @@ class EventResultDashboardController {
     private
     static void writeCSV(List<OsmChartGraph> source, Writer target) throws IOException {
         // Sort graph points by time
-        TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>();
+        Map pointsByGraphByTime = [:].withDefault { [:] }
         for (OsmChartGraph eachCSIValueEntry : source) {
             for (OsmChartPoint eachPoint : eachCSIValueEntry.getPoints()) {
-                pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint);
+                pointsByGraphByTime[eachPoint.time][eachCSIValueEntry.getLabel()] = eachPoint
             }
         }
 

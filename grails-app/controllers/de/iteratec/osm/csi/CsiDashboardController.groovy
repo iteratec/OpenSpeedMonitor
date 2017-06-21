@@ -839,10 +839,10 @@ class CsiDashboardController {
         NumberFormat csvCSIValueFormat = NumberFormat.getNumberInstance(localeForNumberFormat)
 
         // Sort graph points by time
-        TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>()
+        Map pointsByGraphByTime = [:].withDefault { [:] }
         for (OsmChartGraph eachCSIValueEntry : source) {
             for (OsmChartPoint eachPoint : eachCSIValueEntry.getPoints()) {
-                pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint)
+                pointsByGraphByTime[eachPoint.time][eachCSIValueEntry.getLabel()] = eachPoint
             }
         }
 
