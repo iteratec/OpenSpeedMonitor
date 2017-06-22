@@ -20,7 +20,7 @@
         </div>
 
 
-        <div class="form-group ${hasErrors(bean: job, field: 'label', 'has-error')} required">
+        <div class="form-group" id="nameFormGroup" ${hasErrors(bean: job, field: 'label', 'has-error')} required">
             <label for="label" class="col-md-3 control-label">
                 <g:message code="job.label.label" default="Name"/>
                 <span class="required-indicator">*</span>
@@ -158,13 +158,13 @@
                 </select>
             </div>
 
-            <div style="margin-left: 0px" class="col-sm-4 form-group">
+            <div style="margin-left: 0px" class="col-sm-4 form-group" id="cronFormGroup">
                 <input type="text" class="form-control" id="executionSchedule" name="executionSchedule"
-                       value="${executionSchedule ?: "0 * * * ? *"}" data-help-panel-id="cronInfoPanel">
+                       value="${executionSchedule ?: "0 * * * ? *"}" data-cron="true" data-help-panel-id="cronInfoPanel" required>
+                <div class="help-block with-errors"></div>
                 <span id="cronInputHelpBlock" class="help-block"></span>
             </div>
         </div>
-
     </div>
 
 </div>
