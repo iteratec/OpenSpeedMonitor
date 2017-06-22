@@ -50,7 +50,7 @@ class CsiSystemCsiAggregationService {
             started >= fromDate
             started <= toDate
             interval == targetInterval
-            aggregator == AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
+            aggregationType == AggregationType.CSI_SYSTEM
         }
         return query.list()
     }
