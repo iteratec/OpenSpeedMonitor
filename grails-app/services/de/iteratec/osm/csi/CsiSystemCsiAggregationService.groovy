@@ -129,17 +129,16 @@ class CsiSystemCsiAggregationService {
      */
     private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<CsiSystem> csiSystems) {
         List<Long> result = []
-        AggregatorType csiSystemAggregator = AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
 
         csiSystems.each { currentCsiSystem ->
             CsiAggregation csiAggregation
 
-            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, currentCsiSystem)
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndCsiSystem(startDate.toDate(), interval, AggregationType.CSI_SYSTEM, currentCsiSystem)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
-                        aggregator: csiSystemAggregator,
+                        aggregationType: AggregationType.CSI_SYSTEM,
                         csiSystem: currentCsiSystem,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: ''
