@@ -48,21 +48,20 @@ class EventCsiAggregationService {
      */
     List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, ConnectivityProfile connProfile = null) {
         def query
-        AggregatorType measuredEventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 
         if (connProfile == null) {
             query = CsiAggregation.where {
                 started >= fromDate
                 started <= toDate
                 interval == targetInterval
-                aggregator == measuredEventAggregator
+                aggregationType == AggregationType.MEASURED_EVENT
             }
         } else {
             query = CsiAggregation.where {
                 started >= fromDate
                 started <= toDate
                 interval == targetInterval
-                aggregator == measuredEventAggregator
+                aggregationType == AggregationType.MEASURED_EVENT
                 connectivityProfile == connProfile
             }
         }
@@ -74,7 +73,6 @@ class EventCsiAggregationService {
      * @param newResult
      */
     void createOrUpdateHourlyValue(DateTime hourlyStart, EventResult newResult) {
-        AggregatorType eventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
         CsiAggregation hmv = ensurePresence(
                 hourlyStart,
                 CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
@@ -83,7 +81,7 @@ class EventCsiAggregationService {
                 newResult.page,
                 newResult.browser,
                 newResult.location,
-                eventAggregator,
+                AggregationType.MEASURED_EVENT,
                 true,
                 newResult.connectivityProfile)
         calcCsiAggregationForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
@@ -119,23 +117,23 @@ class EventCsiAggregationService {
                     toDateTimeEndOfInterval.toDate(),
                     mvQueryParams,
                     CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
-                    AggregatorType.findByName(AggregatorType.MEASURED_EVENT))
+                    AggregationType.MEASURED_EVENT)
         }
         return result
     }
 
-    private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, JobGroup jobGroup, MeasuredEvent measuredEvent, Page page, Browser browser, Location location, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
+    private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, JobGroup jobGroup, MeasuredEvent measuredEvent, Page page, Browser browser, Location location, AggregationType aggregationType, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
         CsiAggregation toCreateAndOrCalculate
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "EventCsiAggregationService: ensurePresence.findByStarted", 4) {
-            toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile(
-                    startDate.toDate(), interval, eventAggregator, jobGroup, measuredEvent, page, browser, location, connectivityProfile)
-            log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
+            toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile(
+                    startDate.toDate(), interval, aggregationType, jobGroup, measuredEvent, page, browser, location, connectivityProfile)
+            log.debug("CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroupAndMeasuredEventAndPageAndBrowserAndLocationAndConnectivityProfile delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
         }
         if (!toCreateAndOrCalculate) {
             toCreateAndOrCalculate = new CsiAggregation(
                     started: startDate.toDate(),
                     interval: interval,
-                    aggregator: eventAggregator,
+                    aggregationType: aggregationType,
                     jobGroup: jobGroup,
                     measuredEvent: measuredEvent,
                     page: page,
@@ -209,11 +207,10 @@ class EventCsiAggregationService {
         }
 
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 
         return CsiAggregation.createCriteria().list {
             eq('interval', interval)
-            eq('aggregator', aggregatorType)
+            eq('aggregationType', AggregationType.MEASURED_EVENT)
             between('started', fromDate, toDate)
             jobGroup {
                 'in'('id', jobGroups*.id)

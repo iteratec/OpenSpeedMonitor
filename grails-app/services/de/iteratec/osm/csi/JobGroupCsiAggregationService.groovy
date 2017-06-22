@@ -19,7 +19,6 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
@@ -60,7 +59,7 @@ class JobGroupCsiAggregationService {
             return result
         }
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', 1) {
-            result = csiAggregationDaoService.getShopCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
+            result = csiAggregationDaoService.getJobGroupCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
         }
         return result
     }
