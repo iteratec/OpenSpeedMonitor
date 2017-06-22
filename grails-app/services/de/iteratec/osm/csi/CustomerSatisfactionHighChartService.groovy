@@ -98,7 +98,6 @@ class CustomerSatisfactionHighChartService {
      * @param mvInterval
      * 		   The {@link CsiAggregationInterval} to be calculated, not <code>null</code>
      * @return not <code>null</code>.
-     * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
      */
     OsmRickshawChart getCalculatedPageCsiAggregationsAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, CsiAggregationInterval mvInterval, List<CsiType> csiType) {
 
@@ -131,7 +130,6 @@ class CustomerSatisfactionHighChartService {
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      * @return not <code>null</code>.
-     * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
      */
     OsmRickshawChart getCalculatedShopCsiAggregationsAsHighChartMap(Interval timeFrame, CsiAggregationInterval interval, MvQueryParams queryParams, List<CsiType> csiType) {
         Date fromDate = timeFrame.getStart().toDate();
@@ -341,10 +339,10 @@ class CustomerSatisfactionHighChartService {
 
     /**
      * Get label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionCsiAggregationsAsHighChartMap}
-     * for given {@link CsiAggregation} and {@link AggregatorType}
+     * for given {@link CsiAggregation} and {@link AggregationType}
      *
      * @param mv
-     * @param aggregator
+     * @param csiType
      * @return Label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionCsiAggregationsAsHighChartMap}
      */
     private String getMapLabel(CsiAggregation mv, CsiType csiType) {
@@ -462,7 +460,6 @@ class CustomerSatisfactionHighChartService {
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      * @return not <code>null</code>.
-     * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
      */
     OsmRickshawChart getCalculatedCsiSystemCsiAggregationsAsHighChartMap(Interval timeFrame, CsiAggregationInterval interval, Set<Long> selectedCsiSystems, List<CsiType> csiType) {
         Date fromDate = timeFrame.getStart().toDate();
