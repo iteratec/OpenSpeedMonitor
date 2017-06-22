@@ -28,6 +28,14 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import org.grails.databinding.BindUsing
 
+
+enum AggregationType {
+    MEASURED_EVENT,
+    PAGE,
+    JOB_GROUP,
+    CSI_SYSTEM
+}
+
 /**
  * <p>
  * Aggregated values to be shown in diagrams.
@@ -65,6 +73,7 @@ class CsiAggregation implements CsiValue {
     Date started
     CsiAggregationInterval interval
     AggregatorType aggregator
+    AggregationType aggregationType
 
     JobGroup jobGroup
     MeasuredEvent measuredEvent
