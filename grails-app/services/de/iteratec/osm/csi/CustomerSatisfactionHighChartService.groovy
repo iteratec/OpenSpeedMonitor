@@ -256,11 +256,11 @@ class CustomerSatisfactionHighChartService {
     private URL getLinkFor(CsiAggregation csiValue, CsiType csiType) {
         URL linkForPoint
 
-        String aggregatorName = csiValue.aggregator.name
+        AggregationType aggregationType = csiValue.aggregationType
 
-        if (aggregatorName.equals(AggregatorType.PAGE) ||
-                aggregatorName.equals(AggregatorType.SHOP) ||
-                aggregatorName.equals(AggregatorType.CSI_SYSTEM)
+        if (aggregationType.equals(AggregationType.PAGE) ||
+                aggregationType.equals(AggregationType.JOB_GROUP) ||
+                aggregationType.equals(AggregationType.CSI_SYSTEM)
         ) {
             Map paramsToSend = getParamsForLink(csiValue)
             paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
@@ -271,7 +271,7 @@ class CustomerSatisfactionHighChartService {
                     'params'    : paramsToSend
             ]);
             linkForPoint = testsDetailURLAsString ? new URL(testsDetailURLAsString) : null;
-        } else if (aggregatorName.equals(AggregatorType.MEASURED_EVENT)) {
+        } else if (aggregationType.equals(AggregationType.MEASURED_EVENT)) {
             linkForPoint = this.eventResultDashboardService.tryToBuildTestsDetailsURL(csiValue)
         }
         return linkForPoint
@@ -292,7 +292,7 @@ class CustomerSatisfactionHighChartService {
                 '_action_showAll'          : 'Show'
         ]
 
-        if (csiValue.aggregator.name.equals(AggregatorType.CSI_SYSTEM)) {
+        if (csiValue.aggregationType.equals(AggregationType.CSI_SYSTEM)) {
 
             if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
                 paramsToSend['selectedCsiSystems'] = csiValue.csiSystem.ident()
@@ -306,7 +306,7 @@ class CustomerSatisfactionHighChartService {
                 paramsToSend['selectedTimeFrameInterval'] = "0"
             }
 
-        } else if (csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
+        } else if (csiValue.aggregationType.equals(AggregationType.JOB_GROUP)) {
 
             if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
                 paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
@@ -321,7 +321,7 @@ class CustomerSatisfactionHighChartService {
                 paramsToSend['selectedTimeFrameInterval'] = "0"
             }
 
-        } else if (csiValue.aggregator.name.equals(AggregatorType.PAGE)) {
+        } else if (csiValue.aggregationType.equals(AggregationType.PAGE)) {
 
             if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
                 paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
@@ -351,8 +351,8 @@ class CustomerSatisfactionHighChartService {
         String labelForValuesNotAssignable = 'n.a.'
         String csiTypeString = csiType.toString() + HIGHCHART_LEGEND_DELIMITTER
         String tag = getCsiAggregationIdentifierForChart(mv)
-        switch (mv.aggregator.name) {
-            case AggregatorType.MEASURED_EVENT:
+        switch (mv.aggregationType) {
+            case AggregationType.MEASURED_EVENT:
                 if (!hourlyEventTagToGraphLabelMap.containsKey(tag)) {
 
                     JobGroup group = mv.jobGroup
@@ -371,7 +371,7 @@ class CustomerSatisfactionHighChartService {
                 }
                 return csiTypeString + hourlyEventTagToGraphLabelMap[tag]
                 break
-            case AggregatorType.PAGE:
+            case AggregationType.PAGE:
                 if (!weeklyPageTagToGraphLabelMap.containsKey(tag)) {
                     JobGroup group = mv.jobGroup
                     Page page = mv.page
@@ -381,13 +381,13 @@ class CustomerSatisfactionHighChartService {
                 }
                 return csiTypeString + weeklyPageTagToGraphLabelMap[tag]
                 break
-            case AggregatorType.SHOP:
+            case AggregationType.JOB_GROUP:
                 JobGroup group = mv.jobGroup
                 return csiTypeString + (group ?
                         group.name :
                         labelForValuesNotAssignable)
                 break
-            case AggregatorType.CSI_SYSTEM:
+            case AggregationType.CSI_SYSTEM:
                 CsiSystem csiSystem = mv.csiSystem
                 return csiTypeString + (csiSystem ? csiSystem.label : labelForValuesNotAssignable)
                 break

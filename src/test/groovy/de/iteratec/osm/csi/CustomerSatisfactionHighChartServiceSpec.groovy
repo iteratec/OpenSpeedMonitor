@@ -53,10 +53,6 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
 
-    AggregatorType measuredEventAggregator
-    AggregatorType pageAggregator
-    AggregatorType shopAggregator
-
     Date now
     Date tomorrow
     Date fourMonthsAgo
@@ -133,21 +129,21 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
     void "correct graph labels get created for hourly event csiAggregations"() {
         given:
         CsiAggregation mv1 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                aggregationType: AggregationType.MEASURED_EVENT,
                 jobGroup: jobGroup1,
                 measuredEvent: measuredEvent2,
                 page: page1,
                 browser: browser2,
                 location: location1)
         CsiAggregation mv2 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                aggregationType: AggregationType.MEASURED_EVENT,
                 jobGroup: jobGroup1,
                 measuredEvent: measuredEvent1,
                 page: page1,
                 browser: browser1,
                 location: location1)
         CsiAggregation mv3 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                aggregationType: AggregationType.MEASURED_EVENT,
                 jobGroup: jobGroup2,
                 measuredEvent: measuredEvent2,
                 page: page2,
@@ -182,17 +178,17 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
         given:
         CsiAggregation mv1 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                aggregationType: AggregationType.PAGE,
                 interval: weekly,
                 jobGroup: jobGroup1,
                 page: page1)
         CsiAggregation mv2 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                aggregationType: AggregationType.PAGE,
                 interval: weekly,
                 jobGroup: jobGroup1,
                 page: page2)
         CsiAggregation mv3 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                aggregationType: AggregationType.PAGE,
                 interval: weekly,
                 jobGroup: jobGroup2,
                 page: page2)
@@ -218,11 +214,11 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
     void "correct graph labels get created for weekly shop csiAggregations"() {
         given:
         CsiAggregation mv1 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.SHOP),
+                aggregationType: AggregationType.JOB_GROUP,
                 interval: weekly,
                 jobGroup: jobGroup1)
         CsiAggregation mv2 = new CsiAggregation(
-                aggregator: new AggregatorType(name: AggregatorType.SHOP),
+                aggregationType: AggregationType.JOB_GROUP,
                 interval: weekly,
                 jobGroup: jobGroup2)
 
@@ -308,7 +304,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
-        mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
+        mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
         when:
         OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
@@ -338,7 +334,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
-        mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyWithNullList)
+        mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyWithNullList)
 
         when:
         OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
@@ -368,7 +364,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
-        mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
+        mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
         when:
         OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
@@ -398,7 +394,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
-        mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
+        mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
         when:
         OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
@@ -481,9 +477,6 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
     private void createAggregatorTypesAndIntervals() {
         hourly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.HOURLY)
         weekly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.WEEKLY)
-        measuredEventAggregator = AggregatorType.build(name: AggregatorType.MEASURED_EVENT)
-        pageAggregator = AggregatorType.build(name: AggregatorType.PAGE)
-        shopAggregator = AggregatorType.build(name: AggregatorType.SHOP)
     }
 
     private void createJobs() {
@@ -528,7 +521,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                                     new CsiAggregation(
                                             started: now,
                                             interval: hourly,
-                                            aggregator: measuredEventAggregator,
+                                            aggregationType: AggregationType.MEASURED_EVENT,
                                             jobGroup: JobGroup.get(zeroBasedIndexJobGroup + 1),
                                             measuredEvent: MeasuredEvent.get(zeroBasedIndexMeasuredEvent + 1),
                                             page: Page.get(zeroBasedIndexPage + 1),
@@ -547,7 +540,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: hourly,
-                        aggregator: pageAggregator,
+                        aggregationType: AggregationType.PAGE,
                         jobGroup: jobGroup1,
                         page: page1,
                         csByWptDocCompleteInPercent: 85,
@@ -556,7 +549,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 3),
                         interval: hourly,
-                        aggregator: pageAggregator,
+                        aggregationType: AggregationType.PAGE,
                         jobGroup: jobGroup1,
                         page: page1,
                         csByWptDocCompleteInPercent: 83,
@@ -565,7 +558,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: hourly,
-                        aggregator: pageAggregator,
+                        aggregationType: AggregationType.PAGE,
                         jobGroup: jobGroup1,
                         page: page1,
                         csByWptDocCompleteInPercent: 79,
@@ -574,7 +567,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: hourly,
-                        aggregator: pageAggregator,
+                        aggregationType: AggregationType.PAGE,
                         jobGroup: jobGroup1,
                         page: page2,
                         csByWptDocCompleteInPercent: 65,
@@ -583,7 +576,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: hourly,
-                        aggregator: pageAggregator,
+                        aggregationType: AggregationType.PAGE,
                         jobGroup: jobGroup1,
                         page: page2,
                         csByWptDocCompleteInPercent: 67,
@@ -595,7 +588,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: hourly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 85,
                         underlyingEventResultsByWptDocComplete: '1,2'
@@ -603,7 +596,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 3),
                         interval: hourly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 83,
                         underlyingEventResultsByWptDocComplete: '5,6'
@@ -611,7 +604,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: hourly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 79,
                         underlyingEventResultsByWptDocComplete: '3,4'
@@ -622,7 +615,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: '1,2'
@@ -630,7 +623,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 3),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 83,
                         underlyingEventResultsByWptDocComplete: '5,6'
@@ -638,7 +631,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 79,
                         underlyingEventResultsByWptDocComplete: '3,4'
@@ -649,7 +642,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 32,
                         underlyingEventResultsByWptDocComplete: '1,2'
@@ -657,7 +650,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 3),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 83,
                         underlyingEventResultsByWptDocComplete: '5,6'
@@ -665,7 +658,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 79,
                         underlyingEventResultsByWptDocComplete: '3,4'
@@ -676,7 +669,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: now,
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 32.4562,
                         underlyingEventResultsByWptDocComplete: '1,2'
@@ -684,7 +677,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 3),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 83.12367,
                         underlyingEventResultsByWptDocComplete: '5,6'
@@ -692,7 +685,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 new CsiAggregation(
                         started: DateUtils.addHours(now, 2),
                         interval: weekly,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: jobGroup1,
                         csByWptDocCompleteInPercent: 79.0968,
                         underlyingEventResultsByWptDocComplete: '3,4'

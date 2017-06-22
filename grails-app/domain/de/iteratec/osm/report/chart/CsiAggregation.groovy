@@ -364,6 +364,6 @@ class CsiAggregation implements CsiValue {
     }
 
     public String toString() {
-        return "${aggregator} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
+        return "${aggregationType.toString()} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
     }
 }
