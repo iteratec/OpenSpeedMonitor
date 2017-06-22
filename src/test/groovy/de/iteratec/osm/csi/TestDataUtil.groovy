@@ -957,6 +957,36 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     /**
+     * Writes new {@link CsiAggregation} to db without validating it.
+     * @param date
+     * @param csiAggregationInterval
+     * @param aggregationType
+     * @param tag
+     * @param value
+     * @param resultIdsAsString
+     * @param closed
+     */
+    public
+    static CsiAggregation createSimpleCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregationType aggregationType, boolean closed) {
+        JobGroup group = JobGroup.list()[0]
+        Page page
+        if (aggregationType == AggregationType.PAGE) {
+            page = Page.list()[0]
+        }
+        return new CsiAggregation(
+                started: date,
+                interval: csiAggregationInterval,
+                underlyingEventResultsByWptDocComplete: "",
+                underlyingEventResultsByVisuallyComplete: "",
+                aggregationType: aggregationType,
+                csByWptDocCompleteInPercent: 0.0d,
+                closedAndCalculated: closed,
+                jobGroup: group,
+                page: page
+        ).save(validate: false)
+    }
+
+    /**
      * * Writes new {@link CsiAggregation} to db.
      * @param started
      * @param csiAggregationInterval

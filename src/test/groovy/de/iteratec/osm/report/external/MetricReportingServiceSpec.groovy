@@ -25,7 +25,7 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.EventCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -682,10 +682,10 @@ class MetricReportingServiceSpec extends Specification {
         serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService
     }
     /**
-     * Mocks methods of {@linkplain ShopCsiAggregationService}.
+     * Mocks methods of {@linkplain JobGroupCsiAggregationService}.
      */
     private void mockShopCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculateShopCsiAggregations) {
-        def shopCsiAggregationService = Stub(ShopCsiAggregationService) {
+        def shopCsiAggregationService = Stub(JobGroupCsiAggregationService) {
             getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval, _ as List) >> {
                 Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                     return toReturnFromGetOrCalculateShopCsiAggregations

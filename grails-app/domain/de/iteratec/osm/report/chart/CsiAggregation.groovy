@@ -116,20 +116,21 @@ class CsiAggregation implements CsiValue {
     static constraints = {
         started(nullable: false)
         interval(nullable: false)
-        aggregator(nullable: false)
+        aggregator(nullable: true)
+        aggregationType(nullable: false)
 
         // JobGroup can be null if aggregatorType == csiSystem
-        jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || val })
-        // measuredEvent can be null if aggregatorType in (csiSystem, shop, page)
+        jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || val })
+        // measuredEvent can be null if aggregatorType in (csiSystem, jobGroup, page)
         measuredEvent(nullable: true, validator: { val, obj ->
-            return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val
+            return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val
         })
-        //page can be null if aggregatorType in (csiSystem, shop)
-        page(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || val })
-        // browser can be null if aggregatorType in (csiSystem, shop, page)
-        browser(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
-        // location can be null if aggregatorType in (csiSystem, shop, page)
-        location(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
+        //page can be null if aggregatorType in (csiSystem, jobGroup)
+        page(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || val })
+        // browser can be null if aggregatorType in (csiSystem, jobGroup, page)
+        browser(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
+        // location can be null if aggregatorType in (csiSystem, jobGroup, page)
+        location(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
 
         csByWptDocCompleteInPercent(nullable: true)
         csByWptVisuallyCompleteInPercent(nullable: true)

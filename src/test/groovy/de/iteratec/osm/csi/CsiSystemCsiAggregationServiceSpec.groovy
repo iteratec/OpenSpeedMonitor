@@ -52,7 +52,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     void setup() {
         csiSystemAggregator = AggregatorType.build(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND)
         dailyInterval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
-        service.shopCsiAggregationService = Stub(ShopCsiAggregationService) {
+        service.shopCsiAggregationService = Stub(JobGroupCsiAggregationService) {
             getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.buildWithoutSave()]
         }
     }

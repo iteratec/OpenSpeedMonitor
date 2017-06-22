@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -43,7 +42,7 @@ import org.joda.time.DateTime
 class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     AggregatorType job
     AggregatorType page
@@ -100,7 +99,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         Integer countWeeks = 2
         Integer countPages = 7
         when:
-        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
+        List<CsiAggregation> wsmvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
         then:
         wsmvs.size() == countWeeks
         wsmvs.each {

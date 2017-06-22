@@ -25,7 +25,7 @@ import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.EventCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -58,7 +58,7 @@ class MetricReportingService {
     JobGroupDaoService jobGroupDaoService
     CsiAggregationUtilService csiAggregationUtilService
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
@@ -344,7 +344,7 @@ class MetricReportingService {
 
             if (log.debugEnabled) log.debug("getting shop csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
             CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(intervalInMinutes)
-            List<CsiAggregation> smvsWithData = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [currentJobGroup]).findAll { CsiAggregation smv ->
+            List<CsiAggregation> smvsWithData = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [currentJobGroup]).findAll { CsiAggregation smv ->
                 smv.csByWptDocCompleteInPercent != null && smv.countUnderlyingEventResultsByWptDocComplete() > 0
             }
 

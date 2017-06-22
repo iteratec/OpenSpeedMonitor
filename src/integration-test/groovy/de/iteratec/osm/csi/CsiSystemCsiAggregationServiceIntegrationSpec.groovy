@@ -41,7 +41,7 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     CsiSystemCsiAggregationService csiSystemCsiAggregationService
     EventCsiAggregationService eventCsiAggregationService
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     CsiAggregationInterval hourly
     CsiAggregationInterval daily
@@ -77,8 +77,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), hourly, connectivityProfile)
         List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1, jobGroup2], [page1, page2])
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1, jobGroup2], [page1, page2])
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1, jobGroup2])
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1, jobGroup2])
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1, jobGroup2])
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1, jobGroup2])
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily)
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly)
 
@@ -100,8 +100,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
         List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, CsiSystem.findAll())
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, CsiSystem.findAll())
 
@@ -148,8 +148,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
         List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, CsiSystem.findAll())
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, CsiSystem.findAll())
 
@@ -187,8 +187,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), hourly, connectivityProfile)
         List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, JobGroup.list(), Page.list())
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, JobGroup.list(), Page.list())
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, JobGroup.list())
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, JobGroup.list())
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, JobGroup.list())
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, JobGroup.list())
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily)
 
         then:
@@ -222,8 +222,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
         List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [csiSystem])
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [csiSystem])
 
@@ -263,8 +263,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         List<CsiAggregation> pageDailyMvs1 = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, [jobGroup1])
         List<CsiAggregation> pageDailyMvs2 = pageCsiAggregationService.findAll(fromWeekly.toDate(), toWeekly.toDate(), daily,[jobGroup1, jobGroup2], [page1, page2])
         List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, [jobGroup1])
         List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, CsiSystem.findAll())
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, CsiSystem.findAll())
 

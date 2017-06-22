@@ -51,7 +51,7 @@ class CustomerSatisfactionHighChartService {
 
     EventCsiAggregationService eventCsiAggregationService
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     EventResultDashboardService eventResultDashboardService
     CsTargetGraphDaoService csTargetGraphDaoService
     CsiAggregationUtilService csiAggregationUtilService
@@ -137,7 +137,7 @@ class CustomerSatisfactionHighChartService {
         Date fromDate = timeFrame.getStart().toDate();
         Date toDate = timeFrame.getEnd().toDate();
         List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
-        List<CsiAggregation> csiValues = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromDate, toDate, interval, csiGroups)
+        List<CsiAggregation> csiValues = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromDate, toDate, interval, csiGroups)
 
         return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues, csiType))
     }

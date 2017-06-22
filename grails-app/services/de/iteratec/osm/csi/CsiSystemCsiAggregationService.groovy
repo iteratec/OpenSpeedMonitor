@@ -31,7 +31,7 @@ import org.joda.time.DateTime
  */
 class CsiSystemCsiAggregationService {
 
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
     CsiAggregationUtilService csiAggregationUtilService
@@ -185,7 +185,7 @@ class CsiSystemCsiAggregationService {
             CsiSystem csiSystem = toBeCalculated.csiSystem
             List<JobGroup> groupsOfMv = csiSystem.getAffectedJobGroups()
 
-            List<CsiAggregation> shopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
+            List<CsiAggregation> shopCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(
                     toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
 
             List<WeightedCsiValue> weightedCsiValues = []

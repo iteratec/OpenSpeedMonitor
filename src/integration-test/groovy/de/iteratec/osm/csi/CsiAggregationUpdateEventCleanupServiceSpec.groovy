@@ -1,7 +1,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
@@ -22,8 +22,6 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     CsiAggregationInterval daily
     CsiAggregationInterval weekly
-    AggregatorType page
-    AggregatorType shop
 
     def setup() {
         createTestDataCommonForAllTests()
@@ -35,7 +33,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idDailyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, page, false)
+            CsiAggregation mvDailyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
             idDailyPageMvInitiallyOpenAndCalculated = mvDailyPageCalculated.ident()
             TestDataUtil.createUpdateEvent(idDailyPageMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
@@ -59,7 +57,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idDailyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, page, false)
+            CsiAggregation mvDailyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
             idDailyPageMvInitiallyOpenAndOutdated = mvDailyPageOutdated.ident()
             TestDataUtil.createUpdateEvent(idDailyPageMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
@@ -83,7 +81,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idWeeklyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, page, false)
+            CsiAggregation mvWeeklyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.PAGE, false)
             idWeeklyPageMvInitiallyOpenAndCalculated = mvWeeklyPageCalculated.ident()
             TestDataUtil.createUpdateEvent(idWeeklyPageMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
@@ -107,7 +105,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idWeeklyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, page, false)
+            CsiAggregation mvWeeklyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.PAGE, false)
             idWeeklyPageMvInitiallyOpenAndOutdated = mvWeeklyPageOutdated.ident()
             TestDataUtil.createUpdateEvent(idWeeklyPageMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
@@ -131,7 +129,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idDailyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, shop, false)
+            CsiAggregation mvDailyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.JOB_GROUP, false)
             idDailyShopMvInitiallyOpenAndCalculated = mvDailyShopCalculated.ident()
             TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
@@ -155,7 +153,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idDailyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, shop, false)
+            CsiAggregation mvDailyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.JOB_GROUP, false)
             idDailyShopMvInitiallyOpenAndOutdated = mvDailyShopOutdated.ident()
             TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
@@ -179,7 +177,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idWeeklyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, shop, false)
+            CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.JOB_GROUP, false)
             idWeeklyShopMvInitiallyOpenAndCalculated = mvWeeklyShopCalculated.ident()
             TestDataUtil.createUpdateEvent(idWeeklyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
@@ -203,7 +201,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         setup:
         Serializable idWeeklyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, shop, false)
+            CsiAggregation mvWeeklyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.JOB_GROUP, false)
             idWeeklyShopMvInitiallyOpenAndOutdated = mvWeeklyShopOutdated.ident()
             TestDataUtil.createUpdateEvent(idWeeklyShopMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
@@ -226,11 +224,8 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         JobGroup.withNewTransaction {
 
             List<CsiAggregationInterval> intervals = TestDataUtil.createCsiAggregationIntervals()
-            List<AggregatorType> aggregators = TestDataUtil.createAggregatorTypes()
             daily = intervals.find { it.intervalInMinutes == CsiAggregationInterval.DAILY }
             weekly = intervals.find { it.intervalInMinutes == CsiAggregationInterval.WEEKLY }
-            page = aggregators.find { it.name.equals(AggregatorType.PAGE) }
-            shop = aggregators.find { it.name.equals(AggregatorType.SHOP) }
 
             new Page(id: 1, name: "unused page").save(failOnError: true, flush: true)
             new JobGroup(id: 1, name: "unused JobGroup").save(failOnError: true, flush: true)

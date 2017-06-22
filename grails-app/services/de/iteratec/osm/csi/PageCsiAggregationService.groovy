@@ -145,17 +145,16 @@ class PageCsiAggregationService {
      */
     private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<JobGroup> jobGroups, List<Page> pages) {
         List<Long> result = []
-        AggregatorType pageAggregator = AggregatorType.findByName(AggregatorType.PAGE)
 
         jobGroups.each { currentJobGroup ->
             pages.each { currentPage ->
                 CsiAggregation csiAggregation
-                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndPage(startDate.toDate(), interval, pageAggregator, currentJobGroup, currentPage)
+                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroupAndPage(startDate.toDate(), interval, AggregationType.PAGE, currentJobGroup, currentPage)
                 if (!csiAggregation) {
                     csiAggregation = new CsiAggregation(
                             started: startDate.toDate(),
                             interval: interval,
-                            aggregator: pageAggregator,
+                            aggregationType: AggregationType.PAGE,
                             jobGroup: currentJobGroup,
                             page: currentPage,
                             csByWptDocCompleteInPercent: null,

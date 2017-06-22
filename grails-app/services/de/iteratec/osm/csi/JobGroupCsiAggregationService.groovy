@@ -35,7 +35,7 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-class ShopCsiAggregationService {
+class JobGroupCsiAggregationService {
 
     PageCsiAggregationService pageCsiAggregationService
     MeanCalcService meanCalcService

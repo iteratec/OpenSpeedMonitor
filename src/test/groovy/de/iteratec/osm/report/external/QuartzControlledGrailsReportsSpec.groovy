@@ -27,7 +27,7 @@ import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.csi.EventCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -46,7 +46,6 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Assert
 import org.junit.Test
 import spock.lang.Specification
 
@@ -89,7 +88,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         configService(ConfigService)
         eventCsiAggregationService(EventCsiAggregationService)
         pageCsiAggregationService(PageCsiAggregationService)
-        shopCsiAggregationService(ShopCsiAggregationService)
+        shopCsiAggregationService(JobGroupCsiAggregationService)
     }
 
     void setup() {
@@ -352,10 +351,10 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     }
 
     /**
-     * Mocks {@linkplain ShopCsiAggregationService#getOrCalculateShopCsiAggregations}.
+     * Mocks {@linkplain JobGroupCsiAggregationService#getOrCalculateShopCsiAggregations}.
      */
     private void mockShopCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
-        def shopCsiAggregationService = Stub(ShopCsiAggregationService)
+        def shopCsiAggregationService = Stub(JobGroupCsiAggregationService)
         shopCsiAggregationService.getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval,_ as List) >> {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 return interval.intervalInMinutes != expectedIntervalInMinutes? [] : toReturnOnDemandForGetOrCalculateCsiAggregations

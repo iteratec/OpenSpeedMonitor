@@ -34,7 +34,7 @@ import org.springframework.test.annotation.Rollback
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     ResultPersisterService resultPersisterService
 
     Map<String, Double> targetValues
@@ -116,7 +116,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         EventResult.withNewSession {
             results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
             CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-            weeklyShopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
+            weeklyShopCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
         }
 
         then:

@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue
 @Integration
 @Rollback
 @ConfineMetaClassChanges([WeightingService])
-class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
+class JobGroupCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page1
@@ -56,7 +56,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     String jobGroupName2 = 'myJobGroup2'
     String jobGroupName3 = 'myJobGroup3'
 
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService shopCsiAggregationService
 
     def setup() {
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)

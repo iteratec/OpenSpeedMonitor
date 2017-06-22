@@ -36,7 +36,7 @@ import spock.lang.Shared
 class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     @Shared
     ResultPersisterService resultPersisterService
 
@@ -125,7 +125,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         }
 
         when:
-        shopCsiAggregationService.calcCsiAggregations([mvWeeklyShop.id])
+        jobGroupCsiAggregationService.calcCsiAggregations([mvWeeklyShop.id])
 
         then:
         startDate == mvWeeklyShop.started
@@ -171,7 +171,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
         when:
         CsiAggregation.withNewSession { session ->
-            shopCsiAggregationService.calcCsiAggregations([csiAggregationId])
+            jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
             session.flush()
         }
         CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
