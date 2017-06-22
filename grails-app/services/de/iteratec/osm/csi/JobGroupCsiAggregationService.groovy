@@ -138,16 +138,15 @@ class JobGroupCsiAggregationService {
      */
     private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<JobGroup> jobGroups) {
         List<Long> result = []
-        AggregatorType shopAggregator = AggregatorType.findByName(AggregatorType.SHOP)
 
         jobGroups.each { currentJobGroup ->
             CsiAggregation csiAggregation
-            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroup(startDate.toDate(), interval, shopAggregator, currentJobGroup)
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroup(startDate.toDate(), interval, AggregationType.JOB_GROUP, currentJobGroup)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: currentJobGroup,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: ''
