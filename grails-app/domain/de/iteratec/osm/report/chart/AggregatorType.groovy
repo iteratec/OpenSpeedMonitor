@@ -29,14 +29,14 @@ enum MeasurandGroup {
     /**
      * {@link AggregatorType}s with this group are no measurands.
      */
-    NO_MEASURAND,
+    NO_MEASURAND(""),
     /**
      * {@link AggregatorType}s with this group are measurands. But they are not dedicated to a measurand-group (yet).
-     */
-            UNDEFINED,
-    LOAD_TIMES,
-    REQUEST_COUNTS,
-    REQUEST_SIZES,
+     **/
+     UNDEFINED(""),
+    LOAD_TIMES("ms"),
+    REQUEST_COUNTS("#"),
+    REQUEST_SIZES("MB"),
     /**
      * Different measurands with unit percantage.
      *
@@ -44,9 +44,46 @@ enum MeasurandGroup {
      * {@link MetricReportingService} multiplies the values of these measurands by 100 before they get reported.
      * Also in charts the values get multiplied by 100.
      */
-            PERCENTAGES
+            PERCENTAGES("%")
+
+    private String unit;
+
+    private MeasurandGroup(String value){
+        unit = value;
+    }
+    String getUnit(){
+        return unit;
+    }
 }
 
+enum Measurand{
+    DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES),
+    DOM_TIME(MeasurandGroup.LOAD_TIMES),
+    FIRST_BYTE(MeasurandGroup.LOAD_TIMES),
+    FULLY_LOADED_REQUEST_COUNT(MeasurandGroup.REQUEST_COUNTS),
+    FULLY_LOADED_TIME(MeasurandGroup.LOAD_TIMES),
+    LOAD_TIME(MeasurandGroup.LOAD_TIMES),
+    START_RENDER(MeasurandGroup.LOAD_TIMES),
+    DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES),
+    DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS),
+    FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES),
+    CUSTOMER_SATISFACTION(MeasurandGroup.PERCENTAGES),
+    SPEED_INDEX(MeasurandGroup.UNDEFINED),
+    VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES),
+    CS_BASED_ON_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES),
+    CS_BV_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES),
+    CS_BV_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES)
+
+    private MeasurandGroup group
+
+    private Measurand(MeasurandGroup value){
+        group = value
+    }
+
+    MeasurandGroup getMeasurandGroup(){
+        return group
+    }
+}
 /**
  *
  * <p>
