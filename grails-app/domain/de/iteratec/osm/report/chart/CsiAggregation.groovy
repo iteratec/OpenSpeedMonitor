@@ -72,7 +72,6 @@ class CsiAggregation implements CsiValue {
 
     Date started
     CsiAggregationInterval interval
-    AggregatorType aggregator
     AggregationType aggregationType
 
     JobGroup jobGroup
