@@ -217,6 +217,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     void "Graph is shown for custom connectivity"(){
         given: "User selects custom connectivity"
         connectivityTab.click()
+        selectAllConnectivityButton.click()
         selectConnectivityProfilesList.find { it.getAttribute("value").startsWith("Custom") }.click()
 
         when: "User clicks on \"Show\" button"
@@ -407,7 +408,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << "3"
         firstViewList[3].click()
-        firstViewList[7].click()
+        firstViewList[8].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -459,8 +460,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         given: "User defines minimal bytes until doc"
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
         appendedInputBelowRequestSizesTimesTextField << "30"
-        firstViewList[7].click()
-        firstViewList[9].click()
+        firstViewList[8].click()
+        firstViewList[10].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -509,7 +510,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[9].click()
+        firstViewList[10].click()
         firstViewList[0].click()
 
         when: "User wants to see a graph"
@@ -647,7 +648,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[7].click()
+        firstViewList[8].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -664,12 +665,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[7].click()
+        firstViewList[8].click()
     }
 
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[8].click()
+        firstViewList[9].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -686,12 +687,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[8].click()
+        firstViewList[9].click()
     }
 
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[9].click()
+        firstViewList[10].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -708,12 +709,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[9].click()
+        firstViewList[10].click()
     }
 
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[10].click()
+        firstViewList[11].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -730,12 +731,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[10].click()
+        firstViewList[11].click()
     }
 
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[11].click()
+        firstViewList[12].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -752,12 +753,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[11].click()
+        firstViewList[12].click()
     }
 
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[12].click()
+        firstViewList[13].click()
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -774,12 +775,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[12].click()
+        firstViewList[13].click()
     }
 
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[13].click()
+        firstViewList[7].click()
 
         when: "User wants to see a graph"
         clickShowButton()
