@@ -1,6 +1,8 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.Measurand
+import de.iteratec.osm.report.chart.SelectedMeasurand
 
 /**
  * <p>
@@ -79,8 +81,9 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
-        viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
-        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
+        viewModelToCopyTo.put('selectedAggrGroupValues', getSelectedMeasurandsForString(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
+        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
@@ -90,6 +93,18 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('trimAboveRequestSizes', this.trimAboveRequestSizes)
     }
 
+    Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
+        Collection<Measurand> result = []
+        selectedValues.each { result.add(Measurand.valueOf(it))}
+        return result
+    }
+
+    Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
+        Collection<SelectedMeasurand> result = []
+        cached.each { result.add(new SelectedMeasurand(Measurand.valueOf(it), CachedView.CACHED))}
+        uncached.each { result.add(new SelectedMeasurand(Measurand.valueOf(it), CachedView.UNCACHED))}
+        return result
+    }
     /**
      * <p>
      * Creates {@link ErQueryParams} based on this command. This command

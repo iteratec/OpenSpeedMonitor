@@ -33,6 +33,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
+import groovy.transform.EqualsAndHashCode
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
@@ -158,7 +159,7 @@ public class EventResultDashboardService {
      * @param startDate selected start date
      * @param endDate selected end date
      * @param interval selected interval
-     * @param aggregators selected AggregatorTypes
+     * @param n selected AggregatorTypes
      * @param queryParams
      * 		Query params for querying {@link EventResult}s.
      * @return List of {@linkHighchartGraph}s
@@ -168,32 +169,31 @@ public class EventResultDashboardService {
      * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
      */
     public OsmRickshawChart getEventResultDashboardHighchartGraphs(
-            Date startDate, Date endDate, Integer interval, List<AggregatorType> aggregators, ErQueryParams queryParams) {
+            Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> measurands, ErQueryParams queryParams) {
 
-        Map<String, Number> gtValues = [:]
-        Map<String, Number> ltValues = [:]
-        aggregators.each { AggregatorType aggregator ->
-            String associatedEventResultAttributeName = resultCsiAggregationService.getEventResultAttributeNameFromMeasurand(aggregator)
-            if (aggregator.measurandGroup == MeasurandGroup.LOAD_TIMES) {
+        Map<Measurand, Number> gtValues = [:]
+        Map<Measurand, Number> ltValues = [:]
+        measurands.each {
+            if (it.measurand.getMeasurandGroup() == MeasurandGroup.LOAD_TIMES) {
                 if (queryParams.minLoadTimeInMillisecs) {
-                    gtValues[associatedEventResultAttributeName] = queryParams.minLoadTimeInMillisecs
+                    gtValues[it.measurand] = queryParams.minLoadTimeInMillisecs
                 }
                 if (queryParams.maxLoadTimeInMillisecs) {
-                    ltValues[associatedEventResultAttributeName] = queryParams.maxLoadTimeInMillisecs
+                    ltValues[it.measurand] = queryParams.maxLoadTimeInMillisecs
                 }
-            } else if (aggregator.measurandGroup == MeasurandGroup.REQUEST_COUNTS) {
+            } else if (it.measurand.getMeasurandGroup() == MeasurandGroup.REQUEST_COUNTS) {
                 if (queryParams.minRequestCount) {
-                    gtValues[associatedEventResultAttributeName] = queryParams.minRequestCount
+                    gtValues[it.measurand] = queryParams.minRequestCount
                 }
                 if (queryParams.maxRequestCount) {
-                    ltValues[associatedEventResultAttributeName] = queryParams.maxRequestCount
+                    ltValues[it.measurand] = queryParams.maxRequestCount
                 }
-            } else if (aggregator.measurandGroup == MeasurandGroup.REQUEST_SIZES) {
+            } else if (it.measurand.getMeasurandGroup() == MeasurandGroup.REQUEST_SIZES) {
                 if (queryParams.minRequestSizeInBytes) {
-                    gtValues[associatedEventResultAttributeName] = queryParams.minRequestSizeInBytes
+                    gtValues[it.measurand] = queryParams.minRequestSizeInBytes
                 }
                 if (queryParams.maxRequestSizeInBytes) {
-                    ltValues[associatedEventResultAttributeName] = queryParams.maxRequestSizeInBytes
+                    ltValues[it.measurand] = queryParams.maxRequestSizeInBytes
                 }
             }
         }
@@ -209,7 +209,7 @@ public class EventResultDashboardService {
                     new CriteriaSorting(sortingActive: false)
             )
         }
-        return calculateResultMap(eventResults, aggregators, interval, gtValues, ltValues)
+        return calculateResultMap(eventResults, measurands, interval, gtValues, ltValues)
     }
 
     /**
@@ -223,13 +223,13 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<SelectedMeasurand> measurands, Integer interval, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
         Map<String, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
             if (interval == CsiAggregationInterval.RAW) {
-                calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForRawData(measurands, eventResults, gtBoundary, ltBoundary)
             } else {
-                calculatedResultMap = calculateResultMapForAggregatedData(aggregators, eventResults, interval, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForAggregatedData(measurands, eventResults, interval, gtBoundary, ltBoundary)
             }
         }
         List<OsmChartGraph> graphs = []
@@ -245,13 +245,10 @@ public class EventResultDashboardService {
         return chart
     }
 
-    private Map<String, List<OsmChartPoint>> calculateResultMapForRawData(List<AggregatorType> aggregators, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> measurands, Collection<EventResult> eventResults, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
 
-        Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
-
-        aggregators.each { AggregatorType aggregator ->
-
-            CachedView aggregatorTypeCachedView = resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator)
+        Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
+        measurands.each { SelectedMeasurand selectedMeasurand ->
 
             eventResults.each { EventResult eventResult ->
 
@@ -273,11 +270,11 @@ public class EventResultDashboardService {
                         oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
                 )
 
-                if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
-                    Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
+                if(selectedMeasurand.cachedView == eventResult.cachedView){
+                    Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                    if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
-                        String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
+                        GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
                         OsmChartPoint chartPoint = new OsmChartPoint(
                                 time: eventResult.getJobResultDate().getTime(),
                                 csiAggregation: value,
@@ -287,55 +284,44 @@ public class EventResultDashboardService {
                                 chartPointWptInfo: chartPointWptInfo
                         )
                         // customer satisfaction can be 0.
-                        if (chartPoint.isValid() || (aggregator.measurandGroup == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
+                        if (chartPoint.isValid() || (selectedMeasurand.measurand.getMeasurandGroup() == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }
                 }
             }
         }
+
         return highchartPointsForEachGraph
     }
 
-    private boolean isInBounds(EventResult eventResult, AggregatorType aggregatorType, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
-        String name = aggregatorType.getName().replace("Uncached", "").replace("Cached", "") //TODO make this pretty
-        Number lt = gtBoundary[name]
-        Number gt = ltBoundary[name]
+    private boolean isInBounds(EventResult eventResult, Measurand measurand, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
+        Number lt = gtBoundary[measurand]
+        Number gt = ltBoundary[measurand]
 
         boolean inBound = true
-        if (lt) inBound &= eventResult."$name" > lt
-        if (gt) inBound &= eventResult."$name" < gt
+        if (lt) inBound &= resultCsiAggregationService.getEventResultPropertyForCalculation(measurand, eventResult) > lt
+        if (gt) inBound &= resultCsiAggregationService.getEventResultPropertyForCalculation(measurand, eventResult) < gt
 
         return inBound
     }
 
-    private Map<String, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<AggregatorType> aggregators, Collection<EventResult> eventResults, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Integer interval, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
 
-        Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
-        Map<String, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
+        Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
+        Map<GraphLabel, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
             eventResults.each { EventResult eventResult ->
-                aggregators.each { AggregatorType aggregator ->
-                    if (isCachedViewEqualToAggregatorTypesView(eventResult, resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator))) {
-                        Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                        if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
-                            String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
+                selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
+                    if (eventResult.cachedView == selectedMeasurand.cachedView) {
+                        Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                        if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
-                            String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
-                            eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}${UNIQUE_STRING_DELIMITTER}${connectivity}"] << value
+                            GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)
+                            eventResultsToAggregate[key] << value
                         }
                     }
                 }
-            }
-        }
-
-        Map<String, AggregatorType> aggregatorTypeMap
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'get aggr-type-lookup-map', 2) {
-            aggregatorTypeMap = AggregatorType.list().collectEntries { AggregatorType eachAggregatorType ->
-                [
-                        eachAggregatorType.name,
-                        eachAggregatorType
-                ]
             }
         }
 
@@ -344,35 +330,16 @@ public class EventResultDashboardService {
             Double sum = 0
             Integer countValues = 0
             eventResultsToAggregate.each { key, value ->
-
-                List tokenized
-                Long millisStartOfInterval
-                AggregatorType aggregator
-
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'tokenize', 3) {
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'inner tokenize', 4) {
-                        tokenized = key.split(UNIQUE_STRING_DELIMITTER)
-                    }
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'Long.valueOf()', 4) {
-                        millisStartOfInterval = Long.valueOf(tokenized[2])
-                    }
-                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'getting Aggregator from db', 4) {
-                        aggregator = aggregatorTypeMap[tokenized[0]]
-                    }
-                }
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'buildTestsDetailsURL', 3) {
-                    String[] tagSegments = ((String) tokenized[1]).split(";")
-                    testsDetailsURL = buildTestsDetailsURL(tagSegments[0], tagSegments[1], tagSegments[2], tagSegments[3], tagSegments[4], aggregator, millisStartOfInterval, interval, value.size())
-                }
+                testsDetailsURL = buildTestsDetailsURL(key.jobGroupId,key.measuredEventId,key.pageId,key.browserId,key.locationId,key.selectedMeasurand,key.millisStartOfInterval,interval,value.size())
 
                 performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
 
-                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[3]}"
+                    GraphLabel graphLabel = new GraphLabel(key.eventResult, null, key.selectedMeasurand)
                     countValues = value.size()
                     if (countValues > 0) {
                         sum = 0
                         value.each { singleValue -> sum += singleValue }
-                        OsmChartPoint chartPoint = new OsmChartPoint(time: millisStartOfInterval, csiAggregation: sum / countValues, countOfAggregatedResults: countValues, sourceURL: testsDetailsURL, testingAgent: null)
+                        OsmChartPoint chartPoint = new OsmChartPoint(time: key.millisStartOfInterval, csiAggregation: sum / countValues, countOfAggregatedResults: countValues, sourceURL: testsDetailsURL, testingAgent: null)
                         if (chartPoint.isValid())
                             highchartPointsForEachGraph[graphLabel] << chartPoint
                     }
@@ -382,7 +349,7 @@ public class EventResultDashboardService {
         return highchartPointsForEachGraph.sort()
     }
 
-    private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<String, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
+    private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
 
         String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null)
         String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null)
@@ -392,31 +359,12 @@ public class EventResultDashboardService {
         Map<Serializable, JobGroup> jobGroupMap = [:]
         Map<Serializable, MeasuredEvent> measuredEventMap = [:]
         Map<Serializable, Location> locationMap = [:]
-        def aggregatorTypes = [:]
         highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', 1) {
-                List<String> tokenizedGraphLabel = graphLabel.split(UNIQUE_STRING_DELIMITTER)
-                if (tokenizedGraphLabel.size() != 3) {
-                    throw new IllegalArgumentException("The graph-label should consist of three parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
-                }
-                def aggregatorName = tokenizedGraphLabel[0]
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Aggregator', 1) {
-                    if (!aggregatorTypes[aggregatorName]) {
-                        aggregatorTypes[aggregatorName] = AggregatorType.findByName(aggregatorName)
-                    }
-                }
-                AggregatorType aggregator = aggregatorTypes[aggregatorName]
-                if (!aggregator) {
-                    throw new IllegalArgumentException("First part of graph-label should be the name of AggregatorType. This is no correct aggregator-name: ${tokenizedGraphLabel[0]}")
-                }
-                String connectivity = tokenizedGraphLabel[2]
-                if (!connectivity) {
-                    throw new IllegalArgumentException("Thrid part of graph-label should be the the connectivity. This is no correct connectivity: ${tokenizedGraphLabel[2]}")
-                }
 
-                String measurand = i18nService.msg("de.iteratec.isr.measurand.${tokenizedGraphLabel[0].replace('Uncached', '').replace('Cached', '')}", tokenizedGraphLabel[0], null)
+                String measurand = i18nService.msg("de.iteratec.isr.measurand.${graphLabel.selectedMeasurand.measurand}", graphLabel.selectedMeasurand.measurand.toString(), null)
 
-                if (tokenizedGraphLabel[0].endsWith("Uncached")) {
+                if (graphLabel.selectedMeasurand.cachedView == CachedView.CACHED) {
                     if (!repeatedViewEnding.isEmpty()) {
                         measurand = repeatedViewEnding + " " + measurand
                     }
@@ -426,33 +374,30 @@ public class EventResultDashboardService {
                     }
                 }
 
-                String[] tagSegments = tokenizedGraphLabel[1].split(";")
-                if (tagSegments) {
-                    Long jobGroupId = Long.valueOf(tagSegments[0])
-                    JobGroup group = jobGroupMap[jobGroupId] ?: JobGroup.get(jobGroupId)
-                    Long eventId = Long.valueOf(tagSegments[1])
-                    MeasuredEvent measuredEvent = measuredEventMap[eventId] ?: MeasuredEvent.get(eventId)
-                    Long locationId = Long.valueOf(tagSegments[4])
-                    Location location = locationMap[locationId] ?: Location.get(locationId)
+                if (graphLabel.tag) {
+
+                    JobGroup group = jobGroupMap[graphLabel.eventResult.jobGroupId] ?: JobGroup.get(graphLabel.eventResult.jobGroupId)
+                    MeasuredEvent measuredEvent = measuredEventMap[graphLabel.eventResult.measuredEventId] ?: MeasuredEvent.get(graphLabel.eventResult.measuredEventId)
+                    Location location = locationMap[graphLabel.eventResult.locationId] ?: Location.get(graphLabel.eventResult.locationId)
 
                     if (group && measuredEvent && location) {
                         String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
                                 "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
-                                "${HIGHCHART_LEGEND_DELIMITTER}${connectivity}"
+                                "${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.connectivity}"
                         graphs.add(new OsmChartGraph(
                                 label: newGraphLabel,
-                                measurandGroup: aggregator.measurandGroup,
+                                measurandGroup: graphLabel.selectedMeasurand.measurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     } else {
                         graphs.add(new OsmChartGraph(
-                                label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${tokenizedGraphLabel[1]}",
-                                measurandGroup: aggregator.measurandGroup,
+                                label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                                measurandGroup: graphLabel.selectedMeasurand.measurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     }
                 } else {
                     graphs.add(new OsmChartGraph(
-                            label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${tokenizedGraphLabel[1]}",
-                            measurandGroup: aggregator.measurandGroup,
+                            label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                            measurandGroup:graphLabel.selectedMeasurand.measurand.getMeasurandGroup(),
                             points: highChartPoints))
                 }
             }
@@ -524,7 +469,7 @@ public class EventResultDashboardService {
         return resultUrl
     }
 
-    public URL buildTestsDetailsURL(String jobGroupId, String measuredEventId, String pageId, String browserId, String locationId, AggregatorType aggregatorType, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
+    public URL buildTestsDetailsURL(String jobGroupId, String measuredEventId, String pageId, String browserId, String locationId, SelectedMeasurand selectedMeasurand, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
         URL result = null
 
 
@@ -542,7 +487,7 @@ public class EventResultDashboardService {
                             'pageId'                                 : pageId,
                             'browserId'                              : browserId,
                             'locationId'                             : locationId,
-                            'aggregatorTypeNameOrNull'               : aggregatorType.isCachedCriteriaApplicable() ? aggregatorType.getName() : '',
+                            'aggregatorTypeNameOrNull'               : selectedMeasurand.toString(),
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(lastKnownCountOfAggregatedResults)
                     ]
             ])
@@ -570,5 +515,32 @@ public class EventResultDashboardService {
 
     private boolean isCachedViewEqualToAggregatorTypesView(EventResult eventResult, CachedView aggregatorTypeCachedView) {
         return eventResult.cachedView.equals(aggregatorTypeCachedView)
+    }
+}
+
+@EqualsAndHashCode(excludes = "eventResult")
+class GraphLabel {
+    EventResult eventResult;
+    SelectedMeasurand selectedMeasurand
+    String jobGroupId, measuredEventId, pageId, browserId, locationId, tag
+    Long millisStartOfInterval
+    String connectivity
+
+    GraphLabel(EventResult eventResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
+        this.eventResult = eventResult
+        this.connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
+        this.millisStartOfInterval = millisStartOfInterval
+        this.selectedMeasurand = selectedMeasurand
+        this.jobGroupId = String.valueOf(eventResult.jobGroupId)
+        this.measuredEventId = String.valueOf(eventResult.measuredEventId)
+        this.pageId = String.valueOf(eventResult.pageId)
+        this.browserId = String.valueOf(eventResult.browserId)
+        this.locationId = String.valueOf(eventResult.locationId)
+        this.tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
+    }
+
+    @Override
+    String toString(){
+        return selectedMeasurand.toString()+UNIQUE_STRING_DELIMITTER+tag+UNIQUE_STRING_DELIMITTER+connectivity
     }
 }

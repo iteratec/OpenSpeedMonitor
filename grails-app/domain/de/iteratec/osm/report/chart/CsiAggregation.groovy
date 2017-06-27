@@ -115,7 +115,6 @@ class CsiAggregation implements CsiValue {
     static constraints = {
         started(nullable: false)
         interval(nullable: false)
-        aggregator(nullable: true)
         aggregationType(nullable: false)
 
         // JobGroup can be null if aggregatorType == csiSystem

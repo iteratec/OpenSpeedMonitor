@@ -60,7 +60,7 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public static final Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    public static final Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public static final String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
@@ -189,7 +189,7 @@ class EventResultDashboardController {
         Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues, "selectedBrowser")
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
 
-        Collection<String> selectedAggrGroupValuesCached = []
+        Collection<Measurand> selectedAggrGroupValuesCached = []
         // String or List<String>
         def valuesCached = dashboardValues.selectedAggrGroupValuesCached
         if (valuesCached) {
@@ -200,7 +200,7 @@ class EventResultDashboardController {
             }
         }
 
-        Collection<String> selectedAggrGroupValuesUnCached = []
+        Collection<Measurand> selectedAggrGroupValuesUnCached = []
         // String or List<String>
         def valuesUnCached = dashboardValues.selectedAggrGroupValuesUnCached
         if (valuesUnCached) {
@@ -283,11 +283,10 @@ class EventResultDashboardController {
     private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
-        List<String> aggregatorNames = [];
-        aggregatorNames.addAll(cmd.getSelectedAggrGroupValuesCached());
-        aggregatorNames.addAll(cmd.getSelectedAggrGroupValuesUnCached());
+        List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
+        //allMeasurands.addAll(modelToRender.get('selectedAggrGroupValuesCached'))
+        //allMeasurands.addAll(modelToRender.get('selectedAggrGroupValuesUnCached'))
 
-        List<AggregatorType> aggregators = getAggregators(aggregatorNames);
 
         LinkedList<OsmChartAxis> labelToDataMap = new LinkedList<OsmChartAxis>();
         labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.UNDEFINED",
@@ -304,7 +303,7 @@ class EventResultDashboardController {
         ErQueryParams queryParams = cmd.createErQueryParams();
 
         OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
-                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams
+                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, allMeasurands, queryParams
         )
         modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
@@ -356,19 +355,6 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
-    }
-
-    private Collection<AggregatorType> getAggregators(Collection<String> aggregatorNames) {
-
-        Collection<AggregatorType> aggregators = []
-        aggregatorNames.each { String name ->
-            AggregatorType aggregator = AggregatorType.findByName(name);
-            if (aggregator != null) {
-                aggregators.add(aggregator);
-            }
-        }
-
-        return aggregators;
     }
 
     /**
@@ -576,8 +562,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED),
-                'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED),
+                'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES,
+                'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES,
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,

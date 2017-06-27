@@ -112,8 +112,8 @@ class EventResultDashboardControllerSpec extends Specification {
         result != null
         result.size() == 13
 
-        result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED)
-        result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
+        result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES
+        result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES
 
         result["folders"]*.getName() == ["Group1", "Group2"]
         result["pages"]*.getName() == ["Page1", "Page2", "Page3"]

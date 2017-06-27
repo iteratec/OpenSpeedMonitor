@@ -30,7 +30,7 @@ class OptGroupedSelectTagLib {
 		String cssClass = attrs['class']
 		String style = attrs['style']
 		String name = attrs['name']
-		String value = attrs['value']
+		Collection<de.iteratec.osm.report.chart.Measurand> value = attrs['value']
 		out << g.render(template: '/layouts/optGroupedSelect', 
 			model: [dataMap:dataMap, optionKey: optionKey, optionValue: optionValue, multiple: multiple, id: id, cssClass: cssClass, style: style,
 				name: name, selectedValues: value])

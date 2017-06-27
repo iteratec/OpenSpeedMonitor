@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.util.Constants
 import groovy.transform.EqualsAndHashCode
 
 /**
@@ -26,25 +28,12 @@ import groovy.transform.EqualsAndHashCode
  *
  */
 enum MeasurandGroup {
-    /**
-     * {@link AggregatorType}s with this group are no measurands.
-     */
-    NO_MEASURAND(""),
-    /**
-     * {@link AggregatorType}s with this group are measurands. But they are not dedicated to a measurand-group (yet).
-     **/
-     UNDEFINED(""),
     LOAD_TIMES("ms"),
     REQUEST_COUNTS("#"),
     REQUEST_SIZES("MB"),
-    /**
-     * Different measurands with unit percantage.
-     *
-     * <b>Note: </b>Should be persisted as a value between 0 and 1.
-     * {@link MetricReportingService} multiplies the values of these measurands by 100 before they get reported.
-     * Also in charts the values get multiplied by 100.
-     */
-            PERCENTAGES("%")
+    PERCENTAGES("%"),
+    UNDEFINED(""),
+    NO_MEASURAND("")
 
     private String unit;
 
@@ -55,7 +44,6 @@ enum MeasurandGroup {
         return unit;
     }
 }
-
 enum Measurand{
     DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES),
     DOM_TIME(MeasurandGroup.LOAD_TIMES),
@@ -71,8 +59,8 @@ enum Measurand{
     SPEED_INDEX(MeasurandGroup.UNDEFINED),
     VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES),
     CS_BASED_ON_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES),
-    CS_BV_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES),
-    CS_BV_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES)
+    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES),
+    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES)
 
     private MeasurandGroup group
 
@@ -82,6 +70,21 @@ enum Measurand{
 
     MeasurandGroup getMeasurandGroup(){
         return group
+    }
+}
+
+class SelectedMeasurand{
+    Measurand measurand
+    CachedView cachedView
+
+    SelectedMeasurand(Measurand measurand, CachedView cachedView){
+        this.measurand = measurand
+        this.cachedView = cachedView
+    }
+
+    @Override
+    String toString(){
+        return this.measurand.toString()+Constants.UNIQUE_STRING_DELIMITTER+this.cachedView.toString()
     }
 }
 /**
