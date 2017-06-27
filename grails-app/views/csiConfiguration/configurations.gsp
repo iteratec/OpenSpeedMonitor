@@ -8,6 +8,7 @@
     .chart {
         display: block;
     }
+
     %{--Styles for MatrixView--}%
     .xAxisMatrix path,
     .xAxisMatrix line,
@@ -88,7 +89,7 @@
 
     #tooltipMatrixView,
     #tooltipTreemap,
-    #tooltip{
+    #tooltip {
         position: absolute;
         width: auto;
         height: auto;
@@ -178,6 +179,7 @@
                 <strong>
                     <g:message code="de.iteratec.osm.defaults.confirmationMessage"/>
                 </strong>
+
                 <p id="warningsOverwriting"></p>
             </div>
 
@@ -185,6 +187,7 @@
                 <strong>
                     <g:message code="de.iteratec.osm.csi.csvErrors.title"/>
                 </strong>
+
                 <p id="defaultMappingCsvErrors"></p>
             </div>
         </g:if>
@@ -204,46 +207,52 @@
 
 %{-- name and description of actual config --}%
 <div class="card" id="configuration-info">
-    <p class="text-info">
-        <g:if test="${csiConfigurations}">
-            <div class="btn-group" id="select-configuration">
-                <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
-                   aria-haspopup="true" aria-expanded="false" id="customCsiConfigurationDropdownButton">
-                    <g:message code="de.iteratec.isocsi.csiConfiguration.custom.select.label" default="View another Configuration"/>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" id="customCsiConfigurationSelection">
-                    <g:each in="${csiConfigurations}" var="availableConfiguration">
-                        <li><g:link  action="configurations" params="[id: availableConfiguration.id]">
-                            ${availableConfiguration.label}
-                        </g:link>
-                        </li>
-                    </g:each>
-                </ul>
-            </div>
-        </g:if>
-        <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
-        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-            <a href="#updateCsiConfModal" class="fa fa-edit"
-               style="text-decoration:none;color: #3a87ad;" data-toggle="modal"></a>
-        </sec:ifAnyGranted>
-    </p>
+<p class="text-info">
+    <g:if test="${csiConfigurations}">
+        <div class="btn-group" id="select-configuration">
+            <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
+               aria-haspopup="true" aria-expanded="false" id="customCsiConfigurationDropdownButton">
+                <g:message code="de.iteratec.isocsi.csiConfiguration.custom.select.label"
+                           default="View another Configuration"/>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" id="customCsiConfigurationSelection">
+                <g:each in="${csiConfigurations}" var="availableConfiguration">
+                    <li><g:link action="configurations" params="[id: availableConfiguration.id]">
+                        ${availableConfiguration.label}
+                    </g:link>
+                    </li>
+                </g:each>
+            </ul>
+        </div>
+    </g:if>
+    <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
     <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
+</p>
+    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+        <a href="#" class="btn btn-primary" onclick="prepareConfigurationListAndCopy()">
+            <g:message code="de.iteratec.osm.csiConfiguration.saveAs" default="Copy"/>
+        </a>
+        <a href="#updateCsiConfModal" class="btn btn-primary" data-toggle="modal">
+            <g:message code="de.iteratec.osm.csiConfiguration.edit" default="Copy"/>
+        </a>
+    </sec:ifAnyGranted>
 </div>
+
 
 
 %{-- mapping and weights details --}%
 <div class="card">
-<g:render template="confDetails" model="[readOnly                : false,
-                                         showDefaultMappings     : true,
-                                         errorMessagesCsi        : errorMessagesCsi,
-                                         defaultTimeToCsMappings : defaultTimeToCsMappings,
-                                         selectedCsiConfiguration: selectedCsiConfiguration,
-                                         pageMappingsExist       : pageMappingsExist,
-                                         matrixViewData          : matrixViewData,
-                                         treemapData             : treemapData,
-                                         barchartData            : barchartData,
-                                         pageTimeToCsMappings    : pageTimeToCsMappings]"/>
+    <g:render template="confDetails" model="[readOnly                : false,
+                                             showDefaultMappings     : true,
+                                             errorMessagesCsi        : errorMessagesCsi,
+                                             defaultTimeToCsMappings : defaultTimeToCsMappings,
+                                             selectedCsiConfiguration: selectedCsiConfiguration,
+                                             pageMappingsExist       : pageMappingsExist,
+                                             matrixViewData          : matrixViewData,
+                                             treemapData             : treemapData,
+                                             barchartData            : barchartData,
+                                             pageTimeToCsMappings    : pageTimeToCsMappings]"/>
 
 </div>
 %{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
@@ -275,7 +284,7 @@
 
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript(
-                '<g:assetPath src="csi/configurationPost.js" />',
+                '<g:assetPath src="csi/configurationPost.js"/>',
                 true
             )
         });
