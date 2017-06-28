@@ -334,7 +334,7 @@ public class EventResultDashboardService {
 
                 performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
 
-                    GraphLabel graphLabel = new GraphLabel(key.eventResult, null, key.selectedMeasurand)
+                    GraphLabel graphLabel = key.createCopy(false)
                     countValues = value.size()
                     if (countValues > 0) {
                         sum = 0
@@ -362,6 +362,8 @@ public class EventResultDashboardService {
         highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', 1) {
 
+                graphLabel.validate()
+
                 String measurand = i18nService.msg("de.iteratec.isr.measurand.${graphLabel.selectedMeasurand.measurand}", graphLabel.selectedMeasurand.measurand.toString(), null)
 
                 if (graphLabel.selectedMeasurand.cachedView == CachedView.CACHED) {
@@ -376,9 +378,9 @@ public class EventResultDashboardService {
 
                 if (graphLabel.tag) {
 
-                    JobGroup group = jobGroupMap[graphLabel.eventResult.jobGroupId] ?: JobGroup.get(graphLabel.eventResult.jobGroupId)
-                    MeasuredEvent measuredEvent = measuredEventMap[graphLabel.eventResult.measuredEventId] ?: MeasuredEvent.get(graphLabel.eventResult.measuredEventId)
-                    Location location = locationMap[graphLabel.eventResult.locationId] ?: Location.get(graphLabel.eventResult.locationId)
+                    JobGroup group = jobGroupMap[graphLabel.jobGroupId] ?: JobGroup.get(graphLabel.jobGroupId)
+                    MeasuredEvent measuredEvent = measuredEventMap[graphLabel.measuredEventId] ?: MeasuredEvent.get(graphLabel.measuredEventId)
+                    Location location = locationMap[graphLabel.locationId] ?: Location.get(graphLabel.locationId)
 
                     if (group && measuredEvent && location) {
                         String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
@@ -469,11 +471,11 @@ public class EventResultDashboardService {
         return resultUrl
     }
 
-    public URL buildTestsDetailsURL(String jobGroupId, String measuredEventId, String pageId, String browserId, String locationId, SelectedMeasurand selectedMeasurand, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
+    public URL buildTestsDetailsURL(Long jobGroupId, Long measuredEventId, Long pageId, Long browserId, Long locationId, SelectedMeasurand selectedMeasurand, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
         URL result = null
 
 
-        if (jobGroupId && measuredEventId && pageId && browserId && locationId && aggregatorType) {
+        if (jobGroupId && measuredEventId && pageId && browserId && locationId && selectedMeasurand) {
 
             String testsDetailsURLAsString = grailsLinkGenerator.link([
                     'controller': 'highchartPointDetails',
@@ -482,11 +484,11 @@ public class EventResultDashboardService {
                     'params'    : [
                             'from'                                   : String.valueOf(millisFrom),
                             'to'                                     : String.valueOf(millisFrom + intervalInMinutes * 60 * 1000),
-                            'jobGroupId'                             : jobGroupId,
-                            'measuredEventId'                        : measuredEventId,
-                            'pageId'                                 : pageId,
-                            'browserId'                              : browserId,
-                            'locationId'                             : locationId,
+                            'jobGroupId'                             : String.valueOf(jobGroupId),
+                            'measuredEventId'                        : String.valueOf(measuredEventId),
+                            'pageId'                                 : String.valueOf(pageId),
+                            'browserId'                              : String.valueOf(browserId),
+                            'locationId'                             : String.valueOf(locationId),
                             'aggregatorTypeNameOrNull'               : selectedMeasurand.toString(),
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(lastKnownCountOfAggregatedResults)
                     ]
@@ -518,26 +520,56 @@ public class EventResultDashboardService {
     }
 }
 
-@EqualsAndHashCode(excludes = "eventResult")
+@EqualsAndHashCode
 class GraphLabel {
-    EventResult eventResult;
     SelectedMeasurand selectedMeasurand
-    String jobGroupId, measuredEventId, pageId, browserId, locationId, tag
+    Long jobGroupId, measuredEventId, pageId, browserId, locationId
     Long millisStartOfInterval
-    String connectivity
+    String connectivity, tag
 
     GraphLabel(EventResult eventResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
-        this.eventResult = eventResult
         this.connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
         this.millisStartOfInterval = millisStartOfInterval
         this.selectedMeasurand = selectedMeasurand
-        this.jobGroupId = String.valueOf(eventResult.jobGroupId)
-        this.measuredEventId = String.valueOf(eventResult.measuredEventId)
-        this.pageId = String.valueOf(eventResult.pageId)
-        this.browserId = String.valueOf(eventResult.browserId)
-        this.locationId = String.valueOf(eventResult.locationId)
+        this.jobGroupId = eventResult.jobGroupId
+        this.measuredEventId = eventResult.measuredEventId
+        this.pageId = eventResult.pageId
+        this.browserId = eventResult.browserId
+        this.locationId = eventResult.locationId
         this.tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
     }
+
+    GraphLabel createCopy(boolean  withMilliseconds){
+        GraphLabel result = new GraphLabel()
+
+        result.selectedMeasurand = this.selectedMeasurand
+
+        result.jobGroupId = this.jobGroupId
+        result.measuredEventId = this.measuredEventId
+        result.pageId = this.pageId
+        result.browserId = this.browserId
+        result.locationId = this.locationId
+
+        result.connectivity = this.connectivity
+        result.tag = this.tag
+
+        if(withMilliseconds){
+            result.millisStartOfInterval = this.millisStartOfInterval
+        }
+
+        return result
+    }
+
+    void validate(){
+        this.properties.each{ property, value ->
+            if(property != "millisStartOfInterval"){
+                if(value == null){
+                    throw new IllegalArgumentException("Validation failed: ${property} is null.")
+                }
+            }
+        }
+    }
+
 
     @Override
     String toString(){
