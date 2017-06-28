@@ -30,7 +30,7 @@ import spock.lang.Specification
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiAggregationDaoService)
-@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, AggregatorType])
+@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval])
 @Build([CsiAggregation])
 class CsiAggregationDaoServiceSpec extends Specification {
 
