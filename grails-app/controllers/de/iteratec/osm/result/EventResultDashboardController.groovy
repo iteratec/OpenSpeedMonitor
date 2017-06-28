@@ -284,21 +284,9 @@ class EventResultDashboardController {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
         List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
-        //allMeasurands.addAll(modelToRender.get('selectedAggrGroupValuesCached'))
-        //allMeasurands.addAll(modelToRender.get('selectedAggrGroupValuesUnCached'))
-
 
         LinkedList<OsmChartAxis> labelToDataMap = new LinkedList<OsmChartAxis>();
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.UNDEFINED",
-                MeasurandGroup.UNDEFINED.toString()), MeasurandGroup.UNDEFINED, "", 1, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.REQUEST_COUNTS",
-                MeasurandGroup.REQUEST_COUNTS.toString()), MeasurandGroup.REQUEST_COUNTS, "c", 1, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.LOAD_TIMES",
-                MeasurandGroup.LOAD_TIMES.toString()), MeasurandGroup.LOAD_TIMES, "s", 1000, OsmChartAxis.LEFT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.REQUEST_SIZES",
-                MeasurandGroup.REQUEST_SIZES.toString()), MeasurandGroup.REQUEST_SIZES, "KB", 1000, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES",
-                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.RIGHT_CHART_SIDE));
+        allMeasurands.each { labelToDataMap.add(new OsmChartAxis(it.getMeasurand().getMeasurandGroup(),i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString()), getAxisSide(it.getMeasurand().getMeasurandGroup()) ))}
 
         ErQueryParams queryParams = cmd.createErQueryParams();
 
@@ -316,6 +304,14 @@ class EventResultDashboardController {
         modelToRender.put("labelShouldBeEnabled", false);
 
         fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+    }
+
+    private int getAxisSide(MeasurandGroup measurandGroup){
+        if(measurandGroup == MeasurandGroup.LOAD_TIMES){
+            return OsmChartAxis.LEFT_CHART_SIDE
+        }else{
+            return OsmChartAxis.RIGHT_CHART_SIDE
+        }
     }
 
     /**

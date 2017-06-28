@@ -28,22 +28,50 @@ import groovy.transform.EqualsAndHashCode
  *
  */
 enum MeasurandGroup {
-    LOAD_TIMES("ms"),
-    REQUEST_COUNTS("#"),
-    REQUEST_SIZES("MB"),
-    PERCENTAGES("%"),
-    UNDEFINED(""),
-    NO_MEASURAND("")
+    LOAD_TIMES(Unit.MILLISECONDS),
+    REQUEST_COUNTS(Unit.NUMBER),
+    REQUEST_SIZES(Unit.MEGABYTE),
+    PERCENTAGES(Unit.PERCENT),
+    UNDEFINED(Unit.OTHER),
+    NO_MEASURAND(Unit.OTHER)
 
-    private String unit;
+    private Unit unit;
 
-    private MeasurandGroup(String value){
-        unit = value;
+    private MeasurandGroup(Unit unit){
+        this.unit = unit;
     }
-    String getUnit(){
+    Unit getUnit(){
         return unit;
     }
 }
+
+enum Unit{
+    KILOBYTE("KB",1000),
+    MEGABYTE("MB",1000000),
+    MILLISECONDS("ms",1),
+    SECONDS("s",1000),
+    PERCENT("%",0.01),
+    NUMBER("#",1),
+    OTHER("",1)
+
+    private String label
+    private Double divisor
+
+
+    private Unit(String label,Double divisor){
+        this.label = label
+        this.divisor = divisor
+    }
+
+    String getLabel(){
+        return label;
+    }
+
+    Double getDivisor(){
+        return divisor;
+    }
+}
+
 enum Measurand{
     DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES,"docCompleteTimeInMillisecs"),
     DOM_TIME(MeasurandGroup.LOAD_TIMES,"domTimeInMillisecs"),

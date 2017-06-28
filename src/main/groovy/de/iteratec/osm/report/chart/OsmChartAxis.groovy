@@ -70,7 +70,15 @@ public class OsmChartAxis {
 		this.unit=unit;
 		this.color=color;
 	}
-	
+
+	public OsmChartAxis(MeasurandGroup group, String i18NIdentifier, int labelPostion){
+		this.group = group
+		this.labelI18NIdentifier = i18NIdentifier
+		this.labelPosition = labelPosition
+		this.divisor = group.getUnit().getDivisor()
+		this.unit = group.getUnit().getLabel()
+		this.color = "#000000"
+	}
 	/**
 	 * Constructs a HighChartLabel for a {@link OsmChartPoint}-collection.
 	 * 
