@@ -45,9 +45,9 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
  */
 @TestFor(CustomerSatisfactionHighChartService)
-@Mock([AggregatorType, CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
+@Mock([CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
         Script, WebPageTestServer])
-@Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval, AggregatorType])
+@Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval])
 class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
     CsiAggregationInterval hourly
@@ -463,7 +463,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         fourMonthsAgo = DateUtils.addMonths(now, -4)
         tolerableDeviationDueToRounding = 0.2
 
-        createAggregatorTypesAndIntervals()
+        createAggregatorIntervals()
         createJobs()
         createPages()
         createCsTargetGraphs()
@@ -474,7 +474,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
         createCsiAggregations()
     }
 
-    private void createAggregatorTypesAndIntervals() {
+    private void createAggregatorIntervals() {
         hourly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.HOURLY)
         weekly = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.WEEKLY)
     }
