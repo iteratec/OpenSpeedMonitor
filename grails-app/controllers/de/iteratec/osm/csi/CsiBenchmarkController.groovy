@@ -4,7 +4,7 @@ import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CachedView
@@ -20,7 +20,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
@@ -48,7 +48,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
-        return modelToRender;
+        return modelToRender
     }
 
     @RestAction
@@ -62,7 +62,6 @@ class CsiBenchmarkController extends ExceptionHandlerController {
         String selectedCsiType = params.csiType == "visuallyComplete" ? 'csByWptVisuallyCompleteInPercent' : 'csByWptDocCompleteInPercent'
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
 
-        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
         Date from = cmd.from.toDate()
@@ -77,7 +76,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
 
         List allCsiAggregations = CsiAggregation.createCriteria().list {
             'in'('jobGroup', allJobGroups)
-            eq('aggregator', aggregatorType)
+            eq('aggregationType', AggregationType.JOB_GROUP)
             eq('interval', interval)
             'between'('started', from, to)
             projections {
