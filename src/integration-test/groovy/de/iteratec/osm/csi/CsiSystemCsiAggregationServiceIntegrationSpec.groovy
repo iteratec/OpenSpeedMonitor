@@ -5,7 +5,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
@@ -46,7 +46,7 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     CsiAggregationInterval hourly
     CsiAggregationInterval daily
     CsiAggregationInterval weekly
-    AggregatorType measuredEvent
+    AggregationType aggregationType
     ConnectivityProfile connectivityProfile
     JobGroup jobGroup1
     JobGroup jobGroup2
@@ -356,10 +356,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         hourly = new CsiAggregationInterval(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY).save(validate: false)
         daily = new CsiAggregationInterval(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY).save(validate: false)
         weekly = new CsiAggregationInterval(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY).save(validate: false)
-
-        TestDataUtil.createAggregatorTypes()
-        measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-
     }
 
     private MvQueryParams createGetAllQueryParam() {
@@ -392,7 +388,7 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         new CsiAggregation(
                 started: started.toDate(),
                 interval: hourly,
-                aggregator: measuredEvent,
+                aggregationType: AggregationType.MEASURED_EVENT,
                 jobGroup: jobGroup1,
                 measuredEvent: measuredEvent1,
                 page: page1,
