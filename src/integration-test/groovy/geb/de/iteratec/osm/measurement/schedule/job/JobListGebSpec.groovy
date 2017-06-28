@@ -8,7 +8,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -363,9 +362,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
                 it.delete()
             }
             Script.list().each {
-                it.delete()
-            }
-            AggregatorType.list().each {
                 it.delete()
             }
             UserRole.list().each {
