@@ -567,14 +567,11 @@ class TestDataUtil implements OsmTestLogin {
     private static Job getJobOfCSVJobName(String csvJobCoulumn, JobGroup jobGroup, Location location) {
         Job result = Job.findByLabel(csvJobCoulumn);
 
-        AggregatorType page = AggregatorType.findByName(AggregatorType.PAGE) ?: new AggregatorType(name: AggregatorType.PAGE).save(failOnError: true)
-
         if (!result) {
             result = new Job(
                     label: csvJobCoulumn,
                     location: location,
                     connectivityProfile: createConnectivityProfile("conn"),
-                    page: page,
                     active: false,
                     description: '',
                     runs: 1,
