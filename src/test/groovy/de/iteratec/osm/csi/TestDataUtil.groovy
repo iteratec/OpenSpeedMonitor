@@ -1013,6 +1013,32 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     /**
+     * * Writes new {@link CsiAggregation} to db.
+     * @param started
+     * @param csiAggregationInterval
+     * @param aggregator
+     * @param jobGroup
+     * @param page
+     * @param csByWptDocCompleteInPercent
+     * @param resultIds
+     * @param closed
+     * @return
+     */
+    public
+    static CsiAggregation createCsiAggregation(Date started, CsiAggregationInterval csiAggregationInterval, AggregationType aggregationType, JobGroup jobGroup, Page page, Double csByWptDocCompleteInPercent, String resultIds, boolean closed) {
+        return new CsiAggregation(
+                started: started,
+                interval: csiAggregationInterval,
+                aggregationType: aggregationType,
+                jobGroup: jobGroup,
+                page: page,
+                underlyingEventResultsByWptDocComplete: resultIds,
+                csByWptDocCompleteInPercent: csByWptDocCompleteInPercent,
+                closedAndCalculated: closed,
+        ).save(failOnError: true)
+    }
+
+    /**
      * Writes a new {@link CsiAggregationUpdateEvent} with dateOfUpdate = NOW.
      * @param csiAggregationId
      * @param cause
