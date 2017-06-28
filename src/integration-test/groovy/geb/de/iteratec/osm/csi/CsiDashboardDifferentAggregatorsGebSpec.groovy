@@ -527,12 +527,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
 
-//        TestDataUtil.createAggregatorType(AggregatorType.MEASURED_EVENT, MeasurandGroup.NO_MEASURAND)
-//        TestDataUtil.createAggregatorType(AggregatorType.PAGE, MeasurandGroup.NO_MEASURAND)
-//        TestDataUtil.createAggregatorType(AggregatorType.PAGE_AND_BROWSER, MeasurandGroup.NO_MEASURAND)
-//        TestDataUtil.createAggregatorType(AggregatorType.SHOP, MeasurandGroup.NO_MEASURAND)
-//        TestDataUtil.createAggregatorType(AggregatorType.CSI_SYSTEM, MeasurandGroup.NO_MEASURAND)
-
         CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",
                 intervalInMinutes: CsiAggregationInterval.HOURLY
