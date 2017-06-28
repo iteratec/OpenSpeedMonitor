@@ -45,29 +45,34 @@ enum MeasurandGroup {
     }
 }
 enum Measurand{
-    DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES),
-    DOM_TIME(MeasurandGroup.LOAD_TIMES),
-    FIRST_BYTE(MeasurandGroup.LOAD_TIMES),
-    FULLY_LOADED_REQUEST_COUNT(MeasurandGroup.REQUEST_COUNTS),
-    FULLY_LOADED_TIME(MeasurandGroup.LOAD_TIMES),
-    LOAD_TIME(MeasurandGroup.LOAD_TIMES),
-    START_RENDER(MeasurandGroup.LOAD_TIMES),
-    DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES),
-    DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS),
-    FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES),
-    SPEED_INDEX(MeasurandGroup.UNDEFINED),
-    VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES),
-    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES),
-    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES)
+    DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES,"docCompleteTimeInMillisecs"),
+    DOM_TIME(MeasurandGroup.LOAD_TIMES,"domTimeInMillisecs"),
+    FIRST_BYTE(MeasurandGroup.LOAD_TIMES, "firstByteInMillisecs"),
+    FULLY_LOADED_REQUEST_COUNT(MeasurandGroup.REQUEST_COUNTS, "fullyLoadedRequestCount"),
+    FULLY_LOADED_TIME(MeasurandGroup.LOAD_TIMES, "fullyLoadedTimeInMillisecs"),
+    LOAD_TIME(MeasurandGroup.LOAD_TIMES, "loadTimeInMillisecs"),
+    START_RENDER(MeasurandGroup.LOAD_TIMES, "startRenderInMillisecs"),
+    DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES,"docCompleteIncomingBytes"),
+    DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS, "docCompleteRequests"),
+    FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES, "fullyLoadedIncomingBytes"),
+    SPEED_INDEX(MeasurandGroup.UNDEFINED, "speedIndex"),
+    VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs"),
+    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent"),
+    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent")
 
     private MeasurandGroup group
+    private String eventResultField
 
-    private Measurand(MeasurandGroup value){
+    private Measurand(MeasurandGroup value, String name){
         group = value
+        eventResultField = name
     }
 
     MeasurandGroup getMeasurandGroup(){
         return group
+    }
+    String getEventResultField(){
+        return eventResultField
     }
 }
 

@@ -251,9 +251,6 @@ public class EventResultDashboardService {
         measurands.each { SelectedMeasurand selectedMeasurand ->
 
             eventResults.each { EventResult eventResult ->
-
-                String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
-
                 URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
 
                 // Get WPT event result info to build the WPT url dynamically

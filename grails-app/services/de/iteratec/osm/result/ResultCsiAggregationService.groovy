@@ -104,71 +104,7 @@ class ResultCsiAggregationService {
      * @throws IllegalArgumentException if no property is defined for the {@link AggregatorType}
      */
     Double getEventResultPropertyForCalculation(Measurand measurand, EventResult result) {
-        Double returnVal
-
-        switch (measurand) {
-            case Measurand.DOC_COMPLETE_TIME:
-                returnVal = result.getDocCompleteTimeInMillisecs() ? Double.valueOf(result.getDocCompleteTimeInMillisecs()) : null
-                break
-
-            case Measurand.DOM_TIME:
-                returnVal = result.getDomTimeInMillisecs() ? Double.valueOf(result.getDomTimeInMillisecs()) : null
-                break
-
-            case Measurand.FIRST_BYTE:
-                returnVal = result.getFirstByteInMillisecs() ? Double.valueOf(result.getFirstByteInMillisecs()) : null
-                break
-
-            case Measurand.FULLY_LOADED_REQUEST_COUNT:
-                returnVal = result.getFullyLoadedRequestCount() ? Double.valueOf(result.getFullyLoadedRequestCount()) : null
-                break
-
-            case Measurand.FULLY_LOADED_TIME:
-                returnVal = result.getFullyLoadedTimeInMillisecs() ? Double.valueOf(result.getFullyLoadedTimeInMillisecs()) : null
-                break
-
-
-            case Measurand.LOAD_TIME:
-                returnVal = result.getLoadTimeInMillisecs() ? Double.valueOf(result.getLoadTimeInMillisecs()) : null
-                break
-
-            case Measurand.START_RENDER:
-                returnVal = result.getStartRenderInMillisecs() ? Double.valueOf(result.getStartRenderInMillisecs()) : null
-                break
-
-            case Measurand.DOC_COMPLETE_INCOMING_BYTES:
-                returnVal = result.getDocCompleteIncomingBytes() ? Double.valueOf(result.getDocCompleteIncomingBytes()) : null
-                break
-
-            case Measurand.DOC_COMPLETE_REQUESTS:
-                returnVal = result.getDocCompleteRequests() ? Double.valueOf(result.getDocCompleteRequests()) : null
-                break
-
-            case Measurand.FULLY_LOADED_INCOMING_BYTES:
-                returnVal = result.getFullyLoadedIncomingBytes() ? Double.valueOf(result.getFullyLoadedIncomingBytes()) : null
-                break
-
-           case Measurand.CS_BY_WPT_DOC_COMPLETE:
-                returnVal = result.getCsByWptDocCompleteInPercent() ? Double.valueOf(result.getCsByWptDocCompleteInPercent()) : null
-                break
-
-           case Measurand.CS_BY_WPT_VISUALLY_COMPLETE:
-                returnVal = result.getCsByWptVisuallyCompleteInPercent() ? Double.valueOf(result.getCsByWptVisuallyCompleteInPercent()) : null
-                break
-
-            case Measurand.SPEED_INDEX:
-                returnVal = result.getSpeedIndex() ? Double.valueOf(result.getSpeedIndex()) : null
-                break
-
-            case Measurand.VISUALLY_COMPLETE:
-                returnVal = result.visuallyCompleteInMillisecs ? Double.valueOf(result.visuallyCompleteInMillisecs) : null
-                break
-
-            default:
-                throw new IllegalArgumentException("Can not find a EventResult property for " + aggType)
-                break
-        }
-        return returnVal
+        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField())) : null
     }
 
     /**
