@@ -21,7 +21,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
@@ -42,10 +42,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
-
-    AggregatorType pageAggregatorMeasuredEvent
-    AggregatorType pageAggregatorType
-    AggregatorType pageAggregatorShop
 
     static final List<String> pagesToTest = [
             'HP',
@@ -70,7 +66,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             System.out.println('Create some common test-data...');
             TestDataUtil.createOsmConfig()
             TestDataUtil.createCsiAggregationIntervals()
-            TestDataUtil.createAggregatorTypes()
 
             System.out.println('Loading CSV-data...');
             TestDataUtil.
@@ -100,10 +95,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         }
         hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        pageAggregatorShop = AggregatorType.findByName(AggregatorType.SHOP)
-        pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
-
     }
 
     //tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +108,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             mvWeeklyShop = new CsiAggregation(
                     started: startDate,
                     interval: weekly,
-                    aggregator: pageAggregatorShop,
+                    aggregationType: AggregationType.JOB_GROUP,
                     jobGroup: csiGroup,
                     csByWptDocCompleteInPercent: null,
                     underlyingEventResultsByWptDocComplete: ''
@@ -130,7 +121,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         then:
         startDate == mvWeeklyShop.started
         weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-        pageAggregatorShop.name == mvWeeklyShop.aggregator.name
+        AggregationType.JOB_GROUP == mvWeeklyShop.aggregationType
         csiGroup.id == mvWeeklyShop.jobGroupId
         mvWeeklyShop.isCalculated()
         0 == mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete()
@@ -159,7 +150,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             CsiAggregation aggregation = new CsiAggregation(
                     started: startDate,
                     interval: weekly,
-                    aggregator: pageAggregatorShop,
+                    aggregationType: AggregationType.JOB_GROUP,
                     jobGroup: csiGroup,
                     csByWptDocCompleteInPercent: null,
                     underlyingEventResultsByWptDocComplete: ''
@@ -177,10 +168,10 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         then:
-		Math.abs(results.size() - targetResultCount) < 30
+        Math.abs(results.size() - targetResultCount) < 30
         startDate == mvWeeklyShop.started
         weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-        pageAggregatorShop.name == mvWeeklyShop.aggregator.name
+        AggregationType.JOB_GROUP == mvWeeklyShop.aggregationType
         csiGroup == mvWeeklyShop.jobGroup
         mvWeeklyShop.isCalculated()
         mvWeeklyShop.csByWptDocCompleteInPercent != null
