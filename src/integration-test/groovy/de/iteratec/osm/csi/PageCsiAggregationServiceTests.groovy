@@ -51,8 +51,7 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page1, page2, page3
-    AggregatorType pageAggregator;
-    Browser browser;
+    Browser browser
     ConnectivityProfile connectivityProfile
     MeasuredEvent measuredEvent1
     Location location1
@@ -190,8 +189,7 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
         MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page1, name: "measuredEvent").save(failOnError: true)
 
-        AggregatorType measuredEventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregator: measuredEventAggregator, jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(hpmv.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
@@ -221,17 +219,17 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     void "test calculation_DailyInterval_MultipleHourlyMv"() {
         given:
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv1.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv2.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv3.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv4.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv5.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //mocking inner services
@@ -268,17 +266,17 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         given:
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv1.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv2.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv3.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv4.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv5.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //mocking inner services
@@ -313,7 +311,7 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
                 ((valueFirstMv * hourofdayWeightFirstMv * browserWeightAllMvs) + (valueSecondMv * hourofdayWeightSecondMv * browserWeightAllMvs) + (valueThirdMv * hourofdayWeightThirdMv * browserWeightAllMvs)) / sumOfAllWeights,
                 calculatedMvs[0].csByWptDocCompleteInPercent,
                 DELTA
-        );
+        )
 
         assertEquals(1, mvs.size())
         assertTrue(wpmvMarked.isCalculated())
@@ -327,9 +325,9 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //MVs outside of Interval
-        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv1.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv2.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //precondition
@@ -365,10 +363,9 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
         hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
 
-        pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+        browser = new Browser(name: "Test", weight: 1).save(failOnError: true)
 
         connectivityProfile = TestDataUtil.createConnectivityProfile("DSL1")
 
@@ -388,18 +385,18 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         location1 = TestDataUtil.createLocation(wptServer, "unusedIdentifier", browser, false)
 
         //with existing JobGroup and Page:
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup1, page1, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup1, page2, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page1, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page2, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page3, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.PAGE, jobGroup1, page1, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.PAGE, jobGroup1, page2, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.PAGE, jobGroup3, page1, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.PAGE, jobGroup3, page2, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.PAGE, jobGroup3, page3, null, "", false)
 
         List<CsiAggregation> csiAggregationsWithConnectivityProfile = []
-        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup1, page1, 12, "", false)
-        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup1, page2, 10, "", false)
-        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page1, 12, "", false)
-        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page2, 12, "", false)
-        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page3, 10, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, AggregationType.PAGE, jobGroup1, page1, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, AggregationType.PAGE, jobGroup1, page2, 10, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, AggregationType.PAGE, jobGroup3, page1, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, AggregationType.PAGE, jobGroup3, page2, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, AggregationType.PAGE, jobGroup3, page3, 10, "", false)
         csiAggregationsWithConnectivityProfile.each {
             it.connectivityProfile = connectivityProfile
             it.save(failOnError: true)
