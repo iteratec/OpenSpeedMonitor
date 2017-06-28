@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.external.GraphitePath
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
@@ -25,8 +24,8 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 @TestFor(GraphitePath)
-@Mock([GraphitePath, AggregatorType])
-@Build([GraphitePath, AggregatorType])
+@Mock([GraphitePath])
+@Build([GraphitePath])
 class GraphitePathSpec extends Specification {
 
     void "alphanumerical prefixes with trailing dot are valid"(String prefix) {
