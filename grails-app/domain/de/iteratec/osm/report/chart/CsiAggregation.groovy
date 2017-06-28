@@ -117,17 +117,17 @@ class CsiAggregation implements CsiValue {
         interval(nullable: false)
         aggregationType(nullable: false)
 
-        // JobGroup can be null if aggregatorType == csiSystem
+        // JobGroup can be null if aggregationType == csiSystem
         jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || val })
-        // measuredEvent can be null if aggregatorType in (csiSystem, jobGroup, page)
+        // measuredEvent can be null if aggregationType in (csiSystem, jobGroup, page)
         measuredEvent(nullable: true, validator: { val, obj ->
             return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val
         })
-        //page can be null if aggregatorType in (csiSystem, jobGroup)
+        //page can be null if aggregationType in (csiSystem, jobGroup)
         page(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || val })
-        // browser can be null if aggregatorType in (csiSystem, jobGroup, page)
+        // browser can be null if aggregationType in (csiSystem, jobGroup, page)
         browser(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
-        // location can be null if aggregatorType in (csiSystem, jobGroup, page)
+        // location can be null if aggregationType in (csiSystem, jobGroup, page)
         location(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
 
         csByWptDocCompleteInPercent(nullable: true)
@@ -142,7 +142,7 @@ class CsiAggregation implements CsiValue {
         closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
         started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
         interval(index: 'started_and_iVal_and_aggr_idx')
-        aggregator(index: 'started_and_iVal_and_aggr_idx')
+        aggregationType(index: 'started_and_iVal_and_aggr_idx')
     }
 
     /**
