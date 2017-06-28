@@ -28,7 +28,6 @@ import org.junit.Test
 
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -38,6 +37,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import spock.lang.Ignore
 
 
 /**
@@ -54,7 +54,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * The test in this class failed due to thrown org.hibernate.StaleObjectStateException on executing <br><code>CsiAggregation.list()*.delete(failOnError: true, flush: true)</code><br>
  * Shouldn't happen after removing the attribute calculated from domain {@link CsiAggregation} and introduction of domain {@link CsiAggregationUpdateEvent} instead.
  * </p>
- *  
+ *
  * @author nkuhn
  * @see CsiAggregationUpdateEvent
  */
@@ -62,63 +62,60 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 @Rollback
 class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrationSpec {
 
-	CsiAggregationUpdateService csiAggregationUpdateService
-	PageCsiAggregationService pageCsiAggregationService
-	CsiAggregationUtilService csiAggregationUtilService
-	def log = LogFactory.getLog(getClass())
+    CsiAggregationUpdateService csiAggregationUpdateService
+    PageCsiAggregationService pageCsiAggregationService
+    CsiAggregationUtilService csiAggregationUtilService
+    def log = LogFactory.getLog(getClass())
 
-	private static final aTuesday = new DateTime(2014, 6, 3, 0, 0, 0, DateTimeZone.UTC)
-	private static final fridayBeforeTuesday = new DateTime(2014, 5, 30, 0, 0, 0, DateTimeZone.UTC)
+    private static final aTuesday = new DateTime(2014, 6, 3, 0, 0, 0, DateTimeZone.UTC)
+    private static final fridayBeforeTuesday = new DateTime(2014, 5, 30, 0, 0, 0, DateTimeZone.UTC)
 
-	def setup() {
+    def setup() {
 
-		/*/no clue why the criteria in the following service-method doesn't work in this integration test :-(
-		JobResultService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
-			JobResult jobResultToReturn
-			JobResult.list().each {jobResult ->
-				if(jobResult.getEventResults()*.ident().contains(eventResult.ident())) {
-					jobResultToReturn = jobResult
-				}
-			}
-			return jobResultToReturn
-		}
-		//*/
+        /*/no clue why the criteria in the following service-method doesn't work in this integration test :-(
+        JobResultService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
+            JobResult jobResultToReturn
+            JobResult.list().each {jobResult ->
+                if(jobResult.getEventResults()*.ident().contains(eventResult.ident())) {
+                    jobResultToReturn = jobResult
+                }
+            }
+            return jobResultToReturn
+        }
+        //*/
 
-		Page page = new Page(name: 'HP').save(failOnError: true, flush: true)
-		new MeasuredEvent(name: 'event', testedPage: page).save(failOnError: true, flush: true)
+        Page page = new Page(name: 'HP').save(failOnError: true, flush: true)
+        new MeasuredEvent(name: 'event', testedPage: page).save(failOnError: true, flush: true)
 //		look at ToDo below
 //		JobGroup jobGroup = new JobGroup(name: 'group', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true, flush: true)
-		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
-		new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
-		new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
-		new CsiAggregationInterval(name: 'raw', intervalInMinutes: CsiAggregationInterval.RAW).save(failOnError: true, flush: true)
-		new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true, flush: true)
-		new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true, flush: true)
-		new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true, flush: true)
-		Script script = new Script(
-				label: 'script',
-				description: 'script',
-				navigationScript: 'script',
-				provideAuthenticateInformation: false
-		).save(failOnError: true, flush: true)
-		WebPageTestServer server = new WebPageTestServer(
-				label: 'server',
-				proxyIdentifier: 'proxyIdentifier',
-				active: true,
-				baseUrl: 'http://my-url.com',
-				dateCreated: new Date(),
-				lastUpdated: new Date()
-		).save(failOnError: true, flush: true)
-		Browser browser = new Browser(name: 'browser').save(failOnError: true, flush: true)
-		Location location = new Location(
-				label: 'location',
-				active: true,
-				wptServer: server,
-				location: 'location',
-				browser: browser,
-				dateCreated: new Date(),
-				lastUpdated: new Date()
-		).save(failOnError: true, flush: true)
+        new CsiAggregationInterval(name: 'raw', intervalInMinutes: CsiAggregationInterval.RAW).save(failOnError: true, flush: true)
+        new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true, flush: true)
+        new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true, flush: true)
+        new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true, flush: true)
+        Script script = new Script(
+                label: 'script',
+                description: 'script',
+                navigationScript: 'script',
+                provideAuthenticateInformation: false
+        ).save(failOnError: true, flush: true)
+        WebPageTestServer server = new WebPageTestServer(
+                label: 'server',
+                proxyIdentifier: 'proxyIdentifier',
+                active: true,
+                baseUrl: 'http://my-url.com',
+                dateCreated: new Date(),
+                lastUpdated: new Date()
+        ).save(failOnError: true, flush: true)
+        Browser browser = new Browser(name: 'browser').save(failOnError: true, flush: true)
+        Location location = new Location(
+                label: 'location',
+                active: true,
+                wptServer: server,
+                location: 'location',
+                browser: browser,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
+        ).save(failOnError: true, flush: true)
 //		look at ToDo below
 //		new Job(
 //				label: 'job',
@@ -130,20 +127,21 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 //				active: false,
 //				maxDownloadTimeInMinutes: 60
 //		).save(failOnError: true, flush: true)
-	}
+    }
 
-	def testPersistingNewEventResultsWhileManyCsiAggregationCalculationsOccur() {
+    @Ignore
+    def testPersistingNewEventResultsWhileManyCsiAggregationCalculationsOccur() {
 
-		/*TODO: enable this test again
-		 * If this test runs in front of ShopCsiAggregationCalculationIntSpec,
-		 * the ShopCsiAggregationCalculationIntSpec has a AssertionError and fails.
-		 * The dependencies based on JobGroup creation in this Test.
-		 *
-		 * This test fails when it is running in integration test sequence,
-		 * the dependency belongs on ?
-		 */
-		expect:
-		true
+        /*TODO: enable this test again
+         * If this test runs in front of ShopCsiAggregationCalculationIntSpec,
+         * the ShopCsiAggregationCalculationIntSpec has a AssertionError and fails.
+         * The dependencies based on JobGroup creation in this Test.
+         *
+         * This test fails when it is running in integration test sequence,
+         * the dependency belongs on ?
+         */
+        expect:
+        true
 //		CsiAggregationCalculator mvCalculator = new CsiAggregationCalculator()
 //		mvCalculator.start(pageCsiAggregationService, log)
 //
@@ -209,72 +207,74 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 //
 //		CsiAggregation.list()*.delete(failOnError: true, flush: true)
 
-	}
+    }
 
-	public static getEventResult() {
-		return new EventResult()
-	}
+    public static getEventResult() {
+        return new EventResult()
+    }
 }
-	
-	/**
-	 * This thread retrieves daily and weekly-Page-{@link CsiAggregation}s continuously every 10 ms.
-	 * While retrieving these values get calculated.
-	 * @author nkuhn
-	 *
-	 */
-	class CsiAggregationCalculator implements Runnable{
-		
-		private volatile Thread calculatorThread
-		private PageCsiAggregationService pageMVService
-		private def log
 
-		public CsiAggregationCalculator(){}
-		
-		public void start(PageCsiAggregationService pageCsiAggregationService, outerLog){
-			calculatorThread = new Thread(this)
-			pageMVService = pageCsiAggregationService
-			log = outerLog
-			calculatorThread.start()
-		}
-		public void stop(){
-			calculatorThread = null
-		}
-		public void run(){
-			Thread thisThread = Thread.currentThread();
-	        while (calculatorThread == thisThread) {
-	            try {
-	                Thread.sleep(10)
-	            } catch (InterruptedException e){
-	            }
-				log.error "getting daily page-mv's from calculator-thread:"
-				CsiAggregation.withTransaction { status ->
-					 List<JobGroup> groups = JobGroup.findAllByName('group')
-					 List<Page> pages = Page.findAllByName('HP')
-					//daily page
-					List<CsiAggregation> pmvs =  pageMVService.getOrCalculatePageCsiAggregations(
-						HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.minusDays(1).toDate(),
-						HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.plusDays(1).toDate(),
-						CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY),
-						groups, 
-						pages
-					)
-					pmvs.each {
-						log.error "read pmv: ${it.ident()}. Calculated? -> ${it.isCalculated()}"
-					}
-					//weekly page
-					log.error "getting weekly page-mv's from calculator-thread:"
-					pmvs =  pageMVService.getOrCalculatePageCsiAggregations(
-						HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
-						HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
-						CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY),
-						groups,
-						pages
-					)
-					pmvs.each {
-						log.error "read pmv: ${it.ident()}. Calculated? -> ${it.isCalculated()}"
-					}
-					
-				}
-	        }
-		}
-	}
+/**
+ * This thread retrieves daily and weekly-Page-{@link CsiAggregation}s continuously every 10 ms.
+ * While retrieving these values get calculated.
+ * @author nkuhn
+ *
+ */
+class CsiAggregationCalculator implements Runnable {
+
+    private volatile Thread calculatorThread
+    private PageCsiAggregationService pageMVService
+    private def log
+
+    public CsiAggregationCalculator() {}
+
+    public void start(PageCsiAggregationService pageCsiAggregationService, outerLog) {
+        calculatorThread = new Thread(this)
+        pageMVService = pageCsiAggregationService
+        log = outerLog
+        calculatorThread.start()
+    }
+
+    public void stop() {
+        calculatorThread = null
+    }
+
+    public void run() {
+        Thread thisThread = Thread.currentThread();
+        while (calculatorThread == thisThread) {
+            try {
+                Thread.sleep(10)
+            } catch (InterruptedException e) {
+            }
+            log.error "getting daily page-mv's from calculator-thread:"
+            CsiAggregation.withTransaction { status ->
+                List<JobGroup> groups = JobGroup.findAllByName('group')
+                List<Page> pages = Page.findAllByName('HP')
+                //daily page
+                List<CsiAggregation> pmvs = pageMVService.getOrCalculatePageCsiAggregations(
+                        HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.minusDays(1).toDate(),
+                        HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.plusDays(1).toDate(),
+                        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY),
+                        groups,
+                        pages
+                )
+                pmvs.each {
+                    log.error "read pmv: ${it.ident()}. Calculated? -> ${it.isCalculated()}"
+                }
+                //weekly page
+                log.error "getting weekly page-mv's from calculator-thread:"
+                pmvs = pageMVService.getOrCalculatePageCsiAggregations(
+                        HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
+                        HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
+                        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY),
+                        groups,
+                        pages
+                )
+                pmvs.each {
+                    log.error "read pmv: ${it.ident()}. Calculated? -> ${it.isCalculated()}"
+                }
+
+            }
+        }
+    }
+}
