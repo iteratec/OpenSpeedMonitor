@@ -9,6 +9,8 @@ import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.report.chart.Measurand
+import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -17,7 +19,7 @@ import org.springframework.http.HttpStatus
 
 class JobGroupAggregationController extends ExceptionHandlerController {
     public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    static Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
@@ -38,7 +40,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
+        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES)
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -71,7 +73,9 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         }
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
-        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
+        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
+        List<String> measurandFieldName = []
+        allMeasurands.each {measurandFieldName.add(Measurand.valueOf(it).getEventResultField())}
 
         List allEventResults = EventResult.createCriteria().list {
             'in'('jobGroup', allJobGroups)
@@ -83,7 +87,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             )
             projections {
                 groupProperty('jobGroup')
-                allMeasurands.each { m ->
+                measurandFieldName.each { m ->
                     avg(m)
                 }
             }
@@ -103,15 +107,15 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: measurandUtilService.getDimensionalUnit(series.measurands[0]),
-                    yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
+                    dimensionalUnit: Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
+                    yAxisLabel:  Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
                         new BarchartDatum(
-                            measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
-                            value: measurandUtilService.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand.replace("Uncached", "")) + 1], currentMeasurand),
+                            measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
+                            value: measurandUtilService.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1], currentMeasurand),
                             grouping: "${datum[0].name}"
                         )
                     )
