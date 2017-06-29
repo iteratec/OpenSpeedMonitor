@@ -1,6 +1,8 @@
 package de.iteratec.osm.util
 
+import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.report.chart.Unit
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.ResultCsiAggregationService
 import grails.transaction.Transactional
@@ -47,14 +49,14 @@ class MeasurandUtilService {
 
     }
 
-    def normalizeValue(def value, String measurand) {
-        measurand = convertToMeasurandUncached(measurand)
-
-        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
-        if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES).contains(measurand) && value) {
-            return ((double) value) / 1024 / 1024
+    def normalizeValue(def value, String measurandString) {
+        if(measurandString&&value){
+            Measurand measurand = Measurand.valueOf(measurandString)
+            MeasurandGroup measurandGroup = measurand.getMeasurandGroup()
+            Unit unit = measurandGroup.getUnit()
+            Double divisor = unit.getDivisor()
+            return value/divisor
         }
-
         return value
     }
 
