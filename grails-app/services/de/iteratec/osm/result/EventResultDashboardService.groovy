@@ -517,8 +517,8 @@ public class EventResultDashboardService {
     }
 }
 
-@EqualsAndHashCode
-class GraphLabel {
+@EqualsAndHashCode(excludes = "measuredEventId")
+class GraphLabel  implements Comparable<GraphLabel> {
     SelectedMeasurand selectedMeasurand
     Long jobGroupId, measuredEventId, pageId, browserId, locationId
     Long millisStartOfInterval
@@ -536,10 +536,12 @@ class GraphLabel {
         this.tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
     }
 
-    GraphLabel createCopy(boolean  withMilliseconds){
-        GraphLabel result = new GraphLabel()
+    GraphLabel(SelectedMeasurand selectedMeasurand){
+        this.selectedMeasurand = selectedMeasurand
+    }
 
-        result.selectedMeasurand = this.selectedMeasurand
+    GraphLabel createCopy(boolean  withMilliseconds){
+        GraphLabel result = new GraphLabel(this.selectedMeasurand)
 
         result.jobGroupId = this.jobGroupId
         result.measuredEventId = this.measuredEventId
@@ -570,6 +572,19 @@ class GraphLabel {
 
     @Override
     String toString(){
-        return selectedMeasurand.toString()+UNIQUE_STRING_DELIMITTER+tag+UNIQUE_STRING_DELIMITTER+connectivity
+        if(!millisStartOfInterval){
+            return selectedMeasurand.toString()+UNIQUE_STRING_DELIMITTER+tag+UNIQUE_STRING_DELIMITTER+connectivity
+        }else {
+            return selectedMeasurand.toString()+UNIQUE_STRING_DELIMITTER+tag+UNIQUE_STRING_DELIMITTER+millisStartOfInterval+UNIQUE_STRING_DELIMITTER+connectivity
+        }
+    }
+
+    @Override
+    int compareTo(GraphLabel graphLabel) {
+        if(graphLabel){
+            return this.toString().compareTo(graphLabel.toString())
+        }else{
+            return 1
+        }
     }
 }
