@@ -6,7 +6,6 @@ import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
@@ -20,12 +19,10 @@ import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+import de.iteratec.osm.util.MeasurandUtil
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
-    public final
-    static Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
@@ -35,7 +32,6 @@ class PageAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    MeasurandUtilService measurandUtilService
     OsmConfigCacheService osmConfigCacheService
 
 
@@ -47,7 +43,7 @@ class PageAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES)
+        modelToRender.put('aggrGroupValuesUnCached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -153,14 +149,14 @@ class PageAggregationController extends ExceptionHandlerController {
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    def value = measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
+                    def value = MeasurandUtil.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
                     if (value) {
                         barchartSeries.data.add(
                                 new BarchartDatum(
                                         measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
                                         originalMeasurandName: currentMeasurand,
                                         value: value,
-                                        valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                                        valueComparative: MeasurandUtil.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
                                         grouping: key
                                 )
                         )

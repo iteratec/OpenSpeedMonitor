@@ -14,13 +14,10 @@ import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+import de.iteratec.osm.util.MeasurandUtil
 import org.springframework.http.HttpStatus
 
 class JobGroupAggregationController extends ExceptionHandlerController {
-    public final
-    static Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
-
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
@@ -29,7 +26,6 @@ class JobGroupAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    MeasurandUtilService measurandUtilService
     OsmConfigCacheService osmConfigCacheService
 
     def index() {
@@ -40,7 +36,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES)
+        modelToRender.put('aggrGroupValuesUnCached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -115,7 +111,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                            value: measurandUtilService.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1], currentMeasurand),
+                            value: MeasurandUtil.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1], currentMeasurand),
                             grouping: "${datum[0].name}"
                         )
                     )

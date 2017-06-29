@@ -2,7 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -19,14 +18,13 @@ import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+import de.iteratec.osm.util.MeasurandUtil
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class DistributionChartController extends ExceptionHandlerController {
-    public final static Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
@@ -36,9 +34,7 @@ class DistributionChartController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    FilteringAndSortingDataService filteringAndSortingDataService
     PerformanceLoggingService performanceLoggingService
-    MeasurandUtilService measurandUtilService
     OsmConfigCacheService osmConfigCacheService
 
     def index() {
@@ -57,7 +53,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put('pages', pages)
 
         // Measurands
-        modelToRender.put('measurandsUncached', AGGREGATOR_GROUP_VALUES)
+        modelToRender.put('measurandsUncached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)

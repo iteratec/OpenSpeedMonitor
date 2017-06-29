@@ -28,6 +28,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtil
 import de.iteratec.osm.util.ParameterBindingUtility
 
 import grails.converters.JSON
@@ -60,7 +61,7 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public static final Map<MeasurandGroup, List<Measurand>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+
 
     public static final String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
@@ -558,8 +559,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES,
-                'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES,
+                'aggrGroupValuesCached': MeasurandUtil.getAllMeasurandsByMeasurandGroup(),
+                'aggrGroupValuesUnCached': MeasurandUtil.getAllMeasurandsByMeasurandGroup(),
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,

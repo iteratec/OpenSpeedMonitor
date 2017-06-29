@@ -12,14 +12,13 @@ import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+import de.iteratec.osm.util.MeasurandUtil
 
 class PageComparisonController extends ExceptionHandlerController {
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    MeasurandUtilService measurandUtilService
     I18nService i18nService
     OsmConfigCacheService osmConfigCacheService
 
@@ -31,7 +30,7 @@ class PageComparisonController extends ExceptionHandlerController {
         modelToRender.put("pages", Page.list().collectEntries { [it.id, it.name] })
         modelToRender.put("jobGroups", JobGroup.list().collectEntries { [it.id, it.name] })
 
-        modelToRender.put("aggrGroupValuesUnCached", ResultCsiAggregationService.getAggregatorMapForOptGroupSelect())
+        modelToRender.put("aggrGroupValuesUnCached", MeasurandUtil.getAllMeasurandsByMeasurandGroup())
         modelToRender.put("selectedAggrGroupValuesUnCached", [])
 
         // JavaScript-Utility-Stuff:
