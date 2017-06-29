@@ -151,7 +151,12 @@
         position: relative;
     }
 
-    #select-configuration {
+    #header {
+        display: inline-flex;
+        padding-top: 10px;
+    }
+
+    .text-info {
         position: absolute;
         top: 15px;
         right: 15px;
@@ -207,36 +212,41 @@
 
 %{-- name and description of actual config --}%
 <div class="card" id="configuration-info">
-<p class="text-info">
-    <g:if test="${csiConfigurations}">
-        <div class="btn-group" id="select-configuration">
-            <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
-               aria-haspopup="true" aria-expanded="false" id="customCsiConfigurationDropdownButton">
-                <g:message code="de.iteratec.isocsi.csiConfiguration.custom.select.label"
-                           default="View another Configuration"/>
-                <span class="caret"></span>
+    <div class="text-info">
+        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+            <a href="#" class="btn btn-default" onclick="prepareConfigurationListAndCopy()">
+                <g:message code="de.iteratec.osm.csiConfiguration.saveAs" default="Copy"/>
             </a>
-            <ul class="dropdown-menu" id="customCsiConfigurationSelection">
-                <g:each in="${csiConfigurations}" var="availableConfiguration">
-                    <li><g:link action="configurations" params="[id: availableConfiguration.id]">
-                        ${availableConfiguration.label}
-                    </g:link>
-                    </li>
-                </g:each>
-            </ul>
-        </div>
-    </g:if>
-    <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
-    <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
-</p>
-    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-        <a href="#" class="btn btn-primary" onclick="prepareConfigurationListAndCopy()">
-            <g:message code="de.iteratec.osm.csiConfiguration.saveAs" default="Copy"/>
-        </a>
-        <a href="#updateCsiConfModal" class="btn btn-primary" data-toggle="modal">
-            <g:message code="de.iteratec.osm.csiConfiguration.edit" default="Copy"/>
-        </a>
-    </sec:ifAnyGranted>
+        </sec:ifAnyGranted>
+        <g:if test="${csiConfigurations}">
+            <div class="btn-group" id="select-configuration">
+                <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
+                   aria-haspopup="true" aria-expanded="false" id="customCsiConfigurationDropdownButton">
+                    <g:message code="de.iteratec.isocsi.csiConfiguration.custom.select.label"
+                               default="View another Configuration"/>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" id="customCsiConfigurationSelection">
+                    <g:each in="${csiConfigurations}" var="availableConfiguration">
+                        <li><g:link action="configurations" params="[id: availableConfiguration.id]">
+                            ${availableConfiguration.label}
+                        </g:link>
+                        </li>
+                    </g:each>
+                </ul>
+            </div>
+        </g:if>
+    </div>
+
+    <div id="header">
+        <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
+        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+            <a href="#updateCsiConfModal" class="fa fa-edit" data-toggle="modal"></a>
+        </sec:ifAnyGranted>
+    </div>
+    <div>
+        <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
+    </div>
 </div>
 
 
