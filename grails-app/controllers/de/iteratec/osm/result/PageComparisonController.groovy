@@ -8,6 +8,7 @@ import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -30,7 +31,7 @@ class PageComparisonController extends ExceptionHandlerController {
         modelToRender.put("pages", Page.list().collectEntries { [it.id, it.name] })
         modelToRender.put("jobGroups", JobGroup.list().collectEntries { [it.id, it.name] })
 
-        modelToRender.put("aggrGroupValuesUnCached", ResultCsiAggregationService.getAggregatorMapForOptGroupSelect().get(CachedView.UNCACHED))
+        modelToRender.put("aggrGroupValuesUnCached", ResultCsiAggregationService.getAggregatorMapForOptGroupSelect())
         modelToRender.put("selectedAggrGroupValuesUnCached", [])
 
         // JavaScript-Utility-Stuff:
@@ -50,6 +51,8 @@ class PageComparisonController extends ExceptionHandlerController {
             [it['jobGroupId1'] as long, it['jobGroupId2'] as long]
         }.flatten().unique())
 
+        Measurand measurand = Measurand.valueOf(cmd.measurand)
+
         List allEventResults = EventResult.createCriteria().list {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
@@ -62,7 +65,7 @@ class PageComparisonController extends ExceptionHandlerController {
             projections {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
-                avg(cmd.measurand)
+                avg(measurand.getEventResultField())
             }
         }
 
@@ -76,9 +79,9 @@ class PageComparisonController extends ExceptionHandlerController {
         dto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         cmd.selectedPageComparisons.each { row ->
-            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurandUtilService.getDimensionalUnit(cmd.measurand))
-            BarchartDatum datum1 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
-            BarchartDatum datum2 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
+            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurand.getMeasurandGroup().getUnit().getLabel())
+            BarchartDatum datum1 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
+            BarchartDatum datum2 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
             def result1 = allEventResults.find {
                 it[0].toString() == row['jobGroupId1'] &&
                         it[1].toString() == row['pageId1']
