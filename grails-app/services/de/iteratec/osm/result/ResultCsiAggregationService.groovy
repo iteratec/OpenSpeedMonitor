@@ -108,34 +108,6 @@ class ResultCsiAggregationService {
     }
 
     /**
-     * Retrieves attribute-name of {@link EventResult} which is associated with the given {@link AggregatorType}.
-     * @param aggregator
-     * @return
-     * @throws IllegalArgumentException if aggregator is not a measurand or the {@link EventResult}-attribute can't be conducted from aggregator-name.
-     */
-    public String getEventResultAttributeNameFromMeasurand(AggregatorType aggregator) {
-        String eventResultAttributeName = getCachedViewIndependentPartOf(aggregator.name)
-        if (aggregator.measurandGroup == null || aggregator.measurandGroup == MeasurandGroup.NO_MEASURAND) {
-            throw new IllegalArgumentException("AggregatorType ${aggregator} is not a measurand")
-        } else if (!EventResult.metaClass.properties*.name.contains(eventResultAttributeName)) {
-            throw new IllegalArgumentException("The EventResult-attribute '${eventResultAttributeName}' doesn't exist")
-        }
-        return eventResultAttributeName
-    }
-
-    private String getCachedViewIndependentPartOf(String aggregatorName) {
-        String cachedViewIndependentPart = aggregatorName
-        Integer positionOfUncachedSuffix = aggregatorName.indexOf(AggregatorType.UNCACHED_SUFFIX)
-        Integer positionOfCachedSuffix = aggregatorName.indexOf(AggregatorType.CACHED_SUFFIX)
-        if (positionOfUncachedSuffix > -1) {
-            cachedViewIndependentPart = aggregatorName.substring(0, positionOfUncachedSuffix)
-        } else if (positionOfCachedSuffix > -1) {
-            cachedViewIndependentPart = aggregatorName.substring(0, positionOfCachedSuffix)
-        }
-        return cachedViewIndependentPart
-    }
-
-    /**
      * Returns the {@link CachedView} the Result-{@link AggregatorType} is bound to.
      *
      * <p>

@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtil
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
@@ -49,12 +50,10 @@ public class EventResultDashboardService {
 
     BrowserService browserService
     JobGroupDaoService jobGroupDaoService
-    ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
     EventResultDaoService eventResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService
-    ConnectivityProfileDaoService connectivityProfileDaoService
     OsmChartProcessingService osmChartProcessingService
 
     /**
@@ -268,7 +267,7 @@ public class EventResultDashboardService {
                 )
 
                 if(selectedMeasurand.cachedView == eventResult.cachedView){
-                    Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                    Double value = MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
                     if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
@@ -296,8 +295,8 @@ public class EventResultDashboardService {
         Number gt = ltBoundary[measurand]
 
         boolean inBound = true
-        if (lt) inBound &= resultCsiAggregationService.getEventResultPropertyForCalculation(measurand, eventResult) > lt
-        if (gt) inBound &= resultCsiAggregationService.getEventResultPropertyForCalculation(measurand, eventResult) < gt
+        if (lt) inBound &= MeasurandUtil.getEventResultPropertyForCalculation(measurand, eventResult) > lt
+        if (gt) inBound &= MeasurandUtil.getEventResultPropertyForCalculation(measurand, eventResult) < gt
 
         return inBound
     }
@@ -311,7 +310,7 @@ public class EventResultDashboardService {
             eventResults.each { EventResult eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
-                        Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                        Double value = MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
                         if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)
@@ -495,25 +494,6 @@ public class EventResultDashboardService {
         }
 
         return result
-    }
-
-    private TreeMap addToPointMap(Map resultMap, String resultName, Long timeStamp, Integer value) {
-        Map pointMap = resultMap.get(resultName)
-        if (pointMap == null) {
-            pointMap = new TreeMap<Long, Double>()
-        }
-        pointMap.put(timeStamp, value)
-        return pointMap
-    }
-
-    private boolean isEventResultMachingQueryParams(EventResult eventResult, MvQueryParams queryParams) {
-        boolean eins = (queryParams.getMeasuredEventIds().contains(eventResult.measuredEvent.id) || queryParams.getMeasuredEventIds().isEmpty())
-        boolean zwei = (queryParams.getPageIds().contains(eventResult.measuredEvent.testedPage.id) || queryParams.getPageIds().isEmpty())
-        return eins && zwei
-    }
-
-    private boolean isCachedViewEqualToAggregatorTypesView(EventResult eventResult, CachedView aggregatorTypeCachedView) {
-        return eventResult.cachedView.equals(aggregatorTypeCachedView)
     }
 }
 
