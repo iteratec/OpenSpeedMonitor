@@ -40,8 +40,24 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         absoluteMaxValue = 0,
         selectedSeries = "",
         colorScales = {},
+        unitFactors =         measurandOrder = {
+            ms: 1,
+            s: 1000
+        },
         measurandOrder = {
             ms: {
+                order: 1,
+                measurands: {
+                    fullyLoadedTimeInMillisecs: 6,
+                    docCompleteTimeInMillisecs: 3,
+                    loadTimeInMillisecs: 4,
+                    startRenderInMillisecs: 2,
+                    firstByteInMillisecs: 1,
+                    visuallyCompleteInMillisecs: 5,
+                    domTimeInMillisecs: 0
+                }
+            },
+            s: {
                 order: 1,
                 measurands: {
                     fullyLoadedTimeInMillisecs: 6,
@@ -58,6 +74,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
                 measurands: {
                     fullyLoadedRequestCount: 2,
                     docCompleteRequests: 1
+                }
+            },
+            KB: {
+                order: 3,
+                measurands: {
+                    fullyLoadedIncomingBytes: 2,
+                    docCompleteIncomingBytes: 1
                 }
             },
             MB: {
@@ -998,13 +1021,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var shouldDrawTrafficLight = function () {
         var unitNames = Object.keys(units);
-        return unitNames.length == 1 && unitNames[0] == "ms"
+        return unitNames.length == 1 && (unitNames[0] == "ms" || unitNames[0] == "s")
     };
 
     var drawTrafficLightForTimings = function () {
-
-        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
-        var microsecsXScale = unitScales["ms"];
+        var unitName = Object.keys(units);
+        var unitFactor = unitFactors[unitName[0]];
+        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue*unitFactor);
+        var microsecsXScale = unitScales[unitName[0]];
 
         var trafficLight = trafficLightBars.selectAll("g")
             .data(trafficLightData, function (d) {
@@ -1025,7 +1049,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
             .append("g")
             .attr("cx", 0)
             .attr("transform", function (d, index) {
-                var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary) + 2 * barPadding;
+                var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary)/unitFactor + 2 * barPadding;
                 return "translate(" + xOffset + ", " + absoluteMaxYOffset + ")";
             });
 
@@ -1057,18 +1081,18 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         trafficLightTransition
             .attr("transform", function (d, index) {
-                var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary) + 2 * barPadding;
+                var xOffset = barXOffSet + microsecsXScale(d.lowerBoundary)/unitFactor + 2 * barPadding;
                 return "translate(" + xOffset + ", " + absoluteMaxYOffset + ")";
             })
             .select('rect')
             .attr("width", function (d) {
-                return microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0);
+                return (microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0)) / unitFactor;
             });
 
         trafficLightTransition
             .select('text')
             .attr("x", function (d) {
-                return (microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0)) / 2;
+                return (microsecsXScale(d.upperBoundary - d.lowerBoundary) - microsecsXScale(0)) / unitFactor / 2;
             });
 
     };

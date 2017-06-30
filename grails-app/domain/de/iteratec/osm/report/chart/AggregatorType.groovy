@@ -35,13 +35,13 @@ enum MeasurandGroup {
     UNDEFINED(Unit.OTHER),
     NO_MEASURAND(Unit.OTHER)
 
-    private Unit unit;
+    private Unit unit
 
     private MeasurandGroup(Unit unit){
-        this.unit = unit;
+        this.unit = unit
     }
     Unit getUnit(){
-        return unit;
+        return unit
     }
 }
 
@@ -64,11 +64,11 @@ enum Unit{
     }
 
     String getLabel(){
-        return label;
+        return label
     }
 
     Double getDivisor(){
-        return divisor;
+        return divisor
     }
 }
 
