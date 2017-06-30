@@ -108,10 +108,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         descending = true,
         customerJourneyFilter;
 
-    var unitPrecisions = {
-        MB: 2
-    };
-
     var drawChart = function (barchartData) {
 
         if (svg === undefined) {
@@ -690,7 +686,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     };
 
     var formatValue = function (value, unit) {
-        var precision = unitPrecisions[unit] || 0;
+        var precision = 2;
         return parseFloat(value).toFixed(precision);
     };
 
