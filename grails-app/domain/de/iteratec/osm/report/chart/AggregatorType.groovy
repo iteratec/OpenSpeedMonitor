@@ -50,7 +50,7 @@ enum Unit{
     MEGABYTE("MB",1000000),
     MILLISECONDS("ms",1),
     SECONDS("s",1000),
-    PERCENT("%",0.01),
+    PERCENT("%",1),
     NUMBER("#",1),
     OTHER("",1)
 

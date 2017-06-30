@@ -287,7 +287,12 @@ class EventResultDashboardController {
         List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
         LinkedList<OsmChartAxis> labelToDataMap = new LinkedList<OsmChartAxis>();
-        allMeasurands.each { labelToDataMap.add(new OsmChartAxis(it.getMeasurand().getMeasurandGroup(),i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString()), getAxisSide(it.getMeasurand().getMeasurandGroup()) ))}
+        allMeasurands.each {
+            labelToDataMap.add(new OsmChartAxis(
+                    it.getMeasurand().getMeasurandGroup(),
+                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString())
+                    + " [" + it.getMeasurand().getMeasurandGroup().getUnit().getLabel() + "]",
+                            getAxisSide(it.getMeasurand().getMeasurandGroup()) ))}
 
         ErQueryParams queryParams = cmd.createErQueryParams();
 

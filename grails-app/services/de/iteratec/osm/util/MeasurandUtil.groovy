@@ -25,6 +25,9 @@ class MeasurandUtil {
     }
 
     static Double getEventResultPropertyForCalculation(Measurand measurand, EventResult result) {
-        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField())) : null
+        MeasurandGroup measurandGroup = measurand.getMeasurandGroup()
+        Unit unit = measurandGroup.getUnit()
+        Double divisor = unit.getDivisor()
+        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField()))/divisor : null
     }
 }

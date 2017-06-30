@@ -206,11 +206,11 @@ function RickshawGraphBuilder(args) {
             var measurandGroup = self.graph.measurandGroupsManager
                 .getMeasurandGroup(axis.measurandGroup);
             if (measurandGroup.label) {
-                var lastIndex = measurandGroup.label.lastIndexOf(" ")
+                /*var lastIndex = measurandGroup.label.lastIndexOf(" ")
                 var str = measurandGroup.label.substring(0, lastIndex);
                 var label = str + " "
-                    + measurandGroup.yValueFormatterForAxis.unit
-                containerOfLabel.html(label);
+                    + measurandGroup.yValueFormatterForAxis.unit*/
+                containerOfLabel.html(measurandGroup.label);
             }
 
             // update label position
@@ -323,7 +323,7 @@ function RickshawGraphBuilder(args) {
                 // insert values in the table
                 pointData += optionalHighlighting + "<td>" + name + ": " + "</td>" +
                     "<td>" + "<i class=\"fa fa-circle\" style=\"color:" + point.series.color + "\"></i> " +
-                    scale.scale.invert(point.value.y).toFixed(0) + "</td>" + "</tr>";
+                    scale.scale.invert(point.value.y).toFixed(2) + "</td>" + "</tr>";
             });
 
 
@@ -951,11 +951,11 @@ function YValueFormatter() {
             }
         } else {
             result.forAxis = function (y) {
-                return y * 1024;
+                return y;
             };
             result.forAxis.unit = "[b]";
             result.forHoverDetail = function (y) {
-                return parseFloat(y * 1024).toFixed(0);
+                return parseFloat(y).toFixed(0);
             };
         }
         return result;
