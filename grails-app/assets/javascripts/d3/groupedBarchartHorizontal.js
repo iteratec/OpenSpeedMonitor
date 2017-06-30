@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         absoluteMaxValue = 0,
         selectedSeries = "",
         colorScales = {},
-        unitFactors =         measurandOrder = {
+        unitFactors = {
             ms: 1,
             s: 1000
         },
