@@ -18,7 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ParameterBindingUtility
 import grails.transaction.Transactional
@@ -164,7 +164,7 @@ class JobService {
             pageIds << pageService.getPageByStepName(it).id
         }
         params["selectedPages"] = pageIds
-        params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME\"]}"
+        params["measurand"] = "{\"stacked\":\"notStacked\",\"values\":[\"$Measurand.DOC_COMPLETE_TIME\"]}"
         return params
     }
 

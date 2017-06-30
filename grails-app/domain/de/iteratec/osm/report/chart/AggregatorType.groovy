@@ -91,7 +91,7 @@ enum Measurand{
     private MeasurandGroup group
     private String eventResultField
 
-    private Measurand(MeasurandGroup value, String name){
+    private (MeasurandGroup value, String name){
         group = value
         eventResultField = name
     }
