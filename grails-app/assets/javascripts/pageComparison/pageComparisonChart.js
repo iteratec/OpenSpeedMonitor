@@ -167,7 +167,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .attr("y", barHeight / 2)
             .text(function (d) {
                 var label = d.label ? d.label + ": " : "";
-                return label + (Math.round(d.value)) + " " + unitName;
+                return label + (d.value.toFixed(2)) + " " + unitName;
             });
 
         // exit //////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
     var drawTrafficLight = function () {
 
-        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
+        var # = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
 
         var trafficLight = trafficLightBars.selectAll("g")
             .data(trafficLightData, function (d) {

@@ -65,6 +65,7 @@ class PageComparisonController extends ExceptionHandlerController {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
                 avg(measurand.getEventResultField())
+                groupProperty('id')
             }
         }
 
@@ -90,7 +91,7 @@ class PageComparisonController extends ExceptionHandlerController {
                         it[1].toString() == row['pageId2']
             }
             if (result1) {
-                datum1.value = result1 ? result1[2] : null
+                datum1.value = result1 ? result1[2]/measurand.getMeasurandGroup().getUnit().getDivisor() : null
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
@@ -99,7 +100,7 @@ class PageComparisonController extends ExceptionHandlerController {
                 }
             }
             if (result2) {
-                datum2.value = result2 ? result2[2] : null
+                datum2.value = result2 ? result2[2]/measurand.getMeasurandGroup().getUnit().getDivisor() : null
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name
