@@ -291,12 +291,13 @@ public class EventResultDashboardService {
     }
 
     private boolean isInBounds(EventResult eventResult, Measurand measurand, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
+
         Number lt = gtBoundary[measurand]
         Number gt = ltBoundary[measurand]
 
         boolean inBound = true
-        if (lt) inBound &= MeasurandUtil.getEventResultPropertyForCalculation(measurand, eventResult) > lt
-        if (gt) inBound &= MeasurandUtil.getEventResultPropertyForCalculation(measurand, eventResult) < gt
+        if (lt) inBound &= eventResult.getProperty(measurand.getEventResultField()) > lt
+        if (gt) inBound &= eventResult.getProperty(measurand.getEventResultField()) < gt
 
         return inBound
     }

@@ -13,7 +13,7 @@
                 <input name="trimBelowLoadTimes" id="appendedInputBelowLoadTimes"
                        value="${trimBelowLoadTimes}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">ms</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.LOAD_TIMES.getUnit().getLabel()}</span>
             </div>
         </div>
         <div class="col-md-6 form-group">
@@ -24,7 +24,7 @@
                 <input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes"
                        value="${trimAboveLoadTimes}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">ms</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.LOAD_TIMES.getUnit().getLabel()}</span>
             </div>
         </div>
     </div>
@@ -40,7 +40,7 @@
                 <input name="trimBelowRequestCounts" id="appendedInputBelowRequestCounts"
                        value="${trimBelowRequestCounts}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">REQ</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.REQUEST_COUNTS.getUnit().getLabel()}</span>
             </div>
         </div>
         <div class="col-md-6 form-group">
@@ -51,7 +51,7 @@
                 <input name="trimAboveRequestCounts" id="appendedInputAboveRequestCounts"
                        value="${trimAboveRequestCounts}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">REQ</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.REQUEST_COUNTS.getUnit().getLabel()}</span>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
                 <input name="trimBelowRequestSizes" id="appendedInputBelowRequestSizes"
                        value="${trimBelowRequestSizes}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">KB</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.REQUEST_SIZES.getUnit().getLabel()}</span>
             </div>
         </div>
         <div class="col-md-6 form-group">
@@ -81,7 +81,7 @@
                 <input name="trimAboveRequestSizes" id="appendedInputAboveRequestSizes"
                        value="${trimAboveRequestSizes}" class="form-control trim-selection" type="text"
                        placeholder="...">
-                <span class="input-group-addon">KB</span>
+                <span class="input-group-addon">${de.iteratec.osm.report.chart.MeasurandGroup.REQUEST_SIZES.getUnit().getLabel()}</span>
             </div>
         </div>
     </div>

@@ -2,6 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.Measurand
+import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.SelectedMeasurand
 import de.iteratec.osm.util.ParameterBindingUtility
 import org.grails.databinding.BindUsing
@@ -36,32 +37,32 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowLoadTimes
+    Double trimBelowLoadTimes
 
     /**
      * Upper bound for load-time-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveLoadTimes
+    Double trimAboveLoadTimes
 
     /**
      * Lower bound for request-count-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestCounts
+    Double trimBelowRequestCounts
 
     /**
      * Upper bound for request-count-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestCounts
+    Double trimAboveRequestCounts
 
     /**
      * Lower bound for request-sizes-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestSizes
+    Double trimBelowRequestSizes
 
     /**
      * Upper bound for request-sizes-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestSizes
+    Double trimAboveRequestSizes
 
     /**
      * Constraints needs to fit.
@@ -124,22 +125,22 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
         if (this.trimBelowLoadTimes) {
-            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes
+            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes*MeasurandGroup.LOAD_TIMES.getUnit().getDivisor()
         }
         if (this.trimAboveLoadTimes) {
-            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes
+            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes*MeasurandGroup.LOAD_TIMES.getUnit().getDivisor()
         }
         if (this.trimBelowRequestCounts) {
-            queryParams.minRequestCount = this.trimBelowRequestCounts
+            queryParams.minRequestCount = this.trimBelowRequestCounts*MeasurandGroup.REQUEST_COUNTS.getUnit().getDivisor()
         }
         if (this.trimAboveRequestCounts) {
-            queryParams.maxRequestCount = this.trimAboveRequestCounts
+            queryParams.maxRequestCount = this.trimAboveRequestCounts*MeasurandGroup.REQUEST_COUNTS.getUnit().getDivisor()
         }
         if (this.trimBelowRequestSizes) {
-            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes * 1000
+            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes*MeasurandGroup.REQUEST_SIZES.getUnit().getDivisor()
         }
         if (this.trimAboveRequestSizes) {
-            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
+            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes*MeasurandGroup.REQUEST_SIZES.getUnit().getDivisor()
         }
 
         return queryParams
