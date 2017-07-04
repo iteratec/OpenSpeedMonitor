@@ -15,19 +15,19 @@ class MeasurandUtil {
 
     static def normalizeValue(def value, String measurandString) {
         if(measurandString&&value){
-            Measurand measurand = Measurand.valueOf(measurandString)
-            MeasurandGroup measurandGroup = measurand.getMeasurandGroup()
-            Unit unit = measurandGroup.getUnit()
-            Double divisor = unit.getDivisor()
-            return value/divisor
+            return normalizeValue(value,Measurand.valueOf(measurandString));
+        }
+        return value
+    }
+
+    static def normalizeValue(def value, Measurand measurand) {
+        if(value){
+            return value/measurand.getMeasurandGroup().getUnit().getDivisor()
         }
         return value
     }
 
     static Double getEventResultPropertyForCalculation(Measurand measurand, EventResult result) {
-        MeasurandGroup measurandGroup = measurand.getMeasurandGroup()
-        Unit unit = measurandGroup.getUnit()
-        Double divisor = unit.getDivisor()
-        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField()))/divisor : null
+        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField())) : null
     }
 }

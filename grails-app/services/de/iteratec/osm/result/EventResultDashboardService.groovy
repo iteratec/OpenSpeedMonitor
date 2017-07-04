@@ -267,7 +267,7 @@ public class EventResultDashboardService {
                 )
 
                 if(selectedMeasurand.cachedView == eventResult.cachedView){
-                    Double value = MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                    Double value = MeasurandUtil.normalizeValue(MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult),selectedMeasurand.measurand)
                     if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
@@ -311,7 +311,7 @@ public class EventResultDashboardService {
             eventResults.each { EventResult eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
-                        Double value = MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult)
+                        Double value = MeasurandUtil.normalizeValue(MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult),selectedMeasurand.measurand)
                         if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)
