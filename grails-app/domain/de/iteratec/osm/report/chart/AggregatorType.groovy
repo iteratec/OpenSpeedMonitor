@@ -32,6 +32,7 @@ enum MeasurandGroup {
     REQUEST_COUNTS(Unit.NUMBER),
     REQUEST_SIZES(Unit.MEGABYTE),
     PERCENTAGES(Unit.PERCENT),
+    CUSTOMER_SATISFACTION(Unit.PERCENT),
     UNDEFINED(Unit.OTHER),
     NO_MEASURAND(Unit.OTHER)
 
@@ -85,8 +86,8 @@ enum Measurand{
     FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES, "fullyLoadedIncomingBytes"),
     SPEED_INDEX(MeasurandGroup.UNDEFINED, "speedIndex"),
     VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs"),
-    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent"),
-    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent")
+    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.CUSTOMER_SATISFACTION, "csByWptDocCompleteInPercent"),
+    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.CUSTOMER_SATISFACTION, "csByWptVisuallyCompleteInPercent")
 
     private MeasurandGroup group
     private String eventResultField
