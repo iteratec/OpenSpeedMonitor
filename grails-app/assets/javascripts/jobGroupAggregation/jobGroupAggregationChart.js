@@ -89,6 +89,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartId
         actualBarchartData.series.forEach(function (currentSeries) {
             var seriesData = currentSeries.data;
             var unitName = currentSeries.dimensionalUnit;
+
+            absoluteMaxValue = 0.0;
             drawSeries(seriesData, unitName);
         });
 
