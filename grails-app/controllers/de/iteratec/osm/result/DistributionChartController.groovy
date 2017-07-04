@@ -115,13 +115,13 @@ class DistributionChartController extends ExceptionHandlerController {
                 def newTrace = distributionChartDTO.series.get(identifier)
                 newTrace.jobGroup = jobGroup
                 newTrace.page = page
-                newTrace.data.add(result[selectedMeasurand.getEventResultField()])
+                newTrace.data.add(result[selectedMeasurand.getEventResultField()]/selectedMeasurand.getMeasurandGroup().getUnit().getDivisor())
             }
         }
 
         distributionChartDTO.dimensionalUnit = selectedMeasurand.getMeasurandGroup().getUnit().getLabel()
 
-        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.isr.measurand.group."+selectedMeasurand.getMeasurandGroup(), "Measurand"))
         distributionChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         distributionChartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
