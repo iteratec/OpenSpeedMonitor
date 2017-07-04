@@ -74,7 +74,7 @@ class GraphiteServer {
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
 
-    static hasMany = [graphitePaths: GraphitePath, graphiteEventSourcePaths: GraphiteEventSourcePath]
+    static hasMany = [graphitePaths: GraphitePath, graphiteEventSourcePaths: GraphiteEventSourcePath, graphitePathsRawData: GraphitePathRawData, graphitePathsCsiData: GraphitePathCsiData]
     static transients = ['serverInetAddress']
 
     Boolean reportCsiAggregationsToGraphiteServer = false
@@ -110,6 +110,8 @@ class GraphiteServer {
         memoryReportPrefix(nullable: false, maxSize: 255)
         threadStatesReportPrefix(nullable: false, maxSize: 255)
         reportProtocol(nullable: false, inList: GraphiteSocketProvider.Protocol.values() as List)
+        graphitePathsCsiData(nullable: true)
+        graphitePathsRawData(nullable: true)
     }
 
     @Override

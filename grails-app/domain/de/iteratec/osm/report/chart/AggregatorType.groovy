@@ -73,27 +73,29 @@ enum Unit{
 }
 
 enum Measurand{
-    DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES,"docCompleteTimeInMillisecs"),
-    DOM_TIME(MeasurandGroup.LOAD_TIMES,"domTimeInMillisecs"),
-    FIRST_BYTE(MeasurandGroup.LOAD_TIMES, "firstByteInMillisecs"),
-    FULLY_LOADED_REQUEST_COUNT(MeasurandGroup.REQUEST_COUNTS, "fullyLoadedRequestCount"),
-    FULLY_LOADED_TIME(MeasurandGroup.LOAD_TIMES, "fullyLoadedTimeInMillisecs"),
-    LOAD_TIME(MeasurandGroup.LOAD_TIMES, "loadTimeInMillisecs"),
-    START_RENDER(MeasurandGroup.LOAD_TIMES, "startRenderInMillisecs"),
-    DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES,"docCompleteIncomingBytes"),
-    DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS, "docCompleteRequests"),
-    FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES, "fullyLoadedIncomingBytes"),
-    SPEED_INDEX(MeasurandGroup.UNDEFINED, "speedIndex"),
-    VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs"),
-    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent"),
-    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent")
+    DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES,"docCompleteTimeInMillisecs","doc-complete"),
+    DOM_TIME(MeasurandGroup.LOAD_TIMES,"domTimeInMillisecs","dom-time"),
+    FIRST_BYTE(MeasurandGroup.LOAD_TIMES, "firstByteInMillisecs","ttfb"),
+    FULLY_LOADED_REQUEST_COUNT(MeasurandGroup.REQUEST_COUNTS, "fullyLoadedRequestCount","requests-fully-loaded"),
+    FULLY_LOADED_TIME(MeasurandGroup.LOAD_TIMES, "fullyLoadedTimeInMillisecs", "fully-loaded"),
+    LOAD_TIME(MeasurandGroup.LOAD_TIMES, "loadTimeInMillisecs","load-time"),
+    START_RENDER(MeasurandGroup.LOAD_TIMES, "startRenderInMillisecs", "start-render"),
+    DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES,"docCompleteIncomingBytes","bytes-doc-complete"),
+    DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS, "docCompleteRequests", "requests-doc-complete"),
+    FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES, "fullyLoadedIncomingBytes", "bytes-fully-loaded"),
+    SPEED_INDEX(MeasurandGroup.UNDEFINED, "speedIndex","speed-index"),
+    VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs", "visually-complete"),
+    CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete"),
+    CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete")
 
     private MeasurandGroup group
     private String eventResultField
+    private String graphiteLabelSuffix
 
-    private Measurand(MeasurandGroup value, String name){
+    private Measurand(MeasurandGroup value, String name, String label){
         group = value
         eventResultField = name
+        graphiteLabelSuffix = label
     }
 
     MeasurandGroup getMeasurandGroup(){
@@ -101,6 +103,9 @@ enum Measurand{
     }
     String getEventResultField(){
         return eventResultField
+    }
+    String getGrapthiteLabelSuffix(){
+        return graphiteLabelSuffix
     }
 }
 
