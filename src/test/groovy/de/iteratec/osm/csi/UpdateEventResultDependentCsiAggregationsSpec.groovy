@@ -153,8 +153,8 @@ class UpdateEventResultDependentCsiAggregationsSpec extends Specification {
     def mockNonRelevantServices() {
         service.csiAggregationUpdateEventDaoService = Mock(CsiAggregationUpdateEventDaoService)
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
-            getMinDocCompleteTimeInMillisecs(_) >> 200
-            getCachedMaxDocCompleteTimeInMillisecs(_) >> 20000
+            getMinValidLoadtime(_) >> 200
+            getMaxValidLoadtime(_) >> 20000
         }
     }
 

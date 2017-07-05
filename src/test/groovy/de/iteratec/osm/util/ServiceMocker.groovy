@@ -30,21 +30,17 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.report.external.MockedGraphiteSocket
-import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
-import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
 /**
  * <p>
@@ -102,12 +98,12 @@ class ServiceMocker {
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
 		def osmConfigCacheService = new OsmConfigCacheService()
-		Integer minTimeToExpect = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
+		Integer minTimeToExpect = DEFAULT_MIN_VALID_LOADTIME
+		osmConfigCacheService.metaClass.getMinValidLoadtime = {Double ageToleranceInHours ->
 			return minTimeToExpect
 		}
-		Integer maxTimeToExpect = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
-		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
+		Integer maxTimeToExpect = DEFAULT_MAX_VALID_LOADTIME
+		osmConfigCacheService.metaClass.getMaxValidLoadtime = {Double ageToleranceInHours ->
 			return maxTimeToExpect
 		}
 		serviceToMockIn.osmConfigCacheService = osmConfigCacheService

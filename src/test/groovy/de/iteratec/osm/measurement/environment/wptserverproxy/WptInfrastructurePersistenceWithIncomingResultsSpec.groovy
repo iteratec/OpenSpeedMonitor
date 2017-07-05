@@ -22,8 +22,8 @@ import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
 /**
  * Tests persistence of wpt infrastructure domains like locations, browsers, WebPagetestserver, etc
@@ -216,8 +216,8 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
             validFrustrationsExistFor(_) >> true
         }
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
-            getCachedMinDocCompleteTimeInMillisecs(_) >> DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-            getCachedMaxDocCompleteTimeInMillisecs(_) >> DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+            getMinValidLoadtime(_) >> DEFAULT_MIN_VALID_LOADTIME
+            getMaxValidLoadtime(_) >> DEFAULT_MAX_VALID_LOADTIME
         }
     }
 

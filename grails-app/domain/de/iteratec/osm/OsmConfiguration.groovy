@@ -26,8 +26,8 @@ class OsmConfiguration {
 
     static final Integer DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS = 2
     static final Integer DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES = 60
-    static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 10
-    static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
+    static final Integer DEFAULT_MIN_VALID_LOADTIME = 10
+    static final Integer DEFAULT_MAX_VALID_LOADTIME = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
@@ -52,12 +52,12 @@ class OsmConfiguration {
      * {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation}.
      * Also they are ignore in several Dashboards because they represent meausrement faults.
      */
-    Integer minDocCompleteTimeInMillisecs = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
+    Integer minValidLoadtime = DEFAULT_MIN_VALID_LOADTIME
     /**
      * {@link EventResult}s with a loadTimeInMillisecs greater than this won't be factored in csi-{@link CsiAggregation}
      * Also they are ignore in several Dashboards because they represent meausrement faults.
      */
-    Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+    Integer maxValidLoadtime = DEFAULT_MAX_VALID_LOADTIME
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     /** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
@@ -80,8 +80,8 @@ class OsmConfiguration {
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
         defaultMaxDownloadTimeInMinutes(defaultValue: DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES)
-        minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS)
-        maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS)
+        minValidLoadtime(defaultValue: DEFAULT_MIN_VALID_LOADTIME)
+        maxValidLoadtime(defaultValue: DEFAULT_MAX_VALID_LOADTIME)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
@@ -94,8 +94,8 @@ class OsmConfiguration {
     static constraints = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS, min: -2147483648, max: 2147483647)
         defaultMaxDownloadTimeInMinutes(defaultValue: DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES, min: -2147483648, max: 2147483647)
-        minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS, min: -2147483648, max: 2147483647)
-        maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS, min: -2147483648, max: 2147483647)
+        minValidLoadtime(defaultValue: DEFAULT_MIN_VALID_LOADTIME, min: -2147483648, max: 2147483647)
+        maxValidLoadtime(defaultValue: DEFAULT_MAX_VALID_LOADTIME, min: -2147483648, max: 2147483647)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS, min: -2147483648, max: 2147483647)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST, maxSize: 255)
         maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS, min: 0, max: 2147483647)

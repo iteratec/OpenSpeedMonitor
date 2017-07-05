@@ -55,9 +55,9 @@ class PageComparisonController extends ExceptionHandlerController {
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
             'between'(
-                    'docCompleteTimeInMillisecs',
-                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
-                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+                    'fullyLoadedTimeInMillisecs',
+                    osmConfigCacheService.getMinValidLoadtime(),
+                    osmConfigCacheService.getMaxValidLoadtime()
             )
             projections {
                 groupProperty('jobGroup.id')
