@@ -140,6 +140,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
     var initChartData = function (barchartData) {
         barchartData.series.forEach(function (series) {
+            if(series.data.length === 0) return; //we simply ignore empty series
             var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
             series.data = labelUtil.getSeriesWithShortestUniqueLabels(true);
             commonLabelParts = labelUtil.getCommonLabelParts(true);
@@ -410,7 +411,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         units = {};
         var dataMap = {};
         $.each(actualBarchartData.series, function (i, series) {
-            if (units[series.dimensionalUnit] === undefined) {
+            if ((series.data.length !== 0) && units[series.dimensionalUnit] === undefined) {
                 units[series.dimensionalUnit] = [];
             }
             $.each(series.data, function (_, datum) {
@@ -725,7 +726,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         var comparativeDifferences = transformedData.map(function (element) {
             return element.bars[0].comparativeDifference;
         });
-
         $.each(units, function (unit, values) {
             var maxValueForThisUnit = d3.max(values);
             var minValueForThisUnit = d3.min(comparativeDifferences);
@@ -867,7 +867,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
 
     var drawHeader = function (headerData) {
-
         var headerText = headerLine.selectAll("text")
             .data(headerData, function (d) {
                 return d.headerText;
@@ -992,7 +991,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         if (shouldDrawTrafficLight()) {
             drawTrafficLightForTimings();
         } else {
-            trafficLightBars.remove();
+            trafficLightBars.selectAll("*").remove();
         }
     };
 
@@ -1005,7 +1004,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
 
         var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
         var microsecsXScale = unitScales["ms"];
-
         var trafficLight = trafficLightBars.selectAll("g")
             .data(trafficLightData, function (d) {
                 return d.id
