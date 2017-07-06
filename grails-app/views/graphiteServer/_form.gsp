@@ -18,12 +18,21 @@
     </div>
 </div>
 
-<div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'graphitePaths', 'error')} ">
-    <label for="graphitePaths" class="control-label col-md-3"><g:message code="graphiteServer.graphitePaths.label" default="Graphite Paths"/></label>
+<div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'graphitePathsRawData', 'error')} ">
+    <label for="graphitePathsRawData" class="control-label col-md-3"><g:message code="graphiteServer.graphitePathsRawData.label" default="Graphite Paths Raw Data"/></label>
 
     <div class="col-md-6">
-        <g:select name="graphitePaths" from="${de.iteratec.osm.report.external.GraphitePathRawData.list()}" multiple="multiple"
+        <g:select name="graphitePathsRawData" from="${de.iteratec.osm.report.external.GraphitePathRawData.list()}" multiple="multiple"
                   optionKey="id" size="5" value="${graphiteServer?.graphitePathsRawData*.id}" class="many-to-many form-control"/>
+    </div>
+</div>
+
+<div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'graphitePathsCsiData', 'error')} ">
+    <label for="graphitePathsCsiData" class="control-label col-md-3"><g:message code="graphiteServer.graphitePathsCsiData.label" default="Graphite Paths Csi Data"/></label>
+
+    <div class="col-md-6">
+        <g:select name="graphitePathsCsiData" from="${de.iteratec.osm.report.external.GraphitePathCsiData.list()}" multiple="multiple"
+                  optionKey="id" size="5" value="${graphiteServer?.graphitePathsCsiData*.id}" class="many-to-many form-control"/>
     </div>
 </div>
 
