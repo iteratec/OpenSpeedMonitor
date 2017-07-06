@@ -40,7 +40,7 @@ class GraphitePathCsiDataController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'graphitePathCsiData.label', default: 'GraphitePathCsiData'), graphitePathCsiData.id])
-                redirect(action: "show", id: graphitePathCsiData.id)
+                redirect graphitePathCsiData
             }
             '*' { respond graphitePathCsiData, [status: CREATED] }
         }

@@ -63,6 +63,7 @@
                          'CsTargetValueController',
                          'EventController',
                          'GraphitePathRawDataController',
+                         'GraphitePathCsiDataController',
                          'GraphiteEventSourcePathController',
                          'GraphiteServerController',
                          'JobGroupController',

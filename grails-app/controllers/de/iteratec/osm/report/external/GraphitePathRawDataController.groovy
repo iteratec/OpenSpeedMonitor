@@ -46,7 +46,7 @@ class GraphitePathRawDataController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'graphitePathRawData.label', default: 'GraphitePathRawData'), graphitePathRawData.id])
-                redirect(action: "show", id: graphitePathRawData.id)
+                redirect graphitePathRawData
             }
             '*' { respond graphitePathRawData, [status: CREATED] }
         }
