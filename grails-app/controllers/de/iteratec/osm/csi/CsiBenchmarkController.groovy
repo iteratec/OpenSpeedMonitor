@@ -7,18 +7,17 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResultDashboardService
-import de.iteratec.osm.result.ResultCsiAggregationService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MeasurandUtil
 import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 class CsiBenchmarkController extends ExceptionHandlerController {
-    public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
@@ -31,9 +30,6 @@ class CsiBenchmarkController extends ExceptionHandlerController {
 
     def show() {
         Map<String, Object> modelToRender = [:]
-
-        // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
