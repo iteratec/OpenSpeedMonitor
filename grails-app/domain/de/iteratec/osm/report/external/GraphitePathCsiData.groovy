@@ -11,4 +11,9 @@ class GraphitePathCsiData {
     static constraints = {
         prefix(matches: /([a-zA-Z0-9]+\.)+/, nullable: false, blank: false, maxSize: 255)
     }
+
+    @Override
+    String toString(){
+        return "${prefix}[STATIC_PATH].${aggregationType}"
+    }
 }

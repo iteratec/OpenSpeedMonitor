@@ -22,8 +22,8 @@
     <label for="graphitePaths" class="control-label col-md-3"><g:message code="graphiteServer.graphitePaths.label" default="Graphite Paths"/></label>
 
     <div class="col-md-6">
-        <g:select name="graphitePaths" from="${de.iteratec.osm.report.external.GraphitePath.list()}" multiple="multiple"
-                  optionKey="id" size="5" value="${graphiteServer?.graphitePaths*.id}" class="many-to-many form-control"/>
+        <g:select name="graphitePaths" from="${de.iteratec.osm.report.external.GraphitePathRawData.list()}" multiple="multiple"
+                  optionKey="id" size="5" value="${graphiteServer?.graphitePathsRawData*.id}" class="many-to-many form-control"/>
     </div>
 </div>
 

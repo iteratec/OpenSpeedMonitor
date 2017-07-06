@@ -52,17 +52,15 @@ class MetricReportingService {
     private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ']
     private static final String REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = '_'
 
-    ResultCsiAggregationService resultCsiAggregationService
     GraphiteSocketProvider graphiteSocketProvider
-    I18nService i18nService
     EventCsiAggregationService eventCsiAggregationService
     JobGroupDaoService jobGroupDaoService
-    CsiAggregationUtilService csiAggregationUtilService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
+    CsiAggregationUtilService csiAggregationUtilService
 
     /**
      * Reports each measurand of incoming result for that a {@link GraphitePath} is configured.
@@ -342,7 +340,7 @@ class MetricReportingService {
                 smv.csByWptDocCompleteInPercent != null && smv.countUnderlyingEventResultsByWptDocComplete() > 0
             }
 
-            reportAllCsiAggregationsFor(currentJobGroup, AggregationType.SHOP, smvsWithData)
+            reportAllCsiAggregationsFor(currentJobGroup, AggregationType.JOB_GROUP, smvsWithData)
         }
     }
 

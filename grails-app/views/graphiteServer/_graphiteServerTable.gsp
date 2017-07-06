@@ -34,8 +34,8 @@
             <td>${fieldValue(bean: graphiteServerInstance, field: "webappPathToRenderingEngine")}</td>
 
             <td>
-                <g:each in ="${graphiteServerInstance.graphitePaths}" var = "graphitePath">
-                    <g:link controller="GraphitePath" action="show" id="${graphitePath.id}">${fieldValue(bean: graphitePath, field: "prefix")}${fieldValue(bean: graphitePath, field: "measurand")}</g:link>
+                <g:each in ="${graphiteServerInstance.graphitePathsRawData}" var = "graphitePathRawData">
+                    <g:link controller="GraphitePathRawData" action="show" id="${graphitePathRawData.id}">${fieldValue(bean: graphitePathRawData, field: "prefix")}${fieldValue(bean: graphitePathRawData, field: "measurand")}${fieldValue(bean: graphitePathRawData, field: "cachedView")}</g:link>
                     <br>
                 </g:each>
             </td>
