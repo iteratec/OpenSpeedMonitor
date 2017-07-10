@@ -11,7 +11,7 @@ enum Measurand{
     DOC_COMPLETE_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES,"docCompleteIncomingBytes","bytes-doc-complete"),
     DOC_COMPLETE_REQUESTS(MeasurandGroup.REQUEST_COUNTS, "docCompleteRequests", "requests-doc-complete"),
     FULLY_LOADED_INCOMING_BYTES(MeasurandGroup.REQUEST_SIZES, "fullyLoadedIncomingBytes", "bytes-fully-loaded"),
-    SPEED_INDEX(MeasurandGroup.UNDEFINED, "speedIndex","speed-index"),
+    SPEED_INDEX(MeasurandGroup.LOAD_TIMES, "speedIndex","speed-index"),
     VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs", "visually-complete"),
     CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete"),
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete")
