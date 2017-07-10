@@ -369,9 +369,9 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         AggregatorType page = new AggregatorType(name: PAGE, measurandGroup: NO_MEASURAND)
         AggregatorType shop = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
-        GraphitePath pathEvent = new GraphitePath(prefix: pathPrefix, measurand: event)
-        GraphitePath pathPage = new GraphitePath(prefix: pathPrefix, measurand: page)
-        GraphitePath pathShop = new GraphitePath(prefix: pathPrefix, measurand: shop)
+//        GraphitePath pathEvent = new GraphitePath(prefix: pathPrefix, measurand: event)
+//        GraphitePath pathPage = new GraphitePath(prefix: pathPrefix, measurand: page)
+//        GraphitePath pathShop = new GraphitePath(prefix: pathPrefix, measurand: shop)
 
         GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePaths: [pathEvent,pathPage,pathShop],
                 reportCsiAggregationsToGraphiteServer: true)

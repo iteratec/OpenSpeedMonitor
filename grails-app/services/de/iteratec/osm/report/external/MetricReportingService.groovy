@@ -63,7 +63,7 @@ class MetricReportingService {
     CsiAggregationUtilService csiAggregationUtilService
 
     /**
-     * Reports each measurand of incoming result for that a {@link GraphitePath} is configured.
+     * Reports each measurand of incoming result for that a {@link GraphitePathRawData} is configured.
      * @param result
      * 				This EventResult defines measurands to sent and must not be null.
      * @throws NullPointerException

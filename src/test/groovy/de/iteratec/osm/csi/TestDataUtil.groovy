@@ -31,7 +31,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
@@ -95,8 +94,8 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     static createTemplate() {
-        new GraphitePath(
-        ).save(failOnError: true)
+//        new GraphitePath(
+//        ).save(failOnError: true)
     }
 
     static createCsTargetGraph(CsTargetValue pointOne, CsTargetValue pointTwo) {
@@ -312,12 +311,12 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static GraphitePath createGraphitePath(String prefix, AggregatorType aggregator) {
-        new GraphitePath(
-                prefix: prefix,
-                measurand: aggregator
-        ).save(failOnError: true)
-    }
+//    static GraphitePath createGraphitePath(String prefix, AggregatorType aggregator) {
+//        new GraphitePath(
+//                prefix: prefix,
+//                measurand: aggregator
+//        ).save(failOnError: true)
+//    }
 
     static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths, Boolean reportHealthMetrics, String healthMetricsReportPrefix) {
         new GraphiteServer(

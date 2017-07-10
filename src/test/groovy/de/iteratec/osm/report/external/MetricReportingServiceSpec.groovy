@@ -51,7 +51,7 @@ import spock.lang.Specification
  */
 @TestFor(MetricReportingService)
 @TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, AggregatorType, JobGroup, BatchActivity, GraphiteServer, GraphitePath, CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration, ConnectivityProfile])
+@Mock([EventResult, AggregatorType, JobGroup, BatchActivity, GraphiteServer,  CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration, ConnectivityProfile])
 @Build([Page,MeasuredEvent,Location, Browser, JobGroup])
 class MetricReportingServiceSpec extends Specification {
     MetricReportingService serviceUnderTest
@@ -592,8 +592,8 @@ class MetricReportingServiceSpec extends Specification {
         GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
         graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
 
-        GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: measurandForGraphitePath)
-        graphiteServer.graphitePaths = [graphitePath]
+//        GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: measurandForGraphitePath)
+//        graphiteServer.graphitePaths = [graphitePath]
 
         jobGroup.graphiteServers = [graphiteServer]
 
@@ -628,8 +628,8 @@ class MetricReportingServiceSpec extends Specification {
             GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
             graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
 
-            GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: new AggregatorType(name: measurandForGraphitePath))
-            graphiteServer.graphitePaths = [graphitePath]
+//            GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: new AggregatorType(name: measurandForGraphitePath))
+//            graphiteServer.graphitePaths = [graphitePath]
 
             graphiteServer.reportCsiAggregationsToGraphiteServer = true
 
@@ -753,7 +753,7 @@ class MetricReportingServiceSpec extends Specification {
         @Override
         void sendDate(GraphitePathName path, double value, Date timestamp)
                 throws NullPointerException, GraphiteComunicationFailureException {
-            sendDates[path.stringValueOfPathName + DELIMITTER + timestamp.toString()] = value
+//            sendDates[path.stringValueOfPathName + DELIMITTER + timestamp.toString()] = value
         }
 
     }
