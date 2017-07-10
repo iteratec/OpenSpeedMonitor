@@ -73,7 +73,7 @@ class MetricReportingServiceSpec extends Specification {
     static final String EVENT_NAME = 'HP_event'
     static final String LOCATION_LOCATION = 'netlab1'
     static final String BROWSER_NAME = 'FF'
-    static final String MEASURAND_DOCREADYTIME_NAME = 'docReadyTime'
+    static final String MEASURAND_DOCREADYTIME_NAME = CachedView.UNCACHED.graphiteLabelPrefix+Measurand.DOC_COMPLETE_TIME.grapthiteLabelSuffix
 
     Page page
     MeasuredEvent measuredEvent
@@ -115,13 +115,8 @@ class MetricReportingServiceSpec extends Specification {
     void testSendResultsOfDifferentCachedView() {
         given:
         int docCompleteTime = 1267i
-       // JobGroup jobGroup = getJobGroup(new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES), SYSTEM_NAME)
         JobGroup jobGroup = getJobGroup(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED, SYSTEM_NAME)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-
-        //test-specific mocks
-        mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
-        mockI18nService()
 
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
@@ -140,10 +135,6 @@ class MetricReportingServiceSpec extends Specification {
                 SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
 
-        //test-specific mocks
-        mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
-        mockI18nService()
-
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
         String expectedKey = "${GRAPHITE_PREFIX}.${SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES_REPLACED}.raw.${PAGE_NAME}.${EVENT_NAME}.${BROWSER_NAME}.${LOCATION_LOCATION}.${MEASURAND_DOCREADYTIME_NAME}${DELIMITTER}${REPORTING_TIMESTAMP.toDate()}"
@@ -161,10 +152,6 @@ class MetricReportingServiceSpec extends Specification {
                 SYSTEM_NAME_WITH_WHITESPACES)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
 
-        //test-specific mocks
-        mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
-        mockI18nService()
-
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
 
@@ -181,10 +168,6 @@ class MetricReportingServiceSpec extends Specification {
         JobGroup jobGroup = getJobGroup(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED,
                 SYSTEM_NAME_WITH_DOTS)
         EventResult result_1 = getEventResult(CachedView.UNCACHED, docCompleteTime, REPORTING_TIMESTAMP.toDate(), jobGroup)
-
-        //test-specific mocks
-        mockResultCsiAggregationService(CachedView.UNCACHED, docCompleteTime)
-        mockI18nService()
 
         when:
         serviceUnderTest.reportEventResultToGraphite(result_1)
@@ -572,8 +555,8 @@ class MetricReportingServiceSpec extends Specification {
         GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
         graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
 
-//        GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: measurandForGraphitePath)
-//        graphiteServer.graphitePaths = [graphitePath]
+        GraphitePathRawData graphitePathRawData = new GraphitePathRawData(prefix: GRAPHITE_PREFIX, measurand: measurandForGraphitePath, cachedView: cachedView)
+        graphiteServer.graphitePathsRawData = [graphitePathRawData]
 
         jobGroup.graphiteServers = [graphiteServer]
 
@@ -581,7 +564,7 @@ class MetricReportingServiceSpec extends Specification {
     }
 
     private EventResult getEventResult(CachedView cachedView, int docCompleteTime, Date jobResultDate, JobGroup jobGroup) {
-        return new EventResult(cachedView: cachedView, docCompleteTime: docCompleteTime, jobResultDate: jobResultDate,
+        return new EventResult(cachedView: cachedView, docCompleteTimeInMillisecs: docCompleteTime, jobResultDate: jobResultDate,
                 jobGroup: jobGroup, measuredEvent: measuredEvent, page: page, browser: browser, location: location)
     }
 
@@ -608,8 +591,8 @@ class MetricReportingServiceSpec extends Specification {
             GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
             graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
 
-//            GraphitePath graphitePath = new GraphitePath(prefix: GRAPHITE_PREFIX, measurand: new AggregatorType(name: measurandForGraphitePath))
-//            graphiteServer.graphitePaths = [graphitePath]
+            GraphitePathCsiData graphitePathCsiData = new GraphitePathCsiData(prefix: GRAPHITE_PREFIX, aggregationType: measurandForGraphitePath)
+            graphiteServer.graphitePathsCsiData = [graphitePathCsiData]
 
             graphiteServer.reportCsiAggregationsToGraphiteServer = true
 
@@ -665,13 +648,13 @@ class MetricReportingServiceSpec extends Specification {
      * Mocks methods of {@linkplain JobGroupCsiAggregationService}.
      */
     private void mockShopCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculateShopCsiAggregations) {
-        def shopCsiAggregationService = Stub(JobGroupCsiAggregationService) {
+        def jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService) {
             getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval, _ as List) >> {
                 Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                     return toReturnFromGetOrCalculateShopCsiAggregations
             }
         }
-        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService
+        serviceUnderTest.jobGroupCsiAggregationService = jobGroupCsiAggregationService
     }
     /**
      * Mocks methods of {@linkplain GraphiteSocketProvider}.
@@ -683,32 +666,6 @@ class MetricReportingServiceSpec extends Specification {
             }
         }
         serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider
-    }
-    /**
-     * Mocks methods of {@linkplain GraphiteSocketProvider}.
-     */
-    private void mockResultCsiAggregationService(CachedView toReturnFromGetAggregatorTypeCachedViewType, int toReturnFromGetEventResultPropertyForCalculation) {
-//        def resultCsiAggregationService = Stub(ResultCsiAggregationService) {
-//            getAggregatorTypeCachedViewType(_ as AggregatorType) >> {AggregatorType aggregator ->
-//                    return toReturnFromGetAggregatorTypeCachedViewType
-//            }
-//            getEventResultPropertyForCalculation(_ as AggregatorType,_ as EventResult) >> { AggregatorType aggType, EventResult result ->
-//                    return Double.valueOf(toReturnFromGetEventResultPropertyForCalculation)
-//            }
-//        }
-//        serviceUnderTest.resultCsiAggregationService = resultCsiAggregationService
-    }
-    /**
-     * Mocks methods of {@linkplain GraphiteSocketProvider}.
-     */
-    private void mockI18nService() {
-        def i18nService = Stub(I18nService) {
-            msg(_ as String, _ as String) >> {
-                String msgKey, String defaultMessage ->
-                    return MEASURAND_DOCREADYTIME_NAME
-            }
-        }
-        serviceUnderTest.i18nService = i18nService
     }
 
     /**
@@ -733,7 +690,7 @@ class MetricReportingServiceSpec extends Specification {
         @Override
         void sendDate(GraphitePathName path, double value, Date timestamp)
                 throws NullPointerException, GraphiteComunicationFailureException {
-//            sendDates[path.stringValueOfPathName + DELIMITTER + timestamp.toString()] = value
+            sendDates[path.stringValueOfPathName + DELIMITTER + timestamp.toString()] = value
         }
 
     }
