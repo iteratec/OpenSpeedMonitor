@@ -8,7 +8,6 @@ import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService

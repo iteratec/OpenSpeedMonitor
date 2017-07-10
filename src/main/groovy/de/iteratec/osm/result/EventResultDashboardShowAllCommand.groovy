@@ -1,11 +1,8 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.Measurand
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.SelectedMeasurand
-import de.iteratec.osm.util.ParameterBindingUtility
-import org.grails.databinding.BindUsing
 
 /**
  * <p>

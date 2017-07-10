@@ -18,12 +18,11 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.Measurand
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ParameterBindingUtility
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
-import groovy.time.TimeCategory
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 

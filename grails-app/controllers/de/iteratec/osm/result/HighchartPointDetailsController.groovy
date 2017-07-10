@@ -19,15 +19,12 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
-import de.iteratec.osm.report.chart.Measurand
-import de.iteratec.osm.report.chart.SelectedMeasurand
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.Constants
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.util.CollectionUtils
 import grails.web.mapping.LinkGenerator
 import org.apache.commons.lang.StringUtils
 import org.joda.time.DateTime

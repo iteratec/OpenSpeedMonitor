@@ -13,8 +13,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.Measurand
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService

@@ -47,7 +47,6 @@ class EventResultDashboardServiceSpec extends Specification {
     DateTime runDate
 
     def doWithSpring = {
-        resultCsiAggregationService(ResultCsiAggregationService)
         osmChartProcessingService(OsmChartProcessingService)
         performanceLoggingService(PerformanceLoggingService)
         csiAggregationUtilService(CsiAggregationUtilService)
