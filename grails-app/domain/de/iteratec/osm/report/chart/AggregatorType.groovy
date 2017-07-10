@@ -24,20 +24,6 @@ import de.iteratec.osm.util.Constants
 import groovy.transform.EqualsAndHashCode
 
 
-class SelectedMeasurand{
-    Measurand measurand
-    CachedView cachedView
-
-    SelectedMeasurand(Measurand measurand, CachedView cachedView){
-        this.measurand = measurand
-        this.cachedView = cachedView
-    }
-
-    @Override
-    String toString(){
-        return this.measurand.toString()+Constants.UNIQUE_STRING_DELIMITTER+this.cachedView.toString()
-    }
-}
 /**
  *
  * <p>

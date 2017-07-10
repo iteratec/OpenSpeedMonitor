@@ -1,7 +1,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.SelectedMeasurand
 
 /**
  * <p>
