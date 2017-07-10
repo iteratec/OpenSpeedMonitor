@@ -7,13 +7,10 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
 import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 

@@ -19,32 +19,10 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.Measurand
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.util.Constants
 import groovy.transform.EqualsAndHashCode
 
-/**
- * To group {@link AggregatorType}s which are measureands.
- *
- * @author nkuhn
- *
- */
-enum MeasurandGroup {
-    LOAD_TIMES(Unit.MILLISECONDS),
-    REQUEST_COUNTS(Unit.NUMBER),
-    REQUEST_SIZES(Unit.MEGABYTE),
-    PERCENTAGES(Unit.PERCENT),
-    UNDEFINED(Unit.OTHER),
-    NO_MEASURAND(Unit.OTHER)
-
-    private Unit unit
-
-    private MeasurandGroup(Unit unit){
-        this.unit = unit
-    }
-    Unit getUnit(){
-        return unit
-    }
-}
 
 enum Unit{
     KILOBYTE("KB",1000),

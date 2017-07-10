@@ -16,6 +16,9 @@
 */
 
 package de.iteratec.osm.report.chart
+
+import de.iteratec.osm.result.MeasurandGroup
+
 /**
  * <p>
  * This class defines the abstraction of a highchart lineType used in the JavaScript lib and {@link OsmChartTagLib}.
@@ -52,7 +55,7 @@ public class OsmChartAxis {
 	 * Constructs a HighChartLabel for a {@link OsmChartPoint}-collection.
 	 * 
 	 * @param i18NIdentifier the i18n-Identifier, not <code>null</code>
-	 * @param group the {@link MeasurandGroup}, not <code>null</code>
+	 * @param group the {@link de.iteratec.osm.result.MeasurandGroup}, not <code>null</code>
 	 * @param unit a string to display its unit-type, not <code>null</code>
 	 * @param color a color string in hex-notation (#xxxxxx), not <code>null</code>
 	 * @param divisor a divisor the results above should be divided by, not <code>null</code> and not <code>0</code>

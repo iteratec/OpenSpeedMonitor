@@ -29,6 +29,7 @@ import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.*

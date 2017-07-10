@@ -16,6 +16,9 @@
 */
 
 package de.iteratec.osm.report.chart
+
+import de.iteratec.osm.result.MeasurandGroup
+
 /**
  * Single graph to show in a highchart-diagram.
  * @author nkuhn
@@ -27,7 +30,7 @@ class OsmChartGraph {
 	 */
 	String label
 	/**
-	 * {@link MeasurandGroup} of the graph. Depending on this, the graph will be associated to a Y-achsis.
+	 * {@link de.iteratec.osm.result.MeasurandGroup} of the graph. Depending on this, the graph will be associated to a Y-achsis.
 	 */
 	MeasurandGroup measurandGroup
 	/**

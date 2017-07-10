@@ -13,7 +13,7 @@ import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role

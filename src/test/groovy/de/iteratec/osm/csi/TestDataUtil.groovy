@@ -35,6 +35,7 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User

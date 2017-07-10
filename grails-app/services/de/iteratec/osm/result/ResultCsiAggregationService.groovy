@@ -19,7 +19,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService

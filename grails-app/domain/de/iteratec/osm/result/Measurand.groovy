@@ -1,7 +1,5 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.MeasurandGroup
-
 enum Measurand{
     DOC_COMPLETE_TIME(MeasurandGroup.LOAD_TIMES,"docCompleteTimeInMillisecs","doc-complete"),
     DOM_TIME(MeasurandGroup.LOAD_TIMES,"domTimeInMillisecs","dom-time"),

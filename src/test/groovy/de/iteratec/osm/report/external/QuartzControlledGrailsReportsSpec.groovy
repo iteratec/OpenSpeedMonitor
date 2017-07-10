@@ -53,7 +53,7 @@ import static de.iteratec.osm.report.chart.AggregatorType.MEASURED_EVENT
 import static de.iteratec.osm.report.chart.AggregatorType.PAGE
 import static de.iteratec.osm.report.chart.AggregatorType.SHOP
 import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
-import static de.iteratec.osm.report.chart.MeasurandGroup.NO_MEASURAND
+import static de.iteratec.osm.result.MeasurandGroup.NO_MEASURAND
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)

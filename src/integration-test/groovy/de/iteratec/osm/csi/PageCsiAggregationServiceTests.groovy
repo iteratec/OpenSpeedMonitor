@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback

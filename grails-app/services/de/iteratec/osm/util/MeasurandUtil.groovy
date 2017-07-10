@@ -1,7 +1,7 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.EventResult
 
 class MeasurandUtil {
