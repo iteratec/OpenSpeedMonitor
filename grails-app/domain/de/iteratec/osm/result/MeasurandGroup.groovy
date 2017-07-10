@@ -1,7 +1,4 @@
 package de.iteratec.osm.result
-
-import de.iteratec.osm.report.chart.Unit
-
 /**
  * To group {@link de.iteratec.osm.report.chart.AggregatorType}s which are measureands.
  *
