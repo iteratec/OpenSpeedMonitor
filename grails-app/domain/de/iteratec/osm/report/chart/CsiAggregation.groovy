@@ -29,13 +29,6 @@ import de.iteratec.osm.result.MeasuredEvent
 import org.grails.databinding.BindUsing
 
 
-enum AggregationType {
-    MEASURED_EVENT,
-    PAGE,
-    JOB_GROUP,
-    CSI_SYSTEM
-}
-
 /**
  * <p>
  * Aggregated values to be shown in diagrams.
