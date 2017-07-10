@@ -35,8 +35,8 @@ import de.iteratec.osm.util.PerformanceLoggingService
 
 
 @TestFor(EventResultDashboardService)
-@Mock([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, AggregatorType, Browser, Page])
-@Build([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, AggregatorType, Browser, Page])
+@Mock([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page])
+@Build([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page])
 class SummarizedChartLegendEntriesSpec extends Specification {
 
     EventResultDashboardService serviceUnderTest
@@ -83,8 +83,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 csiAggregationInterval,
-                [AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES),
-                 AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, measurandGroup: MeasurandGroup.REQUEST_COUNTS)],
+                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED),
+                  new SelectedMeasurand(Measurand.DOC_COMPLETE_REQUESTS, CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -142,7 +142,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)],
+                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -186,7 +186,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)],
+                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -247,8 +247,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES),
-                 AggregatorType.build(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, measurandGroup: MeasurandGroup.REQUEST_COUNTS)],
+                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED),
+                  new SelectedMeasurand(Measurand.DOC_COMPLETE_REQUESTS, CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 

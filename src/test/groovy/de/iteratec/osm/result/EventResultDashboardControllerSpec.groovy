@@ -23,7 +23,6 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.report.chart.AggregatorType
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -63,8 +62,8 @@ class EventResultDashboardControllerSpec extends Specification {
 
         then: "th command is valid and all fields are correctly set"
         command.validate()
-        command.selectedAggrGroupValuesUnCached == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedAggrGroupValuesCached == [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
+        command.selectedAggrGroupValuesUnCached == [Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()]
+        command.selectedAggrGroupValuesCached == [Measurand.DOC_COMPLETE_TIME.toString()]
         command.trimBelowLoadTimes == 100
         command.trimAboveLoadTimes == 10000
         command.trimBelowRequestCounts == 2
@@ -146,8 +145,8 @@ class EventResultDashboardControllerSpec extends Specification {
         command.validate()
         result.size() == 29
         result["selectedInterval"] == 60
-        result["selectedAggrGroupValuesCached"] == [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
-        result["selectedAggrGroupValuesUnCached"] == [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
+        result["selectedAggrGroupValuesCached"] == [Measurand.DOC_COMPLETE_TIME.toString()]
+        result["selectedAggrGroupValuesUnCached"] == [Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()]
     }
 
     void "command creates correct ErQueryParameters"() {
@@ -230,8 +229,8 @@ class EventResultDashboardControllerSpec extends Specification {
         TimeSeriesShowCommandBaseSpec.getDefaultParams().each { key, value ->
             params.setProperty(key, value)
         }
-        params.selectedAggrGroupValuesUnCached = AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-        params.selectedAggrGroupValuesCached = AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME.toString()
+        params.selectedAggrGroupValuesUnCached = Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()
+        params.selectedAggrGroupValuesCached = Measurand.DOC_COMPLETE_TIME.toString()
         params.selectedConnectivities = ['1', CUSTOM_CONNECTIVITY_NAME, 'native']
         params.selectedInterval = 60
         params.trimBelowLoadTimes = 100
@@ -244,8 +243,8 @@ class EventResultDashboardControllerSpec extends Specification {
 
     private setDefaultCommandProperties() {
         TimeSeriesShowCommandBaseSpec.setDefaultCommandProperties(command)
-        command.selectedAggrGroupValuesUnCached = [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES]
-        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME]
+        command.selectedAggrGroupValuesUnCached = [Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()]
+        command.selectedAggrGroupValuesCached = [Measurand.DOC_COMPLETE_TIME.toString()]
         command.selectedInterval = 60
 
         command.trimBelowLoadTimes = 100

@@ -861,28 +861,6 @@ class TestDataUtil implements OsmTestLogin {
 
     /**
      * <p>
-     * Creates the default AggregatorTypes (PAGE; MEASURED_STEP; PAGE_AND_BROWSER; SHOP).
-     * </p>
-     */
-    public static List<AggregatorType> createAggregatorTypes() {
-        AggregatorType eventAggregator = new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType shopAggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        return [eventAggregator, pageAggregator, shopAggregator, csiSystemAggregator]
-    }
-
-    /**
-     * <p>
-     * Creates an AggregatorType with given name and group.
-     * </p>
-     */
-    public static AggregatorType createAggregatorType(String name, MeasurandGroup group) {
-        return new AggregatorType(name: name, measurandGroup: group).save(failOnError: true)
-    }
-
-    /**
-     * <p>
      * Creates the default CsiAggregationIntervals (hourly; daily; weekly).
      * </p>
      */
@@ -923,35 +901,6 @@ class TestDataUtil implements OsmTestLogin {
         return event;
     }
 
-    /**
-     * Writes new {@link CsiAggregation} to db without validating it.
-     * @param date
-     * @param csiAggregationInterval
-     * @param aggregator
-     * @param tag
-     * @param value
-     * @param resultIdsAsString
-     * @param closed
-     */
-    public
-    static CsiAggregation createSimpleCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, boolean closed) {
-        JobGroup group = JobGroup.list()[0]
-        Page page
-        if (aggregator.name == AggregatorType.PAGE) {
-            page = Page.list()[0]
-        }
-        return new CsiAggregation(
-                started: date,
-                interval: csiAggregationInterval,
-                underlyingEventResultsByWptDocComplete: "",
-                underlyingEventResultsByVisuallyComplete: "",
-                aggregator: aggregator,
-                csByWptDocCompleteInPercent: 0.0d,
-                closedAndCalculated: closed,
-                jobGroup: group,
-                page: page
-        ).save(validate: false)
-    }
 
     /**
      * Writes new {@link CsiAggregation} to db without validating it.
@@ -983,31 +932,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(validate: false)
     }
 
-    /**
-     * * Writes new {@link CsiAggregation} to db.
-     * @param started
-     * @param csiAggregationInterval
-     * @param aggregator
-     * @param jobGroup
-     * @param page
-     * @param csByWptDocCompleteInPercent
-     * @param resultIds
-     * @param closed
-     * @return
-     */
-    public
-    static CsiAggregation createCsiAggregation(Date started, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, JobGroup jobGroup, Page page, Double csByWptDocCompleteInPercent, String resultIds, boolean closed) {
-        return new CsiAggregation(
-                started: started,
-                interval: csiAggregationInterval,
-                aggregator: aggregator,
-                jobGroup: jobGroup,
-                page: page,
-                underlyingEventResultsByWptDocComplete: resultIds,
-                csByWptDocCompleteInPercent: csByWptDocCompleteInPercent,
-                closedAndCalculated: closed,
-        ).save(failOnError: true)
-    }
 
     /**
      * * Writes new {@link CsiAggregation} to db.
