@@ -37,7 +37,7 @@
 
             <td>
                 <g:each in ="${graphiteServerInstance.graphitePathsRawData}" var = "graphitePathRawData">
-                    <g:link controller="GraphitePathRawData" action="show" id="${graphitePathRawData.id}">${fieldValue(bean: graphitePathRawData, field: "prefix")}${fieldValue(bean: graphitePathRawData, field: "measurand")}${fieldValue(bean: graphitePathRawData, field: "cachedView")}</g:link>
+                    <g:link controller="GraphitePathRawData" action="show" id="${graphitePathRawData.id}">${fieldValue(bean: graphitePathRawData, field: "prefix")}${fieldValue(bean: graphitePathRawData, field: "cachedView.graphiteLabelPrefix")}${fieldValue(bean: graphitePathRawData, field: "measurand.graphiteLabelSuffix")}</g:link>
                     <br>
                 </g:each>
             </td>
