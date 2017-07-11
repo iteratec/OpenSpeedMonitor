@@ -27,6 +27,6 @@ class MeasurandUtil {
     }
 
     static Double getEventResultPropertyForCalculation(Measurand measurand, EventResult result) {
-        return result.getProperty(measurand.getEventResultField()) ? Double.valueOf(result.getProperty(measurand.getEventResultField())) : null
+        return result.getProperty(measurand.getEventResultField()) != null ? Double.valueOf(result.getProperty(measurand.getEventResultField())) : null
     }
 }

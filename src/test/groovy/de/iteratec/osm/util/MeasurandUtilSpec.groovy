@@ -23,12 +23,13 @@ class MeasurandUtilSpec extends Specification {
         Measurand measurand = Measurand.values().find{it.getEventResultField() == eventResultFieldName}
 
         expect: "correct attribute is returned"
-        MeasurandUtil.getEventResultPropertyForCalculation(measurand,eventResult).getClass() == Double.class
+        if(expectedValue){
+            MeasurandUtil.getEventResultPropertyForCalculation(measurand,eventResult).getClass() == Double.class
+        }
         MeasurandUtil.getEventResultPropertyForCalculation(measurand,eventResult) == expectedValue
 
         where:
         eventResultFieldName               || expectedValue
-        'loadTimeInMillisecs'              || 1000
         'firstByteInMillisecs'             || 1000
         'startRenderInMillisecs'           || 1000
         'docCompleteTimeInMillisecs'       || 1000
@@ -42,6 +43,20 @@ class MeasurandUtilSpec extends Specification {
         'csByWptVisuallyCompleteInPercent' || 1000
         'csByWptDocCompleteInPercent'      || 1000
         'speedIndex'                       || 1000
+        'firstByteInMillisecs'             || 0
+        'startRenderInMillisecs'           || 0
+        'docCompleteTimeInMillisecs'       || 0
+        'visuallyCompleteInMillisecs'      || 0
+        'domTimeInMillisecs'               || 0
+        'fullyLoadedTimeInMillisecs'       || 0
+        'docCompleteRequests'              || 0
+        'fullyLoadedRequestCount'          || 0
+        'docCompleteIncomingBytes'         || 0
+        'fullyLoadedIncomingBytes'         || 0
+        'csByWptVisuallyCompleteInPercent' || 0
+        'csByWptDocCompleteInPercent'      || 0
+        'speedIndex'                       || 0
+        'speedIndex'                       || null
     }
 
     void "test normalizeValue for String"() {
@@ -80,6 +95,20 @@ class MeasurandUtilSpec extends Specification {
         'CS_BY_WPT_DOC_COMPLETE'      || null       || null
         'CS_BY_WPT_VISUALLY_COMPLETE' || null       || null
         'SPEED_INDEX'                 || null       || null
+        'LOAD_TIME'                   || 0          || 0
+        'FIRST_BYTE'                  || 0          || 0
+        'START_RENDER'                || 0          || 0
+        'DOC_COMPLETE_TIME'           || 0          || 0
+        'VISUALLY_COMPLETE'           || 0          || 0
+        'DOM_TIME'                    || 0          || 0
+        'FULLY_LOADED_TIME'           || 0          || 0
+        'DOC_COMPLETE_REQUESTS'       || 0          || 0
+        'FULLY_LOADED_REQUEST_COUNT'  || 0          || 0
+        'DOC_COMPLETE_INCOMING_BYTES' || 0          || 0
+        'FULLY_LOADED_INCOMING_BYTES' || 0          || 0
+        'CS_BY_WPT_DOC_COMPLETE'      || 0          || 0
+        'CS_BY_WPT_VISUALLY_COMPLETE' || 0          || 0
+        'SPEED_INDEX'                 || 0          || 0
     }
 
     void "test normalizeValue for Measurand"() {
