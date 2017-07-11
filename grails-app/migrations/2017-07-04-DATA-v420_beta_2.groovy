@@ -13,15 +13,16 @@ databaseChangeLog = {
                         AS aggregation_type,
                    a.version AS version
             FROM 
-            ((SELECT prefix, graphite_server_graphite_paths_id AS graphite_server_id, measurand_id, version 
-                FROM graphite_path 
+            (SELECT prefix, graphite_server_graphite_paths_id AS graphite_server_id, measurand_id, version 
+                FROM graphite_path
                 INNER JOIN graphite_server_graphite_path 
-                ON id = graphite_path_id) AS a
+                ON graphite_path.id = graphite_server_graphite_path.graphite_path_id) AS a
                 INNER JOIN 
                 (SELECT id, name FROM aggregator_type 
                     WHERE measurand_group = 'NO_MEASURAND') AS b 
-                ON a.measurand_id = b.id);
+                ON a.measurand_id = b.id;
         ''')
+
     }
 
     changeSet(author: "mwg", id: "1499164819-2") {
@@ -53,14 +54,14 @@ databaseChangeLog = {
                         AS measurand,
                    a.version AS version
             FROM 
-            ((SELECT prefix, graphite_server_graphite_paths_id AS graphite_server_id, measurand_id, version 
+            (SELECT prefix, graphite_server_graphite_paths_id AS graphite_server_id, measurand_id, version 
                 FROM graphite_path 
                 INNER JOIN graphite_server_graphite_path 
                 ON id = graphite_path_id) AS a
                 INNER JOIN 
                 (SELECT id, name FROM aggregator_type 
                     WHERE measurand_group != 'NO_MEASURAND') AS b 
-                ON a.measurand_id = b.id);
+                ON a.measurand_id = b.id;
         ''')
     }
 }
