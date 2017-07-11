@@ -7,7 +7,7 @@ import de.iteratec.osm.result.EventResult
 class MeasurandUtil {
     static  Map<MeasurandGroup, List<Measurand>> getAllMeasurandsByMeasurandGroup() {
         Map<MeasurandGroup, List<Measurand>> result = [:]
-        MeasurandGroup.values().each { result.put(it, [])}
+        MeasurandGroup.values().findAll{mg -> Measurand.values().findAll{it.getMeasurandGroup() == mg}.size() > 0}.each { result.put(it, [])}
         Measurand.values().each {result.get(it.getMeasurandGroup()).add(it)}
         return Collections.unmodifiableMap(result)
     }

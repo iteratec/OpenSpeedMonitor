@@ -138,17 +138,11 @@ class MeasurandUtilSpec extends Specification {
 
     void "test all measurand are found"() {
         setup: " determine group"
-        MeasurandGroup measurandGroup = MeasurandGroup.valueOf(measurandGroupString)
+        Map<MeasurandGroup, List<Measurand>> map = MeasurandUtil.getAllMeasurandsByMeasurandGroup()
 
         expect: "all measurands are found for set group"
-        MeasurandUtil.getAllMeasurandsByMeasurandGroup()[measurandGroup] == Measurand.values().findAll {it.getMeasurandGroup() == measurandGroup}
-
-        where:
-        measurandGroupString | _
-        'LOAD_TIMES'         | _
-        'REQUEST_COUNTS'     | _
-        'REQUEST_SIZES'      | _
-        'PERCENTAGES'        | _
-        'UNDEFINED'          | _
+        MeasurandGroup.values().findAll{mg -> Measurand.values().findAll{it.getMeasurandGroup() == mg}.size() > 0}.each{
+            measurandGroup -> map[measurandGroup] == Measurand.values().findAll {it.getMeasurandGroup() == measurandGroup}
+        }
     }
 }
