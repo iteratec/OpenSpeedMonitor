@@ -3,6 +3,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.util.Constants
+import de.iteratec.osm.util.GraphitPathPrefixUtil
 
 class GraphitePathRawData {
     String prefix
@@ -12,7 +13,7 @@ class GraphitePathRawData {
     static belongsTo = [graphiteServer: GraphiteServer]
 
     static constraints = {
-        prefix(matches: /([a-zA-Z0-9]+\.)+/, nullable: false, blank: false, maxSize: 255)
+        importFrom(GraphitePathCsiData)
     }
 
     @Override

@@ -110,7 +110,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         //mocking
         mockEventCsiAggregationService([firstHmv, secondHmv])
         mockPageCsiAggregationService([], HOURLY)
-        mockShopCsiAggregationService([], HOURLY)
+        mockJobGroupCsiAggregationService([], HOURLY)
 
         when: "we report the CSI value of the last hour"
         DateTime cronjobStartsAt = hourlyDateExpectedToBeSent.plusMinutes(20)
@@ -151,7 +151,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([firstDpmv, secondDpmv], DAILY)
-        mockShopCsiAggregationService([], DAILY)
+        mockJobGroupCsiAggregationService([], DAILY)
 
         when: "we report PageCSIValue of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
@@ -188,7 +188,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([], DAILY)
-        mockShopCsiAggregationService([firstDsmv, secondDsmv], DAILY)
+        mockJobGroupCsiAggregationService([firstDsmv, secondDsmv], DAILY)
 
         when: "we report ShopCSIValues of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
@@ -224,7 +224,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([firstWpmv, secondWpmv], WEEKLY)
-        mockShopCsiAggregationService([], WEEKLY)
+        mockJobGroupCsiAggregationService([], WEEKLY)
 
         when: "we report PageCSIValues of the last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
@@ -261,7 +261,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([], WEEKLY)
-        mockShopCsiAggregationService([firstWsmv, secondWsmv], WEEKLY)
+        mockJobGroupCsiAggregationService([firstWsmv, secondWsmv], WEEKLY)
 
         when: "we report ShopCSIValues of last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
@@ -345,13 +345,13 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     /**
      * Mocks {@linkplain JobGroupCsiAggregationService#getOrCalculateShopCsiAggregations}.
      */
-    private void mockShopCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
-        def shopCsiAggregationService = Stub(JobGroupCsiAggregationService)
-        shopCsiAggregationService.getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval,_ as List) >> {
+    private void mockJobGroupCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
+        def jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService)
+        jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval,_ as List) >> {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 return interval.intervalInMinutes != expectedIntervalInMinutes? [] : toReturnOnDemandForGetOrCalculateCsiAggregations
         }
-        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService
+        serviceUnderTest.jobGroupCsiAggregationService = jobGroupCsiAggregationService
     }
 
     //test data common to all tests///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
 
         GraphitePathCsiData pathEvent = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.MEASURED_EVENT)
         GraphitePathCsiData pathPage = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.PAGE)
-        GraphitePathCsiData pathShop = new GraphitePathCsiData(prefix: pathPrefix, measurand: AggregationType.JOB_GROUP)
+        GraphitePathCsiData pathShop = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.JOB_GROUP)
 
         GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
                 reportCsiAggregationsToGraphiteServer: true)
