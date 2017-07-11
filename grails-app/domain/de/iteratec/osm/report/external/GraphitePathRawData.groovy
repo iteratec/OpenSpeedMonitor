@@ -3,7 +3,6 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.util.Constants
-import de.iteratec.osm.util.GraphitPathPrefixUtil
 
 class GraphitePathRawData {
     String prefix
