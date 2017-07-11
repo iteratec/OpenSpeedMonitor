@@ -347,8 +347,8 @@ public class EventResultDashboardService {
 
     private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
 
-        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null)
-        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null)
+        String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null)
+        String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null)
 
         List<OsmChartGraph> graphs = []
 

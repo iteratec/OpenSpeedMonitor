@@ -116,7 +116,7 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created and we trim the data below and above some given values"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<SelectedMeasurand> measurands = [ new SelectedMeasurand(measurand: Measurand.DOM_TIME, cachedView: CachedView.CACHED)]
+        List<SelectedMeasurand> measurands = [ new SelectedMeasurand(Measurand.DOM_TIME,CachedView.CACHED)]
         ErQueryParams queryParams = createEventResultQueryParams()
         queryParams.minLoadTimeInMillisecs = 3000
         queryParams.maxLoadTimeInMillisecs = 7000

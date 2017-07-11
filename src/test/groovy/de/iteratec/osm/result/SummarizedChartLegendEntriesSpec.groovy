@@ -42,7 +42,6 @@ class SummarizedChartLegendEntriesSpec extends Specification {
     EventResultDashboardService serviceUnderTest
 
     def doWithSpring = {
-        resultCsiAggregationService(ResultCsiAggregationService)
         eventResultDaoService(EventResultDaoService)
         csiAggregationUtilService(CsiAggregationUtilService)
         osmChartProcessingService(OsmChartProcessingService)
@@ -53,7 +52,6 @@ class SummarizedChartLegendEntriesSpec extends Specification {
     def setup() {
         serviceUnderTest = service
         mockGrailsLinkGenerator()
-        mockResultCsiAggregationService()
         mockI18NServices()
     }
 
@@ -66,14 +64,18 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 1"),
                             location: Location.build(location: "Location 1"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 1"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 1,
+                            docCompleteRequests: 1
                     ),
                     EventResult.build(
                             jobGroup: JobGroup.build(name: "Job Group 2"),
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 2"),
                             location: Location.build(location: "Location 2"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 2"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 1,
+                            docCompleteRequests: 1
                     )
             ]
         }
@@ -92,10 +94,10 @@ class SummarizedChartLegendEntriesSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLabels = resultGraphs*.label
         graphLabels.containsAll([
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 2 | Measured Event 2 | Location 2 | Connectivity Profile 2",
-                "Uncached docCompleteRequestsUncached | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteRequestsUncached | Job Group 2 | Measured Event 2 | Location 2 | Connectivity Profile 2"
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 2 | Measured Event 2 | Location 2 | Connectivity Profile 2",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 2 | Measured Event 2 | Location 2 | Connectivity Profile 2"
         ])
         chart.osmChartGraphsCommonLabel == ""
 
@@ -128,7 +130,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                                     location: location,
                                     connectivityProfile: connectivityProfile,
                                     browser: browser,
-                                    cachedView: CachedView.UNCACHED
+                                    cachedView: CachedView.UNCACHED,
+                                    docCompleteTimeInMillisecs: 0
                             )
                     )
                 }
@@ -148,7 +151,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
 
         then: "all label parts are the same and we get one label"
         resultGraphs.size() == 1
-        resultGraphs[0].label == "Uncached docCompleteTimeInMillisecsUncached | Job Group | Measured Event | Location | Connectivity Profile"
+        resultGraphs[0].label == "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group | Measured Event | Location | Connectivity Profile"
         chart.osmChartGraphsCommonLabel == ""
 
         where: "all CSI aggregation intervals are tested"
@@ -169,14 +172,16 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 1"),
                             location: Location.build(location: "Location 1"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 1"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0
                     ),
                     EventResult.build(
                             jobGroup: JobGroup.build(name: "Job Group 1"),
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 1"),
                             location: Location.build(location: "Location 2"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 2"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0
                     )
             ]
         }
@@ -197,7 +202,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 "Location 1 | Connectivity Profile 1",
                 "Location 2 | Connectivity Profile 2",
         ])
-        chart.osmChartGraphsCommonLabel == "<b></b>: Uncached docCompleteTimeInMillisecsUncached | <b></b>: Job Group 1 | <b></b>: Measured Event 1"
+        chart.osmChartGraphsCommonLabel == "<b></b>: Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | <b></b>: Job Group 1 | <b></b>: Measured Event 1"
 
         where: "all CSI aggregation intervals are tested"
         csiAggregationInterval        | _
@@ -216,28 +221,36 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 1"),
                             location: Location.build(location: "Location 1"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 1"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0,
+                            docCompleteRequests: 0
                     ),
                     EventResult.build(
                             jobGroup: JobGroup.build(name: "Job Group 2"),
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 1"),
                             location: Location.build(location: "Location 1"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 1"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0,
+                            docCompleteRequests: 0
                     ),
                     EventResult.build(
                             jobGroup: JobGroup.build(name: "Job Group 3"),
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 2"),
                             location: Location.build(location: "Location 2"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 2"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0,
+                            docCompleteRequests: 0
                     ),
                     EventResult.build(
                             jobGroup: JobGroup.build(name: "Job Group 4"),
                             measuredEvent: MeasuredEvent.build(name: "Measured Event 3"),
                             location: Location.build(location: "Location 3"),
                             connectivityProfile: ConnectivityProfile.build(name: "Connectivity Profile 3"),
-                            cachedView: CachedView.UNCACHED
+                            cachedView: CachedView.UNCACHED,
+                            docCompleteTimeInMillisecs: 0,
+                            docCompleteRequests: 0
                     )
             ]
         }
@@ -256,14 +269,14 @@ class SummarizedChartLegendEntriesSpec extends Specification {
         resultGraphs.size() == 8
         List<String> graphLabels = resultGraphs*.label
         graphLabels.containsAll([
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 2 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 3 | Measured Event 2 | Location 2 | Connectivity Profile 2",
-                "Uncached docCompleteTimeInMillisecsUncached | Job Group 4 | Measured Event 3 | Location 3 | Connectivity Profile 3",
-                "Uncached docCompleteRequestsUncached | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteRequestsUncached | Job Group 2 | Measured Event 1 | Location 1 | Connectivity Profile 1",
-                "Uncached docCompleteRequestsUncached | Job Group 3 | Measured Event 2 | Location 2 | Connectivity Profile 2",
-                "Uncached docCompleteRequestsUncached | Job Group 4 | Measured Event 3 | Location 3 | Connectivity Profile 3"
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 2 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 3 | Measured Event 2 | Location 2 | Connectivity Profile 2",
+                "Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | Job Group 4 | Measured Event 3 | Location 3 | Connectivity Profile 3",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 1 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 2 | Measured Event 1 | Location 1 | Connectivity Profile 1",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 3 | Measured Event 2 | Location 2 | Connectivity Profile 2",
+                "Uncached " + Measurand.DOC_COMPLETE_REQUESTS.toString() + " | Job Group 4 | Measured Event 3 | Location 3 | Connectivity Profile 3"
         ])
         chart.osmChartGraphsCommonLabel == ''
 
@@ -277,13 +290,6 @@ class SummarizedChartLegendEntriesSpec extends Specification {
 
     def mockGrailsLinkGenerator() {
         serviceUnderTest.grailsLinkGenerator = Mock(LinkGenerator)
-    }
-
-    def mockResultCsiAggregationService() {
-        serviceUnderTest.resultCsiAggregationService = Stub(ResultCsiAggregationService) {
-            getEventResultPropertyForCalculation(_, _) >> 1.0
-            getAggregatorTypeCachedViewType(_) >> CachedView.UNCACHED
-        }
     }
 
     def mockI18NServices() {

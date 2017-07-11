@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.util.MeasurandUtil
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -111,8 +112,8 @@ class EventResultDashboardControllerSpec extends Specification {
         result != null
         result.size() == 13
 
-        result["aggrGroupValuesCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES
-        result["aggrGroupValuesUnCached"] == EventResultDashboardController.AGGREGATOR_GROUP_VALUES
+        result["aggrGroupValuesCached"] ==  MeasurandUtil.getAllMeasurandsByMeasurandGroup()
+        result["aggrGroupValuesUnCached"] ==  MeasurandUtil.getAllMeasurandsByMeasurandGroup()
 
         result["folders"]*.getName() == ["Group1", "Group2"]
         result["pages"]*.getName() == ["Page1", "Page2", "Page3"]
@@ -143,10 +144,10 @@ class EventResultDashboardControllerSpec extends Specification {
 
         then: "the map contains the data and the command is valid"
         command.validate()
-        result.size() == 29
+        result.size() == 30
         result["selectedInterval"] == 60
-        result["selectedAggrGroupValuesCached"] == [Measurand.DOC_COMPLETE_TIME.toString()]
-        result["selectedAggrGroupValuesUnCached"] == [Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()]
+        result["selectedAggrGroupValuesCached"] == [Measurand.DOC_COMPLETE_TIME]
+        result["selectedAggrGroupValuesUnCached"] == [Measurand.DOC_COMPLETE_INCOMING_BYTES]
     }
 
     void "command creates correct ErQueryParameters"() {
@@ -251,7 +252,7 @@ class EventResultDashboardControllerSpec extends Specification {
         command.trimAboveLoadTimes = 10000
         command.trimBelowRequestCounts = 2
         command.trimAboveRequestCounts = 200
-        command.trimBelowRequestSizes = 30
-        command.trimAboveRequestSizes = 3000
+        command.trimBelowRequestSizes = 0.03
+        command.trimAboveRequestSizes = 3
     }
 }
