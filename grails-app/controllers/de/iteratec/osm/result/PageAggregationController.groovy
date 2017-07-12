@@ -180,7 +180,11 @@ class PageAggregationController extends ExceptionHandlerController {
             }
         }
         if (!hasData) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "no data")
+            ControllerUtils.sendSimpleResponseAsStream(
+                response,
+                HttpStatus.OK,
+                i18nService.msg("de.iteratec.ism.no.data.on.current.selection.heading", "No data")
+            )
         }
         else {
             ControllerUtils.sendObjectAsJSON(response, barchartDTO)
