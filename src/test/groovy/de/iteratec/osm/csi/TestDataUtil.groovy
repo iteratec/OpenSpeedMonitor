@@ -47,8 +47,8 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 
 import java.util.regex.Pattern
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static org.junit.Assert.assertNotNull
 
 /**
@@ -841,7 +841,7 @@ class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
      * Creates an OsmConfiguration and persists it.
-     * This method uses default values for minDocCompleteTimeInMillisecs and maxDocCompleteTimeInMillisecs.
+     * This method uses default values for minValidLoadtime and maxValidLoadtime.
      * </p>
      */
     public static void createOsmConfig() {
@@ -849,8 +849,8 @@ class TestDataUtil implements OsmTestLogin {
             new OsmConfiguration(
                     detailDataStorageTimeInWeeks: 2,
                     defaultMaxDownloadTimeInMinutes: 60,
-                    minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
-                    maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
+                    minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
+                    maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME,
                     initialChartHeightInPixels: 400,
                     maxDataStorageTimeInMonths: 12,
                     csiTransformation: CsiTransformation.BY_MAPPING,

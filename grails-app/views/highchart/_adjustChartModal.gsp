@@ -85,11 +85,11 @@
                     <div class="col-md-4" data-toggle="buttons">
                         <div class="btn-group btn-group-justified">
                             <label class="btn btn-default">
-                                <input type="checkbox" id="to-enable-label">
+                                <input type="checkbox" id="to-enable-label" ${showDataLabels ? "checked" : ""}>
                                 <g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Data Labels"/>
                             </label>
                             <label class="btn btn-default">
-                                <input type="checkbox" id="to-enable-marker">
+                                <input type="checkbox" id="to-enable-marker" ${showDataMarkers ? "checked" : ""}>
                                 <g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Data Points"/>
                             </label>
                         </div>

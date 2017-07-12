@@ -44,8 +44,8 @@ import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
 class BootStrap {
 
@@ -136,8 +136,8 @@ class BootStrap {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 12,
                 defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
-                maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
+                minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
+                maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME,
                 maxDataStorageTimeInMonths: 13,
                 csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)

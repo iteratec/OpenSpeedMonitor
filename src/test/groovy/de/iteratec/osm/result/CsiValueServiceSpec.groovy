@@ -46,8 +46,8 @@ class CsiValueServiceSpec extends Specification {
     void setup() {
         serviceUnderTest = service
         serviceUnderTest.osmConfigCacheService = Stub(OsmConfigCacheService) {
-            getCachedMaxDocCompleteTimeInMillisecs (_) >> { return MAX_DOC_COMPLETE }
-            getCachedMinDocCompleteTimeInMillisecs (_) >> { return MIN_DOC_COMPLETE }
+            getMaxValidLoadtime (_) >> { return MAX_DOC_COMPLETE }
+            getMinValidLoadtime (_) >> { return MIN_DOC_COMPLETE }
         }
         eventResult = EventResult.build(csByWptDocCompleteInPercent: 50, docCompleteTimeInMillisecs: 300)
         csiAggregation = CsiAggregation.build(csByWptDocCompleteInPercent: 50.0)

@@ -198,10 +198,11 @@ OpenSpeedMonitor.chartContextUtil = (function(){
 
   function buildWptUrl(wptView, nearestPoint) {
     var url = null;
+    var defaultVideoParameter = '&ival=100&end=full';
     if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
       // build url for the comparison view launched from the chart context menu
       url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl +
-        "video/compare.php?tests=" + comparingPartOfFilmstripsURL();
+        "video/compare.php?tests=" + comparingPartOfFilmstripsURL()+defaultVideoParameter;
     } else {
       // build url for the comparison view launched from a a specific point
 
@@ -215,7 +216,7 @@ OpenSpeedMonitor.chartContextUtil = (function(){
 
       // build the url
       if (wptView == "compare") {
-        url = wptServerBaseurl + "video/compare.php?tests=" + comparingPartOfFilmstripsURL();
+        url = wptServerBaseurl + "video/compare.php?tests=" + comparingPartOfFilmstripsURL() + defaultVideoParameter;
       } else if (wptView == "filmstrip") {
         cached = cachedView ? "1" : "0";
 
@@ -223,7 +224,8 @@ OpenSpeedMonitor.chartContextUtil = (function(){
           testId +
           "-r:" + numberOfWptRun +
           "-c:" + cached +
-          "-s:" + oneBaseStepIndexInJourney;
+          "-s:" + oneBaseStepIndexInJourney +
+          defaultVideoParameter;
       } else {
         cached = cachedView ? "cached/" : "";
 

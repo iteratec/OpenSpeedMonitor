@@ -22,6 +22,8 @@ class EventResultDashboardPage extends I18nGebPage {
         fromDatepicker { $(".timerange-userinput-from") }
         toDatepicker { $(".timerange-userinput-to") }
         firstViewDiv { $("#selectAggregatorUncachedHtmlId") }
+        graphNameSelect { $("#graphName") }
+        graphNameSelectOptions { $("#graphName").find("option").contextElements }
         firstViewList { $("#selectAggregatorUncachedHtmlId").find("option").contextElements }
         filterJobsAccordionContent { $("#collapseTwo") }
         filterJobsAccordion { $(".accordion-toggle")[1] }
@@ -34,8 +36,8 @@ class EventResultDashboardPage extends I18nGebPage {
         diaYAxisMinInputField { $(".dia-y-axis-min") }
         diaYAxisMaxInputField { $(".dia-y-axis-max") }
         diaChangeYAxisButton { $(".dia-change-yaxis") }
-        showDataMarkersCheckBox { $("#to-enable-marker") }
-        showDataLabelsCheckBox { $("#to-enable-label") }
+        showDataMarkersCheckBox { $("#to-enable-marker").parent() }
+        showDataLabelsCheckBox { $("#to-enable-label").parent() }
         addAliasButton { $("#addAliasButton") }
         aliasInputField { $(".input-alias")[0] }
         graphName { $("span.label").attr("innerHTML") }
@@ -51,8 +53,9 @@ class EventResultDashboardPage extends I18nGebPage {
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
-        customDashboardSelectionList { $("#customDashBoardSelection") }
+        customDashboardSelectionDropdown { $("#show-button-caret") }
+        customDashboardSelectionList { $("#show-button-dropdown") }
+        firstCustomDashboardLink { $("#show-button-dropdown li.custom-dashboard a", 0) }
         appendedInputBelowLoadTimesTextField { $("#appendedInputBelowLoadTimes") }
         appendedInputAboveLoadTimesTextField { $("#appendedInputAboveLoadTimes") }
         appendedInputBelowRequestCountsTextField { $("#appendedInputBelowRequestCounts") }
@@ -78,6 +81,11 @@ class EventResultDashboardPage extends I18nGebPage {
         adjustChartApply{$("#adjustChartApply")}
         cardTabsUl{$("#erd-card-tabs")}
 
+    }
+
+    public setColorPicker(String value) {
+        colorPicker.jquery.val(value)
+        colorPicker.jquery.trigger("change")
     }
 
     public clickVariableSelectionTab(){

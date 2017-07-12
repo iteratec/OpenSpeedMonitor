@@ -23,8 +23,8 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 
 @TestFor(ConfigService)
@@ -39,8 +39,8 @@ class ConfigServiceSpec extends Specification {
         then: "config service hat its values including the defaults"
         service.getDetailDataStorageTimeInWeeks() == 4
         service.getDefaultMaxDownloadTimeInMinutes() == DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
-        service.getMinDocCompleteTimeInMillisecs() == DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-        service.getMaxDocCompleteTimeInMillisecs() == DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+        service.getMinValidLoadtime() == DEFAULT_MIN_VALID_LOADTIME
+        service.getMaxValidLoadtime() == DEFAULT_MAX_VALID_LOADTIME
         service.getInitialChartHeightInPixels() == DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     }
 
