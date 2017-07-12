@@ -357,6 +357,13 @@ function fixChosen() {
     });
 }
 
+function makeChosenAccessibleForBootstrapValidation(){
+    //bootstraps validation highlighting only works, of the element to be highlighted has the class "form-control"
+    //since the chosen plugin provides us with this form, we have no other way then adding the class dynamically
+    $(".chosen-single").addClass("form-control");
+}
+
+
 function fireWindowEvent(eventName) {
     var event = document.createEvent('Event');
     event.initEvent(eventName, true, true);
@@ -372,3 +379,37 @@ $("#main-navbar .dropdown-toggle").click(function () {
         $(this).trigger('focus').attr('aria-expanded', 'true')
     }
 });
+
+/**
+ * Adds a cron validator to the form. The cron input field must define the attribute: data-cron, to use this.
+ * @param $form the form which holds a cron input
+ * @param $outputElement will receive a text which describws the entered cron
+ */
+function addCronValidatorToForm($form, $outputElement){
+    $form.validator({
+        custom: {
+            'cron': function() {
+                var error = "";
+                $.ajax({
+                    url: OpenSpeedMonitor.urls.cronExpressionNextExecution,
+                    data: { cronExpression: cronStringInputField.val()},
+                    dataType: "text",
+                    type: 'GET',
+                    async:false,
+                    success: function (data) {
+                        $outputElement.text(prettyCron.toString(cronStringInputField.val()));
+                    },
+                    error: function (e, status) {
+                        if (status === "error") {
+                            error = e.responseText;
+                            $outputElement.text("");
+                        } else {
+                            console.error(e);
+                        }
+                    }
+                });
+                return error;
+            }
+        }
+    });
+}

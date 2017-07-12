@@ -53,7 +53,45 @@ function doOnDomReady(newJob,
         $("#execution-schedule-shown").change();
     });
 
-};
+    addCronValidatorToForm($("form"), cronInputHelpBlock);
+    makeChosenAccessibleForBootstrapValidation();
+    addChangeListenerForTabs();
+
+}
+
+function addChangeListenerForTabs() {
+    var tabErrorClassName = "tab-has-error";
+    var errorClass = "has-error";
+    var jobTab = $("#jobSettingsTabLink");
+    var scriptTab = $('#scriptTabLink');
+    var advancedTab = $('#advancedSettingsTabLink');
+
+    var scriptHasError = function () {
+        if ($("#scriptFormGroup").hasClass(errorClass)) {
+            scriptTab.addClass(tabErrorClassName);
+        } else {
+            scriptTab.removeClass(tabErrorClassName)
+        }
+    };
+    var settingsHasError = function () {
+        if ($("#nameFormGroup").hasClass(errorClass) || $("#cronFormGroup").hasClass(errorClass)) {
+            jobTab.addClass(tabErrorClassName);
+        } else {
+            jobTab.removeClass(tabErrorClassName);
+        }
+    };
+
+    var removeOwnHighlighting = function (e) {
+        $(e.currentTarget).removeClass("tab-has-error");
+    };
+
+    jobTab.on('click', scriptHasError);
+    jobTab.on('click', removeOwnHighlighting);
+    scriptTab.on('click', settingsHasError);
+    scriptTab.on('click', removeOwnHighlighting);
+    advancedTab.on('click', scriptHasError);
+    advancedTab.on('click', settingsHasError);
+}
 
 function initializeSelects() {
     var chosenOptions = {
@@ -116,7 +154,7 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
     }
 }
 
-var inputUserAgent =  $("#inputField-userAgent");
+var inputUserAgent = $("#inputField-userAgent");
 var inputEmulateMobile = $("#chkbox-emulateMobile");
 
 var predefinedCronSelectBox = $("#selectExecutionSchedule");
@@ -124,31 +162,30 @@ var cronStringInputField = $("#executionSchedule");
 var cronInputHelpBlock = $("#cronInputHelpBlock");
 
 function registerEventHandlers() {
-    $("#location").on("change",toggleChromeTab);
-    inputEmulateMobile.on("change",toggleMobileOptions);
-    $("#chkbox-captureTimeline").on("change",toggleTimelineOptions);
-    $("#chkbox-trace").on("change",toggleTraceOptions);
+    $("#location").on("change", toggleChromeTab);
+    inputEmulateMobile.on("change", toggleMobileOptions);
+    $("#chkbox-captureTimeline").on("change", toggleTimelineOptions);
+    $("#chkbox-trace").on("change", toggleTraceOptions);
     toggleChromeTab();
     toggleMobileOptions();
     toggleTimelineOptions();
     toggleTraceOptions();
 
-    $("#inputField-takeScreenshots").on("change",toggleScreenshotOptions);
-    inputUserAgent.on("change",toggleUserAgentOptions);
+    $("#inputField-takeScreenshots").on("change", toggleScreenshotOptions);
+    inputUserAgent.on("change", toggleUserAgentOptions);
     toggleScreenshotOptions();
     toggleUserAgentOptions();
-    
-    $('#inputField-JobLabel').on('keyup',updateJobName);
+
+    $('#inputField-JobLabel').on('keyup', updateJobName);
     updateJobName();
 
-    $("#runs").on("change",toggleMedianOptions);
+    $("#runs").on("change", toggleMedianOptions);
     toggleMedianOptions();
 
-    $("#provideAuthenticateInformation").on("change",toggleAuthOptions);
+    $("#provideAuthenticateInformation").on("change", toggleAuthOptions);
     toggleAuthOptions();
 
     predefinedCronSelectBox.change(updateCronStringFromPredefined);
-    cronStringInputField.keyup(validateCronExpression);
     var initValue = cronStringInputField.val();
     if (initValue) {
         // check if init value is a predefined cron string
@@ -160,14 +197,13 @@ function registerEventHandlers() {
             cronStringInputField.val(initValue);
         }
     }
-    validateCronExpression();
     updateCronStringFromPredefined();
 
     $("input, select", $("#jobSettingsTab")).on('focus', showHelpPanel);
     $("#jobSettingsTab .chosen").on('chosen:showing_dropdown', showHelpPanel);
 }
 
-var showHelpPanel = function() {
+var showHelpPanel = function () {
     $(".help-panel").toggleClass("hidden", true);
     var helpPanelId = $(this).data("help-panel-id");
     if (helpPanelId) {
@@ -187,37 +223,12 @@ var updateCronStringFromPredefined = function () {
     if (!!selectedValue) {
         cronStringInputField.val(selectedValue);
     }
-    validateCronExpression();
-};
-
-var validateCronExpression = function () {
-    $.ajax({
-        url: OpenSpeedMonitor.urls.cronExpressionNextExecution,
-        data: { cronExpression: cronStringInputField.val()},
-        dataType: "text",
-        type: 'GET',
-        success: function (data) {
-            processCronExpressionValidation(true, prettyCron.toString(cronStringInputField.val()));
-        },
-        error: function (e, status) {
-            if (status === "error") {
-                processCronExpressionValidation(false, e.responseText);
-            } else {
-                console.error(e);
-            }
-        }
-    });
-};
-
-var processCronExpressionValidation = function (isValid, helpText) {
-    cronInputHelpBlock.text(helpText);
-    cronStringInputField.parent().toggleClass("has-error", !isValid);
 };
 
 function toggleAuthOptions() {
     if (!$("#provideAuthenticateInformation").prop("checked")) {
-        $("#authUsername").attr("disabled","");
-        $("#authPassword").attr("disabled","");
+        $("#authUsername").attr("disabled", "");
+        $("#authPassword").attr("disabled", "");
     }
     else {
         $("#authUsername").removeAttr("disabled");
@@ -460,7 +471,7 @@ function createJobGroup(createJobGroupUrl) {
 
 function selectAllGraphiteServer(select) {
     var obj = $("#graphiteServers")[0];
-    for (var i=0; i<obj.options.length; i++) {
+    for (var i = 0; i < obj.options.length; i++) {
         obj.options[i].selected = select;
     }
 }
