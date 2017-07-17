@@ -85,6 +85,13 @@ class EventResult implements CsiValue {
     Integer startRenderInMillisecs
     Double csByWptDocCompleteInPercent
     Double csByWptVisuallyCompleteInPercent
+
+    Integer consistentlyInteractiveInMillisecs
+    Integer firstInteractiveInMillisecs
+    Integer visuallyComplete85InMillisecs
+    Integer visuallyComplete90InMillisecs
+    Integer visuallyComplete95InMillisecs
+    Integer visuallyComplete99InMillisecs
     /**
      * The WPT speed index received from WPT server.
      *
@@ -154,6 +161,14 @@ class EventResult implements CsiValue {
         csByWptVisuallyCompleteInPercent(nullable: true)
         speedIndex(nullable: true)
         visuallyCompleteInMillisecs(nullable: true)
+
+        consistentlyInteractiveInMillisecs(nullable: true)
+        firstInteractiveInMillisecs(nullable: true)
+
+        visuallyComplete85InMillisecs(nullable: true)
+        visuallyComplete90InMillisecs(nullable: true)
+        visuallyComplete95InMillisecs(nullable: true)
+        visuallyComplete99InMillisecs(nullable: true)
 
         downloadAttempts(nullable: true)
         firstStatusUpdate(nullable: true)
