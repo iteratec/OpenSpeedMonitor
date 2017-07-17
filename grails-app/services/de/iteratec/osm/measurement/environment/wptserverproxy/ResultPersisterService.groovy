@@ -33,7 +33,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
-import org.apache.commons.lang3.StringUtils
 import org.springframework.transaction.annotation.Propagation
 
 import java.util.zip.GZIPOutputStream
@@ -389,6 +388,7 @@ class ResultPersisterService implements iResultListener {
         result.location = jobRun.job.location
         setSpeedIndex(result, viewTag)
         setAllVisuallyCompleteTimes(viewTag, result)
+        setTimeToInteractive(viewTag, result)
         setWaterfallUrl(result, jobRun, waterfallAnchor)
         setCustomerSatisfaction(step, result, docCompleteTime)
         result.testAgent = jobRun.testAgent
@@ -441,17 +441,21 @@ class ResultPersisterService implements iResultListener {
     }
 
     private void setAllVisuallyCompleteTimes(GPathResult viewTag, EventResult result) {
-        setVisuallyCompletePercentage(viewTag, result, 85)
-        setVisuallyCompletePercentage(viewTag, result, 90)
-        setVisuallyCompletePercentage(viewTag, result, 95)
-        setVisuallyCompletePercentage(viewTag, result, 99)
-        setVisuallyCompletePercentage(viewTag, result, null)
+        setPropertyWithinEventResult("visualComplete85", viewTag, Measurand.VISUALLY_COMPLETE_85.getEventResultField(), result)
+        setPropertyWithinEventResult("visualComplete90", viewTag, Measurand.VISUALLY_COMPLETE_90.getEventResultField(), result)
+        setPropertyWithinEventResult("visualComplete95", viewTag, Measurand.VISUALLY_COMPLETE_95.getEventResultField(), result)
+        setPropertyWithinEventResult("visualComplete99", viewTag, Measurand.VISUALLY_COMPLETE_99.getEventResultField(), result)
+        setPropertyWithinEventResult("visualComplete", viewTag, Measurand.VISUALLY_COMPLETE.getEventResultField(), result)
     }
 
-    private void setVisuallyCompletePercentage(GPathResult viewTag, EventResult result, Integer percentage){
-        String perInString = percentage ?: StringUtils.EMPTY
-        if(checkIfTagIsThere(viewTag ,"visualComplete"+perInString)){
-            result.setProperty("visuallyComplete"+perInString+"InMillisecs", viewTag.getProperty("visualComplete"+perInString).toInteger())
+    private void setTimeToInteractive(GPathResult viewTag, EventResult result){
+        setPropertyWithinEventResult("FirstInteractive",viewTag, Measurand.FIRST_INTERACTIVE.getEventResultField(), result)
+        setPropertyWithinEventResult("TimeToInteractive",viewTag, Measurand.CONSISTENTLY_INTERACTIVE.getEventResultField(), result)
+    }
+
+    private void setPropertyWithinEventResult(String tag, GPathResult viewTag, String eventResultPropertyName, EventResult result){
+        if(checkIfTagIsThere(viewTag, tag)){
+            result.setProperty(eventResultPropertyName, viewTag.getProperty(tag).toInteger())
         }
     }
 

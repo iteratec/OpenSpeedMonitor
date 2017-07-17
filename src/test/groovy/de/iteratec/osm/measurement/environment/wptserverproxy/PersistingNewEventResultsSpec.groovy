@@ -187,13 +187,34 @@ class PersistingNewEventResultsSpec extends Specification {
         service.listenToResult(xmlResult, wptServer)
         List<EventResult> eventResults = EventResult.list()
 
-        then: "there are 15 EventResults with visually complete and cs values"
+        then: "there are 6 EventResults with all kinds of visually complete values"
         eventResults.size() == 6
         !eventResults.any { it.visuallyCompleteInMillisecs == null }
         !eventResults.any { it.visuallyComplete85InMillisecs == null }
         !eventResults.any { it.visuallyComplete90InMillisecs == null }
         !eventResults.any { it.visuallyComplete95InMillisecs == null }
         !eventResults.any { it.visuallyComplete99InMillisecs == null }
+    }
+
+    void "new results have all time to interactive"() {
+        setup:
+        File file = new File("src/test/resources/WptResultXmls/WPT_EXAMPLE_CHROME_TTI_1Run_1Event.xml")
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+        WebPageTestServer wptServer = WebPageTestServer.build()
+        Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
+        Job.build(label: "ExampleJob Chrome TTI")
+        service.timeToCsMappingService = Stub(TimeToCsMappingService) {
+            getCustomerSatisfactionInPercent(_) >> { value -> value }
+        }
+
+        when: "the service creates new event results from the XML result"
+        service.listenToResult(xmlResult, wptServer)
+        List<EventResult> eventResults = EventResult.list()
+
+        then: "there is one EventResult with both time to interactive values"
+        eventResults.size() == 1
+        eventResults.get(0).firstInteractiveInMillisecs == 2286
+        eventResults.get(0).consistentlyInteractiveInMillisecs == 2286
     }
 
     void "test waterfall URL creation for WPT >2.19 with multistep"(int run, String measuredEvent, CachedView cachedView, String expectedUrl) {
