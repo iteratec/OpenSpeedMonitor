@@ -33,6 +33,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
+import org.apache.commons.lang3.StringUtils
 import org.springframework.transaction.annotation.Propagation
 
 import java.util.zip.GZIPOutputStream
@@ -387,7 +388,7 @@ class ResultPersisterService implements iResultListener {
         result.browser = jobRun.job.location.browser
         result.location = jobRun.job.location
         setSpeedIndex(result, viewTag)
-        setVisuallyCompleteTime(viewTag, result)
+        setAllVisuallyCompleteTimes(viewTag, result)
         setWaterfallUrl(result, jobRun, waterfallAnchor)
         setCustomerSatisfaction(step, result, docCompleteTime)
         result.testAgent = jobRun.testAgent
@@ -439,10 +440,23 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    private void setVisuallyCompleteTime(GPathResult viewTag, EventResult result) {
-        if (!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0) {
-            result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
+    private void setAllVisuallyCompleteTimes(GPathResult viewTag, EventResult result) {
+        setVisuallyCompletePercentage(viewTag, result, 85)
+        setVisuallyCompletePercentage(viewTag, result, 90)
+        setVisuallyCompletePercentage(viewTag, result, 95)
+        setVisuallyCompletePercentage(viewTag, result, 99)
+        setVisuallyCompletePercentage(viewTag, result, null)
+    }
+
+    private void setVisuallyCompletePercentage(GPathResult viewTag, EventResult result, Integer percentage){
+        String perInString = percentage ?: StringUtils.EMPTY
+        if(checkIfTagIsThere(viewTag ,"visualComplete"+perInString)){
+            result.setProperty("visuallyComplete"+perInString+"InMillisecs", viewTag.getProperty("visualComplete"+perInString).toInteger())
         }
+    }
+
+    private boolean checkIfTagIsThere(GPathResult viewTag, String tag){
+        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
     }
 
     private void setSpeedIndex(EventResult result, GPathResult viewTag) {
