@@ -47,13 +47,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 class EventResult implements CsiValue {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-    /**
-     * This is value is to be used for {@link #speedIndex} if no value is
-     * available.
-     *
-     * @since IT-223
-     */
-    public static final Integer SPEED_INDEX_DEFAULT_VALUE = -1;
 
     OsmConfigCacheService osmConfigCacheService
 

@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -110,7 +111,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification{
         allResults.size() == 3
 
         allResults.every{ it.visuallyCompleteInMillisecs == null }
-        allResults.every{ it.speedIndex == EventResult.SPEED_INDEX_DEFAULT_VALUE }
+        allResults.every{ it.speedIndex == null }
 
     }
     void "Screenshot dependent measurands get persisted for run #run, step #eventName of Multistep5Run3EventsFvOnlyWithVideo."() {
@@ -227,6 +228,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification{
     void createMocksCommonForAllTests() {
         service.proxyService = Mock(ProxyService)
         service.metricReportingService = Mock(MetricReportingService)
+        service.csiValueService = Mock(CsiValueService)
     }
 
 }
