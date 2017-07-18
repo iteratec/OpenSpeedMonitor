@@ -92,9 +92,7 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        Collection<Measurand> result = []
-        selectedValues.each { result.add(Measurand.valueOf(it))}
-        return result
+        return selectedValues.collect{Measurand.valueOf(it)}
     }
 
     Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
@@ -120,22 +118,22 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
         if (this.trimBelowLoadTimes) {
-            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes*MeasurandGroup.LOAD_TIMES.getUnit().getDivisor()
+            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimAboveLoadTimes) {
-            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes*MeasurandGroup.LOAD_TIMES.getUnit().getDivisor()
+            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimBelowRequestCounts) {
-            queryParams.minRequestCount = this.trimBelowRequestCounts*MeasurandGroup.REQUEST_COUNTS.getUnit().getDivisor()
+            queryParams.minRequestCount = this.trimBelowRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimAboveRequestCounts) {
-            queryParams.maxRequestCount = this.trimAboveRequestCounts*MeasurandGroup.REQUEST_COUNTS.getUnit().getDivisor()
+            queryParams.maxRequestCount = this.trimAboveRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimBelowRequestSizes) {
-            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes*MeasurandGroup.REQUEST_SIZES.getUnit().getDivisor()
+            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
         if (this.trimAboveRequestSizes) {
-            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes*MeasurandGroup.REQUEST_SIZES.getUnit().getDivisor()
+            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
 
         return queryParams

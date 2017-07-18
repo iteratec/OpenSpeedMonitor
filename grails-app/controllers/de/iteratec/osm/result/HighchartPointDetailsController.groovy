@@ -26,7 +26,6 @@ import de.iteratec.osm.util.Constants
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.web.mapping.LinkGenerator
-import org.apache.commons.lang.StringUtils
 import org.joda.time.DateTime
 
 /**
@@ -343,7 +342,7 @@ class HighchartPointDetailsController {
 
         // Select the cached view state:
         Set<CachedView> relevantCachedViews = Collections.checkedSet(new HashSet<CachedView>(), CachedView.class);
-        if (StringUtils.isNotBlank(aggregatorTypeNameOrNull)) {
+        if (aggregatorTypeNameOrNull) {
             if(aggregatorTypeNameOrNull.contains(Constants.UNIQUE_STRING_DELIMITTER)){
                 String[] splitted = aggregatorTypeNameOrNull.split(Constants.UNIQUE_STRING_DELIMITTER)
                 Measurand measurand = Measurand.valueOf(splitted[0])
