@@ -123,8 +123,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .range([height - margin.bottom, margin.top])
             .domain(domain);
 
-        $("#rickshaw_y-axis_left_label").remove();
-        $("#svg-container").append("<div id=\"rickshaw_y-axis_left_label\" class=\"rickshaw_y-axis_left_label\" style=\"left: 45px;position: absolute;white-space: nowrap;transform: translate(-50%, 0%) rotate(-90deg);top: 50%;\">"+text+"</div>");
+        $("#y-axis_left_label").remove();
+        $("#svg-container").append("<div id=\"y-axis_left_label\" style=\"left: 45px;position: absolute;white-space: nowrap;transform: translate(-50%, 0%) rotate(-90deg);top: 50%;\">"+text+"</div>");
 
         var yAxis = d3.svg.axis()
                 .scale(y)
