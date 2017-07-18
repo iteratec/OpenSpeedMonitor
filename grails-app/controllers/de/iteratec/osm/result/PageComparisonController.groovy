@@ -77,7 +77,7 @@ class PageComparisonController extends ExceptionHandlerController {
         dto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         cmd.selectedPageComparisons.each { row ->
-            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurand.getMeasurandGroup().getUnit().getLabel())
+            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurand.measurandGroup.unit.label)
             BarchartDatum datum1 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
             BarchartDatum datum2 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
             def result1 = allEventResults.find {
@@ -89,7 +89,7 @@ class PageComparisonController extends ExceptionHandlerController {
                         it[1].toString() == row['pageId2']
             }
             if (result1) {
-                datum1.value = result1 ? result1[2]/measurand.getMeasurandGroup().getUnit().getDivisor() : null
+                datum1.value = measurand.normalizeValue(result1[2])
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
@@ -98,7 +98,7 @@ class PageComparisonController extends ExceptionHandlerController {
                 }
             }
             if (result2) {
-                datum2.value = result2 ? result2[2]/measurand.getMeasurandGroup().getUnit().getDivisor() : null
+                datum2.value = measurand.normalizeValue(result2[2])
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name

@@ -686,7 +686,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         })
     };
 
-    var formatValue = function (value, unit) {
+    var formatValue = function (value) {
         var precision = 2;
         return parseFloat(value).toFixed(precision);
     };
@@ -694,7 +694,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
     var updateBarLabel = function (bar, barElement, barWidth, innerYScale) {
         var textY = innerYScale.rangeBand() / 2;
         var textLabel = d3.select(barElement).select(".d3chart-value");
-        var text = "" + formatValue(bar.value, bar.unit) + " " + bar.unit;
+        var text = "" + formatValue(bar.value) + " " + bar.unit;
         var textTrans = textLabel.transition().duration(transitionDuration)
             .text(text)
             .attr("y", textY);
@@ -712,7 +712,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationHorizontal = (function (chartIdenti
         var textY = innerYScale.rangeBand() / 2;
         var textLabel = d3.select(barElement).select(".d3chart-comparative-value");
         var sign = bar.comparativeDifference > 0 ? "+" : "";
-        var text = sign + formatValue(bar.comparativeDifference, bar.unit) + " " + bar.unit;
+        var text = sign + formatValue(bar.comparativeDifference) + " " + bar.unit;
 
         var visibility = checkIfTextWouldFitRect(text, textLabel, barWidth) ? "" : "hidden";
         var labelOffset = bar.comparativeDifference > 0 ? -valueLabelOffset : valueLabelOffset;
