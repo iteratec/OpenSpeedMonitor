@@ -9,8 +9,7 @@ enum MeasurandGroup {
     LOAD_TIMES(Unit.MILLISECONDS),
     REQUEST_COUNTS(Unit.NUMBER),
     REQUEST_SIZES(Unit.MEGABYTE),
-    PERCENTAGES(Unit.PERCENT),
-    UNDEFINED(Unit.OTHER)
+    PERCENTAGES(Unit.PERCENT)
 
     private Unit unit
 

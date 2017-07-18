@@ -85,8 +85,7 @@ class PageAggregationController extends ExceptionHandlerController {
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName = []
-        allMeasurands.each {measurandFieldName.add(Measurand.valueOf(it).getEventResultField())}
+        List<String> measurandFieldName = allMeasurands.collect {(it as Measurand).eventResultField}
 
         List eventResultAverages = EventResult.createCriteria().list {
             'in'('page', allPages)
@@ -140,8 +139,8 @@ class PageAggregationController extends ExceptionHandlerController {
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
-                    yAxisLabel:  Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
+                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
