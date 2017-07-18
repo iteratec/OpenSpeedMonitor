@@ -68,8 +68,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName = []
-        allMeasurands.each {measurandFieldName.add(Measurand.valueOf(it).getEventResultField())}
+        List<String> measurandFieldName = allMeasurands.collect { (it as Measurand).getEventResultField() }
 
         List allEventResults = EventResult.createCriteria().list {
             'in'('jobGroup', allJobGroups)
@@ -101,15 +100,15 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
-                    yAxisLabel:  Measurand.valueOf(series.measurands[0]).getMeasurandGroup().getUnit().getLabel(),
+                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 allEventResults.each { datum ->
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                            value: Measurand.valueOf(currentMeasurand).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
+                            value: (currentMeasurand as Measurand).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
                             grouping: "${datum[0].name}"
                         )
                     )
