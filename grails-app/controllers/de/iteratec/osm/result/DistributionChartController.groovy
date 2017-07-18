@@ -16,7 +16,7 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
@@ -51,7 +51,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put('pages', pages)
 
         // Measurands
-        modelToRender.put('measurandsUncached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
+        modelToRender.put('measurandsUncached', Measurand.values().groupBy { it.measurandGroup })
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)

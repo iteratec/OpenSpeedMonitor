@@ -28,7 +28,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
@@ -266,7 +266,7 @@ public class EventResultDashboardService {
                 )
 
                 if(selectedMeasurand.cachedView == eventResult.cachedView){
-                    Double value = MeasurandUtil.normalizeValue(MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult),selectedMeasurand.measurand)
+                    Double value = eventResult.getNormalizedValueFor(selectedMeasurand.measurand)
                     if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                         String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
@@ -310,7 +310,7 @@ public class EventResultDashboardService {
             eventResults.each { EventResult eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
-                        Double value = MeasurandUtil.normalizeValue(MeasurandUtil.getEventResultPropertyForCalculation(selectedMeasurand.measurand, eventResult),selectedMeasurand.measurand)
+                        Double value = eventResult.getNormalizedValueFor(selectedMeasurand.measurand)
                         if (value != null && isInBounds(eventResult, selectedMeasurand.measurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)

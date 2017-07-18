@@ -668,23 +668,7 @@ class MetricReportingServiceSpec extends Specification {
         serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider
     }
 
-    /**
-     * <p>
-     * Just for testing-purposes. Instances can be used to be returned in Mock of
-     * {@link GraphiteSocketProvider#getSocket(GraphiteServer)}.
-     * <br>Map {@link #sendDates} contains the informations about calls to {@link #sendDate(GraphitePathName, double, Date)} for assertions.
-     * </p>
-     *
-     * @author nkuhn
-     *
-     */
     class TestSocket implements GraphiteSocket {
-        /** This map contains one entry for every call to {@link #sendDate} of this socket during the test.
-         * <ul>
-         * <li>key		= <br>[GraphitePathName.stringValueOfPathName of the call] + {@link #DELIMITTER}<br>[timestamp.toString() of the call]</li>
-         * <li>value	= <br>(double-)value of the call</li>
-         * </ul>
-         *   */
         Map<String, Double> sendDates = [:]
 
         @Override

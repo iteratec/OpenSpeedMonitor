@@ -28,7 +28,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
+
 import de.iteratec.osm.util.ParameterBindingUtility
 
 import grails.converters.JSON
@@ -286,13 +286,13 @@ class EventResultDashboardController {
 
         List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
-        LinkedList<OsmChartAxis> labelToDataMap = new LinkedList<OsmChartAxis>();
-        allMeasurands.each {
-            labelToDataMap.add(new OsmChartAxis(
+        List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
+                new OsmChartAxis(
                     it.getMeasurand().getMeasurandGroup(),
                     i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString())
                     + " [" + it.getMeasurand().getMeasurandGroup().getUnit().getLabel() + "]",
-                            getAxisSide(it.getMeasurand().getMeasurandGroup()) ))}
+                            getAxisSide(it.getMeasurand().getMeasurandGroup()) )
+        }
 
         ErQueryParams queryParams = cmd.createErQueryParams();
 
@@ -564,8 +564,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': MeasurandUtil.getAllMeasurandsByMeasurandGroup(),
-                'aggrGroupValuesUnCached': MeasurandUtil.getAllMeasurandsByMeasurandGroup(),
+                'aggrGroupValuesCached': Measurand.values().groupBy { it.measurandGroup },
+                'aggrGroupValuesUnCached': Measurand.values().groupBy { it.measurandGroup },
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,

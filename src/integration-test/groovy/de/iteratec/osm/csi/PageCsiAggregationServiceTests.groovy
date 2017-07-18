@@ -363,9 +363,6 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
         hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
-
-//        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true)
 
         connectivityProfile = TestDataUtil.createConnectivityProfile("DSL1")

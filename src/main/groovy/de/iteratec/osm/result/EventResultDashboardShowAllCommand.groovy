@@ -99,8 +99,8 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
 
     Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
         Collection<SelectedMeasurand> result = []
-        cached.each { result.add(new SelectedMeasurand(Measurand.valueOf(it), CachedView.CACHED))}
-        uncached.each { result.add(new SelectedMeasurand(Measurand.valueOf(it), CachedView.UNCACHED))}
+        cached.each { result.add(new SelectedMeasurand(measurand: Measurand.valueOf(it), cachedView: CachedView.CACHED))}
+        uncached.each { result.add(new SelectedMeasurand(measurand:  Measurand.valueOf(it), cachedView:  CachedView.UNCACHED))}
         return result
     }
     /**

@@ -15,9 +15,9 @@ public enum CachedView {
      * A WPT first view result; the browsers cache have been cleared before,
      * all date was loaded from the web-server.
      */
-    UNCACHED("fv-");
+    UNCACHED("fv-")
 
-    static transients = ['cached'];
+    static transients = ['cached']
     private String graphiteLabelPrefix
 
     private CachedView(String label){
@@ -37,7 +37,7 @@ public enum CachedView {
      * @return <code>true</code> if this is a cached state,
      *         <code>false</code> else.
      */
-    public boolean isCached() {
+    boolean isCached() {
         return this == CACHED;
     }
 }

@@ -94,11 +94,6 @@ class TestDataUtil implements OsmTestLogin {
         return result
     }
 
-    static createTemplate() {
-//        new GraphitePath(
-//        ).save(failOnError: true)
-    }
-
     static createCsTargetGraph(CsTargetValue pointOne, CsTargetValue pointTwo) {
         new CsTargetGraph(
                 label: 'TestCsTargetGraph',
@@ -312,12 +307,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-//    static GraphitePath createGraphitePath(String prefix, AggregatorType aggregator) {
-//        new GraphitePath(
-//                prefix: prefix,
-//                measurand: aggregator
-//        ).save(failOnError: true)
-//    }
 
     static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths, Boolean reportHealthMetrics, String healthMetricsReportPrefix) {
         new GraphiteServer(
@@ -345,7 +334,7 @@ class TestDataUtil implements OsmTestLogin {
      *         not <code>null</code>,
      *         not {@linkplain Collection#isEmpty() empty}.
      */
-    public
+
     static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages) {
         createJobGroups()
         createServer()

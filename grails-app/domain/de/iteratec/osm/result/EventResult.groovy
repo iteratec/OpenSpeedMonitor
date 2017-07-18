@@ -319,4 +319,11 @@ class EventResult implements CsiValue {
                 "\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n"
     }
 
+    Double getValueFor(Measurand measurand){
+        return this."$measurand.eventResultField" != null ? Double.valueOf(this."$measurand.eventResultField") : null
+    }
+
+    Double getNormalizedValueFor(Measurand measurand){
+        return measurand.normalizeValue(getValueFor(measurand))
+    }
 }

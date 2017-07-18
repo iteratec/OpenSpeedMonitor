@@ -23,7 +23,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.util.MeasurandUtil
+
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -112,8 +112,8 @@ class EventResultDashboardControllerSpec extends Specification {
         result != null
         result.size() == 13
 
-        result["aggrGroupValuesCached"] ==  MeasurandUtil.getAllMeasurandsByMeasurandGroup()
-        result["aggrGroupValuesUnCached"] ==  MeasurandUtil.getAllMeasurandsByMeasurandGroup()
+        result["aggrGroupValuesCached"] ==  Measurand.values().groupBy { it.measurandGroup }
+        result["aggrGroupValuesUnCached"] ==  Measurand.values().groupBy { it.measurandGroup }
 
         result["folders"]*.getName() == ["Group1", "Group2"]
         result["pages"]*.getName() == ["Page1", "Page2", "Page3"]

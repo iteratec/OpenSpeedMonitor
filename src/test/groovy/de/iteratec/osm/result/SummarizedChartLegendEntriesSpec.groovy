@@ -85,8 +85,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 csiAggregationInterval,
-                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED),
-                  new SelectedMeasurand(Measurand.DOC_COMPLETE_REQUESTS, CachedView.UNCACHED)],
+                [ new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_TIME, cachedView: CachedView.UNCACHED),
+                  new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_REQUESTS, cachedView: CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -145,7 +145,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED)],
+                [ new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_TIME, cachedView: CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -191,7 +191,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED)],
+                [ new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_TIME, cachedView:  CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -260,8 +260,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME, CachedView.UNCACHED),
-                  new SelectedMeasurand(Measurand.DOC_COMPLETE_REQUESTS, CachedView.UNCACHED)],
+                [ new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_TIME, cachedView:  CachedView.UNCACHED),
+                  new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_REQUESTS, cachedView:  CachedView.UNCACHED)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 

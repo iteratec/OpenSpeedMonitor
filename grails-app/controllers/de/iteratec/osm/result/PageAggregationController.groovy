@@ -17,7 +17,7 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
+
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -41,7 +41,7 @@ class PageAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
+        modelToRender.put('aggrGroupValuesUnCached', Measurand.values().groupBy { it.measurandGroup })
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -147,14 +147,14 @@ class PageAggregationController extends ExceptionHandlerController {
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    def value = MeasurandUtil.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
+                    def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
                     if (value) {
                         barchartSeries.data.add(
                                 new BarchartDatum(
                                         measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
                                         originalMeasurandName: currentMeasurand,
                                         value: value,
-                                        valueComparative: MeasurandUtil.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                                        valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
                                         grouping: key
                                 )
                         )

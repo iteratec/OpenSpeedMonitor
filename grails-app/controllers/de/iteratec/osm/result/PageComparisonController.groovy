@@ -11,7 +11,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
 
 class PageComparisonController extends ExceptionHandlerController {
 
@@ -29,7 +28,7 @@ class PageComparisonController extends ExceptionHandlerController {
         modelToRender.put("pages", Page.list().collectEntries { [it.id, it.name] })
         modelToRender.put("jobGroups", JobGroup.list().collectEntries { [it.id, it.name] })
 
-        modelToRender.put("aggrGroupValuesUnCached", MeasurandUtil.getAllMeasurandsByMeasurandGroup())
+        modelToRender.put("aggrGroupValuesUnCached", Measurand.values().groupBy { it.measurandGroup })
         modelToRender.put("selectedAggrGroupValuesUnCached", [])
 
         // JavaScript-Utility-Stuff:

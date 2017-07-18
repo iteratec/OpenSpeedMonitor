@@ -12,7 +12,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
+
 import org.springframework.http.HttpStatus
 
 class JobGroupAggregationController extends ExceptionHandlerController {
@@ -34,7 +34,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', MeasurandUtil.getAllMeasurandsByMeasurandGroup())
+        modelToRender.put('aggrGroupValuesUnCached', Measurand.values().groupBy { it.measurandGroup })
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -109,7 +109,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                            value: MeasurandUtil.normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1], currentMeasurand),
+                            value: Measurand.valueOf(currentMeasurand).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
                             grouping: "${datum[0].name}"
                         )
                     )

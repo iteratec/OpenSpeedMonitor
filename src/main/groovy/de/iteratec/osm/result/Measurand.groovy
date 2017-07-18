@@ -46,4 +46,11 @@ enum Measurand{
     String getTagInResultXml(){
         return tagInResultXml
     }
+
+    Double normalizeValue(Double input){
+        if(input){
+            return input/group.getUnit().getDivisor()
+        }
+        return input
+    }
 }

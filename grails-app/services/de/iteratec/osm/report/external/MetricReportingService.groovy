@@ -37,8 +37,6 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
-import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtil
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import org.joda.time.DateTime
@@ -107,7 +105,7 @@ class MetricReportingService {
 
             graphiteServer.graphitePathsRawData.findAll { it.cachedView == result.cachedView }.each {
                 GraphitePathRawData eachPath ->
-                    Double value = MeasurandUtil.getEventResultPropertyForCalculation(eachPath.measurand, result)
+                    Double value = result.getValueFor(eachPath.measurand)
                     if (value != null) {
                         String measurandName = result.cachedView.getGraphiteLabelPrefix()+eachPath.measurand.getGrapthiteLabelSuffix()
 
