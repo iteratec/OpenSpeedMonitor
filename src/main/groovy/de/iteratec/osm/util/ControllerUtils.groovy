@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
-
 /**
  * <p>
  * A collection of Utilities for controller purposes.
@@ -91,8 +90,8 @@ class ControllerUtils {
      * @param httpStatus Status code of the response
      * @param message The message to respond
      */
-    static void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
-        response.setContentType('text/plain;charset=UTF-8')
+    static void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message, String contentType = 'text/plain;charset=UTF-8') {
+        response.setContentType(contentType)
         response.status = httpStatus.value()
 
         try {
@@ -126,7 +125,7 @@ class ControllerUtils {
     static void sendObjectAsJSON(HttpServletResponse response, Object objectToSend, boolean prettyPrint = false) {
         JSON jsonObject = objectToSend as JSON
         jsonObject.setPrettyPrint(prettyPrint)
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonObject.toString())
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonObject.toString(), 'application/json;charset=UTF-8')
     }
 
     /**
