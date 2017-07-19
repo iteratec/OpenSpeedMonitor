@@ -41,21 +41,22 @@ class JobControllerSpec extends Specification {
         given: "a job"
         Job job = Job.build(label: "label", executionSchedule:  "0 0 7-22 * * ? *")
         String newLabel = "new Label"
-        List newTags = ["newTag1", "newTag2"]
+        List newTagNames = ["newTag1", "newTag2"]
         when: "we create a copy of the job"
         bindData(job)
         controller.params.remove('id')
         controller.params["label"] = newLabel
-        controller.params["tags"] = newTags
+        controller.params["tags"] = newTagNames
         controller.save()
         Job copy = Job.get(job.id + 1)
+        List<Tag> tags = findTags(copy)
         then: "there should be a new job, with the new attributes"
         copy
         copy.location == job.location
         copy.label == newLabel
         copy.executionSchedule == job.executionSchedule
         copy.script == job.script
-        findTags(copy).size() == newTags.size()
+        tags*.name.sort() == newTagNames.sort()
     }
 
     def "test that creation of a copy doesn't affect the original"() {
@@ -70,10 +71,10 @@ class JobControllerSpec extends Specification {
         Job.get(job.id) == job
     }
 
-    def "test create without params"(){
+    def "test retrieve job template without params"(){
         when: "a job without params is created"
         def resp = controller.create()
-        then: "the responding job should't have any variables set"
+        then: "the responding template shouldn't have any variables set"
         resp.job
         !resp.job.label
         !resp.job.executionSchedule
@@ -81,7 +82,7 @@ class JobControllerSpec extends Specification {
         !resp.job.location
     }
 
-    def "test create with params"(){
+    def "test retrieve job template with params"(){
         given: "some params for a job"
         String label = "a label"
         params.label = label
@@ -89,7 +90,7 @@ class JobControllerSpec extends Specification {
         params.executionSchedule = executionSchedule
         when: "a job with these params is created"
         def resp = controller.create()
-        then: "the responding job should have all the defined variables"
+        then: "the responding template should have all the defined variables"
         resp.job.label == label
         resp.job.executionSchedule == executionSchedule
         !resp.job.deleted
