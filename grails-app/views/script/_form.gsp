@@ -4,7 +4,7 @@
 		<span class="required-indicator">*</span>
 	</label>
 	<div class="col-md-10">
-		<g:textField name="label" value="${script?.label}" class="form-control" required=""/>
+		<g:textField name="label" value="${script?.label}" class="form-control" required="required"/>
 	</div>
 </div>
 <div class="fieldcontain ${hasErrors(bean: script, field: 'description', 'error')} form-group">
