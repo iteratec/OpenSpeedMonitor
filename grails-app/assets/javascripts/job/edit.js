@@ -67,22 +67,18 @@ function addChangeListenerForTabs() {
     var advancedTab = $('#advancedSettingsTabLink');
 
     var scriptHasError = function () {
-        if ($("#scriptFormGroup").hasClass(errorClass)) {
-            scriptTab.addClass(tabErrorClassName);
-        } else {
-            scriptTab.removeClass(tabErrorClassName)
-        }
+        var scriptFormGroup = $("#scriptFormGroup");
+        scriptTab.toggleClass(tabErrorClassName, scriptFormGroup.hasClass(errorClass));
     };
     var settingsHasError = function () {
-        if ($("#nameFormGroup").hasClass(errorClass) || $("#cronFormGroup").hasClass(errorClass)) {
-            jobTab.addClass(tabErrorClassName);
-        } else {
-            jobTab.removeClass(tabErrorClassName);
-        }
+        var nameFormGroup = $("#nameFormGroup");
+        var cronFormGroup = $("#cronFormGroup");
+        var shouldToggleClass = nameFormGroup.hasClass(errorClass) || cronFormGroup.hasClass(errorClass);
+        jobTab.toggleClass(tabErrorClassName, shouldToggleClass);
     };
 
     var removeOwnHighlighting = function (e) {
-        $(e.currentTarget).removeClass("tab-has-error");
+        $(e.currentTarget).removeClass(tabErrorClassName);
     };
 
     jobTab.on('click', scriptHasError);
@@ -92,6 +88,7 @@ function addChangeListenerForTabs() {
     advancedTab.on('click', scriptHasError);
     advancedTab.on('click', settingsHasError);
 }
+
 
 function initializeSelects() {
     var chosenOptions = {
