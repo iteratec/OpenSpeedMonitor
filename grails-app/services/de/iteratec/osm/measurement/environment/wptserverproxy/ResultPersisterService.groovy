@@ -31,6 +31,7 @@ import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
+import grails.util.CollectionUtils
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
 import org.springframework.transaction.annotation.Propagation
@@ -380,6 +381,7 @@ class ResultPersisterService implements iResultListener {
         result.testAgent = jobRun.testAgent
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
+        setAllUserTimings(viewTag, result)
 
         jobRun.merge(failOnError: true)
         result.save(failOnError: true)
@@ -445,6 +447,35 @@ class ResultPersisterService implements iResultListener {
         return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
     }
 
+    private void setAllUserTimings(GPathResult viewTag, EventResult result){
+        List<UserTiming> allUserTimings = []
+        allUserTimings.addAll(createAllMarks(viewTag, result))
+        allUserTimings.addAll(createAllMeasures(viewTag, result))
+        result.userTimings = allUserTimings
+    }
+
+    private List<UserTiming> createAllMarks(GPathResult viewTag, EventResult result){
+        return viewTag.getProperty(UserTimingType.MARK.tagInResultXml).children().collect{GPathResult valueTag ->
+            new UserTiming(
+                    name: valueTag[0].name.toString(),
+                    startTime: Double.parseDouble(valueTag.toString()),
+                    type: UserTimingType.MARK,
+                    eventResult: result
+            )
+        }
+    }
+
+    private List<UserTiming> createAllMeasures(GPathResult viewTag, EventResult result){
+        return viewTag.getProperty(UserTimingType.MEASURE.tagInResultXml).value.collect{GPathResult valueTag ->
+            new UserTiming(
+                name: valueTag.(name).toString(),
+                startTime: Double.parseDouble(valueTag.startTime.toString()),
+                duration: Double.parseDouble(valueTag.duration.toString()),
+                type: UserTimingType.MEASURE,
+                eventResult: result
+            )
+        }
+    }
 
     private void setConnectivity(EventResult result, JobResult jobRun) {
         if (jobRun.job.noTrafficShapingAtAll) {
