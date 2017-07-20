@@ -190,8 +190,8 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
         MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page1, name: "measuredEvent").save(failOnError: true)
 
-        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true)
-        TestDataUtil.createUpdateEvent(hpmv.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+        CsiAggregation csiAggregation = new CsiAggregation(interval: hourlyInterval, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        TestDataUtil.createUpdateEvent(csiAggregation.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         assertEquals(0, mvs.size())

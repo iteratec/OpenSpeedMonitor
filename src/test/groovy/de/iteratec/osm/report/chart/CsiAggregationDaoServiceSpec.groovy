@@ -36,7 +36,6 @@ class CsiAggregationDaoServiceSpec extends Specification {
 
     CsiAggregationDaoService serviceUnderTest
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
-    AggregationType pageAggregator, jobgroupAggregator, eventAggregator
 
     def doWithSpring = {
         csiAggregationUtilService(CsiAggregationUtilService)
@@ -50,9 +49,6 @@ class CsiAggregationDaoServiceSpec extends Specification {
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
         hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
-        pageAggregator = AggregationType.PAGE
-        jobgroupAggregator = AggregationType.JOB_GROUP
-        eventAggregator = AggregationType.MEASURED_EVENT
     }
 
     def "test getUpdateEvents"() {
@@ -82,14 +78,14 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
 
-        def mvWithFiveEvents = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
+        def mvWithFiveEvents = createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140928)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, true, false)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
-        def mvWithoutEvents = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
-        def mvWithOneEvent = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        def mvWithoutEvents = createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140929)
+        def mvWithOneEvent = createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140930)
         createUpdateEventForCsiAggregation(mvWithOneEvent, false, false)
 
         expect:
@@ -102,7 +98,7 @@ class CsiAggregationDaoServiceSpec extends Specification {
     def "test getUpdateEvents with an empty list"(){
         given: "some data that hopefully won't change our result"
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
-        def mvWithFiveEvents = createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
+        def mvWithFiveEvents = createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140928)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, true, false)
         createUpdateEventForCsiAggregation(mvWithFiveEvents, false, false)
 
@@ -115,9 +111,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0800)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0900)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0800)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0900)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_1000)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -132,9 +128,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0800)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0900)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0800)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0900)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_1000)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 28, 9, 15, 0, DateTimeZone.UTC))
 
@@ -166,9 +162,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928_0800 = new DateTime(2014, 9, 28, 8, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_0900 = new DateTime(2014, 9, 28, 9, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140928_1000 = new DateTime(2014, 9, 28, 10, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0800)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_0900)
-        createAndSaveCsiAggregation(hourlyInterval, eventAggregator, false, date_20140928_1000)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0800)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_0900)
+        createAndSaveCsiAggregation(hourlyInterval, AggregationType.MEASURED_EVENT, false, date_20140928_1000)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -184,9 +180,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -202,9 +198,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140930)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
 
@@ -236,9 +232,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, pageAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.PAGE, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -254,9 +250,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140919)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -272,9 +268,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140919)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
 
@@ -306,9 +302,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, pageAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.PAGE, false, date_20140919)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -323,9 +319,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -341,9 +337,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140930)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 29, 5, 1, 0, DateTimeZone.UTC))
 
@@ -375,9 +371,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140928 = new DateTime(2014, 9, 28, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140929 = new DateTime(2014, 9, 29, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140930 = new DateTime(2014, 9, 30, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140928)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140929)
-        createAndSaveCsiAggregation(dailyInterval, jobgroupAggregator, false, date_20140930)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140928)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140929)
+        createAndSaveCsiAggregation(dailyInterval, AggregationType.JOB_GROUP, false, date_20140930)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -392,9 +388,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140919)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 11, 23, 59, 59, DateTimeZone.UTC))
 
@@ -409,9 +405,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140919)
         List<CsiAggregation> openAndExpired
         mockCsiAggregationUtilService(new DateTime(2014, 9, 12, 5, 0, 0, DateTimeZone.UTC))
 
@@ -443,9 +439,9 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140905)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140912)
-        createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140919)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140905)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140912)
+        createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140919)
         List<CsiAggregation> openAndExpired
 
         when:
@@ -460,7 +456,7 @@ class CsiAggregationDaoServiceSpec extends Specification {
         Date date_20140905 = new DateTime(2014, 9, 5, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140912 = new DateTime(2014, 9, 12, 0, 0, 0, DateTimeZone.UTC).toDate()
         Date date_20140919 = new DateTime(2014, 9, 19, 0, 0, 0, DateTimeZone.UTC).toDate()
-        CsiAggregation csiAggregation = createAndSaveCsiAggregation(weeklyInterval, jobgroupAggregator, false, date_20140905)
+        CsiAggregation csiAggregation = createAndSaveCsiAggregation(weeklyInterval, AggregationType.JOB_GROUP, false, date_20140905)
         new CsiAggregationUpdateEvent( dateOfUpdate: date_20140905,
                 csiAggregationId: csiAggregation.id,
                 updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED

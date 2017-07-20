@@ -29,12 +29,12 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "already calculated daily page mvs get closed"() {
+    void "already calculated daily page csi aggregations get closed"() {
         setup:
         Serializable idDailyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
-            idDailyPageMvInitiallyOpenAndCalculated = mvDailyPageCalculated.ident()
+            CsiAggregation csiAggregationDailyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
+            idDailyPageMvInitiallyOpenAndCalculated = csiAggregationDailyPageCalculated.ident()
             TestDataUtil.createUpdateEvent(idDailyPageMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
@@ -53,7 +53,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "outdated daily page mvs get calculated and closed"() {
+    void "outdated daily page csi aggregations get calculated and closed"() {
         setup:
         Serializable idDailyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
@@ -77,7 +77,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "already calculated weekly page mvs get closed"() {
+    void "already calculated weekly page csi aggregations get closed"() {
         setup:
         Serializable idWeeklyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
@@ -101,7 +101,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "outdated weekly page mvs get calculated and closed"() {
+    void "outdated weekly page csi aggregations get calculated and closed"() {
         setup:
         Serializable idWeeklyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
@@ -125,7 +125,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "already calculated daily shop mvs get closed"() {
+    void "already calculated daily shop csi aggregations get closed"() {
         setup:
         Serializable idDailyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
@@ -149,7 +149,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "outdated daily shop mvs get calculated and closed"() {
+    void "outdated daily shop csi aggregations get calculated and closed"() {
         setup:
         Serializable idDailyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
@@ -173,7 +173,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "already calculated weekly shop mvs get closed"() {
+    void "already calculated weekly shop csi aggregations get closed"() {
         setup:
         Serializable idWeeklyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
@@ -197,7 +197,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
     }
 
 
-    void "outdated weekly shop mvs get calculated and closed"() {
+    void "outdated weekly shop csi aggregations get calculated and closed"() {
         setup:
         Serializable idWeeklyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
