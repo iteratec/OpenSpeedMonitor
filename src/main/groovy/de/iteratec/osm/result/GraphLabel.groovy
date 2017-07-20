@@ -17,7 +17,7 @@ class GraphLabel  implements Comparable<GraphLabel> {
     String connectivity, tag
 
     GraphLabel(EventResult eventResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
-        this.connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName
+        this.connectivity = getConnectivityName(eventResult)
         this.millisStartOfInterval = millisStartOfInterval
         this.selectedMeasurand = selectedMeasurand
         this.jobGroupId = eventResult.jobGroupId
@@ -52,6 +52,16 @@ class GraphLabel  implements Comparable<GraphLabel> {
             if(property != "millisStartOfInterval" && value == null){
                 throw new IllegalArgumentException("Validation failed: ${property} is null.")
             }
+        }
+    }
+
+    private static getConnectivityName(EventResult eventResult) {
+        if (eventResult.connectivityProfile) {
+            return eventResult.connectivityProfile.name
+        } else if (eventResult.customConnectivityName) {
+            return eventResult.customConnectivityName
+        } else {
+            return "native"
         }
     }
 
