@@ -122,10 +122,9 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
                         sort: columnToSortBy,
                         order: sortingDirection,
                     },
-                    success: function (content) {
-                        var jsonResponse = JSON.parse(content);
+                    success: function (jsonResponse) {
                         $("#elementTable").html(jsonResponse.table);
-                        createPagination(jsonResponse.count)
+                        createPagination(jsonResponse.count);
                         $('#elementFilter').focus();
                         updateInProgress = false;
                         if (updateRequired) {
