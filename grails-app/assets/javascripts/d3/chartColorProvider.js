@@ -42,7 +42,9 @@ OpenSpeedMonitor.ChartColorProvider = function() {
 
         measurandGroupColorCombination = {
             "ms": loadingTimeColors,
+            "s": loadingTimeColors,
             "#": countOfRequestColors,
+            "KB": sizeOfRequestColors,
             "MB": sizeOfRequestColors,
             "%": csiColors,
             "": speedIndexColors

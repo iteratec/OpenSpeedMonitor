@@ -126,7 +126,7 @@ class RickshawHtmlCreater {
     def generateDataPoints = { OsmChartGraph graph ->
 
         def sw = new StringWriter()
-        def measurandGroup = graph.measurandGroup.toString();
+        //def measurandGroup = graph.measurandGroup.toString();
         def prefix = ""
         String testingAgent
 
@@ -135,11 +135,6 @@ class RickshawHtmlCreater {
 
             def url = "undefined"
             def csiAggregation = eachPoint.csiAggregation
-
-            if (measurandGroup == "REQUEST_SIZES") {
-                csiAggregation = csiAggregation / 1000;
-            }
-
             if (eachPoint.sourceURL != null) {
                 url = eachPoint.sourceURL.toString();
             }

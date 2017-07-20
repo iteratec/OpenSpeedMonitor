@@ -17,21 +17,20 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.external.GraphitePath
+import de.iteratec.osm.report.external.GraphitePathRawData
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-@TestFor(GraphitePath)
-@Mock([GraphitePath, AggregatorType])
-@Build([GraphitePath, AggregatorType])
-class GraphitePathSpec extends Specification {
+@TestFor(GraphitePathRawData)
+@Mock([GraphitePathRawData])
+@Build([GraphitePathRawData])
+class GraphitePathRawDataSpec extends Specification {
 
     void "alphanumerical prefixes with trailing dot are valid"(String prefix) {
         given: "a valid built GraphitePath"
-        GraphitePath path = GraphitePath.build()
+        GraphitePathRawData path = GraphitePathRawData.build()
 
         when: "an invalid prefix is set"
         path.prefix = prefix
@@ -49,7 +48,7 @@ class GraphitePathSpec extends Specification {
 
     void "prefixes which are not alphanumerical or without trailing dot are invalid"(String prefix) {
         given: "a valid built GraphitePath"
-        GraphitePath path = GraphitePath.build()
+        GraphitePathRawData path = GraphitePathRawData.build()
 
         when: "an invalid prefix is set"
         path.prefix = prefix

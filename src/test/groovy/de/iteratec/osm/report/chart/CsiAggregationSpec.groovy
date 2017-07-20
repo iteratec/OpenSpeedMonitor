@@ -28,32 +28,24 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Test
 import spock.lang.Specification
 
 import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause.OUTDATED
-import static org.hamcrest.Matchers.is
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertThat
 
 /**
  * Test-suite for {@link CsiAggregation}.
  */
 @TestMixin(GrailsUnitTestMixin)
-@Mock([CsiAggregation, AggregatorType, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page, Browser, Location])
+@Mock([CsiAggregation, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page, Browser, Location])
 @Build([CsiAggregation, JobGroup])
 class CsiAggregationSpec extends Specification{
 
     Date dateOfMv1
     Date dateOfMv2
-    AggregatorType measuredEventAggregator, pageAggregator, shopAggregator
     CsiAggregationInterval hourly, daily, weekly
 
     void setup() {
-        measuredEventAggregator = new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        pageAggregator = new AggregatorType( name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        shopAggregator =  new AggregatorType( name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         hourly = new CsiAggregationInterval( name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY ).save(failOnError: true)
         daily = new CsiAggregationInterval( name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY ).save(failOnError: true)
         weekly = new CsiAggregationInterval( name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY ).save(failOnError: true)
@@ -61,8 +53,8 @@ class CsiAggregationSpec extends Specification{
         dateOfMv1 = new DateTime(2012, 1, 1, 0, 0, DateTimeZone.UTC).toDate()
         dateOfMv2 = new DateTime(2012, 1, 2, 0, 0, DateTimeZone.UTC).toDate()
 
-        CsiAggregation.build(started: dateOfMv1, interval: hourly, aggregator: measuredEventAggregator, underlyingEventResultsByWptDocComplete: '')
-        CsiAggregation.build(started: dateOfMv2, interval: hourly, aggregator: measuredEventAggregator, underlyingEventResultsByWptDocComplete: '1,2')
+        CsiAggregation.build(started: dateOfMv1, interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, underlyingEventResultsByWptDocComplete: '')
+        CsiAggregation.build(started: dateOfMv2, interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, underlyingEventResultsByWptDocComplete: '1,2')
     }
 
 
@@ -70,7 +62,6 @@ class CsiAggregationSpec extends Specification{
         given:
         CsiAggregation mvInitialWithoutResultids = CsiAggregation.findByStarted(dateOfMv1)
         JobGroup.build()
-        println JobGroup.count()
 
         expect:
         mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete() == 0

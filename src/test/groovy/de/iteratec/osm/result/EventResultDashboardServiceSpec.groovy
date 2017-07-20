@@ -33,8 +33,8 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 
 @TestFor(EventResultDashboardService)
-@Mock([EventResult, AggregatorType, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
-@Build([EventResult, AggregatorType, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
+@Mock([EventResult, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
+@Build([EventResult, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
 class EventResultDashboardServiceSpec extends Specification {
 
     Browser browser
@@ -47,7 +47,6 @@ class EventResultDashboardServiceSpec extends Specification {
     DateTime runDate
 
     def doWithSpring = {
-        resultCsiAggregationService(ResultCsiAggregationService)
         osmChartProcessingService(OsmChartProcessingService)
         performanceLoggingService(PerformanceLoggingService)
         csiAggregationUtilService(CsiAggregationUtilService)
@@ -62,7 +61,7 @@ class EventResultDashboardServiceSpec extends Specification {
         mockGrailsLinkGenerator()
     }
 
-    void "get event result dashboard chart map"(List aggregatorTypeNames, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues) {
+    void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues) {
         given: "two event results with attribute uncached and cached respectively"
         List<EventResult> eventResults = createEventResults(2)
         eventResults[0].domTimeInMillisecs = 2000
@@ -77,9 +76,9 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<AggregatorType> aggregatorTypes = []
-        aggregatorTypeNames.each { name ->
-            aggregatorTypes.push(AggregatorType.build(name: name, measurandGroup: MeasurandGroup.LOAD_TIMES))
+        List<SelectedMeasurand> aggregatorTypes = []
+        cached.each {
+            aggregatorTypes.push(new SelectedMeasurand(measurand: Measurand.DOM_TIME, cachedView: it))
         }
         ErQueryParams queryParams = createEventResultQueryParams()
 
@@ -93,13 +92,13 @@ class EventResultDashboardServiceSpec extends Specification {
         }
 
         where:
-        aggregatorTypeNames                                                              | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues
-        [AggregatorType.RESULT_CACHED_DOM_TIME]                                          | CsiAggregationInterval.RAW    | 1                      | [2000]
-        [AggregatorType.RESULT_CACHED_DOM_TIME]                                          | CsiAggregationInterval.HOURLY | 1                      | [2000]
-        [AggregatorType.RESULT_UNCACHED_DOM_TIME]                                        | CsiAggregationInterval.RAW    | 1                      | [3000]
-        [AggregatorType.RESULT_UNCACHED_DOM_TIME]                                        | CsiAggregationInterval.HOURLY | 1                      | [3000]
-        [AggregatorType.RESULT_CACHED_DOM_TIME, AggregatorType.RESULT_UNCACHED_DOM_TIME] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]
-        [AggregatorType.RESULT_CACHED_DOM_TIME, AggregatorType.RESULT_UNCACHED_DOM_TIME] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]
+        cached                                   | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]
     }
 
     void "get event result dashboard chart map with trimmed values"(int csiAggregationInterval, int expectedNumberOfPoints, int expectedValue) {
@@ -117,12 +116,12 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created and we trim the data below and above some given values"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<AggregatorType> aggregatorTypes = [AggregatorType.build(name: AggregatorType.RESULT_CACHED_DOM_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)]
+        List<SelectedMeasurand> measurands = [ new SelectedMeasurand(measurand:  Measurand.DOM_TIME, cachedView: CachedView.CACHED)]
         ErQueryParams queryParams = createEventResultQueryParams()
         queryParams.minLoadTimeInMillisecs = 3000
         queryParams.maxLoadTimeInMillisecs = 7000
 
-        OsmRickshawChart chart = service.getEventResultDashboardHighchartGraphs(startTime, endTime, csiAggregationInterval, aggregatorTypes, queryParams)
+        OsmRickshawChart chart = service.getEventResultDashboardHighchartGraphs(startTime, endTime, csiAggregationInterval, measurands, queryParams)
 
         then: "we only get the event results within the given range"
         chart.osmChartGraphs.size() == 1

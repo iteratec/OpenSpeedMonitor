@@ -27,7 +27,7 @@ import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.csi.EventCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -46,15 +46,11 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Assert
 import org.junit.Test
 import spock.lang.Specification
 
-import static de.iteratec.osm.report.chart.AggregatorType.MEASURED_EVENT
-import static de.iteratec.osm.report.chart.AggregatorType.PAGE
-import static de.iteratec.osm.report.chart.AggregatorType.SHOP
 import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
-import static de.iteratec.osm.report.chart.MeasurandGroup.NO_MEASURAND
+
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
@@ -89,7 +85,7 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         configService(ConfigService)
         eventCsiAggregationService(EventCsiAggregationService)
         pageCsiAggregationService(PageCsiAggregationService)
-        shopCsiAggregationService(ShopCsiAggregationService)
+        shopCsiAggregationService(JobGroupCsiAggregationService)
     }
 
     void setup() {
@@ -107,15 +103,14 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     void "writing hourly CsiAggregations to Graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: HOURLY).save()
-        AggregatorType event = new AggregatorType(name: MEASURED_EVENT, measurandGroup: NO_MEASURAND)
 
-        CsiAggregation firstHmv = getCsiAggregation(interval, event, firstHourlyValueToSend, hourlyDateExpectedToBeSent, '1,2,3')
-        CsiAggregation secondHmv = getCsiAggregation(interval, event, secondHourlyValueToSend, hourlyDateExpectedToBeSent, '4,5,6')
+        CsiAggregation firstHmv = getCsiAggregation(interval, AggregationType.MEASURED_EVENT, firstHourlyValueToSend, hourlyDateExpectedToBeSent, '1,2,3')
+        CsiAggregation secondHmv = getCsiAggregation(interval, AggregationType.MEASURED_EVENT, secondHourlyValueToSend, hourlyDateExpectedToBeSent, '4,5,6')
 
         //mocking
         mockEventCsiAggregationService([firstHmv, secondHmv])
         mockPageCsiAggregationService([], HOURLY)
-        mockShopCsiAggregationService([], HOURLY)
+        mockJobGroupCsiAggregationService([], HOURLY)
 
         when: "we report the CSI value of the last hour"
         DateTime cronjobStartsAt = hourlyDateExpectedToBeSent.plusMinutes(20)
@@ -149,15 +144,14 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     void "writing daily PageCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: DAILY).save()
-        AggregatorType aggregator = new AggregatorType(name: PAGE, measurandGroup: NO_MEASURAND)
 
-        CsiAggregation firstDpmv = getCsiAggregation(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
-        CsiAggregation secondDpmv = getCsiAggregation(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
+        CsiAggregation firstDpmv = getCsiAggregation(interval, AggregationType.PAGE, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
+        CsiAggregation secondDpmv = getCsiAggregation(interval, AggregationType.PAGE, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
 
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([firstDpmv, secondDpmv], DAILY)
-        mockShopCsiAggregationService([], DAILY)
+        mockJobGroupCsiAggregationService([], DAILY)
 
         when: "we report PageCSIValue of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
@@ -187,15 +181,14 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     void "writing daily ShopCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: DAILY).save()
-        AggregatorType aggregator = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
-        CsiAggregation firstDsmv = getCsiAggregation(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
-        CsiAggregation secondDsmv = getCsiAggregation(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
+        CsiAggregation firstDsmv = getCsiAggregation(interval, AggregationType.JOB_GROUP, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
+        CsiAggregation secondDsmv = getCsiAggregation(interval, AggregationType.JOB_GROUP, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
 
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([], DAILY)
-        mockShopCsiAggregationService([firstDsmv, secondDsmv], DAILY)
+        mockJobGroupCsiAggregationService([firstDsmv, secondDsmv], DAILY)
 
         when: "we report ShopCSIValues of the last hour"
         DateTime cronjobStartsAt = dailyDateExpectedToBeSent.plusMinutes(20)
@@ -224,15 +217,14 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     void "writing weekly PageCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: WEEKLY).save()
-        AggregatorType aggregator = new AggregatorType(name: PAGE,measurandGroup: NO_MEASURAND)
 
-        CsiAggregation firstWpmv = getCsiAggregation(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
-        CsiAggregation secondWpmv = getCsiAggregation(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
+        CsiAggregation firstWpmv = getCsiAggregation(interval, AggregationType.PAGE, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
+        CsiAggregation secondWpmv = getCsiAggregation(interval, AggregationType.PAGE, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
 
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([firstWpmv, secondWpmv], WEEKLY)
-        mockShopCsiAggregationService([], WEEKLY)
+        mockJobGroupCsiAggregationService([], WEEKLY)
 
         when: "we report PageCSIValues of the last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
@@ -262,15 +254,14 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     void "writing WeeklyShopCsiCsiAggregations to graphite"() {
         given:
         CsiAggregationInterval interval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes:WEEKLY).save()
-        AggregatorType aggregator = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
-        CsiAggregation firstWsmv = getCsiAggregation(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
-        CsiAggregation secondWsmv = getCsiAggregation(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
+        CsiAggregation firstWsmv = getCsiAggregation(interval, AggregationType.JOB_GROUP, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
+        CsiAggregation secondWsmv = getCsiAggregation(interval, AggregationType.JOB_GROUP, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
 
         //mocking
         mockEventCsiAggregationService([])
         mockPageCsiAggregationService([], WEEKLY)
-        mockShopCsiAggregationService([firstWsmv, secondWsmv], WEEKLY)
+        mockJobGroupCsiAggregationService([firstWsmv, secondWsmv], WEEKLY)
 
         when: "we report ShopCSIValues of last week"
         DateTime cronjobStartsAt = weeklyDateExpectedToBeSent.plusMinutes(20)
@@ -352,39 +343,36 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     }
 
     /**
-     * Mocks {@linkplain ShopCsiAggregationService#getOrCalculateShopCsiAggregations}.
+     * Mocks {@linkplain JobGroupCsiAggregationService#getOrCalculateShopCsiAggregations}.
      */
-    private void mockShopCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
-        def shopCsiAggregationService = Stub(ShopCsiAggregationService)
-        shopCsiAggregationService.getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval,_ as List) >> {
+    private void mockJobGroupCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
+        def jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService)
+        jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(_ as Date, _ as Date, _ as CsiAggregationInterval,_ as List) >> {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 return interval.intervalInMinutes != expectedIntervalInMinutes? [] : toReturnOnDemandForGetOrCalculateCsiAggregations
         }
-        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService
+        serviceUnderTest.jobGroupCsiAggregationService = jobGroupCsiAggregationService
     }
 
     //test data common to all tests///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     static Collection<GraphiteServer> getGraphiteServers() {
-        AggregatorType event = new AggregatorType(name: MEASURED_EVENT, measurandGroup: NO_MEASURAND)
-        AggregatorType page = new AggregatorType(name: PAGE, measurandGroup: NO_MEASURAND)
-        AggregatorType shop = new AggregatorType(name: SHOP, measurandGroup: NO_MEASURAND)
 
-        GraphitePath pathEvent = new GraphitePath(prefix: pathPrefix, measurand: event)
-        GraphitePath pathPage = new GraphitePath(prefix: pathPrefix, measurand: page)
-        GraphitePath pathShop = new GraphitePath(prefix: pathPrefix, measurand: shop)
+        GraphitePathCsiData pathEvent = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.MEASURED_EVENT)
+        GraphitePathCsiData pathPage = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.PAGE)
+        GraphitePathCsiData pathShop = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.JOB_GROUP)
 
-        GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePaths: [pathEvent,pathPage,pathShop],
+        GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
                 reportCsiAggregationsToGraphiteServer: true)
 
         return [serverWithPaths]
     }
 
-    static getCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, Double value, DateTime valueForStated, String resultIds) {
+    static getCsiAggregation(CsiAggregationInterval interval, AggregationType aggregationType, Double value, DateTime valueForStated, String resultIds) {
         return CsiAggregation.buildWithoutSave(
             started: valueForStated.toDate(),
             interval: interval,
-            aggregator: aggregator,
+            aggregationType: aggregationType,
             csByWptDocCompleteInPercent: value,
             underlyingEventResultsByWptDocComplete: resultIds,
             page: Page.buildWithoutSave(name: pageName),

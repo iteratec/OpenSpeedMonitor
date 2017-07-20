@@ -2,7 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -17,14 +16,13 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class DistributionChartController extends ExceptionHandlerController {
-    public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
@@ -34,9 +32,7 @@ class DistributionChartController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    FilteringAndSortingDataService filteringAndSortingDataService
     PerformanceLoggingService performanceLoggingService
-    MeasurandUtilService measurandUtilService
     OsmConfigCacheService osmConfigCacheService
 
     def index() {
@@ -55,7 +51,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put('pages', pages)
 
         // Measurands
-        modelToRender.put('measurandsUncached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
+        modelToRender.put('measurandsUncached', Measurand.values().groupBy { it.measurandGroup })
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
@@ -81,7 +77,7 @@ class DistributionChartController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        def selectedMeasurand = cmd.selectedMeasurand.replace("Uncached", "")
+        Measurand selectedMeasurand = Measurand.valueOf(cmd.selectedMeasurand)
 
         List allEventResults = performanceLoggingService.logExecutionTime(DEBUG, "select EventResults for DistributionChart", 1) {
             EventResult.createCriteria().list {
@@ -117,13 +113,13 @@ class DistributionChartController extends ExceptionHandlerController {
                 def newTrace = distributionChartDTO.series.get(identifier)
                 newTrace.jobGroup = jobGroup
                 newTrace.page = page
-                newTrace.data.add(result[selectedMeasurand])
+                newTrace.data.add(selectedMeasurand.normalizeValue(result[selectedMeasurand.eventResultField]))
             }
         }
 
-        distributionChartDTO.dimensionalUnit = measurandUtilService.getDimensionalUnit(selectedMeasurand)
+        distributionChartDTO.dimensionalUnit = selectedMeasurand.measurandGroup.unit.label
 
-        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.isr.measurand.group."+selectedMeasurand.getMeasurandGroup(), "Measurand"))
         distributionChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         distributionChartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 

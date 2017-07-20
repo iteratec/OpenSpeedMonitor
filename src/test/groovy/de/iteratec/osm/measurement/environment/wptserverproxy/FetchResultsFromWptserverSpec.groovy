@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
@@ -52,7 +51,7 @@ import static org.junit.Assert.assertThat
  * get xml result and proof the data registered {@link iResultListener}s get in their called fetchResults() method.
  */
 @TestFor(ProxyService)
-@Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, AggregatorType, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
+@Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
 class FetchResultsFromWptserverSpec extends Specification {
 
     public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
@@ -97,7 +96,6 @@ class FetchResultsFromWptserverSpec extends Specification {
 
     void createTestDataCommonToAllTests() {
         TestDataUtil.createOsmConfig()
-        TestDataUtil.createAggregatorTypes()
         TestDataUtil.createCsiAggregationIntervals()
         WebPageTestServer wptserverMultistep = TestDataUtil.createWebPageTestServer(WPTSERVER_MULTISTEP_URL, WPTSERVER_MULTISTEP_URL, true, "http://${WPTSERVER_MULTISTEP_URL}/")
         WebPageTestServer wptserverSinglestep = TestDataUtil.createWebPageTestServer(WPTSERVER_SINGLESTEP_URL, WPTSERVER_SINGLESTEP_URL, true, "http://${WPTSERVER_SINGLESTEP_URL}/")

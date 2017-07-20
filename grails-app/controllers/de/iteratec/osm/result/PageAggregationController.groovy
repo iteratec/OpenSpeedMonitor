@@ -6,7 +6,6 @@ import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
-import de.iteratec.osm.chartUtilities.FilteringAndSortingDataService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
@@ -18,12 +17,10 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
+
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
-    public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
@@ -33,8 +30,6 @@ class PageAggregationController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    MeasurandUtilService measurandUtilService
-    FilteringAndSortingDataService filteringAndSortingDataService
     OsmConfigCacheService osmConfigCacheService
 
 
@@ -46,7 +41,7 @@ class PageAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
+        modelToRender.put('aggrGroupValuesUnCached', Measurand.values().groupBy { it.measurandGroup })
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -89,7 +84,8 @@ class PageAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
+        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
+        List<String> measurandFieldName = allMeasurands.collect {(it as Measurand).eventResultField}
 
         List eventResultAverages = EventResult.createCriteria().list {
             'in'('page', allPages)
@@ -103,7 +99,7 @@ class PageAggregationController extends ExceptionHandlerController {
             projections {
                 groupProperty('page')
                 groupProperty('jobGroup')
-                allMeasurands.each { m ->
+                measurandFieldName.each { m ->
                     avg(m)
                 }
             }
@@ -118,7 +114,7 @@ class PageAggregationController extends ExceptionHandlerController {
                 projections {
                     groupProperty('page')
                     groupProperty('jobGroup')
-                    allMeasurands.each { m ->
+                    measurandFieldName.each { m ->
                         avg(m)
                     }
                 }
@@ -143,21 +139,21 @@ class PageAggregationController extends ExceptionHandlerController {
 
         allSeries.each { series ->
             BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: measurandUtilService.getDimensionalUnit(series.measurands[0]),
-                    yAxisLabel: measurandUtilService.getAxisLabel(series.measurands[0]),
+                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
                     stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
-                    def measurandIndex = allMeasurands.indexOf(currentMeasurand.replace("Uncached", ""))
+                    def measurandIndex = allMeasurands.indexOf(currentMeasurand)
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    def value = measurandUtilService.normalizeValue(datum[measurandIndex + 2], currentMeasurand)
+                    def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
                     if (value) {
                         barchartSeries.data.add(
                                 new BarchartDatum(
-                                        measurand: measurandUtilService.getI18nMeasurand(currentMeasurand),
+                                        measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
                                         originalMeasurandName: currentMeasurand,
                                         value: value,
-                                        valueComparative: measurandUtilService.normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex), currentMeasurand),
+                                        valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
                                         grouping: key
                                 )
                         )

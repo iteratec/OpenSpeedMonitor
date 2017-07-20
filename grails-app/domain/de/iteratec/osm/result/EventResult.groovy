@@ -25,39 +25,6 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 
-/**
- * The cache-setting a {@link EventResult result} is based on.
- *
- * @author nkuhn
- */
-public enum CachedView {
-    /**
-     * A WPT repeated view result; could have used some data out of the
-     * browsers cache.
-     */
-    CACHED,
-
-    /**
-     * A WPT first view result; the browsers cache have been cleared before,
-     * all date was loaded from the web-server.
-     */
-    UNCACHED;
-
-    static transients = ['cached'];
-
-    /**
-     * <p>
-     * Determines weather this cached-view-state is a cached state (repeated
-     * view) or an un-cached state (first view).
-     * </p>
-     *
-     * @return <code>true</code> if this is a cached state,
-     *         <code>false</code> else.
-     */
-    public boolean isCached() {
-        return this == CACHED;
-    }
-}
 
 /**
  * <p>
@@ -80,13 +47,6 @@ public enum CachedView {
 class EventResult implements CsiValue {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-    /**
-     * This is value is to be used for {@link #speedIndex} if no value is
-     * available.
-     *
-     * @since IT-223
-     */
-    public static final Integer SPEED_INDEX_DEFAULT_VALUE = -1;
 
     OsmConfigCacheService osmConfigCacheService
 
@@ -118,6 +78,13 @@ class EventResult implements CsiValue {
     Integer startRenderInMillisecs
     Double csByWptDocCompleteInPercent
     Double csByWptVisuallyCompleteInPercent
+
+    Integer consistentlyInteractiveInMillisecs
+    Integer firstInteractiveInMillisecs
+    Integer visuallyComplete85InMillisecs
+    Integer visuallyComplete90InMillisecs
+    Integer visuallyComplete95InMillisecs
+    Integer visuallyComplete99InMillisecs
     /**
      * The WPT speed index received from WPT server.
      *
@@ -187,6 +154,14 @@ class EventResult implements CsiValue {
         csByWptVisuallyCompleteInPercent(nullable: true)
         speedIndex(nullable: true)
         visuallyCompleteInMillisecs(nullable: true)
+
+        consistentlyInteractiveInMillisecs(nullable: true)
+        firstInteractiveInMillisecs(nullable: true)
+
+        visuallyComplete85InMillisecs(nullable: true)
+        visuallyComplete90InMillisecs(nullable: true)
+        visuallyComplete95InMillisecs(nullable: true)
+        visuallyComplete99InMillisecs(nullable: true)
 
         downloadAttempts(nullable: true)
         firstStatusUpdate(nullable: true)
@@ -344,4 +319,11 @@ class EventResult implements CsiValue {
                 "\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n"
     }
 
+    Double getValueFor(Measurand measurand){
+        return this."$measurand.eventResultField" != null ? Double.valueOf(this."$measurand.eventResultField") : null
+    }
+
+    Double getNormalizedValueFor(Measurand measurand){
+        return measurand.normalizeValue(getValueFor(measurand))
+    }
 }

@@ -21,7 +21,7 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
@@ -39,7 +39,7 @@ class CsiAggregationUpdateEventCleanupService {
     public static final int BATCH_SIZE = 500
     CsiAggregationDaoService csiAggregationDaoService
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
     CsiSystemCsiAggregationService csiSystemCsiAggregationService
@@ -131,16 +131,16 @@ class CsiAggregationUpdateEventCleanupService {
 
             List<CsiAggregation> toClose
 
-            switch (csiAggregation.aggregator.name) {
-                case AggregatorType.PAGE:
+            switch (csiAggregation.aggregationType) {
+                case AggregationType.PAGE:
                     toClose = pageCsiAggregationService.calcCsiAggregations([csiAggregation.id])
                     break
 
-                case AggregatorType.SHOP:
-                    toClose = shopCsiAggregationService.calcCsiAggregations([csiAggregation.id])
+                case AggregationType.JOB_GROUP:
+                    toClose = jobGroupCsiAggregationService.calcCsiAggregations([csiAggregation.id])
                     break
 
-                case AggregatorType.CSI_SYSTEM:
+                case AggregationType.CSI_SYSTEM:
                     toClose = csiSystemCsiAggregationService.calcCsiAggregations([csiAggregation.id])
                     break
             }

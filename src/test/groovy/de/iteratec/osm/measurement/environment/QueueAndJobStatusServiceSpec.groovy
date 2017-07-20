@@ -7,7 +7,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -28,7 +27,7 @@ import spock.lang.Specification
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 
 @TestFor(QueueAndJobStatusService)
-@Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, AggregatorType, CsiAggregationInterval])
+@Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, CsiAggregationInterval])
 class QueueAndJobStatusServiceSpec extends Specification {
 
 //    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/betamaxrties').toURL()).toProperties())
@@ -112,7 +111,6 @@ class QueueAndJobStatusServiceSpec extends Specification {
 
     private void createTestDataCommonForAllTests() {
         TestDataUtil.createOsmConfig()
-        TestDataUtil.createAggregatorTypes()
         TestDataUtil.createCsiAggregationIntervals()
         server1 = TestDataUtil.createWebPageTestServer(WPTSERVER_URL, WPTSERVER_URL, true, "http://${WPTSERVER_URL}/")
         server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")

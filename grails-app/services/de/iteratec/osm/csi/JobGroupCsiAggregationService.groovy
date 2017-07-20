@@ -19,7 +19,6 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
@@ -35,7 +34,7 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-class ShopCsiAggregationService {
+class JobGroupCsiAggregationService {
 
     PageCsiAggregationService pageCsiAggregationService
     MeanCalcService meanCalcService
@@ -60,7 +59,7 @@ class ShopCsiAggregationService {
             return result
         }
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', 1) {
-            result = csiAggregationDaoService.getShopCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
+            result = csiAggregationDaoService.getJobGroupCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
         }
         return result
     }
@@ -139,16 +138,15 @@ class ShopCsiAggregationService {
      */
     private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<JobGroup> jobGroups) {
         List<Long> result = []
-        AggregatorType shopAggregator = AggregatorType.findByName(AggregatorType.SHOP)
 
         jobGroups.each { currentJobGroup ->
             CsiAggregation csiAggregation
-            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroup(startDate.toDate(), interval, shopAggregator, currentJobGroup)
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroup(startDate.toDate(), interval, AggregationType.JOB_GROUP, currentJobGroup)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
-                        aggregator: shopAggregator,
+                        aggregationType: AggregationType.JOB_GROUP,
                         jobGroup: currentJobGroup,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: ''

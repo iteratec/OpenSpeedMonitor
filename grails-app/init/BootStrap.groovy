@@ -32,10 +32,8 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterSer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.HealthReportService
 import de.iteratec.osm.security.Role
@@ -99,7 +97,6 @@ class BootStrap {
 
         initConfig()
         initUserData(createDefaultUsers)
-        initChartData()
         initCsiData()
         initMeasurementInfrastructure()
         initJobScheduling()
@@ -221,46 +218,7 @@ class BootStrap {
         UserRole.findByUser(user) ?: new UserRole(user: user, role: role).save(failOnError: true)
     }
 
-    void initChartData() {
-        log.info "initChartData starts"
 
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-        log.info "initChartData ends"
-    }
-
-    void createAggregatorTypeIfMissing(String aggregatorName, MeasurandGroup groupName) {
-        // Add aggregator Types if missing
-        AggregatorType.findByName(aggregatorName) ?: new AggregatorType([name: aggregatorName, measurandGroup: groupName]).save(failOnError: true)
-    }
 
 
     void initCsiData() {
@@ -280,12 +238,6 @@ class BootStrap {
         }
 
         Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
-
-        createAggregatorTypeIfMissing(AggregatorType.MEASURED_EVENT, MeasurandGroup.NO_MEASURAND)
-        createAggregatorTypeIfMissing(AggregatorType.PAGE, MeasurandGroup.NO_MEASURAND)
-        createAggregatorTypeIfMissing(AggregatorType.PAGE_AND_BROWSER, MeasurandGroup.NO_MEASURAND)
-        createAggregatorTypeIfMissing(AggregatorType.SHOP, MeasurandGroup.NO_MEASURAND)
-        createAggregatorTypeIfMissing(AggregatorType.CSI_SYSTEM, MeasurandGroup.NO_MEASURAND)
 
         CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",

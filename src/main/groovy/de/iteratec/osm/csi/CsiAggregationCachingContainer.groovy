@@ -21,7 +21,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 
 /**
- * For caching elements during expensive calculations in {@link EventCsiAggregationService}, {@link PageCsiAggregationService} or {@link ShopCsiAggregationService}.
+ * For caching elements during expensive calculations in {@link EventCsiAggregationService}, {@link PageCsiAggregationService} or {@link JobGroupCsiAggregationService}.
  * @author nkuhn
  *
  */

@@ -21,7 +21,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
@@ -34,14 +34,13 @@ import org.springframework.test.annotation.Rollback
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     ResultPersisterService resultPersisterService
 
     Map<String, Double> targetValues
     List<Page> pageObjectsToTest
 
     static CsiAggregationInterval weeklyInterval
-    static AggregatorType shopAggregatorType
     static List<JobGroup> csiGroups
     static final List<String> pagesToTest = [
             'HP',
@@ -59,15 +58,14 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
     static final Integer countWeeklyShopMvsToBeCreated = 2
 
     def setupData() {
-        System.out.println('Create some common test-data...');
+        System.out.println('Create some common test-data...')
         TestDataUtil.createOsmConfig()
         TestDataUtil.createCsiAggregationIntervals()
-        TestDataUtil.createAggregatorTypes()
-        System.out.println('Create some common test-data... DONE');
+        System.out.println('Create some common test-data... DONE')
 
-        System.out.println('Loading CSV-data...');
-        TestDataUtil.loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
-        System.out.println('Loading CSV-data... DONE');
+        System.out.println('Loading CSV-data...')
+        TestDataUtil.loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest)
+        System.out.println('Loading CSV-data... DONE')
         csiGroups = [
                 JobGroup.findByName(csiGroup1Name),
                 JobGroup.findByName(csiGroup2Name)
@@ -87,7 +85,6 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
             }
         }
 
-        shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
         weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 
         targetValues = [
@@ -116,7 +113,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         EventResult.withNewSession {
             results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
             CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-            weeklyShopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
+            weeklyShopCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
         }
 
         then:
@@ -125,7 +122,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         CsiAggregation.withNewSession {
             weeklyShopCsiAggregations*.id.each { mvWeeklyShopId ->
                 CsiAggregation mvWeeklyShop = CsiAggregation.get(mvWeeklyShopId)
-                assert shopAggregatorType.name == mvWeeklyShop.aggregator.name
+                assert AggregationType.JOB_GROUP == mvWeeklyShop.aggregationType
                 assert startDate == mvWeeklyShop.started
                 assert weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
                 assert mvWeeklyShop.isCalculated()

@@ -28,6 +28,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
+
 import de.iteratec.osm.util.ParameterBindingUtility
 
 import grails.converters.JSON
@@ -60,7 +61,7 @@ class EventResultDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public static final Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+
 
     public static final String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
@@ -189,7 +190,7 @@ class EventResultDashboardController {
         Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues, "selectedBrowser")
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
 
-        Collection<String> selectedAggrGroupValuesCached = []
+        Collection<Measurand> selectedAggrGroupValuesCached = []
         // String or List<String>
         def valuesCached = dashboardValues.selectedAggrGroupValuesCached
         if (valuesCached) {
@@ -200,7 +201,7 @@ class EventResultDashboardController {
             }
         }
 
-        Collection<String> selectedAggrGroupValuesUnCached = []
+        Collection<Measurand> selectedAggrGroupValuesUnCached = []
         // String or List<String>
         def valuesUnCached = dashboardValues.selectedAggrGroupValuesUnCached
         if (valuesUnCached) {
@@ -244,12 +245,12 @@ class EventResultDashboardController {
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
         if (dashboardValues.selectedTimeFrameInterval) cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()
-        if (dashboardValues.trimAboveRequestSizes) cmd.trimAboveRequestSizes = dashboardValues.trimAboveRequestSizes.toInteger()
-        if (dashboardValues.trimBelowRequestSizes) cmd.trimBelowRequestSizes = dashboardValues.trimBelowRequestSizes.toInteger()
-        if (dashboardValues.trimAboveRequestCounts) cmd.trimAboveRequestCounts = dashboardValues.trimAboveRequestCounts.toInteger()
-        if (dashboardValues.trimBelowRequestCounts) cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts.toInteger()
-        if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
-        if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
+        if (dashboardValues.trimAboveRequestSizes) cmd.trimAboveRequestSizes = dashboardValues.trimAboveRequestSizes
+        if (dashboardValues.trimBelowRequestSizes) cmd.trimBelowRequestSizes = dashboardValues.trimBelowRequestSizes
+        if (dashboardValues.trimAboveRequestCounts) cmd.trimAboveRequestCounts = dashboardValues.trimAboveRequestCounts
+        if (dashboardValues.trimBelowRequestCounts) cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts
+        if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes
+        if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) {
             cmd.chartHeight = dashboardValues.chartHeight == "auto" ? -1 : dashboardValues.chartHeight.toInteger()
@@ -283,28 +284,20 @@ class EventResultDashboardController {
     private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
-        List<String> aggregatorNames = [];
-        aggregatorNames.addAll(cmd.getSelectedAggrGroupValuesCached());
-        aggregatorNames.addAll(cmd.getSelectedAggrGroupValuesUnCached());
+        List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
-        List<AggregatorType> aggregators = getAggregators(aggregatorNames);
-
-        LinkedList<OsmChartAxis> labelToDataMap = new LinkedList<OsmChartAxis>();
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.UNDEFINED",
-                MeasurandGroup.UNDEFINED.toString()), MeasurandGroup.UNDEFINED, "", 1, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.REQUEST_COUNTS",
-                MeasurandGroup.REQUEST_COUNTS.toString()), MeasurandGroup.REQUEST_COUNTS, "c", 1, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.LOAD_TIMES",
-                MeasurandGroup.LOAD_TIMES.toString()), MeasurandGroup.LOAD_TIMES, "s", 1000, OsmChartAxis.LEFT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.REQUEST_SIZES",
-                MeasurandGroup.REQUEST_SIZES.toString()), MeasurandGroup.REQUEST_SIZES, "KB", 1000, OsmChartAxis.RIGHT_CHART_SIDE));
-        labelToDataMap.add(new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES",
-                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.RIGHT_CHART_SIDE));
+        List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
+                new OsmChartAxis(
+                    it.getMeasurand().getMeasurandGroup(),
+                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString())
+                    + " [" + it.getMeasurand().getMeasurandGroup().getUnit().getLabel() + "]",
+                            getAxisSide(it.getMeasurand().getMeasurandGroup()) )
+        }
 
         ErQueryParams queryParams = cmd.createErQueryParams();
 
         OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
-                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams
+                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, allMeasurands, queryParams
         )
         modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
@@ -317,6 +310,14 @@ class EventResultDashboardController {
         modelToRender.put("labelShouldBeEnabled", false);
 
         fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+    }
+
+    private int getAxisSide(MeasurandGroup measurandGroup){
+        if(measurandGroup == MeasurandGroup.LOAD_TIMES){
+            return OsmChartAxis.LEFT_CHART_SIDE
+        }else{
+            return OsmChartAxis.RIGHT_CHART_SIDE
+        }
     }
 
     /**
@@ -356,19 +357,6 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
-    }
-
-    private Collection<AggregatorType> getAggregators(Collection<String> aggregatorNames) {
-
-        Collection<AggregatorType> aggregators = []
-        aggregatorNames.each { String name ->
-            AggregatorType aggregator = AggregatorType.findByName(name);
-            if (aggregator != null) {
-                aggregators.add(aggregator);
-            }
-        }
-
-        return aggregators;
     }
 
     /**
@@ -576,8 +564,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': AGGREGATOR_GROUP_VALUES.get(CachedView.CACHED),
-                'aggrGroupValuesUnCached': AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED),
+                'aggrGroupValuesCached': Measurand.values().groupBy { it.measurandGroup },
+                'aggrGroupValuesUnCached': Measurand.values().groupBy { it.measurandGroup },
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,

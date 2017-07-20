@@ -153,21 +153,21 @@ class ServiceMocker {
 		serviceToMockIn.pageCsiAggregationService = pageCsiAggregationServiceMocked
 	}
 	/**
-	 * Mocks {@link ShopCsiAggregationService}.
+	 * Mocks {@link JobGroupCsiAggregationService}.
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyShopCsiAggregations
-	 * 		List of {@link CsiAggregation}s, the method {@link ShopCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
+	 * 		List of {@link CsiAggregation}s, the method {@link JobGroupCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
 	 */
-	void mockShopCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
-		def shopCsiAggregationServiceMocked = new ShopCsiAggregationService()
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations =  { Date from, Date to ->
+	void mockJobGroupCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
+		def jobGroupCsiAggregationServiceMocked = new JobGroupCsiAggregationService()
+		jobGroupCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations =  { Date from, Date to ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations = { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
+		jobGroupCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations = { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		serviceToMockIn.shopCsiAggregationService = shopCsiAggregationServiceMocked
+		serviceToMockIn.jobGroupCsiAggregationService = jobGroupCsiAggregationServiceMocked
 	}
 	/**
 	 * Mocks methods in {@link CsTargetGraphDaoService}.

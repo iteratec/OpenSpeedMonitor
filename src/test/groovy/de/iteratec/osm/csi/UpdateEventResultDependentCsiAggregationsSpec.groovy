@@ -35,8 +35,8 @@ import de.iteratec.osm.util.PerformanceLoggingService
 
 
 @TestFor(EventCsiAggregationService)
-@Mock([EventResult, AggregatorType, CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult, CsiAggregation])
-@Build([EventResult, AggregatorType, CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult])
+@Mock([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult, CsiAggregation])
+@Build([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult])
 class UpdateEventResultDependentCsiAggregationsSpec extends Specification {
 
     static final DateTime eventResultDateTime = new DateTime(DateTimeZone.UTC)
@@ -49,7 +49,6 @@ class UpdateEventResultDependentCsiAggregationsSpec extends Specification {
     }
 
     def setup() {
-        AggregatorType.build(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND)
         hourlyCsiAggregationInterval = CsiAggregationInterval.build(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY)
 
         mockNonRelevantServices()

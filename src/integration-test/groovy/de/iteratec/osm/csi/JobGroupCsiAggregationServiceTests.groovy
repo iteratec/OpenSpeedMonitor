@@ -22,7 +22,7 @@ import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiValueService
@@ -41,14 +41,12 @@ import static org.junit.Assert.assertTrue
 @Integration
 @Rollback
 @ConfineMetaClassChanges([WeightingService])
-class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
+class JobGroupCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page1
 
-    AggregatorType shopAggregator, pageAggregator
-
-    Browser browser;
+    Browser browser
 
     static final double DELTA = 1e-15
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
@@ -56,16 +54,12 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     String jobGroupName2 = 'myJobGroup2'
     String jobGroupName3 = 'myJobGroup3'
 
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     def setup() {
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
         hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
-
-        TestDataUtil.createAggregatorTypes()
-        shopAggregator = AggregatorType.findByName(AggregatorType.SHOP)
-        pageAggregator = AggregatorType.findByName(AggregatorType.PAGE)
 
         jobGroup1 = TestDataUtil.createJobGroup(jobGroupName1)
         jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
@@ -73,24 +67,24 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
         page1 = new Page(name: "page1", weight: 1).save(failOnError: true)
 
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+        browser = new Browser(name: "Test", weight: 1).save(failOnError: true)
 
         //with existing JobGroup:
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup1, null, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup2, null, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup3, null, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup1, null, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup2, null, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup3, null, null, "", false)
     }
 
     def cleanup() {
         // undo mocked service
-        shopCsiAggregationService.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
+        jobGroupCsiAggregationService.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
     }
 
     void "test findAll"() {
         Integer countMvs = 3
 
         expect:
-        shopCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, JobGroup.list()).size() == countMvs
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, JobGroup.list()).size() == countMvs
     }
 
     void "test findAllByJobGroups"() {
@@ -101,10 +95,10 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         Integer with_group2 = 1
 
         then:
-        shopCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup2, jobGroup3]).size() == with_group1to3
-        shopCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2, jobGroup3]).size() == with_group2to3
-        shopCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup3]).size() == with_group1or3
-        shopCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2]).size() == with_group2
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup2, jobGroup3]).size() == with_group1to3
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2, jobGroup3]).size() == with_group2to3
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup3]).size() == with_group1or3
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2]).size() == with_group2
     }
 
     /**
@@ -122,12 +116,12 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
-        List<CsiAggregation> mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, mvs.size())
 
         when:
-        List<CsiAggregation> calculatedMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then:
         assertEquals(1, calculatedMvs.size())
@@ -160,16 +154,16 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
-        List<CsiAggregation> mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, mvs.size())
 
         when:
-        List<CsiAggregation> calculatedMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then:
         assertEquals(1, calculatedMvs.size())
-        assertEquals(shopAggregator.name, calculatedMvs[0].aggregator.name)
+        assertEquals(AggregationType.JOB_GROUP, calculatedMvs[0].aggregationType)
         assertTrue(calculatedMvs[0].isCalculated())
         assertEquals(
                 (((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights),
@@ -192,12 +186,12 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
         //precondition
 
-        List<CsiAggregation> mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, mvs.size())
 
         when:
-        List<CsiAggregation> calculatedMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = shopCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then:
         assertEquals(1, calculatedMvs.size())
@@ -212,7 +206,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
      */
 
     private void mockCsiValueService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        shopCsiAggregationService.csiValueService = Stub(CsiValueService){
+        jobGroupCsiAggregationService.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> toReturnFromGetWeightedCsiValues
             getWeightedCsiValuesByVisuallyComplete(_, _, _) >> toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }

@@ -156,7 +156,7 @@ describe("GroupedBarchart Creation", function () {
 
     it("should be the right value within the bar", function () {
         drawChartWithOneGroupeAndOnePage();
-        expect($(".bar").text()).toContain("" + parseFloat(554.832).toFixed(0))
+        expect($(".bar").text()).toContain("" + parseFloat(554.823).toFixed(2))
     });
 
     it("should be the right unit for times on the bar", function () {

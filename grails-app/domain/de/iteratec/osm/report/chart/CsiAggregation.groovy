@@ -28,6 +28,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import org.grails.databinding.BindUsing
 
+
 /**
  * <p>
  * Aggregated values to be shown in diagrams.
@@ -64,7 +65,7 @@ class CsiAggregation implements CsiValue {
 
     Date started
     CsiAggregationInterval interval
-    AggregatorType aggregator
+    AggregationType aggregationType
 
     JobGroup jobGroup
     MeasuredEvent measuredEvent
@@ -107,20 +108,20 @@ class CsiAggregation implements CsiValue {
     static constraints = {
         started(nullable: false)
         interval(nullable: false)
-        aggregator(nullable: false)
+        aggregationType(nullable: false)
 
-        // JobGroup can be null if aggregatorType == csiSystem
-        jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || val })
-        // measuredEvent can be null if aggregatorType in (csiSystem, shop, page)
+        // JobGroup can be null if aggregationType == csiSystem
+        jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || val })
+        // measuredEvent can be null if aggregationType in (csiSystem, jobGroup, page)
         measuredEvent(nullable: true, validator: { val, obj ->
-            return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val
+            return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val
         })
-        //page can be null if aggregatorType in (csiSystem, shop)
-        page(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || val })
-        // browser can be null if aggregatorType in (csiSystem, shop, page)
-        browser(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
-        // location can be null if aggregatorType in (csiSystem, shop, page)
-        location(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
+        //page can be null if aggregationType in (csiSystem, jobGroup)
+        page(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || val })
+        // browser can be null if aggregationType in (csiSystem, jobGroup, page)
+        browser(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
+        // location can be null if aggregationType in (csiSystem, jobGroup, page)
+        location(nullable: true, validator: { val, obj -> return (obj.aggregationType == AggregationType.CSI_SYSTEM) || (obj.aggregationType == AggregationType.JOB_GROUP) || (obj.aggregationType == AggregationType.PAGE) || val })
 
         csByWptDocCompleteInPercent(nullable: true)
         csByWptVisuallyCompleteInPercent(nullable: true)
@@ -134,7 +135,7 @@ class CsiAggregation implements CsiValue {
         closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
         started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
         interval(index: 'started_and_iVal_and_aggr_idx')
-        aggregator(index: 'started_and_iVal_and_aggr_idx')
+        aggregationType(index: 'started_and_iVal_and_aggr_idx')
     }
 
     /**
@@ -354,6 +355,6 @@ class CsiAggregation implements CsiValue {
     }
 
     public String toString() {
-        return "${aggregator} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
+        return "${aggregationType.toString()} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
     }
 }

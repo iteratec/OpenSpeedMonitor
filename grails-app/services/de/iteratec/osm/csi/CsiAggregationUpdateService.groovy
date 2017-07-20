@@ -35,7 +35,7 @@ class CsiAggregationUpdateService {
 
 	EventCsiAggregationService eventCsiAggregationService
 	PageCsiAggregationService pageCsiAggregationService
-	ShopCsiAggregationService shopCsiAggregationService
+	JobGroupCsiAggregationService jobGroupCsiAggregationService
 	CsiSystemCsiAggregationService csiSystemCsiAggregationService
 	CsiAggregationUtilService csiAggregationUtilService
 
@@ -78,7 +78,7 @@ class CsiAggregationUpdateService {
 	private void markMvs(DateTime startOfInterval, EventResult newResult, CsiAggregationInterval interval){
 		
 		pageCsiAggregationService.markMvAsOutdated(startOfInterval, newResult, interval)
-		shopCsiAggregationService.markMvAsOutdated(startOfInterval, newResult, interval)
+		jobGroupCsiAggregationService.markMvAsOutdated(startOfInterval, newResult, interval)
 		csiSystemCsiAggregationService.markCaAsOutdated(startOfInterval, newResult, interval)
 
 	}

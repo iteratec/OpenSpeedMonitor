@@ -35,12 +35,11 @@ import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
 @TestFor(CsiSystemCsiAggregationService)
-@Build([CsiAggregation, CsiAggregationInterval, AggregatorType, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration])
-@Mock([CsiAggregation, CsiAggregationInterval, AggregatorType, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
+@Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration])
+@Mock([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
         CsiSystem, JobGroup, CsiAggregationUpdateEvent])
 class CsiSystemCsiAggregationServiceSpec extends Specification {
 
-    AggregatorType csiSystemAggregator
     CsiAggregationInterval dailyInterval
 
     def doWithSpring = {
@@ -50,9 +49,8 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     }
 
     void setup() {
-        csiSystemAggregator = AggregatorType.build(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND)
         dailyInterval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
-        service.shopCsiAggregationService = Stub(ShopCsiAggregationService) {
+        service.jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService) {
             getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.buildWithoutSave()]
         }
     }
@@ -118,7 +116,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
         then: "a new CsiAggregation is calculated, but with no value"
         calculatedMvs.size() == 1
-        calculatedMvs[0].aggregator == csiSystemAggregator
+        calculatedMvs[0].aggregationType == AggregationType.CSI_SYSTEM
         calculatedMvs[0].isCalculated()
         calculatedMvs[0].csByWptDocCompleteInPercent == null
         calculatedMvs[0].underlyingEventResultsByWptDocCompleteAsList.isEmpty()
