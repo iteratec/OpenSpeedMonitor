@@ -468,11 +468,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
@@ -494,11 +494,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         scrollBottom()
@@ -508,7 +508,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        clickFirstViewMeasurand("FULLY_LOADED_INCOMING_BYTES")
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
         clickFirstViewMeasurand("LOAD_TIME")
 
         when: "User wants to see a graph"
@@ -699,11 +699,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
@@ -721,11 +721,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:184.46], [x:1466565300, y:23.36], [x:1466565480, y:133.36]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.18446], [x:1466565300, y:0.02336], [x:1466565480, y:0.13336]]
 
         cleanup:
         clickVariableSelectionTab()
