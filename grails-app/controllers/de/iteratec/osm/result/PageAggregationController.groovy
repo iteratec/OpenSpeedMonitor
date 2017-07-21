@@ -3,7 +3,6 @@ package de.iteratec.osm.result
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartDTO
-import de.iteratec.osm.barchart.BarchartDatum
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
@@ -17,7 +16,6 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -138,44 +136,32 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
                     def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
                     if (value) {
-                        barchartSeries.data.add(
-                                new BarchartDatum(
-                                        measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                                        originalMeasurandName: currentMeasurand,
-                                        value: value,
-                                        valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
-                                        grouping: key
-                                )
+                        BarchartSeries barchartSeries = new BarchartSeries(
+                                unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                                measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
+                                measurand: currentMeasurand,
+                                value: value,
+                                valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
+                                page: datum[0],
+                                jobGroup: datum[1]?.name
                         )
+                        barchartDTO.series.add(barchartSeries)
                     }
                 }
             }
-            barchartDTO.series.add(barchartSeries)
         }
 
 //      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
-        boolean hasData = false;
-        barchartDTO.series.each {series ->
-            series.data.each {datum ->
-                if (datum.value) {
-                    hasData = true;
-                }
-            }
-        }
-        if (!hasData) {
+        if (!barchartDTO.series) {
             ControllerUtils.sendSimpleResponseAsStream(
                 response,
                 HttpStatus.OK,
