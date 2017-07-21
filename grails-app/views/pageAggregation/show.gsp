@@ -14,7 +14,7 @@
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
-<div class="card hidden" id="chart-card">
+<div class="card" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>
@@ -124,8 +124,7 @@
                 data.toComparative = comparativeTimeFrame[1].toISOString();
             }
 
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregation("svg-container");
+            var pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
 
             spinner.start();
             $.ajax({
@@ -141,7 +140,8 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
+                        pageAggregationChart.setData(data);
+                        pageAggregationChart.render();
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {

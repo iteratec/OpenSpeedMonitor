@@ -42,11 +42,12 @@
     </div>
 
     <div id="svg-container">
+        <svg id="page-aggregation-svg"></svg>
     </div>
 </div>
 <g:render template="/pageAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageAggregation/pageAggregationChart.js" />',true,'groupedBarchartHorizontal');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageAggregation/pageAggregationChart.js" />',true,'pageAggregationChart');
     });
 </asset:script>
