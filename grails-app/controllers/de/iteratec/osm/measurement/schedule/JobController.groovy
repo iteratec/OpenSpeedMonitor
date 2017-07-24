@@ -265,21 +265,11 @@ class JobController {
     }
 
     def execute() {
-        if (params.id) {
-            Job job = new Job(params)
-            setVariablesOnJob(params.variables, job)
-            try {
-                redirect(url: jobProcessingService.launchJobRunInteractive(job))
-            } catch (JobExecutionException e) {
-                render e.htmlResult
-            }
-        } else {
-            handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
-                if (jobProcessingService.launchJobRun(job))
-                    massExecutionResults[job.id] = [status: 'success']
-                else
-                    massExecutionResults[job.id] = [status: 'failure']
-            }
+        handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
+            if (jobProcessingService.launchJobRun(job))
+                massExecutionResults[job.id] = [status: 'success']
+            else
+                massExecutionResults[job.id] = [status: 'failure']
         }
     }
 

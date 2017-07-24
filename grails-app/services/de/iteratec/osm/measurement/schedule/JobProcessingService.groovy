@@ -394,25 +394,6 @@ class JobProcessingService {
     }
 
     /**
-     * Launch Job interactively
-     *
-     * @return If successful, a URL to the WPT Server Results Page is returned
-     * @throws JobExecutionException If the job could not be submitted successfully, a JobExecutionException is thrown
-     * 	 and its htmlResult contains the HTML response from the WPT Server indicating why test execution failed.
-     */
-    public String launchJobRunInteractive(Job job) throws JobExecutionException {
-        def parameters = fillRequestParameters(job);
-        WebPageTestServer wptserver = job.location.wptServer
-        HttpResponseDecorator result = proxyService.runtest(wptserver, parameters);
-
-        if (result.getStatus() == 302) {
-            return result.getHeaders().getAt('Location').getValue()
-        } else {
-            throw new JobExecutionException("ProxyService.runtest() returned statusCode ${result.getStatus()}", result.data.text)
-        }
-    }
-
-    /**
      * Updates the status of a currently running job.
      * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
      * every pollDelaySeconds seconds is removed
