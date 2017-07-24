@@ -31,7 +31,6 @@ import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.ContentType
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 /**
@@ -61,7 +60,13 @@ class QueueAndJobStatusService {
      * @return A list of {@link LocationWithXmlNode}.
      */
     List<LocationWithXmlNode> getActiveLocations(WebPageTestServer wptServer) {
-        GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
+        GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponse(
+            wptServer,
+            'getLocations.php',
+            [:],
+            'text/plain',
+            [Accept: 'application/xml']
+        )
         List locations = []
         if (locationsResponse != null) {
             locationsResponse.data.location.each { locationTagInXml ->
@@ -88,7 +93,7 @@ class QueueAndJobStatusService {
      * @return The root node of the returned XML
      */
     GPathResult getAgentsHttpResponse(WebPageTestServer wptServer) {
-        return httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [f: 'xml'], ContentType.TEXT, [Accept: 'application/xml'])
+        return httpRequestService.getWptServerHttpGetResponse(wptServer, 'getTesters.php', [f: 'xml'], 'text/plain', [Accept: 'application/xml'])
     }
 
     /**
@@ -293,7 +298,7 @@ class QueueAndJobStatusService {
     private Map<String, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
         Map<String, Integer> result = new HashMap<>();
 
-        GPathResult getTestersResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
+        GPathResult getTestersResponse = httpRequestService.getWptServerHttpGetResponse(wptServer, 'getTesters.php', [:], 'text/plain', [Accept: 'application/xml'])
 
         getTestersResponse.data.location.each { GPathResult locationTagInXml ->
 

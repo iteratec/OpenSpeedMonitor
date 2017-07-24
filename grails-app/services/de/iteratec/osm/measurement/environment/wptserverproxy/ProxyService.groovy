@@ -23,8 +23,6 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.async.Promise
 import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpResponseDecorator
 
 import java.util.concurrent.locks.ReentrantLock
 
@@ -85,25 +83,22 @@ class ProxyService {
      * 			Should contain all necessary for running tests on wptserver.
      * @return
      */
-    HttpResponseDecorator runtest(WebPageTestServer wptserver, Map params) {
-        log.info("baseurl of called wptsever=${wptserver.baseUrl}")
-
-
-        return httpRequestService.getRestClientFrom(wptserver).post(
-                path: 'runtest.php',
-                query: params,
-                contentType: ContentType.TEXT,
-                headers: [Accept: 'application/xml']
-        )
-
+    Object runtest(WebPageTestServer wptserver, Map params) {
+        Map paramsNotNull = params.findAll {k,v-> !v.equals('null') }
+        return httpRequestService.getRestClientFrom(wptserver).post {
+            request.uri.path = '/runtest.php'
+            request.uri.query = paramsNotNull
+            request.contentType = 'application/xml'
+            request.headers['Accept'] = 'application/xml'
+        }
     }
 
-    HttpResponseDecorator cancelTest(WebPageTestServer wptserver, Map params) {
-        return httpRequestService.getRestClientFrom(wptserver).post(
-                path: 'cancelTest.php',
-                query: params,
-                contentType: ContentType.TEXT
-        )
+    Object cancelTest(WebPageTestServer wptserver, Map params) {
+        return httpRequestService.getRestClientFrom(wptserver).post{
+            request.uri.path = '/cancelTest.php'
+            request.uri.query = params
+            request.contentType = 'text/plain'
+        }
     }
 
     /**
@@ -126,7 +121,13 @@ class ProxyService {
     List<Location> fetchLocations(WebPageTestServer wptserver, Map queryParams){
         List<Location> addedLocations = []
 
-        def locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserver, 'getLocations.php', queryParams, ContentType.TEXT, [Accept: 'application/xml'])
+        def locationsResponse = httpRequestService.getWptServerHttpGetResponse(
+            wptserver,
+            '/getLocations.php',
+            queryParams,
+                'application/xml',
+            [Accept: 'application/xml']
+        )
 
         log.info("${this.locationListeners.size} iResultListener(s) listen to the fetching of locations")
         this.locationListeners.each {
@@ -196,8 +197,13 @@ class ProxyService {
     }
 
     private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
-        return httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserverOfResult, 'xmlResult.php',
-                ['f': 'xml', 'test': params.resultId, 'r': params.resultId, 'multistepFormat': '1'], ContentType.TEXT, [Accept: 'application/xml'])
+        return httpRequestService.getWptServerHttpGetResponse(
+            wptserverOfResult,
+            '/xmlResult.php',
+            ['f': 'xml', 'test': params.resultId, 'r': params.resultId, 'multistepFormat': '1'],
+                'application/xml',
+            [Accept: 'application/xml']
+        )
     }
 
 }
