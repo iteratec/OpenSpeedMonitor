@@ -12,24 +12,20 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovyx.net.http.RESTClient
-import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
-import spock.lang.Ignore
-import org.yaml.snakeyaml.introspector.Property
 import software.betamax.Configuration
 import software.betamax.ProxyConfiguration
-import software.betamax.TapeMode
 import software.betamax.junit.Betamax
 import software.betamax.junit.RecorderRule
+import spock.lang.Ignore
 import spock.lang.Specification
-
-import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 
 @TestFor(QueueAndJobStatusService)
 @Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, AggregatorType, CsiAggregationInterval])
 class QueueAndJobStatusServiceSpec extends Specification {
+
+    //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
 
 //    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/betamaxrties').toURL()).toProperties())
     Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
@@ -90,25 +86,7 @@ class QueueAndJobStatusServiceSpec extends Specification {
         mocker = ServiceMocker.create()
         mocker.mockI18nService(serviceUnderTest)
         serviceUnderTest.jobService = Mock(JobService)
-        mockHttpBuilderToUseBetamax()
     }
-
-    private void mockHttpBuilderToUseBetamax(){
-        Properties properties = new Properties()
-        new File('grails-app/conf/betamax.properties').withInputStream {
-            properties.load(it)
-        }
-        String host = properties.'betamax.proxyHost'
-        int port = properties.'betamax.proxyPort' as int
-        HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
-        httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
-            RESTClient restClient = new RESTClient(wptserver.baseUrl)
-            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(host, port, 'http'))
-            return restClient
-        }
-        serviceUnderTest.httpRequestService = httpRequestService
-    }
-
 
     private void createTestDataCommonForAllTests() {
         TestDataUtil.createOsmConfig()
