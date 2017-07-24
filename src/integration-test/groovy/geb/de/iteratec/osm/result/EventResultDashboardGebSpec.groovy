@@ -1178,12 +1178,16 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {
+        datePicker << Keys.chord(Keys.ESCAPE)
+        Thread.sleep(500l)
         datePicker.click()
         datePicker << Keys.chord(Keys.END)
         25.times {
             datePicker << Keys.chord(Keys.BACK_SPACE)
         }
         datePicker << date
+        datePicker << Keys.chord(Keys.ESCAPE)
+        Thread.sleep(500l)
     }
 
     private void initChartData() {
