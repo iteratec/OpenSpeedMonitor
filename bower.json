@@ -1,6 +1,6 @@
 {
   "name": "open_speed_monitor",
-  "description": "OpenSpeedMonitor automates web performance measurements based on WebPagetest. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.",
+  "description": "OpenSpeedMonitor automates web performance measurements based on WebPagetest.",
   "main": "",
   "authors": [
     "Nils Kuhn <nils.kuhn@iteratec.de>"
