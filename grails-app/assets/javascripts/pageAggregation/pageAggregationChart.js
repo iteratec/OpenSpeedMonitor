@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require /chartComponents/chartBars.js
 //= require_self
 
 "use strict";
@@ -8,7 +9,8 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var svg = d3.select(selector);
-    var chartBars = [];
+    var svgChartBars = svg.append("g");
+    var chartBarsComponents = {};
 
     var setData = function (data) {
         // setDataForHeader(data);
@@ -22,14 +24,28 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var seriesByMeasurand = d3.nest()
             .key(function(d) { return d.measurand; })
             .entries(data.series);
-        console.log(seriesByMeasurand);
+        var newchartBarsComponents = {};
+        seriesByMeasurand.forEach(function (measurandData) {
+            newchartBarsComponents[measurandData.key] = chartBarsComponents[measurandData.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
+            newchartBarsComponents[measurandData.key].setData(measurandData.values);
+        });
+        chartBarsComponents = newchartBarsComponents;
     };
 
     var render = function () {
-        svg.append("circle")
-           .attr("cx", 30)
-           .attr("cy", 30)
-           .attr("r", 20);
+        renderBars();
+    };
+
+    var renderBars = function () {
+        var chartBars = svgChartBars.selectAll(".bar-charts").data(chartBarsComponents.values());
+        chartBars.enter()
+            .append("g")
+            .attr("class", "bar-charts");
+        chartBars.exit()
+            .remove();
+        chartBars.each(function(chartBarsComponent) {
+           chartBarsComponent.render(this);
+        });
     };
 
     return {
