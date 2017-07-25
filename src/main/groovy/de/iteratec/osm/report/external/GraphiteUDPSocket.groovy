@@ -28,8 +28,8 @@ import de.iteratec.osm.result.Contract
  */
 class GraphiteUDPSocket implements GraphiteSocket {
 
-    private final InetAddress serverAddress;
-    private final int port;
+    private final InetAddress serverAddress
+    private final int port
 
     /**
      * <p>
@@ -45,15 +45,13 @@ class GraphiteUDPSocket implements GraphiteSocket {
      */
     GraphiteUDPSocket(InetAddress serverAddress, int port)
             throws NullPointerException, IllegalArgumentException {
-        Contract.requiresArgumentNotNull("serverAddress", serverAddress);
+        Contract.requiresArgumentNotNull("serverAddress", serverAddress)
         if (port < 0 || port > 65535) {
-            throw new IllegalArgumentException(
-                    "The port number must be between 0 and 65535"
-                            + " (both inclusive).");
+            throw new IllegalArgumentException("The port number must be between 0 and 65535" + " (both inclusive).")
         }
 
-        this.serverAddress = serverAddress;
-        this.port = port;
+        this.serverAddress = serverAddress
+        this.port = port
     }
 
     @Override
@@ -65,7 +63,7 @@ class GraphiteUDPSocket implements GraphiteSocket {
             graphiteSocket = new GraphiteUDP(serverAddress.getHostAddress(), this.port)
             // use seconds
             long metricTimestamp = timestamp.getTime() / 1000;
-            graphiteSocket.send(path.toString(), String.valueOf(value), metricTimestamp);
+            graphiteSocket.send(path.toString(), String.valueOf(value), metricTimestamp)
         } catch (IOException cause) {
             throw new GraphiteComunicationFailureException(serverAddress, port, cause)
         } finally {
