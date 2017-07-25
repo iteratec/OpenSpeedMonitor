@@ -84,7 +84,7 @@ class ProxyService {
      * @return
      */
     Object runtest(WebPageTestServer wptserver, Map params) {
-        Map paramsNotNull = params.findAll {k,v-> !v.equals('null') }
+        Map paramsNotNull = params.findAll {k,v-> v != null  }
         return httpRequestService.getRestClientFrom(wptserver).post {
             request.uri.path = '/runtest.php'
             request.uri.query = paramsNotNull
