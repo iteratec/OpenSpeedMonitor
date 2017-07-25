@@ -16,6 +16,10 @@ class UserTiming {
     static constraints = {
         name(nullable: false)
         startTime(nullable: false)
-        duration(nullable: true)
+        duration(nullable: true, validator: { currentDuration, userTimingInstance ->
+            boolean  isMark = userTimingInstance.type == UserTimingType.MARK && currentDuration == null
+            boolean isMeasure = userTimingInstance.type == UserTimingType.MEASURE && currentDuration != null
+            return isMark || isMeasure
+        })
     }
 }

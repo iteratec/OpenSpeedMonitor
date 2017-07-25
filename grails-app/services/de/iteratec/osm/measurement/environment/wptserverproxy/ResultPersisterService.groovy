@@ -455,8 +455,10 @@ class ResultPersisterService implements iResultListener {
     }
 
     private List<UserTiming> createAllMarks(GPathResult viewTag, EventResult result){
-        return viewTag.getProperty(UserTimingType.MARK.tagInResultXml).children().collect{GPathResult valueTag ->
-            new UserTiming(
+        return viewTag.getProperty(UserTimingType.MARK.tagInResultXml).children().findAll{
+            it && it[0].name && it.toString().isDouble()
+        }.collect{GPathResult valueTag ->
+            return new UserTiming(
                     name: valueTag[0].name.toString(),
                     startTime: Double.parseDouble(valueTag.toString()),
                     type: UserTimingType.MARK,
@@ -466,8 +468,10 @@ class ResultPersisterService implements iResultListener {
     }
 
     private List<UserTiming> createAllMeasures(GPathResult viewTag, EventResult result){
-        return viewTag.getProperty(UserTimingType.MEASURE.tagInResultXml).value.collect{GPathResult valueTag ->
-            new UserTiming(
+        return viewTag.getProperty(UserTimingType.MEASURE.tagInResultXml).value.findAll{
+            it.name && it.startTime && it.duration && it.startTime.toString().isDouble() && it.duration.toString().isDouble()
+        }.collect{GPathResult valueTag ->
+            return new UserTiming(
                 name: valueTag.(name).toString(),
                 startTime: Double.parseDouble(valueTag.startTime.toString()),
                 duration: Double.parseDouble(valueTag.duration.toString()),

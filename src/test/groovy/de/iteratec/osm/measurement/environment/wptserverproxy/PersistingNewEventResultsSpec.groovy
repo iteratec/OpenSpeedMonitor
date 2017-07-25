@@ -50,7 +50,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  */
 @TestFor(ResultPersisterService)
 @Build([Location, WebPageTestServer, Job, Page])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay, UserTiming])
 class PersistingNewEventResultsSpec extends Specification {
 
     def doWithSpring = {
