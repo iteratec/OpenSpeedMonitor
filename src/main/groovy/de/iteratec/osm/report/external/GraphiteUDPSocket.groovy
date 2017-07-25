@@ -60,13 +60,18 @@ class GraphiteUDPSocket implements GraphiteSocket {
     void sendDate(GraphitePathName path, double value, Date timestamp)
             throws NullPointerException, GraphiteComunicationFailureException {
 
-        GraphiteUDP graphiteSocket = new GraphiteUDP(serverAddress.getHostAddress(), this.port);
+        GraphiteUDP graphiteSocket
         try {
+            graphiteSocket = new GraphiteUDP(serverAddress.getHostAddress(), this.port)
             // use seconds
             long metricTimestamp = timestamp.getTime() / 1000;
             graphiteSocket.send(path.toString(), String.valueOf(value), metricTimestamp);
         } catch (IOException cause) {
-            throw new GraphiteComunicationFailureException(serverAddress, port, cause);
+            throw new GraphiteComunicationFailureException(serverAddress, port, cause)
+        } finally {
+            if (graphiteSocket) {
+                graphiteSocket.close()
+            }
         }
     }
 }
