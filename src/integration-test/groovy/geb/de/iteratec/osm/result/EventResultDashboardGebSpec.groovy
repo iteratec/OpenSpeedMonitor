@@ -10,7 +10,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -406,8 +405,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         given: "User defines maximal request count"
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << "3"
-        firstViewList[3].click()
-        firstViewList[8].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_TIME")
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -458,9 +457,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     void "Trim minimal size"() {
         given: "User defines minimal bytes until doc"
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
-        appendedInputBelowRequestSizesTimesTextField << "30"
-        firstViewList[8].click()
-        firstViewList[10].click()
+        appendedInputBelowRequestSizesTimesTextField << "0.03"
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -469,11 +468,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
@@ -485,7 +484,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     void "Trim maximal size"() {
         given: "User defines maximal bytes until doc"
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
-        insertIntoAboveRequestSizeTextField("73")
+        insertIntoAboveRequestSizeTextField("0.073")
 
         when: "User wants to see a graph"
         scrollTop()
@@ -495,11 +494,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         scrollBottom()
@@ -509,8 +508,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[10].click()
-        firstViewList[0].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
+        clickFirstViewMeasurand("LOAD_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -527,13 +526,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[0].click()
+        clickFirstViewMeasurand("LOAD_TIME")
     }
 
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[1].click()
+        clickFirstViewMeasurand("FIRST_BYTE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -550,14 +549,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[1].click()
+        clickFirstViewMeasurand("FIRST_BYTE")
 
     }
 
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[2].click()
+        clickFirstViewMeasurand("START_RENDER")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -574,13 +573,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[2].click()
+        clickFirstViewMeasurand("START_RENDER")
     }
 
     void "Visually complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[4].click()
+        clickFirstViewMeasurand("VISUALLY_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -597,12 +596,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[4].click()
+        clickFirstViewMeasurand("VISUALLY_COMPLETE")
     }
 
     void "Dom time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[5].click()
+        clickFirstViewMeasurand("DOM_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -619,12 +618,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[5].click()
+        clickFirstViewMeasurand("DOM_TIME")
     }
 
     void "Fully loaded time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[6].click()
+        clickFirstViewMeasurand("FULLY_LOADED_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -641,13 +640,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[6].click()
+        clickFirstViewMeasurand("FULLY_LOADED_TIME")
 
     }
 
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[8].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -664,12 +663,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[8].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
     }
 
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[9].click()
+        clickFirstViewMeasurand("FULLY_LOADED_REQUEST_COUNT")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -686,12 +685,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[9].click()
+        clickFirstViewMeasurand("FULLY_LOADED_REQUEST_COUNT")
     }
 
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[10].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -700,20 +699,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[10].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
     }
 
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[11].click()
+        clickFirstViewMeasurand("FULLY_LOADED_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -722,20 +721,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:184.46], [x:1466565300, y:23.36], [x:1466565480, y:133.36]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.18446], [x:1466565300, y:0.02336], [x:1466565480, y:0.13336]]
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[11].click()
+        clickFirstViewMeasurand("FULLY_LOADED_INCOMING_BYTES")
     }
 
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[12].click()
+        clickFirstViewMeasurand("CS_BY_WPT_VISUALLY_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -752,12 +751,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[12].click()
+        clickFirstViewMeasurand("CS_BY_WPT_VISUALLY_COMPLETE")
     }
 
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[13].click()
+        clickFirstViewMeasurand("CS_BY_WPT_DOC_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -774,12 +773,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[13].click()
+        clickFirstViewMeasurand("CS_BY_WPT_DOC_COMPLETE")
     }
 
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[7].click()
+        clickFirstViewMeasurand("SPEED_INDEX")
 
         when: "User wants to see a graph"
         clickShowButton()

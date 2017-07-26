@@ -28,7 +28,7 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || (function(res
                 type: 'GET',
                 url: checkUrl+"?activeCount="+ids.length,
                 success: function (content) {
-                    if (content == "true") {
+                    if (content) {
                         responsiveTable.updateElementTable(updateTableUrl);
                     }else {
                         if(ids.length > 0)updateRows(ids,rowUpdateUrl);

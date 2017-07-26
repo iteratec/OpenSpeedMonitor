@@ -24,7 +24,6 @@ class EventResultDashboardPage extends I18nGebPage {
         firstViewDiv { $("#selectAggregatorUncachedHtmlId") }
         graphNameSelect { $("#graphName") }
         graphNameSelectOptions { $("#graphName").find("option").contextElements }
-        firstViewList { $("#selectAggregatorUncachedHtmlId").find("option").contextElements }
         filterJobsAccordionContent { $("#collapseTwo") }
         filterJobsAccordion { $(".accordion-toggle")[1] }
         chooseMeasuredVariablesAccordionContent { $("#collapseThree") }
@@ -109,6 +108,10 @@ class EventResultDashboardPage extends I18nGebPage {
         waitFor { showButton.displayed }
         scrollTop()
         waitFor { showButton.click() }
+    }
+
+    public void clickFirstViewMeasurand(String measuradValue) {
+        $("#selectAggregatorUncachedHtmlId").find("option", value: measuradValue).click()
     }
 
     public insertIntoAboveRequestSizeTextField(String aboveRequestSizeValueToSet){
