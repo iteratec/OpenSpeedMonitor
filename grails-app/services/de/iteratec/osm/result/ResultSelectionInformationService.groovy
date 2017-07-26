@@ -48,6 +48,8 @@ class ResultSelectionInformationService {
                     }
                 }
                 groupedResults.each { entry ->
+                    List<UserTimingSelectionInfomation> userTimingSelectionInfomations = getUserTimingSelectionInfosForGroupedEventResult(entry, startDay, endDay)
+
                     def map = [
                         jobResultDate: entry[0],
                         page: entry[1],
@@ -57,7 +59,8 @@ class ResultSelectionInformationService {
                         browser: entry[5],
                         connectivityProfile: entry[6],
                         customConnectivityName: entry[7],
-                        noTrafficShapingAtAll: entry[8]
+                        noTrafficShapingAtAll: entry[8],
+                        userTimings: userTimingSelectionInfomations
                     ]
                     def created = new ResultSelectionInformation(map).save()
                     if (!created) {
@@ -66,6 +69,46 @@ class ResultSelectionInformationService {
                 }
             }
             batchActivityUpdater.done()
+        }
+    }
+
+    def getGroupedEventResults(def startDay, endDay){
+        return EventResult.createCriteria().list {
+            between('jobResultDate', startDay.toDate(), endDay.toDate())
+            projections {
+                sqlGroupProjection('CAST(job_result_date as DATE) as jr_date', 'CAST(job_result_date as DATE)', ["jr_date"], [StandardBasicTypes.DATE])
+                groupProperty('page')
+                groupProperty('measuredEvent')
+                groupProperty('jobGroup')
+                groupProperty('location')
+                groupProperty('browser')
+                groupProperty('connectivityProfile')
+                groupProperty('customConnectivityName')
+                groupProperty('noTrafficShapingAtAll')
+            }
+        }
+    }
+
+    List<UserTimingSelectionInfomation> getUserTimingSelectionInfosForGroupedEventResult(def groupedEventResult, def startDay, def endDay){
+        def userTimingsForGroupedEventResult = EventResult.createCriteria().list{
+                between('jobResultDate', startDay.toDate(), endDay.toDate())
+                eq('page', groupedEventResult[1])
+                eq('measuredEvent', groupedEventResult[2])
+                eq('jobGroup', groupedEventResult[3])
+                eq('location', groupedEventResult[4])
+                eq('browser', groupedEventResult[5])
+                eq('connectivityProfile', groupedEventResult[6])
+                eq('customConnectivityName', groupedEventResult[7])
+                eq('noTrafficShapingAtAll', groupedEventResult[8])
+                projections{
+                    property('userTimings')
+                }
+            }
+        if(userTimingsForGroupedEventResult.size() > 0){
+            def flattenedUniqueUserTimingsEachAsArray = userTimingsForGroupedEventResult.collect{it as List}.flatten().findAll {it != null}.collect {[it.name, it.type]}.unique(false)
+            return flattenedUniqueUserTimingsEachAsArray.collect {new UserTimingSelectionInfomation(name: it[0], type: it[1])}
+        }else{
+            return null
         }
     }
 }
