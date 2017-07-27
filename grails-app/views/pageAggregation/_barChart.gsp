@@ -46,8 +46,3 @@
     </div>
 </div>
 <g:render template="/pageAggregation/adjustBarchartModal"/>
-<asset:script type="text/javascript">
-    $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageAggregation/pageAggregationChart.js" />',true,'pageAggregationChart');
-    });
-</asset:script>

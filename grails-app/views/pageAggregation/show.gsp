@@ -96,6 +96,12 @@
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationGuiHandling.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationChart.js" />',true,'pageAggregationChart');
+        });
+
+        var pageAggregationChart = null;
+        $(window).on('pageAggregationChartLoaded', function () {
+            pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
@@ -123,8 +129,6 @@
                 data.fromComparative = comparativeTimeFrame[0].toISOString();
                 data.toComparative = comparativeTimeFrame[1].toISOString();
             }
-
-            var pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
 
             spinner.start();
             $.ajax({

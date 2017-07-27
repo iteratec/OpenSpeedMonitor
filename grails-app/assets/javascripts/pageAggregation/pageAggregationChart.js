@@ -37,7 +37,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     };
 
     var renderBars = function () {
-        var chartBars = svgChartBars.selectAll(".bar-charts").data(chartBarsComponents.values());
+        var chartBars = svgChartBars.selectAll(".bar-charts").data(Object.values(chartBarsComponents));
         chartBars.enter()
             .append("g")
             .attr("class", "bar-charts");

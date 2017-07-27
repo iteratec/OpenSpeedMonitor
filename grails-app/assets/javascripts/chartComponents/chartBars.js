@@ -6,14 +6,13 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 
-OpenSpeedMonitor.ChartComponents.ChartBars = (function (selector) {
-    var svg = d3.select(selector);
+OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var setData = function (data) {
     };
 
-    var render = function () {
-        svg.append("circle")
+    var render = function (svg) {
+        d3.select(svg).append("circle")
             .attr("cx", 30)
             .attr("cy", 30)
             .attr("r", 20);
