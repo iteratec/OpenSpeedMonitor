@@ -35,7 +35,8 @@
             pages: "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}",
             browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
             connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
-            resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}"
+            resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}",
+            userTimings: "${createLink(controller: 'resultSelection', action: 'getUserTimings')}"
         },
         jobTags: {
             getTagsForJobs: "${createLink(controller: 'job', action: 'getTagsForJobs')}",

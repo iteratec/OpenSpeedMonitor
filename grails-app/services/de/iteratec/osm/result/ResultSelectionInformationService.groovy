@@ -4,7 +4,7 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
-import de.iteratec.osm.util.UserTimingUtil
+
 import grails.transaction.Transactional
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
@@ -89,9 +89,12 @@ class ResultSelectionInformationService {
                 eq('customConnectivityName', groupedEventResult[7])
                 eq('noTrafficShapingAtAll', groupedEventResult[8])
                 projections{
-                    property('userTimings')
+                    userTimings {
+                        groupProperty('name')
+                        groupProperty('type')
+                    }
                 }
             }
-       return UserTimingUtil.transformUserTimingsFromEventResultProjections(userTimingsForGroupedEventResult)
+       return userTimingsForGroupedEventResult.collect {new UserTimingSelectionInfomation(name: it[0], type: [1])}
     }
 }

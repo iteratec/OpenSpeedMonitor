@@ -11,7 +11,7 @@ class UserTiming {
     Double duration
     UserTimingType type
 
-    static belongsTo = [eventResult: EventResult]
+    static belongsTo = [EventResult]
 
     static constraints = {
         name(nullable: false)
