@@ -4,6 +4,7 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
+import de.iteratec.osm.util.UserTimingUtil
 import grails.transaction.Transactional
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
@@ -33,20 +34,7 @@ class ResultSelectionInformationService {
                 def startDay = lastProcessedDateStartDay.plusDays(startDayOffset)
                 def endDay = startDay.plusDays(1)
                 batchActivityUpdater.update()
-                def groupedResults = EventResult.createCriteria().list {
-                    between('jobResultDate', startDay.toDate(), endDay.toDate())
-                    projections {
-                        sqlGroupProjection('CAST(job_result_date as DATE) as jr_date', 'CAST(job_result_date as DATE)', ["jr_date"], [StandardBasicTypes.DATE])
-                        groupProperty('page')
-                        groupProperty('measuredEvent')
-                        groupProperty('jobGroup')
-                        groupProperty('location')
-                        groupProperty('browser')
-                        groupProperty('connectivityProfile')
-                        groupProperty('customConnectivityName')
-                        groupProperty('noTrafficShapingAtAll')
-                    }
-                }
+                def groupedResults = getGroupedEventResults(startDay, endDay)
                 groupedResults.each { entry ->
                     List<UserTimingSelectionInfomation> userTimingSelectionInfomations = getUserTimingSelectionInfosForGroupedEventResult(entry, startDay, endDay)
 
@@ -104,11 +92,6 @@ class ResultSelectionInformationService {
                     property('userTimings')
                 }
             }
-        if(userTimingsForGroupedEventResult.size() > 0){
-            def flattenedUniqueUserTimingsEachAsArray = userTimingsForGroupedEventResult.collect{it as List}.flatten().findAll {it != null}.collect {[it.name, it.type]}.unique(false)
-            return flattenedUniqueUserTimingsEachAsArray.collect {new UserTimingSelectionInfomation(name: it[0], type: it[1])}
-        }else{
-            return null
-        }
+       return UserTimingUtil.transformUserTimingsFromEventResultProjections(userTimingsForGroupedEventResult)
     }
 }
