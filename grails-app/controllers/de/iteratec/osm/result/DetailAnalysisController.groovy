@@ -7,7 +7,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
 import grails.web.mapping.LinkGenerator
-import groovyx.net.http.RESTClient
 import org.joda.time.Interval
 
 import javax.xml.ws.http.HTTPException
@@ -113,7 +112,4 @@ class DetailAnalysisController {
         render(view: "show", model: modelToRender)
     }
 
-    RESTClient getRestClient(String url) {
-        return new RESTClient(url)
-    }
 }
