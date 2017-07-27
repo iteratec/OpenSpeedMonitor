@@ -49,7 +49,7 @@
 						<g:message code="security.signout.label" default="Log out"/></g:link>
 				</li>
 
-				<sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
+				<sec:ifAnyGranted roles="ROLE_SUPER_ADMIN">
 					%{--csi --------------------------------------------------------}%
 					<li class="controller">
 						<g:link controller="user" action="index"><i class="fa fa-user" aria-hidden="true"></i> <g:message
