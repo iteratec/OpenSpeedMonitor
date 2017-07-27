@@ -61,8 +61,9 @@ class GraphiteUDPSocket implements GraphiteSocket {
         GraphiteUDP graphiteSocket
         try {
             graphiteSocket = new GraphiteUDP(serverAddress.getHostAddress(), this.port)
+            graphiteSocket.connect()
             // use seconds
-            long metricTimestamp = timestamp.getTime() / 1000;
+            long metricTimestamp = timestamp.getTime() / 1000
             graphiteSocket.send(path.toString(), String.valueOf(value), metricTimestamp)
         } catch (IOException cause) {
             throw new GraphiteComunicationFailureException(serverAddress, port, cause)
