@@ -1,6 +1,8 @@
 //= require /bower_components/d3/d3.min.js
 //= require /chartComponents/chartBars.js
 //= require /chartComponents/chartBarScore.js
+//= require /d3/chartColorProvider.js
+//= require /chartComponents/chartLegend.js
 //= require_self
 
 "use strict";
@@ -12,12 +14,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var svg = d3.select(selector);
     var svgChartBars = svg.append("g");
     var svgChartScore = svg.append("g");
+    var svgChartLegend = svg.append("g");
     var chartBarsComponents = {};
+    var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
+    var barComponentWidth = 700;
 
     var setData = function (data) {
         // setDataForHeader(data);
-        // setDataForLegend(data);
+        setDataForLegend(data);
         setDataForBarScore(data);
         // setDataForSideLabels(data);
         setDataForBars(data);
@@ -25,8 +30,29 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var setDataForBarScore = function (data) {
         chartBarScoreComponent.setData({
-            width: 700,
+            width: barComponentWidth,
             max: d3.max(data.series, function(entry) { return entry.value; })
+        });
+    };
+
+    var setDataForLegend = function (data) {
+        var colorProvider = OpenSpeedMonitor.ChartColorProvider();
+        var colorScales = {};
+        var labelsAndColors = {};
+        data.series.forEach(function(entry) {
+           if (labelsAndColors[entry.measurand]) {
+               return;
+           }
+           colorScales[entry.unit] = colorScales[entry.unit] || colorProvider.getColorscaleForMeasurandGroup(entry.unit);
+           labelsAndColors[entry.measurand] = {
+               id: entry.measurand,
+               label: entry.measurandLabel,
+               color: colorScales[entry.unit](entry.measurand)
+           };
+        });
+        chartLegendComponent.setData({
+            entries: Object.values(labelsAndColors),
+            width: barComponentWidth
         });
     };
 
@@ -45,6 +71,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var render = function () {
         renderBars();
         chartBarScoreComponent.render(svgChartScore);
+        chartLegendComponent.render(svgChartLegend);
     };
 
     var renderBars = function () {
