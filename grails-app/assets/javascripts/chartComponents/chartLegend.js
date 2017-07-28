@@ -52,7 +52,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     };
 
     var renderUpdate = function(updateSelection) {
-        var maxEntryGroupSize = d3.max(getLabelWidths(entryData)) + colorPreviewSize + entryMargin + colorPreviewMargin;
+        var maxEntryGroupSize = calculateMaxEntryGroupWidth(svg);
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
         var anyIsSelected = isAnyEntrySelected();
         var anyIsHighlighted = isAnyEntryHighlighted();
@@ -84,9 +84,9 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .remove();
     };
 
-    var getLabelWidths = function (entryData) {
+    var getLabelWidths = function (svgForEstimation, entryData) {
         var widths = [];
-        svg.selectAll('.invisible-text-to-measure')
+        svgForEstimation.selectAll('.invisible-text-to-measure')
             .data(entryData)
             .enter()
             .append("text")
@@ -97,6 +97,10 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
                 this.remove();
             });
         return widths;
+    };
+
+    var calculateMaxEntryGroupWidth = function (svgForEstimation) {
+        return d3.max(getLabelWidths(svgForEstimation, entryData)) + colorPreviewSize + entryMargin + colorPreviewMargin;
     };
 
     var mouseOverEntry = function (legendEntry) {
@@ -150,10 +154,18 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         eventHandlers[eventType] = eventHandler;
     };
 
+    var estimateHeight = function (svgForEstimation) {
+        svgForEstimation = svg || svgForEstimation;
+        var maxEntryGroupSize = calculateMaxEntryGroupWidth(svgForEstimation);
+        var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
+        return Math.floor(entryData.length / maxEntriesInRow) * entryMargin;
+    };
+
     return {
         render: render,
         setData: setData,
-        on: registerEventHandler
+        on: registerEventHandler,
+        estimateHeight: estimateHeight
     };
 
 });

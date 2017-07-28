@@ -102,6 +102,10 @@
         var pageAggregationChart = null;
         $(window).on('pageAggregationChartLoaded', function () {
             pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
+            $(window).on('resize', function() {
+                pageAggregationChart.autoWidth();
+                pageAggregationChart.render();
+            });
         });
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
@@ -144,6 +148,7 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
+                        data.width = -1;
                         pageAggregationChart.setData(data);
                         pageAggregationChart.render();
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
