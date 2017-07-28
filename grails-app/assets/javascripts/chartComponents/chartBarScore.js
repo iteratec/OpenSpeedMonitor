@@ -51,32 +51,31 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
             }
             lastBarEnd = bar.end;
         }
+        barsToRender.reverse();
     };
 
     var render = function (svg) {
         var scale = d3.scale.linear().rangeRound([0, width]).domain([0, max]);
         var scoreBars = svg.selectAll(".scoreBar").data(barsToRender, function (d) { return d.id });
+        renderExit(scoreBars.exit(), scale);
         renderEnter(scoreBars.enter(), scale);
-        renderExit(scoreBars.exit());
         renderUpdate(scoreBars, scale);
     };
 
     var renderEnter = function(enterSelection, scale) {
         var barGroup = enterSelection
             .append("g")
-            .attr("class", "scoreBar")
-            .attr("transform", function (d) {
-                return "translate(" + scale(d.start) + ", 0)";
-            });
+            .attr("class", "scoreBar");
         barGroup.append("rect")
             .attr("height", barHeight)
             .attr("width", initialBarWidth)
-            .attr("fill", function (d) { return d.fill; })
+            .attr("fill", function (d) { return d.fill; });
         barGroup.append("text")
             .attr("class", function (d) { return d.cssClass; })
             .text(function (d) { return d.label; })
+            .style("opacity", 0)
             .attr("y", barHeight / 2)
-            .attr("dy", ".35em") //vertical align middle
+            .attr("dominant-baseline", "middle")
             .attr("text-anchor", "middle");
     };
 
@@ -92,15 +91,26 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
                 return scale(d.end) - scale(d.start);
             });
         transition.select('text')
+            .style("opacity", 1)
             .attr("x", function (d) {
                 return (scale(d.end) - scale(d.start)) / 2;
             });
     };
 
-    var renderExit = function (exitSelection) {
-        exitSelection.transition()
-            .duration(transitionDuration)
-            .attr("width", 0)
+    var renderExit = function (exitSelection, scale) {
+        var exitTransition = exitSelection.transition()
+            .duration(transitionDuration);
+        exitTransition
+            .select('rect')
+            .attr("width", 0);
+        exitTransition
+            .select('text')
+            .style("opacity", 0)
+            .attr("x", 0);
+        exitTransition
+            .attr("transform", function (d) {
+                return "translate(" + scale(d.start) + ", 0)";
+            })
             .remove();
     };
 
