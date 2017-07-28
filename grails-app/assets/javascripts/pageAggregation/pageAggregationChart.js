@@ -4,6 +4,7 @@
 //= require /d3/chartColorProvider.js
 //= require /chartComponents/chartLegend.js
 //= require /chartComponents/chartSideLabels.js
+//= require /chartComponents/chartHeader.js
 //= require_self
 
 "use strict";
@@ -17,6 +18,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
+    var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var componentMargin = 15;
     var transitionDuration = 500;
     var chartSideLabelsWidth = 200;
@@ -32,17 +34,24 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
         sideLabelData = (data && data.series) ? data.series.map(function (s) { return s.page;}) : sideLabelData;
 
-        var fullWidth = (data && data.width) ? data.width : fullWidth;
+        fullWidth = (data && data.width) ? data.width : fullWidth;
         fullWidth = fullWidth < 0 ? svg.node().getBoundingClientRect().width : fullWidth;
         chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
         chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight(measurandDataEntries[0].values.series.length);
 
-        // setDataForHeader(data);
-        setDataForLegend(measurandDataEntries);
+        setDataForHeader();
+        setDataForLegend();
         setDataForBarScore();
         setDataForSideLabels();
         setDataForBars();
+    };
+
+    var setDataForHeader = function () {
+        chartHeaderComponent.setData({
+            width: fullWidth,
+            text: measurandDataEntries[0].values.series[0].jobGroup
+        });
     };
 
     var setDataForBarScore = function () {
@@ -129,17 +138,19 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var render = function () {
         var shouldShowScore = !!measurandGroupDataMap["LOAD_TIMES"];
+        var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height;
         var barScorePosY = chartBarsHeight + componentMargin;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
-        var chartHeight = legendPosY + legendHeight;
+        var chartHeight = legendPosY + legendHeight + headerHeight;
 
         svg
             .transition()
             .duration(transitionDuration)
             .style("height", chartHeight);
-        renderSideLabels(svg);
+        renderHeader(svg);
+        renderSideLabels(svg, headerHeight);
 
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
@@ -148,20 +159,32 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         contentGroup
             .transition()
             .duration(transitionDuration)
-            .attr("transform", "translate(" + (chartSideLabelsWidth + componentMargin) +", 0)");
+            .attr("transform", "translate(" + (chartSideLabelsWidth + componentMargin) +", " + headerHeight +")");
         renderBars(contentGroup);
         renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         renderLegend(contentGroup, legendPosY);
     };
 
-    var renderSideLabels = function(svg) {
+    var renderHeader = function (svg) {
+        var header = svg.selectAll(".header-group").data([chartHeaderComponent]);
+        header.exit()
+            .remove();
+        header.enter()
+            .append("g")
+            .classed("header-group", true);
+        header.call(chartHeaderComponent.render);
+    };
+
+    var renderSideLabels = function(svg, posY) {
         var sideLabels = svg.selectAll(".side-labels-group").data([chartSideLabelsComponent]);
         sideLabels.exit()
             .remove();
         sideLabels.enter()
             .append("g")
             .classed("side-labels-group", true);
-        sideLabels.call(chartSideLabelsComponent.render)
+        sideLabels
+            .attr("transform", "translate(0, " + posY + ")")
+            .call(chartSideLabelsComponent.render)
     };
 
     var renderBarScore = function (svg, shouldShowScore, posY) {
