@@ -65,12 +65,16 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .transition()
             .duration(transitionDuration);
 
-        transition.selectAll(".bar-rect")
+        transition.select(".bar-rect")
             .style("fill", barColor)
-            .attr("y", function (d) { return yScale(d.page) })
-            .attr("width", function (d) { return xScale(d.value) });
+            .attr("y", function (d) {
+                return yScale(d.page)
+            })
+            .attr("width", function (d) {
+                return xScale(d.value)
+            });
 
-        transition.selectAll(".bar-value")
+        transition.select(".bar-value")
             .attr("y", function (d) { return yScale(d.page) + barBand / 2 })
             .attr("x", function (d) { return xScale(d.value) - valueLabelOffset });
     };
