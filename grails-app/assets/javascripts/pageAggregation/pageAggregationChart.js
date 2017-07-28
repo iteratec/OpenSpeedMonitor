@@ -121,8 +121,6 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         svg
             .transition()
             .duration(transitionDuration)
-            .attr("viewBox", "0 0 " + chartBarsWidth + " " + chartHeight)
-            .attr("preserveAspectRatio", "xMinYMin meet")
             .style("height", chartHeight);
         renderBars(svg);
         renderBarScore(svg, shouldShowScore, barScorePosY);
