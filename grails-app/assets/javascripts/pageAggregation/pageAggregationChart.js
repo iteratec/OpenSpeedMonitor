@@ -36,10 +36,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         setDataForBars(data);
     };
 
-    var setDataForBarScore = function (data) {
+    var setDataForBarScore = function () {
         chartBarScoreComponent.setData({
             width: chartBarsWidth,
-            max: d3.max(data.series, function(entry) { return entry.value; })
+            max: measurandGroupDataMap["LOAD_TIMES"] ? measurandGroupDataMap["LOAD_TIMES"].max : 0
         });
     };
 
@@ -113,11 +113,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var render = function () {
         renderBars();
+        var shouldShowScore = !!measurandGroupDataMap["LOAD_TIMES"];
         var svgChartScoreY = chartBarsHeight + componentMargin;
-        var svgChartLegendY = svgChartScoreY + OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin;
+        var svgChartScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
+        var svgChartLegendY = svgChartScoreY + svgChartScoreHeight;
         svgChartScore
             .call(chartBarScoreComponent.render)
             .transition()
+            .style("opacity", shouldShowScore ? 1 : 0)
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + svgChartScoreY + ")");
         svgChartLegend
