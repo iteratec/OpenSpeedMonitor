@@ -3,6 +3,7 @@
 //= require /chartComponents/chartBarScore.js
 //= require /d3/chartColorProvider.js
 //= require /chartComponents/chartLegend.js
+//= require /chartComponents/chartSideLabels.js
 //= require_self
 
 "use strict";
@@ -15,23 +16,32 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartBarsComponents = {};
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
+    var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var componentMargin = 15;
     var transitionDuration = 500;
+    var chartSideLabelsWidth = 200;
     var chartBarsWidth = 700;
+    var fullWidth = chartSideLabelsWidth + chartBarsWidth;
     var chartBarsHeight = 400;
     var measurandDataEntries = {};
     var measurandGroupDataMap = {};
+    var sideLabelData = [];
 
     var setData = function (data) {
         measurandDataEntries = (data && data.series) ? extractMeasurandData(data.series) : measurandDataEntries;
         measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
-        chartBarsWidth = (data && data.width) ? data.width : chartBarsWidth;
-        chartBarsWidth = chartBarsWidth < 0 ? svg.node().getBoundingClientRect().width : chartBarsWidth;
+        sideLabelData = (data && data.series) ? data.series.map(function (s) { return s.page;}) : sideLabelData;
+
+        var fullWidth = (data && data.width) ? data.width : fullWidth;
+        fullWidth = fullWidth < 0 ? svg.node().getBoundingClientRect().width : fullWidth;
+        chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
+        chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight(measurandDataEntries[0].values.series.length);
+
         // setDataForHeader(data);
         setDataForLegend(measurandDataEntries);
         setDataForBarScore();
-        // setDataForSideLabels(data);
+        setDataForSideLabels();
         setDataForBars();
     };
 
@@ -54,6 +64,13 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             }),
             width: chartBarsWidth
         });
+    };
+
+    var setDataForSideLabels = function () {
+      chartSideLabelsComponent.setData({
+         height: chartBarsHeight,
+         labels: sideLabelData
+      });
     };
 
     var setDataForBars = function () {
@@ -122,9 +139,29 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             .transition()
             .duration(transitionDuration)
             .style("height", chartHeight);
-        renderBars(svg);
-        renderBarScore(svg, shouldShowScore, barScorePosY);
-        renderLegend(svg, legendPosY);
+        renderSideLabels(svg);
+
+        var contentGroup = svg.selectAll(".bars-content-group").data([1]);
+        contentGroup.enter()
+            .append("g")
+            .classed("bars-content-group", true);
+        contentGroup
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", "translate(" + (chartSideLabelsWidth + componentMargin) +", 0)");
+        renderBars(contentGroup);
+        renderBarScore(contentGroup, shouldShowScore, barScorePosY);
+        renderLegend(contentGroup, legendPosY);
+    };
+
+    var renderSideLabels = function(svg) {
+        var sideLabels = svg.selectAll(".side-labels-group").data([chartSideLabelsComponent]);
+        sideLabels.exit()
+            .remove();
+        sideLabels.enter()
+            .append("g")
+            .classed("side-labels-group", true);
+        sideLabels.call(chartSideLabelsComponent.render)
     };
 
     var renderBarScore = function (svg, shouldShowScore, posY) {

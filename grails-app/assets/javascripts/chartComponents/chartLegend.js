@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require /chartComponents/utility.js
 //= require_self
 
 "use strict";
@@ -84,23 +85,12 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .remove();
     };
 
-    var getLabelWidths = function (svgForEstimation, entryData) {
-        var widths = [];
-        svgForEstimation.selectAll('.invisible-text-to-measure')
-            .data(entryData)
-            .enter()
-            .append("text")
-            .attr("opacity", 0)
-            .text(function(d) { return d.label })
-            .each(function() {
-                widths.push(this.getComputedTextLength());
-                this.remove();
-            });
-        return widths;
-    };
-
     var calculateMaxEntryGroupWidth = function (svgForEstimation) {
-        return d3.max(getLabelWidths(svgForEstimation, entryData)) + colorPreviewSize + entryMargin + colorPreviewMargin;
+        var labels = entryData.map(function (d) {
+            return d.label;
+        });
+        var labelWidths = OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svgForEstimation, labels);
+        return d3.max(labelWidths) + colorPreviewSize + entryMargin + colorPreviewMargin;
     };
 
     var mouseOverEntry = function (legendEntry) {
