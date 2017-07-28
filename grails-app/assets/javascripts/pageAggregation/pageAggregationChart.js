@@ -64,7 +64,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             componentsToRender[measurandNestEntry.key].setData({
                 values: measurandNestEntry.values.series,
                 color: measurandNestEntry.values.color,
-                min: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min,
+                min: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min > 0 ? 0 : measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min,
                 max: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].max,
                 height: chartBarsHeight,
                 width: chartBarsWidth
