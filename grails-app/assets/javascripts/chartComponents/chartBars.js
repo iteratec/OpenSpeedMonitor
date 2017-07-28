@@ -7,22 +7,22 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 
 OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
-    var data = null;
-    var minValue = null;
-    var maxValue = null;
-    var height = null;
-    var width = null;
+    var data = [];
+    var minValue = 0;
+    var maxValue = 1000;
+    var height = 500;
+    var width = 1000;
     var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
-    var barColor = null;
+    var barColor = "#1660A7";
     var transitionDuration = 500;
 
     var setData = function (componentData) {
-        data = componentData.values;
-        minValue = componentData.min;
-        maxValue = componentData.max;
-        height = componentData.height;
-        width = componentData.width;
-        barColor = componentData.color;
+        data = componentData.values || data;
+        minValue = componentData.min || minValue;
+        maxValue = componentData.max || maxValue;
+        height = componentData.height || height;
+        width = componentData.width || width;
+        barColor = componentData.color || barColor;
     };
 
     var render = function (selector) {
