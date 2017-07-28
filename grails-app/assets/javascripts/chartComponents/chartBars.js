@@ -37,19 +37,38 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     };
 
     var renderEnter = function (enterSelection) {
-        enterSelection.append("rect")
-            .attr("class", "bar")
+        var bars = enterSelection.append("g")
+            .attr("class", "bar");
+        bars.append("rect")
+            .attr("class", "bar-rect")
+            .attr("x", 0)
             .attr("width", 0)
-            .attr("height", barBand);
+            .attr("height", barBand)
+            .attr("fill", barColor);
+        bars.append("text")
+            .attr("class", "bar-value")
+            .attr("x", 0)
+            .text(function (d) { return Math.round(d.value) + " " + d.unit})
+            .attr("text-anchor", "end")
+            .attr("dominant-baseline", "middle")
+            .style("fill", "white")
+            .style("font-weight", "bold");
     };
 
     var renderUpdate = function (updateSelection, xScale, yScale) {
-        updateSelection.attr("x", 0)
+        var valueLabelOffset = 10;
+        var transition = updateSelection
+            .transition()
+            .duration(transitionDuration);
+
+        transition.selectAll(".bar-rect")
             .style("fill", barColor)
-        .transition()
-            .duration(transitionDuration)
             .attr("y", function (d) { return yScale(d.page) })
             .attr("width", function (d) { return xScale(d.value) });
+
+        transition.selectAll(".bar-value")
+            .attr("y", function (d) { return yScale(d.page) + barBand / 2 })
+            .attr("x", function (d) { return xScale(d.value) - valueLabelOffset });
     };
 
     var renderExit = function (exitSelection) {
