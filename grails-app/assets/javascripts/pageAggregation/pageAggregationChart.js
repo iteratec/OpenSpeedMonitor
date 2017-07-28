@@ -22,15 +22,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var transitionDuration = 500;
     var chartBarsWidth = 700;
     var chartBarsHeight = 400;
-    var measurandDataNest = {};
+    var measurandDataEntries = {};
     var measurandGroupDataMap = {};
 
     var setData = function (data) {
-        measurandDataNest = (data && data.series) ? extractMeasurandData(data.series) : measurandDataNest;
+        measurandDataEntries = (data && data.series) ? extractMeasurandData(data.series) : measurandDataEntries;
         measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
-        chartBarsHeight = calculateChartBarsHeight(measurandDataNest[0].values.series.length);
+        chartBarsHeight = calculateChartBarsHeight(measurandDataEntries[0].values.series.length);
         // setDataForHeader(data);
-        setDataForLegend(measurandDataNest);
+        setDataForLegend(measurandDataEntries);
         setDataForBarScore(data);
         // setDataForSideLabels(data);
         setDataForBars(data);
@@ -45,7 +45,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var setDataForLegend = function () {
         chartLegendComponent.setData({
-            entries: measurandDataNest.map(function (measurandNestEntry) {
+            entries: measurandDataEntries.map(function (measurandNestEntry) {
                 var measurandValue = measurandNestEntry.values;
                 return {
                     id: measurandValue.id,
@@ -59,7 +59,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var setDataForBars = function () {
         var componentsToRender = {};
-        measurandDataNest.forEach(function (measurandNestEntry) {
+        measurandDataEntries.forEach(function (measurandNestEntry) {
             componentsToRender[measurandNestEntry.key] = chartBarsComponents[measurandNestEntry.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
             componentsToRender[measurandNestEntry.key].setData({
                 values: measurandNestEntry.values.series,
