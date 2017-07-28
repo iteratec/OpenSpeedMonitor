@@ -61,11 +61,23 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             .key(function(d) { return d.measurand; })
             .entries(data.series);
         var newchartBarsComponents = {};
+        var chartBarsHeight = calculateChartBarsHeight(seriesByMeasurand[0].values.length);
         seriesByMeasurand.forEach(function (measurandData) {
             newchartBarsComponents[measurandData.key] = chartBarsComponents[measurandData.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
-            newchartBarsComponents[measurandData.key].setData(measurandData.values);
+            newchartBarsComponents[measurandData.key].setData({
+                values: measurandData.values,
+                height: chartBarsHeight,
+                width: 1500
+            });
         });
         chartBarsComponents = newchartBarsComponents;
+    };
+
+    var calculateChartBarsHeight = function (numberOfMeasurands) {
+        var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
+        var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
+
+        return numberOfMeasurands * (barBand + barGap);
     };
 
     var render = function () {
