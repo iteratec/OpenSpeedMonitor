@@ -18,11 +18,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartBarsComponents = {};
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
-    var barComponentWidth = 700;
+    var chartBarsWidth = 700;
+    var chartBarsHeight = 400;
+    var measurandDataNest = {};
 
     var setData = function (data) {
+        measurandDataNest = (data && data.series) ? extractMeasurandData(data.series) : measurandDataNest;
+        chartBarsHeight = calculateChartBarsHeight(measurandDataNest[0].values.series.length);
         // setDataForHeader(data);
-        setDataForLegend(data);
+        setDataForLegend(measurandDataNest);
         setDataForBarScore(data);
         // setDataForSideLabels(data);
         setDataForBars(data);
@@ -30,48 +34,56 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var setDataForBarScore = function (data) {
         chartBarScoreComponent.setData({
-            width: barComponentWidth,
+            width: chartBarsWidth,
             max: d3.max(data.series, function(entry) { return entry.value; })
         });
     };
 
-    var setDataForLegend = function (data) {
-        var colorProvider = OpenSpeedMonitor.ChartColorProvider();
-        var colorScales = {};
-        var labelsAndColors = {};
-        data.series.forEach(function(entry) {
-           if (labelsAndColors[entry.measurand]) {
-               return;
-           }
-           colorScales[entry.unit] = colorScales[entry.unit] || colorProvider.getColorscaleForMeasurandGroup(entry.unit);
-           labelsAndColors[entry.measurand] = {
-               id: entry.measurand,
-               label: entry.measurandLabel,
-               color: colorScales[entry.unit](entry.measurand)
-           };
-        });
+    var setDataForLegend = function () {
         chartLegendComponent.setData({
-            entries: Object.values(labelsAndColors),
-            width: barComponentWidth
+            entries: measurandDataNest.map(function (measurandNestEntry) {
+                var measurandValue = measurandNestEntry.values;
+                return {
+                    id: measurandValue.id,
+                    color: measurandValue.color,
+                    label: measurandValue.label
+                };
+            }),
+            width: chartBarsWidth
         });
     };
 
     var setDataForBars = function (data) {
-        var seriesByMeasurand = d3.nest()
-            .key(function(d) { return d.measurand; })
-            .entries(data.series);
-        var newchartBarsComponents = {};
-        var chartBarsHeight = calculateChartBarsHeight(seriesByMeasurand[0].values.length);
-        seriesByMeasurand.forEach(function (measurandData) {
-            newchartBarsComponents[measurandData.key] = chartBarsComponents[measurandData.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
-            newchartBarsComponents[measurandData.key].setData({
-                values: measurandData.values,
+        var componentsToRender = {};
+        measurandDataNest.forEach(function (measurandNestEntry) {
+            componentsToRender[measurandNestEntry.key] = chartBarsComponents[measurandNestEntry.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
+            componentsToRender[measurandNestEntry.key].setData({
+                values: measurandNestEntry.values.series,
+                color: measurandNestEntry.values.color,
                 height: chartBarsHeight,
-                width: 1500,
-                color: "blue"
+                width: chartBarsWidth
             });
         });
-        chartBarsComponents = newchartBarsComponents;
+        chartBarsComponents = componentsToRender;
+    };
+
+    var extractMeasurandData = function (series) {
+        var colorProvider = OpenSpeedMonitor.ChartColorProvider();
+        var colorScales = {};
+        return d3.nest()
+            .key(function(d) { return d.measurand; })
+            .rollup(function (seriesOfMeasurand) {
+                var firstValue = seriesOfMeasurand[0];
+                var unit = firstValue.unit;
+                colorScales[unit] = colorScales[unit] || colorProvider.getColorscaleForMeasurandGroup(unit);
+                return {
+                    id: firstValue.measurand,
+                    label: firstValue.measurandLabel,
+                    color: colorScales[unit](firstValue.measurand),
+                    series: seriesOfMeasurand
+                };
+            })
+            .entries(series);
     };
 
     var calculateChartBarsHeight = function (numberOfMeasurands) {
