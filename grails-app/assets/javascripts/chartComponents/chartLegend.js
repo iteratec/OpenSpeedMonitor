@@ -12,6 +12,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var width = 300;
     var colorPreviewSize = 10;
     var entryMargin = 20;
+    var eventHandlers = {};
 
     var setData = function (data) {
         width = data.width || 300;
@@ -32,7 +33,10 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
 
     var renderEnter = function (entrySelection) {
         var entryGroup = entrySelection.append("g")
-            .attr("class", "legend-entry");
+            .attr("class", "legend-entry")
+            .on("mouseover", function (d) { callEventHandler("mouseover", d); })
+            .on("mouseout", function (d) { callEventHandler("mouseout", d); })
+            .on("click", function (d) { callEventHandler("click", d); });
         entryGroup.append('rect')
             .attr('width', colorPreviewSize)
             .attr('height', colorPreviewSize);
@@ -74,14 +78,25 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .text(function(d) { return d.label })
             .each(function() {
                 widths.push(this.getComputedTextLength());
-                this.remove()
+                this.remove();
             });
         return widths;
     };
 
+    var callEventHandler = function (eventType, legendEntry) {
+        if (eventHandlers[eventType]) {
+            eventHandlers[eventType](legendEntry);
+        }
+    };
+
+    var registerEventHandler = function (eventType, eventHandler) {
+        eventHandlers[eventType] = eventHandler;
+    };
+
     return {
         render: render,
-        setData: setData
+        setData: setData,
+        on: registerEventHandler
     };
 
 });
