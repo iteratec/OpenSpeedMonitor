@@ -7,6 +7,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 
 OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
+    var svg = null;
     var entryData = [];
     var width = 300;
     var colorPreviewSize = 10;
@@ -17,11 +18,16 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         entryData = data.entries || entryData;
     };
 
-    var render = function (svg) {
+    var render = function (d3SelectionToRenderOn) {
+        svg = d3SelectionToRenderOn || svg;
+        if (!svg) {
+            return;
+        }
+
         var entries = svg.selectAll(".legend-entry").data(entryData, function(e) { return e.id });
         renderExit(entries.exit());
         renderEnter(entries.enter());
-        renderUpdate(entries, svg);
+        renderUpdate(entries);
     };
 
     var renderEnter = function (entrySelection) {
@@ -35,7 +41,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .attr('y', colorPreviewSize);
     };
 
-    var renderUpdate = function(updateSelection, svg) {
+    var renderUpdate = function(updateSelection) {
         var maxEntryGroupSize = d3.max(getLabelWidths(svg, entryData)) + 2 * colorPreviewSize + entryMargin;
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
         updateSelection.select("rect")
@@ -58,7 +64,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         exitSelection.remove();
     };
 
-    var getLabelWidths = function (svg, entryData) {
+    var getLabelWidths = function (entryData) {
         var widths = [];
         svg.selectAll('.invisible-text-to-measure')
             .data(entryData)
