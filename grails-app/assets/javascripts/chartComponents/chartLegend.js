@@ -12,7 +12,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var width = 300;
     var colorPreviewSize = 10;
     var entryMargin = 20;
-    var transitionDuration = 200;
+    var transitionDuration = 500;
     var eventHandlers = {};
 
     var setData = function (data) {

@@ -9,7 +9,7 @@ OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     var width = 300;
     var initialBarWidth = 0;
-    var transitionDuration = 1000;
+    var transitionDuration = 500;
     var barHeight = OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight;
     var availableScoreBars = [
         {

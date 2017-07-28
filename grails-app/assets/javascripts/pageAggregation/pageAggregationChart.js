@@ -19,6 +19,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var componentMargin = 15;
+    var transitionDuration = 500;
     var chartBarsWidth = 700;
     var chartBarsHeight = 400;
     var measurandDataNest = {};
