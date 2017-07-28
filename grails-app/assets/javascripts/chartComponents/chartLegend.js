@@ -11,6 +11,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var entryData = [];
     var width = 300;
     var colorPreviewSize = 10;
+    var colorPreviewMargin = 5;
     var entryMargin = 20;
     var transitionDuration = 500;
     var eventHandlers = {};
@@ -42,14 +43,16 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .on("click", clickEntry);
         entryGroup.append('rect')
             .attr('width', colorPreviewSize)
-            .attr('height', colorPreviewSize);
+            .attr('height', colorPreviewSize)
+            .attr("rx", 2)
+            .attr("ry", 2);
         entryGroup.append("text")
-            .attr('x', colorPreviewSize * 2)
+            .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize);
     };
 
     var renderUpdate = function(updateSelection) {
-        var maxEntryGroupSize = d3.max(getLabelWidths(entryData)) + 2 * colorPreviewSize + entryMargin;
+        var maxEntryGroupSize = d3.max(getLabelWidths(entryData)) + colorPreviewSize + entryMargin + colorPreviewMargin;
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
         var anyIsSelected = isAnyEntrySelected();
         var anyIsHighlighted = isAnyEntryHighlighted();
