@@ -23,9 +23,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartBarsWidth = 700;
     var chartBarsHeight = 400;
     var measurandDataNest = {};
+    var measurandGroupDataMap = {};
 
     var setData = function (data) {
         measurandDataNest = (data && data.series) ? extractMeasurandData(data.series) : measurandDataNest;
+        measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
         chartBarsHeight = calculateChartBarsHeight(measurandDataNest[0].values.series.length);
         // setDataForHeader(data);
         setDataForLegend(measurandDataNest);
@@ -55,13 +57,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         });
     };
 
-    var setDataForBars = function (data) {
+    var setDataForBars = function () {
         var componentsToRender = {};
         measurandDataNest.forEach(function (measurandNestEntry) {
             componentsToRender[measurandNestEntry.key] = chartBarsComponents[measurandNestEntry.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
             componentsToRender[measurandNestEntry.key].setData({
                 values: measurandNestEntry.values.series,
                 color: measurandNestEntry.values.color,
+                min: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min,
+                max: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].max,
                 height: chartBarsHeight,
                 width: chartBarsWidth
             });
@@ -81,11 +85,24 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
                 return {
                     id: firstValue.measurand,
                     label: firstValue.measurandLabel,
+                    measurandGroup: firstValue.measurandGroup,
                     color: colorScales[unit](firstValue.measurand),
                     series: seriesOfMeasurand
                 };
             })
             .entries(series);
+    };
+
+    var extractMeasurandGroupData = function (series) {
+        return d3.nest()
+            .key(function(d) { return d.measurandGroup; })
+            .rollup(function (seriesOfMeasurandGroup) {
+                var extent = d3.extent(seriesOfMeasurandGroup, function(entry) { return entry.value; });
+                return {
+                    min: extent[0],
+                    max: extent[1]
+                };
+            }).map(series);
     };
 
     var calculateChartBarsHeight = function (numberOfMeasurands) {

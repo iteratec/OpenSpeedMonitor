@@ -146,6 +146,7 @@ class PageAggregationController extends ExceptionHandlerController {
                                 unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
                                 measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
                                 measurand: currentMeasurand,
+                                measurandGroup: Measurand.valueOf(currentMeasurand).measurandGroup,
                                 value: value,
                                 valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
                                 page: datum[0],
