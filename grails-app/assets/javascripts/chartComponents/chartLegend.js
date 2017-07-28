@@ -36,6 +36,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         var entryGroup = entrySelection.append("g")
             .attr("class", "legend-entry")
             .classed("d3chart-legend-entry", true)
+            .style("opacity", 0)
             .on("mouseover", mouseOverEntry)
             .on("mouseout", mouseOutEntry)
             .on("click", clickEntry);
@@ -60,7 +61,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
                 .attr("transform", "translate(" + x + "," + y + ")")
                 .transition()
                 .duration(transitionDuration)
-                .attr("opacity", opacity);
+                .style("opacity", opacity);
         });
         updateSelection.select("rect")
             .style('fill', function (d) {
@@ -73,7 +74,11 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     };
 
     var renderExit = function (exitSelection) {
-        exitSelection.remove();
+        exitSelection
+            .transition()
+            .duration(transitionDuration)
+            .style("opacity", 0)
+            .remove();
     };
 
     var getLabelWidths = function (entryData) {
