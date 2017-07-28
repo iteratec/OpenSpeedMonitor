@@ -8,7 +8,6 @@ OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 
 OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     var width = 300;
-    var initialBarWidth = 0;
     var transitionDuration = 500;
     var barHeight = OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight;
     var availableScoreBars = [
@@ -68,7 +67,7 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
             .attr("class", "scoreBar");
         barGroup.append("rect")
             .attr("height", barHeight)
-            .attr("width", initialBarWidth)
+            .attr("width", 0)
             .attr("fill", function (d) { return d.fill; });
         barGroup.append("text")
             .attr("class", function (d) { return d.cssClass; })
@@ -116,7 +115,7 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
 
     return {
         render: render,
-        setData: setData
+        setData: setData,
     };
 
 });
