@@ -138,7 +138,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var render = function () {
         var shouldShowScore = !!measurandGroupDataMap["LOAD_TIMES"];
-        var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height;
+        var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
         var barScorePosY = chartBarsHeight + componentMargin;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
         var legendPosY = barScorePosY + barScoreHeight;
