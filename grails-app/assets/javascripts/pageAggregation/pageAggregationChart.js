@@ -67,7 +67,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             newchartBarsComponents[measurandData.key].setData({
                 values: measurandData.values,
                 height: chartBarsHeight,
-                width: 1500
+                width: 1500,
+                color: "blue"
             });
         });
         chartBarsComponents = newchartBarsComponents;
