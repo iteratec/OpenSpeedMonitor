@@ -18,6 +18,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartBarsComponents = {};
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
+    var componentMargin = 15;
     var chartBarsWidth = 700;
     var chartBarsHeight = 400;
     var measurandDataNest = {};
@@ -89,14 +90,23 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var calculateChartBarsHeight = function (numberOfMeasurands) {
         var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
         var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
-
-        return numberOfMeasurands * (barBand + barGap);
+        return numberOfMeasurands * (barBand + barGap) - barGap;
     };
 
     var render = function () {
         renderBars();
-        chartBarScoreComponent.render(svgChartScore);
-        chartLegendComponent.render(svgChartLegend);
+        var svgChartScoreY = chartBarsHeight + componentMargin;
+        var svgChartLegendY = svgChartScoreY + OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin;
+        svgChartScore
+            .call(chartBarScoreComponent.render)
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", "translate(0, " + svgChartScoreY + ")");
+        svgChartLegend
+            .call(chartLegendComponent.render)
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", "translate(0, " + svgChartLegendY + ")");
     };
 
     var renderBars = function () {
