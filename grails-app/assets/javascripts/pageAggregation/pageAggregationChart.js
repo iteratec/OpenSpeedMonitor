@@ -12,9 +12,6 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var svg = d3.select(selector);
-    var svgChartBars = svg.append("g");
-    var svgChartScore = svg.append("g");
-    var svgChartLegend = svg.append("g");
     var chartBarsComponents = {};
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
@@ -112,31 +109,52 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     };
 
     var render = function () {
-        renderBars();
         var shouldShowScore = !!measurandGroupDataMap["LOAD_TIMES"];
-        var svgChartScoreY = chartBarsHeight + componentMargin;
-        var svgChartScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
-        var svgChartLegendY = svgChartScoreY + svgChartScoreHeight;
-        svgChartScore
+        var barScorePosY = chartBarsHeight + componentMargin;
+        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
+
+        renderBars();
+        renderBarScore(shouldShowScore, barScorePosY);
+        renderLegend(barScorePosY + barScoreHeight);
+    };
+
+    var renderBarScore = function (shouldShowScore, posY) {
+        var barScore = svg.selectAll(".chart-score-group").data([chartBarScoreComponent]);
+        barScore.exit()
+            .remove();
+        barScore.enter()
+            .append("g")
+            .attr("class", "chart-score-group")
+            .attr("transform", "translate(0, " + posY + ")");
+        barScore
             .call(chartBarScoreComponent.render)
             .transition()
             .style("opacity", shouldShowScore ? 1 : 0)
             .duration(transitionDuration)
-            .attr("transform", "translate(0, " + svgChartScoreY + ")");
-        svgChartLegend
-            .call(chartLegendComponent.render)
+            .attr("transform", "translate(0, " + posY + ")");
+    };
+
+    var renderLegend = function (posY) {
+        var legend = svg.selectAll(".chart-legend-group").data([chartLegendComponent]);
+        legend.exit()
+            .remove();
+        legend.enter()
+            .append("g")
+            .attr("class", "chart-legend-group")
+            .attr("transform", "translate(0, " + posY + ")");
+        legend.call(chartLegendComponent.render)
             .transition()
             .duration(transitionDuration)
-            .attr("transform", "translate(0, " + svgChartLegendY + ")");
+            .attr("transform", "translate(0, " + posY + ")");
     };
 
     var renderBars = function () {
-        var chartBars = svgChartBars.selectAll(".bar-charts").data(Object.values(chartBarsComponents));
+        var chartBars = svg.selectAll(".bar-charts").data(Object.values(chartBarsComponents));
+        chartBars.exit()
+            .remove();
         chartBars.enter()
             .append("g")
             .attr("class", "bar-charts");
-        chartBars.exit()
-            .remove();
         chartBars.each(function(chartBarsComponent) {
            chartBarsComponent.render(this);
         });
