@@ -12,6 +12,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var width = 300;
     var colorPreviewSize = 10;
     var entryMargin = 20;
+    var transitionDuration = 200;
     var eventHandlers = {};
 
     var setData = function (data) {
@@ -34,9 +35,10 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var renderEnter = function (entrySelection) {
         var entryGroup = entrySelection.append("g")
             .attr("class", "legend-entry")
-            .on("mouseover", function (d) { callEventHandler("mouseover", d); })
-            .on("mouseout", function (d) { callEventHandler("mouseout", d); })
-            .on("click", function (d) { callEventHandler("click", d); });
+            .classed("d3chart-legend-entry", true)
+            .on("mouseover", mouseOverEntry)
+            .on("mouseout", mouseOutEntry)
+            .on("click", clickEntry);
         entryGroup.append('rect')
             .attr('width', colorPreviewSize)
             .attr('height', colorPreviewSize);
@@ -46,8 +48,20 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     };
 
     var renderUpdate = function(updateSelection) {
-        var maxEntryGroupSize = d3.max(getLabelWidths(svg, entryData)) + 2 * colorPreviewSize + entryMargin;
+        var maxEntryGroupSize = d3.max(getLabelWidths(entryData)) + 2 * colorPreviewSize + entryMargin;
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
+        var anyIsSelected = isAnyEntrySelected();
+        var anyIsHighlighted = isAnyEntryHighlighted();
+        updateSelection.each(function(d, i) {
+            var x = maxEntryGroupSize * (i % maxEntriesInRow);
+            var y = Math.floor(i / maxEntriesInRow) * entryMargin;
+            var opacity = (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
+            d3.select(this)
+                .attr("transform", "translate(" + x + "," + y + ")")
+                .transition()
+                .duration(transitionDuration)
+                .attr("opacity", opacity);
+        });
         updateSelection.select("rect")
             .style('fill', function (d) {
                 return d.color;
@@ -56,12 +70,6 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .text(function (d) {
                 return d.label;
             });
-        updateSelection.each(function(d, i) {
-            var updateGroup = d3.select(this);
-            var x = maxEntryGroupSize * (i % maxEntriesInRow);
-            var y = Math.floor(i / maxEntriesInRow) * entryMargin;
-            updateGroup.attr("transform", "translate(" + x + "," + y + ")");
-        });
     };
 
     var renderExit = function (exitSelection) {
@@ -81,6 +89,47 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
                 this.remove();
             });
         return widths;
+    };
+
+    var mouseOverEntry = function (legendEntry) {
+        if (isAnyEntrySelected()) {
+            return;
+        }
+        entryData.forEach(function (entry) {
+            entry.highlighted = entry.id === legendEntry.id;
+        });
+        render();
+        callEventHandler("highlight", legendEntry);
+    };
+
+    var mouseOutEntry = function (legendEntry) {
+        if (isAnyEntrySelected()) {
+            return;
+        }
+        legendEntry.highlighted = false;
+        render();
+        callEventHandler("highlight", legendEntry);
+    };
+
+    var clickEntry = function (legendEntry) {
+        entryData.forEach(function (entry) {
+            entry.selected = (entry.id === legendEntry.id) ? !entry.selected : false;
+            entry.highlighted = false;
+        });
+        render();
+        callEventHandler("select", legendEntry);
+    };
+
+    var isAnyEntrySelected = function () {
+        return entryData.some(function(entry) {
+            return !!entry.selected;
+        });
+    };
+
+    var isAnyEntryHighlighted = function () {
+        return entryData.some(function(entry) {
+            return !!entry.highlighted;
+        });
     };
 
     var callEventHandler = function (eventType, legendEntry) {
