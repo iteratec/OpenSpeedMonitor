@@ -7,7 +7,6 @@ describe("GroupedBarchart Creation", function () {
             "Job3": ["Page1 | Desktop"],
             "Job4": ["Page1 | Desktop"]
         },
-        "groupingLabel": "Page / JobGroup",
         "i18nMap": {
             "measurand": "Messgröße",
             "jobGroup": "Job Gruppe",
@@ -32,7 +31,6 @@ describe("GroupedBarchart Creation", function () {
             "Job1": ["Page1 | Desktop"],
             "Job2": ["Page1 | Smartphone"]
         },
-        "groupingLabel": "Page / JobGroup",
         "i18nMap": {
             "measurand": "Messgröße",
             "jobGroup": "Job Gruppe",
@@ -62,7 +60,6 @@ describe("GroupedBarchart Creation", function () {
             "Job1": ["Page1 | Desktop", "Page1 | Smartphone"],
             "Job2": ["Page1 | Desktop", "Page1 | Smartphone"]
         },
-        "groupingLabel": "Page / JobGroup",
         "i18nMap": {
             "measurand": "Measurand",
             "jobGroup": "Job Group",
