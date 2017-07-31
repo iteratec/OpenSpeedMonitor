@@ -94,14 +94,21 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var setDataForBars = function () {
         var componentsToRender = {};
-        measurandDataEntries.forEach(function (measurandNestEntry) {
-            componentsToRender[measurandNestEntry.key] = chartBarsComponents[measurandNestEntry.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
-            componentsToRender[measurandNestEntry.key].setData({
-                id: measurandNestEntry.values.id,
-                values: measurandNestEntry.values.series,
-                color: measurandNestEntry.values.color,
-                min: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min > 0 ? 0 : measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min,
-                max: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].max,
+        measurandDataEntries.forEach(function (entry) {
+            if (!chartBarsComponents[entry.key]) {
+                var component = OpenSpeedMonitor.ChartComponents.ChartBars();
+                component.on("mouseover", function () {chartLegendComponent.mouseOverEntry({id: entry.key});});
+                component.on("mouseout", function () {chartLegendComponent.mouseOutEntry({id: entry.key});});
+                component.on("click", function () {chartLegendComponent.clickEntry({id: entry.key});});
+                chartBarsComponents[entry.key] = component;
+            }
+            componentsToRender[entry.key] = chartBarsComponents[entry.key];
+            componentsToRender[entry.key].setData({
+                id: entry.values.id,
+                values: entry.values.series,
+                color: entry.values.color,
+                min: measurandGroupDataMap[entry.values.measurandGroup].min > 0 ? 0 : measurandGroupDataMap[entry.values.measurandGroup].min,
+                max: measurandGroupDataMap[entry.values.measurandGroup].max,
                 height: chartBarsHeight,
                 width: chartBarsWidth
             });

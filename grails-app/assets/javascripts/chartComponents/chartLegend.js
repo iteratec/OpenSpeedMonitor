@@ -175,7 +175,10 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         render: render,
         setData: setData,
         on: registerEventHandler,
-        estimateHeight: estimateHeight
+        estimateHeight: estimateHeight,
+        clickEntry: clickEntry,
+        mouseOverEntry: mouseOverEntry,
+        mouseOutEntry: mouseOutEntry
     };
 
 });

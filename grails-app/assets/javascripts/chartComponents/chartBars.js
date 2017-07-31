@@ -16,7 +16,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var barColor = "#1660a7";
     var transitionDuration = 500;
     var isRestrained = false;
-
+    var eventHandlers = {};
 
     var setData = function (componentData) {
         data = componentData.values || data;
@@ -45,7 +45,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderEnter = function (enterSelection) {
         var bars = enterSelection.append("g")
-            .attr("class", "bar");
+            .attr("class", "bar")
+            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
+            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
+            .on("click", function(data) { callEventHandler("click", data) });
         bars.append("rect")
             .attr("class", "bar-rect")
             .attr("x", 0)
@@ -92,9 +95,21 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .remove();
     };
 
+    var callEventHandler = function (eventType, bar) {
+        if (eventHandlers[eventType]) {
+            eventHandlers[eventType](bar);
+        }
+    };
+
+    var registerEventHandler = function (eventType, eventHandler) {
+        eventHandlers[eventType] = eventHandler;
+    };
+
+
     return {
         render: render,
-        setData: setData
+        setData: setData,
+        on: registerEventHandler
     };
 });
 
