@@ -57,16 +57,17 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
         var anyIsSelected = isAnyEntrySelected();
         var anyIsHighlighted = isAnyEntryHighlighted();
-        updateSelection.each(function(d, i) {
-            var x = maxEntryGroupSize * (i % maxEntriesInRow);
-            var y = Math.floor(i / maxEntriesInRow) * entryMargin;
-            var opacity = (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
-            d3.select(this)
-                .attr("transform", "translate(" + x + "," + y + ")")
-                .transition()
-                .duration(transitionDuration)
-                .style("opacity", opacity);
-        });
+        updateSelection
+            .attr("transform", function(d, i) {
+                var x = maxEntryGroupSize * (i % maxEntriesInRow);
+                var y = Math.floor(i / maxEntriesInRow) * entryMargin;
+                return "translate(" + x + "," + y + ")";
+            })
+            .transition()
+            .duration(transitionDuration)
+            .style("opacity", function(d) {
+                return (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
+            });
         updateSelection.select("rect")
             .style('fill', function (d) {
                 return d.color;
