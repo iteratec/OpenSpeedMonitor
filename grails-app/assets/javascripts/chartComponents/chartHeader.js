@@ -28,7 +28,7 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
           .append("text")
           .classed("header-text", true)
           .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "middle")
+          .attr("dominant-baseline", "alphabetic")
           .text(function (d) {
               return d;
           })
@@ -38,7 +38,7 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
           .duration(transitionDuration)
           .style("opacity", 1)
           .attr("x", width/2)
-          .attr("y", height/2);
+          .attr("y", height);
     };
 
     return {
