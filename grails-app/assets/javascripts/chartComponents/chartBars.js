@@ -58,7 +58,6 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         bars.append("text")
             .attr("class", "bar-value")
             .attr("x", 0)
-            .text(function (d) { return Math.round(d.value) + " " + d.unit})
             .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
             .style("fill", "white")
@@ -82,6 +81,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             });
 
         transition.select(".bar-value")
+            .text(function (d) { return Math.round(d.value) + " " + d.unit})
             .attr("y", function (d) { return yScale(d.id) + barBand / 2 })
             .attr("x", function (d) { return xScale(d.value) - valueLabelOffset });
     };
