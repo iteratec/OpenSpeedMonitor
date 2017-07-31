@@ -5,6 +5,7 @@
 //= require /chartComponents/chartLegend.js
 //= require /chartComponents/chartSideLabels.js
 //= require /chartComponents/chartHeader.js
+//= require /d3/chartLabelUtil.js
 //= require_self
 
 "use strict";
@@ -28,6 +29,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var measurandDataEntries = {};
     var measurandGroupDataMap = {};
     var sideLabelData = [];
+    var headerText = "";
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
@@ -40,11 +42,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     });
 
     var setData = function (data) {
-        measurandDataEntries = (data && data.series) ? extractMeasurandData(data.series) : measurandDataEntries;
-        measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
-        sideLabelData = (data && data.series) ? data.series.map(function (s) { return s.page;}) : sideLabelData;
+        if (data.series) {
+            var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(data.series, data.i18nMap);
+            headerText = chartLabelUtils.getCommonLabelParts(true);
+            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
+            measurandDataEntries = extractMeasurandData(data.series);
+            measurandGroupDataMap = extractMeasurandGroupData(data.series);
+        }
 
-        fullWidth = (data && data.width) ? data.width : fullWidth;
+        fullWidth = data.width || fullWidth;
         fullWidth = fullWidth < 0 ? svg.node().getBoundingClientRect().width : fullWidth;
         chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
         chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
@@ -60,7 +66,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var setDataForHeader = function () {
         chartHeaderComponent.setData({
             width: fullWidth,
-            text: measurandDataEntries[0].values.series[0].jobGroup
+            text: headerText
         });
     };
 

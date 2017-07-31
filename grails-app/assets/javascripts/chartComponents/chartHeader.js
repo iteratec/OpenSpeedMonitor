@@ -13,7 +13,7 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
     var transitionDuration = 500;
 
     var setData = function (data) {
-        textData = data.text || textData;
+        textData = (data.text || data.text === "") ? data.text : textData;
         width = data.width || width;
     };
 
