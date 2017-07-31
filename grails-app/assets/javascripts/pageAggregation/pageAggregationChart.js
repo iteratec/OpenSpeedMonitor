@@ -87,6 +87,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         measurandDataEntries.forEach(function (measurandNestEntry) {
             componentsToRender[measurandNestEntry.key] = chartBarsComponents[measurandNestEntry.key] || OpenSpeedMonitor.ChartComponents.ChartBars();
             componentsToRender[measurandNestEntry.key].setData({
+                id: measurandNestEntry.values.id,
                 values: measurandNestEntry.values.series,
                 color: measurandNestEntry.values.color,
                 min: measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min > 0 ? 0 : measurandGroupDataMap[measurandNestEntry.values.measurandGroup].min,
@@ -107,6 +108,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
                 var firstValue = seriesOfMeasurand[0];
                 var unit = firstValue.unit;
                 colorScales[unit] = colorScales[unit] || colorProvider.getColorscaleForMeasurandGroup(unit);
+                seriesOfMeasurand.forEach(function(pageData) {
+                    pageData.id = pageData.page + ";" + pageData.jobGroup
+                });
                 return {
                     id: firstValue.measurand,
                     label: firstValue.measurandLabel,

@@ -15,8 +15,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
     var barColor = null;
     var transitionDuration = 500;
+    var id = "";
 
     var setData = function (componentData) {
+        id = componentData.id || id;
         data = componentData.values;
         minValue = componentData.min;
         maxValue = componentData.max;
@@ -30,10 +32,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         var yScale = d3.scale.ordinal().rangeBands([0, height]);
 
         xScale.domain([minValue, maxValue]);
-        yScale.domain(data.map(function(d) { return d.page; }));
+        yScale.domain(data.map(function(d) { return d.id; }));
 
         var bars = d3.select(selector).selectAll(".bar").data(data, function (d) {
-            return d.page;
+            return d.id;
         });
         renderExit(bars.exit());
         renderEnter(bars.enter(), yScale);
@@ -68,14 +70,14 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         transition.select(".bar-rect")
             .style("fill", barColor)
             .attr("y", function (d) {
-                return yScale(d.page)
+                return yScale(d.id)
             })
             .attr("width", function (d) {
                 return xScale(d.value)
             });
 
         transition.select(".bar-value")
-            .attr("y", function (d) { return yScale(d.page) + barBand / 2 })
+            .attr("y", function (d) { return yScale(d.id) + barBand / 2 })
             .attr("x", function (d) { return xScale(d.value) - valueLabelOffset });
     };
 
