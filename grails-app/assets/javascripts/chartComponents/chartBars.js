@@ -15,16 +15,17 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
     var barColor = "#1660a7";
     var transitionDuration = 500;
-    var id = "";
+    var isRestrained = false;
+
 
     var setData = function (componentData) {
-        id = componentData.id || id;
         data = componentData.values || data;
         minValue = componentData.min || minValue;
         maxValue = componentData.max || maxValue;
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
+        isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
     };
 
     var render = function (selector) {
@@ -65,7 +66,8 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         var valueLabelOffset = 10;
         var transition = updateSelection
             .transition()
-            .duration(transitionDuration);
+            .duration(transitionDuration)
+            .style("opacity", isRestrained ? 0.2 : 1);
 
         transition.select(".bar-rect")
             .style("fill", barColor)

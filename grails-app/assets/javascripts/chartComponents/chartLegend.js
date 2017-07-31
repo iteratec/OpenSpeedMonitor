@@ -93,33 +93,53 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         return d3.max(labelWidths) + colorPreviewSize + entryMargin + colorPreviewMargin;
     };
 
-    var mouseOverEntry = function (legendEntry) {
+    var mouseOverEntry = function (data) {
         if (isAnyEntrySelected()) {
             return;
         }
         entryData.forEach(function (entry) {
-            entry.highlighted = entry.id === legendEntry.id;
+            entry.highlighted = entry.id === data.id;
         });
         render();
-        callEventHandler("highlight", legendEntry);
+        callEventHandler("highlight", {
+            id: data.id,
+            highlighted: true,
+            anyHighlighted: true
+        });
     };
 
-    var mouseOutEntry = function (legendEntry) {
+    var mouseOutEntry = function (data) {
         if (isAnyEntrySelected()) {
             return;
         }
-        legendEntry.highlighted = false;
+        entryData.forEach(function (entry) {
+            if (entry.id === data.id) {
+                entry.highlighted = false;
+            }
+        });
         render();
-        callEventHandler("highlight", legendEntry);
+        callEventHandler("highlight", {
+            id: data.id,
+            highlighted: false,
+            anyHighlighted: false
+        });
     };
 
-    var clickEntry = function (legendEntry) {
+    var clickEntry = function (data) {
+        var idIsSelected = false;
         entryData.forEach(function (entry) {
-            entry.selected = (entry.id === legendEntry.id) ? !entry.selected : false;
+            entry.selected = (entry.id === data.id) ? !entry.selected : false;
             entry.highlighted = false;
+            if (entry.id === data.id) {
+                idIsSelected = entry.selected;
+            }
         });
         render();
-        callEventHandler("select", legendEntry);
+        callEventHandler("select", {
+            id: data.id,
+            selected: idIsSelected,
+            anySelected: isAnyEntrySelected()
+        });
     };
 
     var isAnyEntrySelected = function () {

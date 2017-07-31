@@ -29,6 +29,16 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var measurandGroupDataMap = {};
     var sideLabelData = [];
 
+    chartLegendComponent.on("select", function (selectEvent) {
+        toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
+        render();
+    });
+
+    chartLegendComponent.on("highlight", function (highlightEvent) {
+        toggleBarComponentHighlight(highlightEvent.id, highlightEvent.anyHighlighted, highlightEvent.highlighted);
+        render();
+    });
+
     var setData = function (data) {
         measurandDataEntries = (data && data.series) ? extractMeasurandData(data.series) : measurandDataEntries;
         measurandGroupDataMap = (data && data.series) ? extractMeasurandGroupData(data.series) : measurandGroupDataMap;
@@ -237,6 +247,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
            chartBarsComponent.render(this);
         });
 
+    };
+
+    var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {
+        Object.keys(chartBarsComponents).forEach(function(measurand) {
+            var isRestrained = anyHighlighted && !(doHighlight && measurand === measurandToHighlight);
+            chartBarsComponents[measurand].setData({isRestrained: isRestrained});
+        });
+        render();
     };
 
     var autoWidth = function () {
