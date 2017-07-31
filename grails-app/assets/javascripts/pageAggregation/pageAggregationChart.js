@@ -30,6 +30,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var measurandGroupDataMap = {};
     var sideLabelData = [];
     var headerText = "";
+    var stackBars = false;
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
@@ -49,12 +50,12 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             measurandDataEntries = extractMeasurandData(data.series);
             measurandGroupDataMap = extractMeasurandGroupData(data.series);
         }
-
+        stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
         fullWidth = data.width || fullWidth;
         fullWidth = fullWidth < 0 ? svg.node().getBoundingClientRect().width : fullWidth;
         chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
         chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
-        chartBarsHeight = calculateChartBarsHeight(measurandDataEntries[0].values.series.length);
+        chartBarsHeight = calculateChartBarsHeight();
 
         setDataForHeader();
         setDataForLegend();
@@ -157,10 +158,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             }).map(series);
     };
 
-    var calculateChartBarsHeight = function (numberOfMeasurands) {
+    var calculateChartBarsHeight = function () {
         var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
         var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
-        return numberOfMeasurands * (barBand + barGap) - barGap;
+        var numberOfMeasurands = measurandDataEntries.length;
+        var numberOfPages = d3.max(measurandDataEntries.map(function(d) { return d.values.series.length; }));
+        var numberOfBars = numberOfPages * (stackBars ? 1 : numberOfMeasurands);
+        var gapSize = barGap * ((stackBars || numberOfMeasurands < 2) ? 1 : 2);
+        return ((numberOfPages - 1) * gapSize) + numberOfBars * barBand;
     };
 
     var render = function () {
@@ -256,7 +261,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         chartBars.enter()
             .append("g")
             .attr("class", "chart-bars");
-        chartBars.each(function(chartBarsComponent) {
+        chartBars
+            .attr("transform", function (_, i) {
+                return "translate(0, " + (i * OpenSpeedMonitor.ChartComponents.ChartBars.BarBand) + ")";
+            })
+            .each(function(chartBarsComponent) {
            chartBarsComponent.render(this);
         });
 
