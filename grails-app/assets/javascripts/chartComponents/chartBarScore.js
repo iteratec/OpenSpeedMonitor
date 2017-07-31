@@ -90,9 +90,11 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
                 return scale(d.end) - scale(d.start);
             });
         transition.select('text')
-            .style("opacity", 1)
             .attr("x", function (d) {
                 return (scale(d.end) - scale(d.start)) / 2;
+            })
+            .style("opacity", function(d) {
+                return ((this.getComputedTextLength() + 20) > ((scale(d.end) - scale(d.start)) / 2)) ? 0 : 1;
             });
     };
 

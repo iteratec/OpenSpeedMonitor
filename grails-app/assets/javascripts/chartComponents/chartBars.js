@@ -90,10 +90,8 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .attr("x", function (d) {
                 return xScale(d.value) - valueLabelOffset;
             })
-            .each(function(d) {
-                if ((this.getComputedTextLength() + 2 * valueLabelOffset) > xScale(d.value)) {
-                    d3.select(this).style("opacity", 0);
-                }
+            .style("opacity", function(d) {
+                return ((this.getComputedTextLength() + 2 * valueLabelOffset) > xScale(d.value)) ? 0 : 1;
             });
     };
 
