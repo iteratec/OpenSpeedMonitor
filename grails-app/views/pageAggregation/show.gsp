@@ -103,7 +103,7 @@
         $(window).on('pageAggregationChartLoaded', function () {
             pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
             $(window).on('resize', function() {
-                pageAggregationChart.autoWidth();
+                pageAggregationChart.setData({autoWidth: true});
                 pageAggregationChart.render();
             });
         });

@@ -31,6 +31,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var sideLabelData = [];
     var headerText = "";
     var stackBars = false;
+    var autoWidth = true;
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
@@ -52,7 +53,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         }
         stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
         fullWidth = data.width || fullWidth;
-        fullWidth = fullWidth < 0 ? svg.node().getBoundingClientRect().width : fullWidth;
+        autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
+        fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
         chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
         chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
@@ -180,7 +182,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         svg
             .transition()
             .duration(transitionDuration)
-            .style("height", chartHeight);
+            .style("height", chartHeight)
+            .each("end", rerenderIfWidthChanged);
+
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);
 
@@ -271,6 +275,17 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     };
 
+    var rerenderIfWidthChanged = function () {
+        if (autoWidth && (Math.abs(getActualSvgWidth() - fullWidth) >= 1)) {
+            setData({autoWidth: true});
+            render();
+        }
+    };
+
+    var getActualSvgWidth = function() {
+        return svg.node().getBoundingClientRect().width;
+    };
+
     var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {
         Object.keys(chartBarsComponents).forEach(function(measurand) {
             var isRestrained = anyHighlighted && !(doHighlight && measurand === measurandToHighlight);
@@ -279,14 +294,9 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         render();
     };
 
-    var autoWidth = function () {
-        setData({width: -1});
-    };
-
     return {
         render: render,
-        setData: setData,
-        autoWidth: autoWidth
+        setData: setData
     };
 
 });
