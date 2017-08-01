@@ -106,7 +106,38 @@
                 pageAggregationChart.setData({autoWidth: true});
                 pageAggregationChart.render();
             });
+            $("#inFrontButton").click(function() {
+                pageAggregationChart.setData({stackBars: true});
+                pageAggregationChart.render();
+            });
+            $("#besideButton").click(function() {
+                pageAggregationChart.setData({stackBars: false});
+                pageAggregationChart.render();
+            });
+            $(".chart-filter").click(onFilterClick);
         });
+
+        function onFilterClick() {
+            pageAggregationChart.setData({activeFilter: $(this).data("filter")});
+            pageAggregationChart.render();
+            $(".chart-filter i").toggleClass('filterInactive', true).toggleClass('filterActive', false);
+            $("i", $(this)).toggleClass('filterActive', true);
+        }
+
+        function addFiltersToGui(filterRules) {
+            var $filterDropdownGroup = $("#filter-dropdown-group");
+            var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
+            $filterDropdownGroup.find('.filterRule').remove();
+            if ($filterDropdownGroup.hasClass("hidden"))
+                $filterDropdownGroup.removeClass("hidden");
+
+            Object.keys(filterRules).forEach(function(filterRuleKey) {
+                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+                link.data('filter', filterRuleKey);
+                link.click(onFilterClick);
+                link.insertAfter($customerJourneyHeader);
+            });
+        }
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -149,6 +180,9 @@
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
                         data.width = -1;
+                        if (data.filterRules) {
+                            addFiltersToGui(data.filterRules);
+                        }
                         pageAggregationChart.setData(data);
                         pageAggregationChart.render();
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);

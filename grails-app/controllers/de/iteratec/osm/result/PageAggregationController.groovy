@@ -195,7 +195,7 @@ class PageAggregationController extends ExceptionHandlerController {
      * The filterRules can filter the data by testedPages in {@link Script}
      * @return a map which maps the {@link Script}-name to a list of page-jobGroup-name-combinations (e.g. ["script1" : ["page1 / jobGroup1"]])
      */
-    private Map<String, List<String>> createFilterRules(List<Page> pages, List<JobGroup> jobGroups) {
+    private Map<String, List<Map<String, String>>> createFilterRules(List<Page> pages, List<JobGroup> jobGroups) {
         Map<String, List<String>> result = [:].withDefault { [] }
 
         // Get all scripts
@@ -222,7 +222,7 @@ class PageAggregationController extends ExceptionHandlerController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << "${p.name} | ${it.name}"
+                        filterRule << [ page: p.name, jobGroup: it.name]
                     }
                 }
             }

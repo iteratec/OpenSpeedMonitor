@@ -77,7 +77,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
                 return yScale(d.id)
             })
             .attr("width", function (d) {
-                return xScale(d.value)
+                return d.value === null ? 0 : xScale(d.value);
             });
 
         transition.select(".bar-value")
