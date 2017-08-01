@@ -245,6 +245,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         return chartSideLabelsWidth;
     };
 
+    var hasStackedBars = function () {
+        return stackBars;
+    };
+
     return {
         setData: setData,
         getDataForHeader: getDataForHeader,
@@ -256,7 +260,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         hasLoadTimes: hasLoadTimes,
         needsAutoResize: needsAutoResize,
         getChartBarsHeight: getChartBarsHeight,
-        getChartSideLabelsWidth: getChartSideLabelsWidth
+        getChartSideLabelsWidth: getChartSideLabelsWidth,
+        hasStackedBars: hasStackedBars
     }
 });
 OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin = 15;

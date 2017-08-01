@@ -148,7 +148,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         chartBarsGroup.enter()
             .append("g")
             .attr("class", "chart-bar-group");
-
+        var barsOffset = data.hasStackedBars() ? 0 : OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
         var chartBars = chartBarsGroup.selectAll(".chart-bars").data(Object.values(chartBarsComponents));
         chartBars.exit()
             .remove();
@@ -156,8 +156,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
             .append("g")
             .attr("class", "chart-bars");
         chartBars
+            .transition()
+            .duration(transitionDuration)
             .attr("transform", function (_, i) {
-                return "translate(0, " + (i * OpenSpeedMonitor.ChartComponents.ChartBars.BarBand) + ")";
+                return "translate(0, " + (i * barsOffset) + ")";
             })
             .each(function(chartBarsComponent) {
            chartBarsComponent.render(this);
