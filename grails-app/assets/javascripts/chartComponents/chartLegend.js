@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require /chartComponents/utility.js
 //= require_self
 
 "use strict";
@@ -56,16 +57,17 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         var maxEntriesInRow = Math.floor(width / maxEntryGroupSize);
         var anyIsSelected = isAnyEntrySelected();
         var anyIsHighlighted = isAnyEntryHighlighted();
-        updateSelection.each(function(d, i) {
-            var x = maxEntryGroupSize * (i % maxEntriesInRow);
-            var y = Math.floor(i / maxEntriesInRow) * entryMargin;
-            var opacity = (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
-            d3.select(this)
-                .attr("transform", "translate(" + x + "," + y + ")")
-                .transition()
-                .duration(transitionDuration)
-                .style("opacity", opacity);
-        });
+        updateSelection
+            .attr("transform", function(d, i) {
+                var x = maxEntryGroupSize * (i % maxEntriesInRow);
+                var y = Math.floor(i / maxEntriesInRow) * entryMargin;
+                return "translate(" + x + "," + y + ")";
+            })
+            .transition()
+            .duration(transitionDuration)
+            .style("opacity", function(d) {
+                return (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
+            });
         updateSelection.select("rect")
             .style('fill', function (d) {
                 return d.color;
@@ -84,52 +86,61 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
             .remove();
     };
 
-    var getLabelWidths = function (svgForEstimation, entryData) {
-        var widths = [];
-        svgForEstimation.selectAll('.invisible-text-to-measure')
-            .data(entryData)
-            .enter()
-            .append("text")
-            .attr("opacity", 0)
-            .text(function(d) { return d.label })
-            .each(function() {
-                widths.push(this.getComputedTextLength());
-                this.remove();
-            });
-        return widths;
-    };
-
     var calculateMaxEntryGroupWidth = function (svgForEstimation) {
-        return d3.max(getLabelWidths(svgForEstimation, entryData)) + colorPreviewSize + entryMargin + colorPreviewMargin;
+        var labels = entryData.map(function (d) {
+            return d.label;
+        });
+        var labelWidths = OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svgForEstimation, labels);
+        return d3.max(labelWidths) + colorPreviewSize + entryMargin + colorPreviewMargin;
     };
 
-    var mouseOverEntry = function (legendEntry) {
+    var mouseOverEntry = function (data) {
         if (isAnyEntrySelected()) {
             return;
         }
         entryData.forEach(function (entry) {
-            entry.highlighted = entry.id === legendEntry.id;
+            entry.highlighted = entry.id === data.id;
         });
         render();
-        callEventHandler("highlight", legendEntry);
+        callEventHandler("highlight", {
+            id: data.id,
+            highlighted: true,
+            anyHighlighted: true
+        });
     };
 
-    var mouseOutEntry = function (legendEntry) {
+    var mouseOutEntry = function (data) {
         if (isAnyEntrySelected()) {
             return;
         }
-        legendEntry.highlighted = false;
+        entryData.forEach(function (entry) {
+            if (entry.id === data.id) {
+                entry.highlighted = false;
+            }
+        });
         render();
-        callEventHandler("highlight", legendEntry);
+        callEventHandler("highlight", {
+            id: data.id,
+            highlighted: false,
+            anyHighlighted: false
+        });
     };
 
-    var clickEntry = function (legendEntry) {
+    var clickEntry = function (data) {
+        var idIsSelected = false;
         entryData.forEach(function (entry) {
-            entry.selected = (entry.id === legendEntry.id) ? !entry.selected : false;
+            entry.selected = (entry.id === data.id) ? !entry.selected : false;
             entry.highlighted = false;
+            if (entry.id === data.id) {
+                idIsSelected = entry.selected;
+            }
         });
         render();
-        callEventHandler("select", legendEntry);
+        callEventHandler("select", {
+            id: data.id,
+            selected: idIsSelected,
+            anySelected: isAnyEntrySelected()
+        });
     };
 
     var isAnyEntrySelected = function () {
@@ -165,7 +176,10 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
         render: render,
         setData: setData,
         on: registerEventHandler,
-        estimateHeight: estimateHeight
+        estimateHeight: estimateHeight,
+        clickEntry: clickEntry,
+        mouseOverEntry: mouseOverEntry,
+        mouseOutEntry: mouseOutEntry
     };
 
 });

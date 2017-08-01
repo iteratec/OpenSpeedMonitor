@@ -14,14 +14,14 @@
                 <g:message code="de.iteratec.osm.barchart.filter.noFilterHeader" default="no filter"/>
             </li>
             <li>
-                <a id="all-bars-desc" href="#">
+                <a id="all-bars-desc" class="chart-filter" data-filter="desc" href="#">
                     <i class="fa fa-check filterActive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterDesc"
                                default="no filter, sorting desc"/>
                 </a>
             </li>
             <li>
-                <a id="all-bars-asc" href="#">
+                <a id="all-bars-asc" class="chart-filter" data-filter="asc" href="#">
                     <i class="fa fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterAsc"
                                default="no filter, sorting asc"/>
