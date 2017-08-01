@@ -6,6 +6,7 @@
 //= require /chartComponents/chartSideLabels.js
 //= require /chartComponents/chartHeader.js
 //= require /d3/chartLabelUtil.js
+//= require /pageAggregation/pageAggregationChartData.js
 //= require_self
 
 "use strict";
@@ -20,18 +21,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
-    var componentMargin = 15;
+    var data = OpenSpeedMonitor.ChartModules.PageAggregationData(svg);
     var transitionDuration = 500;
-    var chartSideLabelsWidth = 200;
-    var chartBarsWidth = 700;
-    var fullWidth = chartSideLabelsWidth + chartBarsWidth;
-    var chartBarsHeight = 400;
-    var measurandDataEntries = {};
-    var measurandGroupDataMap = {};
-    var sideLabelData = [];
-    var headerText = "";
-    var stackBars = false;
-    var autoWidth = true;
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
@@ -43,137 +34,36 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         render();
     });
 
-    var setData = function (data) {
-        if (data.series) {
-            var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(data.series, data.i18nMap);
-            headerText = chartLabelUtils.getCommonLabelParts(true);
-            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
-            measurandDataEntries = extractMeasurandData(data.series);
-            measurandGroupDataMap = extractMeasurandGroupData(data.series);
-        }
-        stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
-        fullWidth = data.width || fullWidth;
-        autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
-        fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
-        chartSideLabelsWidth = chartSideLabelsComponent.estimateWidth(svg, sideLabelData);
-        chartBarsWidth = fullWidth - componentMargin - chartSideLabelsWidth;
-        chartBarsHeight = calculateChartBarsHeight();
-
-        setDataForHeader();
-        setDataForLegend();
-        setDataForBarScore();
-        setDataForSideLabels();
+    var setData = function (inputData) {
+        data.setData(inputData);
+        chartHeaderComponent.setData(data.getDataForHeader());
+        chartBarScoreComponent.setData(data.getDataForBarScore());
+        chartLegendComponent.setData(data.getDataForLegend());
+        chartSideLabelsComponent.setData(data.getDataForSideLabels());
         setDataForBars();
-    };
-
-    var setDataForHeader = function () {
-        chartHeaderComponent.setData({
-            width: fullWidth,
-            text: headerText
-        });
-    };
-
-    var setDataForBarScore = function () {
-        chartBarScoreComponent.setData({
-            width: chartBarsWidth,
-            max: measurandGroupDataMap["LOAD_TIMES"] ? measurandGroupDataMap["LOAD_TIMES"].max : 0
-        });
-    };
-
-    var setDataForLegend = function () {
-        chartLegendComponent.setData({
-            entries: measurandDataEntries.map(function (measurandNestEntry) {
-                var measurandValue = measurandNestEntry.values;
-                return {
-                    id: measurandValue.id,
-                    color: measurandValue.color,
-                    label: measurandValue.label
-                };
-            }),
-            width: chartBarsWidth
-        });
-    };
-
-    var setDataForSideLabels = function () {
-      chartSideLabelsComponent.setData({
-         height: chartBarsHeight,
-         labels: sideLabelData
-      });
     };
 
     var setDataForBars = function () {
         var componentsToRender = {};
-        measurandDataEntries.forEach(function (entry) {
-            if (!chartBarsComponents[entry.key]) {
+        data.getAllMeasurands().forEach(function (measurand) {
+            if (!chartBarsComponents[measurand]) {
                 var component = OpenSpeedMonitor.ChartComponents.ChartBars();
-                component.on("mouseover", function () {chartLegendComponent.mouseOverEntry({id: entry.key});});
-                component.on("mouseout", function () {chartLegendComponent.mouseOutEntry({id: entry.key});});
-                component.on("click", function () {chartLegendComponent.clickEntry({id: entry.key});});
-                chartBarsComponents[entry.key] = component;
+                component.on("mouseover", function () {chartLegendComponent.mouseOverEntry({id: measurand});});
+                component.on("mouseout", function () {chartLegendComponent.mouseOutEntry({id: measurand});});
+                component.on("click", function () {chartLegendComponent.clickEntry({id: measurand});});
+                chartBarsComponents[measurand] = component;
             }
-            componentsToRender[entry.key] = chartBarsComponents[entry.key];
-            componentsToRender[entry.key].setData({
-                id: entry.values.id,
-                values: entry.values.series,
-                color: entry.values.color,
-                min: measurandGroupDataMap[entry.values.measurandGroup].min > 0 ? 0 : measurandGroupDataMap[entry.values.measurandGroup].min,
-                max: measurandGroupDataMap[entry.values.measurandGroup].max,
-                height: chartBarsHeight,
-                width: chartBarsWidth
-            });
+            componentsToRender[measurand] = chartBarsComponents[measurand];
+            componentsToRender[measurand].setData(data.getDataForBars(measurand));
         });
         chartBarsComponents = componentsToRender;
     };
 
-    var extractMeasurandData = function (series) {
-        var colorProvider = OpenSpeedMonitor.ChartColorProvider();
-        var colorScales = {};
-        return d3.nest()
-            .key(function(d) { return d.measurand; })
-            .rollup(function (seriesOfMeasurand) {
-                var firstValue = seriesOfMeasurand[0];
-                var unit = firstValue.unit;
-                colorScales[unit] = colorScales[unit] || colorProvider.getColorscaleForMeasurandGroup(unit);
-                seriesOfMeasurand.forEach(function(pageData) {
-                    pageData.id = pageData.page + ";" + pageData.jobGroup
-                });
-                return {
-                    id: firstValue.measurand,
-                    label: firstValue.measurandLabel,
-                    measurandGroup: firstValue.measurandGroup,
-                    color: colorScales[unit](firstValue.measurand),
-                    series: seriesOfMeasurand
-                };
-            })
-            .entries(series);
-    };
-
-    var extractMeasurandGroupData = function (series) {
-        return d3.nest()
-            .key(function(d) { return d.measurandGroup; })
-            .rollup(function (seriesOfMeasurandGroup) {
-                var extent = d3.extent(seriesOfMeasurandGroup, function(entry) { return entry.value; });
-                return {
-                    min: extent[0],
-                    max: extent[1]
-                };
-            }).map(series);
-    };
-
-    var calculateChartBarsHeight = function () {
-        var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
-        var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
-        var numberOfMeasurands = measurandDataEntries.length;
-        var numberOfPages = d3.max(measurandDataEntries.map(function(d) { return d.values.series.length; }));
-        var numberOfBars = numberOfPages * (stackBars ? 1 : numberOfMeasurands);
-        var gapSize = barGap * ((stackBars || numberOfMeasurands < 2) ? 1 : 2);
-        return ((numberOfPages - 1) * gapSize) + numberOfBars * barBand;
-    };
-
     var render = function () {
-        var shouldShowScore = !!measurandGroupDataMap["LOAD_TIMES"];
+        var shouldShowScore = data.hasLoadTimes();
+        var componentMargin = OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin;
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
-        var barScorePosY = chartBarsHeight + componentMargin;
+        var barScorePosY = data.getChartBarsHeight() + componentMargin;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
@@ -195,7 +85,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         contentGroup
             .transition()
             .duration(transitionDuration)
-            .attr("transform", "translate(" + (chartSideLabelsWidth + componentMargin) +", " + headerHeight +")");
+            .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) +", " + headerHeight +")");
         renderBars(contentGroup);
         renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         renderLegend(contentGroup, legendPosY);
@@ -276,14 +166,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     };
 
     var rerenderIfWidthChanged = function () {
-        if (autoWidth && (Math.abs(getActualSvgWidth() - fullWidth) >= 1)) {
+        if (data.needsAutoResize()) {
             setData({autoWidth: true});
             render();
         }
-    };
-
-    var getActualSvgWidth = function() {
-        return svg.node().getBoundingClientRect().width;
     };
 
     var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {
