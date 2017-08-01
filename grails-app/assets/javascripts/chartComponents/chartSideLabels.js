@@ -25,7 +25,7 @@ OpenSpeedMonitor.ChartComponents.ChartSideLabels = (function () {
         }
 
         var yScale = d3.scale.ordinal().rangeBands([0, height]).domain(labelData);
-        var labels = svg.selectAll(".side-label").data(labelData);
+        var labels = svg.selectAll(".side-label").data(labelData, function (d) { return d; });
         labels.exit()
             .transition()
             .duration(transitionDuration)
@@ -36,15 +36,15 @@ OpenSpeedMonitor.ChartComponents.ChartSideLabels = (function () {
             .classed("side-label", true)
             .style("opacity", 0)
             .attr("dominant-baseline", "middle")
+        labels
             .transition()
             .duration(transitionDuration)
-            .style("opacity", 1);
-        labels
-            .attr("y", function (d) {
-                return yScale(d) + (yScale.rangeBand() / 2);
-            })
             .text(function (d) {
                 return d;
+            })
+            .style("opacity", 1)
+            .attr("transform", function (d) {
+                return "translate(0, " + (yScale(d) + (yScale.rangeBand() / 2)) +")";
             });
     };
 
