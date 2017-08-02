@@ -328,4 +328,13 @@ class EventResult implements CsiValue {
     Double getNormalizedValueFor(Measurand measurand){
         return measurand.normalizeValue(getValueFor(measurand))
     }
+
+    Double getNormalizedValueFor(String userTimingName){
+        UserTiming userTiming = this.userTimings.find {it.name == userTimingName};
+        if(userTiming){
+            return  userTiming.getNormalizedValue()
+        }else{
+            return null
+        }
+    }
 }

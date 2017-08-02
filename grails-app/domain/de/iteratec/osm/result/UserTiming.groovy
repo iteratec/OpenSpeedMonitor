@@ -22,4 +22,12 @@ class UserTiming {
             return isMark || isMeasure
         })
     }
+
+    Double getValue(){
+        return this.type == UserTimingType.MARK ? this.startTime: this.duration
+    }
+
+    Double getNormalizedValue(){
+        return this.getValue() ?: this.getValue()/type.measurandGroup.unit.divisor
+    }
 }

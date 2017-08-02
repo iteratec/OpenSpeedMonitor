@@ -11,12 +11,12 @@ import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 @EqualsAndHashCode(excludes = "measuredEventId")
 @InheritConstructors
 class GraphLabel  implements Comparable<GraphLabel> {
-    SelectedMeasurand selectedMeasurand
+    Selected selectedMeasurand
     Long jobGroupId, measuredEventId, pageId, browserId, locationId
     Long millisStartOfInterval
     String connectivity, tag
 
-    GraphLabel(EventResult eventResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
+    GraphLabel(EventResult eventResult, Long millisStartOfInterval, Selected selectedMeasurand){
         this.connectivity = getConnectivityName(eventResult)
         this.millisStartOfInterval = millisStartOfInterval
         this.selectedMeasurand = selectedMeasurand

@@ -284,14 +284,14 @@ class EventResultDashboardController {
     private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
-        List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
+        List<Selected> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
         List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
                 new OsmChartAxis(
-                    it.getMeasurand().getMeasurandGroup(),
-                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString())
-                    + " [" + it.getMeasurand().getMeasurandGroup().getUnit().getLabel() + "]",
-                            getAxisSide(it.getMeasurand().getMeasurandGroup()) )
+                    it.getMeasurandGroup(),
+                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurandGroup()}", it.getMeasurandGroup().toString())
+                    + " [" + it.getMeasurandGroup().getUnit().getLabel() + "]",
+                            getAxisSide(it.getMeasurandGroup()) )
         }
 
         ErQueryParams queryParams = cmd.createErQueryParams();

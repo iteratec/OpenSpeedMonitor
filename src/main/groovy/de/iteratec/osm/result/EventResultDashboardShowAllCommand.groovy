@@ -29,6 +29,9 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      */
     Collection<String> selectedAggrGroupValuesUnCached = []
 
+    Collection<String> selectedUserTimingsUncached = []
+
+    Collection<String> selectedUserTimingsCached = []
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
@@ -79,9 +82,10 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
-        viewModelToCopyTo.put('selectedAggrGroupValues', getSelectedMeasurandsForString(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached, this.selectedUserTimingsCached, this.selectedUserTimingsUncached))
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggreGroupUserTimings', getSelectedUserTimings(this.selectedUserTimingsCached, this.selectedUserTimingsUncached))
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
@@ -95,10 +99,24 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         return selectedValues.collect{Measurand.valueOf(it)}
     }
 
-    Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
-        Collection<SelectedMeasurand> result = []
-        cached.each { result.add(new SelectedMeasurand(measurand: Measurand.valueOf(it), cachedView: CachedView.CACHED))}
-        uncached.each { result.add(new SelectedMeasurand(measurand:  Measurand.valueOf(it), cachedView:  CachedView.UNCACHED))}
+    Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached, Collection<String> usertimingsCached, Collection<String> usertimingsUncached){
+        Collection<Selected> result = getSelectedMeasurands(measurandsCached, measurandsUncached)
+        result.addAll(getSelectedUserTimings(usertimingsCached, usertimingsUncached))
+        return result
+    }
+
+
+    Collection<Selected> getSelectedUserTimings(Collection<String> cached, Collection<String> uncached){
+        Collection<Selected> result = []
+        cached.each { result.add(new Selected(name: it, cachedView: CachedView.CACHED, selectedType: SelectedType.USERTIMING))}
+        uncached.each { result.add(new Selected(name: it, cachedView: CachedView.UNCACHED, selectedType: SelectedType.USERTIMING))}
+        return result
+    }
+
+    Collection<Selected> getSelectedMeasurands(Collection<String> cached, Collection<String> uncached){
+        Collection<Selected> result = []
+        cached.each { result.add(new Selected(name: it, cachedView: CachedView.CACHED, selectedType: SelectedType.MEASURAND))}
+        uncached.each { result.add(new Selected(name: it, cachedView: CachedView.UNCACHED, selectedType: SelectedType.MEASURAND))}
         return result
     }
     /**
