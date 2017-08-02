@@ -286,18 +286,6 @@ public class EventResultDashboardService {
 
         return highchartPointsForEachGraph
     }
-//
-//    private boolean isInBounds(EventResult eventResult, Measurand measurand, Map<Measurand, Number> gtBoundary, Map<Measurand, Number> ltBoundary) {
-//
-//        Number lt = gtBoundary[measurand]
-//        Number gt = ltBoundary[measurand]
-//
-//        boolean inBound = true
-//        if (lt) inBound &= eventResult.getProperty(measurand.getEventResultField()) > lt
-//        if (gt) inBound &= eventResult.getProperty(measurand.getEventResultField()) < gt
-//
-//        return inBound
-//    }
 
     private boolean isInBounds(def value, Selected selected, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary){
         if(value == null){
@@ -323,7 +311,7 @@ public class EventResultDashboardService {
             eventResults.each { EventResult eventResult ->
                 selectedMeasurands.each { Selected selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
-                        Double value = selectedMeasurand.getNormalizedValueFor(eventResult)
+                        Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                         if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)
