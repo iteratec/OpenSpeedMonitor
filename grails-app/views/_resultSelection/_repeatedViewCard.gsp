@@ -9,4 +9,5 @@
                                name="selectedAggrGroupValuesCached" optionKey="value"
                                optionValue="value"
                                value="${selectedAggrGroupValuesCached}"/>
+    <g:render template="/_resultSelection/selectUserTimingsCard" model="[name:'Cached']"/>
 </div>

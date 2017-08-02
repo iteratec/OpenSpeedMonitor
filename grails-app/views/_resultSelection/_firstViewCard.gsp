@@ -12,4 +12,5 @@
                                optionKey="value" optionValue="value"
                                multiple="true"
                                value="${selectedAggrGroupValuesUnCached}"/>
+    <g:render template="/_resultSelection/selectUserTimingsCard" model="[name:'Uncached']"/>
 </div>

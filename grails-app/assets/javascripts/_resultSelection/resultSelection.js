@@ -169,9 +169,10 @@ OpenSpeedMonitor.resultSelection = (function () {
             }
 
         }
-
-        updateCard(resultSelectionUrls["userTimings"], handle, spinner);
-        updateStarted = true;
+        if(OpenSpeedMonitor.selectUserTimings){
+            updateCard(resultSelectionUrls["userTimings"], OpenSpeedMonitor.selectUserTimings.updateUserTimings, spinner);
+            updateStarted = true;
+        }
 
         if (updateStarted && currentQueryArgs.caller === "EventResult") {
             updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);

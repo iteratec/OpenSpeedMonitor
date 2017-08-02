@@ -175,7 +175,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
             })
-            return userTimings.collect{[name: it[0], type:it[1]]}.groupBy {it.type}
+            return userTimings.collect{[name: it[0], type:it[1]]}
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

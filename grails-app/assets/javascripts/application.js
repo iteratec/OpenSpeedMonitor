@@ -255,6 +255,25 @@ OpenSpeedMonitor.domUtils = (function () {
         return options;
     };
 
+    var createOptionsOnlyByName = function (values) {
+        var options = [];
+        if (!values) {
+            return [];
+        }
+        values.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        values.forEach(function (value) {
+            if (value &&  value.name) {
+                options.push($("<option/>", {
+                    value: value.name,
+                    text: value.name
+                }));
+            }
+        });
+        return options;
+    };
+
     /**
      * Gets all values of all option elements in a select element
      * @param selectElement The select element with options as children
@@ -288,6 +307,17 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.val(selection);
     };
 
+    var updateSelectOptionsNamesOnly = function (selectElement, nameList, noResultsText) {
+        selectElement = $(selectElement);
+        var selection = selectElement.val();
+        selectElement.empty();
+        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsOnlyByName(nameList));
+        if (!selectElement.children().length && noResultsText) {
+            selectElement.append($("<option/>", {disabled: "disabled", text: noResultsText}));
+        }
+        selectElement.val(selection);
+    };
+
     /**
      * Deselects all selected options in a select element
      * @param selectElement The select element
@@ -306,7 +336,9 @@ OpenSpeedMonitor.domUtils = (function () {
         getAllOptionValues: getAllOptionValues,
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
-        deselectAllOptions: deselectAllOptions
+        deselectAllOptions: deselectAllOptions,
+        createOptionsOnlyByName: createOptionsOnlyByName,
+        updateSelectOptionsNamesOnly: updateSelectOptionsNamesOnly
     };
 })();
 
