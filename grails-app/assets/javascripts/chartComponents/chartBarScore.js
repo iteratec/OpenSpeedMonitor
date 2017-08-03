@@ -34,9 +34,11 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     ];
     var barsToRender = [];
     var max = 0;
+    var min = 0;
 
     var setData = function (data) {
         max = data.max || 0;
+        min = data.min || 0;
         width = data.width || width;
         barsToRender = [];
         var lastBarEnd = 0;
@@ -54,7 +56,7 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     };
 
     var render = function (svg) {
-        var scale = d3.scale.linear().rangeRound([0, width]).domain([0, max]);
+        var scale = d3.scale.linear().rangeRound([0, width]).domain([min, max]);
         var scoreBars = svg.selectAll(".scoreBar").data(barsToRender, function (d) { return d.id });
         renderExit(scoreBars.exit(), scale);
         renderEnter(scoreBars.enter(), scale);

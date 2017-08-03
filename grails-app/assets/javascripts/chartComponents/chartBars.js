@@ -16,6 +16,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var barColor = "#1660a7";
     var transitionDuration = 500;
     var isRestrained = false;
+    var forceSignInLabel = false;
     var eventHandlers = {};
 
     var setData = function (componentData) {
@@ -25,6 +26,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
+        forceSignInLabel = componentData.forceSignInLabel || forceSignInLabel;
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
     };
 
@@ -58,7 +60,6 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         bars.append("text")
             .attr("class", "bar-value")
             .attr("x", 0)
-            .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
             .style("fill", "white")
             .style("font-weight", "bold");
@@ -66,6 +67,11 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderUpdate = function (updateSelection, xScale, yScale) {
         var valueLabelOffset = 10;
+        updateSelection.select(".bar-value")
+            .text(function (d) {
+                var prefix = d.value > 0 && forceSignInLabel ? "+" : "";
+                return prefix + formatValue(d.value) + " " + d.unit;
+            });
         var transition = updateSelection
             .transition()
             .duration(transitionDuration)
@@ -76,23 +82,38 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .attr("y", function (d) {
                 return yScale(d.id)
             })
+            .attr("x", function (d) {
+                return barStart(xScale, d.value)
+            })
             .attr("width", function (d) {
-                return d.value === null ? 0 : xScale(d.value);
+                return barWidth(xScale, d.value);
             });
 
         transition.select(".bar-value")
-            .text(function (d) {
-                return formatValue(d.value) + " " + d.unit;
-            })
             .attr("y", function (d) {
                 return yScale(d.id) + barBand / 2;
             })
             .attr("x", function (d) {
-                return xScale(d.value) - valueLabelOffset;
+                return (d.value < 0) ? (barStart(xScale, d.value) + valueLabelOffset) : (barEnd(xScale, d.value) - valueLabelOffset);
+            })
+            .attr("text-anchor", function (d) {
+                return (d.value < 0) ? "start" : "end";
             })
             .style("opacity", function(d) {
-                return ((this.getComputedTextLength() + 2 * valueLabelOffset) > xScale(d.value)) ? 0 : 1;
+                return ((this.getComputedTextLength() + 2 * valueLabelOffset) > barWidth(xScale, d.value)) ? 0 : 1;
             });
+    };
+
+    var barEnd = function(xScale, value) {
+        return (value < 0) ? xScale(0) : xScale(value);
+    };
+
+    var barStart = function (xScale, value) {
+        return (value < 0) ? xScale(value) : xScale(0);
+    };
+
+    var barWidth = function(xScale, value) {
+        return value === null ? 0 : (barEnd(xScale, value) - barStart(xScale, value));
     };
 
     var renderExit = function (exitSelection) {
