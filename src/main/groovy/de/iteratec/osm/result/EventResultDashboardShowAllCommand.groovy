@@ -28,10 +28,6 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      * Determines wich {@link CachedView#UNCACHED} results should be shown.
      */
     Collection<String> selectedAggrGroupValuesUnCached = []
-
-    Collection<String> selectedUserTimingsUncached = []
-
-    Collection<String> selectedUserTimingsCached = []
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
@@ -82,7 +78,7 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
-        viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached, this.selectedUserTimingsCached, this.selectedUserTimingsUncached))
+        viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
 
@@ -95,19 +91,26 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.collect{Measurand.valueOf(it)}
+        return selectedValues.findAll {!it.startsWith("_UT_")}.collect {Measurand.valueOf(it)}
     }
 
-    Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached, Collection<String> usertimingsCached, Collection<String> usertimingsUncached){
-        Collection<Selected> result = getSelectedFor(measurandsCached, CachedView.CACHED, SelectedType.MEASURAND)
-        result.addAll(getSelectedFor(measurandsUncached, CachedView.UNCACHED, SelectedType.MEASURAND))
-        result.addAll(getSelectedFor(usertimingsCached, CachedView.CACHED, SelectedType.USERTIMING))
-        result.addAll(getSelectedFor(usertimingsUncached, CachedView.UNCACHED, SelectedType.USERTIMING))
+    Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
+        Collection<Selected> result = measurandsUncached.collect{createSelectedFor(it, CachedView.UNCACHED)}
+        result.addAll(measurandsCached.collect{createSelectedFor(it, CachedView.CACHED)})
         return result
     }
 
-    Collection<Selected> getSelectedFor(Collection<String> input, CachedView cachedView, SelectedType selectedType){
-        return input.collect{ new Selected(name: it, cachedView: cachedView, selectedType:  selectedType)}
+    Selected createSelectedFor(String inputParam, CachedView cachedView){
+        if(inputParam.startsWith("_UT_")){
+            String name = inputParam.substring(4);
+            if(name){
+                return new Selected(name: name, cachedView: cachedView, selectedType:  SelectedType.USERTIMING)
+            }else{
+                return null
+            }
+        }else{
+            return new Selected(name: inputParam, cachedView: cachedView, selectedType: SelectedType.MEASURAND)
+        }
     }
     /**
      * <p>

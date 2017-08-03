@@ -255,7 +255,7 @@ OpenSpeedMonitor.domUtils = (function () {
         return options;
     };
 
-    var createOptionsOnlyByName = function (values) {
+    var createOptionsForUserTimings = function (values) {
         var options = [];
         if (!values) {
             return [];
@@ -266,7 +266,7 @@ OpenSpeedMonitor.domUtils = (function () {
         values.forEach(function (value) {
             if (value &&  value.name) {
                 options.push($("<option/>", {
-                    value: value.name,
+                    value: "_UT_"+ value.name,
                     text: value.name
                 }));
             }
@@ -307,16 +307,15 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.val(selection);
     };
 
-    var updateSelectOptionsNamesOnly = function (selectElement, nameList, noResultsText) {
+    var updateOptionGroupWithUserTimings = function (selectElement, newNamesList, oldNamesList){
         selectElement = $(selectElement);
         var selection = selectElement.val();
-        selectElement.empty();
-        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsOnlyByName(nameList));
-        if (!selectElement.children().length && noResultsText) {
-            selectElement.append($("<option/>", {disabled: "disabled", text: noResultsText}));
-        }
+        oldNamesList.forEach(function(old){
+            selectElement.find('[value="_UT_'+old.name+'"]').remove();
+        });
+        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsForUserTimings(newNamesList));
         selectElement.val(selection);
-    };
+    }
 
     /**
      * Deselects all selected options in a select element
@@ -337,8 +336,8 @@ OpenSpeedMonitor.domUtils = (function () {
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
         deselectAllOptions: deselectAllOptions,
-        createOptionsOnlyByName: createOptionsOnlyByName,
-        updateSelectOptionsNamesOnly: updateSelectOptionsNamesOnly
+        createOptionsForUserTimings: createOptionsForUserTimings,
+        updateOptionGroupWithUserTimings: updateOptionGroupWithUserTimings
     };
 })();
 

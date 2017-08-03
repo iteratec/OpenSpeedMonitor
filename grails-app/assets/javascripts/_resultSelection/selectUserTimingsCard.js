@@ -4,50 +4,36 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectUserTimings = (function() {
     var resetButtonElement = $(".reset-result-selection");
-    var cards = [];
+    var optGroups = [];
+    var oldValues = [];
 
-    function Card(cardDomElement){
-        var cardElement = $(cardDomElement);
-        var userTimingsSelectElement = cardElement.find('.select-usertimings-element-class');
+    function OptGroup(optGroupDomElement){
+        var optGroupLoadTimes = $(optGroupDomElement).find('.measurand-opt-group-LOAD_TIMES');
 
-        function registerEvents(){
-            if(cardElement && userTimingsSelectElement){
-                userTimingsSelectElement.on("change", function () {
-                    cardElement.trigger("userTimingSelectionChanged", {userTimings: userTimingsSelectElement.val()});
-                });
-                resetButtonElement.on("click", function () {
-                    OpenSpeedMonitor.domUtils.deselectAllOptions(cardElement, true);
-                })
+        resetButtonElement.on("click", function () {
+            OpenSpeedMonitor.domUtils.deselectAllOptions(optGroupLoadTimes, true);
+        });
+
+        this.updateOptions = function (newNamesList) {
+            if(optGroupLoadTimes){
+                OpenSpeedMonitor.domUtils.updateOptionGroupWithUserTimings(optGroupLoadTimes, newNamesList, oldValues);
             }
         }
-
-        this.updateOptions = function (options) {
-            if(cardElement && userTimingsSelectElement){
-                if(options.length > 1){
-                    OpenSpeedMonitor.domUtils.updateSelectOptionsNamesOnly(userTimingsSelectElement, options, OpenSpeedMonitor.i18n.noResultsMsg);
-                    userTimingsSelectElement.trigger("change");
-                    cardElement.show()
-                } else {
-                    cardElement.hide()
-                }
-            }
-        };
-
-        registerEvents();
     }
 
     function init() {
-        $('.select-usertimings-card-class').each(function (index, cardElement) {
-            var card = new Card(cardElement);
-            cards.push(card);
+        $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
+            var optGroup = new OptGroup(optGroupElement);
+            optGroups.push(optGroup);
         })
     }
 
 
     var updateUserTimings = function(userTimings) {
-        cards.forEach(function (card) {
-            card.updateOptions(userTimings);
-        })
+        optGroups.forEach(function (optGroup) {
+            optGroup.updateOptions(userTimings);
+        });
+        oldValues = userTimings;
     };
 
 

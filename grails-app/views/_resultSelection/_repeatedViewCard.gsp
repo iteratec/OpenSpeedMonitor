@@ -5,9 +5,8 @@
     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                dataMap="${aggrGroupValuesCached}"
                                multiple="true" id="selectAggregatorCachedHtmlId"
-                               class="form-control long-select"
+                               class="form-control long-select measurands-select-opt-groups"
                                name="selectedAggrGroupValuesCached" optionKey="value"
                                optionValue="value"
                                value="${selectedAggrGroupValuesCached}"/>
-    <g:render template="/_resultSelection/selectUserTimingsCard" model="[name:'Cached']"/>
 </div>

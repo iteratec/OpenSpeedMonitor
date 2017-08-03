@@ -557,7 +557,6 @@ class EventResultDashboardController {
         def measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
         def browsers = eventResultDashboardService.getAllBrowser()
         def locations = eventResultDashboardService.getAllLocations()
-        def userTimings = []
         def eventsOfPages = pages.collectEntries { page ->
             [(page.id): measuredEvents.findResults { page.id == it.testedPage.id ? it.id : null } as HashSet<Long>]
         }
@@ -578,7 +577,6 @@ class EventResultDashboardController {
                 'tagToJobGroupNameMap' : jobGroupDaoService.getTagToJobGroupNameMap(),
                 'eventsOfPages': eventsOfPages,
                 'locationsOfBrowsers': locationsOfBrowsers,
-                'userTimings': userTimings
         ]
     }
 
