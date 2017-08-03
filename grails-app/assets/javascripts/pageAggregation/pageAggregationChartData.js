@@ -24,7 +24,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var setData = function (data) {
         rawSeries = data.series || rawSeries;
         filterRules = data.filterRules || filterRules;
-        activeFilter = data.activeFilter || activeFilter;
+        activeFilter = data.activeFilter || validateActiveFilter(activeFilter);
         if (data.series || data.filterRules || data.activeFilter) {
             var filteredSeries = filterSeries(rawSeries);
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
@@ -43,6 +43,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         chartBarsHeight = calculateChartBarsHeight();
     };
 
+    var validateActiveFilter = function(activeFilter) {
+        return (activeFilter === "asc" || activeFilter === "desc" || filterRules[activeFilter]) ? activeFilter : "desc";
+    };
 
     var extractMeasurandData = function (series) {
         var colorProvider = OpenSpeedMonitor.ChartColorProvider();
@@ -90,7 +93,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var filterSeries = function (series) {
-        if (activeFilter !== "asc" || activeFilter !== "desc" || !filterRules[activeFilter]) {
+        if (activeFilter === "asc" || activeFilter === "desc") {
             return series;
         }
         var filteredSeries = [];
