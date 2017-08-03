@@ -85,7 +85,6 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached, this.selectedUserTimingsCached, this.selectedUserTimingsUncached))
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
-        viewModelToCopyTo.put('selectedAggreGroupUserTimings', getSelectedUserTimings(this.selectedUserTimingsCached, this.selectedUserTimingsUncached))
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
@@ -100,24 +99,15 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached, Collection<String> usertimingsCached, Collection<String> usertimingsUncached){
-        Collection<Selected> result = getSelectedMeasurands(measurandsCached, measurandsUncached)
-        result.addAll(getSelectedUserTimings(usertimingsCached, usertimingsUncached))
+        Collection<Selected> result = getSelectedFor(measurandsCached, CachedView.CACHED, SelectedType.MEASURAND)
+        result.addAll(getSelectedFor(measurandsUncached, CachedView.UNCACHED, SelectedType.MEASURAND))
+        result.addAll(getSelectedFor(usertimingsCached, CachedView.CACHED, SelectedType.USERTIMING))
+        result.addAll(getSelectedFor(usertimingsUncached, CachedView.UNCACHED, SelectedType.USERTIMING))
         return result
     }
 
-
-    Collection<Selected> getSelectedUserTimings(Collection<String> cached, Collection<String> uncached){
-        Collection<Selected> result = []
-        cached.each { result.add(new Selected(name: it, cachedView: CachedView.CACHED, selectedType: SelectedType.USERTIMING))}
-        uncached.each { result.add(new Selected(name: it, cachedView: CachedView.UNCACHED, selectedType: SelectedType.USERTIMING))}
-        return result
-    }
-
-    Collection<Selected> getSelectedMeasurands(Collection<String> cached, Collection<String> uncached){
-        Collection<Selected> result = []
-        cached.each { result.add(new Selected(name: it, cachedView: CachedView.CACHED, selectedType: SelectedType.MEASURAND))}
-        uncached.each { result.add(new Selected(name: it, cachedView: CachedView.UNCACHED, selectedType: SelectedType.MEASURAND))}
-        return result
+    Collection<Selected> getSelectedFor(Collection<String> input, CachedView cachedView, SelectedType selectedType){
+        return input.collect{ new Selected(name: it, cachedView: cachedView, selectedType:  selectedType)}
     }
     /**
      * <p>
