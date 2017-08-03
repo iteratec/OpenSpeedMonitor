@@ -180,10 +180,6 @@ OpenSpeedMonitor.resultSelection = (function () {
 
     };
 
-    function handle(data){
-        console.dir(data)
-    }
-
     var validateForm = function () {
         var hasMeasurandSeries = OpenSpeedMonitor.BarchartMeasurings ? OpenSpeedMonitor.BarchartMeasurings.hasMeasurandSeries() : true;
         warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);

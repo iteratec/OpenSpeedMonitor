@@ -102,7 +102,7 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
 
     Selected createSelectedFor(String inputParam, CachedView cachedView){
         if(inputParam.startsWith("_UT_")){
-            String name = inputParam.substring(4);
+            String name = inputParam.substring(4)
             if(name){
                 return new Selected(name: name, cachedView: cachedView, selectedType:  SelectedType.USERTIMING)
             }else{

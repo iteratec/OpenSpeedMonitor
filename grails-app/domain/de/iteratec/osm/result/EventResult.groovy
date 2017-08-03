@@ -330,7 +330,7 @@ class EventResult implements CsiValue {
     }
 
     Double getNormalizedValueFor(String userTimingName){
-        UserTiming userTiming = this.userTimings.find {it.name == userTimingName};
+        UserTiming userTiming = this.userTimings.find {it.name == userTimingName}
         if(userTiming){
             return  userTiming.getNormalizedValue()
         }else{

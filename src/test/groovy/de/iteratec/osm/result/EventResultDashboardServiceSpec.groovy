@@ -216,7 +216,7 @@ class EventResultDashboardServiceSpec extends Specification {
     }
 
     def createUserTiming(UserTimingType type, Double relevantValue){
-        Double startTime = null
+        Double startTime
         Double duration = null
         if(type == UserTimingType.MEASURE){
             duration = relevantValue
