@@ -151,6 +151,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var barsOffset = data.hasStackedBars() ? 0 : OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
         var chartBars = chartBarsGroup.selectAll(".chart-bars").data(getSortedChartBarsComponents());
         chartBars.exit()
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", "translate(0, 0)")
+            .style("opacity", 0)
             .remove();
         chartBars.enter()
             .append("g")
