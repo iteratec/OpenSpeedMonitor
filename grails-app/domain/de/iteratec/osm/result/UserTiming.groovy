@@ -6,6 +6,7 @@ import groovy.transform.ToString
 @ToString(includeNames=true, includeFields=true)
 @EqualsAndHashCode(includeFields = true)
 class UserTiming {
+
     String name
     Double startTime
     Double duration

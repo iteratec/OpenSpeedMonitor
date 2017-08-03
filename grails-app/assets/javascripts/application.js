@@ -266,7 +266,7 @@ OpenSpeedMonitor.domUtils = (function () {
         values.forEach(function (value) {
             if (value &&  value.name) {
                 options.push($("<option/>", {
-                    value: "_UT_"+ value.name,
+                    value: value.option,
                     text: value.name
                 }));
             }
@@ -311,7 +311,7 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement = $(selectElement);
         var selection = selectElement.val();
         oldNamesList.forEach(function(old){
-            selectElement.find('[value="_UT_'+old.name+'"]').remove();
+            selectElement.find('[value="'+old.option+'"]').remove();
         });
         selectElement.append(OpenSpeedMonitor.domUtils.createOptionsForUserTimings(newNamesList));
         selectElement.val(selection);

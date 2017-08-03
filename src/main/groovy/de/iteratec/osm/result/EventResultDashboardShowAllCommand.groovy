@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.util.SelectedUtil
 
 /**
  * <p>
@@ -91,27 +92,15 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.findAll {!it.startsWith("_UT_")}.collect {Measurand.valueOf(it)}
+        return selectedValues.findAll {!it.startsWith(SelectedUtil.USERTIMING_PREFIX)}.collect {Measurand.valueOf(it)}
     }
 
     Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
-        Collection<Selected> result = measurandsUncached.collect{createSelectedFor(it, CachedView.UNCACHED)}
-        result.addAll(measurandsCached.collect{createSelectedFor(it, CachedView.CACHED)})
+        Collection<Selected> result = measurandsUncached.collect{SelectedUtil.createSelectedFor(it, CachedView.UNCACHED)}
+        result.addAll(measurandsCached.collect{SelectedUtil.createSelectedFor(it, CachedView.CACHED)})
         return result
     }
 
-    Selected createSelectedFor(String inputParam, CachedView cachedView){
-        if(inputParam.startsWith("_UT_")){
-            String name = inputParam.substring(4)
-            if(name){
-                return new Selected(name: name, cachedView: cachedView, selectedType:  SelectedType.USERTIMING)
-            }else{
-                return null
-            }
-        }else{
-            return new Selected(name: inputParam, cachedView: cachedView, selectedType: SelectedType.MEASURAND)
-        }
-    }
     /**
      * <p>
      * Creates {@link ErQueryParams} based on this command. This command
