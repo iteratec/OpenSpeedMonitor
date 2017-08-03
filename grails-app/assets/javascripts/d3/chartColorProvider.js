@@ -51,8 +51,8 @@ OpenSpeedMonitor.ChartColorProvider = function() {
         }
     };
 
-    var getColorscaleForMeasurandGroup = function (measurandUnit) {
-        var colors = measurandGroupColorCombination[measurandUnit];
+    var getColorscaleForMeasurandGroup = function (measurandUnit, skipFirst) {
+        var colors = measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0)
         var colorscale = d3.scale.ordinal()
                            .domain(createDomain(colors.length))
                            .range(colors);

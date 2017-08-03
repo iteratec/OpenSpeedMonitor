@@ -29,9 +29,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         i18n = data.i18nMap || i18n;
         if (data.series || data.filterRules || data.activeFilter) {
             var filteredSeries = filterSeries(rawSeries);
-            Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries))
-            allMeasurandDataMap = extractMeasurandData(filteredSeries);
+            Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
+            allMeasurandDataMap = extractMeasurandData(filteredSeries);
             dataOrder = createDataOrder();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(dataOrder, data.i18nMap);
             headerText = chartLabelUtils.getCommonLabelParts(true);
@@ -107,7 +107,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
                 measurandData.color = colorProvider.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
             } else {
                 var unit = measurandData.unit;
-                colorScales[unit] = colorScales[unit] || colorProvider.getColorscaleForMeasurandGroup(unit);
+                var hasComparative = measurandGroupDataMap[measurandData.measurandGroup].hasComparative;
+                colorScales[unit] = colorScales[unit] || colorProvider.getColorscaleForMeasurandGroup(unit, hasComparative);
                 measurandData.color = colorScales[unit](measurand)
             }
         });
@@ -132,9 +133,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             .key(function(d) { return d.measurandGroup; })
             .rollup(function (seriesOfMeasurandGroup) {
                 var extent = d3.extent(seriesOfMeasurandGroup, function(entry) { return entry.value; });
+                var hasComparative = seriesOfMeasurandGroup.some(function(value) {
+                    return (value.isImprovement || value.isDeterioration);
+                });
                 return {
                     min: extent[0],
-                    max: extent[1]
+                    max: extent[1],
+                    hasComparative: hasComparative
                 };
             }).map(series);
     };
