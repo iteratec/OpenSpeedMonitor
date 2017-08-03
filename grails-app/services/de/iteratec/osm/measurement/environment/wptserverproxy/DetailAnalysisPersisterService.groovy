@@ -23,7 +23,6 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
-
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
@@ -33,14 +32,9 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.WptXmlResultVersion
 import grails.web.mapping.LinkGenerator
-import groovyx.net.http.ContentType
-import groovyx.net.http.RESTClient
-
-import static groovyx.net.http.ContentType.URLENC
-
 /**
  * Persists locations and results. Observer of ProxyService.
- * @author rschuett , nkuhn
+ * @author rschuett, nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */
 class DetailAnalysisPersisterService implements iResultListener {
@@ -55,6 +49,7 @@ class DetailAnalysisPersisterService implements iResultListener {
     BatchActivityService batchActivityService
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
+    HttpRequestService httpRequestService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -115,7 +110,7 @@ class DetailAnalysisPersisterService implements iResultListener {
             return
         }
 
-        RESTClient client = new RESTClient(microserviceUrl)
+        def client = httpRequestService.getRestClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
         String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
@@ -129,10 +124,20 @@ class DetailAnalysisPersisterService implements iResultListener {
         while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
             attempts++
             try {
-                resp = client.post(path: 'restApi/persistAssetsForWptResult',
-                        body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
-                        requestContentType: URLENC)
-            } catch (ConnectException ex) {
+                resp = client.post {
+                    request.uri.path = '/restApi/persistAssetsForWptResult'
+                    request.body = [
+                        osmUrl: osmUrl,
+                        jobId: jobId,
+                        wptVersion: wptVersion,
+                        wptTestId: wptTestIds,
+                        wptServerBaseUrl: wptServerBaseUrl,
+                        jobGroupId: jobGroupId,
+                        apiKey: apiKey
+                    ]
+                    request.contentType = 'application/x-www-form-urlencoded'
+                }
+            } catch (Exception ex) {
                 log.error("Couldn't queue persistDetailAnalysisData", ex)
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }
@@ -189,11 +194,11 @@ class DetailAnalysisPersisterService implements iResultListener {
                     jobGroupId: jobResult.job.jobGroup.id])
         }
 
-        RESTClient client = new RESTClient(microserviceUrl)
+        def client = httpRequestService.getRestClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
         String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
-        String callbackUrl = "rest/receiveCallback"
+        String callbackUrl = "/rest/receiveCallback"
 
         def resp
         int attempts = 0
@@ -203,11 +208,19 @@ class DetailAnalysisPersisterService implements iResultListener {
             try {
                 batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload DetailAnalysisData" ,1, true, 1)
                 log.debug("Attempt ${attempts+1} to contact DetailDatenService: MicroserviceUrl=${microserviceUrl} OsmUrl=${osmUrl} CallbackUrl=${callbackUrl} CallbackJobId=${batchActivity.getBatchActivityId()} PersistanceJobList =${persistanceJobList}")
-                resp = client.post(path: 'restApi/persistAssetsBatchJob',
-                        body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
-                contentType: ContentType.JSON)
-                if(resp.data["target"]) {
-                    batchActivity.beginNewStage("Update Stats",  resp.data["target"], 1)
+                resp = client.post{
+                    request.uri.path = '/restApi/persistAssetsBatchJob'
+                    request.body = [
+                        osmUrl: osmUrl,
+                        apiKey: apiKey,
+                        callbackUrl: callbackUrl,
+                        callbackJobId: batchActivity.getBatchActivityId(),
+                        persistanceJobList: persistanceJobList
+                    ]
+                    request.contentType = 'application/json'
+                }
+                if(resp.target) {
+                    batchActivity.beginNewStage("Update Stats",  resp.target, 1)
                     returnValue=true
                 }
 

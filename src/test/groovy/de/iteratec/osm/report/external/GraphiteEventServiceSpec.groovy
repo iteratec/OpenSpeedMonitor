@@ -29,24 +29,23 @@ import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovyx.net.http.RESTClient
-import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
 import software.betamax.Configuration
 import software.betamax.ProxyConfiguration
 import software.betamax.junit.Betamax
 import software.betamax.junit.RecorderRule
+import spock.lang.Ignore
 import spock.lang.Specification
-
-import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
-
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(GraphiteEventService)
 @Mock([GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath])
+@Ignore
 class GraphiteEventServiceSpec extends Specification {
+
+    //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
 
     public static final DateTime untilDateTime = new DateTime(2015, 5, 29, 5, 0, 0)
     public static final int minutesInPast = 1
@@ -72,7 +71,6 @@ class GraphiteEventServiceSpec extends Specification {
         mockBatchActivityService()
         serviceUnderTest.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
         mockCsiAggregationUtilService()
-        mockHttpBuilderToUseBetamax()
 
     }
 
@@ -118,22 +116,6 @@ class GraphiteEventServiceSpec extends Specification {
         server.addToGraphiteEventSourcePaths(eventSourcePath)
         server.save(failOnError: true)
 
-    }
-
-    private void mockHttpBuilderToUseBetamax() {
-        Properties properties = new Properties()
-        new File('grails-app/conf/betamax.properties').withInputStream {
-            properties.load(it)
-        }
-        String host = properties.'betamax.proxyHost'
-        int port = properties.'betamax.proxyPort' as int
-        HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
-        httpRequestService.metaClass.getRestClient = { String url ->
-            RESTClient restClient = new RESTClient(url)
-            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(host, port, 'http'))
-            return restClient
-        }
-        serviceUnderTest.httpRequestService = httpRequestService
     }
 
     private void mockBatchActivityService(){

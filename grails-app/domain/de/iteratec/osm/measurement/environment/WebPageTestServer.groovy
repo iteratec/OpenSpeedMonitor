@@ -56,7 +56,7 @@ class WebPageTestServer {
 
     public String getBaseUrl() {
         if (baseUrl) {
-            return baseUrl.endsWith('/') ? "${baseUrl}" : "${baseUrl}/"
+            return baseUrl.endsWith('/') ? baseUrl : "${baseUrl}/"
         } else {
             return ""
         }

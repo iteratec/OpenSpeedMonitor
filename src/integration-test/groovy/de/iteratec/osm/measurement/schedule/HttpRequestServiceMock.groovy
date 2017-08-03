@@ -17,10 +17,9 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.ContentType
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import groovy.util.slurpersupport.GPathResult
 
 class HttpRequestServiceMock extends HttpRequestService {
 	public static final String testId = '140210_6W_1'
@@ -29,13 +28,8 @@ class HttpRequestServiceMock extends HttpRequestService {
 
 	private int fetchResultCallCount = 0;
 
-	// called from ProxyService.fetchResult() to retrieve har
-	Object getWptServerHttpGetResponse(WebPageTestServer wptserver, String path, Map query, ContentType contentType, Map headers) {
-		return [data: null]
-	}
-
 	// called from ProxyService.fetchResult()
-	GPathResult getWptServerHttpGetResponseAsGPathResult(WebPageTestServer wptserver, String path, Map query, ContentType contentType, Map headers){
+	GPathResult getWptServerHttpGetResponse(WebPageTestServer wptserver, String path, Map query, String contentType, Map headers){
 		fetchResultCallCount++
 		int statusCode = fetchResultCallCount <= statusCodes.length ? statusCodes[fetchResultCallCount - 1] : 200
 		String statusText
@@ -699,4 +693,10 @@ class HttpRequestServiceMock extends HttpRequestService {
 		"""
 		return parseXml([ data: [ text: xmlHeader + (statusCode == 200 ? resultData : '') + xmlFooter ]])
 	}
+    GPathResult parseXml(Object xmlResponse) {
+        assert xmlResponse != null
+        def myresponse = new XmlSlurper().parseText(xmlResponse.data.text)
+        assert myresponse != null
+        return myresponse
+    }
 }
