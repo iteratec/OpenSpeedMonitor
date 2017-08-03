@@ -23,8 +23,13 @@ OpenSpeedMonitor.selectUserTimings = (function() {
 
         this.updateOptions = function (options) {
             if(cardElement && userTimingsSelectElement){
-                OpenSpeedMonitor.domUtils.updateSelectOptionsNamesOnly(userTimingsSelectElement, options, OpenSpeedMonitor.i18n.noResultsMsg);
-                userTimingsSelectElement.trigger("change");
+                if(options.length > 1){
+                    OpenSpeedMonitor.domUtils.updateSelectOptionsNamesOnly(userTimingsSelectElement, options, OpenSpeedMonitor.i18n.noResultsMsg);
+                    userTimingsSelectElement.trigger("change");
+                    cardElement.show()
+                } else {
+                    cardElement.hide()
+                }
             }
         };
 
