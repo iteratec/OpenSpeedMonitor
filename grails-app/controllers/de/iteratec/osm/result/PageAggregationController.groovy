@@ -109,6 +109,11 @@ class PageAggregationController extends ExceptionHandlerController {
                 'in'('page', allPages)
                 'in'('jobGroup', allJobGroups)
                 'between'('jobResultDate', cmd.fromComparative.toDate(), cmd.toComparative.toDate())
+                'between'(
+                        'fullyLoadedTimeInMillisecs',
+                        osmConfigCacheService.getMinValidLoadtime(),
+                        osmConfigCacheService.getMaxValidLoadtime()
+                )
                 projections {
                     groupProperty('page')
                     groupProperty('jobGroup')
