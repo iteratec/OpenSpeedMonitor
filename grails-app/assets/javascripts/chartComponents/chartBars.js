@@ -26,7 +26,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
-        forceSignInLabel = componentData.forceSignInLabel || forceSignInLabel;
+        forceSignInLabel = (componentData.forceSignInLabel !== undefined) ? componentData.forceSignInLabel : forceSignInLabel;
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
     };
 

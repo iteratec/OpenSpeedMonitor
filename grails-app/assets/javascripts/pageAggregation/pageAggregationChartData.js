@@ -274,7 +274,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             max: Math.max(measurandGroupDataMap[measurandData.measurandGroup].max, 0),
             height: chartBarsHeight,
             width: chartBarsWidth,
-            forceSignInLabel: measurand.isDeterioration
+            forceSignInLabel: measurandData.isDeterioration
         }
     };
 
