@@ -2,14 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.util.Constants
 
-/**
- * Created by mwg on 02.08.2017.
- */
-enum SelectedType {
-    MEASURAND,
-    USERTIMING
-}
-
 
 class Selected {
     String name
@@ -22,20 +14,10 @@ class Selected {
     }
 
     Double getNormalizedValueFrom(EventResult eventResult){
-        if(selectedType == SelectedType.MEASURAND){
-            return eventResult.getNormalizedValueFor(name as Measurand)
-        }
-        if(selectedType == SelectedType.USERTIMING){
-            return eventResult.getNormalizedValueFor(name)
-        }
+        return eventResult.getNormalizedValueFor(selectedType.getEventResultParam.call(name))
     }
 
     MeasurandGroup getMeasurandGroup(){
-        if(selectedType == SelectedType.MEASURAND){
-            return Measurand.valueOf(name).measurandGroup
-        }
-        if(selectedType == SelectedType.USERTIMING){
-            return MeasurandGroup.LOAD_TIMES
-        }
+        return selectedType.getMeasurandGroup.call(name)
     }
 }

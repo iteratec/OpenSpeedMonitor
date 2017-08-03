@@ -33,8 +33,8 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 
 @TestFor(EventResultDashboardService)
-@Mock([EventResult, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
-@Build([EventResult, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
+@Mock([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
+@Build([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
 class EventResultDashboardServiceSpec extends Specification {
 
     Browser browser
@@ -61,13 +61,22 @@ class EventResultDashboardServiceSpec extends Specification {
         mockGrailsLinkGenerator()
     }
 
-    void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues) {
+    void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedType selectedType, UserTimingType userTimingType) {
         given: "two event results with attribute uncached and cached respectively"
         List<EventResult> eventResults = createEventResults(2)
         eventResults[0].domTimeInMillisecs = 2000
         eventResults[0].cachedView = CachedView.CACHED
         eventResults[1].domTimeInMillisecs = 3000
         eventResults[1].cachedView = CachedView.UNCACHED
+
+        if(selectedType == SelectedType.USERTIMING){
+            eventResults[0].domTimeInMillisecs = 1
+            eventResults[0].cachedView = CachedView.CACHED
+            eventResults[0].userTimings = [createUserTiming(userTimingType, 2000)]
+            eventResults[1].domTimeInMillisecs = 1
+            eventResults[1].cachedView = CachedView.UNCACHED
+            eventResults[1].userTimings = [createUserTiming(userTimingType, 3000)]
+        }
 
         service.eventResultDaoService = Stub(EventResultDaoService) {
             getLimitedMedianEventResultsBy(_, _, _, _, _, _) >> eventResults
@@ -76,9 +85,9 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<SelectedMeasurand> aggregatorTypes = []
+        List<Selected> aggregatorTypes = []
         cached.each {
-            aggregatorTypes.push(new SelectedMeasurand(measurand: Measurand.DOM_TIME, cachedView: it))
+            aggregatorTypes.push( new Selected(name:  Measurand.DOM_TIME.toString(), cachedView: it, selectedType: selectedType))
         }
         ErQueryParams queryParams = createEventResultQueryParams()
 
@@ -92,13 +101,25 @@ class EventResultDashboardServiceSpec extends Specification {
         }
 
         where:
-        cached                                   | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues
-        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]
-        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]
+        cached                                   | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues | selectedType             | userTimingType
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.MEASURAND   | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.USERTIMING  | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.USERTIMING  | UserTimingType.MEASURE
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.USERTIMING  | UserTimingType.MEASURE
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.USERTIMING  | UserTimingType.MEASURE
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.USERTIMING  | UserTimingType.MEASURE
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.USERTIMING  | UserTimingType.MEASURE
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.USERTIMING  | UserTimingType.MEASURE
     }
 
     void "get event result dashboard chart map with trimmed values"(int csiAggregationInterval, int expectedNumberOfPoints, int expectedValue) {
@@ -116,7 +137,7 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created and we trim the data below and above some given values"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<SelectedMeasurand> measurands = [ new SelectedMeasurand(measurand:  Measurand.DOM_TIME, cachedView: CachedView.CACHED)]
+        List<Selected> measurands = [ new Selected(name:  Measurand.DOM_TIME.toString(), cachedView: CachedView.CACHED, selectedType: SelectedType.MEASURAND)]
         ErQueryParams queryParams = createEventResultQueryParams()
         queryParams.minLoadTimeInMillisecs = 3000
         queryParams.maxLoadTimeInMillisecs = 7000
@@ -192,6 +213,18 @@ class EventResultDashboardServiceSpec extends Specification {
         }
 
         return eventResults
+    }
+
+    def createUserTiming(UserTimingType type, Double relevantValue){
+        Double startTime = null
+        Double duration = null
+        if(type == UserTimingType.MEASURE){
+            duration = relevantValue
+            startTime = 10
+        }else{
+            startTime = relevantValue
+        }
+        return UserTiming.build(name: Measurand.DOM_TIME.toString(), type: type, startTime:  startTime, duration: duration)
     }
 
     def createEventResultQueryParams() {
