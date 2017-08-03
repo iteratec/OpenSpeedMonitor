@@ -153,10 +153,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
         var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
         var numberOfMeasurands = Object.keys(allMeasurandDataMap).length;
-        var numberOfPages = d3.max(Object.values(allMeasurandDataMap).map(function(d) { return d.series.length; }));
-        var numberOfBars = numberOfPages * (stackBars ? 1 : numberOfMeasurands);
+        var numberOfBars = dataOrder.length * (stackBars ? 1 : numberOfMeasurands);
         var gapSize = barGap * ((stackBars || numberOfMeasurands < 2) ? 1 : 2);
-        return ((numberOfPages - 1) * gapSize) + numberOfBars * barBand;
+        return ((dataOrder.length - 1) * gapSize) + numberOfBars * barBand;
     };
 
     var getDataForHeader = function () {
