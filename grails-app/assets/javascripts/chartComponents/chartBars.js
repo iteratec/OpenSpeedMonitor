@@ -105,7 +105,8 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     };
 
     var formatValue = function (value) {
-        return parseFloat(value).toFixed(2).toString();
+        var precision = (maxValue >= 1000 || minValue <= -1000) ? 0 : 2;
+        return parseFloat(value).toFixed(precision).toString();
     };
 
     var callEventHandler = function (eventType, bar) {
