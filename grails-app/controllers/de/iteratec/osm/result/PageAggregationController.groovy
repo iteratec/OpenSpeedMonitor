@@ -196,7 +196,7 @@ class PageAggregationController extends ExceptionHandlerController {
      * @return a map which maps the {@link Script}-name to a list of page-jobGroup-name-combinations (e.g. ["script1" : ["page1 / jobGroup1"]])
      */
     private Map<String, List<Map<String, String>>> createFilterRules(List<Page> pages, List<JobGroup> jobGroups) {
-        Map<String, List<String>> result = [:].withDefault { [] }
+        Map<String, List<String>> result = [:]
 
         // Get all scripts
         List<Job> jobList = jobDaoService.getJobs(jobGroups)
@@ -205,7 +205,7 @@ class PageAggregationController extends ExceptionHandlerController {
         allScripts.each { currentScript ->
             List<String> filterRule = []
             List<Page> testedPages = []
-            List<List<Page>> testedPagesPerJob = [].withDefault { [] }
+            List<List<Page>> testedPagesPerJob = []
 
             jobList.findAll { it.script == currentScript }.each { j ->
                 testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables)).getTestedPages().unique()
