@@ -5,7 +5,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.SelectedUtil
+
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
@@ -175,7 +175,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
             })
-            return userTimings.collect{[name: it[0], option: SelectedUtil.USERTIMING_PREFIX + it[0]]}
+            return userTimings.collect{Selected.createUserTimingOptionFor(it[0], it[1])}
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

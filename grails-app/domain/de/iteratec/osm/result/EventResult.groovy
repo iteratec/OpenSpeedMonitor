@@ -337,4 +337,13 @@ class EventResult implements CsiValue {
             return null
         }
     }
+
+    Double getNormalizedValueFor(Closure specificUserTiming){
+        UserTiming userTiming = this.userTimings.find specificUserTiming
+        if(userTiming){
+            return  userTiming.getNormalizedValue()
+        }else{
+            return null
+        }
+    }
 }

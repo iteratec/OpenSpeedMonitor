@@ -1,7 +1,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.util.SelectedUtil
 
 /**
  * <p>
@@ -92,12 +91,12 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.findAll {!it.startsWith(SelectedUtil.USERTIMING_PREFIX)}.collect {Measurand.valueOf(it)}
+        return selectedValues.findAll {Selected.isNoUserTiming(it)}.collect {Measurand.valueOf(it)}
     }
 
     Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
-        Collection<Selected> result = measurandsUncached.collect{SelectedUtil.createSelectedFor(it, CachedView.UNCACHED)}
-        result.addAll(measurandsCached.collect{SelectedUtil.createSelectedFor(it, CachedView.CACHED)})
+        Collection<Selected> result = measurandsUncached.collect{new Selected(it, CachedView.UNCACHED)}
+        result.addAll(measurandsCached.collect{new Selected(it, CachedView.CACHED)})
         return result
     }
 
