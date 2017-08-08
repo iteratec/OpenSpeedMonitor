@@ -82,12 +82,14 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         cleanUpData()
     }
 
-    void "no selection no timings"() {
+    void "super old date no timings"() {
         given: "navigate to EventResultDashboard"
         createData()
         to EventResultDashboardPage
 
-        when: "measurands button is clicked"
+        when: "old date is set and measurands button is clicked"
+        selectDateInDatepicker(fromDatepicker, "21.06.2015 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2015 23:59")
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
