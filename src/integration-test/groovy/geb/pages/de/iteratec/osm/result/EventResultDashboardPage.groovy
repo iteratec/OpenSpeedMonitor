@@ -1,5 +1,7 @@
 package geb.pages.de.iteratec.osm.result
 
+import de.iteratec.osm.result.MeasurandGroup
+import de.iteratec.osm.result.SelectedType
 import geb.pages.de.iteratec.osm.I18nGebPage
 import org.openqa.selenium.Keys
 
@@ -93,8 +95,31 @@ class EventResultDashboardPage extends I18nGebPage {
         }
     }
 
-    public boolean isVariableSelectionTabActive(){
+    public clickJobSelectionTab(){
+        if(isVariableSelectionTabActive()){
+            tabJobSelection.click()
+        }
+    }
+
+    boolean isVariableSelectionTabActive(){
         return cardTabsUl.children("li")[1].classes().contains("active")
+    }
+
+    def getFirstViewOptionsFor(MeasurandGroup measurandGroup){
+        return firstViewDiv.find(".measurand-opt-group-${measurandGroup.toString()}")
+    }
+
+    int getFirstViewOptionsSizeFor(MeasurandGroup measurandGroup){
+        return getFirstViewOptionsFor(measurandGroup).children().size()
+    }
+
+    def findOptionInFristView(SelectedType selectedType, String name){
+        String query = selectedType.optionPrefix+name
+        return getFirstViewOptionsFor(selectedType.getMeasurandGroup.call(name)).find('[value="'+query+'"]')
+    }
+
+    boolean firstViewHasOptionFor(SelectedType selectedType, String name){
+       return findOptionInFristView(selectedType, name).size() == 1
     }
 
     public void scrollTop(){
