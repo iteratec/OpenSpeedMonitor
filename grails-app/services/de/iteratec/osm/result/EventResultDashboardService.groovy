@@ -266,7 +266,6 @@ public class EventResultDashboardService {
                 if(selectedMeasurand.cachedView == eventResult.cachedView){
                     Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                     if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
-                        String tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
                         GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
                         OsmChartPoint chartPoint = new OsmChartPoint(
                                 time: eventResult.getJobResultDate().getTime(),
@@ -292,8 +291,8 @@ public class EventResultDashboardService {
             return false
         }
 
-        Number lt = gtBoundary[selected.name]
-        Number gt = ltBoundary[selected.name]
+        Number lt = selected.normalizeValue(gtBoundary[selected.name])
+        Number gt = selected.normalizeValue(ltBoundary[selected.name])
 
         boolean inBound = true
         if (lt) inBound &= value > lt

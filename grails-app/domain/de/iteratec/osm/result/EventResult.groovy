@@ -325,14 +325,10 @@ class EventResult implements CsiValue {
         return this."$measurand.eventResultField" != null ? Double.valueOf(this."$measurand.eventResultField") : null
     }
 
-    Double getNormalizedValueFor(Measurand measurand){
-        return measurand.normalizeValue(getValueFor(measurand))
-    }
-
-    Double getNormalizedValueFor(Closure specificUserTiming){
+    Double getValueFor(Closure specificUserTiming){
         UserTiming userTiming = this.userTimings.find specificUserTiming
         if(userTiming){
-            return  userTiming.getNormalizedValue()
+            return  userTiming.getValue()
         }else{
             return null
         }

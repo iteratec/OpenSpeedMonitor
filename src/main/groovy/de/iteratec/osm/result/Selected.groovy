@@ -9,18 +9,24 @@ class Selected {
     CachedView cachedView
     SelectedType selectedType
 
-    Selected(String input, CachedView cachedView){
+    Selected(String optionValue, CachedView cachedView){
         this.cachedView = cachedView
 
-        if(isNoUserTiming(input)){
-            name = input
+        if(!isValid(optionValue)){
+            name = ""
+            selectedType = SelectedType.USERTIMING_MEASURE
+            return
+        }
+
+        if(isNoUserTiming(optionValue)){
+            name = optionValue
             selectedType = SelectedType.MEASURAND
         }else{
-            if(input.startsWith(SelectedType.USERTIMING_MARK.optionPrefix)){
-                name = input.substring(SelectedType.USERTIMING_MARK.optionPrefix.length())
+            if(optionValue.startsWith(SelectedType.USERTIMING_MARK.optionPrefix)){
+                name = optionValue.substring(SelectedType.USERTIMING_MARK.optionPrefix.length())
                 selectedType = SelectedType.USERTIMING_MARK
             }else{
-                name = input.substring(SelectedType.USERTIMING_MEASURE.optionPrefix.length())
+                name = optionValue.substring(SelectedType.USERTIMING_MEASURE.optionPrefix.length())
                 selectedType = SelectedType.USERTIMING_MEASURE
             }
         }
@@ -32,11 +38,18 @@ class Selected {
     }
 
     Double getNormalizedValueFrom(EventResult eventResult){
-        return eventResult.getNormalizedValueFor(selectedType.getEventResultParam.call(name))
+        return normalizeValue(eventResult.getValueFor(selectedType.getEventResultParam.call(name)))
     }
 
     MeasurandGroup getMeasurandGroup(){
         return selectedType.getMeasurandGroup.call(name)
+    }
+
+    Double normalizeValue(def input){
+        if(!input){
+            return input
+        }
+        return input/this.getMeasurandGroup().getUnit().getDivisor()
     }
 
     static Map createUserTimingOptionFor(String name, UserTimingType type){
@@ -44,6 +57,17 @@ class Selected {
     }
 
     static boolean isNoUserTiming(String name){
-        return !name.startsWith(SelectedType.USERTIMING_MEASURE.optionPrefix)&& !name.startsWith(SelectedType.USERTIMING_MARK.optionPrefix)
+        return Measurand.values().collect{ it.toString() }.contains(name)
+    }
+
+    boolean isValid(String name){
+        if(name){
+            if(isNoUserTiming(name)){
+                return true
+            }else{
+                return name.length() > SelectedType.USERTIMING_MARK.optionPrefix.length() || name.length() > SelectedType.USERTIMING_MEASURE.optionPrefix.length()
+            }
+        }
+        return false
     }
 }
