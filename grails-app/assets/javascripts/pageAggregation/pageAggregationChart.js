@@ -26,12 +26,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
-        render();
     });
 
     chartLegendComponent.on("highlight", function (highlightEvent) {
         toggleBarComponentHighlight(highlightEvent.id, highlightEvent.anyHighlighted, highlightEvent.highlighted);
-        render();
     });
 
     var setData = function (inputData) {
