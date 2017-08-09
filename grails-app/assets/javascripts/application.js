@@ -59,13 +59,8 @@ OpenSpeedMonitor.postLoader = (function () {
     var loadJavascript = function (url, async, name) {
         async = async || true;
         var script = document.createElement("script");
-        script.onload = script.onreadystatechange = function () {
-            //console.log( this.readyState ); //uncomment this line to see which ready states are called.
-            var r;
-            if (!r && (!this.readyState || this.readyState == 'complete')) {
-                r = true;
-                fireWindowEvent("" + name + "Loaded");
-            }
+        script.onload = function () {
+            fireWindowEvent("" + name + "Loaded");
         };
         script.setAttribute("src", url);
         script.setAttribute("type", "text/javascript");

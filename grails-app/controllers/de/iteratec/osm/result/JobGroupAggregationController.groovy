@@ -93,7 +93,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         }
 
         List allSeries = cmd.selectedSeries
-        BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "JobGroup")
+        BarchartDTO barchartDTO = new BarchartDTO()
         barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))

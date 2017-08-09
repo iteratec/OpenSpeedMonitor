@@ -14,7 +14,7 @@
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
-<div class="card hidden" id="chart-card">
+<div class="card" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>
@@ -96,7 +96,48 @@
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationGuiHandling.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationChart.js" />',true,'pageAggregationChart');
         });
+
+        var pageAggregationChart = null;
+        $(window).on('pageAggregationChartLoaded', function () {
+            pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
+            $(window).on('resize', function() {
+                pageAggregationChart.setData({autoWidth: true});
+                pageAggregationChart.render();
+            });
+            $("#inFrontButton").click(function() {
+                pageAggregationChart.setData({stackBars: true});
+                pageAggregationChart.render();
+            });
+            $("#besideButton").click(function() {
+                pageAggregationChart.setData({stackBars: false});
+                pageAggregationChart.render();
+            });
+            $(".chart-filter").click(onFilterClick);
+        });
+
+        function onFilterClick() {
+            pageAggregationChart.setData({activeFilter: $(this).data("filter")});
+            pageAggregationChart.render();
+            $(".chart-filter i").toggleClass('filterInactive', true).toggleClass('filterActive', false);
+            $("i", $(this)).toggleClass('filterActive', true);
+        }
+
+        function addFiltersToGui(filterRules) {
+            var $filterDropdownGroup = $("#filter-dropdown-group");
+            var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
+            $filterDropdownGroup.find('.filterRule').remove();
+            if ($filterDropdownGroup.hasClass("hidden"))
+                $filterDropdownGroup.removeClass("hidden");
+
+            Object.keys(filterRules).forEach(function(filterRuleKey) {
+                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+                link.data('filter', filterRuleKey);
+                link.click(onFilterClick);
+                link.insertAfter($customerJourneyHeader);
+            });
+        }
 
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -124,9 +165,6 @@
                 data.toComparative = comparativeTimeFrame[1].toISOString();
             }
 
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
-
             spinner.start();
             $.ajax({
                 type: 'POST',
@@ -141,7 +179,12 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
+                        data.width = -1;
+                        if (data.filterRules) {
+                            addFiltersToGui(data.filterRules);
+                        }
+                        pageAggregationChart.setData(data);
+                        pageAggregationChart.render();
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
