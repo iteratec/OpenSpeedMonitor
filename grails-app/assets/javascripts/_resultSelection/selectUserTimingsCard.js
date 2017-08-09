@@ -4,7 +4,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectUserTimings = (function() {
     var resetButtonElement = $(".reset-result-selection");
-    var optGroups = [];
+
     var oldValues = [];
 
     function OptGroup(optGroupDomElement){
@@ -21,23 +21,19 @@ OpenSpeedMonitor.selectUserTimings = (function() {
         }
     }
 
-    function init() {
+    var updateUserTimings = function(userTimings) {
+        var optGroups = [];
         $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
             var optGroup = new OptGroup(optGroupElement);
             optGroups.push(optGroup);
-        })
-    }
+        });
 
-
-    var updateUserTimings = function(userTimings) {
         optGroups.forEach(function (optGroup) {
             optGroup.updateOptions(userTimings);
         });
         oldValues = userTimings;
     };
 
-
-    init();
     return {
         updateUserTimings: updateUserTimings
     }

@@ -52,6 +52,14 @@ class Selected {
         return input/this.getMeasurandGroup().getUnit().getDivisor()
     }
 
+    String getDatabaseRelevantName(){
+        if(selectedType == SelectedType.MEASURAND){
+            return Measurand.valueOf(name).eventResultField
+        }else{
+            return name
+        }
+    }
+
     static Map createUserTimingOptionFor(String name, UserTimingType type){
         return [name:name,option: type.selectedType.optionPrefix+name]
     }
@@ -60,7 +68,7 @@ class Selected {
         return Measurand.values().collect{ it.toString() }.contains(name)
     }
 
-    boolean isValid(String name){
+    private boolean isValid(String name){
         if(name){
             if(isNoUserTiming(name)){
                 return true

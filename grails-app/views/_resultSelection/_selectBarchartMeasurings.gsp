@@ -21,7 +21,7 @@
                 <div class="col-sm-7">
                     <iteratec:optGroupedSelect id="selectedAggrGroupValuesUnCached"
                                                dataMap="${aggrGroupValuesUnCached}"
-                                               class="firstMeasurandSelect form-control"
+                                               class="firstMeasurandSelect form-control measurands-select-opt-groups"
                                                name="selectedAggrGroupValuesUnCached"
                                                optionKey="value" optionValue="value"
                                                value="${selectedAggrGroupValuesUnCached}"/>
@@ -43,7 +43,7 @@
     <div id="additionalMeasurand-clone" class="row hidden form-group addMeasurandRow">
         <div class="col-sm-7 col-sm-offset-3">
             <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
-                                       class="additionalMeasurand form-control"
+                                       class="additionalMeasurand form-control measurands-select-opt-groups"
                                        optionKey="value" optionValue="value"
                                        value="${selectedAggrGroupValuesUnCached}"/>
         </div>
@@ -58,5 +58,6 @@
 <asset:script type="text/javascript">
     $(window).load(function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectBarchartMeasurings.js"/>', true, 'barchartMeasurings')
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectUserTimingsCard.js" />');
     });
 </asset:script>
