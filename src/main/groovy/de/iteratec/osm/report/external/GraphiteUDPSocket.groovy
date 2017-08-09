@@ -47,7 +47,7 @@ class GraphiteUDPSocket implements GraphiteSocket {
             throws NullPointerException, IllegalArgumentException {
         Contract.requiresArgumentNotNull("serverAddress", serverAddress)
         if (port < 0 || port > 65535) {
-            throw new IllegalArgumentException("The port number must be between 0 and 65535" + " (both inclusive).")
+            throw new IllegalArgumentException("The port number must be between 0 and 65535 (both inclusive).")
         }
 
         this.serverAddress = serverAddress
