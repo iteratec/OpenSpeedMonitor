@@ -2,6 +2,8 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.barchart.BarChartAggregation
+import de.iteratec.osm.barchart.BarChartAggregationService
 import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
@@ -29,6 +31,7 @@ class PageAggregationController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
+    BarChartAggregationService barChartAggregationService
 
 
     def index() {
@@ -82,52 +85,10 @@ class PageAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName = allMeasurands.collect {(it as Measurand).eventResultField}
 
-        List eventResultAverages = EventResult.createCriteria().list {
-            'in'('page', allPages)
-            'in'('jobGroup', allJobGroups)
-            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
-            'between'(
-                'fullyLoadedTimeInMillisecs',
-                osmConfigCacheService.getMinValidLoadtime(),
-                osmConfigCacheService.getMaxValidLoadtime()
-            )
-            projections {
-                groupProperty('page')
-                groupProperty('jobGroup')
-                measurandFieldName.each { m ->
-                    avg(m)
-                }
-            }
-        }
+        List<BarChartAggregation> barChartAggregations = barChartAggregationService.getAggregationForPageAggreagation(cmd)
 
-        Map comparativeEventResultAverages = null
-        if (cmd.fromComparative && cmd.toComparative) {
-            comparativeEventResultAverages = EventResult.createCriteria().list {
-                'in'('page', allPages)
-                'in'('jobGroup', allJobGroups)
-                'between'('jobResultDate', cmd.fromComparative.toDate(), cmd.toComparative.toDate())
-                'between'(
-                        'fullyLoadedTimeInMillisecs',
-                        osmConfigCacheService.getMinValidLoadtime(),
-                        osmConfigCacheService.getMaxValidLoadtime()
-                )
-                projections {
-                    groupProperty('page')
-                    groupProperty('jobGroup')
-                    measurandFieldName.each { m ->
-                        avg(m)
-                    }
-                }
-            }?.collectEntries({ it ->
-                [("${it[0].name} | ${it[1].name}".toString()): it.takeRight(it.size()-2)]
-            })
-        }
-
-        // return if no data is available
-        if (!eventResultAverages && !comparativeEventResultAverages) {
+        if (!barChartAggregations) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
@@ -140,27 +101,17 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
         barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        allSeries.each { series ->
-            series.measurands.each { currentMeasurand ->
-                eventResultAverages.each { datum ->
-                    def measurandIndex = allMeasurands.indexOf(currentMeasurand)
-                    def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
-                    if (value) {
-                        BarchartSeries barchartSeries = new BarchartSeries(
-                                unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                                measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                                measurand: currentMeasurand,
-                                measurandGroup: Measurand.valueOf(currentMeasurand).measurandGroup,
-                                value: value,
-                                valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
-                                page: datum[0],
-                                jobGroup: datum[1]?.name
-                        )
-                        barchartDTO.series.add(barchartSeries)
-                    }
-                }
-            }
+        barchartDTO.series = barChartAggregations.collect {
+            new BarchartSeries(
+                    unit: it.selected.getMeasurandGroup().unit.label,
+                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selected.name}", it.selected.name),
+                    measurand: it.selected.name,
+                    measurandGroup: it.selected.getMeasurandGroup(),
+                    value: it.value,
+                    valueComparative: it.comparativeValue,
+                    page: it.page,
+                    jobGroup: it.jobGroup
+            )
         }
 
 //      TODO: see ticket [IT-1614]

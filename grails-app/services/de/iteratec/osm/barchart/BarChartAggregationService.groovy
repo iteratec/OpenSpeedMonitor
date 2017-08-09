@@ -16,50 +16,52 @@ class BarChartAggregationService {
     OsmConfigCacheService osmConfigCacheService
 
     List<BarChartAggregation> getAggregationForPageAggreagation(GetBarchartCommand cmd) {
-        List<Selected> allSelected = cmd.selectedSeries*.measurands.flatten().collect { new Selected(it, CachedView.UNCACHED)}
+        List<Selected> allUserTimings = cmd.selectedSeries*.measurands.flatten().collect { new Selected(it, CachedView.UNCACHED)}.findAll {it.selectedType != SelectedType.MEASURAND}
+        List<Selected> allMeasurands = cmd.selectedSeries*.measurands.flatten().collect { new Selected(it, CachedView.UNCACHED)}.findAll {it.selectedType == SelectedType.MEASURAND}
         Date from =  cmd.from.toDate()
         Date to = cmd.to.toDate()
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
 
-        def aggregationsForMeasurands = aggregateMeasurandForPageAggregation(allSelected, from, to, allJobGroups, allPages)
-        def comparativesForMeasurands = []
-        def aggregationsForUserTimings = aggregateUserTimingsForPageAggregation(allSelected, from, to, allJobGroups, allPages)
-        def comparativesForUserTimings = []
+        List<BarChartAggregation> aggregationsForMeasurands = aggregateMeasurandForPageAggregation(allMeasurands, from, to, allJobGroups, allPages)
+        List<BarChartAggregation> aggregationsForUserTimings = aggregateUserTimingsForPageAggregation(allUserTimings, from, to, allJobGroups, allPages)
+
+        List<BarChartAggregation> comparatives = []
         if (cmd.fromComparative && cmd.toComparative) {
             Date comparativeFrom =  cmd.fromComparative.toDate()
             Date comparativeTo =  cmd.toComparative.toDate()
-            comparativesForMeasurands = aggregateMeasurandForPageAggregation(allSelected, comparativeFrom, comparativeTo, allJobGroups, allPages)
-            comparativesForUserTimings = aggregateUserTimingsForPageAggregation(allSelected, comparativeFrom, comparativeTo, allJobGroups, allPages)
+            List<BarChartAggregation> comparativesForMeasurands = aggregateMeasurandForPageAggregation(allMeasurands, comparativeFrom, comparativeTo, allJobGroups, allPages)
+            List<BarChartAggregation> comparativesForUserTimings = aggregateUserTimingsForPageAggregation(allUserTimings, comparativeFrom, comparativeTo, allJobGroups, allPages)
+            comparatives.addAll(comparativesForMeasurands)
+            comparatives.addAll(comparativesForUserTimings)
         }
 
-        List<BarChartAggregation> resultForMeasurands = collectBarChartAggregationsForMeasurand(allSelected, aggregationsForMeasurands, comparativesForMeasurands)
-        List<BarChartAggregation> resultForUserTimings = collectBarChartAggregationsForUserTimings(allSelected, aggregationsForUserTimings, comparativesForUserTimings)
-
         List<BarChartAggregation> result = []
-        result.addAll(resultForMeasurands)
-        result.addAll(resultForUserTimings)
+        result.addAll(aggregationsForMeasurands)
+        result.addAll(aggregationsForUserTimings)
 
-        return result
+        return mergeAggregationsWithComparatives(result, comparatives)
     }
 
     private def aggregateMeasurandForPageAggregation(List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages){
-        List<Selected> selectedMeasurands = allSelected.findAll {it.selectedType == SelectedType.MEASURAND}
+        if(allSelected.size() < 1){
+            return []
+        }
         Closure projection = {
             projections {
                 groupProperty('page')
                 groupProperty('jobGroup')
-                selectedMeasurands.collect {it.getDatabaseRelevantName()}.each { m ->
+                allSelected.collect {it.getDatabaseRelevantName()}.each { m ->
                     avg(m)
                 }
             }
         }
-        return aggregateFor(projection, from, to, allJobGroups, allPages, null)
+        def aggregation =  aggregateFor(projection, from, to, allJobGroups, allPages, null)
+        return  createListForMeasurandAggregation(allSelected, aggregation)
     }
 
     private def aggregateUserTimingsForPageAggregation(List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages){
-        List<Selected> selectedUserTimings = allSelected.findAll {it.selectedType != SelectedType.MEASURAND}
-        if(selectedUserTimings.size() < 1){
+        if(allSelected.size() < 1){
             return []
         }
         Closure projection = {
@@ -74,8 +76,8 @@ class BarChartAggregationService {
                 }
             }
         }
-        return  aggregateFor(projection, from, to, allJobGroups, allPages, selectedUserTimings)
-
+        def aggregation =  aggregateFor(projection, from, to, allJobGroups, allPages, allSelected)
+        return  createListForUserTimingAggregation(allSelected, aggregation)
     }
 
     private def aggregateFor(Closure projection, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<Selected> userTimings){
@@ -91,30 +93,26 @@ class BarChartAggregationService {
         }
     }
 
-    private List<BarChartAggregation> collectBarChartAggregationsForMeasurand(List<Selected> allSelected, def values, def comparativeValues){
-        List<BarChartAggregation> result = []
-        if(values && values.size() >= 1){
-            result = createListForMeasurandAggregation(allSelected,values)
+    private List<BarChartAggregation> mergeAggregationsWithComparatives(def values, def comparativeValues){
+        List<BarChartAggregation> result = values
             if(comparativeValues && comparativeValues.size() >= 1){
-                List<BarChartAggregation> comparatives = createListForMeasurandAggregation(allSelected, comparativeValues)
-                comparatives.each{ comparative ->
+                comparativeValues.each{ comparative ->
                     BarChartAggregation matches = result.find {it.page == comparative.page && it.jobGroup == comparative.jobGroup && it.selected == comparative.selected}
                     matches.comparativeValue = comparative.value
                 }
             }
-        }
         return result
     }
 
     private List<BarChartAggregation> createListForMeasurandAggregation(List<Selected> allSelected, def measurandAggregations){
         List<BarChartAggregation> result = []
-        List<Selected> selectedMeasurands = allSelected.findAll {it.selectedType == SelectedType.MEASURAND}
         if(measurandAggregations && measurandAggregations.size() >= 1){
             measurandAggregations.each{ aggregation ->
                 result.addAll(
-                        selectedMeasurands.collect{ Selected selected ->
-                            int relevantIndex = selectedMeasurands.indexOf(selected) + 2
-                            new BarChartAggregation(page: aggregation[0], jobGroup: aggregation[1], value: aggregation[relevantIndex], selected: selected)
+                        allSelected.collect{ Selected selected ->
+                            int relevantIndex = allSelected.indexOf(selected) + 2
+                            Double value = selected.normalizeValue(aggregation[relevantIndex])
+                            new BarChartAggregation(page: aggregation[0], jobGroup: aggregation[1], value: value, selected: selected)
                         }
                 )
             }
@@ -122,33 +120,19 @@ class BarChartAggregationService {
         return result
     }
 
-    private List<BarChartAggregation> collectBarChartAggregationsForUserTimings(List<Selected> allSelected, def values, def comparativeValues){
-        List<BarChartAggregation> result = []
-        if(values && values.size() >= 1){
-            result = createListForUserTimingAggregation(allSelected,values)
-            if(comparativeValues && comparativeValues.size() >= 1){
-                List<BarChartAggregation> comparatives = createListForUserTimingAggregation(allSelected, comparativeValues)
-                comparatives.each{ comparative ->
-                    BarChartAggregation matches = result.find {it.page == comparative.page && it.jobGroup == comparative.jobGroup && it.selected == comparative.selected}
-                    matches.comparativeValue = comparative.value
-                }
-            }
-        }
-        return result
-    }
 
     private List<BarChartAggregation> createListForUserTimingAggregation(List<Selected> allSelected, def userTimingAggregations){
         List<BarChartAggregation> result = []
-        List<Selected> selectedMeasurands = allSelected.findAll {it.selectedType != SelectedType.MEASURAND}
         if(userTimingAggregations && userTimingAggregations.size() >= 1){
             result = userTimingAggregations.collect{ aggregation ->
-                Selected selected = selectedMeasurands.find{it.name = aggregation[2]}
-                Double value
+                Selected selected = allSelected.find{it.name == aggregation[2] && it.selectedType == aggregation[3].selectedType}
+                Double valueRaw
                 if(aggregation[3] == UserTimingType.MEASURE){
-                    value = aggregation[5]
+                    valueRaw = aggregation[5]
                 }else{
-                    value = aggregation[4]
+                    valueRaw = aggregation[4]
                 }
+                Double value = selected.normalizeValue(valueRaw)
                 new BarChartAggregation(page: aggregation[0], jobGroup: aggregation[1], value: value, selected: selected)
             }
         }
