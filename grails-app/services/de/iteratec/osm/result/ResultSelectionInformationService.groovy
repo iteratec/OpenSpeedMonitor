@@ -36,7 +36,7 @@ class ResultSelectionInformationService {
                 batchActivityUpdater.update()
                 def groupedResults = getGroupedEventResults(startDay, endDay)
                 groupedResults.each { entry ->
-                    List<UserTimingSelectionInfomation> userTimingSelectionInfomations = getUserTimingSelectionInfosForGroupedEventResult(entry, startDay, endDay)
+                    List<UserTimingSelectionInfomation> userTimingSelectionInformationList = getUserTimingSelectionInfosForGroupedEventResult(entry, startDay, endDay)
 
                     def map = [
                         jobResultDate: entry[0],
@@ -48,7 +48,7 @@ class ResultSelectionInformationService {
                         connectivityProfile: entry[6],
                         customConnectivityName: entry[7],
                         noTrafficShapingAtAll: entry[8],
-                        userTimings: userTimingSelectionInfomations
+                        userTimings: userTimingSelectionInformationList
                     ]
                     def created = new ResultSelectionInformation(map).save()
                     if (!created) {
