@@ -165,7 +165,7 @@ public class EventResultDashboardService {
      * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
      */
     public OsmRickshawChart getEventResultDashboardHighchartGraphs(
-            Date startDate, Date endDate, Integer interval, List<Selected> measurands, ErQueryParams queryParams) {
+            Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> measurands, ErQueryParams queryParams) {
 
         Map<String, Number> gtValues = [:]
         Map<String, Number> ltValues = [:]
@@ -219,7 +219,7 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<Selected> measurands, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<SelectedMeasurand> measurands, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
         Map<GraphLabel, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
             if (interval == CsiAggregationInterval.RAW) {
@@ -241,10 +241,10 @@ public class EventResultDashboardService {
         return chart
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<Selected> measurands, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> measurands, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
 
         Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
-        measurands.each { Selected selectedMeasurand ->
+        measurands.each { SelectedMeasurand selectedMeasurand ->
 
             eventResults.each { EventResult eventResult ->
                 URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
@@ -286,7 +286,7 @@ public class EventResultDashboardService {
         return highchartPointsForEachGraph
     }
 
-    private boolean isInBounds(def value, Selected selected, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary){
+    private boolean isInBounds(def value, SelectedMeasurand selected, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary){
         if(value == null){
             return false
         }
@@ -301,14 +301,14 @@ public class EventResultDashboardService {
         return inBound
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<Selected> selectedMeasurands, Collection<EventResult> eventResults, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
 
         Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
         Map<GraphLabel, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
             eventResults.each { EventResult eventResult ->
-                selectedMeasurands.each { Selected selectedMeasurand ->
+                selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
                         Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                         if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
@@ -467,7 +467,7 @@ public class EventResultDashboardService {
         return resultUrl
     }
 
-    public URL buildTestsDetailsURL(Long jobGroupId, Long measuredEventId, Long pageId, Long browserId, Long locationId, Selected selectedMeasurand, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
+    public URL buildTestsDetailsURL(Long jobGroupId, Long measuredEventId, Long pageId, Long browserId, Long locationId, SelectedMeasurand selectedMeasurand, Long millisFrom, Integer intervalInMinutes, Integer lastKnownCountOfAggregatedResults) {
         URL result = null
 
 

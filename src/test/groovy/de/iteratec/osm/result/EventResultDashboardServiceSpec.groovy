@@ -61,7 +61,7 @@ class EventResultDashboardServiceSpec extends Specification {
         mockGrailsLinkGenerator()
     }
 
-    void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedType selectedType, UserTimingType userTimingType) {
+    void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedMeasurandType selectedType, UserTimingType userTimingType) {
         given: "two event results with attribute uncached and cached respectively"
         List<EventResult> eventResults = createEventResults(2)
         eventResults[0].domTimeInMillisecs = 2000
@@ -69,7 +69,7 @@ class EventResultDashboardServiceSpec extends Specification {
         eventResults[1].domTimeInMillisecs = 3000
         eventResults[1].cachedView = CachedView.UNCACHED
 
-        if(selectedType == SelectedType.USERTIMING_MARK || selectedType == SelectedType.USERTIMING_MEASURE){
+        if(selectedType == SelectedMeasurandType.USERTIMING_MARK || selectedType == SelectedMeasurandType.USERTIMING_MEASURE){
             eventResults[0].domTimeInMillisecs = 1
             eventResults[0].cachedView = CachedView.CACHED
             eventResults[0].userTimings = [createUserTiming(userTimingType, 2000)]
@@ -85,9 +85,9 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<Selected> aggregatorTypes = []
+        List<SelectedMeasurand> aggregatorTypes = []
         cached.each {
-            aggregatorTypes.push( new Selected(name:  Measurand.DOM_TIME.toString(), cachedView: it, selectedType: selectedType))
+            aggregatorTypes.push( new SelectedMeasurand(name:  Measurand.DOM_TIME.toString(), cachedView: it, selectedType: selectedType))
         }
         ErQueryParams queryParams = createEventResultQueryParams()
 
@@ -101,25 +101,25 @@ class EventResultDashboardServiceSpec extends Specification {
         }
 
         where:
-        cached                                   | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues | selectedType                    | userTimingType
-        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.MEASURAND          | UserTimingType.MARK
-        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.USERTIMING_MARK    | UserTimingType.MARK
-        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
-        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
-        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
-        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        cached                                   | csiAggregationInterval        | expectedNumberOfGraphs | expectedValues | selectedType                             | userTimingType
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedMeasurandType.MEASURAND          | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedMeasurandType.USERTIMING_MARK    | UserTimingType.MARK
+        [CachedView.CACHED]                      | CsiAggregationInterval.RAW    | 1                      | [2000]         | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        [CachedView.CACHED]                      | CsiAggregationInterval.HOURLY | 1                      | [2000]         | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.RAW    | 1                      | [3000]         | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        [CachedView.UNCACHED]                    | CsiAggregationInterval.HOURLY | 1                      | [3000]         | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.RAW    | 2                      | [2000, 3000]   | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
+        [CachedView.CACHED, CachedView.UNCACHED] | CsiAggregationInterval.HOURLY | 2                      | [2000, 3000]   | SelectedMeasurandType.USERTIMING_MEASURE | UserTimingType.MEASURE
     }
 
     void "get event result dashboard chart map with trimmed values"(int csiAggregationInterval, int expectedNumberOfPoints, int expectedValue) {
@@ -137,7 +137,7 @@ class EventResultDashboardServiceSpec extends Specification {
         when: "the data for the time series chart gets created and we trim the data below and above some given values"
         Date startTime = runDate.minusHours(1).toDate()
         Date endTime = runDate.plusHours(1).toDate()
-        List<Selected> measurands = [ new Selected(name:  Measurand.DOM_TIME.toString(), cachedView: CachedView.CACHED, selectedType: SelectedType.MEASURAND)]
+        List<SelectedMeasurand> measurands = [new SelectedMeasurand(name:  Measurand.DOM_TIME.toString(), cachedView: CachedView.CACHED, selectedType: SelectedMeasurandType.MEASURAND)]
         ErQueryParams queryParams = createEventResultQueryParams()
         queryParams.minLoadTimeInMillisecs = 3000
         queryParams.maxLoadTimeInMillisecs = 7000

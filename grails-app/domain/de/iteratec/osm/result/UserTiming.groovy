@@ -25,6 +25,6 @@ class UserTiming {
     }
 
     Double getValue(){
-        return this.type == UserTimingType.MARK ? this.startTime: this.duration
+        return this.type == UserTimingType.MARK ? this.startTime : this.duration
     }
 }

@@ -3,8 +3,8 @@ package de.iteratec.osm
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.Selected
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
 import grails.buildtestdata.mixin.Build
@@ -19,42 +19,55 @@ import spock.lang.*
 @TestMixin(GrailsUnitTestMixin)
 @Mock([EventResult, UserTiming])
 @Build([EventResult, UserTiming])
-class SelectedSpec extends Specification {
-    CachedView  cachedView = CachedView.UNCACHED
+class SelectedMeasurandSpec extends Specification {
+    CachedView cachedView = CachedView.UNCACHED
 
-    void "test if constructor works as intended for edge cases"(){
+    void "test if constructor works as intended"() {
         when: "selected is constructed for optionValue"
-        Selected selected = new Selected(optionValue, cachedView)
+        SelectedMeasurand selected = new SelectedMeasurand(optionValue, cachedView)
 
         then: "selectedType is as expected"
         selected.selectedType == expectedSelectedType
 
         where:
-        optionValue                                                                  | expectedSelectedType
-        null                                                                         | SelectedType.USERTIMING_MEASURE
-        ""                                                                           | SelectedType.USERTIMING_MEASURE
-        "duck"                                                                       | SelectedType.USERTIMING_MEASURE
-        "Donald Duck"                                                                | SelectedType.USERTIMING_MEASURE
-        SelectedType.USERTIMING_MARK.optionPrefix                                    | SelectedType.USERTIMING_MEASURE
-        SelectedType.USERTIMING_MEASURE.optionPrefix                                 | SelectedType.USERTIMING_MEASURE
-        SelectedType.USERTIMING_MEASURE.optionPrefix + "name"                        | SelectedType.USERTIMING_MEASURE
-        SelectedType.USERTIMING_MEASURE.optionPrefix + Measurand.DOM_TIME.toString() | SelectedType.USERTIMING_MEASURE
-        SelectedType.USERTIMING_MARK.optionPrefix + "name"                           | SelectedType.USERTIMING_MARK
-        SelectedType.USERTIMING_MARK.optionPrefix + Measurand.DOM_TIME.toString()    | SelectedType.USERTIMING_MARK
-        Measurand.DOM_TIME.toString()                                                | SelectedType.MEASURAND
+        optionValue                                                                           | expectedSelectedType
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "name"                        | SelectedMeasurandType.USERTIMING_MEASURE
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + Measurand.DOM_TIME.toString() | SelectedMeasurandType.USERTIMING_MEASURE
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "name"                           | SelectedMeasurandType.USERTIMING_MARK
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + Measurand.DOM_TIME.toString()    | SelectedMeasurandType.USERTIMING_MARK
+        Measurand.DOM_TIME.toString()                                                         | SelectedMeasurandType.MEASURAND
     }
 
-    void "test if constructor works as intended for all measurands"(){
+    void "test if constructor works as intended for bad input"() {
+        when: "selected is constructed for optionValue"
+        SelectedMeasurand selected = new SelectedMeasurand(optionValue, cachedView)
+
+        then: "IllegalArgumentException is thrown"
+        thrown(IllegalArgumentException)
+
+        where:
+        optionValue                                                                  | _
+        null                                                                         | _
+        ""                                                                           | _
+        "duck"                                                                       | _
+        "Donald Duck"                                                                | _
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix                           | _
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix                        | _
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix.toLowerCase() + "name"    | _
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix.toLowerCase() + "name" | _
+    }
+
+    void "test if constructor works as intended for all measurands"() {
         when: " all measurands are converted"
-        List<Selected> toTest = Measurand.values().collect {new Selected(it.toString(), cachedView)}
+        List<SelectedMeasurand> toTest = Measurand.values().collect { new SelectedMeasurand(it.toString(), cachedView) }
 
         then: " each selected has measurand as its type"
-        toTest.each { it.selectedType == SelectedType.MEASURAND}
+        toTest.each { it.selectedType == SelectedMeasurandType.MEASURAND }
     }
 
     void "test normalizeValues"() {
         setup: "create selected"
-        Selected selected = new Selected(optionValue, cachedView)
+        SelectedMeasurand selected = new SelectedMeasurand(optionValue, cachedView)
 
         expect: "value is normalized"
         selected.normalizeValue(inputValue) == expectedValue
@@ -105,35 +118,28 @@ class SelectedSpec extends Specification {
         'SPEED_INDEX'                 | 0          | 0
         '_UTME_name'                  | 1000       | 1000
         '_UTMK_name'                  | 1000       | 1000
-        ''                            | 1000       | 1000
-        null                          | 1000       | 1000
     }
 
-    void "test get value from EventResult"(){
+    void "test get value from EventResult"() {
         given: "testee is intiated"
         EventResult testee = createTestee(1000, 2000, 3000)
 
         when: "selected is build"
-        Selected selected = new Selected(name, cachedView)
+        SelectedMeasurand selected = new SelectedMeasurand(name, cachedView)
 
         then: "normalized value is as expected"
         selected.getNormalizedValueFrom(testee) == expectedResult
 
         where:
-        name                                                           | expectedResult
-        null                                                           | null
-        ""                                                             | null
-        "duck"                                                         | null
-        "donald duck"                                                  | null
-        SelectedType.USERTIMING_MARK.optionPrefix.toLowerCase()+"mark" | null
-        SelectedType.USERTIMING_MARK.optionPrefix + "mark"             | 1000
-        SelectedType.USERTIMING_MARK.optionPrefix + "measure"          | null
-        SelectedType.USERTIMING_MEASURE.optionPrefix + "mark"          | null
-        SelectedType.USERTIMING_MEASURE.optionPrefix + "measure"       | 2000
-        Measurand.DOC_COMPLETE_TIME.toString()                         | 3000
+        name                                                              | expectedResult
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "mark"       | 1000
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "measure"    | null
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "mark"    | null
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "measure" | 2000
+        Measurand.DOC_COMPLETE_TIME.toString()                            | 3000
     }
 
-    private EventResult createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime){
+    private EventResult createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime) {
         List<UserTiming> userTimings = []
         userTimings.add(
                 UserTiming.build(

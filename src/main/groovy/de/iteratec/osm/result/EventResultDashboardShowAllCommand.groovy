@@ -91,12 +91,12 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.findAll {Selected.isNoUserTiming(it)}.collect {Measurand.valueOf(it)}
+        return selectedValues.findAll {SelectedMeasurand.isNoUserTiming(it)}.collect {Measurand.valueOf(it)}
     }
 
-    Collection<Selected> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
-        Collection<Selected> result = measurandsUncached.collect{new Selected(it, CachedView.UNCACHED)}
-        result.addAll(measurandsCached.collect{new Selected(it, CachedView.CACHED)})
+    Collection<SelectedMeasurand> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
+        Collection<SelectedMeasurand> result = measurandsUncached.collect{new SelectedMeasurand(it, CachedView.UNCACHED)}
+        result.addAll(measurandsCached.collect{new SelectedMeasurand(it, CachedView.CACHED)})
         return result
     }
 

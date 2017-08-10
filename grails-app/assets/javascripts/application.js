@@ -254,26 +254,6 @@ OpenSpeedMonitor.domUtils = (function () {
         });
         return options;
     };
-
-    var createOptionsForUserTimings = function (values) {
-        var options = [];
-        if (!values) {
-            return [];
-        }
-        values.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        values.forEach(function (value) {
-            if (value &&  value.name) {
-                options.push($("<option/>", {
-                    value: value.option,
-                    text: value.name
-                }));
-            }
-        });
-        return options;
-    };
-
     /**
      * Gets all values of all option elements in a select element
      * @param selectElement The select element with options as children
@@ -313,7 +293,7 @@ OpenSpeedMonitor.domUtils = (function () {
         oldNamesList.forEach(function(old){
             selectElement.find('[value="'+old.option+'"]').remove();
         });
-        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsForUserTimings(newNamesList));
+        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(newNamesList));
         selectElement.val(selection);
     }
 
@@ -336,7 +316,6 @@ OpenSpeedMonitor.domUtils = (function () {
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
         deselectAllOptions: deselectAllOptions,
-        createOptionsForUserTimings: createOptionsForUserTimings,
         updateOptionGroupWithUserTimings: updateOptionGroupWithUserTimings
     };
 })();

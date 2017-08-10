@@ -284,7 +284,7 @@ class EventResultDashboardController {
     private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
-        List<Selected> allMeasurands = modelToRender.get('selectedAggrGroupValues')
+        List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
         List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
                 new OsmChartAxis(

@@ -1,7 +1,7 @@
 package geb.pages.de.iteratec.osm.result
 
 import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurandType
 import geb.pages.de.iteratec.osm.I18nGebPage
 import org.openqa.selenium.Keys
 
@@ -113,12 +113,12 @@ class EventResultDashboardPage extends I18nGebPage {
         return getFirstViewOptionsFor(measurandGroup).children().size()
     }
 
-    def findOptionInFristView(SelectedType selectedType, String name){
+    def findOptionInFristView(SelectedMeasurandType selectedType, String name){
         String query = selectedType.optionPrefix+name
         return getFirstViewOptionsFor(selectedType.getMeasurandGroup.call(name)).find('[value="'+query+'"]')
     }
 
-    boolean firstViewHasOptionFor(SelectedType selectedType, String name){
+    boolean firstViewHasOptionFor(SelectedMeasurandType selectedType, String name){
        return findOptionInFristView(selectedType, name).size() == 1
     }
 

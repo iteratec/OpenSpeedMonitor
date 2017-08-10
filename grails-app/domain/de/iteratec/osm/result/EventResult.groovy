@@ -321,16 +321,4 @@ class EventResult implements CsiValue {
                 "\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n"
     }
 
-    Double getValueFor(Measurand measurand){
-        return this."$measurand.eventResultField" != null ? Double.valueOf(this."$measurand.eventResultField") : null
-    }
-
-    Double getValueFor(Closure specificUserTiming){
-        UserTiming userTiming = this.userTimings.find specificUserTiming
-        if(userTiming){
-            return  userTiming.getValue()
-        }else{
-            return null
-        }
-    }
 }
