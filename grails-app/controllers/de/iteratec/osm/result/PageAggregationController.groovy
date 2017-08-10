@@ -2,8 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarChartAggregation
-import de.iteratec.osm.barchart.BarChartAggregationService
+import de.iteratec.osm.barchart.BarchartAggregationService
 import de.iteratec.osm.barchart.BarchartDTO
 import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
@@ -31,7 +30,7 @@ class PageAggregationController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
-    BarChartAggregationService barChartAggregationService
+    BarchartAggregationService barchartAggregationService
 
 
     def index() {
@@ -86,9 +85,9 @@ class PageAggregationController extends ExceptionHandlerController {
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
 
-        List<BarChartAggregation> barChartAggregations = barChartAggregationService.getAggregationForPageAggreagation(cmd)
+        List<BarchartSeries> barchartSeriesForCmd = barchartAggregationService.getBarchartSeriesFor(cmd)
 
-        if (!barChartAggregations) {
+        if (!barchartSeriesForCmd) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
@@ -101,18 +100,7 @@ class PageAggregationController extends ExceptionHandlerController {
         barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
         barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        barchartDTO.series = barChartAggregations.collect {
-            new BarchartSeries(
-                    unit: it.selected.getMeasurandGroup().unit.label,
-                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selected.name}", it.selected.name),
-                    measurand: it.selected.name,
-                    measurandGroup: it.selected.getMeasurandGroup(),
-                    value: it.value,
-                    valueComparative: it.comparativeValue,
-                    page: it.page,
-                    jobGroup: it.jobGroup
-            )
-        }
+        barchartDTO.series = barchartSeriesForCmd
 
 //      TODO: see ticket [IT-1614]
         barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
