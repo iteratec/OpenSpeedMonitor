@@ -105,21 +105,25 @@ class EventResultDashboardPage extends I18nGebPage {
         return cardTabsUl.children("li")[1].classes().contains("active")
     }
 
-    def getFirstViewOptionsFor(MeasurandGroup measurandGroup){
-        return firstViewDiv.find(".measurand-opt-group-${measurandGroup.toString()}")
+    def getFirstViewOptionsFor(String measurandGroup){
+        return firstViewDiv.find(".measurand-opt-group-${measurandGroup}")
     }
 
-    int getFirstViewOptionsSizeFor(MeasurandGroup measurandGroup){
+    int getFirstViewOptionsSizeFor(String measurandGroup){
         return getFirstViewOptionsFor(measurandGroup).children().size()
     }
 
-    def findOptionInFristView(SelectedMeasurandType selectedType, String name){
+    def findOptionInFirstViewForUserTiming(SelectedMeasurandType selectedType, String name){
         String query = selectedType.optionPrefix+name
-        return getFirstViewOptionsFor(selectedType.getMeasurandGroup.call(name)).find('[value="'+query+'"]')
+        return getFirstViewOptionsFor("USER_TIMINGS").find('[value="'+query+'"]')
+    }
+
+    boolean isUserTimingsHidden(){
+        return firstViewDiv.find('.measurand-opt-group-USER_TIMINGS[style="display: none;"]').size() == 1
     }
 
     boolean firstViewHasOptionFor(SelectedMeasurandType selectedType, String name){
-       return findOptionInFristView(selectedType, name).size() == 1
+       return findOptionInFirstViewForUserTiming(selectedType, name).size() == 1
     }
 
     public void scrollTop(){

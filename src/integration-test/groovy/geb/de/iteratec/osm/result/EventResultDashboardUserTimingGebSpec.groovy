@@ -93,7 +93,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        isUserTimingsHidden() == true
     }
 
     void "matching date matches timings"(){
@@ -106,7 +107,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
@@ -121,9 +122,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        isUserTimingsHidden() == true
     }
 
     void "timings appear for correct timeframe within a day"(){
@@ -136,7 +136,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
@@ -152,9 +152,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        isUserTimingsHidden() == true
     }
 
     void "timings appear for matching job group"(){
@@ -169,7 +168,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
@@ -187,9 +186,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        isUserTimingsHidden() == true
     }
 
     void "timings appear if page matches"(){
@@ -204,15 +202,15 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
     void "show graph for mark"(){
         given: "usertimings are additionally selected"
-        findOptionInFristView(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName).click()
-        findOptionInFristView(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName).click()
+        findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName).click()
+        findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName).click()
 
         when: "show buttons is pushed"
         clickShowButton()

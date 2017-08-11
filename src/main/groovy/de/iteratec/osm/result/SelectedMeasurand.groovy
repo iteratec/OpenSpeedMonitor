@@ -54,6 +54,17 @@ class SelectedMeasurand {
         return [name: name, id: type.selectedType.optionPrefix + name]
     }
 
+    static Map createDataMapForOptGroupSelect(){
+        Map result = [:]
+        MeasurandGroup.values().each { measurandGroup ->
+            result.put(measurandGroup.toString(), Measurand.values().findAll {it.measurandGroup == measurandGroup})
+            if(measurandGroup == MeasurandGroup.LOAD_TIMES){
+                result.put("USER_TIMINGS", [])
+            }
+        }
+        return result
+    }
+
     static boolean isNoUserTiming(String name) {
         return Measurand.values().any{ it.toString() == name }
     }

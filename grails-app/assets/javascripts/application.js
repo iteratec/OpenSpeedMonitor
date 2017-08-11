@@ -287,16 +287,6 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.val(selection);
     };
 
-    var updateOptionGroupWithUserTimings = function (selectElement, newNamesList, oldNamesList){
-        selectElement = $(selectElement);
-        var selection = selectElement.val();
-        oldNamesList.forEach(function(old){
-            selectElement.find('[value="'+old.option+'"]').remove();
-        });
-        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(newNamesList));
-        selectElement.val(selection);
-    }
-
     /**
      * Deselects all selected options in a select element
      * @param selectElement The select element
@@ -316,7 +306,6 @@ OpenSpeedMonitor.domUtils = (function () {
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
         deselectAllOptions: deselectAllOptions,
-        updateOptionGroupWithUserTimings: updateOptionGroupWithUserTimings
     };
 })();
 
