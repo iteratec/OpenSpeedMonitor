@@ -47,7 +47,7 @@ class BarChartAggregationFilterBuilder {
         return this
     }
 
-    Object build(){
+    Object getFilter(){
         return filter
     }
 }
