@@ -57,7 +57,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
                 return;
             }
             var difference = datum.value - datum.valueComparative;
-            var isImprovement = difference < 0 && datum.measurandGroup !== "PERCENTAGES";
+            var isImprovement = (datum.measurandGroup === "PERCENTAGES") ? difference > 0 : difference < 0;
             var measurandSuffix = isImprovement ? "improvement" : "deterioration";
             var label = isImprovement ? (i18n.comparativeImprovement || "improvement") : (i18n.comparativeDeterioration || "deterioration");
             comparativeSeries.push({
