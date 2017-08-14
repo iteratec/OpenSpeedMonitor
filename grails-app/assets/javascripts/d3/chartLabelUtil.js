@@ -8,7 +8,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
-
+    var groupingDelimiter = " | ";
     var delimiter = ", ";
 
     var seriesData;
@@ -26,7 +26,7 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
     var deduceUniqueEntries = function () {
         seriesData.forEach(function (series) {
             if (series.grouping && !series.page && !series.jobGroup) {
-                var splittedIdentifier = series.grouping.split(delimiter);
+                var splittedIdentifier = series.grouping.split(groupingDelimiter);
                 series.page = splittedIdentifier[0];
                 series.jobGroup = splittedIdentifier[1];
             }
