@@ -104,7 +104,8 @@ class PageAggregationController extends ExceptionHandlerController {
         }
 
         Map comparativeEventResultAverages = null
-        if (cmd.fromComparative && cmd.toComparative) {
+        boolean hasComparativeData = cmd.fromComparative && cmd.toComparative;
+        if (hasComparativeData) {
             comparativeEventResultAverages = EventResult.createCriteria().list {
                 'in'('page', allPages)
                 'in'('jobGroup', allJobGroups)
@@ -133,7 +134,7 @@ class PageAggregationController extends ExceptionHandlerController {
         }
 
         List allSeries = cmd.selectedSeries
-        BarchartDTO barchartDTO = new BarchartDTO()
+        BarchartDTO barchartDTO = new BarchartDTO(hasComparativeData: hasComparativeData)
         barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))

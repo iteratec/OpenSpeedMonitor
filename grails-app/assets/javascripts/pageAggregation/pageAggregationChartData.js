@@ -18,7 +18,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var rawSeries = [];
     var activeFilter = "desc";
     var headerText = "";
-    var stackBars = false;
+    var stackBars = true;
     var autoWidth = true;
     var i18n = {};
 

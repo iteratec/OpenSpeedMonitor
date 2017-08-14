@@ -8,10 +8,10 @@
     position: relative;
 }
 
-.filterActive {
-    visibility: visible;
-}
-
 .filterInactive {
     visibility: hidden;
+}
+
+#stackBarSwitch {
+    margin-right: 5px;
 }
