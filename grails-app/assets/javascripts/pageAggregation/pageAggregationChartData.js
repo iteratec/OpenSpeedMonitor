@@ -337,10 +337,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin = 15;
 OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder = [
     "CS_BY_WPT_VISUALLY_COMPLETE",
     "CS_BY_WPT_DOC_COMPLETE",
-    "FULLY_LOADED_INCOMING_BYTES",
-    "DOC_COMPLETE_INCOMING_BYTES",
-    "FULLY_LOADED_REQUEST_COUNT",
-    "DOC_COMPLETE_REQUESTS",
     "FULLY_LOADED_TIME",
     "VISUALLY_COMPLETE",
     "VISUALLY_COMPLETE_99",
@@ -354,5 +350,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder = [
     "LOAD_TIME",
     "START_RENDER",
     "DOM_TIME",
-    "FIRST_BYTE"
+    "FIRST_BYTE",
+    "FULLY_LOADED_INCOMING_BYTES",
+    "DOC_COMPLETE_INCOMING_BYTES",
+    "FULLY_LOADED_REQUEST_COUNT",
+    "DOC_COMPLETE_REQUESTS"
 ];
