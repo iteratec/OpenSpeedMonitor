@@ -21,8 +21,8 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var setData = function (componentData) {
         data = componentData.values || data;
-        minValue = componentData.min || minValue;
-        maxValue = componentData.max || maxValue;
+        minValue = (componentData.min !== undefined) ? componentData.min : minValue;
+        maxValue = (componentData.max !== undefined) ? componentData.max : maxValue;
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
