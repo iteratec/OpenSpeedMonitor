@@ -122,8 +122,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .transition()
             .duration(transitionDuration);
         exitTransition
-            .attr("width", 0)
+            .style("opacity", 0)
             .remove();
+        exitTransition.select(".bar-rect")
+            .attr("width", 0);
     };
 
     var formatValue = function (value) {
