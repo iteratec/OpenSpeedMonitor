@@ -47,10 +47,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderEnter = function (enterSelection) {
         var bars = enterSelection.append("g")
-            .attr("class", "bar")
-            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
-            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
-            .on("click", function(data) { callEventHandler("click", data) });
+            .attr("class", "bar");
         bars.append("rect")
             .attr("class", "bar-rect")
             .attr("x", 0)
@@ -67,6 +64,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderUpdate = function (updateSelection, xScale, yScale) {
         var valueLabelOffset = 10;
+        updateSelection
+            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
+            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
+            .on("click", function(data) { callEventHandler("click", data) });
         updateSelection.select(".bar-value")
             .text(function (d) {
                 var prefix = d.value > 0 && forceSignInLabel ? "+" : "";
