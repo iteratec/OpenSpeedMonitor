@@ -96,7 +96,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $filterDropdownGroup.toggleClass("hidden", false);
 
         Object.keys(filterRules).forEach(function(filterRuleKey) {
-            var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+            var link = $("<li class='filterRule chart-filter'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             link.data('filter', filterRuleKey);
             link.click(onFilterClick);
             link.insertAfter($customerJourneyHeader);
