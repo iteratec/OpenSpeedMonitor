@@ -53,6 +53,8 @@ OpenSpeedMonitor.postLoadUrls.forEach(function (scriptUrl) {
 });
 
 OpenSpeedMonitor.postLoader = (function () {
+    var postloadedScripts = {};
+    var onLoadedHandlers = {};
 
     var head = document.getElementsByTagName("head")[0];
 
@@ -60,6 +62,8 @@ OpenSpeedMonitor.postLoader = (function () {
         async = async || true;
         var script = document.createElement("script");
         script.onload = function () {
+            postloadedScripts[name] = true;
+            checkCallHandler(name);
             fireWindowEvent("" + name + "Loaded");
         };
         script.setAttribute("src", url);
@@ -68,6 +72,7 @@ OpenSpeedMonitor.postLoader = (function () {
         //script.setAttribute("charset","ISO-8859-1");
         head.appendChild(script);
     };
+
     var loadStylesheet = function (url) {
         var link = document.createElement("link");
         link.rel = "stylesheet";
@@ -77,9 +82,44 @@ OpenSpeedMonitor.postLoader = (function () {
         head.appendChild(link);
     };
 
+    var onLoaded = function(dependencies, callback) {
+        if (typeof dependencies === 'string' || dependencies instanceof String) {
+            dependencies = [dependencies];
+        }
+        var dependencyId = dependencies.sort().join(";");
+        if (!onLoadedHandlers[dependencyId]) {
+            onLoadedHandlers[dependencyId] = [];
+        }
+        if (onLoadedHandlers[dependencyId].indexOf(callback) < 0) {
+            onLoadedHandlers[dependencyId].push(callback);
+        }
+        if (allDependenciesAreLoaded(dependencies)) {
+            callback();
+        }
+    };
+
+    var checkCallHandler = function(nameOfNewLoaded) {
+        Object.keys(onLoadedHandlers).forEach(function(dependencyId) {
+            var dependencies = dependencyId.split(";");
+            if (dependencies.indexOf(nameOfNewLoaded) < 0) {
+                return;
+            }
+            if (allDependenciesAreLoaded(dependencies)) {
+                onLoadedHandlers[dependencyId].forEach(function(callback) {
+                    callback();
+                });
+            }
+        });
+    };
+
+    var allDependenciesAreLoaded = function (dependencies) {
+        return dependencies.every(function (d) { return !!postloadedScripts[d]; });
+    };
+
     return {
         loadJavascript: loadJavascript,
-        loadStylesheet: loadStylesheet
+        loadStylesheet: loadStylesheet,
+        onLoaded: onLoaded
     }
 
 })();
