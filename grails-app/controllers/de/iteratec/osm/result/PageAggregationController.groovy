@@ -143,10 +143,6 @@ class PageAggregationController extends ExceptionHandlerController {
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
@@ -167,7 +163,6 @@ class PageAggregationController extends ExceptionHandlerController {
                     }
                 }
             }
-            barchartDTO.series.add(barchartSeries)
         }
 
 //      TODO: see ticket [IT-1614]
