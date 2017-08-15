@@ -67,17 +67,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var init = function() {
         drawGraphButton.click(loadData);
+        $(window).on('pageAggregationStateLoaded', function() {
+            loadData();
+        });
         $(window).on('resize', function() {
-            pageAggregationChart.setData({autoWidth: true});
-            pageAggregationChart.render();
+            renderChart({autoWidth: true});
         });
         inFrontButton.click(function() {
-            pageAggregationChart.setData({stackBars: true});
-            pageAggregationChart.render();
+            renderChart({stackBars: true});
         });
         besideButton.click(function() {
-            pageAggregationChart.setData({stackBars: false});
-            pageAggregationChart.render();
+            renderChart({stackBars: false});
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -92,8 +92,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var onFilterClick = function(event) {
         event.preventDefault();
-        pageAggregationChart.setData({selectedFilter: $(this).data("filter")});
-        pageAggregationChart.render();
+        renderChart({selectedFilter: $(this).data("filter")});
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
     };
@@ -171,10 +170,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         data.selectedFilter = updateFilters(data.filterRules);
         data.stackBars = updateStackBars(data);
 
-        pageAggregationChart.setData(data);
-        pageAggregationChart.render();
+        renderChart(data);
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         $("#dia-save-chart-as-png").removeClass("disabled");
+    };
+
+    var renderChart = function (data) {
+        if (data) {
+            pageAggregationChart.setData(data);
+            $(window).trigger("pageAggregationStateChanged");
+        }
+        pageAggregationChart.render();
     };
 
     var loadData = function() {

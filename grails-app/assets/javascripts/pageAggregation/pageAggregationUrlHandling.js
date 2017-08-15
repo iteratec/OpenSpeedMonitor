@@ -8,6 +8,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var restoredState = "";
+    var ignoreNextStateChange = true;
 
 
     var initWaitForPostload = function () {
@@ -19,7 +20,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var addEventHandlers = function () {
-        $('#graphButtonHtmlId').on('click', saveState);
+        $(window).on("pageAggregationStateChanged", saveState);
         window.onpopstate = function (event) {
             var state = event.state || OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
             loadState(state);
@@ -31,6 +32,10 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var saveState = function () {
+        if (ignoreNextStateChange) {
+            ignoreNextStateChange = false;
+            return;
+        }
         var state = {};
         state["from"] = $("#fromDatepicker").val();
         state["to"] = $("#toDatepicker").val();
@@ -60,7 +65,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var loadState = function (state) {
-        if (!state ) {
+        if (!state) {
             return;
         }
         var encodedState = urlEncodeState(state);
@@ -73,7 +78,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setMeasurands(state);
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
-            $("#graphButtonHtmlId").click();
+            ignoreNextStateChange = true;
+            $(window).trigger("pageAggregationStateLoaded");
         }
     };
 
