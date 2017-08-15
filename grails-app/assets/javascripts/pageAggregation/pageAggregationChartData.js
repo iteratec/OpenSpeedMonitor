@@ -16,7 +16,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var dataOrder = [];
     var filterRules = [];
     var rawSeries = [];
-    var activeFilter = "desc";
+    var selectedFilter = "desc";
     var headerText = "";
     var stackBars = true;
     var autoWidth = true;
@@ -25,9 +25,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var setData = function (data) {
         rawSeries = data.series || rawSeries;
         filterRules = data.filterRules || filterRules;
-        activeFilter = data.activeFilter || validateActiveFilter(activeFilter);
+        selectedFilter = data.selectedFilter || validateSelectedFilter(selectedFilter);
         i18n = data.i18nMap || i18n;
-        if (data.series || data.filterRules || data.activeFilter) {
+        if (data.series || data.filterRules || data.selectedFilter) {
             var filteredSeries = filterSeries(rawSeries);
             Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
@@ -46,8 +46,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         chartBarsHeight = calculateChartBarsHeight();
     };
 
-    var validateActiveFilter = function(activeFilter) {
-        return (activeFilter === "asc" || activeFilter === "desc" || filterRules[activeFilter]) ? activeFilter : "desc";
+    var validateSelectedFilter = function(selectedFilter) {
+        return (selectedFilter === "asc" || selectedFilter === "desc" || filterRules[selectedFilter]) ? selectedFilter : "desc";
     };
 
     var extractComparativeValuesAsSeries = function(series) {
@@ -145,7 +145,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var createDataOrder = function () {
-        var filter = (activeFilter === "asc" || activeFilter === "desc") ? createSortFilter(activeFilter) : filterRules[activeFilter];
+        var filter = (selectedFilter === "asc" || selectedFilter === "desc") ? createSortFilter(selectedFilter) : filterRules[selectedFilter];
         return filter.map(function (datum) {
             return {
                 page: datum.page,
@@ -156,11 +156,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var filterSeries = function (series) {
-        if (activeFilter === "asc" || activeFilter === "desc") {
+        if (selectedFilter === "asc" || selectedFilter === "desc") {
             return series;
         }
         var filteredSeries = [];
-        filterRules[activeFilter].forEach(function(filterEntry) {
+        filterRules[selectedFilter].forEach(function(filterEntry) {
             Array.prototype.push.apply(filteredSeries, series.filter(function(datum) {
                 return datum.page === filterEntry.page && datum.jobGroup === filterEntry.jobGroup;
             }));

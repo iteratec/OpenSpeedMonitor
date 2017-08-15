@@ -82,26 +82,45 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $(".chart-filter").click(onFilterClick);
     };
 
-    var onFilterClick = function(event) {
-        event.preventDefault();
-        pageAggregationChart.setData({activeFilter: $(this).data("filter")});
-        pageAggregationChart.render();
-        $(".chart-filter i").toggleClass('filterInactive', true);
-        $("i", $(this)).toggleClass('filterInactive', false);
+    var getSelectedFilter = function () {
+        return $(".chart-filter.selected").data("filter");
     };
 
-    var addFiltersToGui = function (filterRules) {
+    var getStackBars = function () {
+        return inFrontButton.hasClass("active");
+    };
+
+    var onFilterClick = function(event) {
+        event.preventDefault();
+        pageAggregationChart.setData({selectedFilter: $(this).data("filter")});
+        pageAggregationChart.render();
+        $(".chart-filter").toggleClass('selected', false);
+        $(this).toggleClass('selected', true);
+    };
+
+    var updateFilters = function (filterRules) {
+        filterRules = filterRules || [];
         var $filterDropdownGroup = $("#filter-dropdown-group");
         var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
+        var selectedFilter = getSelectedFilter();
         $filterDropdownGroup.find('.filterRule').remove();
         $filterDropdownGroup.toggleClass("hidden", false);
 
         Object.keys(filterRules).forEach(function(filterRuleKey) {
-            var link = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+            var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+            var link = $("a", listItem);
+            if (filterRuleKey === selectedFilter) {
+                link.toggleClass("selected", true);
+            }
             link.data('filter', filterRuleKey);
             link.click(onFilterClick);
-            link.insertAfter($customerJourneyHeader);
+            listItem.insertAfter($customerJourneyHeader);
         });
+        if (!getSelectedFilter()) {
+            $("#all-bars-desc").toggleClass("selected", true);
+            selectedFilter = getSelectedFilter();
+        }
+        return selectedFilter;
     };
 
     var countMeasurandGroups = function (data) {
@@ -120,6 +139,23 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         return Object.keys(measurands).length;
     };
 
+    var updateStackBars = function (data) {
+        var numMeasurandGroups = countMeasurandGroups(data);
+        var numMeasurands = countMeasurands(data);
+        var stackBars = false;
+        stackBarSwitch.toggle(numMeasurandGroups < 2 && numMeasurands > 1);
+        if (data.hasComparativeData || numMeasurands === 1) {
+            stackBars = true;
+        } else if (numMeasurandGroups > 1) {
+            stackBars = false;
+        } else {
+            stackBars = getStackBars();
+        }
+        inFrontButton.toggleClass("active", stackBars);
+        besideButton.toggleClass("active", !stackBars);
+        return stackBars;
+    };
+
     var handleNewData = function (data) {
         spinner.stop();
         $("#chart-card").removeClass("hidden");
@@ -132,21 +168,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
         $('#warning-no-data').hide();
         data.width = -1;
-        if (data.filterRules) {
-            addFiltersToGui(data.filterRules);
-        }
-        var numMeasurandGroups = countMeasurandGroups(data);
-        var numMeasurands = countMeasurands(data);
-        stackBarSwitch.toggle(numMeasurandGroups < 2 && numMeasurands > 1);
-        if (data.hasComparativeData || numMeasurands === 1) {
-            data.stackBars = true;
-        } else if (numMeasurandGroups > 1) {
-            data.stackBars = false;
-        }
-        if (data.stackBars !== undefined) {
-            inFrontButton.toggleClass("active", data.stackBars);
-            besideButton.toggleClass("active", !data.stackBars);
-        }
+        data.selectedFilter = updateFilters(data.filterRules);
+        data.stackBars = updateStackBars(data);
+
         pageAggregationChart.setData(data);
         pageAggregationChart.render();
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);

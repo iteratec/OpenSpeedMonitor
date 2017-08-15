@@ -388,7 +388,7 @@ describe("PageAggregationChartData data transformation", function () {
                 new SeriesBuilder().makeTTFB().page("page1").value(7000).build(),
                 new SeriesBuilder().makeRequestsDocComplete().page("page2").value(9900).build()
             ],
-            activeFilter: "asc"
+            selectedFilter: "asc"
         });
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual(["page2", "page1"]);
         expect(pageAggregationData.getDataForBars("FIRST_BYTE").values.map(v => v.page)).toEqual(["page2", "page1"]);
@@ -406,7 +406,7 @@ describe("PageAggregationChartData data transformation", function () {
                 new SeriesBuilder().makeTTFB().page("page1").value(7000).build(),
                 new SeriesBuilder().makeRequestsDocComplete().page("page2").value(9900).build()
             ],
-            activeFilter: "desc"
+            selectedFilter: "desc"
         });
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual(["page1", "page2"]);
         expect(pageAggregationData.getDataForBars("FIRST_BYTE").values.map(v => v.page)).toEqual(["page1", "page2"]);
@@ -434,7 +434,7 @@ describe("PageAggregationChartData data transformation", function () {
                     {page: "page4", jobGroup: "different"}
                 ]
             },
-            activeFilter: "customFilter"
+            selectedFilter: "customFilter"
         });
 
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual(["page3, group", "page2, group", "page4, different"]);
