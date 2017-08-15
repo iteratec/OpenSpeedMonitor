@@ -56,6 +56,10 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             state["comparativeFrom"] = comparativeTimeFrame[0].toISOString();
             state["comparativeTo"] = comparativeTimeFrame[1].toISOString();
         }
+        var inFrontButton = $("#inFrontButton");
+        if (inFrontButton.length) {
+            state["stackBars"] = inFrontButton.hasClass("active") ? "1" : "0";
+        }
 
         var encodedState = urlEncodeState(state);
         if (encodedState !== restoredState) {
@@ -77,6 +81,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setPages(state);
         setMeasurands(state);
         setSelectedFilter(state);
+        setStackBars(state);
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             ignoreNextStateChange = true;
@@ -132,6 +137,13 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             $this.toggleClass("selected", $this.data("filter") === state["selectedFilter"]);
         });
     };
+
+    var setStackBars = function (state) {
+        if (state["stackBars"] === undefined) {
+            return;
+        }
+        $("input[name='stackBars']").val(state["stackBars"]);
+    }
 
     var setMultiSelect = function (id, values) {
         $("#" + id).val(values);
