@@ -2,8 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarchartDTO
-import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -13,6 +11,8 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.dto.PageAggregationChartDTO
+import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -70,7 +70,7 @@ class PageAggregationController extends ExceptionHandlerController {
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
-     * @return BarchartDTO as JSON or string message if an error occurred
+     * @return PageAggregationChartDTO as JSON or string message if an error occurred
      */
     @RestAction
     def getBarchartData(GetBarchartCommand cmd) {
@@ -134,12 +134,12 @@ class PageAggregationController extends ExceptionHandlerController {
         }
 
         List allSeries = cmd.selectedSeries
-        BarchartDTO barchartDTO = new BarchartDTO(hasComparativeData: hasComparativeData)
-        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
-        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
-        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
-        barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
-        barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
+        PageAggregationChartDTO chartDto = new PageAggregationChartDTO(hasComparativeData: hasComparativeData)
+        chartDto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        chartDto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        chartDto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
+        chartDto.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
+        chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
             series.measurands.each { currentMeasurand ->
@@ -148,7 +148,7 @@ class PageAggregationController extends ExceptionHandlerController {
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
                     def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
                     if (value) {
-                        BarchartSeries barchartSeries = new BarchartSeries(
+                        PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
                                 unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
                                 measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
                                 measurand: currentMeasurand,
@@ -158,17 +158,17 @@ class PageAggregationController extends ExceptionHandlerController {
                                 page: datum[0],
                                 jobGroup: datum[1]?.name
                         )
-                        barchartDTO.series.add(barchartSeries)
+                        chartDto.series.add(seriesDto)
                     }
                 }
             }
         }
 
 //      TODO: see ticket [IT-1614]
-        barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+        chartDto.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
-        if (!barchartDTO.series) {
+        if (!chartDto.series) {
             ControllerUtils.sendSimpleResponseAsStream(
                 response,
                 HttpStatus.OK,
@@ -176,7 +176,7 @@ class PageAggregationController extends ExceptionHandlerController {
             )
         }
         else {
-            ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+            ControllerUtils.sendObjectAsJSON(response, chartDto)
         }
     }
 
