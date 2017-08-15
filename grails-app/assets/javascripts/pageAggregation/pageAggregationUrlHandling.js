@@ -34,6 +34,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         var state = {};
         state["from"] = $("#fromDatepicker").val();
         state["to"] = $("#toDatepicker").val();
+        state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
         state["selectedFolder"] = $("#folderSelectHtmlId").val();
         state["selectedPages"] = $("#pageSelectHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
@@ -44,7 +45,13 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             if (val) {
                 state['selectedAggrGroupValuesUnCached'].push(val);
             }
-        };
+        }
+        var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
+        if (comparativeTimeFrame) {
+            state["comparativeFrom"] = comparativeTimeFrame[0].toISOString();
+            state["comparativeTo"] = comparativeTimeFrame[1].toISOString();
+        }
+
         var encodedState = urlEncodeState(state);
         if (encodedState !== restoredState) {
             restoredState = encodedState;
@@ -60,12 +67,22 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         if (encodedState === restoredState) {
             return;
         }
+        setTimeFrame(state);
         setJobGroups(state);
         setPages(state);
         setMeasurands(state);
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             $("#graphButtonHtmlId").click();
+        }
+    };
+
+    var setTimeFrame = function (state) {
+        var timeFrame = (state["from"] && state["to"]) ? [new Date(state["from"]), new Date(state["to"])] : null;
+        OpenSpeedMonitor.selectIntervalTimeframeCard.setTimeFrame(timeFrame, state["selectedTimeFrameInterval"]);
+        if (state["comparativeFrom"] && state["comparativeTo"]) {
+            var comparativeTimeFrame = [new Date(state["comparativeFrom"]), new Date(state["comparativeTo"])];
+            OpenSpeedMonitor.selectIntervalTimeframeCard.setComparativeTimeFrame(comparativeTimeFrame);
         }
     };
 
