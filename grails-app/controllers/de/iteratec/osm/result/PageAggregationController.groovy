@@ -16,6 +16,7 @@ import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -142,6 +143,10 @@ class PageAggregationController extends ExceptionHandlerController {
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         allSeries.each { series ->
+            BarchartSeries barchartSeries = new BarchartSeries(
+                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                    stacked: series.stacked)
             series.measurands.each { currentMeasurand ->
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
@@ -162,6 +167,7 @@ class PageAggregationController extends ExceptionHandlerController {
                     }
                 }
             }
+            barchartDTO.series.add(barchartSeries)
         }
 
 //      TODO: see ticket [IT-1614]
