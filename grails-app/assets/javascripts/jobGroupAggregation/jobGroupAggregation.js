@@ -53,7 +53,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
     var setSelections = function () {
         var params = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
         // setTrim(params);
-        if (params && params.length > 0) {
+        if (params && Object.keys(params).length > 0) {
             setJobGroups(params);
             setMeasurands(params);
             if(params.selectedFolder != null){

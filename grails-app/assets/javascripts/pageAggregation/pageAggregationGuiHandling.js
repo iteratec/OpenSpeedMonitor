@@ -82,7 +82,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $(".chart-filter").click(onFilterClick);
     };
 
-    var onFilterClick = function() {
+    var onFilterClick = function(event) {
+        event.preventDefault();
         pageAggregationChart.setData({activeFilter: $(this).data("filter")});
         pageAggregationChart.render();
         $(".chart-filter i").toggleClass('filterInactive', true);
@@ -96,7 +97,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $filterDropdownGroup.toggleClass("hidden", false);
 
         Object.keys(filterRules).forEach(function(filterRuleKey) {
-            var link = $("<li class='filterRule chart-filter'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+            var link = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             link.data('filter', filterRuleKey);
             link.click(onFilterClick);
             link.insertAfter($customerJourneyHeader);

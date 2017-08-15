@@ -7,159 +7,104 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
+    var restoredState = "";
 
-    var getTimeFrame = function (map) {
-            map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
-            map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
-            map["from"] = $("#fromDatepicker").val();
-            map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
-            map["to"] = $("#toDatepicker").val();
-            map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
-          };
 
-    var getJobGroup = function (map) {
-        map["selectedFolder"] = $("#folderSelectHtmlId").val();
-    };
-
-    var getPage = function (map) {
-        map["selectedPages"] = $("#pageSelectHtmlId").val();
-    };
-
-    var getMeasurands = function (map) {
-        var measurands = [];
-        var measurandObjects = $('.measurandSeries');
-        $.each(measurandObjects, function (_, currentSeries) {
-            var currentMeasurands = [$(currentSeries).find(".firstMeasurandSelect").val()];
-            $(currentSeries).find(".additionalMeasurand").each(function (_, additionalMeasurand) {
-                currentMeasurands.push($(additionalMeasurand).val());
-            });
-            var json = JSON.stringify({
-                "stacked": $(currentSeries).find(".stackedSelect").val(),
-                "values": currentMeasurands
-            });
-            measurands.push(json);
+    var initWaitForPostload = function () {
+        var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
+        OpenSpeedMonitor.postLoader.onLoaded(dependencies, function () {
+            loadState(OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter());
+            addEventHandlers();
         });
-        map['measurand'] = measurands
-    };
-    var addHandler = function () {
-        $('#graphButtonHtmlId').on('click', updateUrl);
     };
 
-    var updateUrl = function () {
-        var map = {};
-        getTimeFrame(map);
-        getJobGroup(map);
-        getPage(map);
-        getMeasurands(map);
-        var path = "show?" + $.param(map, true);
-        window.history.pushState("object or string", "Title", path);
+    var addEventHandlers = function () {
+        $('#graphButtonHtmlId').on('click', saveState);
+        window.onpopstate = function (event) {
+            var state = event.state || OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
+            loadState(state);
+        };
     };
 
-    var setSelections = function () {
-        var params = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
-        // setTrim(params);
-        if (params && params.length > 0) {
-            setJobGroups(params);
-            setPages(params);
-            setMeasurands(params);
-            if(params.selectedFolder != null && params.selectedPages != null){
-                clickShowButton();
+    var urlEncodeState = function (state) {
+        return $.param(state, true);
+    };
+
+    var saveState = function () {
+        var state = {};
+        state["from"] = $("#fromDatepicker").val();
+        state["to"] = $("#toDatepicker").val();
+        state["selectedFolder"] = $("#folderSelectHtmlId").val();
+        state["selectedPages"] = $("#pageSelectHtmlId").val();
+        state['selectedAggrGroupValuesUnCached'] = [];
+        var measurandSelects = $(".measurand-select");
+        // leave out last select as it's the "hidden clone"
+        for (var i = 0; i < measurandSelects.length - 1; i++) {
+            var val = $(measurandSelects[i]).val();
+            if (val) {
+                state['selectedAggrGroupValuesUnCached'].push(val);
             }
+        };
+        var encodedState = urlEncodeState(state);
+        if (encodedState !== restoredState) {
+            restoredState = encodedState;
+            window.history.pushState(state, "", "show?" + encodedState);
         }
-
     };
+
+    var loadState = function (state) {
+        if (!state ) {
+            return;
+        }
+        var encodedState = urlEncodeState(state);
+        if (encodedState === restoredState) {
+            return;
+        }
+        setJobGroups(state);
+        setPages(state);
+        setMeasurands(state);
+        restoredState = encodedState;
+        if(state.selectedFolder && state.selectedPages){
+            $("#graphButtonHtmlId").click();
+        }
+    };
+
+    var setJobGroups = function (params) {
+        if (params['selectedFolder']) {
+            setMultiSelect("folderSelectHtmlId", params['selectedFolder']);
+        }
+    };
+    var setPages = function (params) {
+        if (params['selectedPages']) {
+            setMultiSelect("pageSelectHtmlId", params['selectedPages']);
+        }
+    };
+
+    var setMeasurands = function (params) {
+        var measurands = params['selectedAggrGroupValuesUnCached'];
+        if (!measurands) {
+            return;
+        }
+        if (measurands.constructor !== Array) {
+            measurands = [measurands];
+        }
+        $(".measurandSeries-clone").remove();
+        var currentAddButton = $("#addMeasurandButton");
+        for (var i = 0; i < measurands.length -1; i++) {
+            currentAddButton.click();
+        }
+        var selects = $(".measurand-select");
+        measurands.forEach(function (measurand, i) {
+            $(selects[i]).val(measurand);
+        });
+    };
+
     var setMultiSelect = function (id, values) {
         $("#" + id).val(values);
         $("#" + id).trigger("change")
     };
-    var setJobGroups = function (params) {
-        var selectedFolderParam = params['selectedFolder'];
-        if (selectedFolderParam !== undefined && selectedFolderParam != null) {
-            setMultiSelect("folderSelectHtmlId", selectedFolderParam);
-        }
-    };
-    var setPages = function (params) {
-        var selectedPagesParam = params['selectedPages'];
-        if (selectedPagesParam !== undefined && selectedPagesParam != null) {
-            setMultiSelect("pageSelectHtmlId", selectedPagesParam);
-        }
-    };
 
-    var clickShowButton = function () {
-        $("#graphButtonHtmlId").click()
-    };
-
-    var setMeasurands = function (params) {
-        var measurandGroups = params['measurand'];
-        if (measurandGroups == undefined || measurandGroups == null) {
-            return;
-        }
-        var currentGroup;
-        if (measurandGroups.constructor === Array) {
-            currentGroup = JSON.parse(decodeURIComponent(measurandGroups.shift()));
-            addMeasurands(currentGroup, 0);
-            var addButton = $("#addMeasurandSeriesButton");
-            var length = measurandGroups.length;
-            for (var i = 0; i < length; i++) {
-                addButton.click();
-                addMeasurands(JSON.parse(decodeURIComponent(measurandGroups.shift())), i + 1);
-            }
-        } else {
-            currentGroup = JSON.parse(decodeURIComponent(measurandGroups));
-            addMeasurands(currentGroup, 0);
-        }
-
-    };
-
-    var addMeasurands = function (measurands, index) {
-        var values = measurands['values'];
-        var firstSelect = $(".firstMeasurandSelect").eq(index);
-        firstSelect.val(values.shift());
-        var amountToAdd = values.length;
-        var currentAddButton = $("#addMeasurandButton");
-        while(amountToAdd--){
-            currentAddButton.click();
-        }
-
-        $(".additionalMeasurand").each(function () {
-            $(this).val(values.shift())
-        })
-    };
-
-    var timecardResolved = false;
-    var barChartResolved = false;
-    var markTimeCardAsResolved = function () {
-        timecardResolved = true;
-        if (allLoaded()) {
-           init()
-        }
-    };
-    var markBarChartAsResolved = function () {
-        barChartResolved = true;
-        if (allLoaded()) {
-            init()
-        }
-    };
-    var allLoaded = function () {
-        return timecardResolved && barChartResolved;
-    };
-
-    var init = function () {
-        setSelections();
-        addHandler();
-    };
-
-    var initWaitForPostload = function () {
-        $(window).on("selectIntervalTimeframeCardLoaded", function () {
-            markTimeCardAsResolved();
-        });
-        $(window).on("groupedBarchartHorizontalLoaded", function () {
-            markBarChartAsResolved();
-        });
-    };
-
+    initWaitForPostload();
     return {
-        setSelections: setSelections,
-        init: initWaitForPostload
     };
-});
+})();

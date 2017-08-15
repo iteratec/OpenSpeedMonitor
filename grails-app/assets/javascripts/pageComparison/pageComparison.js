@@ -47,7 +47,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
 
     var setSelections = function () {
         var params = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
-        if (params && params.length > 0) {
+        if (params && Object.keys(params).length > 0) {
             setMeasurands(params);
             setJobGroupsAndPages(params);
             if(params.selectedFolder != null && params.selectedPages != null){
