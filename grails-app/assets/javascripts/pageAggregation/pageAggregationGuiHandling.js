@@ -92,9 +92,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var onFilterClick = function(event) {
         event.preventDefault();
-        renderChart({selectedFilter: $(this).data("filter")});
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
+        renderChart({selectedFilter: $(this).data("filter")});
     };
 
     var updateFilters = function (filterRules) {
@@ -108,16 +108,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         Object.keys(filterRules).forEach(function(filterRuleKey) {
             var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             var link = $("a", listItem);
-            if (filterRuleKey === selectedFilter) {
-                link.toggleClass("selected", true);
-            }
             link.data('filter', filterRuleKey);
             link.click(onFilterClick);
             listItem.insertAfter($customerJourneyHeader);
         });
-        if (!getSelectedFilter()) {
+
+        var selectedFilterElement = $(".chart-filter").filter(function() { return $(this).data("filter") === selectedFilter; });
+        if (selectedFilterElement.length) {
+            selectedFilterElement.toggleClass("selected", true);
+        } else {
+            selectedFilter = "desc";
             $("#all-bars-desc").toggleClass("selected", true);
-            selectedFilter = getSelectedFilter();
         }
         return selectedFilter;
     };

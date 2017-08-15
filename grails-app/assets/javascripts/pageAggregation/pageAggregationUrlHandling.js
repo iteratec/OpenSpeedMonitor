@@ -10,7 +10,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var restoredState = "";
     var ignoreNextStateChange = true;
 
-
     var initWaitForPostload = function () {
         var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
         OpenSpeedMonitor.postLoader.onLoaded(dependencies, function () {
@@ -43,6 +42,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state["selectedFolder"] = $("#folderSelectHtmlId").val();
         state["selectedPages"] = $("#pageSelectHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
+        state["selectedFilter"] = $(".chart-filter.selected").data("filter");
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -76,6 +76,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setJobGroups(state);
         setPages(state);
         setMeasurands(state);
+        setSelectedFilter(state);
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             ignoreNextStateChange = true;
@@ -119,6 +120,16 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         var selects = $(".measurand-select");
         measurands.forEach(function (measurand, i) {
             $(selects[i]).val(measurand);
+        });
+    };
+
+    var setSelectedFilter = function (state) {
+        if (!state["selectedFilter"]) {
+            return;
+        }
+        $(".chart-filter").each(function() {
+            var $this = $(this);
+            $this.toggleClass("selected", $this.data("filter") === state["selectedFilter"]);
         });
     };
 
