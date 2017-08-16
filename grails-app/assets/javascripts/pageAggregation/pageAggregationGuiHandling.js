@@ -67,7 +67,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var init = function() {
         drawGraphButton.click(loadData);
-        $(window).on('pageAggregationStateLoaded', function() {
+        $(window).on('historyStateLoaded', function() {
             loadData();
         });
         $(window).on('resize', function() {
@@ -177,7 +177,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var renderChart = function (data) {
         if (data) {
             pageAggregationChart.setData(data);
-            $(window).trigger("pageAggregationStateChanged");
+            $(window).trigger("historyStateChanged");
         }
         pageAggregationChart.render();
     };

@@ -19,7 +19,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var addEventHandlers = function () {
-        $(window).on("pageAggregationStateChanged", saveState);
+        $(window).on("historyStateChanged", saveState);
         window.onpopstate = function (event) {
             var state = event.state || OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
             loadState(state);
@@ -85,7 +85,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             ignoreNextStateChange = true;
-            $(window).trigger("pageAggregationStateLoaded");
+            $(window).trigger("historyStateLoaded");
         }
     };
 
