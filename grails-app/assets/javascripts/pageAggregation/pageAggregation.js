@@ -1,4 +1,4 @@
 //= require pageAggregationChart.js
 //= require pageAggregationGuiHandling.js
-//= require pageAggregationUrlHandling.js
+//= require pageAggregationHistoryStateHandling.js
 //= require_self
