@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require common.js
 //= require_self
 
 "use strict";
@@ -8,7 +9,7 @@ OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 
 OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     var width = 300;
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var barHeight = OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight;
     var availableScoreBars = [
         {

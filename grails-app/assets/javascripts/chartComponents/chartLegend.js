@@ -1,5 +1,6 @@
 //= require /bower_components/d3/d3.min.js
-//= require /chartComponents/utility.js
+//= require common.js
+//= require utility.js
 //= require_self
 
 "use strict";
@@ -14,7 +15,7 @@ OpenSpeedMonitor.ChartComponents.ChartLegend = (function () {
     var colorPreviewSize = 10;
     var colorPreviewMargin = 5;
     var entryMargin = 20;
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var eventHandlers = {};
 
     var setData = function (data) {

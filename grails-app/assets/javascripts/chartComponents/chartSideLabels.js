@@ -1,5 +1,6 @@
 //= require /bower_components/d3/d3.min.js
 //= require /chartComponents/utility.js
+//= require common.js
 //= require_self
 
 "use strict";
@@ -10,7 +11,7 @@ OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 OpenSpeedMonitor.ChartComponents.ChartSideLabels = (function () {
     var height = 500;
     var labelData = [];
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var svg = null;
 
     var setData = function (data) {

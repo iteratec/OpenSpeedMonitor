@@ -5,6 +5,7 @@
 //= require /chartComponents/chartLegend.js
 //= require /chartComponents/chartSideLabels.js
 //= require /chartComponents/chartHeader.js
+//= require /chartComponents/common.js
 //= require /d3/chartLabelUtil.js
 //= require /pageAggregation/pageAggregationChartData.js
 //= require_self
@@ -22,7 +23,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var data = OpenSpeedMonitor.ChartModules.PageAggregationData(svg);
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);

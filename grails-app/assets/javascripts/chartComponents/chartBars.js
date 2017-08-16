@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require common.js
 //= require_self
 
 "use strict";
@@ -14,7 +15,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var width = 1000;
     var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
     var barColor = "#1660a7";
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var isRestrained = false;
     var forceSignInLabel = false;
     var eventHandlers = {};
