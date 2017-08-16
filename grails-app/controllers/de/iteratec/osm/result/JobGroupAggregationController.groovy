@@ -2,17 +2,16 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarchartDTO
-import de.iteratec.osm.barchart.BarchartDatum
-import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.result.dto.JobGroupAggregationChartDTO
+import de.iteratec.osm.result.dto.JobGroupAggregationChartSeriesDTO
+import de.iteratec.osm.result.dto.JobGroupDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
 import org.springframework.http.HttpStatus
 
 class JobGroupAggregationController extends ExceptionHandlerController {
@@ -92,33 +91,27 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             return
         }
 
-        List allSeries = cmd.selectedSeries
-        BarchartDTO barchartDTO = new BarchartDTO()
-        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
-        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
-        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
+        JobGroupAggregationChartDTO jobGroupAggregationChartDTO = new JobGroupAggregationChartDTO()
 
-        allSeries.each { series ->
-            BarchartSeries barchartSeries = new BarchartSeries(
-                    dimensionalUnit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    yAxisLabel:  (series.measurands[0] as Measurand).measurandGroup.unit.label,
-                    stacked: series.stacked)
-            series.measurands.each { currentMeasurand ->
-                allEventResults.each { datum ->
-                    barchartSeries.data.add(
-                        new BarchartDatum(
-                            measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                            value: new SelectedMeasurand(currentMeasurand, CachedView.UNCACHED).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
-                            grouping: "${datum[0].name}"
-                        )
-                    )
-                }
-            }
+        //Label translations
+        jobGroupAggregationChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        jobGroupAggregationChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
 
-            barchartDTO.series.add(barchartSeries)
+        //Jobgroup measurand and unit
+        JobGroupAggregationChartSeriesDTO jobGroupAggregationChartSeriesDTO = new JobGroupAggregationChartSeriesDTO()
+        jobGroupAggregationChartSeriesDTO.measurand = i18nService.msg("de.iteratec.isr.measurand.${allMeasurands[0]}", allMeasurands[0])
+        jobGroupAggregationChartSeriesDTO.unit = (allMeasurands[0] as Measurand).measurandGroup.unit.label
+
+        //Jobgroup groups and their values
+        allEventResults.each { series ->
+            JobGroupDTO jobGroupDTO = new JobGroupDTO()
+            jobGroupDTO.group = series[0]
+            jobGroupDTO.value = series[1]
+            jobGroupAggregationChartSeriesDTO.groupData.add(jobGroupDTO);
         }
+        jobGroupAggregationChartDTO.series = jobGroupAggregationChartSeriesDTO
 
-        ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+        ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)
     }
 
     /**
