@@ -169,6 +169,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         data.stackBars = updateStackBars(data);
 
         renderChart(data);
+        $('html, body').animate({scrollTop:0},'500');
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
