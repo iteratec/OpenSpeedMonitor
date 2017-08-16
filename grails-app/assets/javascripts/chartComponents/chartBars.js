@@ -13,7 +13,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var maxValue = 10000;
     var height = 500;
     var width = 1000;
-    var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
+    var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
     var barColor = "#1660a7";
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var isRestrained = false;
@@ -151,6 +151,3 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         on: registerEventHandler
     };
 });
-
-OpenSpeedMonitor.ChartComponents.ChartBars.BarBand = 40;
-OpenSpeedMonitor.ChartComponents.ChartBars.BarGap = 5;

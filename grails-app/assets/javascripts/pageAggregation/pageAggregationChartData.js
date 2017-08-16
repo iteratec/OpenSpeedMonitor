@@ -216,8 +216,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var calculateChartBarsHeight = function () {
-        var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
-        var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
+        var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
+        var barGap = OpenSpeedMonitor.ChartComponents.common.barGap;
         var numberOfMeasurands = Object.keys(allMeasurandDataMap).length;
         var numberOfBars = dataOrder.length * (stackBars ? 1 : numberOfMeasurands);
         var gapSize = barGap * ((stackBars || numberOfMeasurands < 2) ? 1 : 2);

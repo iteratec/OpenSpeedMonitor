@@ -10,7 +10,7 @@ OpenSpeedMonitor.ChartComponents = OpenSpeedMonitor.ChartComponents || {};
 OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     var width = 300;
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
-    var barHeight = OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight;
+    var barHeight = OpenSpeedMonitor.ChartComponents.common.barBand;
     var availableScoreBars = [
         {
             id: "good",
@@ -120,9 +120,7 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
 
     return {
         render: render,
-        setData: setData,
+        setData: setData
     };
 
 });
-
-OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight = 40;
