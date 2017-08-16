@@ -8,7 +8,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var restoredState = "";
-    var ignoreNextStateChange = true;
+    var ignoreNextStateChange = false;
 
     var initWaitForPostload = function () {
         var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
