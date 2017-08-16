@@ -133,6 +133,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         } else {
             updateUrls(false);
         }
+        $(window).on("historyStateChanged", function () {
+            updateUrls(true);
+        });
         // $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
         // $('#show-button').on('click', function(){updateUrls(true)});
     };

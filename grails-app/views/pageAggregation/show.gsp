@@ -93,8 +93,6 @@
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', true, "pageAggregation");
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', true, "resultSelection");
         });
-
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
     </asset:script>
 </content>
 
