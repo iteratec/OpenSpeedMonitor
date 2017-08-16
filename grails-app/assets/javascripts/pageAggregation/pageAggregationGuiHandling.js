@@ -74,7 +74,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             renderChart({autoWidth: true});
         });
         $("input[name='stackBars']").on("change", function() {
-            renderChart({stackBars: ($(this).val() === "1")});
+            renderChart({stackBars: getStackBars()});
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -84,7 +84,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var getStackBars = function () {
-        return $("input[name='stackBars']").val() === "1";
+        return $("#inFrontButton input").prop("checked");
     };
 
     var onFilterClick = function(event) {

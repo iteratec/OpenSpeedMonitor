@@ -142,8 +142,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         if (state["stackBars"] === undefined) {
             return;
         }
-        $("input[name='stackBars']").val(state["stackBars"]);
-    }
+        var isStacked = state["stackBars"] === "1";
+        $("#inFrontButton input").prop("checked", isStacked);
+        $("#inFrontButton").toggleClass("active", isStacked);
+        $("#besideButton input").prop("checked", !isStacked);
+        $("#besideButton").toggleClass("active", !isStacked);
+    };
 
     var setMultiSelect = function (id, values) {
         $("#" + id).val(values);
