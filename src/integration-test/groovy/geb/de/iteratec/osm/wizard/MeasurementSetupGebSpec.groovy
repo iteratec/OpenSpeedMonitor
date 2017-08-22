@@ -52,9 +52,10 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         !msPage.canContinueToScript()
     }
 
-    void "setup can be continued with undefined jobgroup"(){
+    void "setup can be continued with a new jobgroup"(){
         when: "the undefined jobgroup was selected"
-        msPage.selectUndefinedJobGroup()
+        msPage.selectNewJobGroup()
+        msPage.jobGroupName << "newJobGroup"
 
         then: "the user is able to continue the setup"
         msPage.canContinueToScript()
