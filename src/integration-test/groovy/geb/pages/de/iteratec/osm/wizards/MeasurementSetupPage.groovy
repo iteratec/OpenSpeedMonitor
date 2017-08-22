@@ -10,88 +10,131 @@ class MeasurementSetupPage extends I18nGebPage {
         title == getI18nMessage("de.iteratec.osm.setupMeasurementWizard.title")
     }
 
-    void selectUndefinedJobGroup(){
+    void selectUndefinedJobGroup() {
         jobSelect.click()
-        $("#jobGroupSelect_chosen").find(".group-option").find{it.text() == "undefined"}.click()
+        $("#jobGroupSelect_chosen").find(".group-option").find { it.text() == "undefined" }.click()
     }
 
-    void selectNewJobGroup(){
+    void selectNewJobGroup() {
         jobSelect.click()
-        $("#jobGroupSelect_chosen").find(".group-option").find{it.text() == getI18nMessage("default.button.create.new")}.click()
+        $("#jobGroupSelect_chosen").find(".group-option").find {
+            it.text() == getI18nMessage("default.button.create.new")
+        }.click()
     }
 
-    boolean canContinueToScript(){
+    boolean canContinueToScript() {
         !nextButtonJobGroup.@disabled
     }
 
-    boolean canContinueToLocation(){
+    boolean canContinueToLocation() {
         !nextButtonScript.@disabled
     }
 
-    boolean canContinueToJob(){
+    boolean canContinueToJob() {
         !nextButtonLocation.@disabled
     }
 
-    void continueToScript(){
+    void continueToScript() {
         nextButtonJobGroup.click()
     }
 
-    void continueToLocation(){
+    void continueToLocation() {
         nextButtonScript.click()
     }
 
-    void continueToJob(){
+    void continueToJob() {
         nextButtonLocation.click()
     }
 
+    boolean canClickCreateButton() {
+        !createButton.@disabled
+    }
 
-    boolean isJobGroupTabActive(){
+    void clickCreateButton() {
+        createButton.click()
+    }
+
+
+    boolean isJobGroupTabActive() {
         return isTabActive("#setJobGroupTab")
     }
 
-    boolean isScriptTabActive(){
+    boolean isScriptTabActive() {
         return isTabActive("#createScriptTab")
     }
 
-    boolean isLocationAndConnectivyTabActive(){
+    boolean isLocationAndConnectivyTabActive() {
         return isTabActive("#selectLocationAndConnectivityTab")
     }
 
-    boolean isJobCreateTabActive(){
+    boolean isJobCreateTabActive() {
         return isTabActive("#createJobTab")
     }
 
-    private boolean isTabActive(String selector){
+    private boolean isTabActive(String selector) {
         $(selector).parent().hasClass("active")
     }
 
+    List<String> getConnectivities() {
+        $("#inputConnectivity").find("option").collect { it.@value }
+    }
 
-    boolean scriptCodeHasErrors(){
+
+    boolean scriptCodeHasErrors() {
         scriptHelpBlock.text()
     }
 
-    void changeScript(String scriptCode){
-        js.exec(scriptCode,"OpenSpeedMonitor.script.codemirrorEditor.setNewContent(arguments[0])")
+    void changeScript(String scriptCode) {
+        js.exec(scriptCode, "OpenSpeedMonitor.script.codemirrorEditor.setNewContent(arguments[0])")
         js.exec("OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard.validate()")
+    }
+
+    void select30MinuteInterval() {
+        selectExecutionPlan("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.halfHourly")
+    }
+
+    void select15MinuteInterval() {
+        selectExecutionPlan("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.15min")
+    }
+
+    void selectDailyInterval() {
+        selectExecutionPlan("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.daily")
+    }
+
+    void selectHourlyInterval(){
+        selectExecutionPlan("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly")
+    }
+
+    void selectExecutionPlan(String i18nMessage) {
+        executionScheduleSelect.click()
+        $("#selectExecutionSchedule_chosen").find(".group-option").find { it.text() == getI18nMessage(i18nMessage) }.click()
+    }
+
+    void clearExecutionScheduleInput(){
+        executionScheduleInput.firstElement().clear()
+    }
+
+    void selectCustomInterval(){
+        selectExecutionPlan("de.iteratec.isocsi.custom")
     }
 
 
     static content = {
         jobSelect { $("#jobGroupSelect_chosen") }
-        jobGroupName { $("#inputNewJobGroupName")}
-        nextButtonJobGroup { $("#setJobGroubTabNextButton")}
-        nextButtonScript { $("#createScriptTabNextButton")}
-        nextButtonLocation { $("#selectLocationAndConnectivityTabNextButton")}
-        previousButton { $("#selectLocationAndConnectivityTabPreviousButton")}
-        scriptName { $("#inputScriptName")}
-        scriptDescirption { $("#inputScriptDescription")}
-        scriptHelpBlock {$("#navigationScriptHelpBlock")}
-        locationSelect { $("#inputLocation_chosen")}
-        connectivitySelect { $("#inputConnectivity_chosen")}
-        jobNameInput {$("#inputJobName")}
-        executionScheduleSelect {$("#selectExecutionSchedule_chosen")}
-        executionScheduleInput {$("#executionSchedule")}
-        createButton {$("#createJobTabCreationButton")}
+        jobGroupName { $("#inputNewJobGroupName") }
+        nextButtonJobGroup { $("#setJobGroubTabNextButton") }
+        nextButtonScript { $("#createScriptTabNextButton") }
+        nextButtonLocation { $("#selectLocationAndConnectivityTabNextButton") }
+        previousButton { $("#selectLocationAndConnectivityTabPreviousButton") }
+        scriptName { $("#inputScriptName") }
+        scriptDescirption { $("#inputScriptDescription") }
+        scriptHelpBlock { $("#navigationScriptHelpBlock") }
+        locationSelect { $("#inputLocation_chosen") }
+        connectivitySelect { $("#inputConnectivity_chosen") }
+        jobNameInput { $("#inputJobName") }
+        executionScheduleSelect { $("#selectExecutionSchedule_chosen") }
+        executionScheduleInput { $("#executionSchedule") }
+        createButton { $("#createJobTabCreationButton") }
     }
 
 }
