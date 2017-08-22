@@ -177,9 +177,7 @@
                 <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
                           model="${['selectedTimeFrameInterval'      : selectedTimeFrameInterval,
                                     'from'                           : from,
-                                    'fromHour'                       : fromHour,
                                     'to'                             : to,
-                                    'toHour'                         : toHour,
                                     'selectedInterval'               : selectedInterval,
                                     'dateFormat'                     : dateFormat,
                                     'weekStart'                      : weekStart,
