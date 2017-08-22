@@ -39,8 +39,8 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
         }
         to LoginPage
-        username << "admin"
-        password << "admin"
+        username << getConfiguredUsername()
+        password  << getConfiguredPassword()
         submitButton.click()
     }
 
