@@ -66,15 +66,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var besideButton = $("#besideButton");
 
     var init = function() {
-        drawGraphButton.click(loadData);
+        drawGraphButton.click(function() {
+            loadData(true);
+        });
         $(window).on('historyStateLoaded', function() {
-            loadData();
+            loadData(false);
         });
         $(window).on('resize', function() {
-            renderChart({autoWidth: true});
+            renderChart({autoWidth: true}, false);
         });
         $("input[name='stackBars']").on("change", function() {
-            renderChart({stackBars: getStackBars()});
+            renderChart({stackBars: getStackBars()}, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -91,7 +93,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
-        renderChart({selectedFilter: $(this).data("filter")});
+        renderChart({selectedFilter: $(this).data("filter")}, true);
     };
 
     var updateFilters = function (filterRules) {
@@ -153,7 +155,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         return stackBars;
     };
 
-    var handleNewData = function (data) {
+    var handleNewData = function (data, isStateChange) {
         spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
@@ -168,20 +170,22 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         data.selectedFilter = updateFilters(data.filterRules);
         data.stackBars = updateStackBars(data);
 
-        renderChart(data);
+        renderChart(data, isStateChange);
         $('html, body').animate({scrollTop:0},'500');
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data) {
+    var renderChart = function (data, isStateChange) {
         if (data) {
             pageAggregationChart.setData(data);
-            $(window).trigger("historyStateChanged");
+            if (isStateChange) {
+                $(window).trigger("historyStateChanged");
+            }
         }
         pageAggregationChart.render();
     };
 
-    var loadData = function() {
+    var loadData = function(isStateChange) {
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
@@ -209,7 +213,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             data: queryData,
             url: OpenSpeedMonitor.urls.pageAggregationGetData,
             dataType: "json",
-            success: handleNewData,
+            success: function (data) {
+                handleNewData(data, isStateChange);
+            },
             error: function (e) {
                 spinner.stop();
                 $("#chart-card").removeClass("hidden")

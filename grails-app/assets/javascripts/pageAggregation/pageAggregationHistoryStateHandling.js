@@ -8,7 +8,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var restoredState = "";
-    var ignoreNextStateChange = false;
 
     var initWaitForPostload = function () {
         var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
@@ -31,10 +30,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var saveState = function () {
-        if (ignoreNextStateChange) {
-            ignoreNextStateChange = false;
-            return;
-        }
         var state = {};
         state["from"] = $("#fromDatepicker").val();
         state["to"] = $("#toDatepicker").val();
@@ -84,7 +79,6 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setStackBars(state);
         restoredState = encodedState;
         if(state.selectedFolder && state.selectedPages){
-            ignoreNextStateChange = true;
             $(window).trigger("historyStateLoaded");
         }
     };
