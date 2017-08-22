@@ -10,11 +10,6 @@ class MeasurementSetupPage extends I18nGebPage {
         title == getI18nMessage("de.iteratec.osm.setupMeasurementWizard.title")
     }
 
-    void selectUndefinedJobGroup() {
-        jobSelect.click()
-        $("#jobGroupSelect_chosen").find(".group-option").find { it.text() == "undefined" }.click()
-    }
-
     void selectNewJobGroup() {
         jobSelect.click()
         $("#jobGroupSelect_chosen").find(".group-option").find {

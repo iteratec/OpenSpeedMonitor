@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm.wizard
 
 import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -21,12 +20,19 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     @Shared
     Location location
+
+    @Shared
+    String newJobGroupName = "New Job Group"
+
     @Shared
     String scriptCode = "setEventName\tHomepage:::Homepage\r\nnavigate\thttp://google.com"
+
     @Shared
-    String jobName = "undefined local"
+    String jobName = "New Job Group local"
+
     @Shared
     String schedule = "0 * * * ? *"
+
     @Shared
     MeasurementSetupPage msPage
 
@@ -34,9 +40,9 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         User.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
+            location = Location.build(label: "location1", location: "local", active: true, wptServer: WebPageTestServer.build(active: true))
+            ConnectivityProfile.build(active: true)
         }
-        WebPageTestServer webPageTestServer = new WebPageTestServer(baseUrl: "https://webpagetest.org", active: true, label: "server",apiKey: "apikey", proxyIdentifier: "pid").save(flush:true)
-        location = new Location(wptServer: webPageTestServer, label: "location1", location: "local", browser: Browser.list()[0], active: true).save(flush: true)
         doLogin()
     }
 
@@ -52,12 +58,17 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         !msPage.canContinueToScript()
     }
 
-    void "setup can be continued with a new jobgroup"(){
-        when: "the undefined jobgroup was selected"
-        msPage.selectNewJobGroup()
-        msPage.jobGroupName << "newJobGroup"
+    void "setup can't be continued without a job group"(){
+        expect: "the user is not able to continue the setup if no job group is selected"
+        !msPage.canContinueToScript()
+    }
 
-        then: "the user is able to continue the setup"
+    void "setup can be continued with a name for a new job group"() {
+        when: "user enters a name for a new Job Group"
+        msPage.selectNewJobGroup()
+        msPage.jobGroupName << newJobGroupName
+
+        then: "the user can continue to the script tab"
         msPage.canContinueToScript()
     }
 
@@ -182,6 +193,8 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         job.location == location
         job.script.navigationScript == scriptCode
         job.executionSchedule == "0 " + schedule
+        job.jobGroup
+        job.jobGroup.name == newJobGroupName
         Job.list().size() == 1
     }
 }
