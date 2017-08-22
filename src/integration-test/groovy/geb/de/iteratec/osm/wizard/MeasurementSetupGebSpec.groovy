@@ -184,6 +184,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         job
         job.location == location
         job.script.navigationScript == scriptCode
+        job.executionSchedule == "0 " + schedule
         Job.list().size() == 1
     }
 }
