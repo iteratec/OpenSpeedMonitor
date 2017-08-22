@@ -1,10 +1,12 @@
 package geb.de.iteratec.osm.wizard
 
 import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.wizards.MeasurementSetupPage
@@ -44,6 +46,18 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
             ConnectivityProfile.build(active: true)
         }
         doLogin()
+    }
+
+    void cleanupSpec() {
+        doLogout()
+        Job.withNewTransaction {
+            Job.list().each { it.delete() }
+            JobGroup.list().each { it.delete() }
+            ConnectivityProfile.list().each { it.delete() }
+            Location.list().each { it.delete() }
+            WebPageTestServer.list().each { it.delete() }
+            Browser.list().each { it.delete() }
+        }
     }
 
     void "Test default values on first step"(){
