@@ -50,7 +50,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     void cleanupSpec() {
         doLogout()
-        Job.withNewTransaction {
+        User.withNewTransaction {
             Job.list().each { it.delete() }
             JobGroup.list().each { it.delete() }
             ConnectivityProfile.list().each { it.delete() }
