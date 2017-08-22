@@ -9,12 +9,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart = (function () {
 
     var getTimeFrame = function (map) {
-        map["setFromHour"] = ($('#setFromHour:checked').length>0) ? "on" :"";
-        map["setToHour"] =  ($('#setToHour:checked').length>0) ? "on" :"";
         map["from"] = $("#fromDatepicker").val();
-        map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
         map["to"] = $("#toDatepicker").val();
-        map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
     };
 
     var getJobGroup = function (map) {
