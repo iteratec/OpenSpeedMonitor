@@ -8,7 +8,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
-import geb.pages.de.iteratec.osm.LoginPage
 import geb.pages.de.iteratec.osm.wizards.MeasurementSetupPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -25,28 +24,25 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
     @Shared
     String scriptCode = "setEventName\tHomepage:::Homepage\r\nnavigate\thttp://google.com"
     @Shared
-    String jobName = "undefined loca"
+    String jobName = "undefined local"
     @Shared
     String schedule = "0 * * * ? *"
     @Shared
     MeasurementSetupPage msPage
 
-    def login(){
+    def setupAndLogin(){
         User.withNewTransaction {
+            TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
-            WebPageTestServer webPageTestServer = new WebPageTestServer(baseUrl: "https://webpagetest.org", active: true, label: "server",apiKey: "apikey", proxyIdentifier: "pid").save(flush:true)
-            location = new Location(wptServer: webPageTestServer, label: "location1", location: "loca", browser: Browser.list()[0], active: true).save(flush: true)
-
         }
-        to LoginPage
-        username << getConfiguredUsername()
-        password  << getConfiguredPassword()
-        submitButton.click()
+        WebPageTestServer webPageTestServer = new WebPageTestServer(baseUrl: "https://webpagetest.org", active: true, label: "server",apiKey: "apikey", proxyIdentifier: "pid").save(flush:true)
+        location = new Location(wptServer: webPageTestServer, label: "location1", location: "local", browser: Browser.list()[0], active: true).save(flush: true)
+        doLogin()
     }
 
     void "Test default values on first step"(){
         given: "user is logged in"
-        login()
+        setupAndLogin()
         to MeasurementSetupPage
         msPage = page as MeasurementSetupPage //so we got IDE support for our methods
 
