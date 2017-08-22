@@ -43,10 +43,12 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
         var clone = additionalMeasurandClone.clone(true, true);
         clone.removeClass("hidden");
         clone.removeAttr("id");
+        clone.toggleClass("measurandSeries-clone", true);
         $("#measurands").append(clone);
     };
 
     var removeMeasurand = function (e) {
+        e.preventDefault();
         var $element = $(e.target);
         if ($element.closest(".measurandSeries").find(".addMeasurandRow").length <= 2) {
             $element.closest(".measurandSeries").find(".stackedSelectContainer").addClass("hidden");

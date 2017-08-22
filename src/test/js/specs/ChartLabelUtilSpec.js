@@ -64,7 +64,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         jobGroup: "develop_Desktop"
       }
     ];
-    var expectedCommonLabelParts = "Measurand: docCompleteTimeInMillisecs | Job Group: develop_Desktop";
+    var expectedCommonLabelParts = "develop_Desktop, docCompleteTimeInMillisecs";
 
     var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataJustPageDiffers);
     expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
@@ -155,7 +155,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         jobGroup: "live_Tablet"
       }
     ];
-    var expectedCommonLabelParts = "Measurand: firstByteInMillisecsUncached | Page: ADS";
+    var expectedCommonLabelParts = "ADS, firstByteInMillisecsUncached";
 
     var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataJustJobGroupDiffers);
     expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)
@@ -193,7 +193,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         value: 909.413,
         page: "ADS",
         jobGroup: "develop_Desktop",
-        label: "ADS | develop_Desktop"
+        label: "ADS, develop_Desktop"
       },
       {
         grouping: "ADS_entry | develop_Desktop",
@@ -201,7 +201,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         value: 1040.8115,
         page: "ADS_entry",
         jobGroup: "develop_Desktop",
-        label: "ADS_entry | develop_Desktop"
+        label: "ADS_entry, develop_Desktop"
       },
       {
         grouping: "ADS | develop_Tablet",
@@ -209,7 +209,7 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         value: 1351.7468,
         page: "ADS",
         jobGroup: "develop_Tablet",
-        label: "ADS | develop_Tablet"
+        label: "ADS, develop_Tablet"
       },
       {
         grouping: "ADS_entry | develop_Tablet",
@@ -217,10 +217,10 @@ describe("BarchartUtil function buildShortestUniqueLabel", function () {
         value: 909.413,
         page: "ADS_entry",
         jobGroup: "develop_Tablet",
-        label: "ADS_entry | develop_Tablet"
+        label: "ADS_entry, develop_Tablet"
       }
     ];
-    var expectedCommonLabelParts = "Measurand: firstByteInMillisecsUncached";
+    var expectedCommonLabelParts = "firstByteInMillisecsUncached";
 
     var seriesLabels = OpenSpeedMonitor.ChartModules.ChartLabelUtil(seriesDataPageAndJobGroupDiffer);
     expect(seriesLabels.getSeriesWithShortestUniqueLabels()).toEqual(expectedSeriesData)

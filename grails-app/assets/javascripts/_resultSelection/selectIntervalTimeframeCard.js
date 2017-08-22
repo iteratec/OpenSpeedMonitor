@@ -37,7 +37,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
       comparativeTimeFramePicker = OpenSpeedMonitor.timeRangePicker(comparativeTimeFramePickerElement);
     }
 
-    setTimeFramePreselection(timeFramePreselection, true);
+    setTimeFramePreselection(timeFramePreselection, null, true);
 
     registerEvents();
     triggerTimeFrameChanged(); // initial event
@@ -105,21 +105,24 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     $("#removeComparativeTimeFrame").on("click", toggleComparativeElements);
   };
 
-  var toggleComparativeElements = function () {
+  var toggleComparativeElements = function (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
     $("#comparativeTimeFrameButton").toggleClass("hidden");
     $(".comparison").toggleClass("hidden");
     $('#timeframe-picker').toggleClass("col-md-offset-4");
   };
 
-  var setTimeFramePreselection = function (timeFrameInSecs, suppressEvent) {
+  var setTimeFramePreselection = function (timeFrameInSecs, manualTimeFrame, suppressEvent) {
     timeFrameInSecs = parseInt(timeFrameInSecs);
 
     var from;
     var to;
 
     if (isNaN(timeFrameInSecs) || timeFrameInSecs <= 0) { // manual time selection
-      from = defaultValueForStart();
-      to = defaultValueForEnd();
+      from = manualTimeFrame ? manualTimeFrame[0] : defaultValueForStart();
+      to = manualTimeFrame ? manualTimeFrame[1] : defaultValueForEnd();
     } else {
       to = new Date();
       from = new Date(to.getTime() - (timeFrameInSecs * 1000));
@@ -152,8 +155,22 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     return timeFramePicker.getRange();
   };
 
+  var setTimeFrame = function (timeFrame, timeFramePreselection) {
+      setTimeFramePreselection(timeFramePreselection, timeFrame);
+  };
+
   var getComparativeTimeFrame = function () {
     return comparativeEnabled() && !comparativeTimeFramePickerContainer.hasClass("hidden") ? comparativeTimeFramePicker.getRange() : null;
+  };
+
+  var setComparativeTimeFrame = function (comparativeTimeFrame) {
+    if (comparativeTimeFrame) {
+        comparativeTimeFramePicker.setRange(comparativeTimeFrame);
+    }
+    if ((comparativeTimeFrame && comparativeEnabled() && comparativeTimeFramePickerContainer.hasClass("hidden")) ||
+        ((!comparativeTimeFrame || !comparativeEnabled()) && !comparativeTimeFramePickerContainer.hasClass("hidden"))) {
+      toggleComparativeElements()
+    }
   };
 
   var triggerTimeFrameChanged = function () {
@@ -167,7 +184,9 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
   init();
   return {
     getTimeFrame: getTimeFrame,
-    getComparativeTimeFrame: getComparativeTimeFrame
+    setTimeFrame: setTimeFrame,
+    getComparativeTimeFrame: getComparativeTimeFrame,
+    setComparativeTimeFrame: setComparativeTimeFrame
   }
 
 })();

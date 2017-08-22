@@ -8,91 +8,76 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
+    var groupingDelimiter = " | ";
+    var delimiter = ", ";
 
-    var delimitter = " | ";
-
-    var seriesData,
-        uniqueEntries,
-        i18nData;
+    var seriesData;
+    var i18nData;
+    var uniquePages = [];
+    var uniqueJobGroups = [];
+    var uniqueMeasurands = [];
 
     var init = function () {
         seriesData = series;
         deduceUniqueEntries();
-        i18nData = i18nMap ? i18nMap : {}
+        i18nData = i18nMap || {};
     };
 
     var deduceUniqueEntries = function () {
-
-        uniqueEntries = {
-            uniquePages: [],
-            uniqueJobGroups: [],
-            uniqueMeasurands: []
-        };
-
         seriesData.forEach(function (series) {
-
-            var splittedIdentifier = series.grouping.split(delimitter);
-            series.page = splittedIdentifier[0];
-            series.jobGroup = splittedIdentifier[1];
-
-            if (series.page && uniqueEntries.uniquePages.indexOf(series.page) == -1) {
-                uniqueEntries.uniquePages.push(series.page);
+            if (series.grouping && !series.page && !series.jobGroup) {
+                var splittedIdentifier = series.grouping.split(groupingDelimiter);
+                series.page = splittedIdentifier[0];
+                series.jobGroup = splittedIdentifier[1];
             }
-            if (series.jobGroup && uniqueEntries.uniqueJobGroups.indexOf(series.jobGroup) == -1) {
-                uniqueEntries.uniqueJobGroups.push(series.jobGroup);
+
+            if (series.page && uniquePages.indexOf(series.page) === -1) {
+                uniquePages.push(series.page);
             }
-            if (series.measurand && uniqueEntries.uniqueMeasurands.indexOf(series.measurand) == -1) {
-                uniqueEntries.uniqueMeasurands.push(series.measurand);
+            if (series.jobGroup && uniqueJobGroups.indexOf(series.jobGroup) === -1) {
+                uniqueJobGroups.push(series.jobGroup);
+            }
+            if (series.measurand && uniqueMeasurands.indexOf(series.measurand) === -1) {
+                uniqueMeasurands.push(series.measurand);
             }
 
         });
 
     };
 
-    var appendUniqueLabels = function (hideMeasurand) {
-
+    var setLabelInSeriesData = function (omitMeasurands) {
         seriesData.forEach(function (series) {
-            series.label = "";
-            if (uniqueEntries.uniquePages.length > 1) {
-                series.label += series.page + delimitter
+            var labelParts = [];
+            if (uniquePages.length > 1) {
+                labelParts.push(series.page);
             }
-            if (uniqueEntries.uniqueJobGroups.length > 1) {
-                series.label += series.jobGroup + delimitter
+            if (uniqueJobGroups.length > 1) {
+                labelParts.push(series.jobGroup);
             }
-            if (!hideMeasurand && uniqueEntries.uniqueMeasurands.length > 1) {
-                series.label += series.measurand + delimitter
+            if (!omitMeasurands && uniqueMeasurands.length > 1) {
+                labelParts.push(series.measurand);
             }
-            series.label = cutTrailingDelimitter(series.label)
+            series.label = labelParts.join(delimiter);
         });
 
     };
 
-    var cutTrailingDelimitter = function (toCutFrom) {
-        if (toCutFrom.indexOf(delimitter) !== -1) {
-            toCutFrom = toCutFrom.substr(0, toCutFrom.length - delimitter.length);
-        }
-        return toCutFrom;
-    };
     var getCommonLabelParts = function (omitMeasurands) {
-        var commonPartsHeader = ""
-        if (uniqueEntries.uniqueMeasurands.length == 1 && !omitMeasurands) {
-            var measurandString = i18nData['measurand'] || "Measurand";
-            commonPartsHeader += measurandString + ": " + uniqueEntries.uniqueMeasurands[0] + delimitter
+        var commonPartsHeader = [];
+        if (uniqueJobGroups.length === 1) {
+            commonPartsHeader.push(uniqueJobGroups[0]);
         }
-        if (uniqueEntries.uniquePages.length == 1) {
-            var pageString = i18nData['page'] || "Page";
-            commonPartsHeader += pageString + ": " + uniqueEntries.uniquePages[0] + delimitter
+        if (uniquePages.length === 1) {
+            commonPartsHeader.push(uniquePages[0]);
         }
-        if (uniqueEntries.uniqueJobGroups.length == 1) {
-            var jobGroupString = i18nData['jobGroup'] || "Job Group";
-            commonPartsHeader += jobGroupString + ": " + uniqueEntries.uniqueJobGroups[0] + delimitter
+        if (uniqueMeasurands.length === 1 && !omitMeasurands) {
+            commonPartsHeader.push(uniqueMeasurands[0]);
         }
-        commonPartsHeader = cutTrailingDelimitter(commonPartsHeader);
-        return commonPartsHeader;
+        return commonPartsHeader.join(delimiter);
     };
 
     var getSeriesWithShortestUniqueLabels = function () {
-        appendUniqueLabels(seriesData);
+        setLabelInSeriesData(seriesData);
         return seriesData;
     };
 
@@ -100,7 +85,7 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
 
     return {
         getSeriesWithShortestUniqueLabels: getSeriesWithShortestUniqueLabels,
-        getCommonLabelParts: getCommonLabelParts,
+        getCommonLabelParts: getCommonLabelParts
     }
 
 };

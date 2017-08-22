@@ -121,15 +121,8 @@
                         });
                         $('#script').change();
                     });
-                    OpenSpeedMonitor.postLoader.loadJavascript(
-                        '<g:assetPath src="codemirror/codemirrorManifest.js"/>',
-                        true
-                    )
-                   OpenSpeedMonitor.postLoader.loadStylesheet(
-                        '<g:assetPath src="codemirror/codemirrorManifest.css"/>',
-                        true
-                    )
-
+                    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
+                    OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });
     </asset:script>
 </content>

@@ -1,7 +1,7 @@
-package de.iteratec.osm.barchart
+package de.iteratec.osm.result.dto
 
-class BarchartDTO {
-    List<BarchartSeries> series = []
+class PageAggregationChartDTO {
+    List<PageAggregationChartSeriesDTO> series = []
     Map<String, List<String>> filterRules = [:].withDefault {[]}
     Map<String, String> i18nMap = [:]
     boolean hasComparativeData
