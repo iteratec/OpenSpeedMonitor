@@ -7,7 +7,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
-    var restoredState = "";
+    var loadedState = "";
 
     var initWaitForPostload = function () {
         var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
@@ -57,8 +57,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
 
         var encodedState = urlEncodeState(state);
-        if (encodedState !== restoredState) {
-            restoredState = encodedState;
+        if (encodedState !== loadedState) {
+            loadedState = encodedState;
             window.history.pushState(state, "", "show?" + encodedState);
         }
     };
@@ -68,7 +68,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             return;
         }
         var encodedState = urlEncodeState(state);
-        if (encodedState === restoredState) {
+        if (encodedState === loadedState) {
             return;
         }
         setTimeFrame(state);
@@ -77,7 +77,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setMeasurands(state);
         setSelectedFilter(state);
         setStackBars(state);
-        restoredState = encodedState;
+        loadedState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             $(window).trigger("historyStateLoaded");
         }
