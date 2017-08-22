@@ -90,8 +90,8 @@
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', true, "pageAggregation");
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', true, "resultSelection");
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', "pageAggregation");
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
     </asset:script>
 </content>

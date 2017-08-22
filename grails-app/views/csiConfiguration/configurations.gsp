@@ -293,10 +293,7 @@
         });
 
         $(window).load(function() {
-            OpenSpeedMonitor.postLoader.loadJavascript(
-                '<g:assetPath src="csi/configurationPost.js"/>',
-                true
-            )
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="csi/configurationPost.js"/>');
         });
 
     </asset:script>

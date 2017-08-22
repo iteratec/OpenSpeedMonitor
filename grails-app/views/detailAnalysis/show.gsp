@@ -110,7 +110,7 @@
 
     <asset:script type="text/javascript">
         $(window).load(function() {
-          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
     </asset:script>

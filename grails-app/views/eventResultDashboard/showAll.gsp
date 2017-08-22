@@ -287,9 +287,9 @@
 
         $(window).load(function() {
             if (!$("#graph_container").data("isAggregatedData")) {
-                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>', 'chartContextUtilities');
             }
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
             OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
 

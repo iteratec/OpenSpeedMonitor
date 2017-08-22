@@ -41,6 +41,6 @@
 
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageComparison/pageComparisonSelectionCard.js"/>', true, 'pageComparisonSelectionCard')
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageComparison/pageComparisonSelectionCard.js"/>', 'pageComparisonSelectionCard');
     });
 </asset:script>

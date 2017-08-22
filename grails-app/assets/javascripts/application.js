@@ -58,8 +58,7 @@ OpenSpeedMonitor.postLoader = (function () {
 
     var head = document.getElementsByTagName("head")[0];
 
-    var loadJavascript = function (url, async, name) {
-        async = async || true;
+    var loadJavascript = function (url, name) {
         var script = document.createElement("script");
         script.onload = function () {
             postloadedScripts[name] = true;
@@ -68,8 +67,7 @@ OpenSpeedMonitor.postLoader = (function () {
         };
         script.setAttribute("src", url);
         script.setAttribute("type", "text/javascript");
-        script.setAttribute("async", async);
-        //script.setAttribute("charset","ISO-8859-1");
+        script.setAttribute("async", "async");
         head.appendChild(script);
     };
 
