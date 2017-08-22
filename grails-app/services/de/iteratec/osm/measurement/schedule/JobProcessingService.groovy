@@ -405,7 +405,7 @@ class JobProcessingService {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
             persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
         } finally {
-            if (resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+            if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
                 unscheduleTest(job, testId)
             }
         }
