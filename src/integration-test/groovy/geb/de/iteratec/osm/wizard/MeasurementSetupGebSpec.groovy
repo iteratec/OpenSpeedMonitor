@@ -1,5 +1,6 @@
 package geb.de.iteratec.osm.wizard
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -7,6 +8,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.wizards.MeasurementSetupPage
@@ -57,6 +59,8 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
             Location.list().each { it.delete() }
             WebPageTestServer.list().each { it.delete() }
             Browser.list().each { it.delete() }
+            Script.list().each { it.delete() }
+            OsmConfiguration.list().each { it.delete() }
         }
     }
 
@@ -209,6 +213,9 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         job.executionSchedule == "0 " + schedule
         job.jobGroup
         job.jobGroup.name == newJobGroupName
+        job.script
+        job.script.label == newJobGroupName
+        job.script.navigationScript == scriptCode
         Job.list().size() == 1
     }
 }
