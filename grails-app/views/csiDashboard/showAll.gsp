@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="de.iteratec.osm.report.chart.AggregatorType" %>
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <%@ page defaultCodec="none" %></page>
@@ -96,8 +95,8 @@
                                       chartTitle                   : chartTitle,
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      markerEnabled                : markerShouldBeEnabled,
-                                      dataLabelsActivated          : labelShouldBeEnabled,
+                                      showDataMarkers              : showDataMarkers,
+                                      showDataLabels               : showDataLabels,
                                       highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
                                       labelSummary                 : labelSummary,
@@ -375,8 +374,7 @@
 
         });
         $(window).load(function() {
-           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"
-                                                                    />')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
         });
 
     </asset:script>

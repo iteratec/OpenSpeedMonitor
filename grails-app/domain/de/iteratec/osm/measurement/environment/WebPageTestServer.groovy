@@ -48,7 +48,7 @@ class WebPageTestServer {
         proxyIdentifier(maxSize: 255)
         active(nullable: false)
         description(nullable: true, widget: 'textarea', maxSize: 255)
-        baseUrl(blank: false, url: ["localhost(:(\\d{1,5}))?"], maxSize: 255)
+        baseUrl(blank: false, matches: '((https?:\\/\\/)[\\-a-zA-Z\\d]+(\\.[a-zA-Z\\d]+)*)(:\\d+)?(\\/[a-zA-Z&=\\d_?]+)*\\/?', maxSize: 255)
         contactPersonName(maxSize: 200, nullable: true)
         contactPersonEmail(email: true, nullable: true, maxSize: 255)
         apiKey(nullable: true, maxSize: 255, password: true)
@@ -56,7 +56,7 @@ class WebPageTestServer {
 
     public String getBaseUrl() {
         if (baseUrl) {
-            return baseUrl.endsWith('/') ? "${baseUrl}" : "${baseUrl}/"
+            return baseUrl.endsWith('/') ? baseUrl : "${baseUrl}/"
         } else {
             return ""
         }

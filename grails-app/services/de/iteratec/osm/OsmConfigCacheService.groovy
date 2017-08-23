@@ -30,26 +30,26 @@ class OsmConfigCacheService {
 	
 	ConfigService configService
 
-    Integer minDocCompleteTimeInMillisecs
-	private DateTime lastFetchOfMinDocCompleteTimeInMillisecs = new DateTime(1980,1,1,0,0)
-    Integer maxDocCompleteTimeInMillisecs
-    private DateTime lastFetchOfMaxDocCompleteTimeInMillisecs = new DateTime(1980,1,1,0,0)
+    Integer cachedMinValidLoadtime
+	private DateTime lastFetchOfMinValidLoadtime = new DateTime(1980,1,1,0,0)
+    Integer cachedMaxValidLoadtime
+    private DateTime lastFetchOfMaxValidLoadtime = new DateTime(1980,1,1,0,0)
 
-	Integer getCachedMinDocCompleteTimeInMillisecs(Double ageToleranceInHours = 24) {
-		Duration durationSinceLastFetch = new Duration(lastFetchOfMinDocCompleteTimeInMillisecs.getMillis(), new DateTime().getMillis())
-		if(!minDocCompleteTimeInMillisecs || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
-			minDocCompleteTimeInMillisecs = configService.getMinDocCompleteTimeInMillisecs()
-			lastFetchOfMinDocCompleteTimeInMillisecs = new DateTime()
+	Integer getMinValidLoadtime(Double ageToleranceInHours = 24) {
+		Duration durationSinceLastFetch = new Duration(lastFetchOfMinValidLoadtime.getMillis(), new DateTime().getMillis())
+		if(!cachedMinValidLoadtime || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
+			cachedMinValidLoadtime = configService.getMinValidLoadtime()
+			lastFetchOfMinValidLoadtime = new DateTime()
 		}
-		return minDocCompleteTimeInMillisecs
+		return cachedMinValidLoadtime
 	}
-	
-	Integer getCachedMaxDocCompleteTimeInMillisecs(Double ageToleranceInHours = 24) {
-		Duration durationSinceLastFetch = new Duration(lastFetchOfMaxDocCompleteTimeInMillisecs.getMillis(), new DateTime().getMillis())
-		if(!maxDocCompleteTimeInMillisecs || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
-			maxDocCompleteTimeInMillisecs = configService.getMaxDocCompleteTimeInMillisecs()
-			lastFetchOfMaxDocCompleteTimeInMillisecs = new DateTime()
+
+	Integer getMaxValidLoadtime(Double ageToleranceInHours = 24) {
+		Duration durationSinceLastFetch = new Duration(lastFetchOfMaxValidLoadtime.getMillis(), new DateTime().getMillis())
+		if(!cachedMaxValidLoadtime || durationSinceLastFetch.getStandardHours()>ageToleranceInHours){
+			cachedMaxValidLoadtime = configService.getMaxValidLoadtime()
+			lastFetchOfMaxValidLoadtime = new DateTime()
 		}
-		return maxDocCompleteTimeInMillisecs
+		return cachedMaxValidLoadtime
 	}
 }

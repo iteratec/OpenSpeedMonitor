@@ -167,7 +167,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .attr("y", barHeight / 2)
             .text(function (d) {
                 var label = d.label ? d.label + ": " : "";
-                return label + (Math.round(d.value)) + " " + unitName;
+                return label + (d.value.toFixed(2)) + " " + unitName;
             });
 
         // exit //////////////////////////////////////////////////////////////////////////////////
@@ -190,9 +190,19 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
     };
 
-    var drawTrafficLight = function () {
+    var unitFactors = {
+        ms: 1,
+        s: 1000,
+        KB: 1,
+        MB: 1000,
+        "#": 10,
+        "%": 1,
+        "": 1
+    }
 
-        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
+    var drawTrafficLight = function () {
+        var unitFactor = unitFactors[unitName];
+        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue*unitFactor);
 
         var trafficLight = trafficLightBars.selectAll("g")
             .data(trafficLightData, function (d) {
@@ -213,7 +223,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .append("g")
             .attr("cx", 0)
             .attr("transform", function (d, index) {
-                var xOffset = outerMargin + xScale(d.lowerBoundary) + barPadding;
+                var xOffset = outerMargin + xScale(d.lowerBoundary) /unitFactor /2 + barPadding;
                 return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
             });
 
@@ -229,7 +239,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .transition()
             .duration(transitionDuration)
             .attr("width", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary);
+                return xScale(d.upperBoundary - d.lowerBoundary) /unitFactor;
             });
         trafficLightEnter.append("text")
             .attr("class", function (d) {
@@ -241,7 +251,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .attr("y", barHeight / 2)
             .attr("dy", ".35em") //vertical align middle
             .attr("x", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+                return xScale(d.upperBoundary - d.lowerBoundary) /unitFactor / 2;
             })
             .attr("text-anchor", "middle");
 
@@ -251,12 +261,12 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .transition()
             .duration(transitionDuration)
             .attr("transform", function (d, index) {
-                var xOffset = outerMargin + xScale(d.lowerBoundary) + barPadding;
+                var xOffset = outerMargin + xScale(d.lowerBoundary) /unitFactor + barPadding;
                 return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
             })
             .select('rect')
             .attr("width", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary);
+                return xScale(d.upperBoundary - d.lowerBoundary) /unitFactor;
             });
 
         trafficLight
@@ -264,7 +274,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .transition()
             .duration(transitionDuration)
             .attr("x", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
+                return xScale(d.upperBoundary - d.lowerBoundary) /unitFactor / 2;
             });
     };
 

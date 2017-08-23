@@ -312,7 +312,7 @@ grails:
                     geb:
                         login: admin
                         password: password
-                        driver: phantomJs
+                        driver: chrome
                 wpt:
                     runtestparams:
                         booleans:

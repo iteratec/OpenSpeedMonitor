@@ -24,12 +24,8 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
-/**
- * Test-suite of {@link TabularResultPresentationController}.
- *
- * @author mze
- * @since IT-106
- */
+
+
 @TestFor(TabularResultPresentationController)
 @Mock([ConnectivityProfile])
 class TabularResultEventResultCommandBaseSpec extends Specification {

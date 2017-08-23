@@ -1,10 +1,10 @@
-<div class="fieldcontain ${hasErrors(bean: script, field: 'label', 'error')} required form-group">
+<div class="fieldcontain ${hasErrors(bean: script, field: 'label', 'error')} form-group">
 	<label for="label" class="control-label col-md-2">
 		<g:message code="script.label.label" default="Name"/>
 		<span class="required-indicator">*</span>
 	</label>
 	<div class="col-md-10">
-		<g:textField name="label" value="${script?.label}" class="form-control"/>
+		<g:textField name="label" value="${script?.label}" class="form-control" required="required"/>
 	</div>
 </div>
 <div class="fieldcontain ${hasErrors(bean: script, field: 'description', 'error')} form-group">

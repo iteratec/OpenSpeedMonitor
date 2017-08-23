@@ -51,7 +51,7 @@
 
 <asset:script type="text/javascript">
     $(window).load(function () {
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/bower_components/saveSvgAsPng/saveSvgAsPng.js"/>', true, 'pngDownloader')
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/bower_components/saveSvgAsPng/saveSvgAsPng.js"/>', 'pngDownloader');
     });
 
     function downloadPNG(chartContainerID) {

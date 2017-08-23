@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.ui
 
+import de.iteratec.osm.result.Measurand
+
 class OptGroupedSelectTagLib {
 	
 	static namespace = "iteratec"
@@ -30,7 +32,7 @@ class OptGroupedSelectTagLib {
 		String cssClass = attrs['class']
 		String style = attrs['style']
 		String name = attrs['name']
-		String value = attrs['value']
+		Collection<Measurand> value = attrs['value']
 		out << g.render(template: '/layouts/optGroupedSelect', 
 			model: [dataMap:dataMap, optionKey: optionKey, optionValue: optionValue, multiple: multiple, id: id, cssClass: cssClass, style: style,
 				name: name, selectedValues: value])

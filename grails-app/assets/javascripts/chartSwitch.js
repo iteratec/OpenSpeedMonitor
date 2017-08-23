@@ -67,12 +67,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     };
 
     var getTimeFrame = function (map) {
-        map["setFromHour"] = ($('#setFromHour:checked').length > 0) ? "on" : "";
-        map["setToHour"] = ($('#setToHour:checked').length > 0) ? "on" : "";
         map["from"] = $("#fromDatepicker").val();
-        map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
         map["to"] = $("#toDatepicker").val();
-        map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
     };
 
 
@@ -137,6 +133,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         } else {
             updateUrls(false);
         }
+        $(window).on("historyStateChanged", function () {
+            updateUrls(true);
+        });
         // $('#graphButtonHtmlId').on('click', function(){updateUrls(true)});
         // $('#show-button').on('click', function(){updateUrls(true)});
     };
@@ -153,12 +152,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         oldParameter["selectedMeasuredEventIds"] = urlParameter["selectedMeasuredEventIds"];
         oldParameter["selectedInterval"] = urlParameter["selectedInterval"];
         oldParameter["selectedTimeFrameInterval"] = urlParameter["selectedTimeFrameInterval"];
-        oldParameter["setFromHour"] = urlParameter["setFromHour"];
-        oldParameter["setToHour"] = urlParameter["setToHour"];
         oldParameter["from"] = urlParameter["from"];
-        oldParameter["fromHour"] = decodeURIComponent(urlParameter["fromHour"]);
         oldParameter["to"] = urlParameter["to"];
-        oldParameter["toHour"] = decodeURIComponent(urlParameter["toHour"]);
         return oldParameter;
     };
 

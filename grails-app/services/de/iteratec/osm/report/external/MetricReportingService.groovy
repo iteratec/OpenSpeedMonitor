@@ -25,19 +25,18 @@ import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.EventCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
-import de.iteratec.osm.util.I18nService
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import org.joda.time.DateTime
@@ -51,20 +50,18 @@ class MetricReportingService {
     private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ']
     private static final String REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = '_'
 
-    ResultCsiAggregationService resultCsiAggregationService
     GraphiteSocketProvider graphiteSocketProvider
-    I18nService i18nService
     EventCsiAggregationService eventCsiAggregationService
     JobGroupDaoService jobGroupDaoService
-    CsiAggregationUtilService csiAggregationUtilService
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
+    CsiAggregationUtilService csiAggregationUtilService
 
     /**
-     * Reports each measurand of incoming result for that a {@link GraphitePath} is configured.
+     * Reports each measurand of incoming result for that a {@link GraphitePathRawData} is configured.
      * @param result
      * 				This EventResult defines measurands to sent and must not be null.
      * @throws NullPointerException
@@ -105,19 +102,12 @@ class MetricReportingService {
                 return
             }
 
-            graphiteServer.graphitePaths.each { GraphitePath eachPath ->
 
-                Boolean resultOfSameCachedViewAsGraphitePath =
-                        eachPath.getMeasurand().isCachedCriteriaApplicable() &&
-                                resultCsiAggregationService.getAggregatorTypeCachedViewType(eachPath.getMeasurand()).equals(result.getCachedView());
-
-                if (resultOfSameCachedViewAsGraphitePath) {
-
-                    Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(eachPath.getMeasurand(), result);
+            graphiteServer.graphitePathsRawData.findAll { it.cachedView == result.cachedView }.each {
+                GraphitePathRawData eachPath ->
+                    Double value = result.getValueFor(eachPath.measurand)
                     if (value != null) {
-
-                        String measurandName = i18nService.msg(
-                                "de.iteratec.ispc.report.external.graphite.measurand.${eachPath.getMeasurand().getName()}", eachPath.getMeasurand().getName());
+                        String measurandName = result.cachedView.getGraphiteLabelPrefix()+eachPath.measurand.getGrapthiteLabelSuffix()
 
                         List<String> pathElements = []
                         pathElements.addAll(eachPath.getPrefix().tokenize('.'))
@@ -149,8 +139,8 @@ class MetricReportingService {
 
                         log.debug("Sent date to graphite: path=${finalPathName}, value=${value} time=${result.getJobResultDate().getTime()}")
                     }
-                }
             }
+
         }
     }
 
@@ -195,7 +185,7 @@ class MetricReportingService {
             }
 
             if (log.debugEnabled) log.debug("CsiAggregations to report for last hour: ${mvs}")
-            reportAllCsiAggregationsFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
+            reportAllCsiAggregationsFor(eachJobGroup, AggregationType.MEASURED_EVENT, mvs)
         }
         activity.done()
     }
@@ -275,7 +265,7 @@ class MetricReportingService {
             }
 
             if (log.debugEnabled) log.debug("reporting ${pmvsWithData.size()} page csi-values with intervalInMinutes ${intervalInMinutes} for JobGroup: ${eachJobGroup}");
-            reportAllCsiAggregationsFor(eachJobGroup, AggregatorType.PAGE, pmvsWithData)
+            reportAllCsiAggregationsFor(eachJobGroup, AggregationType.PAGE, pmvsWithData)
         }
     }
 
@@ -344,22 +334,22 @@ class MetricReportingService {
 
             if (log.debugEnabled) log.debug("getting shop csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
             CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(intervalInMinutes)
-            List<CsiAggregation> smvsWithData = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [currentJobGroup]).findAll { CsiAggregation smv ->
+            List<CsiAggregation> smvsWithData = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [currentJobGroup]).findAll { CsiAggregation smv ->
                 smv.csByWptDocCompleteInPercent != null && smv.countUnderlyingEventResultsByWptDocComplete() > 0
             }
 
-            reportAllCsiAggregationsFor(currentJobGroup, AggregatorType.SHOP, smvsWithData)
+            reportAllCsiAggregationsFor(currentJobGroup, AggregationType.JOB_GROUP, smvsWithData)
         }
     }
 
-    private void reportAllCsiAggregationsFor(JobGroup jobGroup, String aggregatorName, List<CsiAggregation> mvs) {
+    private void reportAllCsiAggregationsFor(JobGroup jobGroup, AggregationType aggregationType, List<CsiAggregation> mvs) {
         List<GraphiteServer> graphiteServerToReportTo = jobGroup.graphiteServers.findAll {
             it.reportCsiAggregationsToGraphiteServer
         }
         graphiteServerToReportTo.each { currentGraphiteServer ->
-            currentGraphiteServer.graphitePaths.findAll {
-                it.measurand.name.equals(aggregatorName)
-            }.each { GraphitePath measuredEventGraphitePath ->
+            currentGraphiteServer.graphitePathsCsiData.findAll {
+                it.aggregationType == aggregationType
+            }.each { GraphitePathCsiData measuredEventGraphitePath ->
 
                 GraphiteSocket socket
                 try {
@@ -374,7 +364,7 @@ class MetricReportingService {
 
                 if (log.debugEnabled) log.debug("${mvs.size()} CsiAggregations should be sent to:\nJobGroup=${jobGroup}\nGraphiteServer=${currentGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
                 mvs.each { CsiAggregation mv ->
-                    if (log.debugEnabled) log.debug("Sending ${mv.interval.name} ${aggregatorName}-csi-value for:\nJobGroup=${jobGroup}\nGraphiteServer=${currentGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
+                    if (log.debugEnabled) log.debug("Sending ${mv.interval.name} ${aggregationType}-csi-value for:\nJobGroup=${jobGroup}\nGraphiteServer=${currentGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
                     reportCsiAggregation(measuredEventGraphitePath.getPrefix(), jobGroup, mv, socket)
                 }
             }
@@ -383,18 +373,18 @@ class MetricReportingService {
 
 
     private void reportCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
-        if (mv.interval.intervalInMinutes == CsiAggregationInterval.HOURLY && mv.aggregator.name.equals(AggregatorType.MEASURED_EVENT)) {
+        if (mv.interval.intervalInMinutes == CsiAggregationInterval.HOURLY && mv.aggregationType == AggregationType.MEASURED_EVENT) {
             reportHourlyCsiAggregation(prefix, jobGroup, mv, socket)
         } else if (mv.interval.intervalInMinutes == CsiAggregationInterval.DAILY) {
-            if (mv.aggregator.name.equals(AggregatorType.PAGE)) {
+            if (mv.aggregationType == AggregationType.PAGE) {
                 reportDailyPageCsiAggregation(prefix, jobGroup, mv, socket)
-            } else if (mv.aggregator.name.equals(AggregatorType.SHOP)) {
+            } else if (mv.aggregationType == AggregationType.JOB_GROUP) {
                 reportDailyShopCsiAggregation(prefix, jobGroup, mv, socket)
             }
         } else if (mv.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
-            if (mv.aggregator.name.equals(AggregatorType.PAGE)) {
+            if (mv.aggregationType == AggregationType.PAGE) {
                 reportWeeklyPageCsiAggregation(prefix, jobGroup, mv, socket)
-            } else if (mv.aggregator.name.equals(AggregatorType.SHOP)) {
+            } else if (mv.aggregationType == AggregationType.JOB_GROUP) {
                 reportWeeklyShopCsiAggregation(prefix, jobGroup, mv, socket)
             }
         }

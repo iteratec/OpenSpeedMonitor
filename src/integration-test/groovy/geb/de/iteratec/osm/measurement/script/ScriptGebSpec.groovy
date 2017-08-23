@@ -47,18 +47,15 @@ class ScriptGebSpec extends CustomUrlGebReportingSpec{
         }
     }
     void "no script creation if label and scriptCode are missing"(){
-        when: "create button clicked without name and scriptCode"
-        createButton.click()
-        then: "we are on create page again and at least 2 danger alerts are shown"
-        waitFor {
-            at ScriptCreatePage
-        }
-        dangerAlerts.size() > 1
+        expect: "the create button should be disabled"
+        createButton.hasClass("disabled")
+
     }
     void "no script creation if scriptCode is missing"(){
         when: "a script name but no scriptCode is added"
         nameOfCreatedScript = "myScript"
         nameInput << nameOfCreatedScript
+        createButton.click()
         then: "we are on create page again and at least 1 danger alerts are shown"
         waitFor {
             at ScriptCreatePage

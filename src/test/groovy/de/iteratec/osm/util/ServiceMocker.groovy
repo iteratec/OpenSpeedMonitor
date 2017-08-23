@@ -30,21 +30,17 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.report.external.MockedGraphiteSocket
-import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
-import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
 /**
  * <p>
@@ -102,12 +98,12 @@ class ServiceMocker {
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
 		def osmConfigCacheService = new OsmConfigCacheService()
-		Integer minTimeToExpect = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
+		Integer minTimeToExpect = DEFAULT_MIN_VALID_LOADTIME
+		osmConfigCacheService.metaClass.getMinValidLoadtime = {Double ageToleranceInHours ->
 			return minTimeToExpect
 		}
-		Integer maxTimeToExpect = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
-		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
+		Integer maxTimeToExpect = DEFAULT_MAX_VALID_LOADTIME
+		osmConfigCacheService.metaClass.getMaxValidLoadtime = {Double ageToleranceInHours ->
 			return maxTimeToExpect
 		}
 		serviceToMockIn.osmConfigCacheService = osmConfigCacheService
@@ -157,21 +153,21 @@ class ServiceMocker {
 		serviceToMockIn.pageCsiAggregationService = pageCsiAggregationServiceMocked
 	}
 	/**
-	 * Mocks {@link ShopCsiAggregationService}.
+	 * Mocks {@link JobGroupCsiAggregationService}.
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyShopCsiAggregations
-	 * 		List of {@link CsiAggregation}s, the method {@link ShopCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
+	 * 		List of {@link CsiAggregation}s, the method {@link JobGroupCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
 	 */
-	void mockShopCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
-		def shopCsiAggregationServiceMocked = new ShopCsiAggregationService()
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations =  { Date from, Date to ->
+	void mockJobGroupCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
+		def jobGroupCsiAggregationServiceMocked = new JobGroupCsiAggregationService()
+		jobGroupCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations =  { Date from, Date to ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations = { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
+		jobGroupCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations = { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		serviceToMockIn.shopCsiAggregationService = shopCsiAggregationServiceMocked
+		serviceToMockIn.jobGroupCsiAggregationService = jobGroupCsiAggregationServiceMocked
 	}
 	/**
 	 * Mocks methods in {@link CsTargetGraphDaoService}.

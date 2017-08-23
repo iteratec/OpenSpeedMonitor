@@ -31,7 +31,7 @@ import org.joda.time.DateTime
  */
 class CsiSystemCsiAggregationService {
 
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
     CsiAggregationUtilService csiAggregationUtilService
@@ -50,7 +50,7 @@ class CsiSystemCsiAggregationService {
             started >= fromDate
             started <= toDate
             interval == targetInterval
-            aggregator == AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
+            aggregationType == AggregationType.CSI_SYSTEM
         }
         return query.list()
     }
@@ -129,17 +129,16 @@ class CsiSystemCsiAggregationService {
      */
     private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<CsiSystem> csiSystems) {
         List<Long> result = []
-        AggregatorType csiSystemAggregator = AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
 
         csiSystems.each { currentCsiSystem ->
             CsiAggregation csiAggregation
 
-            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, currentCsiSystem)
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndCsiSystem(startDate.toDate(), interval, AggregationType.CSI_SYSTEM, currentCsiSystem)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
-                        aggregator: csiSystemAggregator,
+                        aggregationType: AggregationType.CSI_SYSTEM,
                         csiSystem: currentCsiSystem,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: ''
@@ -185,7 +184,7 @@ class CsiSystemCsiAggregationService {
             CsiSystem csiSystem = toBeCalculated.csiSystem
             List<JobGroup> groupsOfMv = csiSystem.getAffectedJobGroups()
 
-            List<CsiAggregation> shopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
+            List<CsiAggregation> shopCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(
                     toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
 
             List<WeightedCsiValue> weightedCsiValues = []

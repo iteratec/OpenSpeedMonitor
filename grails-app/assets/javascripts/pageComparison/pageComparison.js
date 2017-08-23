@@ -9,12 +9,8 @@ OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHan
 OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
 
     var getTimeFrame = function (map) {
-        map["setFromHour"] = ($('#setFromHour:checked').length > 0) ? "on" : "";
-        map["setToHour"] = ($('#setToHour:checked').length > 0) ? "on" : "";
         map["from"] = $("#fromDatepicker").val();
-        map["fromHour"] = $("#startDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val();
         map["to"] = $("#toDatepicker").val();
-        map["toHour"] = $("#endDateTimePicker").find(".input-group.bootstrap-timepicker.time-control").find(".form-control").val()
     };
 
     var getMeasurands = function (map) {
@@ -47,7 +43,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
 
     var setSelections = function () {
         var params = OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter();
-        if (params && params.length > 0) {
+        if (params && Object.keys(params).length > 0) {
             setMeasurands(params);
             setJobGroupsAndPages(params);
             if(params.selectedFolder != null && params.selectedPages != null){

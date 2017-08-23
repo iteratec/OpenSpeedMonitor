@@ -39,6 +39,6 @@
 <g:render template="/jobGroupAggregation/adjustBarchartModal"/>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/jobGroupAggregation/jobGroupAggregationChart.js" />',true,'barchartHorizontal');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/jobGroupAggregation/jobGroupAggregationChart.js" />', 'barchartHorizontal');
     });
 </asset:script>

@@ -17,7 +17,7 @@
 
             <g:render template="messages"/>
             <p><g:message code="default.form.asterisk"/></p>
-            <g:form method="post" role="form" class="form-horizontal">
+            <g:form method="post" role="form" class="form-horizontal" data-toggle="validator">
 
                 <g:render template="versionControl"/>
                 <g:hiddenField name="archivedScriptId"/>

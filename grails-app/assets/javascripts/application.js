@@ -53,26 +53,24 @@ OpenSpeedMonitor.postLoadUrls.forEach(function (scriptUrl) {
 });
 
 OpenSpeedMonitor.postLoader = (function () {
+    var postloadedScripts = {};
+    var onLoadedHandlers = {};
 
     var head = document.getElementsByTagName("head")[0];
 
-    var loadJavascript = function (url, async, name) {
-        async = async || true;
+    var loadJavascript = function (url, name) {
         var script = document.createElement("script");
-        script.onload = script.onreadystatechange = function () {
-            //console.log( this.readyState ); //uncomment this line to see which ready states are called.
-            var r;
-            if (!r && (!this.readyState || this.readyState == 'complete')) {
-                r = true;
-                fireWindowEvent("" + name + "Loaded");
-            }
+        script.onload = function () {
+            postloadedScripts[name] = true;
+            checkCallHandler(name);
+            fireWindowEvent("" + name + "Loaded");
         };
         script.setAttribute("src", url);
         script.setAttribute("type", "text/javascript");
-        script.setAttribute("async", async);
-        //script.setAttribute("charset","ISO-8859-1");
+        script.setAttribute("async", "async");
         head.appendChild(script);
     };
+
     var loadStylesheet = function (url) {
         var link = document.createElement("link");
         link.rel = "stylesheet";
@@ -82,9 +80,44 @@ OpenSpeedMonitor.postLoader = (function () {
         head.appendChild(link);
     };
 
+    var onLoaded = function(dependencies, callback) {
+        if (typeof dependencies === 'string' || dependencies instanceof String) {
+            dependencies = [dependencies];
+        }
+        var dependencyId = dependencies.sort().join(";");
+        if (!onLoadedHandlers[dependencyId]) {
+            onLoadedHandlers[dependencyId] = [];
+        }
+        if (onLoadedHandlers[dependencyId].indexOf(callback) < 0) {
+            onLoadedHandlers[dependencyId].push(callback);
+        }
+        if (allDependenciesAreLoaded(dependencies)) {
+            callback();
+        }
+    };
+
+    var checkCallHandler = function(nameOfNewLoaded) {
+        Object.keys(onLoadedHandlers).forEach(function(dependencyId) {
+            var dependencies = dependencyId.split(";");
+            if (dependencies.indexOf(nameOfNewLoaded) < 0) {
+                return;
+            }
+            if (allDependenciesAreLoaded(dependencies)) {
+                onLoadedHandlers[dependencyId].forEach(function(callback) {
+                    callback();
+                });
+            }
+        });
+    };
+
+    var allDependenciesAreLoaded = function (dependencies) {
+        return dependencies.every(function (d) { return !!postloadedScripts[d]; });
+    };
+
     return {
         loadJavascript: loadJavascript,
-        loadStylesheet: loadStylesheet
+        loadStylesheet: loadStylesheet,
+        onLoaded: onLoaded
     }
 
 })();
@@ -357,13 +390,21 @@ function fixChosen() {
     });
 }
 
+function makeChosenAccessibleForBootstrapValidation(){
+    //bootstraps validation highlighting only works, of the element to be highlighted has the class "form-control"
+    //since the chosen plugin provides us with this form, we have no other way then adding the class dynamically
+    $(".chosen-single").addClass("form-control");
+}
+
+
 function fireWindowEvent(eventName) {
     var event = document.createEvent('Event');
     event.initEvent(eventName, true, true);
     window.dispatchEvent(event);
 }
 
-$("#main-navbar .dropdown-toggle").click(function () {
+$("#main-navbar .dropdown-toggle").click(function (event) {
+    event.preventDefault();
     var parent = $(this).parent();
     var wasOpen = parent.hasClass("open");
     $("#main-navbar .dropdown.open").removeClass("open").attr('aria-expanded', 'false');
@@ -372,3 +413,37 @@ $("#main-navbar .dropdown-toggle").click(function () {
         $(this).trigger('focus').attr('aria-expanded', 'true')
     }
 });
+
+/**
+ * Adds a cron validator to the form. The cron input field must define the attribute: data-cron, to use this.
+ * @param $form the form which holds a cron input
+ * @param $outputElement will receive a text which describws the entered cron
+ */
+function addCronValidatorToForm($form, $outputElement){
+    $form.validator({
+        custom: {
+            'cron': function() {
+                var error = "";
+                $.ajax({
+                    url: OpenSpeedMonitor.urls.cronExpressionNextExecution,
+                    data: { cronExpression: cronStringInputField.val()},
+                    dataType: "text",
+                    type: 'GET',
+                    async:false,
+                    success: function (data) {
+                        $outputElement.text(prettyCron.toString(cronStringInputField.val()));
+                    },
+                    error: function (e, status) {
+                        if (status === "error") {
+                            error = e.responseText;
+                            $outputElement.text("");
+                        } else {
+                            console.error(e);
+                        }
+                    }
+                });
+                return error;
+            }
+        }
+    });
+}

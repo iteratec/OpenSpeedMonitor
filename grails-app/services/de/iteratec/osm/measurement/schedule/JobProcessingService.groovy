@@ -30,8 +30,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.time.TimeCategory
-import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.HttpResponseDecorator
+import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
@@ -133,6 +132,7 @@ class JobProcessingService {
                 type           : job.optionalTestTypes,
                 customHeaders  : job.customHeaders,
                 trace          : job.trace,
+                traceCategories: job.traceCategories,
                 spof           : job.spof
         ]
         if (job.takeScreenshots == Job.TakeScreenshots.NONE) {
@@ -191,6 +191,8 @@ class JobProcessingService {
         if (apiKey) {
             parameters.k = apiKey
         }
+
+        parameters.f='xml'
 
         // convert all boolean parameters to 0 or 1
         parameters = parameters.each {
@@ -283,20 +285,14 @@ class JobProcessingService {
         return result.save(failOnError: true, flush: true)
     }
 
-    private Map parseXmlResponse(String xml, WebPageTestServer wptserver) {
-        GPathResult response = new XmlSlurper().parseText(xml)
-        Map params = [:]
-        params.statusCode = response.statusCode.toInteger()
-        if (params.statusCode == 400) {
-            throw new JobExecutionException(response.statusText.toString() + " (reported by ${wptserver})");
+    private void validateRuntestResponse(NodeChild runtestResponseXml, WebPageTestServer wptserver) {
+        Integer statusCode = runtestResponseXml?.statusCode?.toInteger()
+        if (statusCode != 200) {
+            throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode} for wptserver ${wptserver}")
         }
-        params.testId = response.data.testId?.text()
-        if (!params.testId) {
-            throw new JobExecutionException("No testId was provided")
+        if (!runtestResponseXml?.data?.testId) {
+            throw new JobExecutionException("No testId was provided for wptserver ${wptserver}.")
         }
-        params.userUrl = response.data.userUrl.text()
-
-        return params
     }
 
     /**
@@ -349,66 +345,43 @@ class JobProcessingService {
 
         Map params = [testId: '']
         int statusCode
+        String testId
         try {
             def parameters = fillRequestParameters(job);
-            parameters.f = 'xml';
 
             WebPageTestServer wptserver = job.location.wptServer
             if (!wptserver) {
                 throw new JobExecutionException("Missing wptServer in job ${job.label}");
             }
 
-            HttpResponseDecorator result
+            def result
             performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
                 result = proxyService.runtest(wptserver, parameters);
             }
-            statusCode = result.getStatus()
-            if (statusCode != 200) {
-                throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode}");
-            }
+            validateRuntestResponse(result, wptserver)
             log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}")
-
-            params = parseXmlResponse(result.data.text, wptserver)
+            testId = result.data.testId
 
             use(TimeCategory) {
-                Map jobDataMap = [jobId: job.id, testId: params.testId]
+                Map jobDataMap = [jobId: job.id, testId: testId]
                 Date endDate = new Date() + job.maxDownloadTimeInMinutes.minutes
                 // build and schedule subtrigger for polling every pollDelaySeconds seconds.
                 // Polling is stopped by pollJobRun() when the running test is finished or on endDate at the latest
-                log.debug("Building subtrigger for polling for job ${job.label} and test-id ${params.testId} (enddate ${endDate})")
-                JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(job, params.testId, endDate), jobDataMap)
+                log.debug("Building subtrigger for polling for job ${job.label} and test-id ${testId} (enddate ${endDate})")
+                JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(job, testId, endDate), jobDataMap)
                 // schedule a timeout trigger which will fire once after endDate + a delay of
                 // declareTimeoutAfterMaxDownloadTimePlusSeconds seconds and perform cleaning operations.
                 // This will also set this job run's status to 504 Timeout.
                 Date timeoutDate = endDate + declareTimeoutAfterMaxDownloadTimePlusSeconds.seconds
-                log.debug("Building timeout trigger for job ${job.label} and test-id ${params.testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
-                JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, params.testId, timeoutDate), jobDataMap)
+                log.debug("Building timeout trigger for job ${job.label} and test-id ${testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
+                JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
             }
 
             return true
         } catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
-            persistUnfinishedJobResult(job.id, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
+            persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
             return false
-        }
-    }
-
-    /**
-     * Launch Job interactively
-     *
-     * @return If successful, a URL to the WPT Server Results Page is returned
-     * @throws JobExecutionException If the job could not be submitted successfully, a JobExecutionException is thrown
-     * 	 and its htmlResult contains the HTML response from the WPT Server indicating why test execution failed.
-     */
-    public String launchJobRunInteractive(Job job) throws JobExecutionException {
-        def parameters = fillRequestParameters(job);
-        WebPageTestServer wptserver = job.location.wptServer
-        HttpResponseDecorator result = proxyService.runtest(wptserver, parameters);
-
-        if (result.getStatus() == 302) {
-            return result.getHeaders().getAt('Location').getValue()
-        } else {
-            throw new JobExecutionException("ProxyService.runtest() returned statusCode ${result.getStatus()}", result.data.text)
         }
     }
 
@@ -432,7 +405,7 @@ class JobProcessingService {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
             persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
         } finally {
-            if (resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+            if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
                 unscheduleTest(job, testId)
             }
         }

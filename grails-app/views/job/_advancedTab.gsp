@@ -64,7 +64,7 @@
 
 </div>
 
-<g:render template="checkbox" model="${['booleanAttribute': 'web10','label': "${message(code: 'job.isPrivate.label', default: 'Private')}", 'job': job]}"/>
+<g:render template="checkbox" model="${['booleanAttribute': 'web10','label': "${message(code: 'job.web10.label', default: 'Stop Test at Document Complete')}", 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'noscript','label': "${message(code: 'job.noscript.label', default: 'Disable Javascript')}", 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'captureVideo','label': "${message(code: 'job.captureVideo.label', default: 'Capture Video')}", 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'clearcerts','label': "${message(code: 'job.clearcerts.label', default: 'Clear SSL Certificate Caches')}", 'job': job]}"/>

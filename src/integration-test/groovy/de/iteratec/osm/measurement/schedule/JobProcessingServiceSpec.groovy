@@ -30,18 +30,15 @@ import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.NotTransactional
 import grails.transaction.Rollback
-import groovyx.net.http.HttpResponseDecorator
-import org.apache.http.HttpVersion
-import org.apache.http.message.BasicHttpResponse
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
+import spock.lang.Ignore
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
-
 /**
  * Integration test for JobProcessingService
  *
@@ -69,10 +66,8 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
     def setup() {
 
         // mocks common for all tests
-        jobProcessingService.proxyService = [runtest: { WebPageTestServer wptserver, Map params ->
-            if (params.f == 'xml') {
-                String xml = """\
-                    <?xml version="1.0" encoding="UTF-8"?>
+        jobProcessingService.proxyService = Stub(ProxyService){
+            runtest(_, _) >> new XmlSlurper().parseText("""
                     <response>
                         <statusCode>200</statusCode>
                         <statusText>Ok</statusText>
@@ -84,20 +79,12 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                             <summaryCSV>http://dev.server01.wpt.iteratec.de/result/${HttpRequestServiceMock.testId}/page_data.csv</summaryCSV>
                             <detailCSV>http://dev.server01.wpt.iteratec.de/result/${HttpRequestServiceMock.testId}/requests.csv</detailCSV>
                             <jsonUrl>http://dev.server01.wpt.iteratec.de/jsonResult.php?test=${
-                    HttpRequestServiceMock.testId
-                }/</jsonUrl>
+                HttpRequestServiceMock.testId
+            }/</jsonUrl>
                         </data>
                     </response>
-			"""
-                BasicHttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, null)
-                return new HttpResponseDecorator(httpResponse, [text: xml] as Object)
-            } else {
-                BasicHttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 302, null)
-                HttpResponseDecorator d = new HttpResponseDecorator(httpResponse, null)
-                d.addHeader('Location', HttpRequestServiceMock.redirectUserUrl)
-                return d
-            }
-        }] as ProxyService
+			""")
+        }
         jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
 
         //test data common for all tests
@@ -234,6 +221,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
      * 	The @Transactional(propagation = Propagation.REQUIRES_NEW) annotation on persistUnfinishedJobResult requires that the method calls in this test are encapsulated in individual transactions.
      */
     @NotTransactional
+    @Ignore("See IT-1703")
     void "launchJobAndPoll test"() {
         def jobId
         Job job
@@ -286,16 +274,6 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
 
         // ensure that upon successful completion of the test (statusCode 200) pollJobRun() removed the subtrigger
         jobProcessingService.quartzScheduler.getTrigger(subtriggerKey) == null
-    }
-
-    void "launchJobInteractive test"() {
-        when:
-        Job job = createJob(false)
-        String redirectUrl = jobProcessingService.launchJobRunInteractive(job)
-
-        then:
-        redirectUrl != null
-        HttpRequestServiceMock.redirectUserUrl == redirectUrl
     }
 
     /**

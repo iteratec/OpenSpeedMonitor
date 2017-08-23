@@ -13,8 +13,7 @@ OpenSpeedMonitor.script.versionControl = OpenSpeedMonitor.script.versionControl 
             data: {
                 scriptId: scriptId
             },
-            success: function (content) {
-                var jsonResponse = JSON.parse(content);
+            success: function (jsonResponse) {
                 $("#archivedNavigationScriptColumn .CodeMirror").remove();
                 $("#archivedNavigationScript").text(jsonResponse.navigationScript);
                 createCodeMirror("archivedNavigationScript", true);

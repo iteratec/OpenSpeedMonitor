@@ -2,9 +2,6 @@ import org.openqa.selenium.Dimension
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import org.openqa.selenium.remote.DesiredCapabilities
-
 /*
     This is the geb configuration file
 
@@ -14,12 +11,9 @@ reportsDir = "target/geb-reports"
 reportOnTestFailureOnly = true
 
 driver = {
-    DesiredCapabilities caps = new DesiredCapabilities()
-    caps.setCapability('phantomjs.binary.path','./node_modules/phantomjs-prebuilt/bin/phantomjs')
-    caps.setCapability("takesScreenshot", true)
-
-    def driverInstance = new PhantomJSDriver(caps)
-    driverInstance.manage().window().setSize(new Dimension(1000,1000)) // width of bootstrap 3  viewport of col-md-* is 970px
+    ChromeOptions options = new ChromeOptions()
+    options.addArguments('--headless', '--disable-gpu', '--no-sandbox', '--lang=en-us', '--window-size=1280x1024')
+    def driverInstance = new ChromeDriver(options)
     driverInstance
 }
 
@@ -32,7 +26,7 @@ environments {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--lang=en-us")
             def driverInstance = new ChromeDriver(options)
-            driverInstance.manage().window().setSize(new Dimension(1000,1000))// width of bootstrap 3  viewport of col-md-* is 970px
+            driverInstance.manage().window().setSize(new Dimension(1280,1024))// width of bootstrap 3  viewport of col-md-* is 970px
             driverInstance
         }
     }
@@ -40,7 +34,7 @@ environments {
     firefox {
         driver = {
             def driverInstance = new FirefoxDriver()
-            driverInstance.manage().window().setSize(new Dimension(1000,1000))// width of bootstrap 3  viewport of col-md-* is 970px
+            driverInstance.manage().window().setSize(new Dimension(1280,1024))// width of bootstrap 3  viewport of col-md-* is 970px
             driverInstance
         }
     }

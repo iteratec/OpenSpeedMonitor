@@ -126,7 +126,6 @@ class JobController {
         params.executionSchedule = "0 " + params.executionSchedule
         def tagParam = params.remove('tags')
         Job job = new Job(params)
-        setVariablesOnJob(params.variables, job)
 
         if ((params.executionSchedule != null) && (!(CronExpression.isValidExpression(params.executionSchedule)))) {
             job.errors.reject(
@@ -195,7 +194,6 @@ class JobController {
 
             def tags = params.remove("tags")
             job.properties = params
-            setVariablesOnJob(params.variables, job)
             job.tags = [tags].flatten()
             if (!job.save()) {
                 render(view: 'edit', model: [job: job] << getStaticModelPartForEditOrCreateView())
@@ -265,21 +263,11 @@ class JobController {
     }
 
     def execute() {
-        if (params.id) {
-            Job job = new Job(params)
-            setVariablesOnJob(params.variables, job)
-            try {
-                redirect(url: jobProcessingService.launchJobRunInteractive(job))
-            } catch (JobExecutionException e) {
-                render e.htmlResult
-            }
-        } else {
-            handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
-                if (jobProcessingService.launchJobRun(job))
-                    massExecutionResults[job.id] = [status: 'success']
-                else
-                    massExecutionResults[job.id] = [status: 'failure']
-            }
+        handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
+            if (jobProcessingService.launchJobRun(job))
+                massExecutionResults[job.id] = [status: 'success']
+            else
+                massExecutionResults[job.id] = [status: 'failure']
         }
     }
 
@@ -398,16 +386,6 @@ class JobController {
     def activateMeasurementsGenerally() {
         inMemoryConfigService.activateMeasurementsGenerally()
         redirect(action: 'index')
-    }
-
-    private void setVariablesOnJob(Map variables, Job job) {
-        job.firstViewOnly = !params.repeatedView
-
-        job.variables = [:]
-        variables.each {
-            if (it.value)
-                job.variables[it.key] = it.value
-        }
     }
 
     Map getStaticModelPartForEditOrCreateView() {

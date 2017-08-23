@@ -1,6 +1,6 @@
 <%@ page import="de.iteratec.osm.measurement.script.Script" %>
 <asset:javascript src="bower_components/clipboard/dist/clipboard.min.js"/>
-<div class="form-group ${hasErrors(bean: job, field: 'script', 'error')}">
+<div class="form-group ${hasErrors(bean: job, field: 'script', 'error')}" id="scriptFormGroup">
     <label class="col-md-2 control-label" for="script"><g:message code="job.selectedScript.label"
                                                                   default="Selected Script"/> <span
             class="required-indicator">*</span>

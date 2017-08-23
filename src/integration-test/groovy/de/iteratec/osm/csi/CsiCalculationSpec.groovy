@@ -126,7 +126,6 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
             xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
             TestDataUtil.createCsiAggregationIntervals()
-            TestDataUtil.createAggregatorTypes()
             TestDataUtil.createBrowsersAndAliases()
             createPages()
             server1 = TestDataUtil.createServer()

@@ -31,11 +31,11 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -47,8 +47,8 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 
 import java.util.regex.Pattern
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static org.junit.Assert.assertNotNull
 
 /**
@@ -92,11 +92,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
         result.connectivityProfileService = new ConnectivityProfileService()
         return result
-    }
-
-    static createTemplate() {
-        new GraphitePath(
-        ).save(failOnError: true)
     }
 
     static createCsTargetGraph(CsTargetValue pointOne, CsTargetValue pointTwo) {
@@ -312,12 +307,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static GraphitePath createGraphitePath(String prefix, AggregatorType aggregator) {
-        new GraphitePath(
-                prefix: prefix,
-                measurand: aggregator
-        ).save(failOnError: true)
-    }
 
     static GraphiteServer createGraphiteServer(String serverAdress, int port, List paths, Boolean reportHealthMetrics, String healthMetricsReportPrefix) {
         new GraphiteServer(
@@ -345,7 +334,7 @@ class TestDataUtil implements OsmTestLogin {
      *         not <code>null</code>,
      *         not {@linkplain Collection#isEmpty() empty}.
      */
-    public
+
     static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages) {
         createJobGroups()
         createServer()
@@ -567,14 +556,11 @@ class TestDataUtil implements OsmTestLogin {
     private static Job getJobOfCSVJobName(String csvJobCoulumn, JobGroup jobGroup, Location location) {
         Job result = Job.findByLabel(csvJobCoulumn);
 
-        AggregatorType page = AggregatorType.findByName(AggregatorType.PAGE) ?: new AggregatorType(name: AggregatorType.PAGE).save(failOnError: true)
-
         if (!result) {
             result = new Job(
                     label: csvJobCoulumn,
                     location: location,
                     connectivityProfile: createConnectivityProfile("conn"),
-                    page: page,
                     active: false,
                     description: '',
                     runs: 1,
@@ -662,7 +648,7 @@ class TestDataUtil implements OsmTestLogin {
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
                 measuredEventAggr: event,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
                 noTrafficShapingAtAll: (connectivityProfile ? false : true),
@@ -710,7 +696,7 @@ class TestDataUtil implements OsmTestLogin {
                 jobResult: jobResult,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
                 noTrafficShapingAtAll: true,
@@ -844,7 +830,7 @@ class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
      * Creates an OsmConfiguration and persists it.
-     * This method uses default values for minDocCompleteTimeInMillisecs and maxDocCompleteTimeInMillisecs.
+     * This method uses default values for minValidLoadtime and maxValidLoadtime.
      * </p>
      */
     public static void createOsmConfig() {
@@ -852,36 +838,14 @@ class TestDataUtil implements OsmTestLogin {
             new OsmConfiguration(
                     detailDataStorageTimeInWeeks: 2,
                     defaultMaxDownloadTimeInMinutes: 60,
-                    minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
-                    maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS,
+                    minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
+                    maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME,
                     initialChartHeightInPixels: 400,
                     maxDataStorageTimeInMonths: 12,
                     csiTransformation: CsiTransformation.BY_MAPPING,
                     internalMonitoringStorageTimeInDays: OsmConfiguration.INTERNAL_MONITORING_STORAGETIME_IN_DAYS
             ).save(failOnError: true)
         }
-    }
-
-    /**
-     * <p>
-     * Creates the default AggregatorTypes (PAGE; MEASURED_STEP; PAGE_AND_BROWSER; SHOP).
-     * </p>
-     */
-    public static List<AggregatorType> createAggregatorTypes() {
-        AggregatorType eventAggregator = new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType shopAggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        AggregatorType csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        return [eventAggregator, pageAggregator, shopAggregator, csiSystemAggregator]
-    }
-
-    /**
-     * <p>
-     * Creates an AggregatorType with given name and group.
-     * </p>
-     */
-    public static AggregatorType createAggregatorType(String name, MeasurandGroup group) {
-        return new AggregatorType(name: name, measurandGroup: group).save(failOnError: true)
     }
 
     /**
@@ -926,21 +890,22 @@ class TestDataUtil implements OsmTestLogin {
         return event;
     }
 
+
     /**
      * Writes new {@link CsiAggregation} to db without validating it.
      * @param date
      * @param csiAggregationInterval
-     * @param aggregator
+     * @param aggregationType
      * @param tag
      * @param value
      * @param resultIdsAsString
      * @param closed
      */
     public
-    static CsiAggregation createSimpleCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, boolean closed) {
+    static CsiAggregation createSimpleCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregationType aggregationType, boolean closed) {
         JobGroup group = JobGroup.list()[0]
         Page page
-        if (aggregator.name == AggregatorType.PAGE) {
+        if (aggregationType == AggregationType.PAGE) {
             page = Page.list()[0]
         }
         return new CsiAggregation(
@@ -948,13 +913,14 @@ class TestDataUtil implements OsmTestLogin {
                 interval: csiAggregationInterval,
                 underlyingEventResultsByWptDocComplete: "",
                 underlyingEventResultsByVisuallyComplete: "",
-                aggregator: aggregator,
+                aggregationType: aggregationType,
                 csByWptDocCompleteInPercent: 0.0d,
                 closedAndCalculated: closed,
                 jobGroup: group,
                 page: page
         ).save(validate: false)
     }
+
 
     /**
      * * Writes new {@link CsiAggregation} to db.
@@ -969,11 +935,11 @@ class TestDataUtil implements OsmTestLogin {
      * @return
      */
     public
-    static CsiAggregation createCsiAggregation(Date started, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, JobGroup jobGroup, Page page, Double csByWptDocCompleteInPercent, String resultIds, boolean closed) {
+    static CsiAggregation createCsiAggregation(Date started, CsiAggregationInterval csiAggregationInterval, AggregationType aggregationType, JobGroup jobGroup, Page page, Double csByWptDocCompleteInPercent, String resultIds, boolean closed) {
         return new CsiAggregation(
                 started: started,
                 interval: csiAggregationInterval,
-                aggregator: aggregator,
+                aggregationType: aggregationType,
                 jobGroup: jobGroup,
                 page: page,
                 underlyingEventResultsByWptDocComplete: resultIds,

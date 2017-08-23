@@ -69,10 +69,10 @@
                 function promptForDuplicateName() {
                     var newName = prompt(
                             OpenSpeedMonitor.i18n.duplicatePrompt,
-                            $('input#label').val() + OpenSpeedMonitor.i18n.duplicateSuffix
+                            $('#inputField-JobLabel').val() + OpenSpeedMonitor.i18n.duplicateSuffix
                     );
                     if (newName != null && newName != '') {
-                        $('input#label').val(newName);
+                        $('#inputField-JobLabel').val(newName);
                         return true;
                     } else {
                         return false;
@@ -121,15 +121,8 @@
                         });
                         $('#script').change();
                     });
-                    OpenSpeedMonitor.postLoader.loadJavascript(
-                        '<g:assetPath src="codemirror/codemirrorManifest.js"/>',
-                        true
-                    )
-                   OpenSpeedMonitor.postLoader.loadStylesheet(
-                        '<g:assetPath src="codemirror/codemirrorManifest.css"/>',
-                        true
-                    )
-
+                    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
+                    OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });
     </asset:script>
 </content>

@@ -4,7 +4,6 @@ A row with 3 cards to select the measured variables for first view, repeat view,
 <div class="row">
     <div class="col-md-4">
         <g:render template="/_resultSelection/firstViewCard" model="[
-                selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
                 aggrGroupValuesUnCached        : aggrGroupValuesUnCached,
                 selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached
         ]"/>

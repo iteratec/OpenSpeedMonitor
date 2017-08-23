@@ -29,6 +29,7 @@ import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.*
@@ -839,10 +840,10 @@ class CsiDashboardController {
         NumberFormat csvCSIValueFormat = NumberFormat.getNumberInstance(localeForNumberFormat)
 
         // Sort graph points by time
-        TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>()
+        Map pointsByGraphByTime = [:].withDefault { [:] }
         for (OsmChartGraph eachCSIValueEntry : source) {
             for (OsmChartPoint eachPoint : eachCSIValueEntry.getPoints()) {
-                pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint)
+                pointsByGraphByTime[eachPoint.time][eachCSIValueEntry.getLabel()] = eachPoint
             }
         }
 

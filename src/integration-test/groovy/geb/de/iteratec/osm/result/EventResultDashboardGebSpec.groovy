@@ -10,8 +10,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -24,10 +22,8 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Created by marko on 22.06.16.
  */
@@ -133,7 +129,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "No page selection warning is shown"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
@@ -158,7 +153,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "The user sees no warning on valid selection"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
@@ -184,7 +178,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Valid selection graph is shown"() {
 
         when: "User wants to see the graph"
@@ -192,6 +185,82 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
+        waitFor { graphLines.displayed }
+        graphLines.size() == 3
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:458], [x:1466565480, y:558]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:158], [x:1466565480, y:258]]
+    }
+
+    void "Graph is shown for native connectivity"(){
+        given: "User selects native connectivity"
+        connectivityTab.click()
+        selectConnectivityProfilesList.find { it.getAttribute("value") == "native" }.click()
+
+        when: "User clicks on \"Show\" button"
+        clickShowButton()
+
+        then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:158], [x:1466565480, y:258]]
+    }
+
+    void "Graph is shown for custom connectivity"(){
+        given: "User selects custom connectivity"
+        connectivityTab.click()
+        selectAllConnectivityButton.click()
+        selectConnectivityProfilesList.find { it.getAttribute("value").startsWith("Custom") }.click()
+
+        when: "User clicks on \"Show\" button"
+        clickShowButton()
+
+        then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:458], [x:1466565480, y:558]]
+    }
+
+    void "All graphs are shown for \"Select all Connectivity Profiles\""(){
+        given: "User selects NotUsedBrowser"
+        connectivityTab.click()
+        waitFor {selectAllConnectivityButton.displayed}
+        selectAllConnectivityButton.click()
+
+        when: "User clicks on \"Show\" button"
+        clickShowButton()
+
+        then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 3
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:458], [x:1466565480, y:558]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:158], [x:1466565480, y:258]]
+    }
+
+
+    void "Graph is shown for correct Connectivity Profile"(){
+        given: "User selects NotUsedBrowser"
+        connectivityTab.click()
+        waitFor {selectConnectivityProfilesList.displayed}
+        selectConnectivityProfilesList[0].click()
+
+        when: "User clicks on \"Show\" button"
+        clickShowButton()
+
+        then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
         graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
@@ -201,7 +270,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -222,7 +291,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Browsers\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -242,7 +310,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for correct Location"(){
         given: "User selects NotUsedLocation"
         browserTab.click()
@@ -264,7 +331,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Graph is shown for \"Select all Locations\""(){
         given: "User selects NotUsedBrowser"
         browserTab.click()
@@ -284,99 +350,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
-    @Ignore("[IT-1415] need to implement new connectivity selection")
-    void "Graph is shown for correct Connectivity Profile"(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        waitFor {selectConnectivityProfilesList.displayed}
-        selectConnectivityProfilesList[0].click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
-        graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-
-        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
-    }
-
-    @Ignore("[IT-1415] need to implement new connectivity selection")
-    void "Graph is shown for native connectivity"(){
-        given: "User selects native connectivity"
-        connectivityTab.click()
-        waitFor {includeNativeConnectivityButton.displayed}
-        includeNativeConnectivityButton.click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
-        graphLines.size() == 2
-
-        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:158], [x:1466565480, y:258]]
-
-        cleanup:
-        connectivityTab.click()
-        waitFor {includeNativeConnectivityButton.displayed}
-        includeNativeConnectivityButton.click()
-        pageTab.click()
-    }
-
-    @Ignore("[IT-1415] need to implement new connectivity selection")
-    void "Graph is shown for custom connectivity"(){
-        given: "User selects custom connectivity"
-        connectivityTab.click()
-        waitFor {includeCustomConnectivityButton.displayed}
-        includeCustomConnectivityButton.click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
-        graphLines.size() == 2
-
-        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:458], [x:1466565480, y:558]]
-
-        cleanup:
-        connectivityTab.click()
-        waitFor {includeCustomConnectivityButton.displayed}
-        includeCustomConnectivityButton.click()
-        pageTab.click()
-    }
-
-    @Ignore("[IT-1415] need to implement new connectivity selection")
-    void "Graph is shown for \"Select all Connectivity Profiles\""(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        waitFor {selectAllConnectivityButton.displayed}
-        selectAllConnectivityButton.click()
-
-        when: "User clicks on \"Show\" button"
-        clickShowButton()
-
-        then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
-        graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-
-        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
-    }
-
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim minimal time"() {
         given: "User defines minimal load time"
 
@@ -404,7 +377,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim maximal time"() {
         given: "User defines maximal load time"
         appendedInputAboveLoadTimesTextField << "830"
@@ -429,13 +401,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim minimal requests"() {
         given: "User defines maximal request count"
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << "3"
-        firstViewList[3].click()
-        firstViewList[7].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_TIME")
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -457,7 +428,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim maximal requests"() {
         given: "User defines maximal request count"
 
@@ -484,13 +454,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim minimal size"() {
         given: "User defines minimal bytes until doc"
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
-        appendedInputBelowRequestSizesTimesTextField << "30"
-        firstViewList[7].click()
-        firstViewList[9].click()
+        appendedInputBelowRequestSizesTimesTextField << "0.03"
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -499,11 +468,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
@@ -512,11 +481,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Trim maximal size"() {
         given: "User defines maximal bytes until doc"
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
-        insertIntoAboveRequestSizeTextField("73")
+        insertIntoAboveRequestSizeTextField("0.073")
 
         when: "User wants to see a graph"
         scrollTop()
@@ -526,11 +494,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         scrollBottom()
@@ -538,11 +506,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         clearAboveRequestSizeTextField()
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[9].click()
-        firstViewList[0].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
+        clickFirstViewMeasurand("LOAD_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -559,14 +526,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[0].click()
+        clickFirstViewMeasurand("LOAD_TIME")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[1].click()
+        clickFirstViewMeasurand("FIRST_BYTE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -583,15 +549,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[1].click()
+        clickFirstViewMeasurand("FIRST_BYTE")
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[2].click()
+        clickFirstViewMeasurand("START_RENDER")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -608,14 +573,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[2].click()
+        clickFirstViewMeasurand("START_RENDER")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Visually complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        firstViewList[4].click()
+        clickFirstViewMeasurand("VISUALLY_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -632,13 +596,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[4].click()
+        clickFirstViewMeasurand("VISUALLY_COMPLETE")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Dom time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[5].click()
+        clickFirstViewMeasurand("DOM_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -655,13 +618,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[5].click()
+        clickFirstViewMeasurand("DOM_TIME")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Fully loaded time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[6].click()
+        clickFirstViewMeasurand("FULLY_LOADED_TIME")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -678,14 +640,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[6].click()
+        clickFirstViewMeasurand("FULLY_LOADED_TIME")
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[7].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -702,13 +663,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[7].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_REQUESTS")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[8].click()
+        clickFirstViewMeasurand("FULLY_LOADED_REQUEST_COUNT")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -725,13 +685,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[8].click()
+        clickFirstViewMeasurand("FULLY_LOADED_REQUEST_COUNT")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[9].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -740,21 +699,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565300, y:21.976], [x:1466565480, y:71.976]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.074476], [x:1466565300, y:0.021976], [x:1466565480, y:0.071976]]
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[9].click()
+        clickFirstViewMeasurand("DOC_COMPLETE_INCOMING_BYTES")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[10].click()
+        clickFirstViewMeasurand("FULLY_LOADED_INCOMING_BYTES")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -763,21 +721,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv bytes fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:184.46], [x:1466565300, y:23.36], [x:1466565480, y:133.36]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:0.18446], [x:1466565300, y:0.02336], [x:1466565480, y:0.13336]]
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[10].click()
+        clickFirstViewMeasurand("FULLY_LOADED_INCOMING_BYTES")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[11].click()
+        clickFirstViewMeasurand("CS_BY_WPT_VISUALLY_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -794,13 +751,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[11].click()
+        clickFirstViewMeasurand("CS_BY_WPT_VISUALLY_COMPLETE")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[12].click()
+        clickFirstViewMeasurand("CS_BY_WPT_DOC_COMPLETE")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -817,13 +773,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         cleanup:
         clickVariableSelectionTab()
-        firstViewList[12].click()
+        clickFirstViewMeasurand("CS_BY_WPT_DOC_COMPLETE")
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        firstViewList[13].click()
+        clickFirstViewMeasurand("SPEED_INDEX")
 
         when: "User wants to see a graph"
         clickShowButton()
@@ -878,9 +833,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             Script.list().each {
                 it.delete()
             }
-            AggregatorType.list().each {
-                it.delete()
-            }
             UserRole.list().each {
                 it.delete()
             }
@@ -901,7 +853,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
-            initChartData()
 
             Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
             Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
@@ -1178,47 +1129,15 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {
+        datePicker << Keys.chord(Keys.ESCAPE)
+        Thread.sleep(500l)
         datePicker.click()
         datePicker << Keys.chord(Keys.END)
         25.times {
             datePicker << Keys.chord(Keys.BACK_SPACE)
         }
         datePicker << date
+        datePicker << Keys.chord(Keys.ESCAPE)
+        Thread.sleep(500l)
     }
-
-    private void initChartData() {
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-
-    }
-
 }

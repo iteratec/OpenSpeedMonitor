@@ -17,12 +17,12 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.util.Constants
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.web.mapping.LinkGenerator
@@ -342,20 +342,18 @@ class HighchartPointDetailsController {
 
         // Select the cached view state:
         Set<CachedView> relevantCachedViews = Collections.checkedSet(new HashSet<CachedView>(), CachedView.class);
-        if (aggregatorTypeNameOrNull != null && !aggregatorTypeNameOrNull.isEmpty()) {
-            AggregatorType aggregatorType = AggregatorType.findByName(aggregatorTypeNameOrNull)
-            if (!aggregatorType) {
-                render(status: 400, message: "Bad Request");
-                return null;
+        if (aggregatorTypeNameOrNull) {
+            if(aggregatorTypeNameOrNull.contains(Constants.UNIQUE_STRING_DELIMITTER)){
+                String[] splitted = aggregatorTypeNameOrNull.split(Constants.UNIQUE_STRING_DELIMITTER)
+                Measurand measurand = Measurand.valueOf(splitted[0])
+                CachedView cachedView = CachedView.valueOf(splitted[1])
+                if (cachedView) {
+                    relevantCachedViews.add(cachedView);
+                }
             }
-
-            if (aggregatorType.isCachedCriteriaApplicable()) {
-                relevantCachedViews.add(aggregatorType.isCached() ? CachedView.CACHED : CachedView.UNCACHED);
-            } else {
-                addAllCahcedStates(relevantCachedViews);
-            }
-        } else {
-            addAllCahcedStates(relevantCachedViews);
+        }
+        if(relevantCachedViews.isEmpty()){
+            relevantCachedViews.addAll(CachedView.values())
         }
 
         // Limit listing?
@@ -419,18 +417,6 @@ class HighchartPointDetailsController {
         return null;
     }
 
-    /**
-     * <p>
-     * Adds all cached states to the specified set.
-     * </p>
-     *
-     * @param toAddStatesTo The set to add cached states to, not <code>null</code>.
-     */
-    private static void addAllCahcedStates(Set<CachedView> toAddStatesTo) {
-        for (CachedView eachConstant : CachedView.class.getEnumConstants()) {
-            toAddStatesTo.add(eachConstant);
-        }
-    }
 
     /**
      * <p>

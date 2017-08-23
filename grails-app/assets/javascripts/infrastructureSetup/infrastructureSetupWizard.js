@@ -12,7 +12,7 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     var finishButton = $("#finishButton");
     var serverNameField = $("#serverName");
     var serverUrlField = $("#serverUrl");
-    var apiKeyPrompt = $('#apiKeyPrompt')
+    var apiKeyPrompt = $('#apiKeyPrompt');
     var lastCustomServerName, lastCustomServerUrl;
 
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
@@ -20,7 +20,9 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     var init = function () {
         serverSelectBox.change(updateInputFields);
         finishButton.click(function () {
-            spinner.start();
+            if (!finishButton.hasClass("disabled")) {
+                spinner.start();
+            }
         });
         form.validator({
           feedback: {
@@ -41,10 +43,11 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
         lastCustomServerUrl = serverUrlField.val();
         serverNameField.val(OFFICIAL_WPT_URL);
         serverUrlField.val('http://' + OFFICIAL_WPT_URL);
-        form.validator('validate');
+        document.getElementById("serverApiKey").required = true;
       } else {
         serverNameField.val(lastCustomServerName);
         serverUrlField.val(lastCustomServerUrl);
+        document.getElementById("serverApiKey").required = false;
       }
 
       serverNameField.prop('disabled', isOfficialWptServer);
@@ -52,7 +55,7 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
       wptKeyInputInfo.toggleClass("hidden", !isOfficialWptServer);
       customServerInfo.toggleClass("hidden", isOfficialWptServer);
       apiKeyPrompt.toggleClass("hidden", !isOfficialWptServer);
-
+      form.validator('validate');
     };
 
     init();

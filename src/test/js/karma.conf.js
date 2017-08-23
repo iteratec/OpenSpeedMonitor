@@ -24,7 +24,8 @@ module.exports = function (config) {
             {pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/d3/chartLabelUtil.js', watched: true},
             {pattern: ASSET_PATH + '/javascripts/d3/chartColorProvider.js', watched: true},
-            {pattern: ASSET_PATH +'/javascripts/d3/groupedBarchartHorizontal.js', watched: true},
+            {pattern: ASSET_PATH +'/javascripts/chartComponents/*.js', watched: true},
+            {pattern: ASSET_PATH +'/javascripts/pageAggregation/pageAggregationChartData.js', watched: true},
             {pattern: ASSET_PATH +'/javascripts/d3/trafficLightDataProvider.js', watched: true},
             {pattern: TEST_PATH + '/specs/**/*.js', watched: true}
         ],
@@ -67,10 +68,21 @@ module.exports = function (config) {
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
+        customLaunchers: {
+            ChromeHeadlessForDocker: {
+                base: 'ChromeHeadless',
+                flags: [
+                    '--disable-web-security',
+                    '--disable-gpu',
+                    '--no-sandbox'
+                ],
+                displayName: 'Chrome Headless for docker'
+            }
+        },
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadlessForDocker'],
 
 
         // Continuous Integration mode
@@ -83,7 +95,7 @@ module.exports = function (config) {
 
         plugins: [
             'karma-jasmine',
-            'karma-phantomjs-launcher',
+            'karma-chrome-launcher',
             'karma-junit-reporter',
             'karma-htmlfile-reporter'
         ]

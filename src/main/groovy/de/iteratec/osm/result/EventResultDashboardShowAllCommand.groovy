@@ -32,32 +32,32 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowLoadTimes
+    Double trimBelowLoadTimes
 
     /**
      * Upper bound for load-time-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveLoadTimes
+    Double trimAboveLoadTimes
 
     /**
      * Lower bound for request-count-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestCounts
+    Double trimBelowRequestCounts
 
     /**
      * Upper bound for request-count-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestCounts
+    Double trimAboveRequestCounts
 
     /**
      * Lower bound for request-sizes-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestSizes
+    Double trimBelowRequestSizes
 
     /**
      * Upper bound for request-sizes-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestSizes
+    Double trimAboveRequestSizes
 
     /**
      * Constraints needs to fit.
@@ -79,8 +79,9 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
-        viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
-        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
+        viewModelToCopyTo.put('selectedAggrGroupValues', getSelectedMeasurandsForString(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
+        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
@@ -90,6 +91,16 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('trimAboveRequestSizes', this.trimAboveRequestSizes)
     }
 
+    Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
+        return selectedValues.collect{Measurand.valueOf(it)}
+    }
+
+    Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
+        Collection<SelectedMeasurand> result = []
+        cached.each { result.add(new SelectedMeasurand(measurand: Measurand.valueOf(it), cachedView: CachedView.CACHED))}
+        uncached.each { result.add(new SelectedMeasurand(measurand:  Measurand.valueOf(it), cachedView:  CachedView.UNCACHED))}
+        return result
+    }
     /**
      * <p>
      * Creates {@link ErQueryParams} based on this command. This command
@@ -107,22 +118,22 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
         if (this.trimBelowLoadTimes) {
-            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes
+            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimAboveLoadTimes) {
-            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes
+            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimBelowRequestCounts) {
-            queryParams.minRequestCount = this.trimBelowRequestCounts
+            queryParams.minRequestCount = this.trimBelowRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimAboveRequestCounts) {
-            queryParams.maxRequestCount = this.trimAboveRequestCounts
+            queryParams.maxRequestCount = this.trimAboveRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimBelowRequestSizes) {
-            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes * 1000
+            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
         if (this.trimAboveRequestSizes) {
-            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
+            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
 
         return queryParams

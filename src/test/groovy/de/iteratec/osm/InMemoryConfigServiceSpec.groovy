@@ -3,9 +3,7 @@ package de.iteratec.osm
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-/**
- * Created by mwg on 22.05.2017.
- */
+
 @TestFor(InMemoryConfigService)
 class InMemoryConfigServiceSpec extends Specification{
 

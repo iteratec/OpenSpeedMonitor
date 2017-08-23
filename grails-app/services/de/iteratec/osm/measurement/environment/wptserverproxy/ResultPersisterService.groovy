@@ -359,23 +359,12 @@ class ResultPersisterService implements iResultListener {
                                      GPathResult viewTag, Integer testStepOneBasedIndex, GString waterfallAnchor) {
 
         log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
-        Integer docCompleteTime = viewTag.docTime.toInteger()
 
         result.measuredEvent = step
         result.numberOfWptRun = run
         result.cachedView = view
         result.medianValue = median
         result.wptStatus = viewTag.result.toInteger()
-        result.docCompleteIncomingBytes = viewTag.bytesInDoc.toInteger()
-        result.docCompleteRequests = viewTag.requestsDoc.toInteger()
-        result.docCompleteTimeInMillisecs = docCompleteTime
-        result.domTimeInMillisecs = viewTag.domTime.toInteger()
-        result.firstByteInMillisecs = viewTag.TTFB.toInteger()
-        result.fullyLoadedIncomingBytes = viewTag.bytesIn.toInteger()
-        result.fullyLoadedRequestCount = viewTag.requests.toInteger()
-        result.fullyLoadedTimeInMillisecs = viewTag.fullyLoaded.toInteger()
-        result.loadTimeInMillisecs = viewTag.loadTime.toInteger()
-        result.startRenderInMillisecs = viewTag.render.toInteger()
         result.lastStatusUpdate = new Date()
         result.jobResult = jobRun
         result.jobResultDate = jobRun.date
@@ -386,10 +375,8 @@ class ResultPersisterService implements iResultListener {
         result.page = step.testedPage
         result.browser = jobRun.job.location.browser
         result.location = jobRun.job.location
-        setSpeedIndex(result, viewTag)
-        setVisuallyCompleteTime(viewTag, result)
+        setAllMeasurands(viewTag, result)
         setWaterfallUrl(result, jobRun, waterfallAnchor)
-        setCustomerSatisfaction(step, result, docCompleteTime)
         result.testAgent = jobRun.testAgent
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
@@ -439,19 +426,25 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    private void setVisuallyCompleteTime(GPathResult viewTag, EventResult result) {
-        if (!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0) {
-            result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
+    private void setAllMeasurands(GPathResult inputValues, EventResult result){
+        Measurand.values().each {
+            if(it.getTagInResultXml()){
+                setPropertyWithinEventResult(it, inputValues, result)
+            }
+        }
+        setCustomerSatisfaction(result.measuredEvent, result, result.docCompleteTimeInMillisecs)
+    }
+
+    private void setPropertyWithinEventResult(Measurand measurand, GPathResult inputValues, EventResult result){
+        if(checkIfTagIsThere(inputValues, measurand.getTagInResultXml())){
+            result.setProperty(measurand.getEventResultField(), inputValues.getProperty(measurand.getTagInResultXml()).toInteger())
         }
     }
 
-    private void setSpeedIndex(EventResult result, GPathResult viewTag) {
-        if (!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0) {
-            result.speedIndex = viewTag.SpeedIndex.toInteger()
-        } else {
-            result.speedIndex = EventResult.SPEED_INDEX_DEFAULT_VALUE
-        }
+    private boolean checkIfTagIsThere(GPathResult viewTag, String tag){
+        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
     }
+
 
     private void setConnectivity(EventResult result, JobResult jobRun) {
         if (jobRun.job.noTrafficShapingAtAll) {

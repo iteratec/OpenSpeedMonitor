@@ -13,7 +13,9 @@
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('webappPathToRenderingEngine'); return false;" >${message(code: 'graphiteServer.webappPathToRenderingEngine.label', default: 'Webapp Path To Rendering Engine')}</g:link></th>
 
-        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('graphitePaths'); return false;" >${message(code: 'graphiteServer.graphitePaths.label', default: 'Graphite Paths')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('graphitePathsRawData'); return false;" >${message(code: 'graphiteServer.graphitePathsRawData.label', default: 'Graphite Paths Raw Data')}</g:link></th>
+
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('graphitePathsCsiData'); return false;" >${message(code: 'graphiteServer.graphitePathsCsiData.label', default: 'Graphite Paths Csi Data')}</g:link></th>
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('reportHealthMetrics'); return false;" >${message(code: 'graphiteServer.reportHealthMetrics.label', default: 'Report Health Metrics')}</g:link></th>
 
@@ -34,8 +36,15 @@
             <td>${fieldValue(bean: graphiteServerInstance, field: "webappPathToRenderingEngine")}</td>
 
             <td>
-                <g:each in ="${graphiteServerInstance.graphitePaths}" var = "graphitePath">
-                    <g:link controller="GraphitePath" action="show" id="${graphitePath.id}">${fieldValue(bean: graphitePath, field: "prefix")}${fieldValue(bean: graphitePath, field: "measurand")}</g:link>
+                <g:each in ="${graphiteServerInstance.graphitePathsRawData}" var = "graphitePathRawData">
+                    <g:link controller="GraphitePathRawData" action="show" id="${graphitePathRawData.id}">${fieldValue(bean: graphitePathRawData, field: "prefix")}${fieldValue(bean: graphitePathRawData, field: "cachedView.graphiteLabelPrefix")}${fieldValue(bean: graphitePathRawData, field: "measurand.graphiteLabelSuffix")}</g:link>
+                    <br>
+                </g:each>
+            </td>
+
+            <td>
+                <g:each in ="${graphiteServerInstance.graphitePathsCsiData}" var = "graphitePathCsiData">
+                    <g:link controller="GraphitePathCsiData" action="show" id="${graphitePathCsiData.id}">${fieldValue(bean: graphitePathCsiData, field: "prefix")}${fieldValue(bean: graphitePathCsiData, field: "aggregationType")}</g:link>
                     <br>
                 </g:each>
             </td>

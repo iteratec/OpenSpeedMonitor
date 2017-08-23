@@ -72,13 +72,13 @@ class CsiAggregationDaoService {
             Date fromDate,
             Date toDate,
             CsiAggregationInterval interval,
-            AggregatorType aggregator
+            AggregationType aggregationType
     ) {
         def criteria = CsiAggregation.createCriteria()
         return criteria.list {
             between("started", fromDate, toDate)
             eq("interval", interval)
-            eq("aggregator", aggregator)
+            eq("aggregationType", aggregationType)
         }
     }
 
@@ -207,8 +207,7 @@ class CsiAggregationDaoService {
      * @return a list of all csiAggregations with given criteria
      */
     public List<CsiAggregation> getPageCsiAggregations(Date fromDate, Date toDate, List<JobGroup> jobGroups, List<Page> pages, CsiAggregationInterval targetInterval) {
-        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
-        return CsiAggregation.findAllByStartedBetweenAndAggregatorAndIntervalAndJobGroupInListAndPageInList(fromDate, toDate, aggregatorType, targetInterval, jobGroups, pages)
+        return CsiAggregation.findAllByStartedBetweenAndAggregationTypeAndIntervalAndJobGroupInListAndPageInList(fromDate, toDate, AggregationType.PAGE, targetInterval, jobGroups, pages)
     }
 
     /**
@@ -219,12 +218,11 @@ class CsiAggregationDaoService {
      * @param targetInterval the {@link CsiAggregationInterval}
      * @return a list of all csiAggregations with given criteria
      */
-    public List<CsiAggregation> getShopCsiAggregations(Date fromDate, Date toDate, List<JobGroup> jobGroups, CsiAggregationInterval targetInterval) {
-        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
-        return CsiAggregation.findAllByStartedBetweenAndAggregatorAndIntervalAndJobGroupInList(fromDate, toDate, aggregatorType, targetInterval, jobGroups)
+    public List<CsiAggregation> getJobGroupCsiAggregations(Date fromDate, Date toDate, List<JobGroup> jobGroups, CsiAggregationInterval targetInterval) {
+        return CsiAggregation.findAllByStartedBetweenAndAggregationTypeAndIntervalAndJobGroupInList(fromDate, toDate, AggregationType.JOB_GROUP, targetInterval, jobGroups)
     }
 
-    public List<CsiAggregation> getMvs(Date fromDate, Date toDate, MvQueryParams mvQueryParams, CsiAggregationInterval interval, AggregatorType aggregatorType) {
+    public List<CsiAggregation> getMvs(Date fromDate, Date toDate, MvQueryParams mvQueryParams, CsiAggregationInterval interval, AggregationType aggregationType) {
         def result
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "CsiAggregationDaoService: getMvs", 1) {
 
@@ -240,7 +238,7 @@ class CsiAggregationDaoService {
             criteria.addCriteria {
                 between("started", fromDate, toDate)
                 eq("interval", interval)
-                eq("aggregator", aggregatorType)
+                eq("aggregationType", aggregationType)
             }
 
             if (jobGroups) {

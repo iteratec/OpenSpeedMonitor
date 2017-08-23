@@ -1,6 +1,6 @@
 {
   "name": "open_speed_monitor",
-  "description": "OpenSpeedMonitor automates web performance measurements based on WebPagetest. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.",
+  "description": "OpenSpeedMonitor automates web performance measurements based on WebPagetest.",
   "main": "",
   "authors": [
     "Nils Kuhn <nils.kuhn@iteratec.de>"
@@ -33,7 +33,7 @@
     "later": "^1.2.0",
     "prettycron": "^0.10.0",
     "spin.js": "spin-js#^2.0.1",
-    "tagit": "*",
+    "tagit": "https://github.com/aehlke/tag-it.git",
     "codemirror": "^5.19.0",
     "file-saver": "^1.3.3",
     "StickyTableHeaders": "0.1.19",

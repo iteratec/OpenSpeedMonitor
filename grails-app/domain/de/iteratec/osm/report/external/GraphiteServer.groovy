@@ -24,7 +24,8 @@ import de.iteratec.osm.report.external.provider.*
  * A graphite server to which measured data is to be sent to.
  * The data to send is configured in {@link #graphitePaths}.
  * {@link de.iteratec.osm.report.chart.Event}s can be fetches fromm server via associated graphiteEventSourcePaths.
- * @see GraphitePath
+ * @see GraphitePathRawData
+ * @see GraphitePathCsiData
  * @see GraphiteEventSourcePath
  */
 class GraphiteServer {
@@ -66,15 +67,11 @@ class GraphiteServer {
     GraphiteSocketProvider.Protocol reportProtocol = GraphiteSocketProvider.Protocol.UDP
 
     /**
-     * {@link GraphitePath}s, for which results should be sent for this server.
-     */
-    Collection<GraphitePath> graphitePaths = []
-    /**
      * {@link GraphiteEventSourcePath}s, to create Events.
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
 
-    static hasMany = [graphitePaths: GraphitePath, graphiteEventSourcePaths: GraphiteEventSourcePath]
+    static hasMany = [ graphiteEventSourcePaths: GraphiteEventSourcePath, graphitePathsRawData: GraphitePathRawData, graphitePathsCsiData: GraphitePathCsiData]
     static transients = ['serverInetAddress']
 
     Boolean reportCsiAggregationsToGraphiteServer = false
@@ -99,7 +96,6 @@ class GraphiteServer {
     static constraints = {
         serverAdress(unique: 'port', maxSize: 255)
         port(min: 0, max: 65535)
-        graphitePaths(nullable: false)
         webappUrl(nullable: false)
         webappProtocol(nullable: false)
         webappPathToRenderingEngine(nullable: false)
@@ -110,6 +106,8 @@ class GraphiteServer {
         memoryReportPrefix(nullable: false, maxSize: 255)
         threadStatesReportPrefix(nullable: false, maxSize: 255)
         reportProtocol(nullable: false, inList: GraphiteSocketProvider.Protocol.values() as List)
+        graphitePathsCsiData(nullable: true)
+        graphitePathsRawData(nullable: true)
     }
 
     @Override

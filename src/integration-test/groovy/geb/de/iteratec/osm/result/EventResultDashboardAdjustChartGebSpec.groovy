@@ -10,8 +10,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -24,10 +22,8 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Created by marko on 22.06.16.
  */
@@ -77,14 +73,17 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Document Complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
         timeFrameSelect.click()
-        selectDateInDatepicker(fromDatepicker, "21.06.2016")
-        selectDateInDatepicker(toDatepicker, "23.06.2016")
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
+        sleep(500)
         jobGroupList[0].click()
         pageList[0].click()
+        connectivityTab.click()
+        waitFor {selectConnectivityProfilesList.displayed}
+        selectConnectivityProfilesList[0].click()
         tabVariableSelection.click()
 
         when: "User wants to see a graph"
@@ -105,7 +104,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
 
@@ -113,16 +111,15 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         when: "User edits title"
         waitFor { chartTitleInputField.displayed }
-        sleep(100)
+        sleep(300)
         chartTitleInputField << "CustomTitle"
-        sleep(100)
+        sleep(300)
         adjustChartApply.click()
 
         then: "Chart title is changed"
         waitFor { chartTitle == "CustomTitle" }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Size to illegal values"() {
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
@@ -140,7 +137,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         result == "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Size"() {
         given: "User edits chart size"
         chartWidthInputField.firstElement().clear()
@@ -168,29 +164,34 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         graphYGridLastTick == "840"
     }
 
-    @Ignore("Not yet sure how to trigger the js part")
     void "Add graph alias"() {
         given: "User clicks on the add graph aliases button"
-        waitFor { addAliasButton.click() }
+        sleep(200)
+        adjustChartButton.click()
+        waitFor { addAliasButton.displayed }
+        sleep(200)
+        addAliasButton.click()
 
         when: "User provides graph alias"
-        sleep(500)
-        waitFor { aliasInputField.displayed }
+        waitFor { graphNameSelect.displayed }
+        graphNameSelect.click()
+        sleep(200)
+        graphNameSelectOptions[1].click()
         aliasInputField << "CustomAlias"
-        sleep(500)
+        adjustChartApply.click()
+        sleep(200)
 
         then: "Graph is renamed"
         waitFor { graphName == "CustomAlias" }
     }
 
-    @Ignore("Not yet sure how to trigger the js part")
     void "Change Graph color"() {
         when: "User changes graph color"
-        sleep(500)
-//        colorPicker << '#AAAAAA'
-//        $(".span2").find("input", type:"color")[0].jquery.attr("style", "width: 50%; background-color: rgb(170,170, 170);")
-        $(".span2").find("input", type: "color")[0].jquery.attr("value", "#aaaaaa")
-        sleep(500)
+        waitFor{ adjustChartButton.click() }
+        waitFor { colorPicker.displayed }
+        sleep(300)
+        setColorPicker("#aaaaaa")
+        adjustChartApply.click()
 
         then: "Graph is recolored"
         true
@@ -198,7 +199,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { graphColorField == 'background-color: rgb(170, 170, 170);' }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Adjust Chart Section"() {
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
@@ -214,6 +214,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         then: "Chart changed"
         waitFor { graphLines.displayed }
+        sleep(500)
         graphLines.size() == 1
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
@@ -226,7 +227,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         graphYGridLastTick == "600"
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Markers"() {
         given: "User clicked adjust chart"
         waitFor { adjustChartButton.click() }
@@ -247,7 +247,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         waitFor { dataMarker.attr("style").contains("top: 543px; left: 216px;") }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Enable Data-Labels"() {
         given: "User clicked adjust chart"
         waitFor { adjustChartButton.click() }
@@ -270,7 +269,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Save custom dashboard"() {
         given: "User clicked on \"Save as dashboard\"-button"
         clickSaveAsDashboardButton()
@@ -294,14 +292,13 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
     void "Load custom dashboard"() {
         given: "User visits the EventResultDashboardPage"
         to EventResultDashboardPage
         when: "User loads CustomDashboard"
         customDashboardSelectionDropdown.click()
         waitFor { customDashboardSelectionList.displayed }
-        customDashboardSelectionList.find("a").click()
+        firstCustomDashboardLink.click()
         then: "The old dashboard is loaded again"
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
@@ -367,9 +364,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             Script.list().each {
                 it.delete()
             }
-            AggregatorType.list().each {
-                it.delete()
-            }
             UserRole.list().each {
                 it.delete()
             }
@@ -390,7 +384,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
-            initChartData()
 
             Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
             Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
@@ -668,45 +661,11 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker.click()
-        datePicker << Keys.chord(Keys.CONTROL, "a")
-        datePicker << Keys.chord(Keys.DELETE)
-        datePicker << Keys.chord(Keys.ESCAPE)
+        datePicker << Keys.chord(Keys.END)
+        25.times {
+            datePicker << Keys.chord(Keys.BACK_SPACE)
+        }
         datePicker << date
-    }
-
-    private void initChartData() {
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-
     }
 
 }

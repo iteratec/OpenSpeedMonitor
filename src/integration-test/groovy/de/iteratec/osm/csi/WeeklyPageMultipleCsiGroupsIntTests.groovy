@@ -18,7 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
@@ -51,10 +51,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
             'WKBS',
             'WK',
             Page.UNDEFINED
-    ];
-    static AggregatorType job
-    static AggregatorType page
-    static AggregatorType shop
+    ]
 
     static final String csvName = 'weekly_page_multiple_csi_groups.csv'
     static final DateTime startOfWeek = new DateTime(2012, 11, 12, 0, 0, 0)
@@ -68,23 +65,18 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 
     def setup() {
         CsiAggregation.withNewTransaction {
-            System.out.println('Create some common test-data...');
+            System.out.println('Create some common test-data...')
             TestDataUtil.createOsmConfig()
             TestDataUtil.createCsiAggregationIntervals()
-            TestDataUtil.createAggregatorTypes()
             TestDataUtil.createCsiConfiguration()
 
-            System.out.println('Loading CSV-data...');
+            System.out.println('Loading CSV-data...')
             TestDataUtil.
-                    loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
-            System.out.println('Loading CSV-data... DONE');
+                    loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages)
+            System.out.println('Loading CSV-data... DONE')
 
-            System.out.println('Create some common test-data... DONE');
+            System.out.println('Create some common test-data... DONE')
         }
-
-        job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        page = AggregatorType.findByName(AggregatorType.PAGE)
-        shop = AggregatorType.findByName(AggregatorType.SHOP)
 
         hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
@@ -109,7 +101,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
         then:
         results.size() == 16
-        creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
+        creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results)
     }
 
     void testCreationAndCalculationOfWeeklyPageValuesFor_HP() {
@@ -120,7 +112,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
         then:
         results.size() == 16
-        creationAndCalculationOfWeeklyPageValuesTest("HP", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
+        creationAndCalculationOfWeeklyPageValuesTest("HP", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results)
     }
 
     /**
@@ -130,7 +122,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
                                                               final Integer countResultsPerWeeklyPageMv,
                                                               final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
 
-        Page testedPage = Page.findByName(pageName);
+        Page testedPage = Page.findByName(pageName)
 
         // Skip Page if no data is generated (SpeedUp Test) see pagesToGenerateDataFor
         if (!pagesToGenerateDataFor.contains(pageName)) {
@@ -150,18 +142,18 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         wpmvs.each { CsiAggregation mvWeeklyPage ->
             System.out.println(
                     "WeeklyPageMultipleCsiGroupsIntTests.creationAndCalculationOfWeeklyPageValuesTest(): " +
-                            mvWeeklyPage.ident() + " : " + mvWeeklyPage.isCalculated());
+                            mvWeeklyPage.ident() + " : " + mvWeeklyPage.isCalculated())
         }
 
 
         wpmvs.each { CsiAggregation mvWeeklyPage ->
             assertEquals(startDate, mvWeeklyPage.started)
             assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
-            assertEquals(page.name, mvWeeklyPage.aggregator.name)
+            assertEquals(AggregationType.PAGE, mvWeeklyPage.aggregationType)
             assertTrue(mvWeeklyPage.isCalculated())
         }
 
-        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
         csiGroups.each { JobGroup csiGroup ->
             List<CsiAggregation> wpmvsOfOneGroupPageCombination = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup], [testedPage])
             assertEquals(1, wpmvsOfOneGroupPageCombination.size())

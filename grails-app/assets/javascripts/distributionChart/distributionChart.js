@@ -34,12 +34,9 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var drawChart = function (distributionChartData) {
         chartData = distributionChartData;
-
         sortSeriesDataAscending();
 
         assignShortLabels();
-
-        dataTrimValue.value = getDomain()[1];
 
         // sort the violins after descending median as default
         sortByMedian();
@@ -60,7 +57,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         var domain = getDomain();
 
         drawXAxis(svg);
-        drawYAxis(svg, domain);
+        drawYAxis(svg, domain,chartData.i18nMap['measurand'] + " [" + chartData.dimensionalUnit + "]");
         drawViolins(svg, domain);
         drawHeader(svg);
 
@@ -121,15 +118,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")");
     };
 
-    var drawYAxis = function (svg, domain) {
+    var drawYAxis = function (svg, domain, text) {
         var y = d3.scale.linear()
             .range([height - margin.bottom, margin.top])
             .domain(domain);
 
+        $("#y-axis_left_label").remove();
+        $("#svg-container").append("<div id=\"y-axis_left_label\" style=\"left: 45px;position: absolute;white-space: nowrap;transform: translate(-50%, 0%) rotate(-90deg);top: 50%;\">"+text+"</div>");
+
         var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left");
-
 
         var g = svg.append("g")
             .attr("class", "d3chart-axis d3chart-yAxis")

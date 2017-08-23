@@ -23,10 +23,8 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -43,11 +41,8 @@ import org.joda.time.DateTime
 class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
-    ShopCsiAggregationService shopCsiAggregationService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
-    AggregatorType job
-    AggregatorType page
-    AggregatorType shop
     DateTime startOfCreatingWeeklyPageValues = new DateTime(2012, 2, 6, 0, 0, 0)
     DateTime startOfCreatingWeeklyShopValues = new DateTime(2012, 3, 12, 0, 0, 0)
 
@@ -58,7 +53,6 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     def setup(){
         CsiAggregationInterval.withNewTransaction {
             TestDataUtil.createCsiAggregationIntervals()
-            TestDataUtil.createAggregatorTypes()
             createPagesAndEvents()
             createBrowsers()
             createHoursOfDay()
@@ -67,9 +61,6 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
             createJobGroups()
             createJobs()
         }
-        job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        page = AggregatorType.findByName(AggregatorType.PAGE)
-        shop = AggregatorType.findByName(AggregatorType.SHOP)
     }
 
     /**
@@ -78,7 +69,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     void "Creating weekly page values test"() {
         given:
         DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
-        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
         Integer countPages = 7
         Integer countWeeks = 2
         when:
@@ -100,7 +91,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         Integer countWeeks = 2
         Integer countPages = 7
         when:
-        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
+        List<CsiAggregation> wsmvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
         then:
         wsmvs.size() == countWeeks
         wsmvs.each {

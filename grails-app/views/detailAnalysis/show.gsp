@@ -4,7 +4,6 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.detailAnalysis"/></title>
-    <asset:javascript src="chartSwitch"/>
 </head>
 
 <body>
@@ -107,10 +106,10 @@
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/showAll.js"/>
-
+    <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+          OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
           OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
     </asset:script>

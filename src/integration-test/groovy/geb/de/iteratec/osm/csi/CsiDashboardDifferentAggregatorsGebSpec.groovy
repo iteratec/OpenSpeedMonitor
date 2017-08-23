@@ -9,10 +9,10 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -77,7 +77,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Daily mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         to CsiDashboardPage
@@ -115,7 +115,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Weekly mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_page"
@@ -140,7 +140,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Daily mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "daily_shop"
@@ -167,7 +167,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Weekly mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_shop"
@@ -192,7 +192,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Daily mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         waitFor { aggregationRadioButtons.displayed }
@@ -221,7 +221,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         ]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Graph for \"Weekly mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "weekly_system"
@@ -246,7 +246,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
         adjustChartButton.click()
@@ -263,7 +263,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         waitFor { chartTitle == "CustomTitle" }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Adjust Chart Size"() {
         given: "User edits chart size"
         adjustChartButton.click()
@@ -298,7 +298,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Adjust Chart Section"() {
         given: "User edits chart size"
         adjustChartButton.click()
@@ -318,7 +318,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         graphYGridLastTick == "80"
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Enable Data-Markers"() {
 
         when: "User clicks \"Show data-marker\""
@@ -335,7 +335,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         waitFor { dataMarker.attr("style").contains("top: 600px; left: 270px;") }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Enable Data-Labels"() {
 
         when: "User clicks \"Show data-marker\""
@@ -353,7 +353,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         }
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Save custom dashboard"() {
         given: "User clicked on \"Save as dashboard\"-button"
         clickSaveAsDashboardButton()
@@ -371,7 +371,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
-    @Ignore("[IT-1427] phantomJS doesn't get events triggered by jquery")
+    @Ignore("[IT-1744] EventResults needed for dynamic result selection")
     void "Load custom dashboard"() {
         given: "User visits the CsiDashboardPage"
         to CsiDashboardPage
@@ -415,7 +415,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
-            initChartData()
             initCsiData()
             createTestSpecificData()
         }
@@ -447,21 +446,20 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
         MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
         CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        new CsiAggregation([started: new DateTime(2016, 6, 5, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 14, csByWptVisuallyCompleteInPercent: 55, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 6, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 22, csByWptVisuallyCompleteInPercent: 58, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 7, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 33, csByWptVisuallyCompleteInPercent: 68, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 8, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 44, csByWptVisuallyCompleteInPercent: 81, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 9, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 55, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 10, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 66, csByWptVisuallyCompleteInPercent: 48, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 11, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 73, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 12, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 24, csByWptVisuallyCompleteInPercent: 98, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 13, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 39, csByWptVisuallyCompleteInPercent: 65, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 14, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 77, csByWptVisuallyCompleteInPercent: 61, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 15, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 88, csByWptVisuallyCompleteInPercent: 72, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 16, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 99, csByWptVisuallyCompleteInPercent: 78, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 17, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started: new DateTime(2016, 6, 18, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 5, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 14, csByWptVisuallyCompleteInPercent: 55, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 6, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 22, csByWptVisuallyCompleteInPercent: 58, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 7, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 33, csByWptVisuallyCompleteInPercent: 68, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 8, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 44, csByWptVisuallyCompleteInPercent: 81, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 9, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 55, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 10, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 66, csByWptVisuallyCompleteInPercent: 48, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 11, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 73, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 12, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 24, csByWptVisuallyCompleteInPercent: 98, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 13, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 39, csByWptVisuallyCompleteInPercent: 65, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 14, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 77, csByWptVisuallyCompleteInPercent: 61, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 15, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 88, csByWptVisuallyCompleteInPercent: 72, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 16, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 99, csByWptVisuallyCompleteInPercent: 78, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 17, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 18, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
@@ -476,39 +474,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         datePicker << date
     }
 
-    private void initChartData() {
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
-
-    }
 
     private void initCsiData() {
 
@@ -526,12 +491,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         }
 
         Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
-
-        TestDataUtil.createAggregatorType(AggregatorType.MEASURED_EVENT, MeasurandGroup.NO_MEASURAND)
-        TestDataUtil.createAggregatorType(AggregatorType.PAGE, MeasurandGroup.NO_MEASURAND)
-        TestDataUtil.createAggregatorType(AggregatorType.PAGE_AND_BROWSER, MeasurandGroup.NO_MEASURAND)
-        TestDataUtil.createAggregatorType(AggregatorType.SHOP, MeasurandGroup.NO_MEASURAND)
-        TestDataUtil.createAggregatorType(AggregatorType.CSI_SYSTEM, MeasurandGroup.NO_MEASURAND)
 
         CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",
@@ -642,9 +601,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
             Script.list().each {
                 it.delete()
             }
-            AggregatorType.list().each {
-                it.delete()
-            }
             UserRole.list().each {
                 it.delete()
             }
@@ -672,6 +628,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
      * @return timestamp in seconds since UNIX epoch
      */
     private int timestampOfDate(int year, int month, int day) {
-        return new DateTime(year, month, day, 0, 0).getMillis() / 1000;
+        return new DateTime(year, month, day, 0, 0).getMillis() / 1000
     }
 }

@@ -72,8 +72,8 @@
                                       chartTitle                   : chartTitle,
                                       initialChartWidth            : chartWidth,
                                       initialChartHeight           : chartHeight,
-                                      markerEnabled                : markerShouldBeEnabled,
-                                      dataLabelsActivated          : labelShouldBeEnabled,
+                                      showDataMarkers              : showDataMarkers,
+                                      showDataLabels               : showDataLabels,
                                       highChartLabels              : highChartLabels,
                                       annotations                  : annotations,
                                       labelSummary                 : labelSummary,
@@ -102,7 +102,7 @@
             <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                             action="showAll" id="graphButtonHtmlId" class="btn btn-primary show-button"/>
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
+                    aria-haspopup="true" aria-expanded="false" id="show-button-caret">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
@@ -137,7 +137,7 @@
                                    default="View a custom time series"/>
                     </li>
                     <g:each in="${availableDashboards}" var="availableDashboard">
-                        <li><g:link action="showAll"
+                        <li class="custom-dashboard"><g:link action="showAll"
                                     params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
@@ -177,9 +177,7 @@
                 <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
                           model="${['selectedTimeFrameInterval'      : selectedTimeFrameInterval,
                                     'from'                           : from,
-                                    'fromHour'                       : fromHour,
                                     'to'                             : to,
-                                    'toHour'                         : toHour,
                                     'selectedInterval'               : selectedInterval,
                                     'dateFormat'                     : dateFormat,
                                     'weekStart'                      : weekStart,
@@ -287,9 +285,9 @@
 
         $(window).load(function() {
             if (!$("#graph_container").data("isAggregatedData")) {
-                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>')
+                OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>', 'chartContextUtilities');
             }
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
             OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
         });
 

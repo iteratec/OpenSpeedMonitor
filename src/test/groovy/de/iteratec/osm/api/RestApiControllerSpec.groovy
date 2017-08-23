@@ -152,8 +152,8 @@ class RestApiControllerSpec extends Specification {
     void "get just active Locations as JSON, when active and not active existing"() {
         given: "1 active, 1 not active and 1 active but wptServer not active Locations exist"
         Location locationActive = Location.build(active: true, wptServer: WebPageTestServer.build(active: true))
-        Location locationNotActive = Location.build(active: false, wptServer: WebPageTestServer.build(active: true))
-        Location locationActiveButWptServerNotActive = Location.build(active: true, wptServer: WebPageTestServer.build(active: false))
+        Location.build(active: false, wptServer: WebPageTestServer.build(active: true))
+        Location.build(active: true, wptServer: WebPageTestServer.build(active: false))
 
         Collection<LocationDto> activeLocationsAsJson = LocationDto.create([locationActive])
 
@@ -187,7 +187,7 @@ class RestApiControllerSpec extends Specification {
         }
     }
 
-    void "return 400 when asking for non-existing csiConfiguration"() {
+    void "return 404 when asking for non-existing csiConfiguration"() {
         given: "no CsiConfiguration exists for given ID"
         int csiConfigurationId = Integer.MAX_VALUE
 

@@ -12,6 +12,6 @@
 </div>
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageComparison/pageComparisonChart.js" />',true,'pageComparisonChart');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageComparison/pageComparisonChart.js" />', 'pageComparisonChart');
     });
 </asset:script>

@@ -51,25 +51,25 @@ class ConfigService {
     }
 	
 	/** 
-	 * Gets minDocCompleteTimeInMillisecs from osm-configuration.
-	 * {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation}s.
-	 * @return The minimum doc complete time in millisecs {@link EventResult}s get factored with in csi-{@link CsiAggregation}s.
+	 * Gets minValidLoadtime from osm-configuration.
+	 * {@link EventResult}s with a load time lower than this won't be factored in csi-{@link CsiAggregation}s.
+	 * @return The minimum valid load time in millisecs. EventResults with load times below will be considered as measurement error.
      * @see OsmConfiguration
-     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#minDocCompleteTimeInMillisecs} isn't set.
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#minValidLoadtime} isn't set.
 	 */
-	Integer getMinDocCompleteTimeInMillisecs(){
-        return getConfig().minDocCompleteTimeInMillisecs
+	Integer getMinValidLoadtime(){
+        return getConfig().minValidLoadtime
 	}
 	
 	/**
-	 * Gets maxDocCompleteTimeInMillisecs from osm-configuration.
-	 * {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation}s.
-	 * @return The maximum doc complete time in millisecs {@link EventResult}s get factored with in csi-{@link CsiAggregation}s.
+	 * Gets maxValidLoadtime from osm-configuration.
+	 * {@link EventResult}s with a loadtime lower than this won't be factored in csi-{@link CsiAggregation}s.
+	 * @return The maximum valid load time in millisecs. EventResults with load times above will be considered as measurement error.
      * @see OsmConfiguration
-     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#maxDocCompleteTimeInMillisecs} isn't set.
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#maxValidLoadtime} isn't set.
 	 */
-	Integer getMaxDocCompleteTimeInMillisecs(){
-        return getConfig().maxDocCompleteTimeInMillisecs
+	Integer getMaxValidLoadtime(){
+        return getConfig().maxValidLoadtime
 	}
 	
 	/**

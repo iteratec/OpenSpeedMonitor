@@ -45,32 +45,32 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowLoadTimes
+    Double trimBelowLoadTimes
 
     /**
      * Upper bound for load-time-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveLoadTimes
+    Double trimAboveLoadTimes
 
     /**
      * Lower bound for request-count-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestCounts
+    Double trimBelowRequestCounts
 
     /**
      * Upper bound for request-count-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestCounts
+    Double trimAboveRequestCounts
 
     /**
      * Lower bound for request-sizes-measurands. Values lower than this will be excluded from graphs.
      */
-    Integer trimBelowRequestSizes
+    Double trimBelowRequestSizes
 
     /**
      * Upper bound for request-sizes-measurands. Values greater than this will be excluded from graphs.
      */
-    Integer trimAboveRequestSizes
+    Double trimAboveRequestSizes
 
     static constraints = {
         selectedAggrGroupValuesCached(nullable: true)

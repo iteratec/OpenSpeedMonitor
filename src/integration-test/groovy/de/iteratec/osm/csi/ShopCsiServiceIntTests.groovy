@@ -36,8 +36,8 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.util.mop.ConfineMetaClassChanges
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
 @Integration
 @Rollback
@@ -274,7 +274,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 2,
                 defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS,
-                maxDocCompleteTimeInMillisecs: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS).save(failOnError: true)
+                minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
+                maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME).save(failOnError: true)
     }
 }

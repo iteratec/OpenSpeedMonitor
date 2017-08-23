@@ -8,9 +8,7 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 import de.iteratec.osm.measurement.schedule.JobGroup
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
+
 @TestFor(ResultSelectionController)
 @Mock([JobGroup])
 @Build([JobGroup])

@@ -13,6 +13,6 @@
 		</g:else>
 	</div>
 </g:each>
-<g:if test="${ variables.size() == 0 }">
+<g:if test="${ variables.size() == 0 && script }">
 	<g:message code="job.placeholders.usedInScript.none" args="${[script.label]}" />
 </g:if>

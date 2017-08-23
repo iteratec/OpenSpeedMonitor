@@ -11,14 +11,12 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.MeasurandUtilService
 
 class PageComparisonController extends ExceptionHandlerController {
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    MeasurandUtilService measurandUtilService
     I18nService i18nService
     OsmConfigCacheService osmConfigCacheService
 
@@ -30,7 +28,7 @@ class PageComparisonController extends ExceptionHandlerController {
         modelToRender.put("pages", Page.list().collectEntries { [it.id, it.name] })
         modelToRender.put("jobGroups", JobGroup.list().collectEntries { [it.id, it.name] })
 
-        modelToRender.put("aggrGroupValuesUnCached", ResultCsiAggregationService.getAggregatorMapForOptGroupSelect().get(CachedView.UNCACHED))
+        modelToRender.put("aggrGroupValuesUnCached", Measurand.values().groupBy { it.measurandGroup })
         modelToRender.put("selectedAggrGroupValuesUnCached", [])
 
         // JavaScript-Utility-Stuff:
@@ -50,19 +48,22 @@ class PageComparisonController extends ExceptionHandlerController {
             [it['jobGroupId1'] as long, it['jobGroupId2'] as long]
         }.flatten().unique())
 
+        Measurand measurand = Measurand.valueOf(cmd.measurand)
+
         List allEventResults = EventResult.createCriteria().list {
             'in'('page', allPages)
             'in'('jobGroup', allJobGroups)
             'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
             'between'(
-                    'docCompleteTimeInMillisecs',
-                    osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(),
-                    osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs()
+                    'fullyLoadedTimeInMillisecs',
+                    osmConfigCacheService.getMinValidLoadtime(),
+                    osmConfigCacheService.getMaxValidLoadtime()
             )
             projections {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
-                avg(cmd.measurand)
+                avg(measurand.getEventResultField())
+                groupProperty('id')
             }
         }
 
@@ -76,9 +77,9 @@ class PageComparisonController extends ExceptionHandlerController {
         dto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
 
         cmd.selectedPageComparisons.each { row ->
-            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurandUtilService.getDimensionalUnit(cmd.measurand))
-            BarchartDatum datum1 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
-            BarchartDatum datum2 = new BarchartDatum(measurand: measurandUtilService.getI18nMeasurand(cmd.measurand))
+            BarchartSeries series = new BarchartSeries(stacked: false, dimensionalUnit: measurand.measurandGroup.unit.label)
+            BarchartDatum datum1 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
+            BarchartDatum datum2 = new BarchartDatum(measurand: i18nService.msg("de.iteratec.isr.measurand.${measurand}", measurand.toString()))
             def result1 = allEventResults.find {
                 it[0].toString() == row['jobGroupId1'] &&
                         it[1].toString() == row['pageId1']
@@ -88,7 +89,7 @@ class PageComparisonController extends ExceptionHandlerController {
                         it[1].toString() == row['pageId2']
             }
             if (result1) {
-                datum1.value = result1 ? result1[2] : null
+                datum1.value = measurand.normalizeValue(result1[2])
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
@@ -97,7 +98,7 @@ class PageComparisonController extends ExceptionHandlerController {
                 }
             }
             if (result2) {
-                datum2.value = result2 ? result2[2] : null
+                datum2.value = measurand.normalizeValue(result2[2])
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name

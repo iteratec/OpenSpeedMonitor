@@ -27,8 +27,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.integration.Integration
@@ -253,7 +252,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 page: homepage,
                 browser: fireFoxBrowser,
                 location: ffAgent1,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -303,7 +302,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 page: homepage,
                 browser: fireFoxBrowser,
                 location: ffAgent1,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -353,7 +352,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 page: homepage,
                 browser: fireFoxBrowser,
                 location: ffAgent1,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -403,7 +402,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 page: homepage,
                 browser: fireFoxBrowser,
                 location: ffAgent1,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -453,16 +452,11 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 page: homepage,
                 browser: fireFoxBrowser,
                 location: ffAgent1,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                speedIndex: null,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
         jobRunDatePlus_Day.save(failOnError: true)
-
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_1, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError: true)
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_2, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError: true)
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_3, measurandGroup: MeasurandGroup.REQUEST_COUNTS]).save(failOnError: true)
-        new AggregatorType([name: NON_MEASURAND_AGGREGATOR_TYPE_NAME, measurandGroup: MeasurandGroup.NO_MEASURAND]).save(failOnError: true)
 
         TestDataUtil.createConnectivityProfile(CONN_PROFILE_NAME)
     }
