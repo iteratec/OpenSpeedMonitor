@@ -13,7 +13,7 @@ class SelectedMeasurand {
         this.cachedView = cachedView
 
         if (!isValid(optionValue)) {
-            throw new IllegalArgumentException("non valid input: ${optionValue}")
+            throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
 
         if (isNoUserTiming(optionValue)) {
@@ -26,7 +26,7 @@ class SelectedMeasurand {
             name = optionValue.substring(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix.length())
             selectedType = SelectedMeasurandType.USERTIMING_MEASURE
         } else {
-            throw new IllegalArgumentException("non valid input: ${optionValue}")
+            throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
     }
 
@@ -51,14 +51,14 @@ class SelectedMeasurand {
     }
 
     static Map createUserTimingOptionFor(String name, UserTimingType type) {
-        return [name: name, id: type.selectedType.optionPrefix + name]
+        return [name: name, id: type.selectedMeasurandType.optionPrefix + name]
     }
 
-    static Map createDataMapForOptGroupSelect(){
+    static Map createDataMapForOptGroupSelect() {
         Map result = [:]
         MeasurandGroup.values().each { measurandGroup ->
-            result.put(measurandGroup.toString(), Measurand.values().findAll {it.measurandGroup == measurandGroup})
-            if(measurandGroup == MeasurandGroup.LOAD_TIMES){
+            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup })
+            if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 result.put("USER_TIMINGS", [])
             }
         }
@@ -66,17 +66,11 @@ class SelectedMeasurand {
     }
 
     static boolean isNoUserTiming(String name) {
-        return Measurand.values().any{ it.toString() == name }
+        return Measurand.values().any { it.toString() == name }
     }
 
     boolean isValid(String name) {
-        if (name) {
-            if (isNoUserTiming(name)) {
-                return true
-            } else {
-                return name.length() > SelectedMeasurandType.USERTIMING_MARK.optionPrefix.length() || name.length() > SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix.length()
-            }
-        }
-        return false
+        name = name ?: ""
+        return isNoUserTiming(name) || name.startsWith(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix) || name.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)
     }
 }

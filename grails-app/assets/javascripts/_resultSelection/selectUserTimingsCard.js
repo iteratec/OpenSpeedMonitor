@@ -6,30 +6,35 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     var resetButtonElement = $(".reset-result-selection");
 
     var updateUserTimings = function (userTimings) {
-        $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
-            var optGroupUserTimings = $(optGroupElement).find('.measurand-opt-group-USER_TIMINGS');
-
-            if (optGroupUserTimings) {
-                resetButtonElement.on("click", function () {
-                    OpenSpeedMonitor.domUtils.deselectAllOptions(optGroupUserTimings, true);
-                });
-                if (userTimings) {
-                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, userTimings, userTimings);
-                    if( userTimings.length > 0){
-                        optGroupUserTimings.show();
-                    }else{
-                        optGroupUserTimings.hide();
-                    }
-                }
-            }
-        })
+        loopOverOptGroups(executeUpdate, userTimings);
     };
 
-    function init(){
+    function init() {
+        loopOverOptGroups(executeInit, null);
+    }
+
+    function loopOverOptGroups(executeOperation, userTimings) {
         $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
             var optGroupUserTimings = $(optGroupElement).find('.measurand-opt-group-USER_TIMINGS');
-            optGroupUserTimings.hide();
+            if (optGroupUserTimings) {
+                executeOperation(optGroupUserTimings, userTimings);
+                if (userTimings && userTimings.length > 0) {
+                    optGroupUserTimings.show();
+                } else {
+                    optGroupUserTimings.hide();
+                }
+            }
         });
+    }
+
+    function executeInit(optGroupUserTimings, userTimings) {
+        resetButtonElement.on("click", function () {
+            OpenSpeedMonitor.domUtils.deselectAllOptions(optGroupUserTimings, true);
+        });
+    }
+
+    function executeUpdate(optGroupUserTimings, userTimings) {
+        OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, userTimings, null);
     }
 
     init();

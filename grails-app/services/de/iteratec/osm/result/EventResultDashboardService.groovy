@@ -165,11 +165,11 @@ public class EventResultDashboardService {
      * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
      */
     public OsmRickshawChart getEventResultDashboardHighchartGraphs(
-            Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> measurands, ErQueryParams queryParams) {
+            Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> selectedMeasurands, ErQueryParams queryParams) {
 
         Map<String, Number> gtValues = [:]
         Map<String, Number> ltValues = [:]
-        measurands.each {
+        selectedMeasurands.each {
             if (it.getMeasurandGroup() == MeasurandGroup.LOAD_TIMES) {
                 if (queryParams.minLoadTimeInMillisecs) {
                     gtValues[it.name] = queryParams.minLoadTimeInMillisecs
@@ -205,7 +205,7 @@ public class EventResultDashboardService {
                     new CriteriaSorting(sortingActive: false)
             )
         }
-        return calculateResultMap(eventResults, measurands, interval, gtValues, ltValues)
+        return calculateResultMap(eventResults, selectedMeasurands, interval, gtValues, ltValues)
     }
 
     /**
@@ -219,13 +219,13 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<SelectedMeasurand> measurands, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<SelectedMeasurand> selectedMeasurands, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
         Map<GraphLabel, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
             if (interval == CsiAggregationInterval.RAW) {
-                calculatedResultMap = calculateResultMapForRawData(measurands, eventResults, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForRawData(selectedMeasurands, eventResults, gtBoundary, ltBoundary)
             } else {
-                calculatedResultMap = calculateResultMapForAggregatedData(measurands, eventResults, interval, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForAggregatedData(selectedMeasurands, eventResults, interval, gtBoundary, ltBoundary)
             }
         }
         List<OsmChartGraph> graphs = []
@@ -241,10 +241,10 @@ public class EventResultDashboardService {
         return chart
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> measurands, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
 
         Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
-        measurands.each { SelectedMeasurand selectedMeasurand ->
+        selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
 
             eventResults.each { EventResult eventResult ->
                 URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
@@ -263,10 +263,10 @@ public class EventResultDashboardService {
                         oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
                 )
 
-                if(selectedMeasurand.cachedView == eventResult.cachedView){
+                if (selectedMeasurand.cachedView == eventResult.cachedView) {
                     Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                     if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
-                        GraphLabel graphLabel = new GraphLabel(eventResult, null,  selectedMeasurand)
+                        GraphLabel graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
                         OsmChartPoint chartPoint = new OsmChartPoint(
                                 time: eventResult.getJobResultDate().getTime(),
                                 csiAggregation: value,
@@ -286,13 +286,14 @@ public class EventResultDashboardService {
         return highchartPointsForEachGraph
     }
 
-    private boolean isInBounds(def value, SelectedMeasurand selected, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary){
-        if(value == null){
+    private boolean isInBounds(
+            def value, SelectedMeasurand selectedMeasurand, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+        if (value == null) {
             return false
         }
 
-        Number lt = selected.normalizeValue(gtBoundary[selected.name])
-        Number gt = selected.normalizeValue(ltBoundary[selected.name])
+        Number lt = selectedMeasurand.normalizeValue(gtBoundary[selectedMeasurand.name])
+        Number gt = selectedMeasurand.normalizeValue(ltBoundary[selectedMeasurand.name])
 
         boolean inBound = true
         if (lt) inBound &= value > lt
@@ -313,7 +314,7 @@ public class EventResultDashboardService {
                         Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                         if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
-                            GraphLabel key = new GraphLabel(eventResult,millisStartOfInterval,selectedMeasurand)
+                            GraphLabel key = new GraphLabel(eventResult, millisStartOfInterval, selectedMeasurand)
                             eventResultsToAggregate[key] << value
                         }
                     }
@@ -326,7 +327,7 @@ public class EventResultDashboardService {
             Double sum = 0
             Integer countValues = 0
             eventResultsToAggregate.each { key, value ->
-                testsDetailsURL = buildTestsDetailsURL(key.jobGroupId,key.measuredEventId,key.pageId,key.browserId,key.locationId,key.selectedMeasurand,key.millisStartOfInterval,interval,value.size())
+                testsDetailsURL = buildTestsDetailsURL(key.jobGroupId, key.measuredEventId, key.pageId, key.browserId, key.locationId, key.selectedMeasurand, key.millisStartOfInterval, interval, value.size())
 
                 performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
 
@@ -395,7 +396,7 @@ public class EventResultDashboardService {
                 } else {
                     graphs.add(new OsmChartGraph(
                             label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
-                            measurandGroup:graphLabel.selectedMeasurand.getMeasurandGroup(),
+                            measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                             points: highChartPoints))
                 }
             }

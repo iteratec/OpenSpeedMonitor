@@ -26,7 +26,7 @@ class SelectedMeasurandSpec extends Specification {
         when: "selected is constructed for optionValue"
         SelectedMeasurand selected = new SelectedMeasurand(optionValue, cachedView)
 
-        then: "selectedType is as expected"
+        then: "selectedMeasurandType is as expected"
         selected.selectedType == expectedSelectedType
 
         where:

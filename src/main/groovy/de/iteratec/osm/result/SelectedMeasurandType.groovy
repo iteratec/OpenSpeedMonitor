@@ -12,8 +12,9 @@ enum SelectedMeasurandType {
         MeasurandGroup getMeasurandGroup(String name) {
             return Measurand.valueOf(name).measurandGroup
         }
-        String getOptionPrefix(){
-            return null
+
+        String getOptionPrefix() {
+            return ""
         }
     },
     USERTIMING_MARK{
@@ -25,7 +26,8 @@ enum SelectedMeasurandType {
         MeasurandGroup getMeasurandGroup(String name) {
             return UserTimingType.MARK.getMeasurandGroup()
         }
-        String getOptionPrefix(){
+
+        String getOptionPrefix() {
             return "_UTMK_"
         }
     },
@@ -36,15 +38,19 @@ enum SelectedMeasurandType {
             }
             return userTiming?.getValue()
         }
+
         MeasurandGroup getMeasurandGroup(String name) {
             return UserTimingType.MEASURE.getMeasurandGroup()
         }
-        String getOptionPrefix(){
+
+        String getOptionPrefix() {
             return "_UTME_"
         }
     }
 
     abstract Double getValue(EventResult eventResult, String name)
+
     abstract MeasurandGroup getMeasurandGroup(String name)
+
     abstract String getOptionPrefix()
 }

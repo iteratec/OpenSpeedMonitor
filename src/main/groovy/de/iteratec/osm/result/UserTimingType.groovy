@@ -9,11 +9,11 @@ enum UserTimingType {
 
     MeasurandGroup measurandGroup
     String tagInResultXml
-    SelectedMeasurandType selectedType
+    SelectedMeasurandType selectedMeasurandType
 
     private UserTimingType(MeasurandGroup group, String groupTag, SelectedMeasurandType type){
         measurandGroup = group
         tagInResultXml = groupTag
-        selectedType = type
+        selectedMeasurandType = type
     }
 }
