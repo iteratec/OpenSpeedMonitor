@@ -1,8 +1,8 @@
 <div id="chart-container">
-    <div id="filter-dropdown-group" class="btn-group">
-        <div class="btn-group pull-left" data-toggle="buttons" id="besideSwitches">
-            <label class="btn btn-sm btn-default active" id="besideButton"><input type="radio" name="mode" >Beside</label>
-            <label class="btn btn-sm btn-default" id="inFrontButton"><input type="radio" name="mode" >In Front</label>
+    <div id="filter-dropdown-group">
+        <div class="btn-group pull-left" data-toggle="buttons" id="stackBarSwitch">
+            <label class="btn btn-sm btn-default" id="besideButton"><input type="radio" name="stackBars" value="0" >Beside</label>
+            <label class="btn btn-sm btn-default active" id="inFrontButton"><input type="radio" name="stackBars" value="1" checked>In Front</label>
         </div>
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
@@ -14,14 +14,14 @@
                 <g:message code="de.iteratec.osm.barchart.filter.noFilterHeader" default="no filter"/>
             </li>
             <li>
-                <a id="all-bars-desc" href="#">
-                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                <a id="all-bars-desc" class="chart-filter" data-filter="desc" href="#">
+                    <i class="fa fa-check" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterDesc"
                                default="no filter, sorting desc"/>
                 </a>
             </li>
             <li>
-                <a id="all-bars-asc" href="#">
+                <a id="all-bars-asc" class="chart-filter" data-filter="asc" href="#">
                     <i class="fa fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterAsc"
                                default="no filter, sorting asc"/>
@@ -42,11 +42,7 @@
     </div>
 
     <div id="svg-container">
+        <svg id="page-aggregation-svg" width="100%"></svg>
     </div>
 </div>
 <g:render template="/pageAggregation/adjustBarchartModal"/>
-<asset:script type="text/javascript">
-    $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/d3/groupedBarchartHorizontal.js" />',true,'groupedBarchartHorizontal');
-    });
-</asset:script>

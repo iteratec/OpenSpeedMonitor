@@ -31,9 +31,9 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId"
-                           class="btn btn-primary show-button">
-                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
+                        <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button">
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}
+                        </button>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
@@ -87,84 +87,12 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="/pageAggregation/pageAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
-
-        OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation().init();
-
         $(window).load(function() {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>')
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregationGuiHandling.js"/>')
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', "pageAggregation");
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
-
-        // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
-        var spinner = OpenSpeedMonitor.Spinner("#chart-container");
-
-        function drawGraph() {
-
-            var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
-            var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
-            var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-
-            var data = {
-                    from: selectedTimeFrame[0].toISOString(),
-                    to: selectedTimeFrame[1].toISOString(),
-                    selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
-                        return $(e).text()
-                    })),
-                    selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
-                        return $(e).text()
-                    })),
-                    selectedSeries: JSON.stringify(selectedSeries)
-                };
-
-            if (comparativeTimeFrame) {
-                data.fromComparative = comparativeTimeFrame[0].toISOString();
-                data.toComparative = comparativeTimeFrame[1].toISOString();
-            }
-
-            OpenSpeedMonitor.ChartModules.PageAggregationBarChart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.PageAggregationHorizontal("svg-container");
-
-            spinner.start();
-            $.ajax({
-                type: 'POST',
-                data: data,
-                url: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
-                dataType: "json",
-                success: function (data) {
-                    spinner.stop();
-                    $("#chart-card").removeClass("hidden");
-                    if (!$("#error-div").hasClass("hidden"))
-                        $("#error-div").addClass("hidden");
-
-                    if (!$.isEmptyObject(data)) {
-                        $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.drawChart(data);
-                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-                        $("#dia-save-chart-as-png").removeClass("disabled");
-                    } else {
-                        $('#warning-no-data').show();
-                    }
-                },
-                error: function (e) {
-                    spinner.stop();
-                    if (e.responseText == "no data") {
-                        $("#error-div").addClass("hidden");
-                        $("#chart-card").removeClass("hidden");
-                        $('#warning-no-data').show();
-                    }
-                    else {
-                        $("#error-div").removeClass("hidden");
-                        $("#chart-card").removeClass("hidden");
-                        $("#error-message").html(e.responseText);
-                    }
-                }
-            });
-        }
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-
     </asset:script>
 </content>
 
