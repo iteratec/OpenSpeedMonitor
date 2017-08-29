@@ -1,7 +1,12 @@
 //= require /bower_components/d3/d3.min.js
-//= require /d3/chartLabelUtil
-//= require /d3/trafficLightDataProvider
-//= require /d3/chartColorProvider
+//= require /chartComponents/chartBars.js
+//= require /chartComponents/chartBarScore.js
+//= require /d3/chartColorProvider.js
+//= require /chartComponents/chartLegend.js
+//= require /chartComponents/chartSideLabels.js
+//= require /chartComponents/chartHeader.js
+//= require /d3/chartLabelUtil.js
+//= require /jobGroupAggregation/jobGroupAggregationChartData.js
 //= require_self
 
 "use strict";
@@ -9,411 +14,142 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (chartIdentifier) {
+OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selector) {
+    var svg = d3.select(selector);
+    var chartBarsComponents = {};
+    var chartBars = OpenSpeedMonitor.ChartComponents.ChartBars();
+    var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
+    var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
+    var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
+    var data = OpenSpeedMonitor.ChartModules.JobGroupAggregationData(svg);
+    var transitionDuration = 500;
 
-    var svg,
-        topMargin = 50,
-        svgContainer = $("#" + chartIdentifier),
-        outerMargin = 25,
-        barHeight = 40,
-        barPadding = 10,
-        valueMarginInBar = 4,
-        colorProvider = OpenSpeedMonitor.ChartColorProvider(),
-        absoluteMaxValue = 0,
-        absoluteMaxYOffset = 0,
-        labelWidths = [],
-        xScale = d3.scale.linear(),
-        initialBarWidth = 20,
-        countTrafficLightBar = 1,
-        allBarsGroup,
-        trafficLightBars,
-        transitionDuration = 600,
-        svgHeight,
-        filterRules = {},
-        actualBarchartData,
-        commonLabelParts,
-        headerLine,
-        barSelected;
-    var unitPrecisions = {
-        MB: 2
+    var setData = function (inputData) {
+        data.setData(inputData);
+        chartHeaderComponent.setData(data.getDataForHeader());
+        chartBarScoreComponent.setData(data.getDataForBarScore());
+        chartSideLabelsComponent.setData(data.getDataForSideLabels());
+        chartBars.setData(data.getDataForBars());
     };
 
-    var drawChart = function (barchartData) {
-
-        if (svg === undefined) {
-            initChart();
+    var setDataForBars = function () {
+        if (!chartBarsComponents) {
+            var component = OpenSpeedMonitor.ChartComponents.ChartBars();
+            component.on("mouseover", function () {
+                // chartLegendComponent.mouseOverEntry({id: measurand});
+            });
+            component.on("mouseout", function () {
+                // chartLegendComponent.mouseOutEntry({id: measurand});
+            });
+            component.on("click", function () {
+                // chartLegendComponent.clickEntry({id: measurand});
+            });
+            chartBarsComponents = component;
         }
-
-        initChartData(barchartData);
-
-        initFilterDropdown();
-        drawAllBars();
-
+        var componentsToRender = chartBarsComponents;
+        componentsToRender.setData(data.getDataForBars());
+        chartBarsComponents = componentsToRender;
     };
 
-    var initChart = function () {
+    var render = function () {
+        var shouldShowScore = data.hasLoadTimes();
+        var componentMargin = OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin;
+        var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
+        var barScorePosY = data.getChartBarsHeight() + componentMargin;
+        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
+        var chartHeight = barScorePosY + barScoreHeight + headerHeight;
 
-        $("#chart-card").removeClass("hidden");
-
-        svg = d3.select("#" + chartIdentifier).append("svg")
-            .attr("class", "d3chart");
-
-        headerLine = svg.append("g");
-        allBarsGroup = svg.append("g");
-        trafficLightBars = svg.append("g");
-
-        $(window).resize(drawAllBars);
-    };
-
-    var initChartData = function (barchartData) {
-
-        barchartData.series.forEach(function (series) {
-            var labelUtil = OpenSpeedMonitor.ChartModules.ChartLabelUtil(series.data, barchartData.i18nMap);
-            series.data = labelUtil.getSeriesWithShortestUniqueLabels();
-            commonLabelParts = labelUtil.getCommonLabelParts();
-            series.data.sort(function (x, y) {
-                return d3.ascending(x.value, y.value);
-            });
-        });
-
-        barchartData.originalSeries = clone(barchartData.series);
-
-        actualBarchartData = barchartData;
-
-    };
-
-    var drawAllBars = function () {
-
-        updateSvgWidth();
-
-        actualBarchartData.series.forEach(function (currentSeries) {
-            var seriesData = currentSeries.data;
-            var unitName = currentSeries.dimensionalUnit;
-
-            absoluteMaxValue = 0.0;
-            drawSeries(seriesData, unitName);
-        });
-
-        drawTrafficLight();
-
-        var headerData = [{headerText: commonLabelParts}];
-        drawHeader(headerData);
-
-    };
-
-    var updateSvgWidth = function () {
-        svg.attr("width", svgContainer.width());
-    };
-
-    var drawHeader = function (headerData) {
-
-        var headerText = headerLine.selectAll("text")
-            .data(headerData, function (d) {
-                return d.headerText;
-            });
-
-        // exit
-
-        headerText.exit()
+        svg
             .transition()
             .duration(transitionDuration)
-            .remove();
+            .style("height", chartHeight)
+            .each("end", rerenderIfWidthChanged);
 
-        // enter
+        renderHeader(svg);
+        renderSideLabels(svg, headerHeight);
 
-        headerText.enter().append("text")
-            .text(function (d) {
-                return d.headerText;
-            })
-            .attr("y", barPadding + barHeight / 2)
-            .attr("dy", ".35em") //vertical align middle
-            .attr("cx", 0)
-            .attr("transform", function (d) {
-                return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
-            });
-
-        //update
-
-        headerText
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", function (d) {
-                return "translate(" + parseInt(outerMargin + barPadding + getMaxLabelWidth()) + ")";
-            });
-
-    }
-
-    var drawSeries = function (seriesData, unitName) {
-        var defineXScale = function () {
-            var paddingBetweenLabelAndBar = barPadding;
-            xScale
-                .domain([0, absoluteMaxValue])
-                .range([0, svg.attr("width") - outerMargin * 2 - getMaxLabelWidth() - paddingBetweenLabelAndBar]);
-        };
-
-        svgHeight = topMargin + (seriesData.length + countTrafficLightBar) * (barHeight + barPadding) + barPadding;
-        svg.attr("height", svgHeight);
-        absoluteMaxYOffset = (seriesData.length - 1) * (barHeight + barPadding) + barPadding;
-
-        absoluteMaxValue = Math.max(absoluteMaxValue, d3.max(seriesData, function (d) {
-            return d.value;
-        }));
-
-        var singleBarGroups = allBarsGroup.selectAll("g")
-            .data(seriesData, function (d) {
-                return d.label + d.measurand;
-            });
-
-        // exit ////////////////////////////////////////////////////////////////////////////////////
-
-        singleBarGroups.exit()
-            .transition()
-            .duration(transitionDuration)
-            .attr("width", 0)
-            .remove()
-            .each(function (elem) {
-                labelWidths = labelWidths.filter(function (labelWidth) {
-                    return labelWidth.identifier !== elem.label + elem.measurand;
-                })
-            });
-
-        // enter ////////////////////////////////////////////////////////////////////////////////////
-
-        var singleBarGroupsEnter = singleBarGroups.enter()
+        var contentGroup = svg.selectAll(".bars-content-group").data([1]);
+        contentGroup.enter()
             .append("g")
-            .attr("cx", 0)
-            .attr("transform", function (d, index) {
-                var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
-                return "translate(" + outerMargin + "," + yOffset + ")";
-            });
-
-        singleBarGroupsEnter.append("text")
-            .attr("y", barHeight / 2)
-            .attr("dy", ".35em") //vertical align middle
-            .classed("d3chart-label", true)
-            .text(function (d) {
-                return d.label;
-            })
-            .each(function (elem) {
-                labelWidths.push({identifier: elem.label + elem.measurand, width: this.getBBox().width})
-            });
-
-        defineXScale();
-
-        singleBarGroupsEnter.append("rect")
-            .attr("transform", "translate(" + parseInt(getMaxLabelWidth() + barPadding) + ", 0)")
-            .attr("class", "d3chart-bar")
-            .attr("height", barHeight)
-            .attr("width", initialBarWidth)
-            .attr("fill", function (d, i) {
-                var colorscale = colorProvider.getColorscaleForMeasurandGroup(unitName);
-                return colorscale(0);
-            })
-            .on("click", highlightClickedBar);
-
-        singleBarGroupsEnter.append("text")
-            .classed("d3chart-value", true)
-            .attr("y", barHeight / 2)
-            .attr("dx", -valueMarginInBar + getMaxLabelWidth()) //margin right
-            .attr("text-anchor", "end")
-            .text(function (d) {
-                return formatValue(d.value, unitName) + " " + unitName;
-            });
-
-
-        // update ////////////////////////////////////////////////////////////////////////////////////
-
-        singleBarGroups
+            .classed("bars-content-group", true);
+        contentGroup
             .transition()
             .duration(transitionDuration)
-            .attr("transform", function (d, index) {
-                var yOffset = (topMargin + index * (barHeight + barPadding) + barPadding);
-                return "translate(" + outerMargin + "," + yOffset + ")";
-            })
-            .select("rect")
-            .attr("width", function (d) {
-                return xScale(d.value);
-            });
-
-        singleBarGroups
-            .select(".d3chart-value")
-            .transition()
-            .duration(transitionDuration)
-            .attr("x", function (d) {
-                var width = this.getBBox().width;
-                return Math.max(width + valueMarginInBar, xScale(d.value));
-            })
-            .attr("opacity", function (d) {
-                // Hide labels if they are larger than the rect to draw in
-                var textBox = this.getBBox();
-                var rectWidth = xScale(d.value);
-                if (textBox.width > rectWidth - 3 * valueMarginInBar) {
-                    return 0;
-                }
-                return 1;
-            });
-
-        defineXScale();
-
+            .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+        renderBars(contentGroup);
+        renderBarScore(contentGroup, shouldShowScore, barScorePosY);
     };
 
-
-    var formatValue = function (value, unit) {
-        var precision = unitPrecisions[unit] || 0;
-        return parseFloat(value).toFixed(precision);
-    };
-
-    var getMaxLabelWidth = function () {
-        return d3.max(labelWidths, function (d) {
-            return d.width;
-        });
-    };
-
-    var highlightClickedBar = function (d) {
-        if (barSelected !== d.grouping) {
-            barSelected = d.grouping;
-            d3.selectAll(".d3chart-bar").classed("d3chart-faded", true);
-            d3.select(this).classed("d3chart-faded", false);
-        } else {
-            d3.selectAll(".d3chart-bar").classed("d3chart-faded", false);
-            barSelected = null;
-        }
-    };
-
-    var initFilterDropdown = function () {
-
-        var $filterDropdownGroup = $("#filter-dropdown-group");
-
-        // remove old filter
-        $filterDropdownGroup.find('.filterRule').remove();
-
-        if ($filterDropdownGroup.hasClass("hidden"))
-            $filterDropdownGroup.removeClass("hidden");
-
-        $filterDropdownGroup.find("#all-bars-desc").click(function (e) {
-            filterBarChartData(true);
-            toogleFilterCheckmarks(e.target);
-        });
-        $filterDropdownGroup.find("#all-bars-asc").click(function (e) {
-            filterBarChartData(false);
-            toogleFilterCheckmarks(e.target);
-        })
-    };
-
-    var clone = function (toClone) {
-        return JSON.parse(JSON.stringify(toClone));
-    };
-
-    var filterBarChartData = function (desc) {
-
-        actualBarchartData.series = clone(actualBarchartData.originalSeries);
-
-        if (desc) {
-            actualBarchartData.series.forEach(function (series) {
-                series.data.sort(function (x, y) {
-                    return d3.descending(x.value, y.value);
-                });
-            });
-        } else {
-            actualBarchartData.series.forEach(function (series) {
-                series.data.sort(function (x, y) {
-                    return d3.ascending(x.value, y.value);
-                });
-            });
-        }
-        drawAllBars()
-
-    };
-
-    var toogleFilterCheckmarks = function (listItem) {
-        $('.filterActive').toggleClass("filterInactive filterActive");
-
-        // reset checkmark to 'ascending' if 'Show' gets clicked
-        // otherwise set checkmark to the list item one has clicked on
-        if (typeof listItem == 'undefined') {
-            $('#all-bars-asc > .filterInactive').toggleClass("filterActive filterInactive");
-        } else {
-            $(listItem).find(".filterInactive").toggleClass("filterActive filterInactive");
-        }
-    };
-
-    var drawTrafficLight = function () {
-
-        var trafficLightData = OpenSpeedMonitor.ChartModules.TrafficLightDataProvider.getTimeData(absoluteMaxValue);
-
-        var trafficLight = trafficLightBars.selectAll("g")
-            .data(trafficLightData, function (d) {
-                return d.id
-            });
-
-        //exit
-
-        trafficLight.exit()
-            .transition()
-            .duration(transitionDuration)
-            .attr("width", 0)
+    var renderHeader = function (svg) {
+        var header = svg.selectAll(".header-group").data([chartHeaderComponent]);
+        header.exit()
             .remove();
-
-        // enter
-
-        var trafficLightEnter = trafficLight.enter()
+        header.enter()
             .append("g")
-            .attr("cx", 0)
-            .attr("transform", function (d, index) {
-                var xOffset = outerMargin + getMaxLabelWidth() + xScale(d.lowerBoundary) + barPadding;
-                return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
-            });
-
-        trafficLightEnter.append("rect")
-            .attr("height", barHeight)
-            .attr("width", initialBarWidth)
-            .attr("fill", function (d) {
-                return d.fill;
-            })
-            .attr("fill-opacity", function (d) {
-                return d.fillOpacity;
-            })
-            .transition()
-            .duration(transitionDuration);
-
-        trafficLightEnter.append("text")
-            .attr("class", function (d) {
-                return d.cssClass;
-            })
-            .text(function (d) {
-                return d.name;
-            })
-            .attr("y", barHeight / 2)
-            .attr("dy", ".35em") //vertical align middle
-            .attr("text-anchor", "middle");
-
-        //update
-
-        trafficLight
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", function (d, index) {
-                var xOffset = outerMargin + getMaxLabelWidth() + xScale(d.lowerBoundary) + barPadding;
-                return "translate(" + xOffset + ", " + (topMargin + absoluteMaxYOffset + barHeight + barPadding * 2) + ")";
-            })
-            .select('rect')
-            .attr("width", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary);
-            });
-
-        trafficLight
-            .select("text")
-            .transition()
-            .duration(transitionDuration)
-            .attr("x", function (d) {
-                return xScale(d.upperBoundary - d.lowerBoundary) / 2;
-            });
+            .classed("header-group", true);
+        header.call(chartHeaderComponent.render);
     };
 
-    initChart();
+    var renderSideLabels = function (svg, posY) {
+        var sideLabels = svg.selectAll(".side-labels-group").data([chartSideLabelsComponent]);
+        sideLabels.exit()
+            .remove();
+        sideLabels.enter()
+            .append("g")
+            .classed("side-labels-group", true);
+        sideLabels
+            .attr("transform", "translate(0, " + posY + ")")
+            .call(chartSideLabelsComponent.render)
+    };
+
+    var renderBarScore = function (svg, shouldShowScore, posY) {
+        var barScore = svg.selectAll(".chart-score-group").data([chartBarScoreComponent]);
+        barScore.exit()
+            .remove();
+        barScore.enter()
+            .append("g")
+            .attr("class", "chart-score-group")
+            .attr("transform", "translate(0, " + posY + ")");
+        barScore
+            .call(chartBarScoreComponent.render)
+            .transition()
+            .style("opacity", shouldShowScore ? 1 : 0)
+            .duration(transitionDuration)
+            .attr("transform", "translate(0, " + posY + ")");
+    };
+
+    var renderBars = function (svg) {
+        var bars = svg.selectAll(".chart-bars").data([chartBars]);
+        bars.exit()
+            .remove();
+        bars.enter()
+            .append("g")
+            .attr("class", "chart-bars")
+        bars
+            .call(chartBars.render)
+            .transition()
+            .style("opacity", 1)
+            .duration(transitionDuration)
+    };
+
+    var rerenderIfWidthChanged = function () {
+        if (data.needsAutoResize()) {
+            setData({autoWidth: true});
+            render();
+        }
+    };
+
+    // var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {
+    //     Object.keys(chartBarsComponents).forEach(function(measurand) {
+    //         var isRestrained = anyHighlighted && !(doHighlight && measurand === measurandToHighlight);
+    //         chartBarsComponents[measurand].setData({isRestrained: isRestrained});
+    //     });
+    //     render();
+    // };
 
     return {
-        drawChart: drawChart
+        render: render,
+        setData: setData
     };
 
 });

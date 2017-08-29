@@ -16,7 +16,7 @@
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
-<div class="card hidden" id="chart-card">
+<div class="card" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>
@@ -89,6 +89,10 @@
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
         });
 
+        $(window).on('resize', function() {
+            drawGraph();
+        });
+
         // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
         var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
@@ -98,7 +102,7 @@
             var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
             OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart = OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal("svg-container");
+              OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal("#jobGroupAggregationChart");
 
             spinner.start();
             $.ajax({
@@ -120,7 +124,9 @@
 
                     if (!$.isEmptyObject(data)) {
                         $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.drawChart(data);
+                        // OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.drawChart(data);
+                        OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.setData(data);
+                        OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.render();
                         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
                         $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {

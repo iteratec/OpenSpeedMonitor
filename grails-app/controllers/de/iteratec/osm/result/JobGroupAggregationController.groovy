@@ -101,11 +101,12 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         JobGroupAggregationChartSeriesDTO jobGroupAggregationChartSeriesDTO = new JobGroupAggregationChartSeriesDTO()
         jobGroupAggregationChartSeriesDTO.measurand = i18nService.msg("de.iteratec.isr.measurand.${allMeasurands[0]}", allMeasurands[0])
         jobGroupAggregationChartSeriesDTO.unit = (allMeasurands[0] as Measurand).measurandGroup.unit.label
+        jobGroupAggregationChartSeriesDTO.measurandGroup = Measurand.valueOf(allMeasurands[0]).measurandGroup
 
         //Jobgroup groups and their values
         allEventResults.each { series ->
             JobGroupDTO jobGroupDTO = new JobGroupDTO()
-            jobGroupDTO.group = series[0]
+            jobGroupDTO.group = series[0].name
             jobGroupDTO.value = series[1]
             jobGroupAggregationChartSeriesDTO.groupData.add(jobGroupDTO);
         }
