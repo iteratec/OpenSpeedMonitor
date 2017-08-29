@@ -17,7 +17,9 @@ class BarchartEventResultFilterBuilder {
     }
 
     BarchartEventResultFilterBuilder withJobResultDate(Date from, Date to){
-        filter.between('jobResultDate', from, to)
+        if(from && to){
+            filter.between('jobResultDate', from, to)
+        }
         return this
     }
     BarchartEventResultFilterBuilder withPage(List<Page> allPages){
@@ -34,7 +36,7 @@ class BarchartEventResultFilterBuilder {
     }
 
     BarchartEventResultFilterBuilder withUserTimings(List<Selected> selectedUserTimings){
-        if(selectedUserTimings && selectedUserTimings.size() >= 1){
+        if(selectedUserTimings){
             List<String> userTimingNames = selectedUserTimings.findAll{it.selectedType != SelectedType.MEASURAND}.collect{it.getDatabaseRelevantName()}
             filter.userTimings {
                 or{

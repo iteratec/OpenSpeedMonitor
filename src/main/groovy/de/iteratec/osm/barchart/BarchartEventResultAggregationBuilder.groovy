@@ -21,7 +21,7 @@ class BarchartEventResultAggregationBuilder {
             groupedProperties.add('page')
         }
 
-        Closure projection = createProjection(groupedProperties, selectedList);
+        Closure projection = createProjection(groupedProperties, selectedList)
         List<Selected> userTimings = []
         if (selectedList.any { it.selectedType != SelectedType.MEASURAND }) {
             userTimings = selectedList
