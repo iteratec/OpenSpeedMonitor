@@ -31,14 +31,13 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
     };
 
-    var render = function (selector) {
+    var render = function (selection) {
         var xScale = d3.scale.linear().range([0, width]);
         var yScale = d3.scale.ordinal().rangeBands([0, height]);
 
         xScale.domain([minValue, maxValue]);
         yScale.domain(data.map(function(d) { return d.id; }));
-
-        var bars = d3.select(selector).selectAll(".bar").data(data, function (d) {
+        var bars = selection.selectAll(".bar").data(data, function (d) {
             return d.id;
         });
         renderExit(bars.exit());
