@@ -4,7 +4,6 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Selected
 import de.iteratec.osm.result.SelectedType
 import de.iteratec.osm.result.UserTimingType
@@ -52,16 +51,16 @@ class BarchartAggregationService {
 
         List<BarchartSeries> comparatives = []
         if (cmd.fromComparative && cmd.toComparative) {
-            Date comparativeFrom = cmd.fromComparative.toDate()
-            Date comparativeTo = cmd.toComparative.toDate()
-            comparatives = aggregateFor(groupProperties, allSelected, comparativeFrom, comparativeTo, allJobGroups, allPages)
+            Date fromComparative = cmd.fromComparative.toDate()
+            Date toComparative = cmd.toComparative.toDate()
+            comparatives = aggregateFor(groupProperties, allSelected, fromComparative, toComparative, allJobGroups, allPages)
         }
 
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
     private
-    def aggregateFor(List<String> groupProperties, List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
+    List<BarchartSeries> aggregateFor(List<String> groupProperties, List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
         if (allSelected.size() < 1) {
             return []
         }
@@ -70,29 +69,10 @@ class BarchartAggregationService {
         if (isMeasurand & isUserTiming) {
             return []
         }
-        List<Selected> userTimings = []
-        if (isUserTiming) {
-            userTimings = allSelected
-        }
-        ProjectionWizard wizard = new ProjectionWizard()
-        Closure projection = wizard.createProjection(groupProperties, allSelected)
+        BarchartEventResultAggregationBuilder eventResultAggregationBuilder = new BarchartEventResultAggregationBuilder()
 
-        List<Map> transformedAggregations = wizard.transformAggregations(aggregateEventResults(projection, from, to, allJobGroups, allPages, userTimings))
+        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(groupProperties, from, to, allJobGroups, allPages, allSelected, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
         return isMeasurand ? createListForMeasurandAggregation(allSelected, transformedAggregations) : createListForUserTimingAggregation(allSelected, transformedAggregations)
-    }
-
-    private
-    def aggregateEventResults(Closure projection, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<Selected> userTimings) {
-        return EventResult.createCriteria().list {
-            new BarChartAggregationFilterBuilder(delegate, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                    .withJobResultDate(from, to)
-                    .withJobGroup(allJobGroups)
-                    .withPage(allPages)
-                    .withUserTimings(userTimings)
-                    .getFilter()
-            projection.delegate = delegate
-            projection()
-        }
     }
 
     private List<BarchartSeries> mergeAggregationsWithComparatives(List<BarchartSeries> values, List<BarchartSeries> comparativeValues) {
@@ -124,7 +104,6 @@ class BarchartAggregationService {
                     }
             )
         }
-
         return result
     }
 
@@ -149,7 +128,6 @@ class BarchartAggregationService {
                     page: aggregation.page
             )
         }
-
     }
 
 }

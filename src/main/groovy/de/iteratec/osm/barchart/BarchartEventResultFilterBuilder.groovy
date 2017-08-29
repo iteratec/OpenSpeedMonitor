@@ -8,32 +8,32 @@ import de.iteratec.osm.result.SelectedType
 /**
  * Created by mwg on 08.08.2017.
  */
-class BarChartAggregationFilterBuilder {
+class BarchartEventResultFilterBuilder {
     Object filter
 
-    BarChartAggregationFilterBuilder(Object filter, minValue, maxValue){
+    BarchartEventResultFilterBuilder(Object filter, minValue, maxValue){
         this.filter = filter
         this.filter.between('fullyLoadedTimeInMillisecs', minValue, maxValue)
     }
 
-    BarChartAggregationFilterBuilder withJobResultDate(Date from, Date to){
+    BarchartEventResultFilterBuilder withJobResultDate(Date from, Date to){
         filter.between('jobResultDate', from, to)
         return this
     }
-    BarChartAggregationFilterBuilder withPage(List<Page> allPages){
+    BarchartEventResultFilterBuilder withPage(List<Page> allPages){
         if(allPages && allPages.size() >= 1){
             filter.in('page', allPages)
         }
         return this
     }
-    BarChartAggregationFilterBuilder withJobGroup(List<JobGroup> allJobGroups){
+    BarchartEventResultFilterBuilder withJobGroup(List<JobGroup> allJobGroups){
         if(allJobGroups && allJobGroups.size() >= 1){
             filter.in('jobGroup', allJobGroups)
         }
         return this
     }
 
-    BarChartAggregationFilterBuilder withUserTimings(List<Selected> selectedUserTimings){
+    BarchartEventResultFilterBuilder withUserTimings(List<Selected> selectedUserTimings){
         if(selectedUserTimings && selectedUserTimings.size() >= 1){
             List<String> userTimingNames = selectedUserTimings.findAll{it.selectedType != SelectedType.MEASURAND}.collect{it.getDatabaseRelevantName()}
             filter.userTimings {
