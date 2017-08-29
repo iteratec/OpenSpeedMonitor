@@ -49,10 +49,8 @@ import static org.junit.Assert.assertThat
  */
 @TestFor(ProxyService)
 @Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
-@Ignore
+@Ignore('[IT-1703] Re-Write these tests without mocking http requests (e.g. without betamax or similar library')
 class FetchResultsFromWptserverTests extends Specification {
-
-    //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
 
     public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
     public static final String WPTSERVER_SINGLESTEP_URL = 'www.webpagetest.org'
