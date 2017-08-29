@@ -6,7 +6,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection) {
     var svg = svgSelection;
-    var sideLabelData;
+    var sideLabelData = [];
     var rawSeries = [];
     var activeFilter = "desc";
     var headerText = "";
@@ -20,13 +20,19 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var setData = function (data) {
         rawSeries = data.series || rawSeries;
         i18n = data.i18nMap || i18n;
+        var labelList = [];
         if (data.series) {
-            sideLabelData = [];
-            headerText = data.series.measurand
             data.series.groupData.forEach(function(element) {
-                sideLabelData.push(element.group);
+                labelList.push({
+                    jobGroup: element.jobGroup,
+                    measurand: rawSeries.measurand
+                });
             });
         }
+
+        var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(labelList, data.i18nMap);
+        headerText = chartLabelUtils.getCommonLabelParts(false);
+        sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
         fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
         chartBarsWidth = fullWidth - OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin - chartSideLabelsWidth;
@@ -77,7 +83,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         var mappedValues = [];
         rawValues.groupData.forEach(function (series){
             var mappedSeries = {};
-            mappedSeries.id = series.group;
+            mappedSeries.id = series.jobGroup;
             mappedSeries.value = series.value;
             mappedSeries.unit = rawValues.unit;
             mappedValues.push(mappedSeries);

@@ -106,7 +106,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         //Jobgroup groups and their values
         allEventResults.each { series ->
             JobGroupDTO jobGroupDTO = new JobGroupDTO()
-            jobGroupDTO.group = series[0].name
+            jobGroupDTO.jobGroup = series[0].name
             jobGroupDTO.value = series[1]
             jobGroupAggregationChartSeriesDTO.groupData.add(jobGroupDTO);
         }

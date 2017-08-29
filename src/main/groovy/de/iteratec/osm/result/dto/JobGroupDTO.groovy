@@ -1,6 +1,6 @@
 package de.iteratec.osm.result.dto
 
 class JobGroupDTO {
-    String group = ""
+    String jobGroup = ""
     Double value = null
 }
