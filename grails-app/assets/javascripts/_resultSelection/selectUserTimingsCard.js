@@ -10,7 +10,7 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     };
 
     function init() {
-        loopOverOptGroups(executeInit, null);
+        loopOverOptGroups(executeInit);
     }
 
     function loopOverOptGroups(executeOperation, userTimings) {
@@ -27,7 +27,7 @@ OpenSpeedMonitor.selectUserTimings = (function () {
         });
     }
 
-    function executeInit(optGroupUserTimings, userTimings) {
+    function executeInit(optGroupUserTimings) {
         resetButtonElement.on("click", function () {
             OpenSpeedMonitor.domUtils.deselectAllOptions(optGroupUserTimings, true);
         });
