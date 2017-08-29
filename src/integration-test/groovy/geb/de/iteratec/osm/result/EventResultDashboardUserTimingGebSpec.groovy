@@ -93,7 +93,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
         isUserTimingsHidden() == true
     }
 
@@ -122,7 +122,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
         isUserTimingsHidden() == true
     }
 
@@ -152,7 +152,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
         isUserTimingsHidden() == true
     }
 
@@ -186,7 +186,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor("USER_TIMINGS") == 1
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
         isUserTimingsHidden() == true
     }
 
