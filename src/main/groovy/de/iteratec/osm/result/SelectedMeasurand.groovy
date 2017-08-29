@@ -69,8 +69,12 @@ class SelectedMeasurand {
         return Measurand.values().any { it.toString() == name }
     }
 
+    static boolean couldBeUserTiming(UserTimingType userTimingType, String name){
+        return name.length() > userTimingType.selectedMeasurandType.optionPrefix.length() &&  name.startsWith(userTimingType.selectedMeasurandType.optionPrefix)
+    }
+
     boolean isValid(String name) {
         name = name ?: ""
-        return isNoUserTiming(name) || name.startsWith(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix) || name.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)
+        return isNoUserTiming(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
     }
 }
