@@ -104,7 +104,7 @@ dependencies {
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'org.grails.plugins:joda-time:2.0.0'
     compile 'org.grails.plugins:spring-security-core:3.1.1'
-    compile 'org.grails.plugins:spring-security-ui:3.0.0.M2'
+    compile 'org.grails.plugins:spring-security-ui:3.0.2'
     compile 'org.grails.plugins:greenmail:2.0.0.M1'
     compile 'org.grails.plugins:mail:2.0.0.RC6'
     compile 'org.grails.plugins:quartz:2.0.8'
