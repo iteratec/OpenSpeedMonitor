@@ -21,13 +21,13 @@ class BarchartEventResultFilterBuilder {
         return this
     }
     BarchartEventResultFilterBuilder withPage(List<Page> allPages){
-        if(allPages && allPages.size() >= 1){
+        if(allPages){
             filter.in('page', allPages)
         }
         return this
     }
     BarchartEventResultFilterBuilder withJobGroup(List<JobGroup> allJobGroups){
-        if(allJobGroups && allJobGroups.size() >= 1){
+        if(allJobGroups){
             filter.in('jobGroup', allJobGroups)
         }
         return this

@@ -17,62 +17,59 @@ class BarchartAggregationService {
     I18nService i18nService
 
     List<BarchartSeries> getBarchartSeriesFor(GetBarchartCommand cmd) {
-        List<String> groupProperties = []
         List<JobGroup> allJobGroups = null
-        if (cmd.selectedJobGroups && cmd.selectedJobGroups.size() >= 1) {
+        if (cmd.selectedJobGroups) {
             allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
-            groupProperties.add('jobGroup')
         }
         List<Page> allPages = null
-        if (cmd.selectedPages && cmd.selectedPages.size() >= 1) {
+        if (cmd.selectedPages) {
             allPages = Page.findAllByNameInList(cmd.selectedPages)
-            groupProperties.add('page')
         }
-
         List<Selected> allSelected = cmd.selectedSeries*.measurands.flatten().collect {
             new Selected(it, CachedView.UNCACHED)
         }
+        Date from = cmd.from.toDate()
+        Date to = cmd.to.toDate()
+        Date fromComparative = null
+        Date toComparative = null
+        if (cmd.fromComparative && cmd.toComparative) {
+            fromComparative = cmd.fromComparative.toDate()
+            toComparative = cmd.toComparative.toDate()
+        }
 
         List<BarchartSeries> result = []
-        result.addAll(aggregateForMeasurandOrUserTiming(groupProperties, allSelected.findAll {
+        result.addAll(aggregateWithComparativesForMeasurandOrUserTiming(allSelected.findAll {
             it.selectedType == SelectedType.MEASURAND
-        }, cmd, allJobGroups, allPages))
-        result.addAll(aggregateForMeasurandOrUserTiming(groupProperties, allSelected.findAll {
+        }, from, to, fromComparative, toComparative, allJobGroups, allPages))
+        result.addAll(aggregateWithComparativesForMeasurandOrUserTiming(allSelected.findAll {
             it.selectedType != SelectedType.MEASURAND
-        }, cmd, allJobGroups, allPages))
+        }, from, to, fromComparative, toComparative, allJobGroups, allPages))
 
         return result
     }
 
-    List<BarchartSeries> aggregateForMeasurandOrUserTiming(List<String> groupProperties, List<Selected> allSelected, GetBarchartCommand cmd, List<JobGroup> allJobGroups, List<Page> allPages) {
-        Date from = cmd.from.toDate()
-        Date to = cmd.to.toDate()
-        List<BarchartSeries> aggregations = aggregateFor(groupProperties, allSelected, from, to, allJobGroups, allPages)
-
+    List<BarchartSeries> aggregateWithComparativesForMeasurandOrUserTiming(List<Selected> allSelected, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
+        List<BarchartSeries> aggregations = aggregateFor(allSelected, from, to, allJobGroups, allPages)
         List<BarchartSeries> comparatives = []
-        if (cmd.fromComparative && cmd.toComparative) {
-            Date fromComparative = cmd.fromComparative.toDate()
-            Date toComparative = cmd.toComparative.toDate()
-            comparatives = aggregateFor(groupProperties, allSelected, fromComparative, toComparative, allJobGroups, allPages)
+        if (fromComparative && toComparative) {
+            comparatives = aggregateFor(allSelected, fromComparative, toComparative, allJobGroups, allPages)
         }
-
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
     private
-    List<BarchartSeries> aggregateFor(List<String> groupProperties, List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
-        if (allSelected.size() < 1) {
+    List<BarchartSeries> aggregateFor(List<Selected> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
+        if (!allSelected) {
             return []
         }
-        boolean isUserTiming = allSelected.any { it.selectedType != SelectedType.MEASURAND }
-        boolean isMeasurand = allSelected.any { it.selectedType == SelectedType.MEASURAND }
-        if (isMeasurand & isUserTiming) {
+        boolean hasUserTiming = allSelected.any { it.selectedType != SelectedType.MEASURAND }
+        boolean hasMeasurand = allSelected.any { it.selectedType == SelectedType.MEASURAND }
+        if (hasMeasurand & hasUserTiming) {
             return []
         }
         BarchartEventResultAggregationBuilder eventResultAggregationBuilder = new BarchartEventResultAggregationBuilder()
-
-        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(groupProperties, from, to, allJobGroups, allPages, allSelected, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-        return isMeasurand ? createListForMeasurandAggregation(allSelected, transformedAggregations) : createListForUserTimingAggregation(allSelected, transformedAggregations)
+        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(from, to, allJobGroups, allPages, allSelected, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        return hasMeasurand ? createListForMeasurandAggregation(allSelected, transformedAggregations) : createListForUserTimingAggregation(allSelected, transformedAggregations)
     }
 
     private List<BarchartSeries> mergeAggregationsWithComparatives(List<BarchartSeries> values, List<BarchartSeries> comparativeValues) {
@@ -87,13 +84,11 @@ class BarchartAggregationService {
 
     private List<BarchartSeries> createListForMeasurandAggregation(List<Selected> allSelected, List<Map> measurandAggregations) {
         List<BarchartSeries> result = []
-
         measurandAggregations.each { aggregation ->
             result.addAll(
                     allSelected.collect { Selected selected ->
-                        String key = selected.getDatabaseRelevantName()
                         new BarchartSeries(
-                                value: selected.normalizeValue(aggregation."$key"),
+                                value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                                 unit: selected.getMeasurandGroup().unit.label,
                                 measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${selected.name}", selected.name),
                                 measurand: selected.name,
@@ -112,12 +107,7 @@ class BarchartAggregationService {
             Selected selected = allSelected.find {
                 it.name == aggregation.name && it.selectedType == aggregation.type.selectedType
             }
-            Double valueRaw
-            if (aggregation.type == UserTimingType.MEASURE) {
-                valueRaw = aggregation.duration
-            } else {
-                valueRaw = aggregation.startTime
-            }
+            Double valueRaw = aggregation.type == UserTimingType.MEASURE? aggregation.duration : aggregation.startTime
             new BarchartSeries(
                     value: selected.normalizeValue(valueRaw),
                     unit: selected.getMeasurandGroup().unit.label,
