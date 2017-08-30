@@ -63,7 +63,6 @@ class PageComparisonController extends ExceptionHandlerController {
                 groupProperty('jobGroup.id')
                 groupProperty('page.id')
                 avg(measurand.getEventResultField())
-                groupProperty('id')
             }
         }
 
