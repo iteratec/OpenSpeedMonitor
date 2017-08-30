@@ -47,6 +47,7 @@
         pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
         pageAggregationGetData: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
         jobGroupAggregationShow: "${createLink(action: 'show', controller: 'jobGroupAggregation')}",
+        jobGroupAggregationGetData: "${createLink(controller: 'jobGroupAggregation', action: 'getBarchartData')}",
         tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",

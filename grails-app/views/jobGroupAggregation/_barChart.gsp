@@ -10,15 +10,15 @@
                 <g:message code="de.iteratec.osm.barchart.filter.noFilterHeader" default="no filter"/>
             </li>
             <li>
-                <a id="all-bars-desc" href="#">
-                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                <a id="all-bars-desc" class="chart-filter" data-filter="desc" href="#">
+                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterDesc"
                                default="no filter, sorting desc"/>
                 </a>
             </li>
             <li>
-                <a id="all-bars-asc" href="#">
-                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                <a id="all-bars-asc" class="chart-filter" data-filter="asc" href="#">
+                    <i class="fa fa-check filterinactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterAsc"
                                default="no filter, sorting asc"/>
                 </a>
@@ -34,7 +34,7 @@
     </div>
 
     <div id="svg-container">
-        <svg id="jobGroupAggregationChart" width="100%"></svg>
+        <svg id="job-group-aggregation-svg" width="100%"></svg>
     </div>
 </div>
 <g:render template="/jobGroupAggregation/adjustBarchartModal"/>

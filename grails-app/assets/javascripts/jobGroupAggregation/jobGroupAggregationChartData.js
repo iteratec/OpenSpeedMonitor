@@ -8,6 +8,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var svg = svgSelection;
     var sideLabelData = [];
     var rawSeries = [];
+    var orderedSeries = [];
     var activeFilter = "desc";
     var headerText = "";
     var i18n = {};
@@ -16,13 +17,16 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var chartBarsHeight = 400;
     var fullWidth = chartSideLabelsWidth + chartBarsWidth;
     var autoWidth = true;
+    var labelList = [];
 
     var setData = function (data) {
+        activeFilter = data.activeFilter || activeFilter;
         rawSeries = data.series || rawSeries;
+        orderedSeries = orderData(rawSeries) || orderedSeries;
         i18n = data.i18nMap || i18n;
-        var labelList = [];
-        if (data.series) {
-            data.series.groupData.forEach(function(element) {
+        labelList = !orderedSeries ? labelList : [];
+        if (orderedSeries) {
+            orderedSeries.groupData.forEach(function(element) {
                 labelList.push({
                     jobGroup: element.jobGroup,
                     measurand: rawSeries.measurand
@@ -77,6 +81,14 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
             height: chartBarsHeight,
             width: chartBarsWidth
         }
+    };
+
+    var orderData = function (unorderedSeries) {
+        var compareFunction = (activeFilter === "asc") ? d3.ascending : d3.descending;
+        unorderedSeries.groupData.sort(function (a,b) {
+            return compareFunction(a.value, b.value);
+        })
+        return unorderedSeries;
     };
 
     var getMappedValues = function(rawValues) {

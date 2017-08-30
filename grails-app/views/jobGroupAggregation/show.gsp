@@ -33,7 +33,7 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" onClick="drawGraph()" id="graphButtonHtmlId"
+                        <a href="#" type="button" id="graphButtonHtmlId"
                            class="btn btn-primary show-button">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
                     </div>
@@ -82,67 +82,13 @@
     <asset:javascript src="/jobGroupAggregation/jobGroupAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
-
         OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation().init();
 
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
         });
 
-        $(window).on('resize', function() {
-            drawGraph();
-        });
-
-        // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
-        var spinner = OpenSpeedMonitor.Spinner("#chart-container");
-
-        function drawGraph() {
-
-            var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
-            var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-
-            OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart = OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart ||
-              OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal("#jobGroupAggregationChart");
-
-            spinner.start();
-            $.ajax({
-                type: 'POST',
-                data: {
-                    from: selectedTimeFrame[0].toISOString(),
-                    to: selectedTimeFrame[1].toISOString(),
-                    selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
-                        return $(e).text()
-                    })),
-                    selectedSeries: JSON.stringify(selectedSeries)
-                },
-                url: "${createLink(controller: 'jobGroupAggregation', action: 'getBarchartData')}",
-                dataType: "json",
-                success: function (data) {
-                    spinner.stop();
-                    if (!$("#error-div").hasClass("hidden"))
-                        $("#error-div").addClass("hidden");
-
-                    if (!$.isEmptyObject(data)) {
-                        $('#warning-no-data').hide();
-                        // OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.drawChart(data);
-                        OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.setData(data);
-                        OpenSpeedMonitor.ChartModules.JobGroupAggregationBarChart.render();
-                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-                        $("#dia-save-chart-as-png").removeClass("disabled");
-                    } else {
-                        $('#warning-no-data').show();
-                    }
-                },
-                error: function (e) {
-                    spinner.stop();
-                    $("#error-div").removeClass("hidden");
-                    $("#chart-card").removeClass("hidden");
-                    $("#error-message").html(e.responseText);
-                }
-            });
-        }
         OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-
     </asset:script>
 </content>
 
