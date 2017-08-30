@@ -105,7 +105,7 @@ class MetricReportingService {
 
             graphiteServer.graphitePathsRawData.findAll { it.cachedView == result.cachedView }.each {
                 GraphitePathRawData eachPath ->
-                    Double value = result.getValueFor(eachPath.measurand)
+                    Double value = SelectedMeasurandType.MEASURAND.getValue(result, eachPath.measurand.toString())
                     if (value != null) {
                         String measurandName = result.cachedView.getGraphiteLabelPrefix()+eachPath.measurand.getGrapthiteLabelSuffix()
 

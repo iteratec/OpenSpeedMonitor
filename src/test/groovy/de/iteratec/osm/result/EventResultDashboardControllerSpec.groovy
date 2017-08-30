@@ -112,8 +112,8 @@ class EventResultDashboardControllerSpec extends Specification {
         result != null
         result.size() == 13
 
-        result["aggrGroupValuesCached"] ==  Measurand.values().groupBy { it.measurandGroup }
-        result["aggrGroupValuesUnCached"] ==  Measurand.values().groupBy { it.measurandGroup }
+        result["aggrGroupValuesCached"] ==  SelectedMeasurand.createDataMapForOptGroupSelect()
+        result["aggrGroupValuesUnCached"] ==  SelectedMeasurand.createDataMapForOptGroupSelect()
 
         result["folders"]*.getName() == ["Group1", "Group2"]
         result["pages"]*.getName() == ["Page1", "Page2", "Page3"]

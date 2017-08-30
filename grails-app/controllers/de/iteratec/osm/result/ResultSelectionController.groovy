@@ -175,7 +175,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
             })
-            return userTimings.collect{Selected.createUserTimingOptionFor(it[0], it[1])}
+            return userTimings.collect{SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])}
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

@@ -2,9 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarchartAggregationService
-import de.iteratec.osm.barchart.BarchartDTO
-import de.iteratec.osm.barchart.BarchartSeries
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -14,9 +11,12 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.dto.PageAggregationChartDTO
+import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
+
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -30,7 +30,6 @@ class PageAggregationController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
-    BarchartAggregationService barchartAggregationService
 
 
     def index() {
@@ -72,7 +71,7 @@ class PageAggregationController extends ExceptionHandlerController {
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
-     * @return BarchartDTO as JSON or string message if an error occurred
+     * @return PageAggregationChartDTO as JSON or string message if an error occurred
      */
     @RestAction
     def getBarchartData(GetBarchartCommand cmd) {
@@ -84,28 +83,93 @@ class PageAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
+        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
+        List<String> measurandFieldName = allMeasurands.collect {(it as Measurand).eventResultField}
 
-        List<BarchartSeries> barchartSeriesForCmd = barchartAggregationService.getBarchartSeriesFor(cmd)
+        List eventResultAverages = EventResult.createCriteria().list {
+            'in'('page', allPages)
+            'in'('jobGroup', allJobGroups)
+            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                'fullyLoadedTimeInMillisecs',
+                osmConfigCacheService.getMinValidLoadtime(),
+                osmConfigCacheService.getMaxValidLoadtime()
+            )
+            projections {
+                groupProperty('page')
+                groupProperty('jobGroup')
+                measurandFieldName.each { m ->
+                    avg(m)
+                }
+            }
+        }
 
-        if (!barchartSeriesForCmd) {
+        Map comparativeEventResultAverages = null
+        boolean hasComparativeData = cmd.fromComparative && cmd.toComparative;
+        if (hasComparativeData) {
+            comparativeEventResultAverages = EventResult.createCriteria().list {
+                'in'('page', allPages)
+                'in'('jobGroup', allJobGroups)
+                'between'('jobResultDate', cmd.fromComparative.toDate(), cmd.toComparative.toDate())
+                'between'(
+                        'fullyLoadedTimeInMillisecs',
+                        osmConfigCacheService.getMinValidLoadtime(),
+                        osmConfigCacheService.getMaxValidLoadtime()
+                )
+                projections {
+                    groupProperty('page')
+                    groupProperty('jobGroup')
+                    measurandFieldName.each { m ->
+                        avg(m)
+                    }
+                }
+            }?.collectEntries({ it ->
+                [("${it[0].name} | ${it[1].name}".toString()): it.takeRight(it.size()-2)]
+            })
+        }
+
+        // return if no data is available
+        if (!eventResultAverages && !comparativeEventResultAverages) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
 
-        BarchartDTO barchartDTO = new BarchartDTO()
-        barchartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
-        barchartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
-        barchartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
-        barchartDTO.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
-        barchartDTO.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
+        List allSeries = cmd.selectedSeries
+        PageAggregationChartDTO chartDto = new PageAggregationChartDTO(hasComparativeData: hasComparativeData)
+        chartDto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
+        chartDto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
+        chartDto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
+        chartDto.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
+        chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        barchartDTO.series = barchartSeriesForCmd
+        allSeries.each { series ->
+            series.measurands.each { currentMeasurand ->
+                eventResultAverages.each { datum ->
+                    def measurandIndex = allMeasurands.indexOf(currentMeasurand)
+                    def key = "${datum[0]} | ${datum[1]?.name}".toString()
+                    def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
+                    if (value) {
+                        PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
+                                unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
+                                measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
+                                measurand: currentMeasurand,
+                                measurandGroup: Measurand.valueOf(currentMeasurand).measurandGroup,
+                                value: value,
+                                valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
+                                page: datum[0],
+                                jobGroup: datum[1]?.name
+                        )
+                        chartDto.series.add(seriesDto)
+                    }
+                }
+            }
+        }
 
 //      TODO: see ticket [IT-1614]
-        barchartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+        chartDto.filterRules = createFilterRules(allPages, allJobGroups)
 //        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
-        if (!barchartDTO.series) {
+        if (!chartDto.series) {
             ControllerUtils.sendSimpleResponseAsStream(
                 response,
                 HttpStatus.OK,
@@ -113,7 +177,7 @@ class PageAggregationController extends ExceptionHandlerController {
             )
         }
         else {
-            ControllerUtils.sendObjectAsJSON(response, barchartDTO)
+            ControllerUtils.sendObjectAsJSON(response, chartDto)
         }
     }
 

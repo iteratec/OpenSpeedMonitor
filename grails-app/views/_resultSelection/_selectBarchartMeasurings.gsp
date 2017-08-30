@@ -21,7 +21,7 @@
                 <div class="col-sm-7">
                     <iteratec:optGroupedSelect id="selectedAggrGroupValuesUnCached"
                                                dataMap="${aggrGroupValuesUnCached}"
-                                               class="firstMeasurandSelect form-control measurands-select-opt-groups"
+                                               class="firstMeasurandSelect form-control measurand-select"
                                                name="selectedAggrGroupValuesUnCached"
                                                optionKey="value" optionValue="value"
                                                value="${selectedAggrGroupValuesUnCached}"/>
@@ -43,12 +43,12 @@
     <div id="additionalMeasurand-clone" class="row hidden form-group addMeasurandRow">
         <div class="col-sm-7 col-sm-offset-3">
             <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
-                                       class="additionalMeasurand form-control measurands-select-opt-groups"
+                                       class="additionalMeasurand form-control measurand-select"
                                        optionKey="value" optionValue="value"
                                        value="${selectedAggrGroupValuesUnCached}"/>
         </div>
         <div class="col-sm-1 control-label removeAddMeasurands">
-            <a href="#/" class="removeMeasurandButton">
+            <a href="#" role="button" class="removeMeasurandButton">
                 <i class="fa fa-times" aria-hidden="true"></i>
             </a>
         </div>
@@ -57,7 +57,7 @@
 
 <asset:script type="text/javascript">
     $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectBarchartMeasurings.js"/>', true, 'barchartMeasurings')
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectBarchartMeasurings.js"/>', 'barchartMeasurings');
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectUserTimingsCard.js" />');
     });
 </asset:script>

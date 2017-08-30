@@ -284,7 +284,7 @@ class EventResultDashboardController {
     private void fillWithEventResultData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.createTimeFrameInterval();
 
-        List<Selected> allMeasurands = modelToRender.get('selectedAggrGroupValues')
+        List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
         List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
                 new OsmChartAxis(
@@ -564,8 +564,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': Measurand.values().groupBy { it.measurandGroup },
-                'aggrGroupValuesUnCached': Measurand.values().groupBy { it.measurandGroup },
+                'aggrGroupValuesCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
+                'aggrGroupValuesUnCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,

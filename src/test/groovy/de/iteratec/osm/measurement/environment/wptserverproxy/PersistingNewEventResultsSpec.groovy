@@ -49,8 +49,8 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  *
  */
 @TestFor(ResultPersisterService)
-@Build([Location, WebPageTestServer, Job, Page])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay, UserTiming])
+@Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 class PersistingNewEventResultsSpec extends Specification {
 
     def doWithSpring = {
@@ -211,7 +211,7 @@ class PersistingNewEventResultsSpec extends Specification {
         service.listenToResult(xmlResult, wptServer)
         List<EventResult> eventResults = EventResult.list()
 
-        then: "there are 6 EventResults with all kinds of visually complete values"
+        then: "there are 6 EventResults with 3 UserTimings each"
         eventResults.size() == 6
         !eventResults.any { it.userTimings == null }
         eventResults.each { eventResult ->
@@ -220,8 +220,26 @@ class PersistingNewEventResultsSpec extends Specification {
 
             eventResult.userTimings.findAll { it.type == UserTimingType.MARK}.size() == 2
             eventResult.userTimings.findAll { it.type == UserTimingType.MARK && it.name == "reco_cinemaLoadingStart"}.size() == 1
+
             eventResult.userTimings.findAll { it.type == UserTimingType.MARK && it.name == "p13n_entrypage_visuallyComplete"}.size() == 1
             eventResult.userTimings.findAll { it.type == UserTimingType.MEASURE && it.name == "entryPage" && it.duration != null}.size() == 1
+        }
+        eventResults.find { it.visuallyCompleteInMillisecs == 11000 && it.speedIndex == 3575}.userTimings.each {
+            if(it.name == "reco_cinemaLoadingStart"){
+                it.startTime == 1761.00
+                it.duration == null
+                it.type == UserTimingType.MARK
+            }
+            if(it.name == "p13n_entrypage_visuallyComplete"){
+                it.startTime == 1784.00
+                it.duration == null
+                it.type == UserTimingType.MARK
+            }
+            if(it.name == "entryPage"){
+                it.startTime == 1760.865
+                it.duration == 518.47
+                it.type == UserTimingType.MEASURE
+            }
         }
 
     }
@@ -245,6 +263,28 @@ class PersistingNewEventResultsSpec extends Specification {
         eventResults.size() == 1
         eventResults.get(0).firstInteractiveInMillisecs == 2286
         eventResults.get(0).consistentlyInteractiveInMillisecs == 2286
+    }
+
+    void "check CSI value creation"() {
+        setup: "mock service and create testee"
+        service.timeToCsMappingService = Mock(TimeToCsMappingService)
+        JobGroup jobGroup = JobGroup.buildWithoutSave()
+        EventResult testee = EventResult.buildWithoutSave(inputVariables)
+        testee.jobGroup = jobGroup
+
+        when: "customer satisfaction is set with testee"
+        service.setCustomerSatisfaction(testee)
+
+        then: "interactions with mocked service are as expected"
+        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+
+        where:
+        inputVariables                                                            | expectedInteractionDocComplete | expectedInteractionVisuallyComplete
+        ["docCompleteTimeInMillisecs": 1, "visuallyCompleteInMillisecs": 2]       | 1                              | 1
+        ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": 2]    | 0                              | 1
+        ["docCompleteTimeInMillisecs": 1, "visuallyCompleteInMillisecs": null]    | 1                              | 0
+        ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": null] | 0                              | 0
     }
 
     void "test waterfall URL creation for WPT >2.19 with multistep"(int run, String measuredEvent, CachedView cachedView, String expectedUrl) {

@@ -4,16 +4,16 @@ package de.iteratec.osm.result
  * Created by mwg on 19.07.2017.
  */
 enum UserTimingType {
-    MARK(MeasurandGroup.LOAD_TIMES, "userTimes", SelectedType.USERTIMING_MARK ),
-    MEASURE(MeasurandGroup.LOAD_TIMES, "userTimingMeasures", SelectedType.USERTIMING_MEASURE)
+    MARK(MeasurandGroup.LOAD_TIMES, "userTimes", SelectedMeasurandType.USERTIMING_MARK ),
+    MEASURE(MeasurandGroup.LOAD_TIMES, "userTimingMeasures", SelectedMeasurandType.USERTIMING_MEASURE)
 
     MeasurandGroup measurandGroup
     String tagInResultXml
-    SelectedType selectedType
+    SelectedMeasurandType selectedMeasurandType
 
-    private UserTimingType(MeasurandGroup group, String groupTag, SelectedType type){
+    private UserTimingType(MeasurandGroup group, String groupTag, SelectedMeasurandType type){
         measurandGroup = group
         tagInResultXml = groupTag
-        selectedType = type
+        selectedMeasurandType = type
     }
 }

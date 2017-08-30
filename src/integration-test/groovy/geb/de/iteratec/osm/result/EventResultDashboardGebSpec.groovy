@@ -263,7 +263,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -283,7 +283,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -303,7 +303,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -324,7 +324,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -343,7 +343,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -363,7 +363,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -388,7 +388,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -415,7 +415,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Requests Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -441,7 +441,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Requests Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -468,7 +468,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Bytes Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -494,7 +494,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Bytes Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -518,7 +518,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv load time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Load Time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -541,7 +541,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv ttfb | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv First Byte | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -565,7 +565,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv start render | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Start Render | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -588,7 +588,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv visually complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Visually Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -610,7 +610,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv dom time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv DOM Time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -632,7 +632,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Fully Loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -655,7 +655,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Requests Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -677,7 +677,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv requests fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Requests Fully Loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -699,7 +699,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv bytes doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Bytes Doc Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -721,7 +721,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv bytes fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Bytes Fully Loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -743,7 +743,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv customer satisfaction (visually complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Customer Satisfaction (Visually Complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -765,7 +765,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv customer satisfaction (docComplete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Customer Satisfaction (Document Complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -787,7 +787,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv speed index | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Speed Index | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1

@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require common.js
 //= require_self
 
 "use strict";
@@ -10,7 +11,7 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
     var textData = "";
     var width = 500;
     var height = OpenSpeedMonitor.ChartComponents.ChartHeader.Height;
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
     var setData = function (data) {
         textData = (data.text || data.text === "") ? data.text : textData;

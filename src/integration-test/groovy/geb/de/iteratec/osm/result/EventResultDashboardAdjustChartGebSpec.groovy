@@ -10,8 +10,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -97,7 +95,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         at EventResultDashboardPage
         waitFor { graphLines.displayed }
         graphLines.size() == 1
-        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+        graphName == 'fv Document Complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
@@ -216,6 +214,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         then: "Chart changed"
         waitFor { graphLines.displayed }
+        sleep(500)
         graphLines.size() == 1
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"

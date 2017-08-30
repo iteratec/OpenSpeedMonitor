@@ -1,7 +1,7 @@
 package geb.pages.de.iteratec.osm.result
 
 import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurandType
 import geb.pages.de.iteratec.osm.I18nGebPage
 import org.openqa.selenium.Keys
 
@@ -105,21 +105,25 @@ class EventResultDashboardPage extends I18nGebPage {
         return cardTabsUl.children("li")[1].classes().contains("active")
     }
 
-    def getFirstViewOptionsFor(MeasurandGroup measurandGroup){
-        return firstViewDiv.find(".measurand-opt-group-${measurandGroup.toString()}")
+    def getFirstViewOptionsFor(String measurandGroup){
+        return firstViewDiv.find(".measurand-opt-group-${measurandGroup}")
     }
 
-    int getFirstViewOptionsSizeFor(MeasurandGroup measurandGroup){
+    int getFirstViewOptionsSizeFor(String measurandGroup){
         return getFirstViewOptionsFor(measurandGroup).children().size()
     }
 
-    def findOptionInFristView(SelectedType selectedType, String name){
+    def findOptionInFirstViewForUserTiming(SelectedMeasurandType selectedType, String name){
         String query = selectedType.optionPrefix+name
-        return getFirstViewOptionsFor(selectedType.getMeasurandGroup.call(name)).find('[value="'+query+'"]')
+        return getFirstViewOptionsFor("USER_TIMINGS").find('[value="'+query+'"]')
     }
 
-    boolean firstViewHasOptionFor(SelectedType selectedType, String name){
-       return findOptionInFristView(selectedType, name).size() == 1
+    boolean isUserTimingsHidden(){
+        return firstViewDiv.find('.measurand-opt-group-USER_TIMINGS[style="display: none;"]').size() == 1
+    }
+
+    boolean firstViewHasOptionFor(SelectedMeasurandType selectedType, String name){
+       return findOptionInFirstViewForUserTiming(selectedType, name).size() == 1
     }
 
     public void scrollTop(){

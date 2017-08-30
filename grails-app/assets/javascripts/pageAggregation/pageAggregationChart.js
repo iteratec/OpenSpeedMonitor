@@ -5,6 +5,7 @@
 //= require /chartComponents/chartLegend.js
 //= require /chartComponents/chartSideLabels.js
 //= require /chartComponents/chartHeader.js
+//= require /chartComponents/common.js
 //= require /d3/chartLabelUtil.js
 //= require /pageAggregation/pageAggregationChartData.js
 //= require_self
@@ -22,7 +23,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var data = OpenSpeedMonitor.ChartModules.PageAggregationData(svg);
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
     chartLegendComponent.on("select", function (selectEvent) {
         toggleBarComponentHighlight(selectEvent.id, selectEvent.anySelected, selectEvent.selected);
@@ -62,7 +63,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var componentMargin = OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin;
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
         var barScorePosY = data.getChartBarsHeight() + componentMargin;
-        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
+        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = legendPosY + legendHeight + headerHeight;
@@ -146,7 +147,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         chartBarsGroup.enter()
             .append("g")
             .attr("class", "chart-bar-group");
-        var barsOffset = data.hasStackedBars() ? 0 : OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
+        var barsOffset = data.hasStackedBars() ? 0 : OpenSpeedMonitor.ChartComponents.common.barBand;
         var chartBars = chartBarsGroup.selectAll(".chart-bars").data(getSortedChartBarsComponents());
         chartBars.exit()
             .transition()

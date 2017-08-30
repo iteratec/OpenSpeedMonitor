@@ -201,10 +201,9 @@
                 url: '${createLink(action: 'validateAndSaveDashboardValues')}',
                 data: {values: json_data},
                 statusCode: {
-                    200: function (response) {
+                    200: function (jsonResponse) {
                         $("#saveDashboardSuccessDiv").show();
                         window.scrollTo(0, 0);
-                        var jsonResponse = JSON.parse(response);
                         var linkText = document.createTextNode(dashboardName);
                         var li= document.createElement("li");
                         var a = document.createElement("a");

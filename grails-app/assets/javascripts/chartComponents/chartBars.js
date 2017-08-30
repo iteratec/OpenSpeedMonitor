@@ -1,4 +1,5 @@
 //= require /bower_components/d3/d3.min.js
+//= require common.js
 //= require_self
 
 "use strict";
@@ -12,17 +13,17 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var maxValue = 10000;
     var height = 500;
     var width = 1000;
-    var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
+    var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
     var barColor = "#1660a7";
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var isRestrained = false;
     var forceSignInLabel = false;
     var eventHandlers = {};
 
     var setData = function (componentData) {
         data = componentData.values || data;
-        minValue = componentData.min || minValue;
-        maxValue = componentData.max || maxValue;
+        minValue = (componentData.min !== undefined) ? componentData.min : minValue;
+        maxValue = (componentData.max !== undefined) ? componentData.max : maxValue;
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
@@ -47,10 +48,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderEnter = function (enterSelection) {
         var bars = enterSelection.append("g")
-            .attr("class", "bar")
-            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
-            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
-            .on("click", function(data) { callEventHandler("click", data) });
+            .attr("class", "bar");
         bars.append("rect")
             .attr("class", "bar-rect")
             .attr("x", 0)
@@ -67,6 +65,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
     var renderUpdate = function (updateSelection, xScale, yScale) {
         var valueLabelOffset = 10;
+        updateSelection
+            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
+            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
+            .on("click", function(data) { callEventHandler("click", data) });
         updateSelection.select(".bar-value")
             .text(function (d) {
                 var prefix = d.value > 0 && forceSignInLabel ? "+" : "";
@@ -121,8 +123,10 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .transition()
             .duration(transitionDuration);
         exitTransition
-            .attr("width", 0)
+            .style("opacity", 0)
             .remove();
+        exitTransition.select(".bar-rect")
+            .attr("width", 0);
     };
 
     var formatValue = function (value) {
@@ -147,6 +151,3 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         on: registerEventHandler
     };
 });
-
-OpenSpeedMonitor.ChartComponents.ChartBars.BarBand = 40;
-OpenSpeedMonitor.ChartComponents.ChartBars.BarGap = 5;

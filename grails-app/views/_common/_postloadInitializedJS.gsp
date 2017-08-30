@@ -5,11 +5,6 @@
             OpenSpeedMonitor.postLoaded.idOfItemToDelete = ${item ? item.id : params.id ?: 'null'};
         });
 
-        OpenSpeedMonitor.postLoader.loadJavascript(
-            '<g:assetPath src="postload/application-postload.js"/>',
-            true,
-            "postload"
-        )
-
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="postload/application-postload.js"/>', "postload");
     });
 </script>

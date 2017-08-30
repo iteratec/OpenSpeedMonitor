@@ -53,21 +53,24 @@ OpenSpeedMonitor.postLoadUrls.forEach(function (scriptUrl) {
 });
 
 OpenSpeedMonitor.postLoader = (function () {
+    var postloadedScripts = {};
+    var onLoadedHandlers = {};
 
     var head = document.getElementsByTagName("head")[0];
 
-    var loadJavascript = function (url, async, name) {
-        async = async || true;
+    var loadJavascript = function (url, name) {
         var script = document.createElement("script");
         script.onload = function () {
+            postloadedScripts[name] = true;
+            checkCallHandler(name);
             fireWindowEvent("" + name + "Loaded");
         };
         script.setAttribute("src", url);
         script.setAttribute("type", "text/javascript");
-        script.setAttribute("async", async);
-        //script.setAttribute("charset","ISO-8859-1");
+        script.setAttribute("async", "async");
         head.appendChild(script);
     };
+
     var loadStylesheet = function (url) {
         var link = document.createElement("link");
         link.rel = "stylesheet";
@@ -77,9 +80,44 @@ OpenSpeedMonitor.postLoader = (function () {
         head.appendChild(link);
     };
 
+    var onLoaded = function(dependencies, callback) {
+        if (typeof dependencies === 'string' || dependencies instanceof String) {
+            dependencies = [dependencies];
+        }
+        var dependencyId = dependencies.sort().join(";");
+        if (!onLoadedHandlers[dependencyId]) {
+            onLoadedHandlers[dependencyId] = [];
+        }
+        if (onLoadedHandlers[dependencyId].indexOf(callback) < 0) {
+            onLoadedHandlers[dependencyId].push(callback);
+        }
+        if (allDependenciesAreLoaded(dependencies)) {
+            callback();
+        }
+    };
+
+    var checkCallHandler = function(nameOfNewLoaded) {
+        Object.keys(onLoadedHandlers).forEach(function(dependencyId) {
+            var dependencies = dependencyId.split(";");
+            if (dependencies.indexOf(nameOfNewLoaded) < 0) {
+                return;
+            }
+            if (allDependenciesAreLoaded(dependencies)) {
+                onLoadedHandlers[dependencyId].forEach(function(callback) {
+                    callback();
+                });
+            }
+        });
+    };
+
+    var allDependenciesAreLoaded = function (dependencies) {
+        return dependencies.every(function (d) { return !!postloadedScripts[d]; });
+    };
+
     return {
         loadJavascript: loadJavascript,
-        loadStylesheet: loadStylesheet
+        loadStylesheet: loadStylesheet,
+        onLoaded: onLoaded
     }
 
 })();
@@ -249,26 +287,6 @@ OpenSpeedMonitor.domUtils = (function () {
         });
         return options;
     };
-
-    var createOptionsForUserTimings = function (values) {
-        var options = [];
-        if (!values) {
-            return [];
-        }
-        values.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        values.forEach(function (value) {
-            if (value &&  value.name) {
-                options.push($("<option/>", {
-                    value: value.option,
-                    text: value.name
-                }));
-            }
-        });
-        return options;
-    };
-
     /**
      * Gets all values of all option elements in a select element
      * @param selectElement The select element with options as children
@@ -302,16 +320,6 @@ OpenSpeedMonitor.domUtils = (function () {
         selectElement.val(selection);
     };
 
-    var updateOptionGroupWithUserTimings = function (selectElement, newNamesList, oldNamesList){
-        selectElement = $(selectElement);
-        var selection = selectElement.val();
-        oldNamesList.forEach(function(old){
-            selectElement.find('[value="'+old.option+'"]').remove();
-        });
-        selectElement.append(OpenSpeedMonitor.domUtils.createOptionsForUserTimings(newNamesList));
-        selectElement.val(selection);
-    }
-
     /**
      * Deselects all selected options in a select element
      * @param selectElement The select element
@@ -331,8 +339,6 @@ OpenSpeedMonitor.domUtils = (function () {
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
         deselectAllOptions: deselectAllOptions,
-        createOptionsForUserTimings: createOptionsForUserTimings,
-        updateOptionGroupWithUserTimings: updateOptionGroupWithUserTimings
     };
 })();
 
@@ -396,7 +402,8 @@ function fireWindowEvent(eventName) {
     window.dispatchEvent(event);
 }
 
-$("#main-navbar .dropdown-toggle").click(function () {
+$("#main-navbar .dropdown-toggle").click(function (event) {
+    event.preventDefault();
     var parent = $(this).parent();
     var wasOpen = parent.hasClass("open");
     $("#main-navbar .dropdown.open").removeClass("open").attr('aria-expanded', 'false');

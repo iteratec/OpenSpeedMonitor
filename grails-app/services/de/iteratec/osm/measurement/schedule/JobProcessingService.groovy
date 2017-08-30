@@ -343,7 +343,6 @@ class JobProcessingService {
             return false
         }
 
-        Map params = [testId: '']
         int statusCode
         String testId
         try {
@@ -359,8 +358,13 @@ class JobProcessingService {
                 result = proxyService.runtest(wptserver, parameters);
             }
             validateRuntestResponse(result, wptserver)
-            log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}")
             testId = result.data.testId
+            if (testId){
+                log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
+            } else {
+                testId = "DID_NOT_RECEIVE"
+                throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
+            }
 
             use(TimeCategory) {
                 Map jobDataMap = [jobId: job.id, testId: testId]
@@ -405,7 +409,7 @@ class JobProcessingService {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
             persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
         } finally {
-            if (resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+            if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
                 unscheduleTest(job, testId)
             }
         }

@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.Measurand
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -143,6 +144,18 @@ class JobServiceSpec extends Specification {
         then: "the job isn't deleted in database but is marked as deleted"
         jobToDelete.refresh().deleted
         jobToDelete.refresh().label.contains("_deleted_")
+    }
+
+    void "test createTimeSeriesDataForJob gets a valid measurand"(){
+        given: "a job"
+        Job job = Job.build()
+
+        when:
+        Map result = service.createTimeSeriesParamsFor(job)
+
+        then:
+        Measurand.valueOf(result."selectedAggrGroupValuesUnCached")
+
     }
 
     private void createTestDataCommonForAllTests() {

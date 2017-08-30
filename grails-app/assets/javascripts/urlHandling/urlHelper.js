@@ -5,8 +5,9 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
 OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper = (function () {
+
     var getUrlParameter = function () {
-        var vars = [], hash;
+        var parameterMap = {};
         var currentUrl = window.location.href;
 
         // remove html anchor if exists
@@ -17,22 +18,22 @@ OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper = (function () {
 
         var paramIndex = currentUrl.indexOf('?');
         if (paramIndex < 0)
-            return vars;
+            return parameterMap;
 
-        var hashes = currentUrl.slice(paramIndex + 1).split('&');
-        for (var i = 0; i < hashes.length; i++) {
-            hash = hashes[i].split('=');
-            var currentValue = vars[hash[0]];
-            if (currentValue == null) {
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
-            } else if (currentValue.constructor === Array) {
-                vars[hash[0]].push(hash[1]);
+        var parameters = currentUrl.slice(paramIndex + 1).split('&');
+        for (var i = 0; i < parameters.length; i++) {
+            var parameterPair = parameters[i].split('=');
+            var parameterKey = parameterPair[0];
+            var parameterValue = decodeURIComponent(parameterPair[1] || "");
+            if (!parameterMap[parameterKey]) {
+                parameterMap[parameterKey] = parameterValue;
+            } else if (parameterMap[parameterKey].constructor === Array) {
+                parameterMap[parameterKey].push(parameterValue);
             } else {
-                vars[hash[0]] = [vars[hash[0]], hash[1]]
+                parameterMap[parameterKey] = [parameterMap[parameterKey], parameterValue];
             }
         }
-        return vars;
+        return parameterMap;
     };
 
     return {

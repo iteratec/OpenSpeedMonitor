@@ -31,7 +31,7 @@ class ResultSelectionInformationServiceSpec extends Specification {
 
 
 
-    void "test userTimingInformation are relevant and unique"(relevantEventResults, relevantUserTimingsInHalf, expectedResultSize, irrelevantEventResults, irrelevantUserTimings) {
+    void "test userTimingInformation are relevant and unique"(relevantEventResults, relevantUserTimingsPerType, expectedResultSize, irrelevantEventResults, irrelevantUserTimings) {
         setup: "dates are set"
         DateTime relevantDate = new DateTime(DateTimeZone.UTC)
         DateTime irrelevantDate = relevantDate.minusDays(2)
@@ -39,29 +39,29 @@ class ResultSelectionInformationServiceSpec extends Specification {
         DateTime intervalEnd = relevantDate
 
         when: "eventResults with usertimings are created"
-        createEventResults(irrelevantEventResults, irrelevantDate, createDoubleAmountOfUserTimings(irrelevantUserTimings))
-        createEventResults(relevantEventResults, relevantDate, createDoubleAmountOfUserTimings(relevantUserTimingsInHalf))
+        createEventResults(irrelevantEventResults, irrelevantDate, createUserTimingMarksAndMeasures(irrelevantUserTimings))
+        createEventResults(relevantEventResults, relevantDate, createUserTimingMarksAndMeasures(relevantUserTimingsPerType))
         def groupedResults = ["not needed for this test", page, measuredEvent, jobGroup, location, browser, connectivityProfile, null, false]
 
         then: "unique UserTimingSelectionInfomation objects are returned"
         List<UserTimingSelectionInfomation> testResult = service.getUserTimingSelectionInfosForGroupedEventResult(groupedResults, intervalStart, intervalEnd)
         if(expectedResultSize != 0){
             testResult.size() == expectedResultSize
-            testResult.findAll {it.type == UserTimingType.MARK}.size() == relevantUserTimingsInHalf
-            testResult.findAll {it.type == UserTimingType.MEASURE}.size() == relevantUserTimingsInHalf
+            testResult.findAll {it.type == UserTimingType.MARK}.size() == relevantUserTimingsPerType
+            testResult.findAll {it.type == UserTimingType.MEASURE}.size() == relevantUserTimingsPerType
         } else{
             testResult == null
         }
 
         where:
-        relevantEventResults | relevantUserTimingsInHalf | expectedResultSize | irrelevantEventResults | irrelevantUserTimings
-        4                    | 2                         | 4                  | 6                      | 3
-        4                    | 2                         | 4                  | 6                      | 0
-        4                    | 2                         | 4                  | 0                      | 3
-        4                    | 1                         | 2                  | 6                      | 3
-        1                    | 4                         | 8                  | 6                      | 3
-        0                    | 4                         | 0                  | 6                      | 3
-        4                    | 0                         | 0                  | 6                      | 3
+        relevantEventResults | relevantUserTimingsPerType | expectedResultSize | irrelevantEventResults | irrelevantUserTimings
+        4                    | 2                          | 4                  | 6                      | 3
+        4                    | 2                          | 4                  | 6                      | 0
+        4                    | 2                          | 4                  | 0                      | 3
+        4                    | 1                          | 2                  | 6                      | 3
+        1                    | 4                          | 8                  | 6                      | 3
+        0                    | 4                          | 0                  | 6                      | 3
+        4                    | 0                          | 0                  | 6                      | 3
     }
 
     @Ignore
@@ -103,18 +103,18 @@ class ResultSelectionInformationServiceSpec extends Specification {
     }
 
 
-    List<UserTiming> createDoubleAmountOfUserTimings(int amount){
-        if(amount == 0){
+    List<UserTiming> createUserTimingMarksAndMeasures(int amountPerType){
+        if(amountPerType == 0){
             return  null
         }
 
         List<UserTiming> userTimingList = []
-        amount.times{
+        amountPerType.times{
             userTimingList.push(
                     UserTiming.build(name: "mark${it}", type: UserTimingType.MARK)
             )
         }
-        amount.times{
+        amountPerType.times{
             userTimingList.push(
                     UserTiming.build(name: "mark${it}", type: UserTimingType.MEASURE, duration: it)
             )

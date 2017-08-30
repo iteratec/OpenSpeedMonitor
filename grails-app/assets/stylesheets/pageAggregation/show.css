@@ -8,10 +8,14 @@
     position: relative;
 }
 
-.filterActive {
+.chart-filter .fa {
+    visibility: hidden;
+}
+
+.chart-filter.selected .fa {
     visibility: visible;
 }
 
-.filterInactive {
-    visibility: hidden;
+#stackBarSwitch {
+    margin-right: 5px;
 }

@@ -452,7 +452,6 @@ function createJobGroup(createJobGroupUrl) {
         },
         url: createJobGroupUrl,
         success: function (data, textStatus) {
-            data = JSON.parse(data);
             var newJobGroupOption = $("<option/>").val(data.jobGroupId).text(data.jobGroupName);
             newJobGroupOption.appendTo("#jobgroup");
             $('#jobgroup option').removeAttr('selected');

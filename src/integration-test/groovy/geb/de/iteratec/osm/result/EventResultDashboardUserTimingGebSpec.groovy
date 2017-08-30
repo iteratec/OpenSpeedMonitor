@@ -17,7 +17,7 @@ import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.ResultSelectionInformation
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingSelectionInfomation
 import de.iteratec.osm.result.UserTimingType
@@ -93,7 +93,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
+        isUserTimingsHidden() == true
     }
 
     void "matching date matches timings"(){
@@ -106,9 +107,9 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == true
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == true
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
     void "timings disappear if date does not match" (){
@@ -121,9 +122,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
+        isUserTimingsHidden() == true
     }
 
     void "timings appear for correct timeframe within a day"(){
@@ -136,9 +136,9 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == true
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == true
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
     void "timings disappear if wrong jobGroup"(){
@@ -152,9 +152,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
+        isUserTimingsHidden() == true
     }
 
     void "timings appear for matching job group"(){
@@ -169,9 +168,9 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == true
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == true
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
     void "timings disappear if wrong page"(){
@@ -187,9 +186,8 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "only measurands are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size()
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == false
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == false
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == 0
+        isUserTimingsHidden() == true
     }
 
     void "timings appear if page matches"(){
@@ -204,15 +202,15 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         clickVariableSelectionTab()
 
         then: "timings are shown"
-        getFirstViewOptionsSizeFor(MeasurandGroup.LOAD_TIMES) == Measurand.values().findAll {it.measurandGroup == MeasurandGroup.LOAD_TIMES}.size() + userTimingsSize
-        firstViewHasOptionFor(SelectedType.USERTIMING_MARK, userTimingMarkName) == true
-        firstViewHasOptionFor(SelectedType.USERTIMING_MEASURE, userTimingMeasureName) == true
+        getFirstViewOptionsSizeFor("USER_TIMINGS") == userTimingsSize
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName) == true
+        firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
     void "show graph for mark"(){
         given: "usertimings are additionally selected"
-        findOptionInFristView(SelectedType.USERTIMING_MARK, userTimingMarkName).click()
-        findOptionInFristView(SelectedType.USERTIMING_MEASURE, userTimingMeasureName).click()
+        findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName).click()
+        findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName).click()
 
         when: "show buttons is pushed"
         clickShowButton()

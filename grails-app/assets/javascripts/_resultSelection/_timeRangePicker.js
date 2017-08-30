@@ -84,7 +84,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
     };
 
     var initRangeTo = function () {
-        dateTo = convertToDateOrDefault(valueFromElement.val(), new Date());
+        dateTo = convertToDateOrDefault(valueToElement.val(), new Date());
         var maxDate = new Date();
         maxDate.setHours(23, 59, 59, 999);
         pickerTo = userInputToElement.datepicker($.extend({}, datePickerOptions, {

@@ -9,12 +9,12 @@ import spock.lang.Specification
 class UserTimingSpec extends Specification {
 
 
-    void "test something"(duration, userTimingType, expectedResult) {
+    void "test constraints for duration"(duration, userTimingType, expectedResult) {
         when:"userTiming is created"
-            UserTiming testee = UserTiming.buildWithoutSave(duration: duration, type: userTimingType)
+        UserTiming testee = UserTiming.buildWithoutSave(duration: duration, type: userTimingType)
 
         then:"validation is as expected"
-            testee.validate() == expectedResult
+        testee.validate() == expectedResult
 
         where:
         duration | userTimingType         | expectedResult

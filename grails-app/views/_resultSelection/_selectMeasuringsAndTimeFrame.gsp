@@ -4,8 +4,8 @@ A row with the three cards: selectIntervalTimeframeCard, selectJobGroupCard, and
 <div class="row">
     <div class="col-md-4">
         <g:render template="/_resultSelection/selectIntervalTimeframeCard"
-                  model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                            'fromHour': fromHour, 'to': to, 'toHour': toHour,
+                  model="${['selectedTimeFrameInterval': selectedTimeFrameInterval,
+                            'from': from, 'to': to,
                             'dateFormat': dateFormat, 'weekStart': weekStart,
                             'aggregationIntervals': aggregationIntervals,
                             'selectedInterval': selectedInterval]}"/>
