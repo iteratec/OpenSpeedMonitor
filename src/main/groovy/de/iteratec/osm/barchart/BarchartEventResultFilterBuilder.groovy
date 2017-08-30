@@ -2,8 +2,8 @@ package de.iteratec.osm.barchart
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.Selected
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.SelectedMeasurandType
 
 /**
  * Created by mwg on 08.08.2017.
@@ -35,9 +35,9 @@ class BarchartEventResultFilterBuilder {
         return this
     }
 
-    BarchartEventResultFilterBuilder withUserTimings(List<Selected> selectedUserTimings){
+    BarchartEventResultFilterBuilder withUserTimings(List<SelectedMeasurand> selectedUserTimings){
         if(selectedUserTimings){
-            List<String> userTimingNames = selectedUserTimings.findAll{it.selectedType != SelectedType.MEASURAND}.collect{it.getDatabaseRelevantName()}
+            List<String> userTimingNames = selectedUserTimings.findAll{it.selectedType != SelectedMeasurandType.MEASURAND}.collect{it.getDatabaseRelevantName()}
             filter.userTimings {
                 or{
                     userTimingNames.each { String name ->

@@ -3,8 +3,8 @@ package de.iteratec.osm.barchart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.Selected
-import de.iteratec.osm.result.SelectedType
+import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.SelectedMeasurandType
 
 /**
  * Created by mwg on 10.08.2017.
@@ -12,7 +12,7 @@ import de.iteratec.osm.result.SelectedType
 class BarchartEventResultAggregationBuilder {
     List<String> projectedFields
 
-    List<Map> aggregateFor(Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<Selected> selectedList, Integer minValidLoadtime, Integer maxValidLoadtime) {
+    List<Map> aggregateFor(Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> selectedList, Integer minValidLoadtime, Integer maxValidLoadtime) {
         List<String> groupedProperties = []
         if(allJobGroups){
             groupedProperties.add('jobGroup')
@@ -22,15 +22,15 @@ class BarchartEventResultAggregationBuilder {
         }
 
         Closure projection = createProjection(groupedProperties, selectedList)
-        List<Selected> userTimings = []
-        if (selectedList.any { it.selectedType != SelectedType.MEASURAND }) {
+        List<SelectedMeasurand> userTimings = []
+        if (selectedList.any { it.selectedType != SelectedMeasurandType.MEASURAND }) {
             userTimings = selectedList
         }
         return aggregateEventResults(projection, from, to, allJobGroups, allPages, userTimings, minValidLoadtime, maxValidLoadtime)
     }
 
-    private Closure createProjection(List<String> groupedProperties, List<Selected> selectedList) {
-        boolean withUserTiming = selectedList.any { it.selectedType != SelectedType.MEASURAND }
+    private Closure createProjection(List<String> groupedProperties, List<SelectedMeasurand> selectedList) {
+        boolean withUserTiming = selectedList.any { it.selectedType != SelectedMeasurandType.MEASURAND }
         projectedFields = []
 
         if (!groupedProperties) {
@@ -45,7 +45,7 @@ class BarchartEventResultAggregationBuilder {
             projectedFields.add('startTime')
             projectedFields.add('duration')
         } else {
-            averagedProperties = selectedList.findAll { it.selectedType == SelectedType.MEASURAND }.collect {
+            averagedProperties = selectedList.findAll { it.selectedType == SelectedMeasurandType.MEASURAND }.collect {
                 it.getDatabaseRelevantName()
             }
             projectedFields.addAll(averagedProperties)
@@ -72,7 +72,7 @@ class BarchartEventResultAggregationBuilder {
         }
     }
 
-    private List<Map> aggregateEventResults(Closure projection, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<Selected> userTimings, Integer minValidLoadtime, Integer maxValidLoadtime) {
+    private List<Map> aggregateEventResults(Closure projection, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> userTimings, Integer minValidLoadtime, Integer maxValidLoadtime) {
         return transformAggregations(EventResult.createCriteria().list {
             new BarchartEventResultFilterBuilder(delegate, minValidLoadtime, maxValidLoadtime)
                     .withJobResultDate(from, to)

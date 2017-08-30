@@ -16,6 +16,10 @@ enum SelectedMeasurandType {
         String getOptionPrefix() {
             return ""
         }
+
+        String getDatabaseName(String name) {
+            return Measurand.valueOf(name).eventResultField
+        }
     },
     USERTIMING_MARK{
         Double getValue(EventResult eventResult, String name) {
@@ -29,6 +33,10 @@ enum SelectedMeasurandType {
 
         String getOptionPrefix() {
             return "_UTMK_"
+        }
+
+        String getDatabaseName(String name) {
+            return name
         }
     },
     USERTIMING_MEASURE{
@@ -46,6 +54,10 @@ enum SelectedMeasurandType {
         String getOptionPrefix() {
             return "_UTME_"
         }
+
+        String getDatabaseName(String name) {
+            return name
+        }
     }
 
     abstract Double getValue(EventResult eventResult, String name)
@@ -53,4 +65,6 @@ enum SelectedMeasurandType {
     abstract MeasurandGroup getMeasurandGroup(String name)
 
     abstract String getOptionPrefix()
+
+    abstract String getDatabaseName(String name)
 }
