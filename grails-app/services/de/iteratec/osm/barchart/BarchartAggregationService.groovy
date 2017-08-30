@@ -5,6 +5,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
@@ -15,7 +16,7 @@ class BarchartAggregationService {
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
 
-    List<BarChartAggregation> getBarchartSeriesFor(GetBarchartCommand cmd) {
+    List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
         if (cmd.selectedJobGroups) {
             allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
@@ -36,57 +37,57 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        List<BarChartAggregation> result = []
+        List<BarchartAggregation> result = []
         result.addAll(aggregateWithComparativesForMeasurandOrUserTiming(allSelected.findAll {
-            it.selectedType == SelectedType.MEASURAND
+            it.selectedType == SelectedMeasurandType.MEASURAND
         }, from, to, fromComparative, toComparative, allJobGroups, allPages))
         result.addAll(aggregateWithComparativesForMeasurandOrUserTiming(allSelected.findAll {
-            it.selectedType != SelectedType.MEASURAND
+            it.selectedType != SelectedMeasurandType.MEASURAND
         }, from, to, fromComparative, toComparative, allJobGroups, allPages))
 
         return result
     }
 
-    List<BarChartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> allSelected, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
-        List<BarChartAggregation> aggregations = aggregateFor(allSelected, from, to, allJobGroups, allPages)
-        List<BarChartAggregation> comparatives = []
+    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages)
+        List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(allSelected, fromComparative, toComparative, allJobGroups, allPages)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
     private
-    List<BarChartAggregation> aggregateFor(List<SelectedMeasurand> allSelected, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
-        if (!allSelected) {
+    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
+        if (!selectedMeasurands) {
             return []
         }
-        boolean hasUserTiming = allSelected.any { it.selectedType != SelectedType.MEASURAND }
-        boolean hasMeasurand = allSelected.any { it.selectedType == SelectedType.MEASURAND }
+        boolean hasUserTiming = selectedMeasurands.any { it.selectedType != SelectedMeasurandType.MEASURAND }
+        boolean hasMeasurand = selectedMeasurands.any { it.selectedType == SelectedMeasurandType.MEASURAND }
         if (hasMeasurand & hasUserTiming) {
             return []
         }
         BarchartEventResultAggregationBuilder eventResultAggregationBuilder = new BarchartEventResultAggregationBuilder()
-        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(from, to, allJobGroups, allPages, allSelected, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-        return hasMeasurand ? createListForMeasurandAggregation(allSelected, transformedAggregations) : createListForUserTimingAggregation(allSelected, transformedAggregations)
+        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(from, to, allJobGroups, allPages, selectedMeasurands, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        return hasMeasurand ? createListForMeasurandAggregation(selectedMeasurands, transformedAggregations) : createListForUserTimingAggregation(selectedMeasurands, transformedAggregations)
     }
 
-    private List<BarChartAggregation> mergeAggregationsWithComparatives(List<BarChartAggregation> values, List<BarChartAggregation> comparativeValues) {
+    private List<BarchartAggregation> mergeAggregationsWithComparatives(List<BarchartAggregation> values, List<BarchartAggregation> comparativeValues) {
         if (comparativeValues) {
             comparativeValues.each { comparative ->
-                BarChartAggregation matches = values.find { it == comparative }
+                BarchartAggregation matches = values.find { it == comparative }
                 matches.valueComparative = comparative.value
             }
         }
         return values
     }
 
-    private List<BarChartAggregation> createListForMeasurandAggregation(List<SelectedMeasurand> allSelected, List<Map> measurandAggregations) {
-        List<BarChartAggregation> result = []
+    private List<BarchartAggregation> createListForMeasurandAggregation(List<SelectedMeasurand> selectedMeasurands, List<Map> measurandAggregations) {
+        List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result.addAll(
-                    allSelected.collect { SelectedMeasurand selected ->
-                        new BarChartAggregation(
+                    selectedMeasurands.collect { SelectedMeasurand selected ->
+                        new BarchartAggregation(
                                 value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                                 selectedMeasurand: selected,
                                 jobGroup: aggregation.jobGroup,
@@ -98,13 +99,13 @@ class BarchartAggregationService {
         return result
     }
 
-    private List<BarChartAggregation> createListForUserTimingAggregation(List<SelectedMeasurand> allSelected, List<Map> userTimingAggregations) {
+    private List<BarchartAggregation> createListForUserTimingAggregation(List<SelectedMeasurand> selectedMeasurands, List<Map> userTimingAggregations) {
         return userTimingAggregations.collect { aggregation ->
-            SelectedMeasurand selected = allSelected.find {
-                it.name == aggregation.name && it.selectedType == aggregation.type.selectedType
+            SelectedMeasurand selected = selectedMeasurands.find {
+                it.name == aggregation.name && it.selectedType == aggregation.type.selectedMeasurandType
             }
             Double valueRaw = aggregation.type == UserTimingType.MEASURE? aggregation.duration : aggregation.startTime
-            new BarChartAggregation(
+            new BarchartAggregation(
                     value: selected.normalizeValue(valueRaw),
                     selectedMeasurand:  selected,
                     jobGroup: aggregation.jobGroup,

@@ -12,7 +12,7 @@ import de.iteratec.osm.result.SelectedMeasurandType
 class BarchartEventResultAggregationBuilder {
     List<String> projectedFields
 
-    List<Map> aggregateFor(Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> selectedList, Integer minValidLoadtime, Integer maxValidLoadtime) {
+    List<Map> aggregateFor(Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> selectedMeasurands, Integer minValidLoadtime, Integer maxValidLoadtime) {
         List<String> groupedProperties = []
         if(allJobGroups){
             groupedProperties.add('jobGroup')
@@ -21,10 +21,10 @@ class BarchartEventResultAggregationBuilder {
             groupedProperties.add('page')
         }
 
-        Closure projection = createProjection(groupedProperties, selectedList)
+        Closure projection = createProjection(groupedProperties, selectedMeasurands)
         List<SelectedMeasurand> userTimings = []
-        if (selectedList.any { it.selectedType != SelectedMeasurandType.MEASURAND }) {
-            userTimings = selectedList
+        if (selectedMeasurands.any { it.selectedType != SelectedMeasurandType.MEASURAND }) {
+            userTimings = selectedMeasurands
         }
         return aggregateEventResults(projection, from, to, allJobGroups, allPages, userTimings, minValidLoadtime, maxValidLoadtime)
     }

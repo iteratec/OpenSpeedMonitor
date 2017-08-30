@@ -9,7 +9,7 @@ import groovy.transform.EqualsAndHashCode
  * Created by mwg on 30.08.2017.
  */
 @EqualsAndHashCode(excludes = ["value", "valueComparative"])
-class BarChartAggregation {
+class BarchartAggregation {
     Double value
     Double valueComparative
     SelectedMeasurand selectedMeasurand
