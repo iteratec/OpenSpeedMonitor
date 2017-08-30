@@ -77,7 +77,8 @@ class DistributionChartController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        Measurand selectedMeasurand = Measurand.valueOf(cmd.selectedMeasurand)
+        //Measurand selectedMeasurand = Measurand.valueOf(cmd.selectedMeasurand)
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.selectedMeasurand, CachedView.UNCACHED)
 
         List allEventResults = performanceLoggingService.logExecutionTime(DEBUG, "select EventResults for DistributionChart", 1) {
             EventResult.createCriteria().list {
@@ -113,7 +114,7 @@ class DistributionChartController extends ExceptionHandlerController {
                 def newTrace = distributionChartDTO.series.get(identifier)
                 newTrace.jobGroup = jobGroup
                 newTrace.page = page
-                newTrace.data.add(selectedMeasurand.normalizeValue(result[selectedMeasurand.eventResultField]))
+                newTrace.data.add(selectedMeasurand.getNormalizedValueFrom(result))
             }
         }
 

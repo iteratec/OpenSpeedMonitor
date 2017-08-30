@@ -68,7 +68,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName = allMeasurands.collect { (it as Measurand).getEventResultField() }
+        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
 
         List allEventResults = EventResult.createCriteria().list {
             'in'('jobGroup', allJobGroups)
@@ -108,7 +108,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
                     barchartSeries.data.add(
                         new BarchartDatum(
                             measurand: i18nService.msg("de.iteratec.isr.measurand.${currentMeasurand}", currentMeasurand),
-                            value: (currentMeasurand as Measurand).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
+                            value: new SelectedMeasurand(currentMeasurand, CachedView.UNCACHED).normalizeValue(datum[allMeasurands.indexOf(currentMeasurand) + 1]),
                             grouping: "${datum[0].name}"
                         )
                     )

@@ -89,7 +89,7 @@ class PageComparisonController extends ExceptionHandlerController {
                         it[1].toString() == row['pageId2']
             }
             if (result1) {
-                datum1.value = measurand.normalizeValue(result1[2])
+                datum1.value = new SelectedMeasurand(measurand.toString(), CachedView.UNCACHED).normalizeValue(result1[2])
                 datum1.grouping = allPages.find {
                     it.id.toString() == row['pageId1']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId1'] }.name
@@ -98,7 +98,7 @@ class PageComparisonController extends ExceptionHandlerController {
                 }
             }
             if (result2) {
-                datum2.value = measurand.normalizeValue(result2[2])
+                datum2.value =  new SelectedMeasurand(measurand.toString(), CachedView.UNCACHED).normalizeValue(result2[2])
                 datum2.grouping = allPages.find {
                     it.id.toString() == row['pageId2']
                 }.name + " | " + allJobGroups.find { it.id.toString() == row['jobGroupId2'] }.name

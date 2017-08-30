@@ -147,7 +147,7 @@ class PageAggregationController extends ExceptionHandlerController {
                 eventResultAverages.each { datum ->
                     def measurandIndex = allMeasurands.indexOf(currentMeasurand)
                     def key = "${datum[0]} | ${datum[1]?.name}".toString()
-                    def value = Measurand.valueOf(currentMeasurand).normalizeValue(datum[measurandIndex + 2])
+                    def value = new SelectedMeasurand(currentMeasurand, CachedView.UNCACHED).normalizeValue(datum[measurandIndex + 2])
                     if (value) {
                         PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
                                 unit: (series.measurands[0] as Measurand).measurandGroup.unit.label,
@@ -155,7 +155,7 @@ class PageAggregationController extends ExceptionHandlerController {
                                 measurand: currentMeasurand,
                                 measurandGroup: Measurand.valueOf(currentMeasurand).measurandGroup,
                                 value: value,
-                                valueComparative: Measurand.valueOf(currentMeasurand).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
+                                valueComparative: new SelectedMeasurand(currentMeasurand, CachedView.UNCACHED).normalizeValue(comparativeEventResultAverages?.get(key)?.getAt(measurandIndex)),
                                 page: datum[0],
                                 jobGroup: datum[1]?.name
                         )
