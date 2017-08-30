@@ -16,13 +16,14 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selector) {
     var svg = d3.select(selector);
-    var chartBarsComponents = {};
     var chartBars = OpenSpeedMonitor.ChartComponents.ChartBars();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var data = OpenSpeedMonitor.ChartModules.JobGroupAggregationData(svg);
+    var dataAvailable = false;
     var transitionDuration = 500;
+    var highlightedGroupId = null;
 
     var setData = function (inputData) {
         data.setData(inputData);
@@ -30,54 +31,41 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
         chartBarScoreComponent.setData(data.getDataForBarScore());
         chartSideLabelsComponent.setData(data.getDataForSideLabels());
         chartBars.setData(data.getDataForBars());
-    };
-
-    var setDataForBars = function () {
-        if (!chartBarsComponents) {
-            var component = OpenSpeedMonitor.ChartComponents.ChartBars();
-            component.on("mouseover", function () {
-                // chartLegendComponent.mouseOverEntry({id: measurand});
-            });
-            component.on("mouseout", function () {
-                // chartLegendComponent.mouseOutEntry({id: measurand});
-            });
-            component.on("click", function () {
-                // chartLegendComponent.clickEntry({id: measurand});
-            });
-            chartBarsComponents = component;
-        }
-        var componentsToRender = chartBarsComponents;
-        componentsToRender.setData(data.getDataForBars());
-        chartBarsComponents = componentsToRender;
+        chartBars.on("click", function () {
+            highlightedGroupId = this.click.arguments["0"].id;
+            toggleBarHighlight(highlightedGroupId);
+        });
     };
 
     var render = function () {
-        var shouldShowScore = data.hasLoadTimes();
-        var componentMargin = OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin;
-        var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
-        var barScorePosY = data.getChartBarsHeight() + componentMargin;
-        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
-        var chartHeight = barScorePosY + barScoreHeight + headerHeight;
+        if (data.isDataAvailable()) {
+            var shouldShowScore = data.hasLoadTimes();
+            var componentMargin = OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin;
+            var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
+            var barScorePosY = data.getChartBarsHeight() + componentMargin;
+            var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.ChartBarScore.BarHeight + componentMargin : 0;
+            var chartHeight = barScorePosY + barScoreHeight + headerHeight;
 
-        svg
-            .transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight)
-            .each("end", rerenderIfWidthChanged);
+            svg
+                .transition()
+                .duration(transitionDuration)
+                .style("height", chartHeight)
+                .each("end", rerenderIfWidthChanged);
 
-        renderHeader(svg);
-        renderSideLabels(svg, headerHeight);
+            renderHeader(svg);
+            renderSideLabels(svg, headerHeight);
 
-        var contentGroup = svg.selectAll(".bars-content-group").data([1]);
-        contentGroup.enter()
-            .append("g")
-            .classed("bars-content-group", true);
-        contentGroup
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
-        renderBars(contentGroup);
-        renderBarScore(contentGroup, shouldShowScore, barScorePosY);
+            var contentGroup = svg.selectAll(".bars-content-group").data([1]);
+            contentGroup.enter()
+                .append("g")
+                .classed("bars-content-group", true);
+            contentGroup
+                .transition()
+                .duration(transitionDuration)
+                .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+            renderBars(contentGroup);
+            renderBarScore(contentGroup, shouldShowScore, barScorePosY);
+        }
     };
 
     var renderHeader = function (svg) {
@@ -139,13 +127,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
         }
     };
 
-    // var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {
-    //     Object.keys(chartBarsComponents).forEach(function(measurand) {
-    //         var isRestrained = anyHighlighted && !(doHighlight && measurand === measurandToHighlight);
-    //         chartBarsComponents[measurand].setData({isRestrained: isRestrained});
-    //     });
-    //     render();
-    // };
+    var toggleBarHighlight = function (highlightGroupId) {
+        chartBars.setData({highLightId: highlightGroupId});
+        render();
+    };
 
     return {
         render: render,

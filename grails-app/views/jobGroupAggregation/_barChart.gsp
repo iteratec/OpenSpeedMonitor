@@ -18,7 +18,7 @@
             </li>
             <li>
                 <a id="all-bars-asc" class="chart-filter" data-filter="asc" href="#">
-                    <i class="fa fa-check filterinactive" aria-hidden="true"></i>
+                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterAsc"
                                default="no filter, sorting asc"/>
                 </a>
