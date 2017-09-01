@@ -16,6 +16,7 @@
 */
 
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.api.MicroserviceType
@@ -58,6 +59,7 @@ class BootStrap {
     DetailAnalysisPersisterService detailAnalysisPersisterService
     ProxyService proxyService
     HealthReportService healthReportService
+    InMemoryConfigService inMemoryConfigService
     def grailsApplication
 
     /**
@@ -83,6 +85,7 @@ class BootStrap {
                 initApplicationData(false)
                 registerProxyListener()
                 fetchLocationsOfWebpagetestOnFirstStart()
+                inMemoryConfigService.activateMeasurementsGenerally()
                 break
         }
 
