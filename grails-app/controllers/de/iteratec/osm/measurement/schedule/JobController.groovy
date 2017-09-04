@@ -264,7 +264,7 @@ class JobController {
 
     def execute() {
         handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
-            if (jobProcessingService.launchJobRun(job))
+            if (jobProcessingService.launchJobRun(job) > 0)
                 massExecutionResults[job.id] = [status: 'success']
             else
                 massExecutionResults[job.id] = [status: 'failure']

@@ -33,6 +33,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -601,6 +602,46 @@ class RestApiController {
 
         return sendObjectAsJSON("ok",true)
     }
+
+    /**
+     * Starts the job of submitted id.
+     *
+     * @return The test id of the job run.
+     */
+    public Map<String, Object> runJob() {
+        Job job = Job.get(params.id)
+        if (job == null) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
+            return
+        }
+
+        String testId = jobProcessingService.launchJobRun(job)
+
+        return sendObjectAsJSON(testId, true)
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Map<String, Object> getJobResult() {
+        String testId = params.testId
+
+        if(testId == null){
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "No test id available!")
+            return
+        }
+
+        JobResult jobResult = JobResult.findByTestId(testId)
+
+        if(jobResult != null) {
+            return sendObjectAsJSON(jobResult.statusCodeMessage, true)
+        } else{
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Test with id ${params.testId} doesn't exist!")
+            return
+        }
+    }
+
     /**
      * Activates the job of submitted id. It gets activated no matter whether it was active/inactive before.
      * This function can't be called without a valid apiKey as parameter.

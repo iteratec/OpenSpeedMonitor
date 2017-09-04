@@ -169,6 +169,14 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [POST: "receiveCallback"]
 		}
+		"/rest/job/run/$id"{
+			controller = "RestApi"
+			action = [GET: "runJob"]
+		}
+		"/rest/job/getResult/$testId"{
+			controller = "RestApi"
+			action = [GET: "getJobResult"]
+		}
 
 		/*
 		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by

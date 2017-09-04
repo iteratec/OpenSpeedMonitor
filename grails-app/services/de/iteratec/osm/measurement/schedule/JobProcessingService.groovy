@@ -332,7 +332,7 @@ class JobProcessingService {
      * If they are not enabled nothing happens.
      * @return whether the job was launched successfully
      */
-    public boolean launchJobRun(Job job) {
+    public String launchJobRun(Job job) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
             log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
@@ -381,11 +381,11 @@ class JobProcessingService {
                 JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
             }
 
-            return true
+            return testId
         } catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return false
+            return testId
         }
     }
 
