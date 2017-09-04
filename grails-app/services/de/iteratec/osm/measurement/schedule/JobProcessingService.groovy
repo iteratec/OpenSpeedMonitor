@@ -385,7 +385,7 @@ class JobProcessingService {
         } catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return testId
+            return null
         }
     }
 
