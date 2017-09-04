@@ -49,7 +49,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  *
  */
 @TestFor(ResultPersisterService)
-@Build([Location, WebPageTestServer, Job, Page])
+@Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 class PersistingNewEventResultsSpec extends Specification {
 
@@ -215,6 +215,28 @@ class PersistingNewEventResultsSpec extends Specification {
         eventResults.size() == 1
         eventResults.get(0).firstInteractiveInMillisecs == 2286
         eventResults.get(0).consistentlyInteractiveInMillisecs == 2286
+    }
+
+    void "check CSI value creation"() {
+        setup: "mock service and create testee"
+        service.timeToCsMappingService = Mock(TimeToCsMappingService)
+        JobGroup jobGroup = JobGroup.buildWithoutSave()
+        EventResult testee = EventResult.buildWithoutSave(inputVariables)
+        testee.jobGroup = jobGroup
+
+        when: "customer satisfaction is set with testee"
+        service.setCustomerSatisfaction(testee)
+
+        then: "interactions with mocked service are as expected"
+        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+
+        where:
+        inputVariables                                                            | expectedInteractionDocComplete | expectedInteractionVisuallyComplete
+        ["docCompleteTimeInMillisecs": 1, "visuallyCompleteInMillisecs": 2]       | 1                              | 1
+        ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": 2]    | 0                              | 1
+        ["docCompleteTimeInMillisecs": 1, "visuallyCompleteInMillisecs": null]    | 1                              | 0
+        ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": null] | 0                              | 0
     }
 
     void "test waterfall URL creation for WPT >2.19 with multistep"(int run, String measuredEvent, CachedView cachedView, String expectedUrl) {

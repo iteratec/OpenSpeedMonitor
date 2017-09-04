@@ -388,13 +388,16 @@ class ResultPersisterService implements iResultListener {
 
     }
 
-    private void setCustomerSatisfaction(MeasuredEvent step, EventResult result, int docCompleteTime) {
+    private void setCustomerSatisfaction(EventResult result) {
         try {
+            MeasuredEvent step = result.measuredEvent
             log.debug("step=${step}")
             log.debug("step.testedPage=${step.testedPage}")
             CsiConfiguration csiConfigurationOfResult = result.jobGroup.csiConfiguration
             log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
-            result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage, csiConfigurationOfResult)
+            if (result.docCompleteTimeInMillisecs) {
+                result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(result.docCompleteTimeInMillisecs, step.testedPage, csiConfigurationOfResult)
+            }
             if (result.visuallyCompleteInMillisecs) {
                 result.csByWptVisuallyCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(result.visuallyCompleteInMillisecs, step.testedPage, csiConfigurationOfResult)
             }
@@ -426,22 +429,22 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    private void setAllMeasurands(GPathResult inputValues, EventResult result){
+    private void setAllMeasurands(GPathResult inputValues, EventResult result) {
         Measurand.values().each {
-            if(it.getTagInResultXml()){
+            if (it.getTagInResultXml()) {
                 setPropertyWithinEventResult(it, inputValues, result)
             }
         }
-        setCustomerSatisfaction(result.measuredEvent, result, result.docCompleteTimeInMillisecs)
+        setCustomerSatisfaction(result)
     }
 
-    private void setPropertyWithinEventResult(Measurand measurand, GPathResult inputValues, EventResult result){
-        if(checkIfTagIsThere(inputValues, measurand.getTagInResultXml())){
+    private void setPropertyWithinEventResult(Measurand measurand, GPathResult inputValues, EventResult result) {
+        if (checkIfTagIsThere(inputValues, measurand.getTagInResultXml())) {
             result.setProperty(measurand.getEventResultField(), inputValues.getProperty(measurand.getTagInResultXml()).toInteger())
         }
     }
 
-    private boolean checkIfTagIsThere(GPathResult viewTag, String tag){
+    private boolean checkIfTagIsThere(GPathResult viewTag, String tag) {
         return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
     }
 
