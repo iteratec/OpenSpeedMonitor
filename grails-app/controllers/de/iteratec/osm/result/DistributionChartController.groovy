@@ -77,7 +77,6 @@ class DistributionChartController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        //Measurand selectedMeasurand = Measurand.valueOf(cmd.selectedMeasurand)
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.selectedMeasurand, CachedView.UNCACHED)
 
         List allEventResults = performanceLoggingService.logExecutionTime(DEBUG, "select EventResults for DistributionChart", 1) {
