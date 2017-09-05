@@ -51,7 +51,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put('pages', pages)
 
         // Measurands
-        modelToRender.put('measurandsUncached', Measurand.values().groupBy { it.measurandGroup })
+        modelToRender.put('measurandsUncached', SelectedMeasurand.createDataMapForOptGroupSelect())
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
