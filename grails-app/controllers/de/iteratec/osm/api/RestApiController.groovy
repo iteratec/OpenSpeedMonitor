@@ -621,8 +621,9 @@ class RestApiController {
     }
 
     /**
+     * Returns the status of the job of submitted id.
      *
-     * @return
+     * @return The status of the submitted job.
      */
     public Map<String, Object> getJobResult() {
         String testId = params.testId
