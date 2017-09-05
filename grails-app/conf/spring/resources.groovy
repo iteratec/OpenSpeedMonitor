@@ -22,4 +22,5 @@ import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 beans = {
     jobGroupDaoService(DefaultJobGroupDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
+    ex(EventRe)
 }

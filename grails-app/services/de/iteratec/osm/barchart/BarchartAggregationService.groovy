@@ -67,8 +67,14 @@ class BarchartAggregationService {
         if (hasMeasurand & hasUserTiming) {
             return []
         }
-        BarchartEventResultAggregationBuilder eventResultAggregationBuilder = new BarchartEventResultAggregationBuilder()
-        List<Map> transformedAggregations = eventResultAggregationBuilder.aggregateFor(from, to, allJobGroups, allPages, selectedMeasurands, osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+
+        List<Map> transformedAggregations = new EventResultProjectionBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobResultDateBetween(from, to)
+                .withPageIn(allPages, true)
+                .withJobGroupIn(allJobGroups, true)
+                .withSelectedMeasurandProjection(selectedMeasurands)
+                .getResults()
+
         return hasMeasurand ? createListForMeasurandAggregation(selectedMeasurands, transformedAggregations) : createListForUserTimingAggregation(selectedMeasurands, transformedAggregations)
     }
 
@@ -104,10 +110,10 @@ class BarchartAggregationService {
             SelectedMeasurand selected = selectedMeasurands.find {
                 it.name == aggregation.name && it.selectedType == aggregation.type.selectedMeasurandType
             }
-            Double valueRaw = aggregation.type == UserTimingType.MEASURE? aggregation.duration : aggregation.startTime
+            Double valueRaw = aggregation.type == UserTimingType.MEASURE ? aggregation.duration : aggregation.startTime
             new BarchartAggregation(
                     value: selected.normalizeValue(valueRaw),
-                    selectedMeasurand:  selected,
+                    selectedMeasurand: selected,
                     jobGroup: aggregation.jobGroup,
                     page: aggregation.page
             )
