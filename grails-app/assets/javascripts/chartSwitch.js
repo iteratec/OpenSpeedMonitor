@@ -88,7 +88,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         } else {
             if (updatedMap["selectedInterval"] == null) updatedMap["selectedInterval"] = -1;
             if (updatedMap["selectedTimeFrameInterval"] == null) updatedMap["selectedTimeFrameInterval"] = 0;
-            var measurand = "docCompleteTimeInMillisecsUncached";
+            var measurand = "DOC_COMPLETE_TIME";
             if ($("#selectedAggrGroupValuesUnCached").val()) {
                 measurand = $("#selectedAggrGroupValuesUnCached").val();
             }

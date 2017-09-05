@@ -20,6 +20,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var headerText = "";
     var stackBars = true;
     var autoWidth = true;
+    var dataAvailalbe = false;
     var i18n = {};
 
     var setData = function (data) {
@@ -44,6 +45,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
         chartBarsWidth = fullWidth - OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
+        dataAvailalbe = data.series ? true : dataAvailalbe;
     };
 
     var validateSelectedFilter = function(selectedFilter) {
@@ -317,6 +319,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         return stackBars;
     };
 
+    var isDataAvailable = function () {
+        return dataAvailalbe;
+    };
+
     return {
         setData: setData,
         getDataForHeader: getDataForHeader,
@@ -324,6 +330,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         getDataForLegend: getDataForLegend,
         getDataForSideLabels: getDataForSideLabels,
         getAllMeasurands: getAllMeasurands,
+        isDataAvailable: isDataAvailable,
         getDataForBars: getDataForBars,
         hasLoadTimes: hasLoadTimes,
         needsAutoResize: needsAutoResize,
