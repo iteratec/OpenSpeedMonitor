@@ -1,6 +1,5 @@
 package de.iteratec.osm.barchart
 
-import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
@@ -9,7 +8,6 @@ import de.iteratec.osm.result.SelectedMeasurandType
 import grails.gorm.DetachedCriteria
 import org.grails.datastore.mapping.query.Projections
 import org.grails.datastore.mapping.query.Query
-import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Created by mwg on 31.08.2017.
@@ -33,18 +31,18 @@ class EventResultProjectionBuilder {
         return this
     }
 
-    EventResultProjectionBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean withProjection) {
-        return withIn('jobGroup', jobGroups, withProjection)
+    EventResultProjectionBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean groupBy) {
+        return withIn('jobGroup', jobGroups, groupBy)
     }
 
-    EventResultProjectionBuilder withPageIn(List<Page> pages, boolean withProjection) {
-        return withIn('page', pages, withProjection)
+    EventResultProjectionBuilder withPageIn(List<Page> pages, boolean groupBy) {
+        return withIn('page', pages, groupBy)
     }
 
-    EventResultProjectionBuilder withIn(String propertyName, List range, boolean withProjection) {
+    EventResultProjectionBuilder withIn(String propertyName, List range, boolean groupBy) {
         if (range) {
             query.in(propertyName, range)
-            return withProjection ? addGroupByProjection(propertyName, null) : this
+            return groupBy ? addGroupByProjection(propertyName, null) : this
         }
         return this
     }
@@ -53,7 +51,7 @@ class EventResultProjectionBuilder {
         List<String> userTimingNames = userTimings.findAll {
             it.selectedType != SelectedMeasurandType.MEASURAND
         }.collect { it.getDatabaseRelevantName() }
-        query.createAlias(USER_TIMINGS_NAME, USER_TIMINGS_NAME)
+        this.joinUserTimings()
         query.in(USER_TIMINGS_NAME + '.name', userTimingNames)
         addGroupByProjection(USER_TIMINGS_NAME + '.name', 'name')
         addGroupByProjection(USER_TIMINGS_NAME + '.type', 'type')
@@ -75,15 +73,41 @@ class EventResultProjectionBuilder {
         return this
     }
 
+    EventResultProjectionBuilder withSelectedMeasurandPropertyProjection(SelectedMeasurand selectedMeasurand, String projectionName) {
+        String propertyName
+        if (selectedMeasurand.selectedType == SelectedMeasurandType.MEASURAND) {
+            propertyName = selectedMeasurand.getDatabaseRelevantName()
+        } else {
+            this.joinUserTimings()
+            query.eq(USER_TIMINGS_NAME + '.name', selectedMeasurand.getDatabaseRelevantName())
+            String relevantFieldName = selectedMeasurand.selectedType == SelectedMeasurandType.USERTIMING_MEASURE ? 'duration' : 'startTime'
+            propertyName = USER_TIMINGS_NAME + '.' + relevantFieldName
+            if(!projectionName){
+                projectionName = relevantFieldName
+            }
+        }
+        return addPropertyProjection(propertyName, projectionName)
+    }
+
+    private void joinUserTimings() {
+        query.createAlias(USER_TIMINGS_NAME, USER_TIMINGS_NAME)
+    }
 
     EventResultProjectionBuilder addGroupByProjection(String propertyName, String projectionName) {
-        projections.add(Projections.groupProperty(propertyName))
-        projectedFields.add(projectionName ?: propertyName)
-        return this
+        return addProjection(Projections.groupProperty(propertyName), propertyName, projectionName)
     }
 
     EventResultProjectionBuilder addAvgProjection(String propertyName, String projectionName) {
-        projections.add(Projections.avg(propertyName))
+        return addProjection(Projections.avg(propertyName), propertyName, projectionName)
+    }
+
+    EventResultProjectionBuilder addPropertyProjection(String propertyName, String projectionName) {
+       return addProjection(Projections.property(propertyName), propertyName, projectionName)
+
+    }
+
+    EventResultProjectionBuilder addProjection(Query.Projection projection, String propertyName, String projectionName) {
+        projections.add(projection)
         projectedFields.add(projectionName ?: propertyName)
         return this
     }
