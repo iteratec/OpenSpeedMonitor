@@ -4,10 +4,10 @@
 <g:each var="job" in="${jobs}">
     <g:set var="tags" value="${jobsWithTags.findAll { it.jobId == job.id }.collect { it.tag }}"/>
     <tr
-            class="${massExecutionResults ? (massExecutionResults[job.id] ? 'highlight ' + massExecutionResults[job.id].status : '') : ''}"
+            class="${flash.massExecutionResults ? (flash.massExecutionResults[job.id] ? 'highlight ' + flash.massExecutionResults[job.id].status : '') : ''}"
         <g:if test="${tags}">data-tags="${tags.join(',')}"</g:if>>
         <td><g:checkBox name="selected.${job.id}" value="on"
-                        checked="${selectedIds?.contains(job.id)}"
+                        checked="${flash.selectedIds?.contains(job.id)}"
                         class="jobCheckbox"/></td>
         <td class="summary">
             <div class="show-chart-buttons">
@@ -39,7 +39,7 @@
                 </g:if>
             </ul>
             <span class="status" id="runningstatus-${job.id}"></span>
-            <span class="status">${massExecutionResults ? (massExecutionResults[job.id]?.message ? "<br />" + massExecutionResults[job.id].message : '') : ''}</span>
+            <span class="status">${flash.massExecutionResults ? (flash.massExecutionResults[job.id]?.message ? "<br />" + flash.massExecutionResults[job.id].message : '') : ''}</span>
         </td>
         <td class="jobgroup">${job.jobGroup.name}</td>
         <td class="location">${job.location.removeBrowser(job.location.uniqueIdentifierForServer ?: job.location.location)}</td>
