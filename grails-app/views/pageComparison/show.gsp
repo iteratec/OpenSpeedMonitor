@@ -77,6 +77,10 @@
     <asset:javascript src="chartSwitch"/>
     <asset:javascript src="/pageComparison/pageComparison.js"/>
     <asset:script type="text/javascript">
+        $(window).load(function() {
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
+        });
+
         var pageComparisonSelectionCardLoaded = false;
         var timeframeCardLoaded = false;
         var barchartMeasuringsLoaded = false;
