@@ -35,6 +35,7 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MeasurementResultDto
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.Threshold
 import de.iteratec.osm.result.ThresholdService
@@ -639,12 +640,12 @@ class RestApiController {
         JobResult jobResult = JobResult.findByTestId(testId)
 
         if(jobResult != null) {
-            List<EventResult> eventResults = jobResult.eventResults
+            List<MeasurementResultDto> results = thresholdService.checkResults(jobResult.eventResults)
 
             Map objectToSend =
                     [
-                            'status' : thresholdService.checkMeasurement(eventResults),
-                            'result': jobResult.statusCodeMessage,
+                            'status': jobResult.httpStatusCode,
+                            'results': results.flatten()
                     ]
 
             return sendObjectAsJSON(objectToSend, true)

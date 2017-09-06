@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.api.dto.MeasurementResultDto
 import de.iteratec.osm.report.chart.Event
 import grails.transaction.Transactional
 
@@ -11,18 +12,32 @@ class ThresholdService {
      * @param eventResults
      * @return
      */
-    String checkMeasurement(List<EventResult> eventResults){
+    List<MeasurementResultDto> checkResults(List<EventResult> eventResults){
+        List<MeasurementResultDto> results = []
         eventResults.each {
-            Threshold threshold = Threshold.findByMeasuredEvent(it.measuredEvent)
-            if(threshold) {
-                if (it.docCompleteTimeInMillisecs < threshold.lowerBoundary) {
-                    return "good"
-                } else if (it.docCompleteTimeInMillisecs > threshold.upperBoundary) {
-                    return "bad"
-                } else {
-                    return "ok"
-                }
+            results.add(checkEventResult(it))
+        }
+        return results
+    }
+
+    /**
+     *
+     * @param eventResult
+     * @return
+     */
+    List<MeasurementResultDto> checkEventResult(EventResult eventResult){
+        List<MeasurementResultDto> results = []
+        List<Threshold> thresholds = Threshold.findAllByMeasuredEventAndJob(eventResult.measuredEvent, eventResult.jobResult.job)
+        thresholds.each {
+            if (eventResult."$it.measurand.eventResultField" < it.lowerBoundary) {
+                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "good"))
+            } else if (eventResult."$it.measurand.eventResultField" > it.upperBoundary) {
+                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "bad"))
+            } else {
+                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "ok"))
             }
         }
+
+        return results
     }
 }
