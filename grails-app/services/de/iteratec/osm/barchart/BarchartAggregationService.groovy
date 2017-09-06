@@ -57,7 +57,6 @@ class BarchartAggregationService {
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
-    private
     List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
         if (!selectedMeasurands) {
             return []

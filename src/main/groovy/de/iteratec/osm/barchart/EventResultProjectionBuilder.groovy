@@ -103,7 +103,6 @@ class EventResultProjectionBuilder {
 
     EventResultProjectionBuilder addPropertyProjection(String propertyName, String projectionName) {
        return addProjection(Projections.property(propertyName), propertyName, projectionName)
-
     }
 
     EventResultProjectionBuilder addProjection(Query.Projection projection, String propertyName, String projectionName) {

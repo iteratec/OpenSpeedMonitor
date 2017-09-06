@@ -13,6 +13,6 @@ class BarchartAggregation {
     Double value
     Double valueComparative
     SelectedMeasurand selectedMeasurand
-    String page
-    String jobGroup
+    Page page
+    JobGroup jobGroup
 }
