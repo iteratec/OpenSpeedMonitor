@@ -37,6 +37,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.Threshold
+import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -83,6 +84,7 @@ class RestApiController {
     InMemoryConfigService inMemoryConfigService
     JobProcessingService jobProcessingService
     JobDaoService jobDaoService
+    ThresholdService thresholdService
     BatchActivityService batchActivityService
 
     /**
@@ -639,22 +641,13 @@ class RestApiController {
         if(jobResult != null) {
             List<EventResult> eventResults = jobResult.eventResults
 
-            String result = ""
+            Map objectToSend =
+                    [
+                            'status' : thresholdService.checkMeasurement(eventResults),
+                            'result': jobResult.statusCodeMessage,
+                    ]
 
-            eventResults.each {
-                Threshold threshold = Threshold.findByMeasuredEvent(it.measuredEvent)
-                if(threshold) {
-                    if (it.docCompleteTimeInMillisecs < threshold.lowerBoundary) {
-                        result = "good"
-                    } else if (it.docCompleteTimeInMillisecs > threshold.upperBoundary) {
-                        result = "bad"
-                    } else {
-                        result = "ok"
-                    }
-                }
-            }
-
-            return sendObjectAsJSON(result, true)
+            return sendObjectAsJSON(objectToSend, true)
         } else{
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Test with id ${params.testId} doesn't exist!")
             return
