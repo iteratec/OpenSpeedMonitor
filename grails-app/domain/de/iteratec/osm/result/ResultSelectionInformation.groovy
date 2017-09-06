@@ -30,4 +30,7 @@ class ResultSelectionInformation {
         connectivityProfile(nullable: true)
         userTimings(nullable: true)
     }
+    static  mapping = {
+        userTimings(cascade: 'all-delete-orphan')
+    }
 }

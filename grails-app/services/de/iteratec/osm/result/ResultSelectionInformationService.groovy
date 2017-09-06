@@ -95,6 +95,6 @@ class ResultSelectionInformationService {
                     }
                 }
             }
-       return userTimingsForGroupedEventResult.collect {new UserTimingSelectionInfomation(name: it[0], type: [1])}
+       return userTimingsForGroupedEventResult.collect {new UserTimingSelectionInfomation(name: it[0], type: it[1])}
     }
 }
