@@ -18,7 +18,7 @@ class ResultSelectionInformation {
     String customConnectivityName
     boolean noTrafficShapingAtAll
 
-    static  hasMany = [userTimings : UserTimingSelectionInfomation]
+    static  hasMany = [userTimings : UserTimingSelectionInformation]
 
     static constraints = {
         measuredEvent(nullable: false)
@@ -29,8 +29,5 @@ class ResultSelectionInformation {
         customConnectivityName(nullable: true)
         connectivityProfile(nullable: true)
         userTimings(nullable: true)
-    }
-    static  mapping = {
-        userTimings(cascade: 'all-delete-orphan')
     }
 }

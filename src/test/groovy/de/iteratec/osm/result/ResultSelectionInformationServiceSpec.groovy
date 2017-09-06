@@ -19,7 +19,7 @@ import spock.lang.*
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(ResultSelectionInformationService)
-@Mock([UserTiming, UserTimingSelectionInfomation, EventResult, ResultSelectionInformation, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
+@Mock([UserTiming, UserTimingSelectionInformation, EventResult, ResultSelectionInformation, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
 @Build([UserTiming, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
 class ResultSelectionInformationServiceSpec extends Specification {
     Page page
@@ -44,7 +44,7 @@ class ResultSelectionInformationServiceSpec extends Specification {
         def groupedResults = ["not needed for this test", page, measuredEvent, jobGroup, location, browser, connectivityProfile, null, false]
 
         then: "unique UserTimingSelectionInfomation objects are returned"
-        List<UserTimingSelectionInfomation> testResult = service.getUserTimingSelectionInfosForGroupedEventResult(groupedResults, intervalStart, intervalEnd)
+        List<UserTimingSelectionInformation> testResult = service.getUserTimingSelectionInfosForGroupedEventResult(groupedResults, intervalStart, intervalEnd)
         if(expectedResultSize != 0){
             testResult.size() == expectedResultSize
             testResult.findAll {it.type == UserTimingType.MARK}.size() == relevantUserTimingsPerType

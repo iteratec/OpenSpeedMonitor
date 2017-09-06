@@ -1,6 +1,6 @@
 package de.iteratec.osm.result
 
-class UserTimingSelectionInfomation {
+class UserTimingSelectionInformation {
     String name
     UserTimingType type
 
