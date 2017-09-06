@@ -30,11 +30,11 @@ class ThresholdService {
         List<Threshold> thresholds = Threshold.findAllByMeasuredEventAndJob(eventResult.measuredEvent, eventResult.jobResult.job)
         thresholds.each {
             if (eventResult."$it.measurand.eventResultField" < it.lowerBoundary) {
-                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "good"))
+                results.add(new MeasurementResultDto(eventResult.measuredEvent, it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "good"))
             } else if (eventResult."$it.measurand.eventResultField" > it.upperBoundary) {
-                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "bad"))
+                results.add(new MeasurementResultDto(eventResult.measuredEvent, it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "bad"))
             } else {
-                results.add(new MeasurementResultDto(it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "ok"))
+                results.add(new MeasurementResultDto(eventResult.measuredEvent, it.measurand, (Integer)eventResult."$it.measurand.eventResultField", "ok"))
             }
         }
 
