@@ -612,7 +612,7 @@ class RestApiController {
      *
      * @return The test id of the job run.
      */
-    public Map<String, Object> runJob() {
+     Map<String, Object> runJob() {
         Job job = Job.get(params.id)
         if (job == null) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
@@ -625,11 +625,11 @@ class RestApiController {
     }
 
     /**
-     * Returns the status of the job of submitted id.
+     * Tests whether the results of the submitted test id passes the threshold tests.
      *
-     * @return The status of the submitted job.
+     * @return The threshold test results of the submitted test id.
      */
-    public Map<String, Object> getJobResult() {
+     Map<String, Object> getThresholdResults() {
         String testId = params.testId
 
         if(testId == null){

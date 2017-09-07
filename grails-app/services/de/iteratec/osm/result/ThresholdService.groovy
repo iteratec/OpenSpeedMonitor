@@ -7,9 +7,10 @@ import grails.transaction.Transactional
 class ThresholdService {
 
     /**
+     * Checks all even results.
      *
-     * @param eventResults
-     * @return
+     * @param eventResults The Event results
+     * @return A list with the threshold results of the event results.
      */
     List<MeasurementResultDto> checkResults(List<EventResult> eventResults) {
         List<MeasurementResultDto> results = []
@@ -20,9 +21,10 @@ class ThresholdService {
     }
 
     /**
+     * Checks whether an event results passes his threshold tests.
      *
      * @param eventResult
-     * @return
+     * @return A list with the threshold results of an event result.
      */
     List<MeasurementResultDto> checkEventResult(EventResult eventResult) {
         List<Threshold> thresholds = Threshold.findAllByMeasuredEventAndJob(eventResult.measuredEvent, eventResult.jobResult.job)

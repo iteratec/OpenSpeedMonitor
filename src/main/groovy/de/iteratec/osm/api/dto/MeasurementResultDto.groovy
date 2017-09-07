@@ -1,8 +1,8 @@
 package de.iteratec.osm.api.dto
 
-import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.MeasuredEvent
-
+/**
+ * Transport class for the threshold results.
+ */
 class MeasurementResultDto {
     String measuredEvent
 

@@ -173,9 +173,9 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "runJob"]
 		}
-		"/rest/job/getResult/$testId"{
+		"/rest/job/getThresholdResults/$testId"{
 			controller = "RestApi"
-			action = [GET: "getJobResult"]
+			action = [GET: "getThresholdResults"]
 		}
 
 		/*
