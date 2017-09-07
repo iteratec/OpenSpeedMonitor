@@ -47,7 +47,11 @@ class Threshold {
      */
     static constraints = {
         measurand(nullable: false)
-        upperBoundary(nullable: false)
-        lowerBoundary(nullable: false)
+        upperBoundary(nullable: false, validator: {currentUpperBoundary, thresholdInstance ->
+           return  thresholdInstance.lowerBoundary == null || currentUpperBoundary > thresholdInstance.lowerBoundary
+        })
+        lowerBoundary(nullable: false, validator: {currentLowerBoundary, thresholdInstance ->
+            return currentLowerBoundary >= 0 && (thresholdInstance.upperBoundary == null || currentLowerBoundary < thresholdInstance.upperBoundary)
+        })
     }
 }

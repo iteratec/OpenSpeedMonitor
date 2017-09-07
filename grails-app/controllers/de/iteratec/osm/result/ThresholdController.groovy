@@ -31,11 +31,12 @@ class ThresholdController {
             return
         }
 
-        if (threshold.hasErrors()) {
+        if (threshold.hasErrors() || !threshold.validate()) {
 
             respond threshold.errors, view:'create'
             return
         }
+
 
         threshold.save flush:true
 
