@@ -18,7 +18,7 @@ class ResultSelectionInformation {
     String customConnectivityName
     boolean noTrafficShapingAtAll
 
-    static  hasMany = [userTimings : UserTimingSelectionInfomation]
+    static  hasMany = [userTimings : UserTimingSelectionInformation]
 
     static constraints = {
         measuredEvent(nullable: false)
