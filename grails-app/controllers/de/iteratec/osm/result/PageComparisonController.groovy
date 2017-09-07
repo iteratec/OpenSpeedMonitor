@@ -47,7 +47,7 @@ class PageComparisonController extends ExceptionHandlerController {
         JobGroup comparativeJobGroup = JobGroup.get((cmd.selectedPageComparisons[0].jobGroupId2) as long)
 
         Page basePage = Page.get((cmd.selectedPageComparisons[0].pageId1) as long)
-        Page comparativePage = Page.get((cmd.selectedPageComparisons[0].pageId1) as long)
+        Page comparativePage = Page.get((cmd.selectedPageComparisons[0].pageId2) as long)
 
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
         List<BarchartAggregation> aggregations = barchartAggregationService.aggregateFor([selectedMeasurand], cmd.from.toDate(), cmd.to.toDate(), [baseJobGroup, comparativeJobGroup], [basePage, comparativePage])
@@ -80,6 +80,6 @@ class PageComparisonController extends ExceptionHandlerController {
         return new BarchartDatum(
                 measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.selectedMeasurand.name}", aggregation.selectedMeasurand.name),
                 value: aggregation.value,
-                grouping: "${aggregation.jobGroup} | ${aggregation.page}")
+                grouping: "${aggregation.jobGroup.name} | ${aggregation.page.name}")
     }
 }
