@@ -640,7 +640,7 @@ class RestApiController {
         JobResult jobResult = JobResult.findByTestId(testId)
 
         if(jobResult != null) {
-            List<MeasurementResultDto> results = thresholdService.checkResults(jobResult.eventResults)
+            List results = thresholdService.checkResults(jobResult.eventResults)
 
             Map objectToSend =
                     [

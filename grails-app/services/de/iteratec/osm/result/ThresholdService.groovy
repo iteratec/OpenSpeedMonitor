@@ -12,12 +12,10 @@ class ThresholdService {
      * @param eventResults The Event results
      * @return A list with the threshold results of the event results.
      */
-    List<MeasurementResultDto> checkResults(List<EventResult> eventResults) {
-        List<MeasurementResultDto> results = []
-        eventResults.each {
-            results.add(checkEventResult(it))
+    List checkResults(List<EventResult> eventResults) {
+        return eventResults.collect() {
+            checkEventResult(it)
         }
-        return results
     }
 
     /**
