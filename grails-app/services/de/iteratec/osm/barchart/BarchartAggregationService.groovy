@@ -71,7 +71,7 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withPageIn(allPages, true)
                 .withJobGroupIn(allJobGroups, true)
-                .withSelectedMeasurandProjection(selectedMeasurands)
+                .withSelectedMeasurandsAveragesProjection(selectedMeasurands)
                 .getResults()
 
         return hasMeasurand ? createListForMeasurandAggregation(selectedMeasurands, transformedAggregations) : createListForUserTimingAggregation(selectedMeasurands, transformedAggregations)
