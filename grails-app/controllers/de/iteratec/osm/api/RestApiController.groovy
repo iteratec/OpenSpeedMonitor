@@ -645,6 +645,7 @@ class RestApiController {
             Map objectToSend =
                     [
                             'status': jobResult.httpStatusCode,
+                            'job': jobResult.job.label,
                             'results': results.flatten()
                     ]
 

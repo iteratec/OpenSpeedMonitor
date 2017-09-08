@@ -26,6 +26,7 @@ class ThresholdService {
      */
     List<MeasurementResultDto> checkEventResult(EventResult eventResult) {
         List<Threshold> thresholds = Threshold.findAllByMeasuredEventAndJob(eventResult.measuredEvent, eventResult.jobResult.job)
+
         return thresholds.collect {
             String evaluatedResult
             if (eventResult."$it.measurand.eventResultField" < it.lowerBoundary) {
@@ -35,6 +36,7 @@ class ThresholdService {
             } else {
                 evaluatedResult = ThresholdResult.OK.getResult()
             }
+
             new MeasurementResultDto(
                     evaluatedResult: evaluatedResult,
                     measuredEvent: eventResult.measuredEvent.name,
