@@ -32,6 +32,11 @@
                     <g:message code="job.tab.custom.label" default="Custom Metrics"/>
                 </a>
             </li>
+            <li>
+                <a data-toggle="pill" href="#ThresholdContent">
+                    <g:message code="job.tab.threshold.label" default="Thresholds"/>
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -59,6 +64,9 @@
 
             <div id="CustomContent" class="tab-pane">
                 <g:render template="customTab" model="${['job': job]}"/>
+            </div>
+            <div id="ThresholdContent" class="tab-pane">
+                <g:render template="thresholdTab" model="${['job': job]}"/>
             </div>
         </div>
     </div>
