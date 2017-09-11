@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -48,6 +49,7 @@ class JobController {
     PerformanceLoggingService performanceLoggingService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
+    ThresholdService thresholdService
     I18nService i18nService
 
     private String getJobI18n() {
@@ -402,7 +404,8 @@ class JobController {
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
                 connectivites                  : ConnectivityProfile.findAllByActive(true),
                 customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
-                executionSchedule              : job.executionSchedule.substring(2)
+                executionSchedule              : job.executionSchedule.substring(2),
+                thresholds                     : thresholdService.getThresholdsForJob(job)
         ]
     }
 

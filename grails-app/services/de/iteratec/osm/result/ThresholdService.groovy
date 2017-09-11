@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.MeasurementResultDto
+import de.iteratec.osm.measurement.schedule.Job
 import grails.transaction.Transactional
 
 @Transactional
@@ -43,5 +44,14 @@ class ThresholdService {
                     measuredValue: eventResult."$it.measurand.eventResultField",
                     measurand: it.measurand)
         }
+    }
+
+    /**
+     *
+     * @param job
+     * @return
+     */
+    List<Threshold> getThresholdsForJob(Job job){
+        return Threshold.findAllByJob(job)
     }
 }

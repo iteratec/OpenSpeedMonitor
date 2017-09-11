@@ -1,10 +1,9 @@
 <div id="list-threshold" class="content scaffold-list" role="main">
-    <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
-    </g:if>
-    <f:table collection="${thresholdList}" />
+    <table>
+        <f:table collection="${thresholds}" />
 
-    <div>
-        <bs:paginate total="${thresholdCount ?: 0}" />
-    </div>
+        <div>
+            <bs:paginate total="${thresholds ?: 0}" />
+        </div>
+    </table>
 </div>
