@@ -3,7 +3,6 @@ package de.iteratec.osm.measurement.environment
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.DataIntegrityViolationExpectionUtil
-import de.iteratec.osm.util.DataIntegrityViolationUtil
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
