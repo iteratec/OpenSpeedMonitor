@@ -134,9 +134,4 @@ class BrowserController {
             '*' { render status: NOT_FOUND }
         }
     }
-
-    private static String toCamelCase( String text ) {
-        text = text.replaceAll( "(_)([A-Za-z0-9])", { Object[] it -> it[2].toUpperCase() } )
-        return text.capitalize()
-    }
 }
