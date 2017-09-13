@@ -308,6 +308,9 @@ class JobController {
         toggleActive(false)
     }
 
+    def addThreshold(){
+    }
+
     def nextExecution() {
         Map model = [:]
         model['cronstring'] = params.value
