@@ -66,9 +66,9 @@ class CsiSystemCsiAggregationService {
 
         JobGroup jobGroupOfResult = newResult.jobResult.job.jobGroup
 
-        List<CsiSystem> affectedCsiSystems = CsiSystem.where {
-            jobGroupWeights*.jobGroup.contains(jobGroupOfResult)
-        }.findAll()
+        List<CsiSystem> affectedCsiSystems = CsiSystem.list().findAll{
+            it.getAffectedJobGroups().contains(jobGroupOfResult)
+        }
 
         if (affectedCsiSystems && jobGroupOfResult.csiConfiguration != null) {
             List<Long> outdatedCsiAggregationIds = ensurePresence(start, interval, affectedCsiSystems)
