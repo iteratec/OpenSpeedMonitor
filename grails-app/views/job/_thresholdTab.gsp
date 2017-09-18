@@ -19,3 +19,5 @@
         <g:message code="job.threshold.create.new" default="Add Threshold"/>
     </a>
 </div>
+
+<g:render template="/_common/modals/createThresholdModal"/>
