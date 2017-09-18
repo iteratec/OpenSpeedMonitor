@@ -136,8 +136,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     };
 
     var calculateChartBarsHeight = function () {
-        var barBand = OpenSpeedMonitor.ChartComponents.ChartBars.BarBand;
-        var barGap = OpenSpeedMonitor.ChartComponents.ChartBars.BarGap;
+        var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
+        var barGap = OpenSpeedMonitor.ChartComponents.common.barGap;
         var numberOfBars = rawSeries.groupData ? rawSeries.groupData.length : 0;
         return ((numberOfBars - 1) * barGap) + numberOfBars * barBand;
     };

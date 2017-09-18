@@ -1,4 +1,4 @@
 //= require jobGroupAggregationChart.js
 //= require jobGroupAggregationGuiHandling.js
-//= require jobGroupAggregationUrlHandling.js
+//= require jobGroupAggregationHistoryStateHandling.js
 //= require_self

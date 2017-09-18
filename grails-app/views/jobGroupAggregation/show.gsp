@@ -82,13 +82,10 @@
     <asset:javascript src="/jobGroupAggregation/jobGroupAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
-        OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation().init();
-
         $(window).load(function() {
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="jobGroupAggregation/jobGroupAggregation.js"/>', "jobGroupAggregation");
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
         });
-
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
     </asset:script>
 </content>
 

@@ -14,6 +14,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
 
     var init = function() {
         drawGraphButton.click(loadData);
+        $(window).on('historyStateLoaded', function() {
+            loadData(false);
+        });
         $(window).on('resize', function() {
             jobGroupAggregationChart.setData({autoWidth: true});
             jobGroupAggregationChart.render();
@@ -22,13 +25,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     };
 
     var onFilterClick = function() {
-        jobGroupAggregationChart.setData({activeFilter: $(this).data("filter")});
-        jobGroupAggregationChart.render();
-        $(".chart-filter i").toggleClass('filterInactive', true);
-        $("i", $(this)).toggleClass('filterInactive', false);
+        event.preventDefault();
+        $(".chart-filter").toggleClass('selected', false);
+        $(this).toggleClass('selected', true);
+        renderChart({activeFilter: $(this).data("filter")}, true);
     };
 
-    var handleNewData = function (data) {
+    var handleNewData = function (data, isStateChange) {
         spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
@@ -41,13 +44,21 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         $('#warning-no-data').hide();
         data.width = -1;
 
-        jobGroupAggregationChart.setData(data);
-        jobGroupAggregationChart.render();
-        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
+        renderChart(data, isStateChange);
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var loadData = function() {
+    var renderChart = function (data, isStateChange) {
+        if (data) {
+            jobGroupAggregationChart.setData(data);
+            if (isStateChange) {
+                $(window).trigger("historyStateChanged");
+            }
+        }
+        jobGroupAggregationChart.render();
+    };
+
+    var loadData = function(isStateChanged) {
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
@@ -67,7 +78,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             data: queryData,
             url: OpenSpeedMonitor.urls.jobGroupAggregationGetData,
             dataType: "json",
-            success: handleNewData,
+            success: function (data) {
+                handleNewData(data, isStateChanged);
+            },
             error: function (e) {
                 spinner.stop();
                 $("#chart-card").removeClass("hidden")
