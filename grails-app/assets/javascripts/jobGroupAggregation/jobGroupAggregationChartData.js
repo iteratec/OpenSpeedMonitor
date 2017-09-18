@@ -22,7 +22,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
 
     var setData = function (data) {
         activeFilter = data.activeFilter || activeFilter;
-        rawSeries = data.series || rawSeries;
+        rawSeries = data.groupData ? data : rawSeries;
         orderedSeries = orderData(rawSeries) || orderedSeries;
         i18n = data.i18nMap || i18n;
         labelList = !orderedSeries ? labelList : [];

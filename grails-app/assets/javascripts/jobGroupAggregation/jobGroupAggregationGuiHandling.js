@@ -13,7 +13,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var drawGraphButton = $("#graphButtonHtmlId");
 
     var init = function() {
-        drawGraphButton.click(loadData);
+        drawGraphButton.click(function() {
+            loadData(true);
+        });
         $(window).on('historyStateLoaded', function() {
             loadData(false);
         });
@@ -22,6 +24,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $(".chart-filter").click(onFilterClick);
+    };
+
+    var getSelectedFilter = function () {
+        return $(".chart-filter.selected").data("filter");
     };
 
     var onFilterClick = function() {
@@ -43,6 +49,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
 
         $('#warning-no-data').hide();
         data.width = -1;
+        data.activeFilter = getSelectedFilter();
 
         renderChart(data, isStateChange);
         $("#dia-save-chart-as-png").removeClass("disabled");

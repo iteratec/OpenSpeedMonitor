@@ -7,7 +7,6 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.result.dto.JobGroupAggregationChartDTO
-import de.iteratec.osm.result.dto.JobGroupAggregationChartSeriesDTO
 import de.iteratec.osm.result.dto.JobGroupDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
@@ -98,19 +97,17 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         jobGroupAggregationChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
 
         //Jobgroup measurand and unit
-        JobGroupAggregationChartSeriesDTO jobGroupAggregationChartSeriesDTO = new JobGroupAggregationChartSeriesDTO()
-        jobGroupAggregationChartSeriesDTO.measurand = i18nService.msg("de.iteratec.isr.measurand.${allMeasurands[0]}", allMeasurands[0])
-        jobGroupAggregationChartSeriesDTO.unit = (allMeasurands[0] as Measurand).measurandGroup.unit.label
-        jobGroupAggregationChartSeriesDTO.measurandGroup = Measurand.valueOf(allMeasurands[0]).measurandGroup
+        jobGroupAggregationChartDTO.measurand = i18nService.msg("de.iteratec.isr.measurand.${allMeasurands[0]}", allMeasurands[0])
+        jobGroupAggregationChartDTO.unit = (allMeasurands[0] as Measurand).measurandGroup.unit.label
+        jobGroupAggregationChartDTO.measurandGroup = Measurand.valueOf(allMeasurands[0]).measurandGroup
 
         //Jobgroup groups and their values
         allEventResults.each { series ->
             JobGroupDTO jobGroupDTO = new JobGroupDTO()
             jobGroupDTO.jobGroup = series[0].name
             jobGroupDTO.value = series[1]
-            jobGroupAggregationChartSeriesDTO.groupData.add(jobGroupDTO);
+            jobGroupAggregationChartDTO.groupData.add(jobGroupDTO);
         }
-        jobGroupAggregationChartDTO.series = jobGroupAggregationChartSeriesDTO
 
         ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)
     }
