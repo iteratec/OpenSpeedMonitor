@@ -20,6 +20,7 @@ package de.iteratec.osm.api
 import de.iteratec.osm.csi.CsiDashboardController
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.PageService
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
@@ -87,7 +88,7 @@ class JobLinkService {
                             'selectedBrowsers': job.location.browser.id,
                             'selectedMeasuredEventIds': eventIds,
                             'selectedLocations': job.location.id,
-                            'selectedAggrGroupValuesUnCached': 'docCompleteTimeInMillisecsUncached',
+                            'selectedAggrGroupValuesUnCached': Measurand.DOC_COMPLETE_TIME,
                             '_action_showAll': 'Anzeigen',
                             'selectedChartType': 0
                     ])
