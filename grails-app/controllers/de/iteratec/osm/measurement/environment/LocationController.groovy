@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.DataIntegrityViolationExpectionUtil
 import grails.converters.JSON
 import org.hibernate.sql.JoinType
 import org.springframework.dao.DataIntegrityViolationException
@@ -76,6 +77,29 @@ class LocationController {
                 redirect location
             }
             '*'{ respond location, [status: OK] }
+        }
+    }
+
+    def delete(Location location) {
+
+        if (location == null) {
+            notFound()
+            return
+        }
+
+        try {
+            location.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            String dependency = DataIntegrityViolationExpectionUtil.getEntityNameForForeignKeyViolation(e)
+            if(dependency){
+                flash.message = message(code: 'default.not.deleted.foreignKeyConstraint.message', args: [message(code: 'location.label', default: 'Location'), params.id, dependency])
+            }else{
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
+            }
+            redirect(action: "index")
         }
     }
 
