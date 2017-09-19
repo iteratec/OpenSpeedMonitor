@@ -40,8 +40,13 @@
 
     <div class="col-md-6">
         <g:select id="measurand" name="measurand"
-                  from="${de.iteratec.osm.result.MeasuredEvent.list()*.name}"
+                  from="[]"
                   class="form-control chosen measured-event-select"/>
     </div>
 </div>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+      OpenSpeedMonitor.thresholdMeasuredEventList.init({scriptId: "${job?.script?.id}" , targetUrl:"${createLink(controller: 'script', action: 'getMeasuredEventsForScript')}"});
+    });
+</asset:script>
 

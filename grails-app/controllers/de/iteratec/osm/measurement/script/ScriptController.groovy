@@ -176,6 +176,16 @@ class ScriptController {
 		render output as JSON
 	}
 
+	def getMeasuredEventsForScript(String scriptId) {
+		Long id = Long.parseLong(scriptId)
+		Script script = Script.get(id)
+		ScriptParser parser = new ScriptParser(pageService, script.navigationScript)
+
+		def output = parser.getAllMeasuredEvent(script.navigationScript).collect {[id: it.id , name: it.name]}
+
+		render output as JSON
+	}
+
 	def getArchivedNavigationScript(long scriptId){
 		def navigationScript = ArchivedScript.findById(scriptId).navigationScript
 		ControllerUtils.sendObjectAsJSON(response, [
