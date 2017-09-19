@@ -20,4 +20,4 @@
     </a>
 </div>
 
-<g:render template="/_common/modals/createThresholdModal"/>
+<g:render template="/_common/modals/createThresholdModal" model="${['job':job]}"/>

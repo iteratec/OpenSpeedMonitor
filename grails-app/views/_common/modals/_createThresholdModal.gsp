@@ -14,7 +14,7 @@ This modal is used to create a threshold
 
             <div class="modal-body">
                 <div>
-                    <g:render template="/threshold/form"></g:render>
+                    <g:render template="/threshold/form" model="${['job':job]}"/>
                 </div>
             </div>
 
