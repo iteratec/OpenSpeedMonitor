@@ -29,6 +29,5 @@ RUN chmod +x /entrypoint.sh && \
     chown osm:osm -R $OSM_HOME $OSM_CONFIG_HOME
 
 USER osm
-VOLUME ["$OSM_CONFIG_HOME","$OSM_HOME/logs"]
 EXPOSE 8080
 ENTRYPOINT /entrypoint.sh

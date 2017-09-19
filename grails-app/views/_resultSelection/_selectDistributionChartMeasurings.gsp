@@ -1,3 +1,4 @@
+<%@ page import="de.iteratec.osm.result.Measurand" %>
 <div class="card form-horizontal" id="distributionChartMeasuringCard">
     <h2>
         <g:message code="de.iteratec.osm.selectMeasurings"
@@ -17,7 +18,7 @@
                                            class="form-control measurand-select"
                                            name="selectedMeasurandSeries"
                                            optionKey="value" optionValue="value"
-                                           value="${['docCompleteTimeInMillisecsUncached']}"/>
+                                           value="${[de.iteratec.osm.result.Measurand.DOC_COMPLETE_TIME]}"/>
             </div>
         </div>
     </div>
