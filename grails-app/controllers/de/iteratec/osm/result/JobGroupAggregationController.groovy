@@ -2,6 +2,8 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.barchart.BarchartAggregation
+import de.iteratec.osm.barchart.BarchartAggregationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -23,6 +25,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
+    BarchartAggregationService barchartAggregationService
 
     def index() {
         redirect(action: 'show')
@@ -32,7 +35,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
         Map<String, Object> modelToRender = [:]
 
         // AggregatorTypes
-        modelToRender.put('aggrGroupValuesUnCached', Measurand.values().groupBy { it.measurandGroup })
+        modelToRender.put('aggrGroupValuesUnCached', SelectedMeasurand.createDataMapForOptGroupSelect())
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -64,25 +67,10 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             return
         }
 
-        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(allMeasurands[0], CachedView.UNCACHED)
 
-        List allEventResults = EventResult.createCriteria().list {
-            'in'('jobGroup', allJobGroups)
-            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
-            'between'(
-                    'fullyLoadedTimeInMillisecs',
-                    osmConfigCacheService.getMinValidLoadtime(),
-                    osmConfigCacheService.getMaxValidLoadtime()
-            )
-            projections {
-                groupProperty('jobGroup')
-                measurandFieldName.each { m ->
-                    avg(m)
-                }
-            }
-        }
+        List<BarchartAggregation> allEventResults = barchartAggregationService.getBarchartAggregationsFor(cmd)
 
         // return if no data is available
         if (!allEventResults) {
@@ -98,15 +86,12 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         //Jobgroup measurand and unit
         jobGroupAggregationChartDTO.measurand = i18nService.msg("de.iteratec.isr.measurand.${allMeasurands[0]}", allMeasurands[0])
-        jobGroupAggregationChartDTO.unit = (allMeasurands[0] as Measurand).measurandGroup.unit.label
-        jobGroupAggregationChartDTO.measurandGroup = Measurand.valueOf(allMeasurands[0]).measurandGroup
+        jobGroupAggregationChartDTO.unit = selectedMeasurand.measurandGroup.unit.label
+        jobGroupAggregationChartDTO.measurandGroup = selectedMeasurand.measurandGroup
 
         //Jobgroup groups and their values
-        allEventResults.each { series ->
-            JobGroupDTO jobGroupDTO = new JobGroupDTO()
-            jobGroupDTO.jobGroup = series[0].name
-            jobGroupDTO.value = series[1]
-            jobGroupAggregationChartDTO.groupData.add(jobGroupDTO);
+        jobGroupAggregationChartDTO.groupData = allEventResults.collect {
+           new JobGroupDTO(jobGroup: it.jobGroup.name, value: it.value)
         }
 
         ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)
