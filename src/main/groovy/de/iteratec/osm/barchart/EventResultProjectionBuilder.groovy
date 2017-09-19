@@ -49,22 +49,33 @@ class EventResultProjectionBuilder {
         return this
     }
 
-    EventResultProjectionBuilder withSelectedMeasurandsAveragesProjection(List<SelectedMeasurand> selectedMeasurands) {
-        if (selectedMeasurands.any { it.selectedType == SelectedMeasurandType.MEASURAND }) {
-            selectedMeasurands.each {
-                if (it.selectedType == SelectedMeasurandType.MEASURAND) {
-                    addAvgProjection(it.getDatabaseRelevantName())
-                }
-            }
-        } else {
-            withUserTiming(selectedMeasurands.findAll { it.selectedType != SelectedMeasurandType.MEASURAND })
+    EventResultProjectionBuilder withMeasurandsAveragesProjection(List<SelectedMeasurand> measurands) {
+        if (measurands.any { it.selectedType.isUserTiming() }) {
+            throw new IllegalArgumentException("selectedMeasurands must not be user timings")
         }
+        measurands.each {
+            addAvgProjection(it.getDatabaseRelevantName())
+        }
+        return this
+    }
+
+    EventResultProjectionBuilder withUserTimingsAveragesProjection(List<SelectedMeasurand> userTimings) {
+        if (userTimings.any { !it.selectedType.isUserTiming() }) {
+            throw new IllegalArgumentException("selectedMeasurands must all be user timings")
+        }
+        List<String> userTimingNames = userTimings*.getDatabaseRelevantName()
+        this.joinUserTimings()
+        query.in(addAliasForUserTimingField('name'), userTimingNames)
+        addGroupByProjection(addAliasForUserTimingField('name'), 'name')
+        addGroupByProjection(addAliasForUserTimingField('type'), 'type')
+        addAvgProjection(addAliasForUserTimingField('startTime'), 'startTime')
+        addAvgProjection(addAliasForUserTimingField('duration'), 'duration')
         return this
     }
 
     EventResultProjectionBuilder withSelectedMeasurandPropertyProjection(SelectedMeasurand selectedMeasurand, String projectionName) {
         String propertyName
-        if (selectedMeasurand.selectedType == SelectedMeasurandType.MEASURAND) {
+        if (!selectedMeasurand.selectedType.isUserTiming()) {
             propertyName = selectedMeasurand.getDatabaseRelevantName()
         } else {
             this.joinUserTimings()
@@ -76,18 +87,6 @@ class EventResultProjectionBuilder {
             }
         }
         return addPropertyProjection(propertyName, projectionName)
-    }
-
-    private void withUserTiming(List<SelectedMeasurand> userTimings) {
-        List<String> userTimingNames = userTimings.findAll {
-            it.selectedType != SelectedMeasurandType.MEASURAND
-        }.collect { it.getDatabaseRelevantName() }
-        this.joinUserTimings()
-        query.in(addAliasForUserTimingField('name'), userTimingNames)
-        addGroupByProjection(addAliasForUserTimingField('name'), 'name')
-        addGroupByProjection(addAliasForUserTimingField('type'), 'type')
-        addAvgProjection(addAliasForUserTimingField('startTime'), 'startTime')
-        addAvgProjection(addAliasForUserTimingField('duration'), 'duration')
     }
 
     private void joinUserTimings() {
