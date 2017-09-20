@@ -13,28 +13,29 @@ import org.grails.datastore.mapping.query.Query
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private EventResultBaseQueryBuilder baseQueryBuilder
+    private EventResultCriteriaBuilder baseQueryBuilder
     private EventResultMeasurandQueryBuilder measurandQueryBuilder
     private EventResultUserTimingQueryBuilder userTimingQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        baseQueryBuilder = new EventResultBaseQueryBuilder(minValidLoadtime, maxValidLoadtime)
+        baseQueryBuilder = new EventResultCriteriaBuilder()
+        baseQueryBuilder.filterBetween('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
     }
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            baseQueryBuilder.filterDateBetween('jobResultDate', from, to)
+            baseQueryBuilder.filterBetween('jobResultDate', from, to)
         }
         return this
     }
 
     EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean groupBy = false) {
-        baseQueryBuilder.withFilterIn('jobGroup', jobGroups, groupBy)
+        baseQueryBuilder.filterIn('jobGroup', jobGroups, groupBy)
         return this
     }
 
     EventResultQueryBuilder withPageIn(List<Page> pages, boolean groupBy = false) {
-        baseQueryBuilder.withFilterIn('page', pages, groupBy)
+        baseQueryBuilder.filterIn('page', pages, groupBy)
         return this
     }
 
@@ -76,10 +77,10 @@ class EventResultQueryBuilder {
         List<EventResultProjection> measurandResult = []
 
         if (userTimingQueryBuilder) {
-            userTimingsResult += userTimingQueryBuilder.getResults(baseQueryBuilder.filters, baseQueryBuilder.projections, baseQueryBuilder.projectedFields)
+            userTimingsResult += userTimingQueryBuilder.getResultsForFilter(baseQueryBuilder)
         }
         if (measurandQueryBuilder) {
-            measurandResult += measurandQueryBuilder.getResults(baseQueryBuilder.filters, baseQueryBuilder.projections, baseQueryBuilder.projectedFields)
+            measurandResult += measurandQueryBuilder.getResultsForFilter(baseQueryBuilder)
         }
 
         return mergeResults(measurandResult, userTimingsResult)

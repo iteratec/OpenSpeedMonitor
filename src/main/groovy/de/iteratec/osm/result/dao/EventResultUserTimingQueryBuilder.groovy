@@ -7,40 +7,37 @@ import de.iteratec.osm.result.UserTimingType
 /**
  * Created by mwg on 20.09.2017.
  */
-class EventResultUserTimingQueryBuilder extends AbstractEventResultQueryExecutor {
+class EventResultUserTimingQueryBuilder{
     private static final String USER_TIMINGS_NAME = 'userTimings'
     private String singleMeasurandProjectionName = null
+    private EventResultCriteriaBuilder builder = new EventResultCriteriaBuilder()
 
     EventResultUserTimingQueryBuilder withUserTimingsAveragesProjection(List<SelectedMeasurand> userTimings) {
-        checkIfQueryIsThere()
-
         if (userTimings.any { !it.selectedType.isUserTiming() }) {
             throw new IllegalArgumentException("selectedMeasurands must all be user timings")
         }
         List<String> userTimingNames = userTimings*.getDatabaseRelevantName()
         this.joinUserTimings()
-        query.in(addAliasForUserTimingField('name'), userTimingNames)
-        addGroupByProjection(addAliasForUserTimingField('name'), 'name')
-        addGroupByProjection(addAliasForUserTimingField('type'), 'type')
-        addAvgProjection(addAliasForUserTimingField('startTime'), 'startTime')
-        addAvgProjection(addAliasForUserTimingField('duration'), 'duration')
+        builder.query.in(addAliasForUserTimingField('name'), userTimingNames)
+        builder.addGroupByProjection(addAliasForUserTimingField('name'), 'name')
+        builder.addGroupByProjection(addAliasForUserTimingField('type'), 'type')
+        builder.addAvgProjection(addAliasForUserTimingField('startTime'), 'startTime')
+        builder.addAvgProjection(addAliasForUserTimingField('duration'), 'duration')
 
         return this
     }
 
     EventResultUserTimingQueryBuilder withSelectedMeasurandPropertyProjection(SelectedMeasurand selectedMeasurand, String projectionName) {
-        checkIfQueryIsThere()
-
         if (selectedMeasurand.selectedType.isUserTiming()) {
             this.joinUserTimings()
-            query.eq(addAliasForUserTimingField('name'), selectedMeasurand.getDatabaseRelevantName())
+            builder.query.eq(addAliasForUserTimingField('name'), selectedMeasurand.getDatabaseRelevantName())
             String relevantFieldName = selectedMeasurand.selectedType == SelectedMeasurandType.USERTIMING_MEASURE ? 'duration' : 'startTime'
             String propertyName = addAliasForUserTimingField(relevantFieldName)
             if (!projectionName) {
                 projectionName = relevantFieldName
             }
             singleMeasurandProjectionName = projectionName
-            addPropertyProjection(propertyName, projectionName)
+            builder.addPropertyProjection(propertyName, projectionName)
         }
         return this
     }
@@ -50,7 +47,12 @@ class EventResultUserTimingQueryBuilder extends AbstractEventResultQueryExecutor
     }
 
     private void joinUserTimings() {
-        query.createAlias(USER_TIMINGS_NAME, USER_TIMINGS_NAME)
+        builder.query.createAlias(USER_TIMINGS_NAME, USER_TIMINGS_NAME)
+    }
+
+    List<EventResultProjection> getResultsForFilter(EventResultCriteriaBuilder baseFilters){
+        this.builder.mergeWith(baseFilters)
+        return createEventResultProjections(builder.getResults())
     }
 
     List<EventResultProjection> createEventResultProjections(List<Map> transformedAggregations) {
