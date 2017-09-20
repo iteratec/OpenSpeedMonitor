@@ -4,6 +4,8 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.util.I18nService
@@ -48,37 +50,21 @@ class BarchartAggregationService {
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
-    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> allJobGroups, List<Page> allPages) {
+    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages) {
         if (!selectedMeasurands) {
             return []
         }
-        List<BarchartAggregation> barchartAggregations = []
 
-        List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
-        if (userTimings) {
-            List<Map> transformedAggregations = initEventResultProjectionBuilder(from, to, allPages, allJobGroups)
-                    .withUserTimingsAveragesProjection(selectedMeasurands)
-                    .getResults()
-            barchartAggregations += createListForUserTimingAggregation(userTimings, transformedAggregations)
-        }
-
-        List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
-        if (measurands) {
-            List<Map> transformedAggregations = initEventResultProjectionBuilder(from, to, allPages, allJobGroups)
-                    .withMeasurandsAveragesProjection(selectedMeasurands)
-                    .getResults()
-            barchartAggregations += createListForMeasurandAggregation(measurands, transformedAggregations)
-        }
-
-        return barchartAggregations
-    }
-
-    private EventResultProjectionBuilder initEventResultProjectionBuilder(Date from, Date to, List<Page> pages, List<JobGroup> jobGroups) {
-        return new EventResultProjectionBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages, true)
                 .withJobGroupIn(jobGroups, true)
+                .withSelectedMeasurandAverageProjection(selectedMeasurands)
+                .getResults()
+
+        return createListForEventResultProjection(selectedMeasurands, projections)
     }
+
 
     private List<BarchartAggregation> mergeAggregationsWithComparatives(List<BarchartAggregation> values, List<BarchartAggregation> comparativeValues) {
         if (comparativeValues) {
@@ -90,7 +76,7 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForMeasurandAggregation(List<SelectedMeasurand> selectedMeasurands, List<Map> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
@@ -104,20 +90,4 @@ class BarchartAggregationService {
         }
         return result
     }
-
-    private List<BarchartAggregation> createListForUserTimingAggregation(List<SelectedMeasurand> selectedMeasurands, List<Map> userTimingAggregations) {
-        return userTimingAggregations.collect { aggregation ->
-            SelectedMeasurand selected = selectedMeasurands.find {
-                it.name == aggregation.name && it.selectedType == aggregation.type.selectedMeasurandType
-            }
-            Double valueRaw = aggregation.type == UserTimingType.MEASURE ? aggregation.duration : aggregation.startTime
-            new BarchartAggregation(
-                    value: selected.normalizeValue(valueRaw),
-                    selectedMeasurand: selected,
-                    jobGroup: aggregation.jobGroup,
-                    page: aggregation.page
-            )
-        }
-    }
-
 }

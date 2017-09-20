@@ -2,7 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.EventResultProjectionBuilder
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -14,6 +13,8 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -183,12 +184,12 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
-        List<Map> aggregations = new EventResultProjectionBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIn(allJobGroups)
                 .withJobResultDateBetween(from, to)
-                .addPropertyProjection('jobGroup')
+                .withProjectedBaseProperty('jobGroup')
                 .withPageIn(allPages)
-                .addPropertyProjection('page')
+                .withProjectedBaseProperty('page')
                 .withSelectedMeasurandPropertyProjection(selectedMeasurand, 'value')
                 .getResults()
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()

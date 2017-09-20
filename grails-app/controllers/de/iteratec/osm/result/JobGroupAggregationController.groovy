@@ -80,6 +80,8 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         JobGroupAggregationChartDTO jobGroupAggregationChartDTO = new JobGroupAggregationChartDTO()
 
+        EventResult
+
         //Label translations
         jobGroupAggregationChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         jobGroupAggregationChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
