@@ -1,5 +1,8 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.util.ControllerUtils
+import org.springframework.boot.autoconfigure.batch.BatchProperties
 import org.springframework.dao.DataIntegrityViolationException
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller-templated was edited due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
@@ -102,6 +105,27 @@ class ThresholdController {
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    def createAsync() {
+        Job job = Job.findByLabel(params['job']);
+        Measurand measurand = params['measurand']
+        MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']));
+        Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
+        Integer upperBoundary = Integer.parseInt(params['upperBoundary'])
+
+        Threshold threshold = new Threshold(job: job, measurand: measurand, measuredEvent: measuredEvent, lowerBoundary: lowerBoundary, upperBoundary: upperBoundary)
+
+        if (!threshold.save(flush: true)) {
+            //ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
+        } else {
+            threshold.save(flush: true)
+            ControllerUtils.sendObjectAsJSON(response, ['measurand': threshold.measurand, 'job': threshold.job.id])
         }
     }
 }

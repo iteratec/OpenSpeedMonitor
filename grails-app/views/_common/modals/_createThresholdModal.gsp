@@ -24,7 +24,7 @@ This modal is used to create a threshold
                 <span class="button">
                     <button type="button" data-dismiss="modal" aria-hidden="true" role="button"
                             id="createJobGroupButton" class="btn btn-primary"
-                            onclick="createJobGroup('${g.createLink([controller: 'jobGroup', action: 'createAsync'])}')"><g:message
+                            onclick="createThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')"><g:message
                             code="default.button.create.label" default="create"/></button>
                 </span>
             </div>
