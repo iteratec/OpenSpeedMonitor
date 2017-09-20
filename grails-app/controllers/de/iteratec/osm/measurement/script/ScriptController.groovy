@@ -176,6 +176,12 @@ class ScriptController {
 		render output as JSON
 	}
 
+	/**
+	 * Collects all measured events for a script.
+	 *
+	 * @param scriptId The selected script id.
+	 * @return All measured events for the script id.
+	 */
 	def getMeasuredEventsForScript(String scriptId) {
 		Long id = Long.parseLong(scriptId)
 		Script script = Script.get(id)

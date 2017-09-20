@@ -5,7 +5,19 @@
 
 <div class="form-group fieldcontain required">
 
-    <label for="name" class="control-label col-md-3"><g:message code="sdsd" default="Measurand"/><span
+    <label for="measuredEvent" class="control-label col-md-3"><g:message code="sdsd" default="Measured Event"/><span
+            class="required-indicator">*</span></label>
+
+    <div class="col-md-6">
+        <g:select id="measuredEvent" name="measuredEvent"
+                  from="[]"
+                  class="form-control chosen measured-event-select"/>
+    </div>
+</div>
+
+<div class="form-group fieldcontain required">
+
+    <label for="measurand" class="control-label col-md-3"><g:message code="sdsd" default="Measurand"/><span
             class="required-indicator">*</span></label>
 
     <div class="col-md-6">
@@ -15,36 +27,26 @@
     </div>
 </div>
 
-<div class="form-group fieldcontain ${hasErrors(bean: threshold, field: 'upperBoundary', 'error')} required">
-    <label for="name" class="control-label col-md-3"><g:message code="sdsd" default="Upper Boundary"/><span
-            class="required-indicator">*</span></label>
-
-    <div class="col-md-6">
-        <g:field class="form-control" type="number" name="upperBoundary" cols="40" rows="5" maxlength="255" value="${threshold?.upperBoundary}"/>
-    </div>
-</div>
-
 <div class="form-group fieldcontain ${hasErrors(bean: threshold, field: 'lowerBoundary', 'error')} required">
-    <label for="name" class="control-label col-md-3"><g:message code="sdsd" default="Lower Boundary"/><span
+    <label for="lowerBoundary" class="control-label col-md-3"><g:message code="sdsd" default="Lower Boundary"/><span
             class="required-indicator">*</span></label>
 
     <div class="col-md-6">
-        <g:field class="form-control" type="number" name="lowerBoundary" cols="40" rows="5" maxlength="255" value="${threshold?.upperBoundary}"/>
+        <g:field id="lowerBoundary" class="form-control" type="number" min="1" name="lowerBoundary" cols="40" rows="5" maxlength="255" value="${threshold?.upperBoundary}"/>
     </div>
 </div>
 
-<div class="form-group fieldcontain required">
-
-    <label for="name" class="control-label col-md-3"><g:message code="sdsd" default="Measurand"/><span
+<div class="form-group fieldcontain ${hasErrors(bean: threshold, field: 'upperBoundary', 'error')} required">
+    <label for="upperBoundary" class="control-label col-md-3"><g:message code="sdsd" default="Upper Boundary"/><span
             class="required-indicator">*</span></label>
 
     <div class="col-md-6">
-        <g:select id="measurand" name="measurand"
-                  from="[]"
-                  class="form-control chosen measured-event-select"/>
+        <g:field id="upperBoundary" class="form-control" type="number" min="1" name="upperBoundary" cols="40" rows="5" maxlength="255" value="${threshold?.upperBoundary}"/>
     </div>
 </div>
+
 <asset:script type="text/javascript">
+    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdMeasuredEventList.js"/>');
     $(window).load(function() {
       OpenSpeedMonitor.thresholdMeasuredEventList.init({scriptId: "${job?.script?.id}" , targetUrl:"${createLink(controller: 'script', action: 'getMeasuredEventsForScript')}"});
     });

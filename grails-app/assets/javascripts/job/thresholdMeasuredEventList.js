@@ -4,26 +4,27 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
-    var init = function (data) {
+    var getMeasuredEvents = function (data) {
+        var scriptId = data.scriptId;
+        var targetUrl = data.targetUrl;
 
-        if(navigationScript && targetUrl){
+        if(scriptId && targetUrl){
             $.ajax({
                 type: 'POST',
-                url: data.targetUrl,
-                data: { scriptId: data.scriptId },
+                url: targetUrl,
+                data: { scriptId: scriptId },
                 success : function(result) {
                     OpenSpeedMonitor.domUtils.updateSelectOptions($('.measured-event-select'), result, null);
                 }
                 ,
-                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                error : function() {
                     return ""
                 }
             });
         }
-
     };
 
     return{
-        init: init
+        init: getMeasuredEvents
     }
 })();
