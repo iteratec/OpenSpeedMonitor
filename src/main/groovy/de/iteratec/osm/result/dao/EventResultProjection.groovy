@@ -9,6 +9,7 @@ import groovy.transform.EqualsAndHashCode
  */
 @EqualsAndHashCode(excludes = ["projectedProperties"])
 class EventResultProjection {
+    boolean isAggregation
     JobGroup jobGroup
     Page page
     Map projectedProperties = [:]

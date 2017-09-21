@@ -7,8 +7,10 @@ import de.iteratec.osm.result.SelectedMeasurand
  */
 class EventResultMeasurandQueryBuilder{
     private EventResultCriteriaBuilder builder = new EventResultCriteriaBuilder()
+    boolean  isAggregated
 
     EventResultMeasurandQueryBuilder withMeasurandsAveragesProjection(List<SelectedMeasurand> measurands) {
+        isAggregated = true
         if (measurands.any { SelectedMeasurand measurand -> measurand.selectedType.isUserTiming() }) {
             throw new IllegalArgumentException("selectedMeasurands must not be user timings")
         }
@@ -39,6 +41,7 @@ class EventResultMeasurandQueryBuilder{
             EventResultProjection eventResultProjection = new EventResultProjection(
                     jobGroup: it.jobGroup,
                     page: it.page,
+                    isAggregation: isAggregated,
             )
             it.remove("jobGroup")
             it.remove("page")

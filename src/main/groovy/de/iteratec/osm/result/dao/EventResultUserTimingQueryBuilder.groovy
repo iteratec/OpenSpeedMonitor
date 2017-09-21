@@ -69,7 +69,7 @@ class EventResultUserTimingQueryBuilder {
             it.page == transformedAggregation.page && it.jobGroup == transformedAggregation.jobGroup && it."$transformedAggregation.name" == null
         }
         if(!relevantProjection){
-            relevantProjection = new EventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page)
+            relevantProjection = new EventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page, isAggregation: isAggregated)
             result.add(relevantProjection)
         }
         return relevantProjection
