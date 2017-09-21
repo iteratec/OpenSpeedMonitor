@@ -7,7 +7,6 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 
@@ -59,7 +58,7 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages, true)
                 .withJobGroupIn(jobGroups, true)
-                .withSelectedMeasurandAverageProjection(selectedMeasurands)
+                .withSelectedMeasurandsAverageProjection(selectedMeasurands)
                 .getResults()
 
         return createListForEventResultProjection(selectedMeasurands, projections)

@@ -9,7 +9,6 @@ import org.grails.datastore.mapping.query.Query
  * Created by mwg on 20.09.2017.
  */
 class EventResultCriteriaBuilder {
-    boolean isAggregated = false
     List<String> projectedFields = []
     List<Query.Projection> projections = []
     DetachedCriteria query = new DetachedCriteria(EventResult)
@@ -33,17 +32,21 @@ class EventResultCriteriaBuilder {
         }
     }
 
+    void filterEquals(String propertyName, def toBeEqualTo) {
+        if (toBeEqualTo) {
+            query.eq(propertyName, toBeEqualTo)
+        }
+    }
+
     void addPropertyProjection(String propertyName, String projectionName = null) {
         addProjection(Projections.property(propertyName), propertyName, projectionName)
     }
 
     void addAvgProjection(String propertyName, String projectionName = null) {
-        isAggregated = true
         addProjection(Projections.avg(propertyName), propertyName, projectionName)
     }
 
     void addGroupByProjection(String propertyName, String projectionName = null) {
-        isAggregated = true
         addProjection(Projections.groupProperty(propertyName), propertyName, projectionName)
     }
 
@@ -62,17 +65,15 @@ class EventResultCriteriaBuilder {
     }
 
     EventResultCriteriaBuilder mergeWith(EventResultCriteriaBuilder eventResultCriteriaBuilder) {
-        if (eventResultCriteriaBuilder.isAggregated == this.isAggregated) {
-            eventResultCriteriaBuilder.filters.each {
-                query.add(it)
-            }
-            projections += eventResultCriteriaBuilder.projections
-            projectedFields += eventResultCriteriaBuilder.projectedFields
+        eventResultCriteriaBuilder.filters.each {
+            query.add(it)
         }
+        projections += eventResultCriteriaBuilder.projections
+        projectedFields += eventResultCriteriaBuilder.projectedFields
         return this
     }
 
-    List<Map> transformAggregations(def aggregations) {
+    private List<Map> transformAggregations(def aggregations) {
         List<Map> result = []
         aggregations.each { aggregation ->
             Map transformed = [:]

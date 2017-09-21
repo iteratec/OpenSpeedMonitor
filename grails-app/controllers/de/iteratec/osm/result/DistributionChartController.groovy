@@ -190,19 +190,19 @@ class DistributionChartController extends ExceptionHandlerController {
                 .withProjectedBaseProperty('jobGroup')
                 .withPageIn(allPages)
                 .withProjectedBaseProperty('page')
-                .withSelectedMeasurandPropertyProjection(selectedMeasurand, 'value')
+                .withSelectedMeasurandsPropertyProjection([selectedMeasurand])
                 .getResults()
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
-        if(aggregations.any {it.value != null}){
+        if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
                 aggregations.each {
-                    if(it.value){
+                    if(it."${selectedMeasurand.getDatabaseRelevantName()}"){
                         String identifier = "${it.page} | ${it.jobGroup}"
                         if (!distributionChartDTO.series.get(identifier)) {
                             distributionChartDTO.series.put(identifier, new DistributionTrace(page: it.page, jobGroup: it.jobGroup))
                         }
                         def newTrace = distributionChartDTO.series.get(identifier)
-                        newTrace.data.add(selectedMeasurand.normalizeValue(it.value))
+                        newTrace.data.add(selectedMeasurand.normalizeValue(it."${selectedMeasurand.getDatabaseRelevantName()}"))
                     }
                 }
             }
