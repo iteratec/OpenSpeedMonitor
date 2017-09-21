@@ -61,7 +61,7 @@ class BarchartAggregationService {
                 .withSelectedMeasurandsAverageProjection(selectedMeasurands)
                 .getResults()
 
-        return createListForEventResultProjection(selectedMeasurands, projections)
+        return createListForEventResultProjection(selectedMeasurands, projections, from, to)
     }
 
 
@@ -70,12 +70,13 @@ class BarchartAggregationService {
             comparativeValues.each { comparative ->
                 BarchartAggregation matches = values.find { it == comparative }
                 matches.valueComparative = comparative.value
+                matches.medianComparative = comparative.median
             }
         }
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, Date from, Date to) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
@@ -83,10 +84,15 @@ class BarchartAggregationService {
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
                         jobGroup: aggregation.jobGroup,
-                        page: aggregation.page
+                        page: aggregation.page,
+                        median: getMedianFor(aggregation, selected, from, to)
                 )
             }
         }
         return result
+    }
+    private Double getMedianFor(EventResultProjection eventResultProjection, SelectedMeasurand selectedMeasurand, Date from, Date to){
+        def medianRaw = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime()).withJobResultDateBetween(from,to).withJobGroupEquals(eventResultProjection.jobGroup).withPageEquals(eventResultProjection.page).getMedianForSelection(selectedMeasurand).median
+        return selectedMeasurand.normalizeValue(medianRaw)
     }
 }

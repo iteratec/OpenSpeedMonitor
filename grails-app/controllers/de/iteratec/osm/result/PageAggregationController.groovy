@@ -118,7 +118,9 @@ class PageAggregationController extends ExceptionHandlerController {
                         measurand: it.selectedMeasurand.name,
                         measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
                         value: it.value,
+                        median: it.median,
                         valueComparative: it.valueComparative,
+                        medianComparative: it.medianComparative,
                         page: it.page,
                         jobGroup: it.jobGroup
                 )

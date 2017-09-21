@@ -31,8 +31,18 @@ class EventResultQueryBuilder {
         return this
     }
 
+    EventResultQueryBuilder withJobGroupEquals(JobGroup jobGroups) {
+        baseQueryBuilder.filterEquals('jobGroup', jobGroups)
+        return this
+    }
+
     EventResultQueryBuilder withPageIn(List<Page> pages, boolean groupBy = false) {
         baseQueryBuilder.filterIn('page', pages, groupBy)
+        return this
+    }
+
+    EventResultQueryBuilder withPageEquals(Page pages) {
+        baseQueryBuilder.filterEquals('page', pages)
         return this
     }
 
@@ -86,6 +96,10 @@ class EventResultQueryBuilder {
         }
 
         return mergeResults(measurandResult, userTimingsResult)
+    }
+
+    EventResultProjection getMedianForSelection(SelectedMeasurand selectedMeasurand) {
+        return new EventResultMedianBuilder().getMedianFor(baseQueryBuilder, selectedMeasurand)
     }
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResult, List<EventResultProjection> userTimingResult) {

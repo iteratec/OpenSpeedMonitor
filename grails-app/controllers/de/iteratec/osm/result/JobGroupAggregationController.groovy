@@ -67,8 +67,51 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             return
         }
 
+        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
+        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(allMeasurands[0], CachedView.UNCACHED)
+
+        Double median;
+        List listEventResults = EventResult.createCriteria().list {
+            'in'('jobGroup', allJobGroups)
+            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                    'fullyLoadedTimeInMillisecs',
+                    osmConfigCacheService.getMinValidLoadtime(),
+                    osmConfigCacheService.getMaxValidLoadtime()
+            )
+//            'ge'(measurandFieldName[0], 0)
+            'order'(measurandFieldName[0], 'asc')
+            projections {
+                property('jobGroup')
+                property(measurandFieldName[0])
+            }
+        }
+
+        List avgResults = EventResult.createCriteria().list {
+            'in'('jobGroup', allJobGroups)
+            'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
+            'between'(
+                    'fullyLoadedTimeInMillisecs',
+                    osmConfigCacheService.getMinValidLoadtime(),
+                    osmConfigCacheService.getMaxValidLoadtime()
+            )
+            projections {
+                groupProperty('jobGroup')
+                measurandFieldName.each { m ->
+                    avg(m)
+                }
+            }
+        }
+
+        def bla = listEventResults.get(7500);
+        if ((listEventResults.size() % 2) != 0) {
+            median = listEventResults.get((Integer) ((listEventResults.size() - 1) / 2))[1];
+        } else {
+            median = (listEventResults.get((Integer) (listEventResults.size() / 2))[1] +
+                    listEventResults.get((Integer) (listEventResults.size() / 2) + 1)[1]) / 2
+        }
 
         List<BarchartAggregation> allEventResults = barchartAggregationService.getBarchartAggregationsFor(cmd)
 
@@ -91,7 +134,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         //Jobgroup groups and their values
         jobGroupAggregationChartDTO.groupData = allEventResults.collect {
-           new JobGroupDTO(jobGroup: it.jobGroup.name, value: it.value)
+           new JobGroupDTO(jobGroup: it.jobGroup.name, value: it.value, median: it.median)
         }
 
         ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)

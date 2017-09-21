@@ -38,6 +38,12 @@ class EventResultCriteriaBuilder {
         }
     }
 
+    void orderBy(String propertyName) {
+        if(propertyName) {
+            query.order(propertyName,'asc')
+        }
+    }
+
     void addPropertyProjection(String propertyName, String projectionName = null) {
         addProjection(Projections.property(propertyName), propertyName, projectionName)
     }
@@ -77,8 +83,13 @@ class EventResultCriteriaBuilder {
         List<Map> result = []
         aggregations.each { aggregation ->
             Map transformed = [:]
-            projectedFields.each {
-                transformed.put(it, aggregation[projectedFields.indexOf(it)])
+            if(projectedFields.size() == 1){
+                transformed.put(projectedFields[0], aggregation)
+            }else{
+
+                projectedFields.each {
+                    transformed.put(it, aggregation[projectedFields.indexOf(it)])
+                }
             }
             result.add(transformed)
         }
