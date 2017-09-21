@@ -342,6 +342,16 @@ class JobController {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, script?.navigationScript)
     }
 
+    /**
+     *
+     * @param jobId
+     * @return
+     */
+    def getThresholdsForJob(long jobId) {
+        Job job = Job.get(jobId: jobId)
+        return thresholdService.getThresholdsForJob(job)
+    }
+
     def getRunningAndRecentlyFinishedJobs() {
         // the following does not work due to unresolved bug in Grails:
         // http://jira.grails.org/browse/GPCONVERTERS-10
