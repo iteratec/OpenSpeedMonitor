@@ -16,6 +16,7 @@
  */
 //= require prettycron/prettycronManifest.js
 //= require bower_components/tagit/js/tag-it.min.js
+//= require bower_components/vue/dist/vue.js
 //= require_self
 function doOnDomReady(newJob,
                       customConnNameForNative,
