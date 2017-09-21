@@ -59,20 +59,19 @@ class EventResultUserTimingQueryBuilder {
         List<EventResultProjection> result = []
         transformedAggregations.each { transformedAggregation ->
             def relevantValue = transformedAggregation.type == UserTimingType.MEASURE ? transformedAggregation.duration : transformedAggregation.startTime
-            EventResultProjection relevantProjection = null
-            if(isAggregated){
-                relevantProjection = result.find {
-                    it.page == transformedAggregation.page && it.jobGroup == transformedAggregation.jobGroup && it."$transformedAggregation.name" == null
-                }
-            }
-            if (relevantProjection) {
-                relevantProjection.projectedProperties.put(transformedAggregation.name, relevantValue)
-            } else {
-                relevantProjection = new EventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page)
-                relevantProjection.projectedProperties.put(transformedAggregation.name, relevantValue)
-                result += relevantProjection
-            }
+            getRelevantProjection(transformedAggregation, result).projectedProperties.put(transformedAggregation.name, relevantValue)
         }
         return result
+    }
+
+    private EventResultProjection getRelevantProjection(Map transformedAggregation, List<EventResultProjection> result){
+        EventResultProjection relevantProjection = result.find {
+            it.page == transformedAggregation.page && it.jobGroup == transformedAggregation.jobGroup && it."$transformedAggregation.name" == null
+        }
+        if(!relevantProjection){
+            relevantProjection = new EventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page)
+            result.add(relevantProjection)
+        }
+        return relevantProjection
     }
 }
