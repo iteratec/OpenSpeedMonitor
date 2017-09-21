@@ -17,42 +17,49 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
+import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Shared
+import spock.lang.Specification
+
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.WARN
 
 @Integration
 @Rollback
 class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
-    /** injected by grails */
+    def log = LogFactory.getLog(getClass())
+
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     @Shared
     ResultPersisterService resultPersisterService
 
-    CsiAggregationInterval hourly
     CsiAggregationInterval weekly
+    Map<String, Location> locations
+    Long jobGroupId
+    Map<String, MeasuredEvent> measuredEvents
+    Map<String, Page> pages
+    Map<String, Browser> browsers
 
-    static final List<String> pagesToTest = [
-            'HP',
-            'MES',
-            'SE',
-            'ADS',
-            'WKBS',
-            'WK'
-    ]
-    static final String csiGroupName = "CSI"
-    /** Testdata is persisted respective this csv */
     static final String csvFilename = 'weekly_page.csv'
 
     /**
@@ -60,72 +67,39 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
      * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
      * with valid TimeToCsMappings from 2012 and added to csv.
      */
-
     def setup() {
-        CsiAggregation.withNewTransaction {
-            System.out.println('Create some common test-data...');
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createCsiAggregationIntervals()
-
-            System.out.println('Loading CSV-data...');
-            TestDataUtil.
-                    loadTestDataFromCustomerCSV(new File("src/test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
-            System.out.println('Loading CSV-data... DONE');
-
-        }
-
-        EventResult.findAll().each {
-            resultPersisterService.informDependentCsiAggregations(it)
-        }
-
-        CsiAggregation.withNewTransaction {
-            CsiConfiguration.findAll().each { csiConfiguration ->
-                ConnectivityProfile.findAll().each { connectivityProfile ->
-                    Browser.findAll().each { browser ->
-                        csiConfiguration.browserConnectivityWeights.
-                                add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
-                    }
-                    Page.findAll().each { page ->
-                        csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
-                    }
-                }
-            }
-
-            System.out.println('Create some common test-data... DONE');
-        }
-        hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-        weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+        createTestDataCommonToAllTests()
     }
 
     //tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void testCalculatingWeeklyShopValueWithoutData() {
         setup:
-        Date startDate = new DateTime(2012, 01, 12, 0, 0, DateTimeZone.UTC).toDate()
-        JobGroup csiGroup = JobGroup.findByName(csiGroupName)
+        Date startDateWithoutResults = new DateTime(2012, 01, 12, 0, 0, DateTimeZone.UTC).toDate()
 
         CsiAggregation mvWeeklyShop
         CsiAggregation.withNewTransaction {
-            mvWeeklyShop = new CsiAggregation(
-                    started: startDate,
-                    interval: weekly,
-                    aggregationType: AggregationType.JOB_GROUP,
-                    jobGroup: csiGroup,
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: ''
-            ).save(failOnError: true)
+            mvWeeklyShop = CsiAggregation.build(
+                started: startDateWithoutResults,
+                interval: weekly,
+                aggregationType: AggregationType.JOB_GROUP,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: ''
+            )
         }
 
         when:
         jobGroupCsiAggregationService.calcCsiAggregations([mvWeeklyShop.id])
 
         then:
-        startDate == mvWeeklyShop.started
-        weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-        AggregationType.JOB_GROUP == mvWeeklyShop.aggregationType
-        csiGroup.id == mvWeeklyShop.jobGroupId
+        mvWeeklyShop.started == startDateWithoutResults
+        mvWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
+        mvWeeklyShop.aggregationType == AggregationType.JOB_GROUP
+        mvWeeklyShop.jobGroupId == jobGroupId
         mvWeeklyShop.isCalculated()
-        0 == mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete()
+        mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete() == 0
         mvWeeklyShop.csByWptDocCompleteInPercent == null
+
     }
 
     /**
@@ -135,30 +109,28 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
      */
     void testCalculatingWeeklyShopValue() {
         setup:
-        Date startDate = new DateTime(2012, 11, 12, 0, 0, DateTimeZone.UTC).toDate()
-        Integer targetResultCount = 233 + 231 + 122 + 176 + 172 + 176
+        createResultDataFromCsv()
+        Date startDateWithData = new DateTime(2012, 11, 12, 0, 0, DateTimeZone.UTC).toDate()
+        Integer targetResultCount = 6*234
 
-        List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-
-        //create test-specific data
-        JobGroup csiGroup = JobGroup.findByName(csiGroupName)
+        List<EventResult> results = EventResult.findAllByJobResultDateBetween(
+            startDateWithData,
+            new DateTime(startDateWithData).plusWeeks(1).toDate()
+        )
         Double expectedValue = 61.30
         long csiAggregationId
 
         CsiAggregation.withNewTransaction {
-
-            CsiAggregation aggregation = new CsiAggregation(
-                    started: startDate,
-                    interval: weekly,
-                    aggregationType: AggregationType.JOB_GROUP,
-                    jobGroup: csiGroup,
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: ''
-            ).save(failOnError: true, flush: true)
+            CsiAggregation aggregation = CsiAggregation.build(
+                started: startDateWithData,
+                interval: weekly,
+                aggregationType: AggregationType.JOB_GROUP,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: ''
+            )
             csiAggregationId = aggregation.id
         }
-
-        CsiAggregationInterval.findAll()
 
         when:
         CsiAggregation.withNewSession { session ->
@@ -169,14 +141,128 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
         then:
         Math.abs(results.size() - targetResultCount) < 30
-        startDate == mvWeeklyShop.started
-        weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-        AggregationType.JOB_GROUP == mvWeeklyShop.aggregationType
-        csiGroup == mvWeeklyShop.jobGroup
+        mvWeeklyShop.started == startDateWithData
+        mvWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
+        mvWeeklyShop.aggregationType == AggregationType.JOB_GROUP
+        mvWeeklyShop.jobGroup.id == jobGroupId
         mvWeeklyShop.isCalculated()
         mvWeeklyShop.csByWptDocCompleteInPercent != null
         Double calculated = mvWeeklyShop.csByWptDocCompleteInPercent * 100
         //TODO: diff should be smaller
         Double.compare(expectedValue, calculated) < 5.0d
     }
+
+    private createTestDataCommonToAllTests() {
+        OsmConfiguration.build()
+        jobGroupId = JobGroup.build().ident()
+        CsiAggregation.withNewTransaction {
+            CsiAggregationInterval.build(
+                name: "hourly",
+                intervalInMinutes: CsiAggregationInterval.HOURLY
+            )
+            CsiAggregationInterval.build(
+                name: "daily",
+                intervalInMinutes: CsiAggregationInterval.DAILY
+            )
+            weekly = CsiAggregationInterval.build(
+                name: "weekly",
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
+            )
+        }
+    }
+
+    private createResultDataFromCsv() {
+        CsiAggregation.withNewTransaction {
+
+            browsers = [
+                "IE8": Browser.build(name: "IE8"),
+                "FF": Browser.build(name: "FF")
+            ]
+            locations = [
+                "IE8": Location.build(label: "IE8",browser: browsers["IE8"]),
+                "FF": Location.build(label: "FF",browser: browsers["FF"])
+            ]
+            measuredEvents = [
+                'Step01': MeasuredEvent.build(name: 'step01'),
+                'Step02': MeasuredEvent.build(name: 'step02'),
+                'Step03': MeasuredEvent.build(name: 'step3'),
+                'Step04': MeasuredEvent.build(name: 'step04'),
+                'Step05': MeasuredEvent.build(name: 'step05'),
+                'Step06': MeasuredEvent.build(name: 'step06')
+            ]
+            pages = [
+                    'Step01': Page.build(name: 'step01'),
+                    'Step02': Page.build(name: 'step02'),
+                    'Step03': Page.build(name: 'step03'),
+                    'Step04': Page.build(name: 'step04'),
+                    'Step05': Page.build(name: 'step05'),
+                    'Step06': Page.build(name: 'step06')
+            ]
+
+            ConnectivityProfile profile = ConnectivityProfile.build()
+            Job job = Job.build()
+
+            new File("src/test/resources/CsiData/${csvFilename}").eachLine {String csvLine ->
+                if (!isHeaderLine(csvLine)){
+
+                    List<String> csvFields = csvLine.split(';')
+
+                    String browserAndLocation = csvFields[0]
+                    String pageAndMeasuredEvent = csvFields[1]
+                    String docCompleteTime = csvFields[7]
+                    String customerSatisfaction = csvFields[8]
+                    Date dateOfJobRun = new Date(csvFields[3] + " " + csvFields[4]);
+
+                    log.info("logged from test")
+
+                    JobResult jobResult = JobResult.build(
+                        date: dateOfJobRun,
+                        job: job
+                    )
+                    EventResult.build(
+                            cachedView: CachedView.UNCACHED,
+                            numberOfWptRun: 1,
+                            wptStatus: 200,
+                            medianValue: true,
+                            docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
+                            csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,
+                            connectivityProfile: profile,
+                            jobResult: jobResult,
+                            jobResultDate: dateOfJobRun,
+                            jobGroup: JobGroup.get(jobGroupId),
+                            measuredEvent:measuredEvents[pageAndMeasuredEvent],
+                            page: pages[pageAndMeasuredEvent],
+                            location: locations[browserAndLocation],
+                            browser: browsers[browserAndLocation]
+                    )
+                }
+            }
+
+        }
+        CsiAggregation.withNewTransaction {
+            CsiConfiguration csiConfiguration = CsiConfiguration.build()
+            ConnectivityProfile.findAll().each { connectivityProfile ->
+                Browser.findAll().each { browser ->
+                    csiConfiguration.browserConnectivityWeights.
+                            add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+                }
+                Page.findAll().each { page ->
+                    csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+                }
+            }
+            JobGroup jobGroup = JobGroup.get(jobGroupId)
+            jobGroup.csiConfiguration = csiConfiguration
+            jobGroup.save(failOnError: true)
+        }
+        CsiAggregation.withNewTransaction {
+            EventResult.findAll().each {
+                resultPersisterService.informDependentCsiAggregations(it)
+            }
+        }
+    }
+
+    private boolean isHeaderLine(String csvLine) {
+        return csvLine.startsWith('location;')
+    }
+
 }
