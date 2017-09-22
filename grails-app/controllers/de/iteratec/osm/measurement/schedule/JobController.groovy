@@ -425,8 +425,7 @@ class JobController {
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
                 connectivites                  : ConnectivityProfile.findAllByActive(true),
                 customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
-                executionSchedule              : job.executionSchedule.substring(2),
-                thresholds                     : thresholdService.getThresholdsForJob(job)
+                executionSchedule              : job.executionSchedule.substring(2)
         ]
     }
 

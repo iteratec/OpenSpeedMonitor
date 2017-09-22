@@ -45,10 +45,3 @@
     </div>
 </div>
 
-<asset:script type="text/javascript">
-    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdMeasuredEventList.js"/>');
-    $(window).load(function() {
-      OpenSpeedMonitor.thresholdMeasuredEventList.init({scriptId: "${job?.script?.id}" , targetUrl:"${createLink(controller: 'script', action: 'getMeasuredEventsForScript')}"});
-    });
-</asset:script>
-

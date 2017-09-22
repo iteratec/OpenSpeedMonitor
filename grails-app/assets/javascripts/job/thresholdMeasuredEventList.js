@@ -4,29 +4,23 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
-    var initVueComponent = function () {
+
+    var initVueComponent = function (data) {
+        var jobId = data.jobId
         new Vue({
-            el: '#editor',
+            el: '#thresholdList',
             data: {
-                foo: '1',
                 thresholds: null
             },
             computed: {
-                compiledMarkdown: function () {
-                    return this.foo.split( '' ).reverse( ).join( '' );
-                }
             },
             created: function () {
                 this.fetchData()
             },
             methods: {
-                update: function (e) {
-                    this.foo = e.target.value
-                },
-
                 fetchData: function () {
                     var self = this;
-                     getThresholdsForJob(277).success(function(result) {
+                     getThresholdsForJob(jobId).success(function(result) {
                          self.thresholds = result;
                      }).error(function(e) {
                          console.log(e);
@@ -42,7 +36,6 @@ OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
                 type: 'GET',
                 url: targetUrl,
                 data: { jobId: jobId }
-
             });
     };
 
@@ -65,9 +58,8 @@ OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
             });
         }
     };
-
-    initVueComponent();
     return{
-        init: getMeasuredEvents
+        init: getMeasuredEvents,
+        initVue: initVueComponent
     }
 })();
