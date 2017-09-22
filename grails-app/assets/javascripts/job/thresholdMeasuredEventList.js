@@ -25,7 +25,12 @@ OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
                 },
 
                 fetchData: function () {
-                    this.thresholds = getThresholdsForJob("277");
+                    var self = this;
+                     getThresholdsForJob(277).success(function(result) {
+                         self.thresholds = result;
+                     }).error(function(e) {
+                         console.log(e);
+                     });
                 }
             }
         });
@@ -33,21 +38,12 @@ OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
 
     var getThresholdsForJob = function (jobId) {
         var targetUrl = "/job/getThresholdsForJob";
-
-        if(jobId && targetUrl){
-            $.ajax({
+           return $.ajax({
                 type: 'GET',
                 url: targetUrl,
-                data: { jobId: jobId },
-                success : function(result) {
-                    OpenSpeedMonitor.domUtils.updateSelectOptions($('.measured-event-select'), result, null);
-                }
-                ,
-                error : function() {
-                    return ""
-                }
+                data: { jobId: jobId }
+
             });
-        }
     };
 
     var getMeasuredEvents = function (data) {

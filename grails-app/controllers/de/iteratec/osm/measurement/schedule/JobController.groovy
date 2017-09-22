@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.Threshold
 import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -349,9 +350,14 @@ class JobController {
      */
     def getThresholdsForJob(String jobId) {
         Job job = Job.get(Long.parseLong(jobId))
-        List thresholds = thresholdService.getThresholdsForJob(job)
+        List<Threshold> thresholds = thresholdService.getThresholdsForJob(job)
 
-        return ControllerUtils.sendObjectAsJSON(response, HttpStatus.OK, thresholds)
+        def output = thresholds.collect {[measurand: it.measurand ,
+                                          measuredEvent: it.measuredEvent,
+                                          upperBoundary: it.upperBoundary,
+                                          lowerBoundary: it.lowerBoundary]}
+
+        render output as JSON
     }
 
     def getRunningAndRecentlyFinishedJobs() {

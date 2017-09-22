@@ -1,7 +1,7 @@
 <div id="editor">
     <ul>
         <li v-for="threshold in thresholds">
-        <div>{{ threshold }}</div>
+        <div>{{ threshold.measurand.name }}</div>
         </li>
     </ul>
 
