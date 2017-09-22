@@ -347,9 +347,11 @@ class JobController {
      * @param jobId
      * @return
      */
-    def getThresholdsForJob(long jobId) {
-        Job job = Job.get(jobId: jobId)
-        return thresholdService.getThresholdsForJob(job)
+    def getThresholdsForJob(String jobId) {
+        Job job = Job.get(Long.parseLong(jobId))
+        List thresholds = thresholdService.getThresholdsForJob(job)
+
+        return ControllerUtils.sendObjectAsJSON(response, HttpStatus.OK, thresholds)
     }
 
     def getRunningAndRecentlyFinishedJobs() {
