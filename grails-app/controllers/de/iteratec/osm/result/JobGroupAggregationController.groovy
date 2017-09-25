@@ -105,7 +105,6 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             }
         }
 
-        def bla = listEventResults.get(7500);
         if ((listEventResults.size() % 2) != 0) {
             median = listEventResults.get((Integer) ((listEventResults.size() - 1) / 2))[1];
         } else {

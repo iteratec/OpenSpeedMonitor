@@ -8,6 +8,7 @@ import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
 @Transactional
@@ -15,6 +16,8 @@ class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
+    PerformanceLoggingService performanceLoggingService
+
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -42,6 +45,8 @@ class BarchartAggregationService {
 
     List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
         List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages)
+        List<BarchartAggregation> medians = getMediansFor(selectedMeasurands, from, to, allJobGroups, allPages)
+        mergeWithMedians(aggregations, medians)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
             comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages)
@@ -53,17 +58,37 @@ class BarchartAggregationService {
         if (!selectedMeasurands) {
             return []
         }
-
         List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobResultDateBetween(from, to)
-                .withPageIn(pages, true)
-                .withJobGroupIn(jobGroups, true)
+                .withPageIn(pages)
+                .withJobGroupIn(jobGroups)
                 .withSelectedMeasurandsAverageProjection(selectedMeasurands)
                 .getResults()
 
-        return createListForEventResultProjection(selectedMeasurands, projections, from, to)
+        return createListForEventResultProjection(selectedMeasurands, projections)
     }
 
+    List<BarchartAggregation> getMediansFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages) {
+        if (!selectedMeasurands) {
+            return []
+        }
+        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobResultDateBetween(from, to)
+                .withPageIn(pages)
+                .withJobGroupIn(jobGroups)
+                .withSelectedMeasurandsPropertyProjection(selectedMeasurands)
+                .getMedians()
+
+        return createListForEventResultProjection(selectedMeasurands, projections)
+    }
+
+    private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {
+        avgs.each { avg ->
+            BarchartAggregation median = medians.find { it == avg }
+            avg.median = median.value
+        }
+        return avgs
+    }
 
     private List<BarchartAggregation> mergeAggregationsWithComparatives(List<BarchartAggregation> values, List<BarchartAggregation> comparativeValues) {
         if (comparativeValues) {
@@ -76,7 +101,7 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, Date from, Date to) {
+    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
@@ -85,14 +110,9 @@ class BarchartAggregationService {
                         selectedMeasurand: selected,
                         jobGroup: aggregation.jobGroup,
                         page: aggregation.page,
-                        median: getMedianFor(aggregation, selected, from, to)
                 )
             }
         }
         return result
-    }
-    private Double getMedianFor(EventResultProjection eventResultProjection, SelectedMeasurand selectedMeasurand, Date from, Date to){
-        def medianRaw = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime()).withJobResultDateBetween(from,to).withJobGroupEquals(eventResultProjection.jobGroup).withPageEquals(eventResultProjection.page).getMedianForSelection(selectedMeasurand).median
-        return selectedMeasurand.normalizeValue(medianRaw)
     }
 }

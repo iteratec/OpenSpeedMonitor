@@ -28,6 +28,8 @@ class EventResultCriteriaBuilder {
             query.in(propertyName, range)
             if (groupBy) {
                 addGroupByProjection(propertyName)
+            } else {
+                addPropertyProjection(propertyName)
             }
         }
     }

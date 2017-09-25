@@ -1,9 +1,7 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTimingType
-
 /**
  * Created by mwg on 20.09.2017.
  */
