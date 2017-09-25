@@ -466,39 +466,6 @@ function createJobGroup(createJobGroupUrl) {
     });
 }
 
-/**
- *
- * @param createThresholdUrl
- */
-function createThreshold(job, createThresholdUrl) {
-    var modalDialog = $("#thresholdModal");
-    var measurand = modalDialog.find("#measurand").val();
-    var measuredEvent = modalDialog.find("#measuredEvent").val();
-    var lowerBoundary = modalDialog.find("#lowerBoundary").val();
-    var upperBoundary = modalDialog.find("#upperBoundary").val();
-    //var errorContainer = $("#jobGroupErrorContainer");
-
-    //errorContainer.addClass("hidden");
-
-    $.ajax({
-        type: 'POST',
-        data: {
-            job: job,
-            measurand: measurand,
-            measuredEvent: measuredEvent,
-            lowerBoundary: lowerBoundary,
-            upperBoundary: upperBoundary
-        },
-        url: createThresholdUrl,
-        success: function (data) {
-
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            errorContainer.text(XMLHttpRequest.responseText);
-            errorContainer.removeClass("hidden");
-        }
-    });
-}
 
 function selectAllGraphiteServer(select) {
     var obj = $("#graphiteServers")[0];

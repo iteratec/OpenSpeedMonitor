@@ -1,5 +1,5 @@
 <%@ page import="de.iteratec.osm.result.Threshold" %>
-<%@ page import="de.iteratec.osm.result.Measurand" %>
+
 <%@ page import="de.iteratec.osm.result.MeasuredEvent" %>
 <div id="thresholdList">
     <div>
@@ -10,22 +10,10 @@
         </li>
     </ul>
     </div>
-    <div>Die
-    <g:select id="measurand" name="measurand"
-              from="${Measurand.values()}"/>
-    Messung von
-    <g:select id="measuredEvent" name="measuredEvent"
-              from="[]"
-              class="measured-event-select"/>
-    sollte schneller als
-    <g:field id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="40" rows="5" maxlength="255"/>
-    ms, aber nicht langsamer als
-    <g:field id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="40" rows="5" maxlength="255"/>
-    ms sein. <a>add</a>  <a>clear</a></div>
 </div>
 
 <asset:script type="text/javascript">
-    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdMeasuredEventList.js"/>');
+    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdForJob.js"/>');
     $(window).load(function() {
       OpenSpeedMonitor.thresholdMeasuredEventList.init({scriptId: "${job?.script?.id}" , targetUrl:"${createLink(controller: 'script', action: 'getMeasuredEventsForScript')}"});
       OpenSpeedMonitor.thresholdMeasuredEventList.initVue({jobId: "${job?.id}"});

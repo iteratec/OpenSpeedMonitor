@@ -3,12 +3,12 @@
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
-
+OpenSpeedMonitor.thresholdforJobs = (function(){
+    
     var initVueComponent = function (data) {
         var jobId = data.jobId
         new Vue({
-            el: '#thresholdList',
+            el: '#threshold',
             data: {
                 thresholds: null
             },
@@ -25,6 +25,39 @@ OpenSpeedMonitor.thresholdMeasuredEventList = (function(){
                      }).error(function(e) {
                          console.log(e);
                      });
+                },
+                addThreshold: function (job, createThresholdUrl) {
+                    var thresholdTab = $("#thresholdCreate");
+                    var measurand = thresholdTab.find("#measurand").val();
+                    var measuredEvent = thresholdTab.find("#measuredEvent").val();
+                    var lowerBoundary = thresholdTab.find("#lowerBoundary").val();
+                    var upperBoundary = thresholdTab.find("#upperBoundary").val();
+                    //var errorContainer = $("#jobGroupErrorContainer");
+
+                    //errorContainer.addClass("hidden");
+
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            job: job,
+                            measurand: measurand,
+                            measuredEvent: measuredEvent,
+                            lowerBoundary: lowerBoundary,
+                            upperBoundary: upperBoundary
+                        },
+                        url: createThresholdUrl,
+                        success: function () {
+                            this.fetchData();
+                            this.thresholds.push({
+                                measurand: measurand,
+                                measuredEvent: measuredEvent,
+                                lowerBoundary: lowerBoundary,
+                                upperBoundary: upperBoundary
+                            });
+                        },
+                        error: function (e) {
+                        }
+                    });
                 }
             }
         });
