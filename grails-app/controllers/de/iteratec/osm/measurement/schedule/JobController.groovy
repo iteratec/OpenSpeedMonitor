@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.Threshold
 import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.util.ControllerUtils
@@ -352,12 +353,22 @@ class JobController {
         Job job = Job.get(Long.parseLong(jobId))
         List<Threshold> thresholds = thresholdService.getThresholdsForJob(job)
 
-        def output = thresholds.collect {[measurand: it.measurand ,
+        def output = thresholds.collect {[measurand: it.measurand,
                                           measuredEvent: it.measuredEvent,
                                           upperBoundary: it.upperBoundary,
                                           lowerBoundary: it.lowerBoundary]}
 
         render output as JSON
+    }
+
+    /**
+     *
+     * @param jobId
+     * @return
+     */
+    def getMeasurands() {
+
+        render Measurand.collect() as JSON
     }
 
     def getRunningAndRecentlyFinishedJobs() {

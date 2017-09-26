@@ -6,37 +6,78 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.thresholdforJobs = (function(){
     
     var initVueComponent = function (data) {
-        var jobId = data.jobId
+        var jobId = data.jobId;
+        var scriptId = data.scriptId;
+
         new Vue({
             el: '#threshold',
             data: {
-                thresholds: null
+                thresholds: null,
+                measuredEvents: [],
+                measurands: [],
+                newThreshold: {}
             },
             computed: {
             },
             created: function () {
+                this.getMeasurands("/job/getMeasurands")
+                this.getMeasuredEvents(scriptId, "/script/getMeasuredEventsForScript")
                 this.fetchData()
             },
             methods: {
                 fetchData: function () {
-                    var self = this;
+                     var self = this;
                      getThresholdsForJob(jobId).success(function(result) {
                          self.thresholds = result;
                      }).error(function(e) {
                          console.log(e);
                      });
                 },
+                getMeasuredEvents: function (scriptId, targetUrl) {
+                    var self = this;
+                    if(scriptId && targetUrl){
+                        $.ajax({
+                            type: 'POST',
+                            url: targetUrl,
+                            data: { scriptId: scriptId },
+                            success : function(result) {
+                               self.measuredEvents = result;
+                            }
+                            ,
+                            error : function() {
+                                return ""
+                            }
+                        });
+                    }
+                },
+                getMeasurands: function (targetUrl) {
+                    var self = this;
+                    if(targetUrl){
+                        $.ajax({
+                            type: 'POST',
+                            url: targetUrl,
+                            data: {},
+                            success : function(result) {
+                                self.measurands = result;
+                            }
+                            ,
+                            error : function() {
+                                return ""
+                            }
+                        });
+                    }
+                },
                 addThreshold: function (job, createThresholdUrl) {
-                    var thresholdTab = $("#thresholdCreate");
-                    var measurand = thresholdTab.find("#measurand").val();
-                    var measuredEvent = thresholdTab.find("#measuredEvent").val();
-                    var lowerBoundary = thresholdTab.find("#lowerBoundary").val();
-                    var upperBoundary = thresholdTab.find("#upperBoundary").val();
-                    //var errorContainer = $("#jobGroupErrorContainer");
-
+                    this.thresholds.push({
+                        measurand: this.newThreshold.measurand,
+                        measuredEvent: this.newThreshold.measuredEvent,
+                        lowerBoundary: this.newThreshold.lowerBoundary,
+                        upperBoundary: this.newThreshold.upperBoundary
+                    });
+                    this.newThreshold = {};
                     //errorContainer.addClass("hidden");
 
-                    $.ajax({
+                    /*$.ajax({
                         type: 'POST',
                         data: {
                             job: job,
@@ -47,17 +88,13 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                         },
                         url: createThresholdUrl,
                         success: function () {
-                            this.fetchData();
-                            this.thresholds.push({
-                                measurand: measurand,
-                                measuredEvent: measuredEvent,
-                                lowerBoundary: lowerBoundary,
-                                upperBoundary: upperBoundary
-                            });
+
+                            console.log("success");
                         },
                         error: function (e) {
+                            console.log(e);
                         }
-                    });
+                    });*/
                 }
             }
         });
@@ -72,27 +109,7 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
             });
     };
 
-    var getMeasuredEvents = function (data) {
-        var scriptId = data.scriptId;
-        var targetUrl = data.targetUrl;
-
-        if(scriptId && targetUrl){
-            $.ajax({
-                type: 'POST',
-                url: targetUrl,
-                data: { scriptId: scriptId },
-                success : function(result) {
-                    OpenSpeedMonitor.domUtils.updateSelectOptions($('.measured-event-select'), result, null);
-                }
-                ,
-                error : function() {
-                    return ""
-                }
-            });
-        }
-    };
     return{
-        init: getMeasuredEvents,
         initVue: initVueComponent
     }
 })();
