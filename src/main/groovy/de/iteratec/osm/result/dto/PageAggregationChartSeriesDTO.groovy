@@ -4,9 +4,9 @@ class PageAggregationChartSeriesDTO {
     String measurand = ""
     String measurandLabel = ""
     String measurandGroup = ""
-    Double value = null
+    Double avg = null
     Double median = null
-    Double valueComparative = null
+    Double avgComparative = null
     Double medianComparative = null
     String page = ""
     String jobGroup = ""

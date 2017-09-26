@@ -117,9 +117,9 @@ class PageAggregationController extends ExceptionHandlerController {
                         measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
                         measurand: it.selectedMeasurand.name,
                         measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
-                        value: it.value,
+                        avg: it.value,
                         median: it.median,
-                        valueComparative: it.valueComparative,
+                        avgComparative: it.valueComparative,
                         medianComparative: it.medianComparative,
                         page: it.page,
                         jobGroup: it.jobGroup

@@ -78,6 +78,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $("input[name='stackBars']").on("change", function() {
             renderChart({stackBars: getStackBars()}, true);
         });
+        $("input[name='aggregationValue']").on("change", function() {
+            renderChart({aggregationValue: $('input[name=aggregationValue]:checked').val()}, true);
+        });
         $(".chart-filter").click(onFilterClick);
     };
 

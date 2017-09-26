@@ -23,6 +23,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.setData({autoWidth: true});
             jobGroupAggregationChart.render();
         });
+        $("input[name='aggregationValue']").on("change", function() {
+            renderChart({aggregationValue: $('input[name=aggregationValue]:checked').val()}, true);
+        });
         $(".chart-filter").click(onFilterClick);
     };
 

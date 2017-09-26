@@ -1,5 +1,12 @@
 <div id="chart-container">
     <div id="filter-dropdown-group" class="btn-group">
+        <div class="btn-group pull-left" data-toggle="buttons" id="aggregationValueSwitch">
+            <label class="btn btn-sm btn-default active" id="averageButton"><input type="radio" name="aggregationValue"
+                                                                                   value="avg">Average</label>
+            <label class="btn btn-sm btn-default" id="medianButton"><input type="radio" name="aggregationValue"
+                                                                           value="median"
+                                                                           checked>Median</label>
+        </div>
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
             <g:message code="de.iteratec.osm.barchart.filter.label" default="filter"/> <span

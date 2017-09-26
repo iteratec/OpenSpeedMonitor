@@ -19,8 +19,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var autoWidth = true;
     var dataAvailable = false;
     var labelList = [];
+    var aggregationValue = "avg";
 
     var setData = function (data) {
+        aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
         activeFilter = data.activeFilter || activeFilter;
         rawSeries = data.groupData ? data : rawSeries;
         orderedSeries = orderData(rawSeries) || orderedSeries;
@@ -34,9 +36,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
                 });
             });
         }
-
         var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(labelList, data.i18nMap);
-        headerText = chartLabelUtils.getCommonLabelParts(false);
+        headerText = chartLabelUtils.getCommonLabelParts(false)+", "+aggregationValue;
         sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
             return s.label;
         });
@@ -59,7 +60,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         var maxVal = 0;
         if (rawSeries.measurandGroup === "LOAD_TIMES") {
             var extent = d3.extent(rawSeries.groupData, function (entry) {
-                return entry.value;
+                return entry[aggregationValue];
             });
             minVal = Math.min(extent[0], 0);
             maxVal = Math.max(extent[1], 0);
@@ -81,7 +82,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var getDataForBars = function () {
         if (rawSeries.groupData) {
             var extent = d3.extent(rawSeries.groupData, function (entry) {
-                return entry.value;
+                return entry[aggregationValue];
             });
             return {
                 values: getMappedValues(rawSeries),
@@ -97,7 +98,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         var compareFunction = (activeFilter === "asc") ? d3.ascending : d3.descending;
         if (unorderedSeries.groupData) {
             unorderedSeries.groupData.sort(function (a, b) {
-                return compareFunction(a.value, b.value);
+                return compareFunction(a[aggregationValue], b[aggregationValue]);
             })
         }
         return unorderedSeries;
@@ -108,7 +109,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         rawValues.groupData.forEach(function (series) {
             var mappedSeries = {};
             mappedSeries.id = series.jobGroup;
-            mappedSeries.value = series.value;
+            mappedSeries.value = series[aggregationValue];
             mappedSeries.unit = rawValues.unit;
             mappedValues.push(mappedSeries);
         });

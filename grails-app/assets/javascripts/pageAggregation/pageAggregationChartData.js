@@ -19,26 +19,32 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var selectedFilter = "desc";
     var headerText = "";
     var stackBars = true;
+    var aggregationValue = "avg";
+    var comparitiveValue = "";
     var autoWidth = true;
     var dataAvailalbe = false;
     var i18n = {};
 
     var setData = function (data) {
         rawSeries = data.series || rawSeries;
+        aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
         filterRules = data.filterRules || filterRules;
         selectedFilter = data.selectedFilter || validateSelectedFilter(selectedFilter);
         i18n = data.i18nMap || i18n;
-        if (data.series || data.filterRules || data.selectedFilter) {
+        if (data.series || data.filterRules || data.selectedFilter || data.aggregationValue) {
             var filteredSeries = filterSeries(rawSeries);
             Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
             dataOrder = createDataOrder();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(dataOrder, data.i18nMap);
-            headerText = chartLabelUtils.getCommonLabelParts(true);
-            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
+            headerText = chartLabelUtils.getCommonLabelParts(true)+", "+aggregationValue;
+            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
+                return s.label;
+            });
         }
         stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
+        comparitiveValue = aggregationValue + "Comparative";
         fullWidth = data.width || fullWidth;
         autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
         fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
@@ -48,17 +54,17 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         dataAvailalbe = data.series ? true : dataAvailalbe;
     };
 
-    var validateSelectedFilter = function(selectedFilter) {
+    var validateSelectedFilter = function (selectedFilter) {
         return (selectedFilter === "asc" || selectedFilter === "desc" || filterRules[selectedFilter]) ? selectedFilter : "desc";
     };
 
-    var extractComparativeValuesAsSeries = function(series) {
+    var extractComparativeValuesAsSeries = function (series) {
         var comparativeSeries = [];
-        series.forEach(function(datum) {
-            if (!datum.valueComparative) {
+        series.forEach(function (datum) {
+            if (!datum[comparitiveValue]) {
                 return;
             }
-            var difference = datum.value - datum.valueComparative;
+            var difference = datum[aggregationValue] - datum[comparitiveValue];
             var isImprovement = (datum.measurandGroup === "PERCENTAGES") ? difference > 0 : difference < 0;
             var measurandSuffix = isImprovement ? "improvement" : "deterioration";
             var label = isImprovement ? (i18n.comparativeImprovement || "improvement") : (i18n.comparativeDeterioration || "deterioration");
@@ -79,11 +85,13 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var extractMeasurandData = function (series) {
         var measurandDataMap = d3.nest()
-            .key(function(d) { return d.measurand; })
+            .key(function (d) {
+                return d.measurand;
+            })
             .rollup(function (seriesOfMeasurand) {
                 var firstValue = seriesOfMeasurand[0];
                 var unit = firstValue.unit;
-                seriesOfMeasurand.forEach(function(value) {
+                seriesOfMeasurand.forEach(function (value) {
                     value.id = createSeriesValueId(value);
                 });
                 return {
@@ -103,7 +111,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         var colorProvider = OpenSpeedMonitor.ChartColorProvider();
         var colorScales = {};
         var measurands = sortByMeasurandOrder(Object.keys(measurandDataMap));
-        measurands.forEach(function(measurand) {
+        measurands.forEach(function (measurand) {
             var measurandData = measurandDataMap[measurand];
             if (measurandData.isImprovement || measurandData.isDeterioration) {
                 measurandData.color = colorProvider.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
@@ -119,7 +127,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var sortByMeasurandOrder = function (measurandList) {
         var measurandOrder = OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder;
-        measurandList.sort(function(a, b) {
+        measurandList.sort(function (a, b) {
             var idxA = measurandOrder.indexOf(a);
             var idxB = measurandOrder.indexOf(b);
             if (idxA < 0) {
@@ -132,10 +140,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var extractMeasurandGroupData = function (series) {
         return d3.nest()
-            .key(function(d) { return d.measurandGroup; })
+            .key(function (d) {
+                return d.measurandGroup;
+            })
             .rollup(function (seriesOfMeasurandGroup) {
-                var extent = d3.extent(seriesOfMeasurandGroup, function(entry) { return entry.value; });
-                var hasComparative = seriesOfMeasurandGroup.some(function(value) {
+                var extent = d3.extent(seriesOfMeasurandGroup, function (entry) {
+                    return entry[aggregationValue];
+                });
+                var hasComparative = seriesOfMeasurandGroup.some(function (value) {
                     return (value.isImprovement || value.isDeterioration);
                 });
                 return {
@@ -162,8 +174,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             return series;
         }
         var filteredSeries = [];
-        filterRules[selectedFilter].forEach(function(filterEntry) {
-            Array.prototype.push.apply(filteredSeries, series.filter(function(datum) {
+        filterRules[selectedFilter].forEach(function (filterEntry) {
+            Array.prototype.push.apply(filteredSeries, series.filter(function (datum) {
                 return datum.page === filterEntry.page && datum.jobGroup === filterEntry.jobGroup;
             }));
         });
@@ -173,10 +185,10 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var createSortFilter = function (ascOrdDesc) {
         var seriesForSorting = getMeasurandDataForSorting().series.slice();
         var compareFunction = (ascOrdDesc === "asc") ? d3.ascending : d3.descending;
-        seriesForSorting.sort(function(a, b) {
-            return compareFunction(a.value, b.value);
+        seriesForSorting.sort(function (a, b) {
+            return compareFunction(a[aggregationValue], b[aggregationValue]);
         });
-        var longestExistingSeries = Object.values(allMeasurandDataMap).reduce(function(curFilter, measurandData) {
+        var longestExistingSeries = Object.values(allMeasurandDataMap).reduce(function (curFilter, measurandData) {
             return (measurandData.series.length > curFilter.length) ? measurandData.series : curFilter;
         }, []);
         if (seriesForSorting.length < longestExistingSeries.length) {
@@ -191,12 +203,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         });
     };
 
-    var addMissingValuesToSeries = function(series, allValues) {
+    var addMissingValuesToSeries = function (series, allValues) {
         var existingIds = {};
         series.forEach(function (value) {
             existingIds[value.id] = true;
         });
-        Array.prototype.push.apply(series, allValues.filter(function(value) {
+        Array.prototype.push.apply(series, allValues.filter(function (value) {
             return !existingIds[value.id];
         }));
         return series;
@@ -213,7 +225,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         return Object.values(allMeasurandDataMap)[0];
     };
 
-    var getActualSvgWidth = function() {
+    var getActualSvgWidth = function () {
         return svg.node().getBoundingClientRect().width;
     };
 
@@ -283,7 +295,17 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getSortedValuesForBars = function (series) {
         var seriesMap = {};
         series.forEach(function (value) {
-            seriesMap[value.id] = value;
+            seriesMap[value.id] = {
+                page: value.page,
+                jobGroup: value.jobGroup,
+                id: value.id,
+                value: value[aggregationValue],
+                valueComparative: value[comparitiveValue],
+                unit: value.unit,
+                measurand: value.measurand,
+                measurandGroup: value.measurandGroup,
+                measurandLabel: value.measurandLabel
+            }
         });
         return dataOrder.map(function (filterEntry) {
             return seriesMap[filterEntry.id] || {
@@ -295,7 +317,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         });
     };
 
-    var createSeriesValueId = function(value) {
+    var createSeriesValueId = function (value) {
         return value.page + ";" + value.jobGroup;
     };
 

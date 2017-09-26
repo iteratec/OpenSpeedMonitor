@@ -133,7 +133,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         //Jobgroup groups and their values
         jobGroupAggregationChartDTO.groupData = allEventResults.collect {
-           new JobGroupDTO(jobGroup: it.jobGroup.name, value: it.value, median: it.median)
+           new JobGroupDTO(jobGroup: it.jobGroup.name, avg: it.value, median: it.median)
         }
 
         ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)
