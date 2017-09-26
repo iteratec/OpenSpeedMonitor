@@ -12,19 +12,19 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
 
-    var init = function() {
-        drawGraphButton.click(function() {
+    var init = function () {
+        drawGraphButton.click(function () {
             loadData(true);
         });
-        $(window).on('historyStateLoaded', function() {
+        $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
-        $(window).on('resize', function() {
+        $(window).on('resize', function () {
             jobGroupAggregationChart.setData({autoWidth: true});
             jobGroupAggregationChart.render();
         });
-        $("input[name='aggregationValue']").on("change", function() {
-            renderChart({aggregationValue: $('input[name=aggregationValue]:checked').val()}, true);
+        $("input[name='aggregationValue']").on("change", function () {
+            renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -33,7 +33,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         return $(".chart-filter.selected").data("filter");
     };
 
-    var onFilterClick = function() {
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
+    };
+
+    var onFilterClick = function () {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
@@ -53,6 +57,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         $('#warning-no-data').hide();
         data.width = -1;
         data.activeFilter = getSelectedFilter();
+        data.aggregationValue = getAggregationValue();
 
         renderChart(data, isStateChange);
         $("#dia-save-chart-as-png").removeClass("disabled");
@@ -68,7 +73,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         jobGroupAggregationChart.render();
     };
 
-    var loadData = function(isStateChanged) {
+    var loadData = function (isStateChanged) {
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
@@ -107,6 +112,5 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     };
 
     init();
-    return {
-    };
+    return {};
 })();

@@ -79,7 +79,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             renderChart({stackBars: getStackBars()}, true);
         });
         $("input[name='aggregationValue']").on("change", function() {
-            renderChart({aggregationValue: $('input[name=aggregationValue]:checked').val()}, true);
+            renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -90,6 +90,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var getStackBars = function () {
         return $("#inFrontButton input").prop("checked");
+    };
+
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
     };
 
     var onFilterClick = function(event) {
@@ -172,6 +176,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         data.width = -1;
         data.selectedFilter = updateFilters(data.filterRules);
         data.stackBars = updateStackBars(data);
+        data.aggregationValue = getAggregationValue();
 
         renderChart(data, isStateChange);
         $('html, body').animate({scrollTop:0},'500');
