@@ -16,6 +16,14 @@ enum SelectedMeasurandType {
         String getOptionPrefix() {
             return ""
         }
+
+        String getDatabaseName(String name) {
+            return Measurand.valueOf(name).eventResultField
+        }
+
+        boolean isUserTiming() {
+            return false
+        }
     },
     USERTIMING_MARK{
         Double getValue(EventResult eventResult, String name) {
@@ -29,6 +37,14 @@ enum SelectedMeasurandType {
 
         String getOptionPrefix() {
             return "_UTMK_"
+        }
+
+        String getDatabaseName(String name) {
+            return name
+        }
+
+        boolean isUserTiming() {
+            return true
         }
     },
     USERTIMING_MEASURE{
@@ -46,11 +62,23 @@ enum SelectedMeasurandType {
         String getOptionPrefix() {
             return "_UTME_"
         }
+
+        String getDatabaseName(String name) {
+            return name
+        }
+
+        boolean isUserTiming() {
+            return true
+        }
     }
+
+    abstract boolean isUserTiming()
 
     abstract Double getValue(EventResult eventResult, String name)
 
     abstract MeasurandGroup getMeasurandGroup(String name)
 
     abstract String getOptionPrefix()
+
+    abstract String getDatabaseName(String name)
 }

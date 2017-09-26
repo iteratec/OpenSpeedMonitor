@@ -50,6 +50,10 @@ class SelectedMeasurand {
         return input / this.getMeasurandGroup().getUnit().getDivisor()
     }
 
+    String getDatabaseRelevantName() {
+        return this.selectedType.getDatabaseName(this.name)
+    }
+
     static Map createUserTimingOptionFor(String name, UserTimingType type) {
         return [name: name, id: type.selectedMeasurandType.optionPrefix + name]
     }
@@ -69,8 +73,8 @@ class SelectedMeasurand {
         return Measurand.values().any { it.toString() == name }
     }
 
-    static boolean couldBeUserTiming(UserTimingType userTimingType, String name){
-        return name.length() > userTimingType.selectedMeasurandType.optionPrefix.length() &&  name.startsWith(userTimingType.selectedMeasurandType.optionPrefix)
+    static boolean couldBeUserTiming(UserTimingType userTimingType, String name) {
+        return name.length() > userTimingType.selectedMeasurandType.optionPrefix.length() && name.startsWith(userTimingType.selectedMeasurandType.optionPrefix)
     }
 
     boolean isValid(String name) {

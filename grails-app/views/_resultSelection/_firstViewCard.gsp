@@ -7,7 +7,7 @@
             value="${[de.iteratec.osm.result.Measurand.DOC_COMPLETE_TIME]}"/></g:if>
     <iteratec:optGroupedSelect dataMap="${aggrGroupValuesUnCached}"
                                id="selectAggregatorUncachedHtmlId"
-                               class="form-control long-select measurands-select-opt-groups"
+                               class="form-control long-select measurand-select"
                                name="selectedAggrGroupValuesUnCached"
                                optionKey="value" optionValue="value"
                                multiple="true"

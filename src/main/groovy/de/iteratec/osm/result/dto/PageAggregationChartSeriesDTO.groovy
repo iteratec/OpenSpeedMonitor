@@ -1,5 +1,7 @@
 package de.iteratec.osm.result.dto
 
+import groovy.transform.EqualsAndHashCode
+
 
 class PageAggregationChartSeriesDTO {
     String measurand = ""

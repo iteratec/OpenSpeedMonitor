@@ -21,6 +21,8 @@ import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+import spock.lang.Unroll
+
 /**
  * Test-suite for {@link Location}
  */
@@ -29,15 +31,23 @@ import spock.lang.Specification
 @Mock([Location, WebPageTestServer,Browser])
 class LocationSpec extends Specification {
 
-    void "only labels up to 150 characters are valid"() {
-        given: "a location with a valid label with 150 characters"
-        Location location = Location.build(label: "*".padLeft(150,"*"))
+    @Unroll
+    void "A location with a label of a length of #labelLength characters validates to #valid"() {
 
-        when: "the label is updated to a length og 151"
-        location.label = "*".padLeft(151,"*")
+        when: "a location with a label of a length of #labelLength characters is created"
+        Location location = Location.buildWithoutSave(label: "*".padLeft(labelLength,"*"))
 
-        then: "the location doesn't validate anymore"
-        location.validate() == false
+        then: "the location validates to #valid"
+        location.validate() == valid
+
+        where:
+        labelLength | valid
+        100         | true
+        200         | true
+        255         | true
+        256         | false
+        1000        | false
+
     }
 
     void "toString includes location, WPT server and browser name, but not the location label"() {

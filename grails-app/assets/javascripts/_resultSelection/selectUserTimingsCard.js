@@ -14,7 +14,7 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     }
 
     function loopOverOptGroups(executeOperation, userTimings) {
-        $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
+        $('.measurand-select').each(function (index, optGroupElement) {
             var optGroupUserTimings = $(optGroupElement).find('.measurand-opt-group-USER_TIMINGS');
             if (optGroupUserTimings) {
                 executeOperation(optGroupUserTimings, userTimings);
