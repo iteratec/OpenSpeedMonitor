@@ -28,6 +28,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var setData = function (data) {
         rawSeries = data.series || rawSeries;
         aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
+        comparitiveValue = aggregationValue + "Comparative";
         filterRules = data.filterRules || filterRules;
         selectedFilter = data.selectedFilter || validateSelectedFilter(selectedFilter);
         i18n = data.i18nMap || i18n;
@@ -44,7 +45,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             });
         }
         stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
-        comparitiveValue = aggregationValue + "Comparative";
         fullWidth = data.width || fullWidth;
         autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
         fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
@@ -145,7 +145,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             })
             .rollup(function (seriesOfMeasurandGroup) {
                 var extent = d3.extent(seriesOfMeasurandGroup, function (entry) {
-                    return entry[aggregationValue];
+                    return entry[aggregationValue] || entry.value;
                 });
                 var hasComparative = seriesOfMeasurandGroup.some(function (value) {
                     return (value.isImprovement || value.isDeterioration);
@@ -299,8 +299,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
                 page: value.page,
                 jobGroup: value.jobGroup,
                 id: value.id,
-                value: value[aggregationValue],
-                valueComparative: value[comparitiveValue],
+                value: value[aggregationValue] ? value[aggregationValue] : value.value,
                 unit: value.unit,
                 measurand: value.measurand,
                 measurandGroup: value.measurandGroup,
