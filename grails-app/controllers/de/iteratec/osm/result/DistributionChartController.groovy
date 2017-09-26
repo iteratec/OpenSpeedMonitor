@@ -190,8 +190,8 @@ class DistributionChartController extends ExceptionHandlerController {
                 .withProjectedBaseProperty('jobGroup')
                 .withPageIn(allPages)
                 .withProjectedBaseProperty('page')
-                .withSelectedMeasurandsPropertyProjection([selectedMeasurand])
-                .getResults()
+                .withSelectedMeasurands([selectedMeasurand])
+                .getRawData()
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {

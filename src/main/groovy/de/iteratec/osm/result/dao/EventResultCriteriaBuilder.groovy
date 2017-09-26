@@ -8,7 +8,8 @@ import org.grails.datastore.mapping.query.Query
 /**
  * Created by mwg on 20.09.2017.
  */
-class EventResultCriteriaBuilder {
+trait EventResultCriteriaBuilder {
+    boolean isAggregated
     List<String> projectedFields = []
     List<Query.Projection> projections = []
     DetachedCriteria query = new DetachedCriteria(EventResult)
@@ -23,16 +24,7 @@ class EventResultCriteriaBuilder {
         }
     }
 
-    void filterIn(String propertyName, List range, boolean groupBy) {
-        if (range) {
-            query.in(propertyName, range)
-            if (groupBy) {
-                addGroupByProjection(propertyName)
-            } else {
-                addPropertyProjection(propertyName)
-            }
-        }
-    }
+    abstract void filterIn(String propertyName, List range, boolean project)
 
     void filterEquals(String propertyName, def toBeEqualTo) {
         if (toBeEqualTo) {
@@ -40,9 +32,9 @@ class EventResultCriteriaBuilder {
         }
     }
 
-    void orderBy(String propertyName) {
+    void orderBy(String propertyName, String direction = 'asc') {
         if(propertyName) {
-            query.order(propertyName,'asc')
+            query.order(propertyName,direction)
         }
     }
 
@@ -58,8 +50,7 @@ class EventResultCriteriaBuilder {
         addProjection(Projections.groupProperty(propertyName), propertyName, projectionName)
     }
 
-
-    private void addProjection(Query.Projection projection, String propertyName, String projectionName) {
+    void addProjection(Query.Projection projection, String propertyName, String projectionName) {
         String projectedField = projectionName ?: propertyName
         if (!projectedFields.contains(projectedField)) {
             projections.add(projection)
@@ -96,5 +87,27 @@ class EventResultCriteriaBuilder {
             result.add(transformed)
         }
         return result
+    }
+}
+
+class EventResultRawDataCriteriaBuilder implements EventResultCriteriaBuilder {
+    void filterIn(String propertyName, List range, boolean project) {
+        if (range) {
+            query.in(propertyName, range)
+            if(project){
+                addPropertyProjection(propertyName)
+            }
+        }
+    }
+}
+
+class EventResultAveragesCriteriaBuilder implements EventResultCriteriaBuilder {
+    void filterIn(String propertyName, List range, boolean project) {
+        if (range) {
+            query.in(propertyName, range)
+            if(project){
+                addGroupByProjection(propertyName)
+            }
+        }
     }
 }

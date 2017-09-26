@@ -45,8 +45,6 @@ class BarchartAggregationService {
 
     List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
         List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages)
-        List<BarchartAggregation> medians = getMediansFor(selectedMeasurands, from, to, allJobGroups, allPages)
-        mergeWithMedians(aggregations, medians)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
             comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages)
@@ -58,28 +56,16 @@ class BarchartAggregationService {
         if (!selectedMeasurands) {
             return []
         }
-        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages)
                 .withJobGroupIn(jobGroups)
-                .withSelectedMeasurandsAverageProjection(selectedMeasurands)
-                .getResults()
+                .withSelectedMeasurands(selectedMeasurands)
 
-        return createListForEventResultProjection(selectedMeasurands, projections)
-    }
+        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
+        List<BarchartAggregation> medians = createListForEventResultProjection(selectedMeasurands, builder.getMedians())
 
-    List<BarchartAggregation> getMediansFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages) {
-        if (!selectedMeasurands) {
-            return []
-        }
-        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobResultDateBetween(from, to)
-                .withPageIn(pages)
-                .withJobGroupIn(jobGroups)
-                .withSelectedMeasurandsPropertyProjection(selectedMeasurands)
-                .getMedians()
-
-        return createListForEventResultProjection(selectedMeasurands, projections)
+        return mergeWithMedians(averages, medians)
     }
 
     private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {

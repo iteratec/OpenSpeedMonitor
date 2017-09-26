@@ -5,11 +5,12 @@ import de.iteratec.osm.result.SelectedMeasurand
 /**
  * Created by mwg on 20.09.2017.
  */
-class EventResultMeasurandQueryBuilder{
-    private EventResultCriteriaBuilder builder = new EventResultCriteriaBuilder()
-    boolean  isAggregated
+class EventResultMeasurandAveragesQueryBuilder implements BaseMeasurandQueryBuilder {
+    EventResultMeasurandAveragesQueryBuilder() {
+        builder = new EventResultAveragesCriteriaBuilder()
+    }
 
-    EventResultMeasurandQueryBuilder withMeasurandsAveragesProjection(List<SelectedMeasurand> measurands) {
+    void configureForSelectedMeasurands(List<SelectedMeasurand> measurands) {
         isAggregated = true
         if (measurands.any { SelectedMeasurand measurand -> measurand.selectedType.isUserTiming() }) {
             throw new IllegalArgumentException("selectedMeasurands must not be user timings")
@@ -17,25 +18,26 @@ class EventResultMeasurandQueryBuilder{
         measurands.each {
             builder.addAvgProjection(it.getDatabaseRelevantName())
         }
-        return this
+    }
+}
+
+class EventResultMeasurandRawDataQueryBuilder implements BaseMeasurandQueryBuilder {
+    EventResultMeasurandRawDataQueryBuilder() {
+        builder = new EventResultRawDataCriteriaBuilder()
     }
 
-    EventResultMeasurandQueryBuilder withMeasurandProjection(List<SelectedMeasurand> measurands) {
+    void configureForSelectedMeasurands(List<SelectedMeasurand> measurands) {
         if (measurands.any { SelectedMeasurand measurand -> measurand.selectedType.isUserTiming() }) {
             throw new IllegalArgumentException("selectedMeasurands must not be user timings")
         }
         measurands.each {
             builder.addPropertyProjection(it.getDatabaseRelevantName())
         }
-        return this
     }
+}
 
-    List<EventResultProjection> getResultsForFilter(EventResultCriteriaBuilder baseFilters){
-        this.builder.mergeWith(baseFilters)
-        return createEventResultProjections(builder.getResults())
-    }
-
-    private List<EventResultProjection> createEventResultProjections(List<Map> normalized) {
+trait BaseMeasurandQueryBuilder extends SelectedMeasurandQueryBuilder {
+    List<EventResultProjection> createEventResultProjections(List<Map> normalized) {
         List<EventResultProjection> eventResultProjections = []
         normalized.each {
             EventResultProjection eventResultProjection = new EventResultProjection(

@@ -9,48 +9,44 @@ import de.iteratec.osm.result.SelectedMeasurand
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private EventResultCriteriaBuilder aggregatedQueryBuilder
-    private EventResultCriteriaBuilder rawQueryBuilder
-    private EventResultMeasurandQueryBuilder measurandQueryBuilder
-    private EventResultUserTimingQueryBuilder userTimingQueryBuilder
+    private List<EventResultCriteriaBuilder> filters
+    private EventResultAveragesCriteriaBuilder aggregatedQueryBuilder
+    private EventResultRawDataCriteriaBuilder rawQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        aggregatedQueryBuilder = new EventResultCriteriaBuilder()
-        aggregatedQueryBuilder.filterBetween('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
-        aggregatedQueryBuilder.filterEquals('cachedView', CachedView.UNCACHED)
-        rawQueryBuilder = new EventResultCriteriaBuilder()
-        rawQueryBuilder.mergeWith(aggregatedQueryBuilder)
+        aggregatedQueryBuilder = new EventResultAveragesCriteriaBuilder()
+        rawQueryBuilder = new EventResultRawDataCriteriaBuilder()
+        filters = [aggregatedQueryBuilder, rawQueryBuilder]
+
+        filters*.filterBetween('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
+        filters*.filterEquals('cachedView', CachedView.UNCACHED)
     }
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            aggregatedQueryBuilder.filterBetween('jobResultDate', from, to)
-            rawQueryBuilder.mergeWith(aggregatedQueryBuilder)
+          filters*.filterBetween('jobResultDate', from, to)
         }
         return this
     }
 
-    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups) {
-        aggregatedQueryBuilder.filterIn('jobGroup', jobGroups, true)
-        rawQueryBuilder.filterIn('jobGroup', jobGroups, false)
+    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
+        filters*.filterIn('jobGroup', jobGroups, project)
         return this
     }
 
-    EventResultQueryBuilder withJobGroupEquals(JobGroup jobGroups) {
-        aggregatedQueryBuilder.filterEquals('jobGroup', jobGroups)
-        rawQueryBuilder.mergeWith(aggregatedQueryBuilder)
+    EventResultQueryBuilder withJobGroupEquals(JobGroup jobGroup) {
+        filters*.filterEquals('jobGroup', jobGroup)
         return this
     }
 
-    EventResultQueryBuilder withPageIn(List<Page> pages) {
-        aggregatedQueryBuilder.filterIn('page', pages, true)
-        rawQueryBuilder.filterIn('page', pages, false)
+    EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = true) {
+        filters*.filterIn('page', pages, project)
         return this
     }
 
-    EventResultQueryBuilder withPageEquals(Page pages) {
-        aggregatedQueryBuilder.filterEquals('page', pages)
-        rawQueryBuilder.mergeWith(aggregatedQueryBuilder)
+    EventResultQueryBuilder withPageEquals(Page page) {
+        filters*.filterEquals('page', page)
         return this
     }
 
@@ -60,68 +56,54 @@ class EventResultQueryBuilder {
     }
 
 
-    EventResultQueryBuilder withSelectedMeasurandsPropertyProjection(List<SelectedMeasurand> selectedMeasurands) {
+    EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
         List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
         List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
 
         if (measurands) {
             initMeasurandsQueryBuilder()
-            measurandQueryBuilder.withMeasurandProjection(measurands)
+            measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
+            measurandAveragesQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
-            userTimingQueryBuilder.withUserTimingsPropertyProjection(userTimings)
+            userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
+            userTimingAveragesQueryBuilder.configureForSelectedMeasurands(userTimings)
         }
 
         return this
     }
 
-    EventResultQueryBuilder withSelectedMeasurandsAverageProjection(List<SelectedMeasurand> selectedMeasurands) {
-        List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
-        List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
-
-        if (measurands) {
-            initMeasurandsQueryBuilder()
-            measurandQueryBuilder.withMeasurandsAveragesProjection(measurands)
-        }
-        if (userTimings) {
-            initUserTimingsQueryBuilder()
-            userTimingQueryBuilder.withUserTimingsAveragesProjection(userTimings)
-        }
-
-        return this
+    List<EventResultProjection> getRawData() {
+        return getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandRawQueryBuilder)
     }
 
-    List<EventResultProjection> getResults() {
-        List<EventResultProjection> userTimingsResult = []
-        List<EventResultProjection> measurandResult = []
-
-        if (userTimingQueryBuilder) {
-            userTimingsResult += userTimingQueryBuilder.getResultsForFilter(aggregatedQueryBuilder)
-        }
-        if (measurandQueryBuilder) {
-            measurandResult += measurandQueryBuilder.getResultsForFilter(aggregatedQueryBuilder)
-        }
-
-        return mergeResults(measurandResult, userTimingsResult)
+    List<EventResultProjection> getAverages() {
+      return getResultFor(aggregatedQueryBuilder, userTimingAveragesQueryBuilder, measurandAveragesQueryBuilder)
     }
 
     List<EventResultProjection> getMedians() {
-        List<EventResultProjection> userTimingsResult = []
-        List<EventResultProjection> measurandResult = []
+        List<EventResultProjection> result = listProjectedValues(getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandRawQueryBuilder))
 
-        if (userTimingQueryBuilder) {
-            userTimingsResult += listProjectedValues(userTimingQueryBuilder.getResultsForFilter(rawQueryBuilder))
-        }
-        if (measurandQueryBuilder) {
-            measurandResult += listProjectedValues(measurandQueryBuilder.getResultsForFilter(rawQueryBuilder))
-        }
-
-        return mergeResults(measurandResult, userTimingsResult).each {
+        return result.each {
             it.projectedProperties.each { key, value ->
                 it.projectedProperties.put(key, getMedian(value))
             }
         }
+    }
+
+    private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder){
+        List<EventResultProjection> userTimingsResult = []
+        List<EventResultProjection> measurandResult = []
+
+        if (userTimingsBuilder) {
+            userTimingsResult += userTimingsBuilder.getResultsForFilter(filters)
+        }
+        if (measurandsBuilder) {
+            measurandResult += measurandsBuilder.getResultsForFilter(filters)
+        }
+
+        return mergeResults(measurandResult, userTimingsResult)
     }
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResult, List<EventResultProjection> userTimingResult) {
@@ -178,14 +160,20 @@ class EventResultQueryBuilder {
     }
 
     private initUserTimingsQueryBuilder() {
-        if (!userTimingQueryBuilder) {
-            userTimingQueryBuilder = new EventResultUserTimingQueryBuilder()
+        if (!userTimingRawQueryBuilder) {
+            userTimingRawQueryBuilder = new EventResultUserTimingRawDataQueryBuilder()
+        }
+        if (!userTimingAveragesQueryBuilder) {
+            userTimingAveragesQueryBuilder = new EventResultUserTimingAveragesQueryBuilder()
         }
     }
 
     private initMeasurandsQueryBuilder() {
-        if (!measurandQueryBuilder) {
-            measurandQueryBuilder = new EventResultMeasurandQueryBuilder()
+        if (!measurandRawQueryBuilder) {
+            measurandRawQueryBuilder = new EventResultMeasurandRawDataQueryBuilder()
+        }
+        if(!measurandAveragesQueryBuilder){
+            measurandAveragesQueryBuilder = new EventResultMeasurandAveragesQueryBuilder()
         }
     }
 }
