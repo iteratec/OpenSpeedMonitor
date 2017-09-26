@@ -153,6 +153,22 @@ class ConfigService {
         return grailsApplication.config.dataSource.driverClassName
     }
 
+    /**
+     * Gets the API Key for the DetailAnalysis service
+     * @return The API Key for the DetailAnalysis Service
+     */
+    String getDetailAnalysisApiKey() {
+        return grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.apiKey
+    }
+
+    /**
+     * Gets the URL for the DetailAnalysis service
+     * @return The URL for the DetailAnalysis Service
+     */
+    String getDetailAnalysisUrl() {
+        return grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.microserviceUrl
+    }
+
     private OsmConfiguration getConfig(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
         int confCount = osmConfigs.size()

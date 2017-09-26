@@ -17,8 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.api.MicroServiceApiKey
-import de.iteratec.osm.api.MicroserviceType
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
@@ -50,6 +49,7 @@ class DetailAnalysisPersisterService implements iResultListener {
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
     HttpRequestService httpRequestService
+    ConfigService configService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -113,7 +113,7 @@ class DetailAnalysisPersisterService implements iResultListener {
         def client = httpRequestService.getRestClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-        String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
+        String apiKey = configService.detailAnalysisApiKey
         List<String> wptTestIds = [resultXml.getTestId()]
         String wptVersion = getWptVersion(resultXml)
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()

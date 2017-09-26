@@ -56,4 +56,5 @@ databaseChangeLog = {
     include file: '2017-08-31-DATA-v430.groovy'
     include file: '2017-09-06-SCHEME-v431.groovy'
     include file: '2017-09-21-SCHEME-v432.groovy'
+    include file: '2017-09-26-SCHEME-v440.groovy'
 }
