@@ -25,7 +25,7 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-          filters*.filterBetween('jobResultDate', from, to)
+            filters*.filterBetween('jobResultDate', from, to)
         }
         return this
     }
@@ -79,7 +79,7 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getAverages() {
-      return getResultFor(aggregatedQueryBuilder, userTimingAveragesQueryBuilder, measurandAveragesQueryBuilder)
+        return getResultFor(aggregatedQueryBuilder, userTimingAveragesQueryBuilder, measurandAveragesQueryBuilder)
     }
 
     List<EventResultProjection> getMedians() {
@@ -92,7 +92,7 @@ class EventResultQueryBuilder {
         }
     }
 
-    private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder){
+    private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
@@ -110,7 +110,9 @@ class EventResultQueryBuilder {
         if (measurandResult && userTimingResult) {
             measurandResult.each { result ->
                 EventResultProjection match = userTimingResult.find { it == result }
-                result.projectedProperties.putAll(match.projectedProperties)
+                if (match) {
+                    result.projectedProperties.putAll(match.projectedProperties)
+                }
             }
         } else {
             return measurandResult ? measurandResult : userTimingResult
@@ -172,7 +174,7 @@ class EventResultQueryBuilder {
         if (!measurandRawQueryBuilder) {
             measurandRawQueryBuilder = new EventResultMeasurandRawDataQueryBuilder()
         }
-        if(!measurandAveragesQueryBuilder){
+        if (!measurandAveragesQueryBuilder) {
             measurandAveragesQueryBuilder = new EventResultMeasurandAveragesQueryBuilder()
         }
     }
