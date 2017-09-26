@@ -39,7 +39,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
             dataOrder = createDataOrder();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(dataOrder, data.i18nMap);
-            headerText = chartLabelUtils.getCommonLabelParts(true)+", "+aggregationValue;
+            headerText = chartLabelUtils.getCommonLabelParts(true);
+            headerText += getAggregationValueLabel();
             sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
                 return s.label;
             });
@@ -56,6 +57,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var validateSelectedFilter = function (selectedFilter) {
         return (selectedFilter === "asc" || selectedFilter === "desc" || filterRules[selectedFilter]) ? selectedFilter : "desc";
+    };
+
+    var getAggregationValueLabel = function () {
+      if (aggregationValue === 'avg') {
+          return 'Average'
+      } else {
+          return 'Median'
+      }
     };
 
     var extractComparativeValuesAsSeries = function (series) {

@@ -37,7 +37,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
             });
         }
         var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(labelList, data.i18nMap);
-        headerText = chartLabelUtils.getCommonLabelParts(false)+", "+aggregationValue;
+        headerText = chartLabelUtils.getCommonLabelParts(false);
+        headerText += getAggregationValueLabel();
         sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
             return s.label;
         });
@@ -53,6 +54,14 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
             width: fullWidth,
             text: headerText
         };
+    };
+
+    var getAggregationValueLabel = function () {
+        if (aggregationValue === 'avg') {
+            return 'Average'
+        } else {
+            return 'Median'
+        }
     };
 
     var getDataForBarScore = function () {
