@@ -74,17 +74,17 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                         lowerBoundary: this.newThreshold.lowerBoundary,
                         upperBoundary: this.newThreshold.upperBoundary
                     });
-                    this.newThreshold = {};
+
                     //errorContainer.addClass("hidden");
 
-                    /*$.ajax({
+                    $.ajax({
                         type: 'POST',
                         data: {
                             job: job,
-                            measurand: measurand,
-                            measuredEvent: measuredEvent,
-                            lowerBoundary: lowerBoundary,
-                            upperBoundary: upperBoundary
+                            measurand: this.newThreshold.measurand.name,
+                            measuredEvent: this.newThreshold.measuredEvent.id,
+                            lowerBoundary: this.newThreshold.lowerBoundary,
+                            upperBoundary: this.newThreshold.upperBoundary
                         },
                         url: createThresholdUrl,
                         success: function () {
@@ -94,7 +94,8 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                         error: function (e) {
                             console.log(e);
                         }
-                    });*/
+                    });
+                    this.newThreshold = {};
                 }
             }
         });

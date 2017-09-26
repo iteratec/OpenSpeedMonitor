@@ -24,7 +24,7 @@
 
 
     <div>Die
-        <select id="measurand" name="measurand" class="measured-event-select" v-model="newThreshold.measurand">
+        <select id="measurand" name="measurand" class="measurand-event-select" v-model="newThreshold.measurand">
             <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
         </select>
         Messung von
