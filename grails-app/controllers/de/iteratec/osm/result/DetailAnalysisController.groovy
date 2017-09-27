@@ -42,8 +42,6 @@ class DetailAnalysisController {
         String microServiceUrl = configService.getDetailAnalysisUrl()
         if (!microServiceUrl) {
             errorList << message(code: 'default.microService.osmDetailAnalysis.url.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.url.undefined', default: 'The url for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
-        } else {
-            microServiceUrl = microServiceUrl.endsWith("/") ? microServiceUrl : "${microServiceUrl}/"
         }
 
         String apiKey = configService.getDetailAnalysisApiKey()

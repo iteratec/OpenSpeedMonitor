@@ -166,7 +166,11 @@ class ConfigService {
      * @return The URL for the DetailAnalysis Service
      */
     String getDetailAnalysisUrl() {
-        return grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.microserviceUrl
+        String url = grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.microserviceUrl
+        if (url && !url.endsWith("/")) {
+            url += "/"
+        }
+        return url
     }
 
     private OsmConfiguration getConfig(){
