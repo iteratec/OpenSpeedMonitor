@@ -4,6 +4,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.util.PerformanceLoggingService
 
 /**
  * Created by mwg on 31.08.2017.
@@ -12,9 +13,13 @@ class EventResultQueryBuilder {
     private List<EventResultCriteriaBuilder> filters
     private EventResultAveragesCriteriaBuilder aggregatedQueryBuilder
     private EventResultRawDataCriteriaBuilder rawQueryBuilder
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder, measurandMedianQueryBuilder
+    PerformanceLoggingService performanceLoggingService
 
-    EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
+
+    EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime, PerformanceLoggingService performanceLoggingService
+    ) {
+        this.performanceLoggingService = performanceLoggingService
         aggregatedQueryBuilder = new EventResultAveragesCriteriaBuilder()
         rawQueryBuilder = new EventResultRawDataCriteriaBuilder()
         filters = [aggregatedQueryBuilder, rawQueryBuilder]
@@ -64,6 +69,7 @@ class EventResultQueryBuilder {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
             measurandAveragesQueryBuilder.configureForSelectedMeasurands(measurands)
+            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
@@ -83,25 +89,31 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getMedians() {
-        List<EventResultProjection> result = listProjectedValues(getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandRawQueryBuilder))
+        List<EventResultProjection> result = getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandMedianQueryBuilder)
 
-        return result.each {
-            it.projectedProperties.each { key, value ->
-                it.projectedProperties.put(key, getMedian(value))
+        def foobar
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians from list", 1, {
+            foobar = result.each {
+                it.projectedProperties.each { key, value ->
+                    it.projectedProperties.put(key, getMedian(value))
+                }
             }
-        }
+        })
+        return foobar
     }
 
     private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
-        if (userTimingsBuilder) {
-            userTimingsResult += userTimingsBuilder.getResultsForFilter(filters)
-        }
-        if (measurandsBuilder) {
-            measurandResult += measurandsBuilder.getResultsForFilter(filters)
-        }
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get raw data from database", 1, {
+            if (userTimingsBuilder) {
+                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters)
+            }
+            if (measurandsBuilder) {
+                measurandResult += measurandsBuilder.getResultsForFilter(filters)
+            }
+        })
 
         return mergeResults(measurandResult, userTimingsResult)
     }
@@ -122,24 +134,26 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> listProjectedValues(List<EventResultProjection> unsortedResults) {
         List<EventResultProjection> sortedResults = []
-        unsortedResults.each { unsortedResult ->
-            EventResultProjection sorted = sortedResults.find { unsortedResult == it }
-            if (!sorted) {
-                sorted = new EventResultProjection(
-                        jobGroup: unsortedResult.jobGroup,
-                        page: unsortedResult.page,
-                        isAggregation: unsortedResult.isAggregation)
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"sort data", 1, {
+            unsortedResults.each { unsortedResult ->
+                EventResultProjection sorted = sortedResults.find { unsortedResult == it }
+                if (!sorted) {
+                    sorted = new EventResultProjection(
+                            jobGroup: unsortedResult.jobGroup,
+                            page: unsortedResult.page,
+                            isAggregation: unsortedResult.isAggregation)
+                    unsortedResult.projectedProperties.each { key, value ->
+                        sorted.projectedProperties.put(key, [])
+                    }
+                    sortedResults += sorted
+                }
                 unsortedResult.projectedProperties.each { key, value ->
-                    sorted.projectedProperties.put(key, [])
-                }
-                sortedResults += sorted
-            }
-            unsortedResult.projectedProperties.each { key, value ->
-                if (value) {
-                    sorted.projectedProperties."$key" += value
+                    if (value) {
+                        sorted.projectedProperties."$key" += value
+                    }
                 }
             }
-        }
+        })
         return sortedResults
     }
 
@@ -176,6 +190,9 @@ class EventResultQueryBuilder {
         }
         if (!measurandAveragesQueryBuilder) {
             measurandAveragesQueryBuilder = new EventResultMeasurandAveragesQueryBuilder()
+        }
+        if(!measurandMedianQueryBuilder){
+            measurandMedianQueryBuilder = new EventResultMeasurandMedianDataQueryBuilder(performanceLoggingService)
         }
     }
 }

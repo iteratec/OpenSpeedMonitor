@@ -18,7 +18,6 @@ class BarchartAggregationService {
     I18nService i18nService
     PerformanceLoggingService performanceLoggingService
 
-
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
         if (cmd.selectedJobGroups) {
@@ -56,15 +55,17 @@ class BarchartAggregationService {
         if (!selectedMeasurands) {
             return []
         }
-        EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime(), performanceLoggingService)
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages)
                 .withJobGroupIn(jobGroups)
                 .withSelectedMeasurands(selectedMeasurands)
 
         List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
-        List<BarchartAggregation> medians = createListForEventResultProjection(selectedMeasurands, builder.getMedians())
-
+        List<BarchartAggregation> medians
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians total", 1, {
+            medians = createListForEventResultProjection(selectedMeasurands, builder.getMedians())
+        })
         return mergeWithMedians(averages, medians)
     }
 
