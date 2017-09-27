@@ -41,16 +41,16 @@ import org.joda.time.DateTimeZone
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.WARN
+import static spock.util.matcher.HamcrestMatchers.closeTo
+import static spock.util.matcher.HamcrestSupport.that
 
 @Integration
 @Rollback
-class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
+class WeeklyJobGroupIntTests extends NonTransactionalIntegrationSpec {
 
     def log = LogFactory.getLog(getClass())
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
-    @Shared
     ResultPersisterService resultPersisterService
 
     CsiAggregationInterval weekly
@@ -60,25 +60,19 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
     Map<String, Page> pages
     Map<String, Browser> browsers
 
-    static final String csvFilename = 'weekly_page.csv'
+    static final double DELTA = 1e-15
 
-    /**
-     * Creating testdata.
-     * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
-     * with valid TimeToCsMappings from 2012 and added to csv.
-     */
     def setup() {
         createTestDataCommonToAllTests()
     }
 
-    //tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void testCalculatingWeeklyShopValueWithoutData() {
-        setup:
-        Date startDateWithoutResults = new DateTime(2012, 01, 12, 0, 0, DateTimeZone.UTC).toDate()
+    void "Without EventResults a JobGroup CsiAggregation get created but csByWptDocCompleteInPercent is still null"() {
 
-        CsiAggregation mvWeeklyShop
+        setup: "Given a weekly JobGroup CsiAggregation with a date without EventResults."
+        Date startDateWithoutResults = new DateTime(2012, 01, 12, 0, 0, DateTimeZone.UTC).toDate()
+        CsiAggregation csiAggWeeklyShop
         CsiAggregation.withNewTransaction {
-            mvWeeklyShop = CsiAggregation.build(
+            csiAggWeeklyShop = CsiAggregation.build(
                 started: startDateWithoutResults,
                 interval: weekly,
                 aggregationType: AggregationType.JOB_GROUP,
@@ -88,38 +82,47 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             )
         }
 
-        when:
-        jobGroupCsiAggregationService.calcCsiAggregations([mvWeeklyShop.id])
+        when: "It get calculated."
+        jobGroupCsiAggregationService.calcCsiAggregations([csiAggWeeklyShop.id])
 
-        then:
-        mvWeeklyShop.started == startDateWithoutResults
-        mvWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
-        mvWeeklyShop.aggregationType == AggregationType.JOB_GROUP
-        mvWeeklyShop.jobGroupId == jobGroupId
-        mvWeeklyShop.isCalculated()
-        mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete() == 0
-        mvWeeklyShop.csByWptDocCompleteInPercent == null
+        then: "It is marked as calculated but csByWptDocCompleteInPercent is still null afterwards."
+        csiAggWeeklyShop.started == startDateWithoutResults
+        csiAggWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
+        csiAggWeeklyShop.aggregationType == AggregationType.JOB_GROUP
+        csiAggWeeklyShop.jobGroupId == jobGroupId
+        csiAggWeeklyShop.isCalculated()
+        csiAggWeeklyShop.countUnderlyingEventResultsByWptDocComplete() == 0
+        csiAggWeeklyShop.csByWptDocCompleteInPercent == null
 
     }
 
     /**
-     * Tests the calculation of one weekly-shop-{@link CsiAggregation}. Databasis for calculation are weekly page-{@link CsiAggregation}s. These get calculated
-     * on-the-fly while calculating the respective weekly-shop-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
-     * won't get calculated on-the-fly. Therefore these get precalculated in test here.
+     * Tests the calculation of one weekly-JobGroup-{@link CsiAggregation}. Databasis for calculation are weekly page-{@link CsiAggregation}s. These get calculated
+     * on-the-fly while calculating the respective weekly-JobGroup-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
+     * won't get calculated on-the-fly. Therefore these get precalculated in test here from {@link EventResult}s. These are constructed from csv data.
+     *
+     * Expected values got calculated by script ./calcJobGroupCsiFromCsvData.groovy
      */
-    void testCalculatingWeeklyShopValue() {
-        setup:
+    void "With EventResults a JobGroup CsiAggregation get created and calculation provides a valid csByWptDocCompleteInPercent"() {
+
+        setup: "Given a weekly JobGroup CsiAggregation with a date with EventResults."
         createResultDataFromCsv()
         Date startDateWithData = new DateTime(2012, 11, 12, 0, 0, DateTimeZone.UTC).toDate()
-        Integer targetResultCount = 6*234
-
-        List<EventResult> results = EventResult.findAllByJobResultDateBetween(
-            startDateWithData,
-            new DateTime(startDateWithData).plusWeeks(1).toDate()
-        )
-        Double expectedValue = 61.30
+        Double avgOfAllHourlyAvgsOfStep01 = 0.8764922727272727d
+        Double avgOfAllHourlyAvgsOfStep02 = 0.7986763636363636d
+        Double avgOfAllHourlyAvgsOfStep03 = 0.6526654545454545d
+        Double avgOfAllHourlyAvgsOfStep04 = 0.5649671428571429d
+        Double avgOfAllHourlyAvgsOfStep05 = 0.45301416666666655d
+        Double avgOfAllHourlyAvgsOfStep06 = 0.3819126666666667d
+        Double totalAvg = (
+                avgOfAllHourlyAvgsOfStep01+
+                avgOfAllHourlyAvgsOfStep02+
+                avgOfAllHourlyAvgsOfStep03+
+                avgOfAllHourlyAvgsOfStep04+
+                avgOfAllHourlyAvgsOfStep05+
+                avgOfAllHourlyAvgsOfStep06) / 6
+        Double expectedValue = totalAvg
         long csiAggregationId
-
         CsiAggregation.withNewTransaction {
             CsiAggregation aggregation = CsiAggregation.build(
                 started: startDateWithData,
@@ -132,24 +135,22 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             csiAggregationId = aggregation.id
         }
 
-        when:
+        when: "It get calculated."
         CsiAggregation.withNewSession { session ->
             jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
             session.flush()
         }
-        CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
+        CsiAggregation csiAggWeeklyShop = CsiAggregation.get(csiAggregationId)
 
-        then:
-        Math.abs(results.size() - targetResultCount) < 30
-        mvWeeklyShop.started == startDateWithData
-        mvWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
-        mvWeeklyShop.aggregationType == AggregationType.JOB_GROUP
-        mvWeeklyShop.jobGroup.id == jobGroupId
-        mvWeeklyShop.isCalculated()
-        mvWeeklyShop.csByWptDocCompleteInPercent != null
-        Double calculated = mvWeeklyShop.csByWptDocCompleteInPercent * 100
-        //TODO: diff should be smaller
-        Double.compare(expectedValue, calculated) < 5.0d
+        then: "It is marked as calculated and has a valid csByWptDocCompleteInPercent."
+        csiAggWeeklyShop.started == startDateWithData
+        csiAggWeeklyShop.interval.intervalInMinutes == weekly.intervalInMinutes
+        csiAggWeeklyShop.aggregationType == AggregationType.JOB_GROUP
+        csiAggWeeklyShop.jobGroup.id == jobGroupId
+        csiAggWeeklyShop.isCalculated()
+        csiAggWeeklyShop.csByWptDocCompleteInPercent != null
+        Double calculated = csiAggWeeklyShop.csByWptDocCompleteInPercent
+        that calculated, closeTo(expectedValue, DELTA)
     }
 
     private createTestDataCommonToAllTests() {
@@ -202,7 +203,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             ConnectivityProfile profile = ConnectivityProfile.build()
             Job job = Job.build()
 
-            new File("src/test/resources/CsiData/${csvFilename}").eachLine {String csvLine ->
+            new File("src/test/resources/CsiData/weekly_page.csv").eachLine {String csvLine ->
                 if (!isHeaderLine(csvLine)){
 
                     List<String> csvFields = csvLine.split(';')
