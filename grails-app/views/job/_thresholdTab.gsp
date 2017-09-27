@@ -14,7 +14,8 @@
                 <ul>
                     <li v-for="threshold in thresholds">
                         <div>Die {{ threshold.measurand.name }} Messung von {{ threshold.measuredEvent.name }}
-                        sollte schneller als {{ threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.upperBoundary }} ms sein. <a>edit</a>  <a>delete</a>
+                        sollte schneller als {{ threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.upperBoundary }} ms sein.
+                            <a>edit</a>  <button type="button" @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
                         </div>
                     </li>
                 </ul>

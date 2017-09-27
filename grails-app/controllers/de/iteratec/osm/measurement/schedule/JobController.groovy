@@ -353,7 +353,8 @@ class JobController {
         Job job = Job.get(Long.parseLong(jobId))
         List<Threshold> thresholds = thresholdService.getThresholdsForJob(job)
 
-        def output = thresholds.collect {[measurand: it.measurand,
+        def output = thresholds.collect {[id: it.id,
+                                          measurand: it.measurand,
                                           measuredEvent: it.measuredEvent,
                                           upperBoundary: it.upperBoundary,
                                           lowerBoundary: it.lowerBoundary]}

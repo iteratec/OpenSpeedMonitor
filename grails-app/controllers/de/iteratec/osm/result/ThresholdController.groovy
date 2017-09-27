@@ -4,6 +4,8 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.util.ControllerUtils
 import org.springframework.boot.autoconfigure.batch.BatchProperties
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
+
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller-templated was edited due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 
@@ -124,8 +126,54 @@ class ThresholdController {
         if (!threshold.save(flush: true)) {
             //ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
         } else {
-            threshold.save(flush: true)
-            ControllerUtils.sendObjectAsJSON(response, ['measurand': threshold.measurand, 'job': threshold.job.id])
+            threshold.id = (threshold.save(flush: true)).id
+            ControllerUtils.sendObjectAsJSON(response, ['thresholdId': threshold.id])
+        }
+    }
+
+    /**
+     * Deletes the threshold
+     *
+     * @return http status
+     */
+    def deleteAsync() {
+        Long id = Long.parseLong(params['thresholdId'])
+        Threshold threshold = Threshold.findById(id)
+        if (threshold == null) {
+            notFound()
+            return
+        }
+
+        try {
+            threshold.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'threshold.label', default: 'Threshold'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'threshold.label', default: 'Threshold'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    def updateAsync() {
+//        Long id = Long.parseLong(params['thresholdId'])
+//        Measurand measurand = params['measurand'];
+//        MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
+//        Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
+//        Integer upperBound*/ary = Integer.parseInt(params['upperBoundary'])
+
+        Threshold threshold = params['threshold']
+
+
+        if (!threshold.save(flush: true)) {
+            //ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
+        } else {
+            threshold.id = (threshold.save(flush: true)).id
+            ControllerUtils.sendObjectAsJSON(response, ['thresholdId': threshold.id])
         }
     }
 }

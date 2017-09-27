@@ -79,7 +79,8 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                             upperBoundary: this.newThreshold.upperBoundary
                         },
                         url: createThresholdUrl,
-                        success: function () {
+                        success: function (result) {
+                            self.newThreshold.id = result.thresholdId;
                             self.thresholds.push(self.newThreshold);
                             self.newThreshold = {};
                             console.log("success");
@@ -88,8 +89,41 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                             console.log(e);
                         }
                     });
-                }
-            }
+                },
+                deleteThreshold: function (threshold, deleteThresholdUrl) {
+                var self = this;
+                var deletedThreshold = threshold;
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        thresholdId: deletedThreshold.id
+                    },
+                    url: deleteThresholdUrl,
+                    success: function () {
+                        self.thresholds.splice(self.thresholds.indexOf(deletedThreshold), 1)
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            },
+                updateThreshold: function (threshold, deleteThresholdUrl) {
+                    var self = this;
+                    var updatedThreshold = threshold;
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            threshold: updatedThreshold.id
+                        },
+                        url: deleteThresholdUrl,
+                        success: function () {
+                            self.thresholds.splice(self.thresholds.indexOf(deletedThreshold), 1)
+                        },
+                        error: function (e) {
+                            console.log(e);
+                        }
+                    });
+                }}
         });
     };
 
