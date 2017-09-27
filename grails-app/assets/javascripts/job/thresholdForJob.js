@@ -68,15 +68,7 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                     }
                 },
                 addThreshold: function (job, createThresholdUrl) {
-                    this.thresholds.push({
-                        measurand: this.newThreshold.measurand,
-                        measuredEvent: this.newThreshold.measuredEvent,
-                        lowerBoundary: this.newThreshold.lowerBoundary,
-                        upperBoundary: this.newThreshold.upperBoundary
-                    });
-
-                    //errorContainer.addClass("hidden");
-
+                    var self = this;
                     $.ajax({
                         type: 'POST',
                         data: {
@@ -88,14 +80,14 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                         },
                         url: createThresholdUrl,
                         success: function () {
-
+                            self.thresholds.push(self.newThreshold);
+                            self.newThreshold = {};
                             console.log("success");
                         },
                         error: function (e) {
                             console.log(e);
                         }
                     });
-                    this.newThreshold = {};
                 }
             }
         });
