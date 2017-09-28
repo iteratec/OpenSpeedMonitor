@@ -13,10 +13,39 @@
             <div>
                 <ul>
                     <li v-for="threshold in thresholds">
-                        <div>Die {{ threshold.measurand.name }} Messung von {{ threshold.measuredEvent.name }}
-                        sollte schneller als {{ threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.upperBoundary }} ms sein.
-                            <a>edit</a>  <button type="button" @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                        <div v-if="threshold.edit">Die
+                            <select id="measurandEdit" name="measurand" class="measurand-event-select"
+                                    v-model="threshold.threshold.measurand">
+                                <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
+                            </select>
+                            Messung von
+                            <select id="measuredEventEdit" name="measuredEvent" class="measured-event-select"
+                                    v-model="threshold.threshold.measuredEvent">
+                                <option v-for="measuredEvent in measuredEvents"
+                                        :value="measuredEvent">{{measuredEvent.name}}</option>
+                            </select>
+                            sollte schneller als
+                            <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="40"
+                                   rows="5"
+                                   maxlength="255"
+                                   v-model="threshold.threshold.lowerBoundary"/>
+                            ms, aber nicht langsamer als
+                            <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
+                                   rows="5"
+                                   maxlength="255"
+                                   v-model="threshold.threshold.upperBoundary"/>
+                            ms sein. <button type="button"
+                                             @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
+                            <button type="button" @click="changeEditMode(threshold, false)">discard</button>
                         </div>
+
+                        <div v-else>Die {{ threshold.threshold.measurand.name }} Messung von {{ threshold.threshold.measuredEvent.name }}
+                        sollte schneller als {{ threshold.threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.threshold.upperBoundary }} ms sein.
+                            <button type="button" @click="changeEditMode(threshold, true)">edit</button>
+                            <button type="button"
+                                                 @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                        </div>
+
                     </li>
                 </ul>
             </div>
@@ -29,20 +58,20 @@
             <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
         </select>
         Messung von
-        <select id="measuredEvent" name="measuredEvent" class="measured-event-select" v-model="newThreshold.measuredEvent">
+        <select id="measuredEvent" name="measuredEvent" class="measured-event-select"
+                v-model="newThreshold.measuredEvent">
             <option v-for="measuredEvent in measuredEvents" :value="measuredEvent">{{measuredEvent.name}}</option>
         </select>
         sollte schneller als
-        <input id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="40" rows="5"
-                 maxlength="255"
-                 v-model="newThreshold.lowerBoundary"/>
+        <input id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="30" rows="5"
+               maxlength="150"
+               v-model="newThreshold.lowerBoundary"/>
         ms, aber nicht langsamer als
         <input id="upperBoundary" class="" type="number" min="1" name="upperBoundary" cols="40" rows="5"
-                 maxlength="255"
-                 v-model="newThreshold.upperBoundary"/>
+               maxlength="150"
+               v-model="newThreshold.upperBoundary"/>
         ms sein. <a>add</a>  <a>clear</a>
     </div>
-
 
 
     <div>
@@ -56,7 +85,6 @@
         </button>
     </div>
 </div>
-
 
 
 <asset:script type="text/javascript">

@@ -160,15 +160,23 @@ class ThresholdController {
      * @return
      */
     def updateAsync() {
-//        Long id = Long.parseLong(params['thresholdId'])
-//        Measurand measurand = params['measurand'];
-//        MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
-//        Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
-//        Integer upperBound*/ary = Integer.parseInt(params['upperBoundary'])
+        //get params
+        Long id = Long.parseLong(params['thresholdId'])
+        Measurand measurand = params['measurand'];
+        MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
+        Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
+        Integer upperBoundary = Integer.parseInt(params['upperBoundary'])
 
-        Threshold threshold = params['threshold']
+        //get threshold
+        Threshold threshold = Threshold.findById(id)
 
+        //update threshold
+        threshold.measurand = measurand
+        threshold.measuredEvent = measuredEvent
+        threshold.lowerBoundary = lowerBoundary
+        threshold.upperBoundary = upperBoundary
 
+        //save changes
         if (!threshold.save(flush: true)) {
             //ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
         } else {

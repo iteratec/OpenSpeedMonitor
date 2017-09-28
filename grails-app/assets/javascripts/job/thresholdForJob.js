@@ -1,10 +1,9 @@
-
 "use strict";
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-OpenSpeedMonitor.thresholdforJobs = (function(){
-    
+OpenSpeedMonitor.thresholdforJobs = (function () {
+
     var initVueComponent = function (data) {
         var jobId = data.jobId;
         var scriptId = data.scriptId;
@@ -12,13 +11,13 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
         new Vue({
             el: '#threshold',
             data: {
-                thresholds: null,
+                thresholds: [],
                 measuredEvents: [],
                 measurands: [],
-                newThreshold: {}
+                newThreshold: {},
+                tmpThreshold: {}
             },
-            computed: {
-            },
+            computed: {},
             created: function () {
                 this.getMeasurands("/job/getMeasurands")
                 this.getMeasuredEvents(scriptId, "/script/getMeasuredEventsForScript")
@@ -26,25 +25,29 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
             },
             methods: {
                 fetchData: function () {
-                     var self = this;
-                     getThresholdsForJob(jobId).success(function(result) {
-                         self.thresholds = result;
-                     }).error(function(e) {
-                         console.log(e);
-                     });
+                    var self = this;
+                    getThresholdsForJob(jobId).success(function (result) {
+                        result.forEach(function(resultThreshold) {
+                            self.thresholds.push({
+                                threshold: resultThreshold,
+                                edit: false
+                            })
+                        });
+                    }).error(function (e) {
+                        console.log(e);
+                    });
                 },
                 getMeasuredEvents: function (scriptId, targetUrl) {
                     var self = this;
-                    if(scriptId && targetUrl){
+                    if (scriptId && targetUrl) {
                         $.ajax({
-                            type: 'POST',
+                            type: 'GET',
                             url: targetUrl,
-                            data: { scriptId: scriptId },
-                            success : function(result) {
-                               self.measuredEvents = result;
-                            }
-                            ,
-                            error : function() {
+                            data: {scriptId: scriptId},
+                            success: function (result) {
+                                self.measuredEvents = result;
+                            },
+                            error: function () {
                                 return ""
                             }
                         });
@@ -52,16 +55,16 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                 },
                 getMeasurands: function (targetUrl) {
                     var self = this;
-                    if(targetUrl){
+                    if (targetUrl) {
                         $.ajax({
-                            type: 'POST',
+                            type: 'GET',
                             url: targetUrl,
                             data: {},
-                            success : function(result) {
+                            success: function (result) {
                                 self.measurands = result;
                             }
                             ,
-                            error : function() {
+                            error: function () {
                                 return ""
                             }
                         });
@@ -81,7 +84,10 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                         url: createThresholdUrl,
                         success: function (result) {
                             self.newThreshold.id = result.thresholdId;
-                            self.thresholds.push(self.newThreshold);
+                            self.thresholds.push({
+                                threshold: self.newThreshold,
+                                edit: false
+                            });
                             self.newThreshold = {};
                             console.log("success");
                         },
@@ -91,29 +97,12 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                     });
                 },
                 deleteThreshold: function (threshold, deleteThresholdUrl) {
-                var self = this;
-                var deletedThreshold = threshold;
-                $.ajax({
-                    type: 'POST',
-                    data: {
-                        thresholdId: deletedThreshold.id
-                    },
-                    url: deleteThresholdUrl,
-                    success: function () {
-                        self.thresholds.splice(self.thresholds.indexOf(deletedThreshold), 1)
-                    },
-                    error: function (e) {
-                        console.log(e);
-                    }
-                });
-            },
-                updateThreshold: function (threshold, deleteThresholdUrl) {
                     var self = this;
-                    var updatedThreshold = threshold;
+                    var deletedThreshold = threshold;
                     $.ajax({
                         type: 'POST',
                         data: {
-                            threshold: updatedThreshold.id
+                            thresholdId: deletedThreshold.threshold.id
                         },
                         url: deleteThresholdUrl,
                         success: function () {
@@ -123,20 +112,53 @@ OpenSpeedMonitor.thresholdforJobs = (function(){
                             console.log(e);
                         }
                     });
-                }}
+                },
+                updateThreshold: function (threshold, updateThresholdUrl) {
+                    var self = this;
+                    var updatedThreshold = threshold;
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            thresholdId: updatedThreshold.threshold.id,
+                            measurand: updatedThreshold.threshold.measurand.name,
+                            measuredEvent: updatedThreshold.threshold.measuredEvent.id,
+                            lowerBoundary: updatedThreshold.threshold.lowerBoundary,
+                            upperBoundary: updatedThreshold.threshold.upperBoundary
+                        },
+                        url: updateThresholdUrl,
+                        success: function () {
+                            updatedThreshold.edit = false;
+                            self.thresholds[self.thresholds.indexOf(updatedThreshold)] = updatedThreshold;
+                        },
+                        error: function (e) {
+                            console.log(e);
+                        }
+                    });
+                },
+                changeEditMode: function (threshold, state) {
+                    if(state){
+                        //shadow copy
+                        this.tmpThreshold = Object.assign({}, threshold.threshold);
+                    }else{
+                        threshold.threshold = this.tmpThreshold;
+                        this.tmpThreshold = {};
+                    }
+                    threshold.edit = state;
+                }
+            }
         });
     };
 
     var getThresholdsForJob = function (jobId) {
         var targetUrl = "/job/getThresholdsForJob";
-           return $.ajax({
-                type: 'GET',
-                url: targetUrl,
-                data: { jobId: jobId }
-            });
+        return $.ajax({
+            type: 'GET',
+            url: targetUrl,
+            data: {jobId: jobId}
+        });
     };
 
-    return{
+    return {
         initVue: initVueComponent
     }
 })();
