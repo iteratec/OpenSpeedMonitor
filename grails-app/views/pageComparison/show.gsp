@@ -33,7 +33,7 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <button type="button" onClick="drawGraph()" id="graphButtonHtmlId"
+                        <button type="button" id="graphButtonHtmlId"
                                 class="btn btn-primary show-button">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
                     </div>
@@ -80,73 +80,6 @@
         $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
-
-        var pageComparisonSelectionCardLoaded = false;
-        var timeframeCardLoaded = false;
-        var barchartMeasuringsLoaded = false;
-
-        var allLoaded = function () {
-            if(pageComparisonSelectionCardLoaded && timeframeCardLoaded && barchartMeasuringsLoaded) {
-                OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison().init();
-                OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-            }
-        };
-
-         $(window).on("pageComparisonSelectionCardLoaded", function () {
-             pageComparisonSelectionCardLoaded = true;
-             allLoaded();
-        });
-         $(window).on("selectIntervalTimeframeCardLoaded", function () {
-             timeframeCardLoaded = true;
-             allLoaded();
-        });
-         $(window).on("barchartMeasuringsLoaded", function () {
-             barchartMeasuringsLoaded = true;
-             allLoaded();
-        });
-
-
-        // declare the spinner outside of the drawGraph function to prevent creation of multiple spinnerContainer
-        var spinner = OpenSpeedMonitor.Spinner("#chart-container");
-
-        function drawGraph() {
-            var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
-
-            OpenSpeedMonitor.ChartModules.PageComparisonBarChart = OpenSpeedMonitor.ChartModules.PageComparisonBarChart ||  OpenSpeedMonitor.ChartModules.PageComparisonChart("svg-container");
-
-            spinner.start();
-            $.ajax({
-                type: 'POST',
-                data: {
-                    from: selectedTimeFrame[0].toISOString(),
-                    to: selectedTimeFrame[1].toISOString(),
-                    measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                    selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.PageComparisonSelection.getValues())
-                },
-                url: "${createLink(controller: 'pageComparison', action: 'getBarchartData')}",
-                dataType: "json",
-                success: function (data) {
-                    spinner.stop();
-                    if (!$("#error-div").hasClass("hidden"))
-                        $("#error-div").addClass("hidden");
-
-                    if (!$.isEmptyObject(data)) {
-                        $('#warning-no-data').hide();
-                        OpenSpeedMonitor.ChartModules.PageComparisonBarChart.drawChart(data);
-                        OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-                        $("#dia-save-chart-as-png").removeClass("disabled");
-                    } else {
-                        $('#warning-no-data').show();
-                    }
-                },
-                error: function (e) {
-                    spinner.stop();
-                    $("#error-div").removeClass("hidden");
-                    $("#chart-card").removeClass("hidden");
-                    $("#error-message").html(e.responseText);
-                    }
-                });
-            }
 
     </asset:script>
 </content>

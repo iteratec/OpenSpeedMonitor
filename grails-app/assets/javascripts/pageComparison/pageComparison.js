@@ -1,5 +1,7 @@
-//= require /urlHandling/urlHelper.js
+//= require pageComparisonChart.js
+//= require pageComparisonGuiHandling.js
 
+//= require /urlHandling/urlHelper.js
 "use strict";
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
