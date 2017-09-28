@@ -210,7 +210,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
                 return curMeasurandData;
             }
         }
-        return Object.values(curMeasurandData)[0];
+        return Object.values(allMeasurandDataMap)[0];
     };
 
     var getActualSvgWidth = function() {

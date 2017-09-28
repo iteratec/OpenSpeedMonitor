@@ -152,7 +152,7 @@ class JobService {
         params["selectedBrowsers"] = "$job.location.browserId"
         params["selectedLocations"] = "$job.location.id"
         params["selectedConnectivities"] = "${job.noTrafficShapingAtAll?'native':job.connectivityProfileId?:job.customConnectivityName}"
-        params["selectedAggrGroupValuesUnCached"] = Measurand.DOC_COMPLETE_TIME
+        params["selectedAggrGroupValuesUnCached"] = "DOC_COMPLETE_TIME"
         return params
     }
 

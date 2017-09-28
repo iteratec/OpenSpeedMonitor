@@ -241,7 +241,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
                 url: OpenSpeedMonitor.urls.jobTags.getTagsForJobs,
                 data: {jobIds: JSON.stringify(getSelectedJobIds())}
             }).done(function (result) {
-                fillDropdown(jQuery.parseJSON(result).tags);
+                fillDropdown(result.tags);
             });
         });
         $("#add-tag-confirm-button").click(function () {

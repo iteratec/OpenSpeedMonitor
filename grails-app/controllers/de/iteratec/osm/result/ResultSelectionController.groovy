@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
+
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
@@ -36,7 +37,8 @@ class ResultSelectionController extends ExceptionHandlerController {
         Locations,
         ConnectivityProfiles,
         Results,
-        Pages
+        Pages,
+        UserTimings
     }
 
     def getResultCount(ResultSelectionCommand command) {
@@ -153,6 +155,29 @@ class ResultSelectionController extends ExceptionHandlerController {
                         parent: [id: it[1].id, name: it[1].name]
                 ]
             }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
+    def getUserTimings(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
+            def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
+                projections {
+                    userTimings {
+                        groupProperty('name')
+                        groupProperty('type')
+                    }
+                }
+            })
+            return userTimings.collect {
+                SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
+            }.unique { a, b -> a.id <=> b.id }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

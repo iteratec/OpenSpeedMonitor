@@ -1,7 +1,6 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.api.MicroServiceApiKey
-import de.iteratec.osm.api.MicroserviceType
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -17,6 +16,7 @@ class DetailAnalysisController {
     LinkGenerator grailsLinkGenerator
     EventResultDashboardService eventResultDashboardService
     DetailAnalysisPersisterService detailAnalysisPersisterService
+    ConfigService configService
 
     public final static String JS_DATE_FORMAT = 'dd.mm.yyyy'
 
@@ -39,15 +39,12 @@ class DetailAnalysisController {
         if (!osmUrl) {
             errorList << message(code: 'default.serverUrl.undefined', args: [message(code: 'default.serverUrl.undefined', default: 'The server url is undefined. You can set it in the custom osm-properties.\n')])
         }
-        String microServiceUrl = grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.detailAnalysisMicroserviceUrl')
-        microServiceUrl = microServiceUrl.endsWith("/") ? microServiceUrl : microServiceUrl + "/"
+        String microServiceUrl = configService.getDetailAnalysisUrl()
         if (!microServiceUrl) {
             errorList << message(code: 'default.microService.osmDetailAnalysis.url.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.url.undefined', default: 'The url for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
-        } else {
-            microServiceUrl = microServiceUrl.endsWith("/") ? microServiceUrl : "${microServiceUrl}/"
         }
 
-        String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
+        String apiKey = configService.getDetailAnalysisApiKey()
         if (!apiKey) {
             errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', default: 'The api key for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
         }

@@ -16,9 +16,8 @@
 */
 
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.api.MicroServiceApiKey
-import de.iteratec.osm.api.MicroserviceType
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
@@ -58,6 +57,7 @@ class BootStrap {
     DetailAnalysisPersisterService detailAnalysisPersisterService
     ProxyService proxyService
     HealthReportService healthReportService
+    InMemoryConfigService inMemoryConfigService
     def grailsApplication
 
     /**
@@ -83,6 +83,7 @@ class BootStrap {
                 initApplicationData(false)
                 registerProxyListener()
                 fetchLocationsOfWebpagetestOnFirstStart()
+                inMemoryConfigService.activateMeasurementsGenerally()
                 break
         }
 
@@ -188,20 +189,6 @@ class BootStrap {
             if (createDefaultUsers) createUser('root', 'root', rootRole)
         } else {
             createUser(appRootUserName, appRootPassword, rootRole)
-        }
-
-        //apiKey for detailAnalysisMicroservice
-        Boolean enablePersistenceOfDetailAnalysisData = grailsApplication.config.grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData
-        if (enablePersistenceOfDetailAnalysisData) {
-            if (MicroServiceApiKey.findAllByMicroService(MicroserviceType.DETAIL_ANALYSIS).isEmpty()) {
-                String initialApiKeyDetailAnalysis = grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey.isEmpty() ?
-                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialDetailAnalysisApiKey
-                if (!initialApiKeyDetailAnalysis) {
-                    log.warn("initial apiKey for detailAnalysisMicroservice missing")
-                } else {
-                    new MicroServiceApiKey([secretKey: initialApiKeyDetailAnalysis, microService: MicroserviceType.DETAIL_ANALYSIS, valid: true]).save(failOnError: true)
-                }
-            }
         }
 
         log.info "initUserData() OSM ends"
@@ -393,10 +380,10 @@ class BootStrap {
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
         if (persistenceEnabled) {
-            String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.detailAnalysis?.detailAnalysisMicroserviceUrl
+            String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.detailAnalysis?.microserviceUrl
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
             if (!microserviceUrl || !urlValidator.isValid(microserviceUrl)) {
-                throw new IllegalStateException("A valid url for the detailAnalysisMicroservice is required, if persistence of detailAnalysisData is to be enabled")
+                throw new IllegalStateException("A valid url for the detailAnalysis microservice is required, if persistence of detailAnalysisData is to be enabled")
             }
             microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
             detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)

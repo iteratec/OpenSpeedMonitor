@@ -85,8 +85,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 csiAggregationInterval,
-                [ new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_TIME, cachedView: CachedView.UNCACHED),
-                  new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_REQUESTS, cachedView: CachedView.UNCACHED)],
+                [new SelectedMeasurand(name: Measurand.DOC_COMPLETE_TIME.toString(), cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND),
+                 new SelectedMeasurand(name: Measurand.DOC_COMPLETE_REQUESTS.toString(), cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -145,7 +145,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(measurand: Measurand.DOC_COMPLETE_TIME, cachedView: CachedView.UNCACHED)],
+                [ new SelectedMeasurand(name: Measurand.DOC_COMPLETE_TIME.toString(), cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -191,7 +191,7 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_TIME, cachedView:  CachedView.UNCACHED)],
+                [ new SelectedMeasurand(name:  Measurand.DOC_COMPLETE_TIME.toString(), cachedView:  CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
@@ -260,8 +260,8 @@ class SummarizedChartLegendEntriesSpec extends Specification {
                 null,
                 null,
                 CsiAggregationInterval.RAW,
-                [ new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_TIME, cachedView:  CachedView.UNCACHED),
-                  new SelectedMeasurand(measurand:  Measurand.DOC_COMPLETE_REQUESTS, cachedView:  CachedView.UNCACHED)],
+                [new SelectedMeasurand(name:  Measurand.DOC_COMPLETE_TIME.toString(), cachedView:  CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND),
+                 new SelectedMeasurand(name:  Measurand.DOC_COMPLETE_REQUESTS.toString(), cachedView:  CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)],
                 new ErQueryParams())
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 

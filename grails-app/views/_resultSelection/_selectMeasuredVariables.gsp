@@ -27,3 +27,8 @@ A row with 3 cards to select the measured variables for first view, repeat view,
         ]"/>
     </div>
 </div>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectUserTimingsCard.js" />');
+    });
+</asset:script>

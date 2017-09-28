@@ -15,7 +15,7 @@
             <div class="col-sm-7">
                 <iteratec:optGroupedSelect dataMap="${measurandsUncached}"
                                            id="measurandSelection"
-                                           class="form-control"
+                                           class="form-control measurand-select"
                                            name="selectedMeasurandSeries"
                                            optionKey="value" optionValue="value"
                                            value="${[de.iteratec.osm.result.Measurand.DOC_COMPLETE_TIME]}"/>
@@ -23,3 +23,9 @@
         </div>
     </div>
 </div>
+
+<asset:script type="text/javascript">
+    $(window).load(function() {
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectUserTimingsCard.js" />');
+    });
+</asset:script>

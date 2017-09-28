@@ -18,6 +18,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var isRestrained = false;
     var forceSignInLabel = false;
+    var highlightId;
     var eventHandlers = {};
 
     var setData = function (componentData) {
@@ -29,16 +30,16 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         barColor = componentData.color || barColor;
         forceSignInLabel = (componentData.forceSignInLabel !== undefined) ? componentData.forceSignInLabel : forceSignInLabel;
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
+        highlightId = highlightId!==componentData.highLightId ? componentData.highLightId || highlightId : undefined;
     };
 
-    var render = function (selector) {
+    var render = function (selection) {
         var xScale = d3.scale.linear().range([0, width]);
         var yScale = d3.scale.ordinal().rangeBands([0, height]);
 
         xScale.domain([minValue, maxValue]);
         yScale.domain(data.map(function(d) { return d.id; }));
-
-        var bars = d3.select(selector).selectAll(".bar").data(data, function (d) {
+        var bars = selection.selectAll(".bar").data(data, function (d) {
             return d.id;
         });
         renderExit(bars.exit());
@@ -81,6 +82,9 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
 
         transition.select(".bar-rect")
             .style("fill", barColor)
+            .style("opacity", function (d) {
+                return !(d.id===highlightId || !highlightId) ? 0.2 : 1;
+            })
             .attr("y", function (d) {
                 return yScale(d.id)
             })
