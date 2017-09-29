@@ -2,59 +2,51 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
 <%@ page import="de.iteratec.osm.result.Measurand" %>
 
-<div class="form-group" id="">
-    <label>
-        <g:message code="job.Thresholds.label" default="Thresholds"/>
-    </label>
-</div>
-
 <div id="threshold">
     <div>
         <div id="thresholdList">
             <div>
-                <ul>
-                    <li v-for="threshold in thresholds">
-                        <div v-if="threshold.edit">Die
-                            <select id="measurandEdit" name="measurand" class="measurand-event-select"
-                                    v-model="threshold.threshold.measurand">
-                                <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-                            </select>
-                            Messung von
-                            <select id="measuredEventEdit" name="measuredEvent" class="measured-event-select"
-                                    v-model="threshold.threshold.measuredEvent">
-                                <option v-for="measuredEvent in measuredEvents"
-                                        :value="measuredEvent">{{measuredEvent.name}}</option>
-                            </select>
-                            sollte schneller als
-                            <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="40"
-                                   rows="5"
-                                   maxlength="255"
-                                   v-model="threshold.threshold.lowerBoundary"/>
-                            ms, aber nicht langsamer als
-                            <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
-                                   rows="5"
-                                   maxlength="255"
-                                   v-model="threshold.threshold.upperBoundary"/>
-                            ms sein. <button type="button"
-                                             class="thresholdButton"
-                                             @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
-                            <button type="button"
-                                    class="thresholdButton"
-                                    @click="changeEditMode(threshold, false)">discard</button>
-                        </div>
+                <div v-for="threshold in thresholds">
+                    <div v-if="threshold.edit">Die
+                        <select id="measurandEdit" name="measurand" class="measurand-event-select"
+                                v-model="threshold.threshold.measurand">
+                            <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
+                        </select>
+                        Messung von
+                        <select id="measuredEventEdit" name="measuredEvent" class="measured-event-select"
+                                v-model="threshold.threshold.measuredEvent">
+                            <option v-for="measuredEvent in measuredEvents"
+                                    :value="measuredEvent">{{measuredEvent.name}}</option>
+                        </select>
+                        sollte schneller als
+                        <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="40"
+                               rows="5"
+                               maxlength="255"
+                               v-model="threshold.threshold.lowerBoundary"/>
+                        ms, aber nicht langsamer als
+                        <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
+                               rows="5"
+                               maxlength="255"
+                               v-model="threshold.threshold.upperBoundary"/>
+                        ms sein. <button type="button"
+                                         class="thresholdButton"
+                                         @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
+                        <button type="button"
+                                class="thresholdButton"
+                                @click="changeEditMode(threshold, false)">discard</button>
+                    </div>
 
-                        <div v-else>Die {{ threshold.threshold.measurand.name }} Messung von {{ threshold.threshold.measuredEvent.name }}
-                        sollte schneller als {{ threshold.threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.threshold.upperBoundary }} ms sein.
-                            <button type="button"
-                                    class="thresholdButton"
-                                    @click="changeEditMode(threshold, true)">edit</button>
-                            <button type="button"
-                                    class="thresholdButton"
-                                    @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
-                        </div>
-
-                    </li>
-                </ul>
+                    <div v-else class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}<br>
+                        <div class="thresholdBoundaries">Good < {{ threshold.threshold.lowerBoundary }} ms < OK < {{ threshold.threshold.upperBoundary }} ms < Bad
+                        <button type="button"
+                                class="thresholdButton"
+                                @click="changeEditMode(threshold, true)">edit</button>
+                        <button type="button"
+                                class="thresholdButton"
+                                @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                    </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

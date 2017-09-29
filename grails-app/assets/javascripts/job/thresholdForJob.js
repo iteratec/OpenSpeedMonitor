@@ -101,7 +101,7 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                     var self = this;
                     var deletedThreshold = threshold;
                     $.ajax({
-                        type: 'DELETE',
+                        type: 'POST',
                         data: {
                             thresholdId: deletedThreshold.threshold.id
                         },
@@ -119,7 +119,7 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                         var self = this;
                         var updatedThreshold = threshold;
                         $.ajax({
-                            type: 'PUT',
+                            type: 'POST',
                             data: {
                                 thresholdId: updatedThreshold.threshold.id,
                                 measurand: updatedThreshold.threshold.measurand.name,
