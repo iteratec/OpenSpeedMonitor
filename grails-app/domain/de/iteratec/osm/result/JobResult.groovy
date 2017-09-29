@@ -256,7 +256,7 @@ class JobResult {
     def beforeUpdate() {
         try {
             boolean noTest = Environment.getCurrent() != Environment.TEST
-            if (noTest && isDirty(httpStatusCode)) {
+            if (noTest && isDirty('httpStatusCode')) {
                 jobStatisticService.updateStatsFor(job)
             }
         } catch (Exception e) {

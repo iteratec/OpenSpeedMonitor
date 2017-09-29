@@ -287,7 +287,6 @@ OpenSpeedMonitor.domUtils = (function () {
         });
         return options;
     };
-
     /**
      * Gets all values of all option elements in a select element
      * @param selectElement The select element with options as children
@@ -339,7 +338,7 @@ OpenSpeedMonitor.domUtils = (function () {
         getAllOptionValues: getAllOptionValues,
         hasAllOptionsSelected: hasAllOptionsSelected,
         updateSelectOptions: updateSelectOptions,
-        deselectAllOptions: deselectAllOptions
+        deselectAllOptions: deselectAllOptions,
     };
 })();
 

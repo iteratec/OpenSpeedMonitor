@@ -14,6 +14,8 @@ testDataConfig {
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
         }
         'de.iteratec.osm.measurement.schedule.Job' {
+            def i = 1
+            label = {-> "labelIncrementedViaBuildTestDataConfig_${i++}" }
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
             connectivityProfile = { -> ConnectivityProfile.build() }
             script = { -> Script.build() }
@@ -51,6 +53,40 @@ testDataConfig {
         }
         'de.iteratec.osm.measurement.environment.WebPageTestServer' {
             baseUrl = {-> "http://wptserver/" }
+        }
+        'de.iteratec.osm.result.MeasuredEvent' {
+            def i = 1
+            name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.measurement.script.Script' {
+            def i = 1
+            label = {-> "labelIncrementedViaBuildTestDataConfig_${i++}" }
+        }
+        'de.iteratec.osm.csi.CsiDay' {
+            hour0Weight = {-> 1}
+            hour1Weight = {-> 1}
+            hour2Weight = {-> 1}
+            hour3Weight = {-> 1}
+            hour4Weight = {-> 1}
+            hour5Weight = {-> 1}
+            hour6Weight = {-> 1}
+            hour7Weight = {-> 1}
+            hour8Weight = {-> 1}
+            hour9Weight = {-> 1}
+            hour10Weight = {-> 1}
+            hour11Weight = {-> 1}
+            hour12Weight = {-> 1}
+            hour13Weight = {-> 1}
+            hour14Weight = {-> 1}
+            hour15Weight = {-> 1}
+            hour16Weight = {-> 1}
+            hour17Weight = {-> 1}
+            hour18Weight = {-> 1}
+            hour19Weight = {-> 1}
+            hour20Weight = {-> 1}
+            hour21Weight = {-> 1}
+            hour22Weight = {-> 1}
+            hour23Weight = {-> 1}
         }
     }
     unitAdditionalBuild = [

@@ -288,10 +288,10 @@ class EventResultDashboardController {
 
         List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
                 new OsmChartAxis(
-                    it.getMeasurand().getMeasurandGroup(),
-                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurand().getMeasurandGroup()}", it.getMeasurand().getMeasurandGroup().toString())
-                    + " [" + it.getMeasurand().getMeasurandGroup().getUnit().getLabel() + "]",
-                            getAxisSide(it.getMeasurand().getMeasurandGroup()) )
+                    it.getMeasurandGroup(),
+                    i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurandGroup()}", it.getMeasurandGroup().toString())
+                    + " [" + it.getMeasurandGroup().getUnit().getLabel() + "]",
+                            getAxisSide(it.getMeasurandGroup()) )
         }
 
         ErQueryParams queryParams = cmd.createErQueryParams();
@@ -564,8 +564,8 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': Measurand.values().groupBy { it.measurandGroup },
-                'aggrGroupValuesUnCached': Measurand.values().groupBy { it.measurandGroup },
+                'aggrGroupValuesCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
+                'aggrGroupValuesUnCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
                 'aggregationIntervals': AGGREGATION_INTERVALS,
                 'folders': eventResultDashboardService.getAllJobGroups(),
                 'pages': pages,
@@ -576,7 +576,7 @@ class EventResultDashboardController {
                 'dateFormat': DATE_FORMAT_STRING_FOR_HIGH_CHART,
                 'tagToJobGroupNameMap' : jobGroupDaoService.getTagToJobGroupNameMap(),
                 'eventsOfPages': eventsOfPages,
-                'locationsOfBrowsers': locationsOfBrowsers
+                'locationsOfBrowsers': locationsOfBrowsers,
         ]
     }
 

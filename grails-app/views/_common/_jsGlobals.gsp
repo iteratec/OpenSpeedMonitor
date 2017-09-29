@@ -35,7 +35,8 @@
             pages: "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}",
             browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
             connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
-            resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}"
+            resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}",
+            userTimings: "${createLink(controller: 'resultSelection', action: 'getUserTimings')}"
         },
         jobTags: {
             getTagsForJobs: "${createLink(controller: 'job', action: 'getTagsForJobs')}",
@@ -46,6 +47,7 @@
         pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
         pageAggregationGetData: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
         jobGroupAggregationShow: "${createLink(action: 'show', controller: 'jobGroupAggregation')}",
+        jobGroupAggregationGetData: "${createLink(controller: 'jobGroupAggregation', action: 'getBarchartData')}",
         tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",

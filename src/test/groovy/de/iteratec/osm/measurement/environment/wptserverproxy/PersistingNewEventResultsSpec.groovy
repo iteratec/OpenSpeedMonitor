@@ -196,6 +196,54 @@ class PersistingNewEventResultsSpec extends Specification {
         !eventResults.any { it.visuallyComplete99InMillisecs == null }
     }
 
+    void "new results have User timings"() {
+        setup:
+        File file = new File("src/test/resources/WptResultXmls/DEV_EXAMPLE_JOB_FIREFOX_17JUL2017_1Run_3Events.xml")
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+        WebPageTestServer wptServer = WebPageTestServer.build()
+        Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
+        Job.build(label: "ExampleJob Firefox")
+        service.timeToCsMappingService = Stub(TimeToCsMappingService) {
+            getCustomerSatisfactionInPercent(_) >> { value -> value }
+        }
+
+        when: "the service creates new event results from the XML result"
+        service.listenToResult(xmlResult, wptServer)
+        List<EventResult> eventResults = EventResult.list()
+
+        then: "there are 6 EventResults with 3 UserTimings each"
+        eventResults.size() == 6
+        !eventResults.any { it.userTimings == null }
+        eventResults.each { eventResult ->
+            eventResult.userTimings.size() == 3
+            !eventResult.userTimings.findAll{ it.name == null || it.startTime == null}
+
+            eventResult.userTimings.findAll { it.type == UserTimingType.MARK}.size() == 2
+            eventResult.userTimings.findAll { it.type == UserTimingType.MARK && it.name == "reco_cinemaLoadingStart"}.size() == 1
+
+            eventResult.userTimings.findAll { it.type == UserTimingType.MARK && it.name == "p13n_entrypage_visuallyComplete"}.size() == 1
+            eventResult.userTimings.findAll { it.type == UserTimingType.MEASURE && it.name == "entryPage" && it.duration != null}.size() == 1
+        }
+        eventResults.find { it.visuallyCompleteInMillisecs == 11000 && it.speedIndex == 3575}.userTimings.each {
+            if(it.name == "reco_cinemaLoadingStart"){
+                it.startTime == 1761.00
+                it.duration == null
+                it.type == UserTimingType.MARK
+            }
+            if(it.name == "p13n_entrypage_visuallyComplete"){
+                it.startTime == 1784.00
+                it.duration == null
+                it.type == UserTimingType.MARK
+            }
+            if(it.name == "entryPage"){
+                it.startTime == 1760.865
+                it.duration == 518.47
+                it.type == UserTimingType.MEASURE
+            }
+        }
+
+    }
+
     void "new results have all time to interactive"() {
         setup:
         File file = new File("src/test/resources/WptResultXmls/WPT_EXAMPLE_CHROME_TTI_1Run_1Event.xml")

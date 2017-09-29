@@ -1,5 +1,7 @@
 package geb.pages.de.iteratec.osm.result
 
+import de.iteratec.osm.result.MeasurandGroup
+import de.iteratec.osm.result.SelectedMeasurandType
 import geb.pages.de.iteratec.osm.I18nGebPage
 import org.openqa.selenium.Keys
 
@@ -93,8 +95,35 @@ class EventResultDashboardPage extends I18nGebPage {
         }
     }
 
-    public boolean isVariableSelectionTabActive(){
+    public clickJobSelectionTab(){
+        if(isVariableSelectionTabActive()){
+            tabJobSelection.click()
+        }
+    }
+
+    boolean isVariableSelectionTabActive(){
         return cardTabsUl.children("li")[1].classes().contains("active")
+    }
+
+    def getFirstViewOptionsFor(String measurandGroup){
+        return firstViewDiv.find(".measurand-opt-group-${measurandGroup}")
+    }
+
+    int getFirstViewOptionsSizeFor(String measurandGroup){
+        return getFirstViewOptionsFor(measurandGroup).children().size()
+    }
+
+    def findOptionInFirstViewForUserTiming(SelectedMeasurandType selectedType, String name){
+        String query = selectedType.optionPrefix+name
+        return getFirstViewOptionsFor("USER_TIMINGS").find('[value="'+query+'"]')
+    }
+
+    boolean isUserTimingsHidden(){
+        return firstViewDiv.find('.measurand-opt-group-USER_TIMINGS[style="display: none;"]').size() == 1
+    }
+
+    boolean firstViewHasOptionFor(SelectedMeasurandType selectedType, String name){
+       return findOptionInFirstViewForUserTiming(selectedType, name).size() == 1
     }
 
     public void scrollTop(){

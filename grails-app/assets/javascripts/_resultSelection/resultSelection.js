@@ -78,6 +78,7 @@ OpenSpeedMonitor.resultSelection = (function () {
             setQueryArgsFromLocationSelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getLocationSelection());
             setQueryArgsFromConnectivitySelection(null, OpenSpeedMonitor.selectPageLocationConnectivityCard.getConnectivitySelection());
         }
+
         enableUpdates(!selectJobGroupCard.data("noAutoUpdate") || !selectPageLocationConnectivityCard.data("noAutoUpdate"));
         updateCards();
     };
@@ -166,10 +167,17 @@ OpenSpeedMonitor.resultSelection = (function () {
                 updateCard(resultSelectionUrls["connectivity"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateConnectivityProfiles, spinner);
                 updateStarted = true;
             }
+
         }
+        if(OpenSpeedMonitor.selectUserTimings){
+            updateCard(resultSelectionUrls["userTimings"], OpenSpeedMonitor.selectUserTimings.updateUserTimings, spinner);
+            updateStarted = true;
+        }
+
         if (updateStarted && currentQueryArgs.caller === "EventResult") {
             updateCard(resultSelectionUrls["resultCount"], updateResultCount, spinner);
         }
+
     };
 
     var validateForm = function () {

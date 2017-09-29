@@ -126,6 +126,7 @@ class EventResult implements CsiValue {
 
     //static belongsTo = JobResult
     static belongsTo = [jobResult: JobResult]
+    static  hasMany = [userTimings : UserTiming]
 
     static constraints = {
         measuredEvent(nullable: false)
@@ -211,6 +212,7 @@ class EventResult implements CsiValue {
 
         })
         oneBasedStepIndexInJourney(nullable: true)
+        userTimings(nullable: true)
     }
 
     static mapping = {
@@ -319,11 +321,4 @@ class EventResult implements CsiValue {
                 "\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n"
     }
 
-    Double getValueFor(Measurand measurand){
-        return this."$measurand.eventResultField" != null ? Double.valueOf(this."$measurand.eventResultField") : null
-    }
-
-    Double getNormalizedValueFor(Measurand measurand){
-        return measurand.normalizeValue(getValueFor(measurand))
-    }
 }

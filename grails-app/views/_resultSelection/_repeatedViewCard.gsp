@@ -5,7 +5,7 @@
     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                dataMap="${aggrGroupValuesCached}"
                                multiple="true" id="selectAggregatorCachedHtmlId"
-                               class="form-control long-select"
+                               class="form-control long-select measurand-select"
                                name="selectedAggrGroupValuesCached" optionKey="value"
                                optionValue="value"
                                value="${selectedAggrGroupValuesCached}"/>

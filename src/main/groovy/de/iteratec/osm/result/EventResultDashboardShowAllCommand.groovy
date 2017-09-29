@@ -28,7 +28,6 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      * Determines wich {@link CachedView#UNCACHED} results should be shown.
      */
     Collection<String> selectedAggrGroupValuesUnCached = []
-
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
      */
@@ -79,7 +78,7 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
-        viewModelToCopyTo.put('selectedAggrGroupValues', getSelectedMeasurandsForString(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
 
@@ -92,15 +91,15 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
     }
 
     Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.collect{Measurand.valueOf(it)}
+        return selectedValues.findAll {SelectedMeasurand.isNoUserTiming(it)}.collect {Measurand.valueOf(it)}
     }
 
-    Collection<SelectedMeasurand> getSelectedMeasurandsForString(Collection<String> cached, Collection<String> uncached){
-        Collection<SelectedMeasurand> result = []
-        cached.each { result.add(new SelectedMeasurand(measurand: Measurand.valueOf(it), cachedView: CachedView.CACHED))}
-        uncached.each { result.add(new SelectedMeasurand(measurand:  Measurand.valueOf(it), cachedView:  CachedView.UNCACHED))}
+    Collection<SelectedMeasurand> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
+        Collection<SelectedMeasurand> result = measurandsUncached.collect{new SelectedMeasurand(it, CachedView.UNCACHED)}
+        result.addAll(measurandsCached.collect{new SelectedMeasurand(it, CachedView.CACHED)})
         return result
     }
+
     /**
      * <p>
      * Creates {@link ErQueryParams} based on this command. This command
