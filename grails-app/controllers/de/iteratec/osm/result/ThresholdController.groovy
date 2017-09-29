@@ -111,8 +111,9 @@ class ThresholdController {
     }
 
     /**
+     * Creates a new threshold and saves the threshold in the database.
      *
-     * @return
+     * @return The id of the new threshold.
      */
     def createAsync() {
         Job job = Job.findByLabel(params['job'])
@@ -132,7 +133,7 @@ class ThresholdController {
     }
 
     /**
-     * Deletes the threshold
+     * Deletes the threshold.
      *
      * @return http status
      */
@@ -156,8 +157,9 @@ class ThresholdController {
     }
 
     /**
+     * Updates the submitted threshold.
      *
-     * @return
+     * @return The id of the threshold.
      */
     def updateAsync() {
         //get params
@@ -166,6 +168,7 @@ class ThresholdController {
         MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
         Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
         Integer upperBoundary = Integer.parseInt(params['upperBoundary'])
+
 
         //get threshold
         Threshold threshold = Threshold.findById(id)

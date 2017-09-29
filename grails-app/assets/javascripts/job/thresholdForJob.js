@@ -25,9 +25,10 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
             },
             methods: {
                 fetchData: function () {
+
                     var self = this;
                     getThresholdsForJob(jobId).success(function (result) {
-                        result.forEach(function(resultThreshold) {
+                        result.forEach(function (resultThreshold) {
                             self.thresholds.push({
                                 threshold: resultThreshold,
                                 edit: false
@@ -71,36 +72,36 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                     }
                 },
                 addThreshold: function (job, createThresholdUrl) {
-                    var self = this;
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            job: job,
-                            measurand: this.newThreshold.measurand.name,
-                            measuredEvent: this.newThreshold.measuredEvent.id,
-                            lowerBoundary: this.newThreshold.lowerBoundary,
-                            upperBoundary: this.newThreshold.upperBoundary
-                        },
-                        url: createThresholdUrl,
-                        success: function (result) {
-                            self.newThreshold.id = result.thresholdId;
-                            self.thresholds.push({
-                                threshold: self.newThreshold,
-                                edit: false
-                            });
-                            self.newThreshold = {};
-                            console.log("success");
-                        },
-                        error: function (e) {
-                            console.log(e);
-                        }
-                    });
+                        var self = this;
+                        $.ajax({
+                            type: 'POST',
+                            data: {
+                                job: job,
+                                measurand: this.newThreshold.measurand.name,
+                                measuredEvent: this.newThreshold.measuredEvent.id,
+                                lowerBoundary: this.newThreshold.lowerBoundary,
+                                upperBoundary: this.newThreshold.upperBoundary
+                            },
+                            url: createThresholdUrl,
+                            success: function (result) {
+                                self.newThreshold.id = result.thresholdId;
+                                self.thresholds.push({
+                                    threshold: self.newThreshold,
+                                    edit: false
+                                });
+                                self.newThreshold = {};
+                                console.log("success");
+                            },
+                            error: function (e) {
+                                console.log(e);
+                            }
+                        });
                 },
                 deleteThreshold: function (threshold, deleteThresholdUrl) {
                     var self = this;
                     var deletedThreshold = threshold;
                     $.ajax({
-                        type: 'POST',
+                        type: 'DELETE',
                         data: {
                             thresholdId: deletedThreshold.threshold.id
                         },
@@ -114,32 +115,36 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                     });
                 },
                 updateThreshold: function (threshold, updateThresholdUrl) {
-                    var self = this;
-                    var updatedThreshold = threshold;
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            thresholdId: updatedThreshold.threshold.id,
-                            measurand: updatedThreshold.threshold.measurand.name,
-                            measuredEvent: updatedThreshold.threshold.measuredEvent.id,
-                            lowerBoundary: updatedThreshold.threshold.lowerBoundary,
-                            upperBoundary: updatedThreshold.threshold.upperBoundary
-                        },
-                        url: updateThresholdUrl,
-                        success: function () {
-                            updatedThreshold.edit = false;
-                            self.thresholds[self.thresholds.indexOf(updatedThreshold)] = updatedThreshold;
-                        },
-                        error: function (e) {
-                            console.log(e);
-                        }
-                    });
+                    if(threshold.threshold.lowerBoundary < threshold.threshold.upperBoundary) {
+                        var self = this;
+                        var updatedThreshold = threshold;
+                        $.ajax({
+                            type: 'PUT',
+                            data: {
+                                thresholdId: updatedThreshold.threshold.id,
+                                measurand: updatedThreshold.threshold.measurand.name,
+                                measuredEvent: updatedThreshold.threshold.measuredEvent.id,
+                                lowerBoundary: updatedThreshold.threshold.lowerBoundary,
+                                upperBoundary: updatedThreshold.threshold.upperBoundary
+                            },
+                            url: updateThresholdUrl,
+                            success: function () {
+                                updatedThreshold.edit = false;
+                                self.thresholds[self.thresholds.indexOf(updatedThreshold)] = updatedThreshold;
+                            },
+                            error: function (e) {
+                                console.log(e);
+                            }
+                        });
+                    }else{
+                        alert("Die obere Grenze muss größer als die untere Grenze sein!")
+                    }
                 },
                 changeEditMode: function (threshold, state) {
-                    if(state){
+                    if (state) {
                         //shadow copy
                         this.tmpThreshold = Object.assign({}, threshold.threshold);
-                    }else{
+                    } else {
                         threshold.threshold = this.tmpThreshold;
                         this.tmpThreshold = {};
                     }

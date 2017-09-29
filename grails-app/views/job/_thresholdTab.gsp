@@ -1,6 +1,7 @@
 <%@ page import="de.iteratec.osm.result.Threshold" %>
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
 <%@ page import="de.iteratec.osm.result.Measurand" %>
+
 <div class="form-group" id="">
     <label>
         <g:message code="job.Thresholds.label" default="Thresholds"/>
@@ -35,15 +36,21 @@
                                    maxlength="255"
                                    v-model="threshold.threshold.upperBoundary"/>
                             ms sein. <button type="button"
+                                             class="thresholdButton"
                                              @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
-                            <button type="button" @click="changeEditMode(threshold, false)">discard</button>
+                            <button type="button"
+                                    class="thresholdButton"
+                                    @click="changeEditMode(threshold, false)">discard</button>
                         </div>
 
                         <div v-else>Die {{ threshold.threshold.measurand.name }} Messung von {{ threshold.threshold.measuredEvent.name }}
                         sollte schneller als {{ threshold.threshold.lowerBoundary }} ms, aber nicht langsamer als {{ threshold.threshold.upperBoundary }} ms sein.
-                            <button type="button" @click="changeEditMode(threshold, true)">edit</button>
                             <button type="button"
-                                                 @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                                    class="thresholdButton"
+                                    @click="changeEditMode(threshold, true)">edit</button>
+                            <button type="button"
+                                    class="thresholdButton"
+                                    @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
                         </div>
 
                     </li>
@@ -70,18 +77,16 @@
         <input id="upperBoundary" class="" type="number" min="1" name="upperBoundary" cols="40" rows="5"
                maxlength="150"
                v-model="newThreshold.upperBoundary"/>
-        ms sein. <a>add</a>  <a>clear</a>
+        ms sein.
+        <button type="button" class="thresholdButton"
+                @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">add</button>
+        <button type="button" class="thresholdButton">clear</button>
     </div>
 
 
-    <div>
+    <div class="ciButton">
         <button class="btn btn-default" type="button" id="copyToClipboard">
             <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
-        </button>
-
-        <button id="threshold_button_create" class="btn btn-default" type="button"
-                @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">
-            <g:message code="job.threshold.create.new" default="Add Threshold"/>
         </button>
     </div>
 </div>
