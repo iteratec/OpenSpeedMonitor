@@ -53,7 +53,7 @@ class BarchartAggregationService {
         if (!selectedMeasurands) {
             return []
         }
-
+        selectedMeasurands.unique({a, b -> a.name <=> b.name})
         List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages, true)
