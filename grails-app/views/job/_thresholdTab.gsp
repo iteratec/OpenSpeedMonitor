@@ -6,73 +6,80 @@
     <div>
         <div id="thresholdList">
             <div>
-                <div v-for="threshold in thresholds">
-                    <div v-if="threshold.edit">Die
-                        <select id="measurandEdit" name="measurand" class="measurand-event-select"
-                                v-model="threshold.threshold.measurand">
-                            <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-                        </select>
-                        Messung von
-                        <select id="measuredEventEdit" name="measuredEvent" class="measured-event-select"
-                                v-model="threshold.threshold.measuredEvent">
-                            <option v-for="measuredEvent in measuredEvents"
-                                    :value="measuredEvent">{{measuredEvent.name}}</option>
-                        </select>
-                        sollte schneller als
-                        <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="40"
-                               rows="5"
-                               maxlength="255"
-                               v-model="threshold.threshold.lowerBoundary"/>
-                        ms, aber nicht langsamer als
-                        <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
-                               rows="5"
-                               maxlength="255"
-                               v-model="threshold.threshold.upperBoundary"/>
-                        ms sein. <button type="button"
-                                         class="thresholdButton"
-                                         @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
-                        <button type="button"
-                                class="thresholdButton"
-                                @click="changeEditMode(threshold, false)">discard</button>
-                    </div>
+                <div v-for="thresholdItem in thresholds">{{ thresholdItem.measuredEvent.name }}
+                    <div v-for="threshold in thresholdItem.thresholdList">
+                        <div v-if="threshold.edit">
+                            <select class="thresholdMeasurand" id="measurandEdit" name="measurand"
+                                    v-model="threshold.threshold.measurand">
+                                <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
+                            </select><br>
 
-                    <div v-else class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}<br>
-                        <div class="thresholdBoundaries">Good < {{ threshold.threshold.lowerBoundary }} ms < OK < {{ threshold.threshold.upperBoundary }} ms < Bad
-                        <button type="button"
-                                class="thresholdButton"
-                                @click="changeEditMode(threshold, true)">edit</button>
-                        <button type="button"
-                                class="thresholdButton"
-                                @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                            <div class="thresholdBoundaries">
+                                Good <
+                                <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="30"
+                                       rows="5"
+                                       maxlength="150"
+                                       v-model="threshold.threshold.lowerBoundary"/>
+                                < OK <
+                                <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
+                                       rows="5"
+                                       maxlength="150"
+                                       v-model="threshold.threshold.upperBoundary"/>
+                                < Bad
+                                <button type="button"
+                                        class="thresholdButton"
+                                        @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
+                                <button type="button"
+                                        class="thresholdButton"
+                                        @click="changeEditMode(threshold, false)">discard</button>
+                            </div>
+                        </div>
+
+                        <div v-else class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}<br>
+
+                            <div class="thresholdBoundaries">Good < {{ threshold.threshold.lowerBoundary }} ms < OK < {{ threshold.threshold.upperBoundary }} ms < Bad
+                                <button type="button"
+                                        class="thresholdButton"
+                                        @click="changeEditMode(threshold, true)">edit</button>
+                                <button type="button"
+                                        class="thresholdButton"
+                                        @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                            </div>
+                        </div>
                     </div>
-                    </div>
+                    <br>
                 </div>
             </div>
         </div>
     </div>
 
 
-    <div>Die
-        <select id="measurand" name="measurand" class="measurand-event-select" v-model="newThreshold.measurand">
-            <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-        </select>
-        Messung von
+    <br> <br>
+
+    <div>New threshold: <br>
         <select id="measuredEvent" name="measuredEvent" class="measured-event-select"
                 v-model="newThreshold.measuredEvent">
             <option v-for="measuredEvent in measuredEvents" :value="measuredEvent">{{measuredEvent.name}}</option>
-        </select>
-        sollte schneller als
-        <input id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="30" rows="5"
-               maxlength="150"
-               v-model="newThreshold.lowerBoundary"/>
-        ms, aber nicht langsamer als
-        <input id="upperBoundary" class="" type="number" min="1" name="upperBoundary" cols="40" rows="5"
-               maxlength="150"
-               v-model="newThreshold.upperBoundary"/>
-        ms sein.
-        <button type="button" class="thresholdButton"
-                @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">add</button>
-        <button type="button" class="thresholdButton">clear</button>
+        </select> <br>
+
+        <select class="thresholdMeasurand" id="measurand" name="measurand" v-model="newThreshold.measurand">
+            <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
+        </select><br>
+
+        <div class="thresholdBoundaries">
+            Good <
+            <input id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="30" rows="5"
+                   maxlength="150"
+                   v-model="newThreshold.lowerBoundary"/>
+            < OK <
+            <input id="upperBoundary" class="" type="number" min="1" name="upperBoundary" cols="40" rows="5"
+                   maxlength="150"
+                   v-model="newThreshold.upperBoundary"/>
+            < Bad
+            <button type="button" class="thresholdButton"
+                    @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">add</button>
+            <button type="button" class="thresholdButton">clear</button>
+        </div>
     </div>
 
 

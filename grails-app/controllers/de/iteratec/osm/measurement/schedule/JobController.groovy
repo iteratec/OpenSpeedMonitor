@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.Measurand
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.Threshold
 import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.util.ControllerUtils
@@ -345,6 +346,7 @@ class JobController {
     }
 
     /**
+     * Get thresholds for the submitted job.
      *
      * @param jobId
      * @return
@@ -353,11 +355,30 @@ class JobController {
         Job job = Job.get(Long.parseLong(jobId))
         List<Threshold> thresholds = thresholdService.getThresholdsForJob(job)
 
-        def output = thresholds.collect {[id: it.id,
-                                          measurand: it.measurand,
-                                          measuredEvent: it.measuredEvent,
-                                          upperBoundary: it.upperBoundary,
-                                          lowerBoundary: it.lowerBoundary]}
+        List<MeasuredEvent> measuredEvents = [];
+
+        thresholds.each {
+            if(!measuredEvents.contains(it.measuredEvent)){
+                measuredEvents.add(it.measuredEvent)
+            }
+        }
+
+        def output = []
+
+        measuredEvents.each {
+            List<Threshold> thresholdsForEvent = thresholds.findAll{
+                threshold -> threshold.measuredEvent == it
+            }
+
+            def thresholdList = thresholdsForEvent.collect {[id: it.id,
+                                            measurand: it.measurand,
+                                            measuredEvent: it.measuredEvent,
+                                            upperBoundary: it.upperBoundary,
+                                            lowerBoundary: it.lowerBoundary]}
+
+            output.add([measuredEvent: it,
+                        thresholds: thresholdList])
+        }
 
         render output as JSON
     }

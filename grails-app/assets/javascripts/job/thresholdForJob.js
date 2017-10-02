@@ -25,15 +25,22 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
             },
             methods: {
                 fetchData: function () {
-
+                    this.thresholds = [];
                     var self = this;
                     getThresholdsForJob(jobId).success(function (result) {
-                        result.forEach(function (resultThreshold) {
+                        result.forEach(function (resultEvent) {
+                            var thresholdsForEvent = [];
+                            resultEvent.thresholds.forEach(function (threshold) {
+                                thresholdsForEvent.push({
+                                    threshold: threshold,
+                                    edit: false
+                                })
+                            });
                             self.thresholds.push({
-                                threshold: resultThreshold,
-                                edit: false
+                                measuredEvent: resultEvent.measuredEvent,
+                                thresholdList: thresholdsForEvent
                             })
-                        });
+                        })
                     }).error(function (e) {
                         console.log(e);
                     });
@@ -85,10 +92,33 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                             url: createThresholdUrl,
                             success: function (result) {
                                 self.newThreshold.id = result.thresholdId;
-                                self.thresholds.push({
-                                    threshold: self.newThreshold,
-                                    edit: false
+
+                                var added = false;
+
+                                //Add threshold to measured event
+                                self.thresholds.forEach(function (measuredEventItem) {
+                                    if(measuredEventItem.measuredEvent.id == self.newThreshold.measuredEvent.id){
+                                        measuredEventItem.thresholdList.push({
+                                            threshold: self.newThreshold,
+                                            edit: false
+                                        });
+
+                                        added = true;
+                                    }
                                 });
+
+                                //Add measured event if it is not existing
+                                if(!added){
+                                    var list = [{
+                                        threshold: self.newThreshold,
+                                        edit: false
+                                    }]
+                                    self.thresholds.push({
+                                        measuredEvent:self.newThreshold.measuredEvent,
+                                        thresholdList: list
+                                    })
+                                }
+
                                 self.newThreshold = {};
                                 console.log("success");
                             },
@@ -107,7 +137,17 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                         },
                         url: deleteThresholdUrl,
                         success: function () {
-                            self.thresholds.splice(self.thresholds.indexOf(deletedThreshold), 1)
+                            self.thresholds.forEach(function (measuredEventItem) {
+                                //remove threshold from measured event
+                                if(measuredEventItem.measuredEvent.id == deletedThreshold.threshold.measuredEvent.id){
+                                    measuredEventItem.thresholdList.splice(measuredEventItem.thresholdList.indexOf(deletedThreshold), 1)
+
+                                    //remove measured event
+                                    if(measuredEventItem.thresholdList.length == 0){
+                                        self.thresholds.splice(self.thresholds.indexOf(measuredEventItem), 1);
+                                    }
+                                }});
+
                         },
                         error: function (e) {
                             console.log(e);
@@ -129,8 +169,11 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                             },
                             url: updateThresholdUrl,
                             success: function () {
-                                updatedThreshold.edit = false;
-                                self.thresholds[self.thresholds.indexOf(updatedThreshold)] = updatedThreshold;
+                                self.thresholds.forEach(function (measuredEventItem) {
+                                    if(measuredEventItem.measuredEvent.id == updatedThreshold.threshold.measuredEvent.id){
+                                        updatedThreshold.edit = false;
+                                        measuredEventItem.thresholdList[ measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
+                                    }});
                             },
                             error: function (e) {
                                 console.log(e);
