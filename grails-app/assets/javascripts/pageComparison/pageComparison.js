@@ -1,4 +1,5 @@
 //= require pageComparisonChart.js
+//= require pageComparisonChartData.js
 //= require pageComparisonGuiHandling.js
 
 //= require /urlHandling/urlHelper.js
@@ -9,7 +10,6 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
-
     var getTimeFrame = function (map) {
         map["from"] = $("#fromDatepicker").val();
         map["to"] = $("#toDatepicker").val();
