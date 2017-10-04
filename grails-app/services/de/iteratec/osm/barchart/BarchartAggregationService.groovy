@@ -2,6 +2,7 @@ package de.iteratec.osm.barchart
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.dao.EventResultProjection
@@ -62,6 +63,28 @@ class BarchartAggregationService {
                 .getResults()
 
         return createListForEventResultProjection(selectedMeasurands, projections)
+    }
+
+
+    List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd){
+        List<PageComparisonAggregation> comparisons = []
+        List<Page> pages = []
+        List<JobGroup> jobGroups = []
+        cmd.selectedPageComparisons.each {
+            pages << Page.get(it.pageId1)
+            pages << Page.get(it.pageId2)
+            jobGroups << JobGroup.get(it.jobGroupId1)
+            jobGroups << JobGroup.get(it.jobGroupId2)
+        }
+        SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
+        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages)
+        cmd.selectedPageComparisons.each { comparison ->
+            PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
+            pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId1 as long) && aggr.page.id == (comparison.pageId1 as long) }
+            pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId2 as long) && aggr.page.id == (comparison.pageId2 as long) }
+            comparisons << pageComparisonAggregation
+        }
+        return comparisons
     }
 
 
