@@ -75,10 +75,10 @@
 
 <content tag="include.bottom">
     <asset:javascript src="chartSwitch"/>
-    <asset:javascript src="/pageComparison/pageComparison.js"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
 
     </asset:script>

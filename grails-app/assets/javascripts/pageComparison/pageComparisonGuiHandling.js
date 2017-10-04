@@ -18,33 +18,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         $(window).on('resize', function() {
             renderChart({autoWidth: true}, false);
         });
-
-
-
-        var pageComparisonSelectionCardLoaded = false;
-        var timeframeCardLoaded = false;
-        var barchartMeasuringsLoaded = false;
-
-        var allLoaded = function () {
-            if(pageComparisonSelectionCardLoaded && timeframeCardLoaded && barchartMeasuringsLoaded) {
-                // pageComparisonChart.init();
-                OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);
-            }
-        };
-        $(window).on("pageComparisonSelectionCardLoaded", function () {
-            pageComparisonSelectionCardLoaded = true;
-            allLoaded();
+        $(window).on('historyStateLoaded', function() {
+            loadData(false);
         });
-        $(window).on("selectIntervalTimeframeCardLoaded", function () {
-            timeframeCardLoaded = true;
-            allLoaded();
-        });
-        $(window).on("barchartMeasuringsLoaded", function () {
-            barchartMeasuringsLoaded = true;
-            allLoaded();
-        });
+
         drawGraphButton.click(function () {
-            loadData();
+            loadData(true);
         });
     };
 
@@ -56,10 +35,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         }
         pageComparisonChart.render();
-
     };
 
-    var loadData = function () {
+    var handleNewData = function (data, isStateChange) {
+      renderChart(data, isStateChange)
+    };
+
+    var loadData = function (isStateChange) {
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         spinner.start();
         $.ajax({
@@ -79,8 +61,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
                 if (!$.isEmptyObject(data)) {
                     $('#warning-no-data').hide();
-                    pageComparisonChart.setData(data);
-                    pageComparisonChart.render();
+                    handleNewData(data, isStateChange);
                     $("#dia-save-chart-as-png").removeClass("disabled");
                 } else {
                     $('#warning-no-data').show();
