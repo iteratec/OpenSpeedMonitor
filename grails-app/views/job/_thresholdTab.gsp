@@ -9,41 +9,95 @@
                 <div v-for="thresholdItem in thresholds">{{ thresholdItem.measuredEvent.name }}
                     <div v-for="threshold in thresholdItem.thresholdList">
                         <div v-if="threshold.edit">
-                            <select class="thresholdMeasurand" id="measurandEdit" name="measurand"
-                                    v-model="threshold.threshold.measurand">
-                                <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-                            </select><br>
-
-                            <div class="thresholdBoundaries">
-                                Good <
-                                <input id="lowerBoundaryEdit" class="" type="number" min="1" name="lowerBoundary" cols="30"
+                            <div class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}</div><br>
+                            <div class="thresholdBoundaries row">
+                                <div class="col-md-2">
+                                    <label class="text-success">
+                                        Good
+                                    </label>
+                                    <label><</label>
+                                </div>
+                                <div class="col-md-2">
+                                <input id="lowerBoundaryEdit" class="form-control" type="number" min="1"
+                                       name="lowerBoundary" cols="30"
                                        rows="5"
                                        maxlength="150"
                                        v-model="threshold.threshold.lowerBoundary"/>
-                                < OK <
-                                <input id="upperBoundaryEdit" class="" type="number" min="1" name="upperBoundary" cols="40"
+                                </div>
+                                <div class="col-md-2">
+                                    <label>
+                                        <
+                                    </label>
+                                    <label class="text-warning">
+                                        OK
+                                    </label>
+                                    <label><</label>
+                                </div>
+                                <div class="col-md-2">
+                                <input id="upperBoundaryEdit" class="form-control" type="number" min="1"
+                                       name="upperBoundary" cols="40"
                                        rows="5"
                                        maxlength="150"
                                        v-model="threshold.threshold.upperBoundary"/>
-                                < Bad
+                                </div>
+                                <div class="col-md-2">
+                                    <label>
+                                        <
+                                    </label>
+                                    <label class="text-danger">
+                                        Bad
+                                    </label>
+                                </div>
                                 <button type="button"
-                                        class="thresholdButton"
+                                        class="btn btn-warning btn-xs"
                                         @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
                                 <button type="button"
-                                        class="thresholdButton"
+                                        class="margins btn btn-danger btn-xs"
                                         @click="changeEditMode(threshold, false)">discard</button>
                             </div>
                         </div>
 
                         <div v-else class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}<br>
 
-                            <div class="thresholdBoundaries">Good < {{ threshold.threshold.lowerBoundary }} ms < OK < {{ threshold.threshold.upperBoundary }} ms < Bad
+                            <div class="thresholdBoundaries row">
+                                <div class="col-md-2">
+                                    <label class="text-success">
+                                        Good
+                                    </label>
+                                    <label><</label>
+                                </div>
+                                <label class="col-md-2">
+                                    {{ threshold.threshold.lowerBoundary }}
+                                </label>
+                                <div class="col-md-2">
+                                    <label>
+                                        <
+                                    </label>
+                                    <label class="text-warning">
+                                        OK
+                                    </label>
+                                    <label><</label>
+                                </div>
+                                <label class="col-md-2">
+                                    {{ threshold.threshold.upperBoundary }}
+                                </label>
+
+                                <div class="col-md-2">
+                                    <label>
+                                        <
+                                    </label>
+                                    <label class="text-danger">
+                                        Bad
+                                    </label>
+                                </div>
+                                <div class="col-md-2">
                                 <button type="button"
-                                        class="thresholdButton"
+                                        class="btn btn-warning btn-xs"
                                         @click="changeEditMode(threshold, true)">edit</button>
                                 <button type="button"
-                                        class="thresholdButton"
+                                        class="btn btn-danger btn-xs"
                                         @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -66,19 +120,42 @@
             <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
         </select><br>
 
-        <div class="thresholdBoundaries">
-            Good <
-            <input id="lowerBoundary" class="" type="number" min="1" name="lowerBoundary" cols="30" rows="5"
+        <div class="thresholdBoundaries form-inline">
+            <label class="text-success">
+                Good
+            </label>
+            <label>
+                <
+            </label>
+            <input id="lowerBoundary" class="form-control" type="number" min="1"
+                   name="lowerBoundary" cols="30"
+                   rows="5"
                    maxlength="150"
                    v-model="newThreshold.lowerBoundary"/>
-            < OK <
-            <input id="upperBoundary" class="" type="number" min="1" name="upperBoundary" cols="40" rows="5"
+            <label>
+                <
+            </label>
+            <label class="text-warning">
+                OK
+            </label>
+            <label>
+                <
+            </label>
+            <input id="upperBoundary" class="form-control" type="number" min="1"
+                   name="upperBoundary" cols="40"
+                   rows="5"
                    maxlength="150"
                    v-model="newThreshold.upperBoundary"/>
-            < Bad
-            <button type="button" class="thresholdButton"
-                    @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">add</button>
-            <button type="button" class="thresholdButton">clear</button>
+            <label>
+                <
+            </label>
+            <label class="text-danger">
+                Bad
+            </label>
+            <button type="button" class="margins btn btn-default"
+                    @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">
+                <i class="fa text-success fa-lg fa-plus"></i>
+            </button>
         </div>
     </div>
 
