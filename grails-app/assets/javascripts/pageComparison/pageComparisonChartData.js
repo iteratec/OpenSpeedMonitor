@@ -25,8 +25,9 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         i18n = data.i18nMap || i18n;
         if (data.series) {
             filterData();
-            // headerText = chartLabelUtils.getCommonLabelParts(true);
-            // sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
+            var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(createLabelFilterData(), data.i18nMap);
+            headerText = chartLabelUtils.getCommonLabelParts(true);
+            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
         }
         fullWidth = data.width || fullWidth;
         autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
@@ -35,6 +36,18 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         chartBarsWidth = fullWidth - chartSideLabelsWidth - OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailalbe = data.series ? true : dataAvailalbe;
+    };
+
+    var createLabelFilterData = function () {
+      return [].concat.apply([], allPageData.map(function (groups) {
+          return groups.map(function (page) {
+              return {
+                  page: filterPageName(page.id),
+                  jobGroup: filterJobGroup(page.id),
+                  id: page.id
+              }
+          })
+      }))
     };
 
     var filterData = function(){
@@ -48,12 +61,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
                 var add = {
                     id: dataElement.grouping,
                     label: filterPageName(dataElement.grouping),
+                    showLabelOnTop: true,
                     value: dataElement.value,
                     unit: series.dimensionalUnit
                 };
                 if(series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[index].push(add);
-                if(dataElement.value > newMax) newMax = dataElement.value
+                if(dataElement.value > newMax) newMax = dataElement.value;
                 ++index;
             })
         });
@@ -62,6 +76,10 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
 
     var filterPageName = function (grouping) {
         return grouping.substring(grouping.lastIndexOf("|")+1,grouping.length).trim()
+    };
+
+    var filterJobGroup= function (grouping) {
+        return grouping.substring(0, grouping.lastIndexOf("|")).trim()
     };
 
     var getActualSvgWidth = function() {

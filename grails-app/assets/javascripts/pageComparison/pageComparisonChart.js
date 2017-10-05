@@ -65,7 +65,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight ;
 
-        // var chartHeight = legendPosY + legendHeight + headerHeight;
         svg.transition()
             .duration(transitionDuration)
             .style("height", chartHeight)

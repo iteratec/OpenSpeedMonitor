@@ -72,7 +72,8 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .on("click", function(data) { callEventHandler("click", data) });
         updateSelection.select(".bar-value")
             .text(function (d) {
-                var prefix = d.value > 0 && forceSignInLabel ? "+" : "";
+                var prefix =  d.showLabelOnTop? d.label+": ": "";
+                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
                 return prefix + formatValue(d.value) + " " + d.unit;
             });
         var transition = updateSelection
