@@ -9,7 +9,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var chartSideLabelsWidth = 0;
     var chartBarsWidth = 700;
     var fullWidth = chartSideLabelsWidth + chartBarsWidth;
-    var chartBarsHeight = 400;
+    var chartBarsHeight = 40;
     var allPageData = [];
     var sideLabelData = [];
     var rawSeries = [];
@@ -51,9 +51,10 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
                     value: dataElement.value,
                     unit: series.dimensionalUnit
                 };
-                if(series.dimensionalUnit === "ms") hasLoadTime = true
+                if(series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[index].push(add);
                 if(dataElement.value > newMax) newMax = dataElement.value
+                ++index;
             })
         });
         max = newMax;
@@ -99,18 +100,20 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
 
     var getDataForBars = function (firstOrSecond) {
         var colorProvider = OpenSpeedMonitor.ChartColorProvider().getColorscaleForMeasurandGroup("ms");
-        var series = [];
-        allPageData.forEach(function (data) {
-            series.push(data[firstOrSecond]);
-        });
+        var series = allPageData[firstOrSecond];
         return {
             id: "page"+firstOrSecond,
             color: colorProvider(firstOrSecond),
             values: series,
             min: 0,
             max: max,
-            width: chartBarsWidth
+            width: chartBarsWidth,
+            height: chartBarsHeight
         }
+    };
+
+    var getComparisonAmount = function () {
+        return allPageData[0].length
     };
 
     var needsAutoResize = function () {
@@ -144,6 +147,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         needsAutoResize: needsAutoResize,
         getChartBarsHeight: getChartBarsHeight,
         getChartSideLabelsWidth: getChartSideLabelsWidth,
+        getComparisonAmount: getComparisonAmount,
         hasLoadTimes: hasLoadTimes
     }
 });

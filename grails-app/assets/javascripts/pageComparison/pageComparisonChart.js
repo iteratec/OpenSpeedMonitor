@@ -17,7 +17,6 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) {
 
     var svg = d3.select(chartIdentifier),
-        svgContainer = $(chartIdentifier),
         allBarsGroup,
         trafficLightBars,
         transitionDuration = 600,
@@ -40,8 +39,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     var initChart = function () {
         $("#chart-card").removeClass("hidden");
 
-        svg = d3.select(chartIdentifier).append("svg")
-            .attr("class", "d3chart");
+        svg = d3.select(chartIdentifier);
 
         headerLine = svg.append("g");
         allBarsGroup = svg.append("g");
@@ -63,9 +61,9 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var shouldShowScore = data.hasLoadTimes();
         var componentMargin = OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
-        var barScorePosY = data.getChartBarsHeight() + componentMargin;
-        // var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
-        var chartHeight = headerHeight;
+        var barScorePosY = data.getChartBarsHeight() + OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin*2;
+        var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
+        var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight ;
 
         // var chartHeight = legendPosY + legendHeight + headerHeight;
         svg.transition()
@@ -85,7 +83,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
         renderHeader(svg);
         renderBars(contentGroup);
-        renderBarScore(svg,shouldShowScore, barScorePosY)
+        renderBarScore(svg, shouldShowScore, barScorePosY)
 
     };
     var rerenderIfWidthChanged = function () {
@@ -96,7 +94,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     };
 
     var renderBars = function (contentGroup) {
-              var chartBarsGroup = contentGroup.selectAll(".chart-bar-group").data([1]);
+        var chartBarsGroup = contentGroup.selectAll(".chart-bar-group").data([1]);
         chartBarsGroup.enter()
             .append("g")
             .attr("class", "chart-bar-group");
@@ -139,10 +137,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .style("opacity", shouldShowScore ? 1 : 0)
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + posY + ")");
-    };
-
-    var updateSvgWidth = function () {
-        svg.attr("width", svgContainer.width());
     };
 
     initChart();
