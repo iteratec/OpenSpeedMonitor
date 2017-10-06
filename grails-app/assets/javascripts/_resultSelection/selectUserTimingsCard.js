@@ -34,7 +34,18 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     }
 
     function executeUpdate(optGroupUserTimings, userTimings) {
+        var selectedOptions = [];
+        optGroupUserTimings.find('option:selected').each(function (index, option){
+            selectedOptions.push(option.value);
+        });
         OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, userTimings, null);
+        selectedOptions.forEach(function (value) {
+            optGroupUserTimings.find('option').each(function (index2, option){
+                if(option.value == value){
+                    option.selected = true;
+                }
+            });
+        });
     }
 
     init();

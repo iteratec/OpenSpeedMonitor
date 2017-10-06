@@ -61,7 +61,7 @@ class SelectedMeasurand {
     static Map createDataMapForOptGroupSelect() {
         Map result = [:]
         MeasurandGroup.values().each { measurandGroup ->
-            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup })
+            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {it.toString()})
             if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 result.put("USER_TIMINGS", [])
             }

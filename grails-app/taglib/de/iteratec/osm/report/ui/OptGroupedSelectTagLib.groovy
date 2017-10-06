@@ -32,7 +32,7 @@ class OptGroupedSelectTagLib {
 		String cssClass = attrs['class']
 		String style = attrs['style']
 		String name = attrs['name']
-		Collection<Measurand> value = attrs['value']
+		Collection<String> value = attrs['value']
 		out << g.render(template: '/layouts/optGroupedSelect', 
 			model: [dataMap:dataMap, optionKey: optionKey, optionValue: optionValue, multiple: multiple, id: id, cssClass: cssClass, style: style,
 				name: name, selectedValues: value])
