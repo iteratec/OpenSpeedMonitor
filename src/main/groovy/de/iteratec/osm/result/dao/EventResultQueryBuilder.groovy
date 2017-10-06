@@ -13,7 +13,7 @@ class EventResultQueryBuilder {
     private List<EventResultCriteriaBuilder> filters
     private EventResultAveragesCriteriaBuilder aggregatedQueryBuilder
     private EventResultRawDataCriteriaBuilder rawQueryBuilder
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder, measurandMedianQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder
     PerformanceLoggingService performanceLoggingService
 
 
@@ -69,7 +69,6 @@ class EventResultQueryBuilder {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
             measurandAveragesQueryBuilder.configureForSelectedMeasurands(measurands)
-            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
@@ -88,25 +87,11 @@ class EventResultQueryBuilder {
         return getResultFor(aggregatedQueryBuilder, userTimingAveragesQueryBuilder, measurandAveragesQueryBuilder)
     }
 
-    List<EventResultProjection> getMedians() {
-        List<EventResultProjection> result = getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandMedianQueryBuilder)
-
-        def foobar
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians from list", 1, {
-            foobar = result.each {
-                it.projectedProperties.each { key, value ->
-                    it.projectedProperties.put(key, getMedian(value))
-                }
-            }
-        })
-        return foobar
-    }
-
     private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get raw data from database", 1, {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "get calculated data from database", 1, {
             if (userTimingsBuilder) {
                 userTimingsResult += userTimingsBuilder.getResultsForFilter(filters)
             }
@@ -132,49 +117,6 @@ class EventResultQueryBuilder {
 
     }
 
-    private List<EventResultProjection> listProjectedValues(List<EventResultProjection> unsortedResults) {
-        List<EventResultProjection> sortedResults = []
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"sort data", 1, {
-            unsortedResults.each { unsortedResult ->
-                EventResultProjection sorted = sortedResults.find { unsortedResult == it }
-                if (!sorted) {
-                    sorted = new EventResultProjection(
-                            jobGroup: unsortedResult.jobGroup,
-                            page: unsortedResult.page,
-                            isAggregation: unsortedResult.isAggregation)
-                    unsortedResult.projectedProperties.each { key, value ->
-                        sorted.projectedProperties.put(key, [])
-                    }
-                    sortedResults += sorted
-                }
-                unsortedResult.projectedProperties.each { key, value ->
-                    if (value) {
-                        sorted.projectedProperties."$key" += value
-                    }
-                }
-            }
-        })
-        return sortedResults
-    }
-
-    private def getMedian(List data) {
-        data.sort()
-        if (data) {
-            if (data.size() == 2) {
-                return (data.get(0) + data.get(1)) / 2
-            }
-            if (data.size() == 1) {
-                return data.get(0)
-            }
-            if ((data.size() % 2) != 0) {
-                return data.get((Integer) ((data.size() - 1) / 2));
-            } else {
-                return (data.get((Integer) (data.size() / 2)) +
-                        data.get((Integer) (data.size() / 2) + 1)) / 2
-            }
-        }
-    }
-
     private initUserTimingsQueryBuilder() {
         if (!userTimingRawQueryBuilder) {
             userTimingRawQueryBuilder = new EventResultUserTimingRawDataQueryBuilder()
@@ -190,9 +132,6 @@ class EventResultQueryBuilder {
         }
         if (!measurandAveragesQueryBuilder) {
             measurandAveragesQueryBuilder = new EventResultMeasurandAveragesQueryBuilder()
-        }
-        if(!measurandMedianQueryBuilder){
-            measurandMedianQueryBuilder = new EventResultMeasurandMedianDataQueryBuilder(performanceLoggingService)
         }
     }
 }

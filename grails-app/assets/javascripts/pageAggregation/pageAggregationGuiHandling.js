@@ -79,7 +79,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             renderChart({stackBars: getStackBars()}, true);
         });
         $("input[name='aggregationValue']").on("change", function() {
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            loadData();
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -207,7 +207,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
                 return $(e).text()
             })),
-            selectedSeries: JSON.stringify(selectedSeries)
+            selectedSeries: JSON.stringify(selectedSeries),
+            selectedAggregationValue: JSON.stringify(getAggregationValue())
         };
 
         if (comparativeTimeFrame) {

@@ -24,7 +24,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $("input[name='aggregationValue']").on("change", function () {
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            loadData();
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -83,8 +83,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
                 return $(e).text()
             })),
-            selectedSeries: JSON.stringify(selectedSeries)
-
+            selectedSeries: JSON.stringify(selectedSeries),
+            selectedAggregationValue: JSON.stringify(getAggregationValue())
         };
 
         spinner.start();

@@ -17,6 +17,7 @@ class BarchartAggregationService {
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
     PerformanceLoggingService performanceLoggingService
+    BarchartMedianService barchartMedianService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -39,22 +40,23 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages)
+        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.selectedAggregationValue)
     }
 
-    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
-        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages)
+    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
-    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages) {
+    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages, String selectedAggregationValue) {
         if (!selectedMeasurands) {
             return []
         }
+        selectedMeasurands.unique({a, b -> a.name <=> b.name})
         EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime(), performanceLoggingService)
                 .withJobResultDateBetween(from, to)
                 .withPageIn(pages)
@@ -62,17 +64,21 @@ class BarchartAggregationService {
                 .withSelectedMeasurands(selectedMeasurands)
 
         List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
-        List<BarchartAggregation> medians
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians total", 1, {
-            medians = createListForEventResultProjection(selectedMeasurands, builder.getMedians())
-        })
+        List<BarchartAggregation> medians = []
+        if (selectedAggregationValue == 'median') {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians total", 1, {
+                medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
+            })
+        }
         return mergeWithMedians(averages, medians)
     }
 
     private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {
-        avgs.each { avg ->
-            BarchartAggregation median = medians.find { it == avg }
-            avg.median = median.value
+        if (medians) {
+            avgs.each { avg ->
+                BarchartAggregation median = medians.find { it == avg }
+                avg.median = median.value
+            }
         }
         return avgs
     }

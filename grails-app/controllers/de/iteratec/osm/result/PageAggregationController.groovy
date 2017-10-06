@@ -4,6 +4,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
+import de.iteratec.osm.barchart.BarchartMedianService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -18,7 +19,7 @@ import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -33,7 +34,8 @@ class PageAggregationController extends ExceptionHandlerController {
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
     BarchartAggregationService barchartAggregationService
-
+    PerformanceLoggingService performanceLoggingService
+    BarchartMedianService barchartMedianService
 
     def index() {
         redirect(action: 'show')
@@ -102,7 +104,6 @@ class PageAggregationController extends ExceptionHandlerController {
             return
         }
 
-        List allSeries = cmd.selectedSeries
         PageAggregationChartDTO chartDto = new PageAggregationChartDTO(hasComparativeData: hasComparativeData)
         chartDto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         chartDto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))

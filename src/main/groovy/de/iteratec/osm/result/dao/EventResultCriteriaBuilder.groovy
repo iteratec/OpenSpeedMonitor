@@ -4,12 +4,10 @@ import de.iteratec.osm.result.EventResult
 import grails.gorm.DetachedCriteria
 import org.grails.datastore.mapping.query.Projections
 import org.grails.datastore.mapping.query.Query
-
 /**
  * Created by mwg on 20.09.2017.
  */
 trait EventResultCriteriaBuilder {
-    boolean isAggregated
     List<String> projectedFields = []
     List<Query.Projection> projections = []
     DetachedCriteria query = new DetachedCriteria(EventResult)
@@ -29,12 +27,6 @@ trait EventResultCriteriaBuilder {
     void filterEquals(String propertyName, def toBeEqualTo) {
         if (toBeEqualTo) {
             query.eq(propertyName, toBeEqualTo)
-        }
-    }
-
-    void orderBy(String propertyName, String direction = 'asc') {
-        if(propertyName) {
-            query.order(propertyName,direction)
         }
     }
 
@@ -72,19 +64,26 @@ trait EventResultCriteriaBuilder {
         return this
     }
 
-    private List<Map> transformAggregations(def aggregations) {
-        List<Map> result = []
-        aggregations.each { aggregation ->
-            Map transformed = [:]
-            if(projectedFields.size() == 1){
-                transformed.put(projectedFields[0], aggregation)
-            }else{
+    private List<List> transformAggregations(def aggregations) {
+        List<List> result = []
 
+        if (projectedFields.size() == 1) {
+            for (i = 0; i < aggregations.size(); i++) {
+                aggregations[i]
+            }
+            aggregations.each { aggregation ->
+                Map transformed = [:]
+                transformed.put(projectedFields[0], aggregation)
+                result.add(transformed)
+            }
+        } else {
+            aggregations.each { aggregation ->
+                Map transformed = [:]
                 projectedFields.each {
                     transformed.put(it, aggregation[projectedFields.indexOf(it)])
                 }
+                result.add(transformed)
             }
-            result.add(transformed)
         }
         return result
     }
@@ -94,7 +93,7 @@ class EventResultRawDataCriteriaBuilder implements EventResultCriteriaBuilder {
     void filterIn(String propertyName, List range, boolean project) {
         if (range) {
             query.in(propertyName, range)
-            if(project){
+            if (project) {
                 addPropertyProjection(propertyName)
             }
         }
@@ -105,7 +104,7 @@ class EventResultAveragesCriteriaBuilder implements EventResultCriteriaBuilder {
     void filterIn(String propertyName, List range, boolean project) {
         if (range) {
             query.in(propertyName, range)
-            if(project){
+            if (project) {
                 addGroupByProjection(propertyName)
             }
         }

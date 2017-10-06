@@ -50,7 +50,7 @@ class PageComparisonController extends ExceptionHandlerController {
         Page comparativePage = Page.get((cmd.selectedPageComparisons[0].pageId2) as long)
 
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = barchartAggregationService.aggregateFor([selectedMeasurand], cmd.from.toDate(), cmd.to.toDate(), [baseJobGroup, comparativeJobGroup], [basePage, comparativePage])
+        List<BarchartAggregation> aggregations = barchartAggregationService.aggregateFor([selectedMeasurand], cmd.from.toDate(), cmd.to.toDate(), [baseJobGroup, comparativeJobGroup], [basePage, comparativePage], "test")
 
         if (!aggregations || aggregations.every { it.value == null }) {
             ControllerUtils.sendObjectAsJSON(response, [:])
