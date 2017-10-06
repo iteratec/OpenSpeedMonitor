@@ -6,99 +6,71 @@
     <div>
         <div id="thresholdList">
             <div>
-                <div v-for="thresholdItem in thresholds">{{ thresholdItem.measuredEvent.name }}
+                <div v-for="thresholdItem in thresholds"><label class="measuredEventLabel">{{ thresholdItem.measuredEvent.name }}</label>
                     <div v-for="threshold in thresholdItem.thresholdList">
-                        <div v-if="threshold.edit">
-                            <div class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}</div><br>
-                            <div class="thresholdBoundaries row">
-                                <div class="col-md-2">
-                                    <label class="text-success">
-                                        Good
-                                    </label>
-                                    <label><</label>
-                                </div>
-                                <div class="col-md-2">
-                                <input id="lowerBoundaryEdit" class="form-control" type="number" min="1"
+                    <div class="thresholdMeasurand"><label>{{ threshold.threshold.measurand.name }}</label>
+                            <div class="thresholdBoundaries form-inline">
+                                <label class="text-success">
+                                    Good
+                                </label>
+                                <label>
+                                    <
+                                </label>
+                                <input v-if="threshold.edit" id="lowerBoundaryEdit" class="form-control" type="number" min="1"
                                        name="lowerBoundary" cols="30"
                                        rows="5"
                                        maxlength="150"
                                        v-model="threshold.threshold.lowerBoundary"/>
-                                </div>
-                                <div class="col-md-2">
-                                    <label>
-                                        <
-                                    </label>
-                                    <label class="text-warning">
-                                        OK
-                                    </label>
-                                    <label><</label>
-                                </div>
-                                <div class="col-md-2">
-                                <input id="upperBoundaryEdit" class="form-control" type="number" min="1"
+                                <input v-else id="lowerBoundaryShow" class="form-control float-right" type="number" min="1"
+                                       name="lowerBoundary" cols="30"
+                                       rows="5"
+                                       maxlength="150"
+                                       readonly
+                                       v-model="threshold.threshold.lowerBoundary"/>
+                                <label>
+                                    ms <
+                                </label>
+                                <label class="text-warning">
+                                    OK
+                                </label>
+                                <label>
+                                    <
+                                </label>
+                                <input v-if="threshold.edit" id="upperBoundaryEdit" class="form-control" type="number" min="1"
                                        name="upperBoundary" cols="40"
                                        rows="5"
                                        maxlength="150"
                                        v-model="threshold.threshold.upperBoundary"/>
-                                </div>
-                                <div class="col-md-2">
-                                    <label>
-                                        <
-                                    </label>
-                                    <label class="text-danger">
-                                        Bad
-                                    </label>
-                                </div>
+                                <input v-else id="upperBoundaryShow" class="form-control float-right" type="number" min="1"
+                                       name="upperBoundary" cols="40"
+                                       rows="5"
+                                       maxlength="150"
+                                       readonly
+                                       v-model="threshold.threshold.upperBoundary"/>
+                                <label>
+                                    ms <
+                                </label>
+                                <label class="text-danger">
+                                    Bad
+                                </label>
+                                <span v-if="threshold.edit">
                                 <button type="button"
-                                        class="btn btn-warning btn-xs"
+                                        class="thresholdButton margins btn btn-warning btn-xs"
                                         @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
                                 <button type="button"
-                                        class="margins btn btn-danger btn-xs"
+                                        class="thresholdButton btn btn-danger btn-xs"
                                         @click="changeEditMode(threshold, false)">discard</button>
+                                </span>
+                                <span v-else>
+                                    <button type="button"
+                                            class="thresholdButton margins btn btn-warning btn-xs"
+                                            @click="changeEditMode(threshold, true)">edit</button>
+                                    <button type="button"
+                                            class="thresholdButton btn btn-danger btn-xs"
+                                            @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                                </span>
                             </div>
-                        </div>
 
-                        <div v-else class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}<br>
-
-                            <div class="thresholdBoundaries row">
-                                <div class="col-md-2">
-                                    <label class="text-success">
-                                        Good
-                                    </label>
-                                    <label><</label>
-                                </div>
-                                <label class="col-md-2">
-                                    {{ threshold.threshold.lowerBoundary }}
-                                </label>
-                                <div class="col-md-2">
-                                    <label>
-                                        <
-                                    </label>
-                                    <label class="text-warning">
-                                        OK
-                                    </label>
-                                    <label><</label>
-                                </div>
-                                <label class="col-md-2">
-                                    {{ threshold.threshold.upperBoundary }}
-                                </label>
-
-                                <div class="col-md-2">
-                                    <label>
-                                        <
-                                    </label>
-                                    <label class="text-danger">
-                                        Bad
-                                    </label>
-                                </div>
-                                <div class="col-md-2">
-                                <button type="button"
-                                        class="btn btn-warning btn-xs"
-                                        @click="changeEditMode(threshold, true)">edit</button>
-                                <button type="button"
-                                        class="btn btn-danger btn-xs"
-                                        @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <br>
@@ -107,20 +79,20 @@
         </div>
     </div>
 
-
     <br> <br>
 
-    <div>New threshold: <br>
-        <select id="measuredEvent" name="measuredEvent" class="measured-event-select"
+    <div><label>New threshold:</label> <br>
+        <div>
+        <select id="measuredEvent" name="measuredEvent" class="form-control thresholdSelects"
                 v-model="newThreshold.measuredEvent">
             <option v-for="measuredEvent in measuredEvents" :value="measuredEvent">{{measuredEvent.name}}</option>
-        </select> <br>
-
-        <select class="thresholdMeasurand" id="measurand" name="measurand" v-model="newThreshold.measurand">
+        </select>
+        </div>
+        <select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand" v-model="newThreshold.measurand">
             <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-        </select><br>
+        </select>
 
-        <div class="thresholdBoundaries form-inline">
+        <div class="thresholdBoundaries form-inline thresholdSelects">
             <label class="text-success">
                 Good
             </label>
@@ -133,7 +105,7 @@
                    maxlength="150"
                    v-model="newThreshold.lowerBoundary"/>
             <label>
-                <
+                ms <
             </label>
             <label class="text-warning">
                 OK
@@ -147,7 +119,7 @@
                    maxlength="150"
                    v-model="newThreshold.upperBoundary"/>
             <label>
-                <
+                ms <
             </label>
             <label class="text-danger">
                 Bad
