@@ -15,7 +15,8 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                 measuredEvents: [],
                 measurands: [],
                 newThreshold: {},
-                tmpThreshold: {}
+                tmpThreshold: {},
+                newThresholdState: false
             },
             computed: {},
             created: function () {
@@ -79,53 +80,54 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                     }
                 },
                 addThreshold: function (job, createThresholdUrl) {
-                        var self = this;
-                        $.ajax({
-                            type: 'POST',
-                            data: {
-                                job: job,
-                                measurand: this.newThreshold.measurand.name,
-                                measuredEvent: this.newThreshold.measuredEvent.id,
-                                lowerBoundary: this.newThreshold.lowerBoundary,
-                                upperBoundary: this.newThreshold.upperBoundary
-                            },
-                            url: createThresholdUrl,
-                            success: function (result) {
-                                self.newThreshold.id = result.thresholdId;
+                    var self = this;
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            job: job,
+                            measurand: this.newThreshold.measurand.name,
+                            measuredEvent: this.newThreshold.measuredEvent.id,
+                            lowerBoundary: this.newThreshold.lowerBoundary,
+                            upperBoundary: this.newThreshold.upperBoundary
+                        },
+                        url: createThresholdUrl,
+                        success: function (result) {
+                            self.newThreshold.id = result.thresholdId;
 
-                                var added = false;
+                            var added = false;
 
-                                //Add threshold to measured event
-                                self.thresholds.forEach(function (measuredEventItem) {
-                                    if(measuredEventItem.measuredEvent.id == self.newThreshold.measuredEvent.id){
-                                        measuredEventItem.thresholdList.push({
-                                            threshold: self.newThreshold,
-                                            edit: false
-                                        });
-
-                                        added = true;
-                                    }
-                                });
-
-                                //Add measured event if it is not existing
-                                if(!added){
-                                    var list = [{
+                            //Add threshold to measured event
+                            self.thresholds.forEach(function (measuredEventItem) {
+                                if (measuredEventItem.measuredEvent.id == self.newThreshold.measuredEvent.id) {
+                                    measuredEventItem.thresholdList.push({
                                         threshold: self.newThreshold,
                                         edit: false
-                                    }]
-                                    self.thresholds.push({
-                                        measuredEvent:self.newThreshold.measuredEvent,
-                                        thresholdList: list
-                                    })
-                                }
+                                    });
 
-                                self.newThreshold = {};
-                                console.log("success");
-                            },
-                            error: function (e) {
-                                console.log(e);
+                                    added = true;
+                                }
+                            });
+
+                            //Add measured event if it is not existing
+                            if (!added) {
+                                var list = [{
+                                    threshold: self.newThreshold,
+                                    edit: false
+                                }]
+                                self.thresholds.push({
+                                    measuredEvent: self.newThreshold.measuredEvent,
+                                    thresholdList: list
+                                })
                             }
-                        });
+
+                            self.newThreshold = {};
+                            self.changeNewThresholdState();
+                            console.log("success");
+                        },
+                        error: function (e) {
+                            console.log(e);
+                        }
+                    });
                 },
                 deleteThreshold: function (threshold, deleteThresholdUrl) {
                     var self = this;
@@ -139,14 +141,15 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                         success: function () {
                             self.thresholds.forEach(function (measuredEventItem) {
                                 //remove threshold from measured event
-                                if(measuredEventItem.measuredEvent.id == deletedThreshold.threshold.measuredEvent.id){
+                                if (measuredEventItem.measuredEvent.id == deletedThreshold.threshold.measuredEvent.id) {
                                     measuredEventItem.thresholdList.splice(measuredEventItem.thresholdList.indexOf(deletedThreshold), 1)
 
                                     //remove measured event
-                                    if(measuredEventItem.thresholdList.length == 0){
+                                    if (measuredEventItem.thresholdList.length == 0) {
                                         self.thresholds.splice(self.thresholds.indexOf(measuredEventItem), 1);
                                     }
-                                }});
+                                }
+                            });
 
                         },
                         error: function (e) {
@@ -155,7 +158,7 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                     });
                 },
                 updateThreshold: function (threshold, updateThresholdUrl) {
-                    if(threshold.threshold.lowerBoundary < threshold.threshold.upperBoundary) {
+                    if (threshold.threshold.lowerBoundary < threshold.threshold.upperBoundary) {
                         var self = this;
                         var updatedThreshold = threshold;
                         $.ajax({
@@ -170,28 +173,36 @@ OpenSpeedMonitor.thresholdforJobs = (function () {
                             url: updateThresholdUrl,
                             success: function () {
                                 self.thresholds.forEach(function (measuredEventItem) {
-                                    if(measuredEventItem.measuredEvent.id == updatedThreshold.threshold.measuredEvent.id){
-                                        updatedThreshold.edit = false;
-                                        measuredEventItem.thresholdList[ measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
-                                    }});
+                                    if (measuredEventItem.measuredEvent.id == updatedThreshold.threshold.measuredEvent.id) {
+                                        self.changeEditMode(updatedThreshold, false);
+                                        measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
+                                    }
+                                });
                             },
                             error: function (e) {
                                 console.log(e);
                             }
                         });
-                    }else{
+                    } else {
                         alert("Die obere Grenze muss größer als die untere Grenze sein!")
                     }
                 },
+                changeNewThresholdState: function () {
+                    this.newThresholdState = !this.newThresholdState
+                },
                 changeEditMode: function (threshold, state) {
                     if (state) {
-                        //shadow copy
-                        this.tmpThreshold = Object.assign({}, threshold.threshold);
+                        if (Object.keys(this.tmpThreshold).length == 0) {
+                            //shadow copy
+                            this.tmpThreshold = Object.assign({}, threshold.threshold);
+                            threshold.edit = state;
+                        }
                     } else {
                         threshold.threshold = this.tmpThreshold;
                         this.tmpThreshold = {};
+                        threshold.edit = state;
                     }
-                    threshold.edit = state;
+
                 }
             }
         });
