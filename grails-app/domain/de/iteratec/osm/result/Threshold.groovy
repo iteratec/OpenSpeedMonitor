@@ -46,7 +46,8 @@ class Threshold {
      * Set the constraints
      */
     static constraints = {
-        measurand(nullable: false)
+        measurand(nullable: false, unique: ['job', 'measuredEvent'])
+
         upperBoundary(nullable: false, validator: {currentUpperBoundary, thresholdInstance ->
            return  thresholdInstance.lowerBoundary == null || currentUpperBoundary > thresholdInstance.lowerBoundary
         })

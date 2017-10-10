@@ -35,7 +35,6 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasurementResultDto
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.Threshold
 import de.iteratec.osm.result.ThresholdService

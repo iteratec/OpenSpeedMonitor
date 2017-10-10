@@ -125,7 +125,7 @@ class ThresholdController {
         Threshold threshold = new Threshold(job: job, measurand: measurand, measuredEvent: measuredEvent, lowerBoundary: lowerBoundary, upperBoundary: upperBoundary)
 
         if (!threshold.save(flush: true)) {
-            //ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Fehler")
         } else {
             threshold.id = (threshold.save(flush: true)).id
             ControllerUtils.sendObjectAsJSON(response, ['thresholdId': threshold.id])
