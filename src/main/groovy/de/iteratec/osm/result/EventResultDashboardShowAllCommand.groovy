@@ -82,10 +82,10 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
         viewModelToCopyTo.get('aggrGroupValuesCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesCached.findAll {
-            !SelectedMeasurand.isNoUserTiming(it)
+            !SelectedMeasurand.isMeasurand(it)
         })
         viewModelToCopyTo.get('aggrGroupValuesUnCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
-            !SelectedMeasurand.isNoUserTiming(it)
+            !SelectedMeasurand.isMeasurand(it)
         })
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
@@ -94,10 +94,6 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('trimAboveRequestCounts', this.trimAboveRequestCounts)
         viewModelToCopyTo.put('trimBelowRequestSizes', this.trimBelowRequestSizes)
         viewModelToCopyTo.put('trimAboveRequestSizes', this.trimAboveRequestSizes)
-    }
-
-    Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues) {
-        return selectedValues.findAll { SelectedMeasurand.isNoUserTiming(it) }.collect { Measurand.valueOf(it) }
     }
 
     Collection<SelectedMeasurand> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached) {
