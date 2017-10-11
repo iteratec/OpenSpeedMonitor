@@ -46,17 +46,7 @@ class PageComparisonController extends ExceptionHandlerController {
     def getBarchartData(GetPageComparisonDataCommand cmd) {
         ArrayList<PageComparisonAggregation> aggregations = barchartAggregationService.getBarChartAggregationsFor(cmd)
 
-<<<<<<< HEAD
-        Page basePage = Page.get((cmd.selectedPageComparisons[0].pageId1) as long)
-        Page comparativePage = Page.get((cmd.selectedPageComparisons[0].pageId2) as long)
-
-        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = barchartAggregationService.aggregateFor([selectedMeasurand], cmd.from.toDate(), cmd.to.toDate(), [baseJobGroup, comparativeJobGroup], [basePage, comparativePage], "test")
-
-        if (!aggregations || aggregations.every { it.value == null }) {
-=======
         if (!aggregations || aggregations.every { !it.baseAggregation.value && !it.comperativeAggregation.value}) {
->>>>>>> feature/pageComparisonRefactoring
             ControllerUtils.sendObjectAsJSON(response, [:])
         }
 
