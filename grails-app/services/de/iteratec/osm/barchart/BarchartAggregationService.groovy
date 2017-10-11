@@ -58,13 +58,13 @@ class BarchartAggregationService {
             return []
         }
         selectedMeasurands.unique({a, b -> a.name <=> b.name})
-        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobResultDateBetween(from, to)
-                .withPageIn(pages)
-                .withJobGroupIn(jobGroups)
-                .withSelectedMeasurands(selectedMeasurands)
-
-        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
+//        EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime(), performanceLoggingService)
+//                .withJobResultDateBetween(from, to)
+//                .withPageIn(pages)
+//                .withJobGroupIn(jobGroups)
+//                .withSelectedMeasurands(selectedMeasurands)
+//        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
+        List<BarchartAggregation> averages =  createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
         List<BarchartAggregation> medians = []
         if (selectedAggregationValue == 'median') {
             performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians total", 1, {
