@@ -266,7 +266,7 @@ class BarchartMedianService {
                 groupededAggregations.get(ungrouped.jobGroup.id).get(ungrouped.name) << value
             }
             groupededAggregations.each { key, valueMap ->
-                Long jobGroupId = key.split("_")[0] as Long
+                Long jobGroupId = key as Long
                 EventResultProjection erp = new EventResultProjection()
                 erp.jobGroup = jobGroups.find { it.id == jobGroupId }
                 valueMap.each { nameKey, valueList ->

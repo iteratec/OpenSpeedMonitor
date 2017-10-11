@@ -69,7 +69,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
+//        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(allMeasurands[0], CachedView.UNCACHED)
         List<BarchartAggregation> allEventResults = barchartAggregationService.getBarchartAggregationsFor(cmd)
 

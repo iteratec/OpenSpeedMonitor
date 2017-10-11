@@ -5,58 +5,60 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.PerformanceLoggingService
+import org.hibernate.criterion.CriteriaSpecification
 
 /**
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private List<EventResultCriteriaBuilder> filters
-    private EventResultAveragesCriteriaBuilder aggregatedQueryBuilder
-    private EventResultRawDataCriteriaBuilder rawQueryBuilder
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandAveragesQueryBuilder, userTimingRawQueryBuilder, userTimingAveragesQueryBuilder
-    PerformanceLoggingService performanceLoggingService
+    private List<Closure> filters
+    private List<String> additionalProjections
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, userTimingRawQueryBuilder
 
+    EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        filters = []
+        additionalProjections = []
+        filters.add(getBaseClosure(minValidLoadtime, maxValidLoadtime))
+    }
 
-    EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime, PerformanceLoggingService performanceLoggingService
-    ) {
-        this.performanceLoggingService = performanceLoggingService
-        aggregatedQueryBuilder = new EventResultAveragesCriteriaBuilder()
-        rawQueryBuilder = new EventResultRawDataCriteriaBuilder()
-        filters = [aggregatedQueryBuilder, rawQueryBuilder]
-
-        filters*.filterBetween('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
-        filters*.filterEquals('cachedView', CachedView.UNCACHED)
+    Closure getBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        return {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            'eq'('cachedView', CachedView.UNCACHED)
+            'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
+        }
     }
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            filters*.filterBetween('jobResultDate', from, to)
+            filters.add({
+                'between' 'jobResultDate', from, to
+            })
         }
         return this
     }
 
     EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
-        filters*.filterIn('jobGroup', jobGroups, project)
-        return this
-    }
-
-    EventResultQueryBuilder withJobGroupEquals(JobGroup jobGroup) {
-        filters*.filterEquals('jobGroup', jobGroup)
+        if (jobGroups) {
+            filters.add({
+                'in' 'jobGroup', jobGroups
+            })
+        }
+        if (project) {
+            additionalProjections.add('jobGroup')
+        }
         return this
     }
 
     EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = true) {
-        filters*.filterIn('page', pages, project)
-        return this
-    }
-
-    EventResultQueryBuilder withPageEquals(Page page) {
-        filters*.filterEquals('page', page)
-        return this
-    }
-
-    EventResultQueryBuilder withProjectedBaseProperty(String propertyName) {
-        rawQueryBuilder.addPropertyProjection(propertyName)
+        if (pages) {
+            filters.add({
+                'in' 'page', pages
+            })
+        }
+        if (project) {
+            additionalProjections.add('page')
+        }
         return this
     }
 
@@ -68,37 +70,29 @@ class EventResultQueryBuilder {
         if (measurands) {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
-            measurandAveragesQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
             userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
-            userTimingAveragesQueryBuilder.configureForSelectedMeasurands(userTimings)
         }
 
         return this
     }
 
     List<EventResultProjection> getRawData() {
-        return getResultFor(rawQueryBuilder, userTimingRawQueryBuilder, measurandRawQueryBuilder)
+        return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
     }
 
-    List<EventResultProjection> getAverages() {
-        return getResultFor(aggregatedQueryBuilder, userTimingAveragesQueryBuilder, measurandAveragesQueryBuilder)
-    }
-
-    private getResultFor(EventResultCriteriaBuilder filters, SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
+    private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "get calculated data from database", 1, {
-            if (userTimingsBuilder) {
-                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters)
-            }
-            if (measurandsBuilder) {
-                measurandResult += measurandsBuilder.getResultsForFilter(filters)
-            }
-        })
+        if (userTimingsBuilder) {
+            userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, additionalProjections)
+        }
+        if (measurandsBuilder) {
+            measurandResult += measurandsBuilder.getResultsForFilter(filters, additionalProjections)
+        }
 
         return mergeResults(measurandResult, userTimingsResult)
     }
@@ -119,19 +113,13 @@ class EventResultQueryBuilder {
 
     private initUserTimingsQueryBuilder() {
         if (!userTimingRawQueryBuilder) {
-            userTimingRawQueryBuilder = new EventResultUserTimingRawDataQueryBuilder()
-        }
-        if (!userTimingAveragesQueryBuilder) {
-            userTimingAveragesQueryBuilder = new EventResultUserTimingAveragesQueryBuilder()
+            userTimingRawQueryBuilder = new UserTimingRawDataQueryBuilder()
         }
     }
 
     private initMeasurandsQueryBuilder() {
         if (!measurandRawQueryBuilder) {
-            measurandRawQueryBuilder = new EventResultMeasurandRawDataQueryBuilder()
-        }
-        if (!measurandAveragesQueryBuilder) {
-            measurandAveragesQueryBuilder = new EventResultMeasurandAveragesQueryBuilder()
+            measurandRawQueryBuilder = new MeasurandRawDataQueryBuilder()
         }
     }
 }

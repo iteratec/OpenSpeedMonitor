@@ -6,7 +6,6 @@ import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -57,17 +56,11 @@ class BarchartAggregationService {
         if (!selectedMeasurands) {
             return []
         }
-        selectedMeasurands.unique({a, b -> a.name <=> b.name})
-//        EventResultQueryBuilder builder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime(), performanceLoggingService)
-//                .withJobResultDateBetween(from, to)
-//                .withPageIn(pages)
-//                .withJobGroupIn(jobGroups)
-//                .withSelectedMeasurands(selectedMeasurands)
-//        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, builder.getAverages())
-        List<BarchartAggregation> averages =  createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
+        selectedMeasurands.unique({ a, b -> a.name <=> b.name })
+        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
         List<BarchartAggregation> medians = []
         if (selectedAggregationValue == 'median') {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG,"get medians total", 1, {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "get medians total", 1, {
                 medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
             })
         }
@@ -84,7 +77,7 @@ class BarchartAggregationService {
         return avgs
     }
 
-    List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd){
+    List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
         List<PageComparisonAggregation> comparisons = []
         List<Page> pages = []
         List<JobGroup> jobGroups = []
