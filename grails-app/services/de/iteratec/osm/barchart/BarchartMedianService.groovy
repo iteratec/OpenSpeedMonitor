@@ -23,7 +23,7 @@ class BarchartMedianService {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             'eq'('cachedView', CachedView.UNCACHED)
             'between'('fullyLoadedTimeInMillisecs', osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-            if(pages) 'in'('page', pages)
+            if (pages) 'in'('page', pages)
             'in'('jobGroup', jobGroups)
             'between'('jobResultDate', from, to)
             projections {
