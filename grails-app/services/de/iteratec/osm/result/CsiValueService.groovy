@@ -234,7 +234,7 @@ class CsiValueService {
     }
 
     boolean isCsiRelevant(EventResult eventResult) {
-        return eventResult.csByWptDocCompleteInPercent && eventResult.docCompleteTimeInMillisecs &&
+        return eventResult.csByWptDocCompleteInPercent != null && eventResult.docCompleteTimeInMillisecs &&
                 (eventResult.docCompleteTimeInMillisecs >= osmConfigCacheService.getMinValidLoadtime(24) &&
                         eventResult.docCompleteTimeInMillisecs <= osmConfigCacheService.getMaxValidLoadtime(24))
     }

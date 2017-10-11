@@ -29,7 +29,7 @@
         </div>
 
         <div class="col-sm-2 control-label removeAddMeasurands">
-            <a href="#/" class="addMeasurandButton">
+            <a href="#/" class="addMeasurandButton" id="addPageComparison">
                 <i class="fa fa-lg fa-plus-circle"></i>
             </a>
             <a href="#/" class="removeMeasurandButton hidden">

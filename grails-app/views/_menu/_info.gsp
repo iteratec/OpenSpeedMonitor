@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li>
-                <a href="mailto:wpt@iteratec.de">
+                <a href="mailto:osm@iteratec.de">
                     <i class="fa fa-envelope-o"></i>
                     <g:message code="de.iteratec.osm.contact.label" locale="${lang}"/>
                 </a>

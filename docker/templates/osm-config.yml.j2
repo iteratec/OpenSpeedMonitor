@@ -19,7 +19,6 @@ grails:
           initialOsmRootUser:
             username: '{{ default .Env.OSM_ROOT_USER "root" }}'
             password: '{{ default .Env.OSM_ROOT_PASSWORD "muchMoreSecret!123" }}'
-          initialDetailAnalysisApiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
 
 environments:
   production:
@@ -27,7 +26,8 @@ environments:
       serverURL: '{{ default .Env.OSM_URL "http://localhost:8080"}}'
       de.iteratec.osm.detailAnalysis:
         enablePersistenceOfDetailAnalysisData: {{ default .Env.ENABLE_DETAIL_ANALYSIS false }}
-        detailAnalysisMicroserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
+        microserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
+        apiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
     dataSource:
       url: 'jdbc:mysql://{{ default .Env.MYSQL_HOST "osm-mysql" }}/{{ default .Env.MYSQL_DATABASE "osm" }}'
       username: '{{ default .Env.MYSQL_USER "osm" }}'
