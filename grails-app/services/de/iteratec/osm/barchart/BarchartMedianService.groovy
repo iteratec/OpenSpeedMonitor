@@ -350,4 +350,30 @@ class BarchartMedianService {
             return measurandResult ? measurandResult : userTimingResult
         }
     }
+
+    List<EventResultProjection> getRawDataFor(List<JobGroup> jobGroups, List<Page> pages, Date from, Date to, SelectedMeasurand selectedMeasurand) {
+        Closure projectionMethod
+        if (selectedMeasurand.selectedType.isUserTiming()) {
+            projectionMethod = getUserTimingRawDataProjection
+        } else {
+            projectionMethod = getMeasurandRawDataProjection
+        }
+        return createProjectionForSelectedMeasurand(getFor(jobGroups, pages, from, to, [selectedMeasurand], projectionMethod), selectedMeasurand)
+    }
+
+    List<EventResultProjection> createProjectionForSelectedMeasurand(List<Map> transformedData, SelectedMeasurand selectedMeasurand) {
+        List<EventResultProjection> result = []
+        transformedData.each {
+            EventResultProjection erp = new EventResultProjection(jobGroup: it.jobGroup, page: it.page)
+            if (selectedMeasurand.selectedType.isUserTiming()) {
+                def relevantValue = it.type == UserTimingType.MEASURE ? it.duration : it.startTime
+                erp.projectedProperties.put(it.name, relevantValue)
+            } else {
+                String name = selectedMeasurand.getDatabaseRelevantName()
+                erp.projectedProperties.put(name, it."$name")
+            }
+            result.add(erp)
+        }
+        return result
+    }
 }
