@@ -9,7 +9,7 @@ class GraphitePathRawData {
     Measurand measurand
     CachedView cachedView
 
-    static belongsTo = [graphiteServer: GraphiteServer]
+    static belongsTo = [GraphiteServer]
 
     static constraints = {
         importFrom(GraphitePathCsiData)
