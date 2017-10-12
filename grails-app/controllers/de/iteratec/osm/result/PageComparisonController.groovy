@@ -4,6 +4,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
+import de.iteratec.osm.barchart.PageComparisonAggregation
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.barchart.BarchartDTO
@@ -43,16 +44,9 @@ class PageComparisonController extends ExceptionHandlerController {
 
     @RestAction
     def getBarchartData(GetPageComparisonDataCommand cmd) {
-        JobGroup baseJobGroup = JobGroup.get((cmd.selectedPageComparisons[0].jobGroupId1) as long)
-        JobGroup comparativeJobGroup = JobGroup.get((cmd.selectedPageComparisons[0].jobGroupId2) as long)
+        ArrayList<PageComparisonAggregation> aggregations = barchartAggregationService.getBarChartAggregationsFor(cmd)
 
-        Page basePage = Page.get((cmd.selectedPageComparisons[0].pageId1) as long)
-        Page comparativePage = Page.get((cmd.selectedPageComparisons[0].pageId2) as long)
-
-        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = barchartAggregationService.aggregateFor([selectedMeasurand], cmd.from.toDate(), cmd.to.toDate(), [baseJobGroup, comparativeJobGroup], [basePage, comparativePage])
-
-        if (!aggregations || aggregations.every { it.value == null }) {
+        if (!aggregations || aggregations.every { !it.baseAggregation.value && !it.comperativeAggregation.value}) {
             ControllerUtils.sendObjectAsJSON(response, [:])
         }
 
@@ -60,23 +54,22 @@ class PageComparisonController extends ExceptionHandlerController {
         dto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         dto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         dto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
-        dto.series = [createSeriesFor(aggregations, baseJobGroup, comparativeJobGroup, basePage, comparativePage)]
+        dto.series = aggregations.collect {createSeriesFor(it)}
 
         ControllerUtils.sendObjectAsJSON(response, dto)
     }
 
-    private BarchartSeries createSeriesFor(List<BarchartAggregation> aggregations, JobGroup baseJobGroup, JobGroup comparativeJobGroup, Page basePage, Page comparativePage) {
-        BarchartDatum baseSeries = mapToSeriesFor(aggregations, basePage, baseJobGroup)
-        BarchartDatum comparativeSeries = mapToSeriesFor(aggregations, comparativePage, comparativeJobGroup)
+    private BarchartSeries createSeriesFor(PageComparisonAggregation aggregation) {
+        BarchartDatum baseSeries = mapToSeriesFor(aggregation.baseAggregation)
+        BarchartDatum comparativeSeries = mapToSeriesFor(aggregation.comperativeAggregation)
         return new BarchartSeries(
                 stacked: false,
-                dimensionalUnit: aggregations[0].selectedMeasurand.getMeasurandGroup().unit.label,
+                dimensionalUnit: aggregation.baseAggregation.selectedMeasurand.getMeasurandGroup().unit.label,
                 data: [baseSeries, comparativeSeries]
         )
     }
 
-    private BarchartDatum mapToSeriesFor(List<BarchartAggregation> aggregations, Page page, JobGroup jobGroup) {
-        BarchartAggregation aggregation = aggregations.find { it.page == page && it.jobGroup == jobGroup }
+    private BarchartDatum mapToSeriesFor(BarchartAggregation aggregation) {
         return new BarchartDatum(
                 measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.selectedMeasurand.name}", aggregation.selectedMeasurand.name),
                 value: aggregation.value,
