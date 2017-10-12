@@ -2,12 +2,13 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
 <%@ page import="de.iteratec.osm.result.Measurand" %>
 
-<div id="threshold">
+<div id="threshold" :jobId="${job?.id}" :scriptId="${job?.script?.id}">
     <div>
         <div id="thresholdList">
             <div>
-                <div v-for="thresholdItem in thresholds"><label
-                        class="measuredEventLabel">{{ thresholdItem.measuredEvent.name }}</label>
+                <div v-for="thresholdItem in thresholds">
+
+                    <threshold-measured-event :threshold="thresholdItem"></threshold-measured-event>
 
                     <div v-for="threshold in thresholdItem.thresholdList">
                         <div class="thresholdMeasurand"><label>{{ threshold.threshold.measurand.name }}</label>
@@ -87,8 +88,12 @@
 
     <br> <br>
 
-    <div><button type="button" class="btn btn-primary"
-                 @click="changeNewThresholdState()">New threshold</button>
+    <div>
+        <button type="button" class="btn btn-primary"
+                @click="changeNewThresholdState()">
+            <span v-if="newThresholdState">Hide new Threshold</span>
+            <span v-else>New Threshold</span>
+        </button>
         <button class="btn btn-default ciButton" type="button" id="copyToClipboard">
             <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
         </button><br>
@@ -145,13 +150,17 @@
             </div>
         </span>
     </div>
-
 </div>
+<g:render template="thresholdTabMeasuredEventVue"/>
 
+
+<asset:javascript src="job/thresholdForJob.js"/>
+
+%{--
 
 <asset:script type="text/javascript">
     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdForJob.js"/>');
     $(window).load(function() {
       OpenSpeedMonitor.thresholdforJobs.initVue({jobId: "${job?.id}", scriptId: "${job?.script?.id}"});
     });
-</asset:script>
+</asset:script>--}%
