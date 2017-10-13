@@ -10,4 +10,5 @@
 </script>
 <g:render template="thresholdTabThresholdRowVue"/>
 <g:render template="thresholdTabMeasurandVue"/>
+
 <asset:javascript src="job/thresholdTabMeasuredEventVue.js"/>

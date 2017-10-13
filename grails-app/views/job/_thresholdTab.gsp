@@ -79,7 +79,6 @@
         </span>
     </div>
 </div>
-
 <g:render template="thresholdTabMeasuredEventVue"/>
 <asset:javascript src="job/thresholdForJob.js"/>
 

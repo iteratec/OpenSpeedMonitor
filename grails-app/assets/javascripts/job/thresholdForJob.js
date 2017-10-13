@@ -3,8 +3,8 @@
 //= require job/thresholdTabMeasuredEventVue.js
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
-"use strict";
 
+"use strict";
 
 new Vue({
     el: '#threshold',
@@ -91,9 +91,7 @@ new Vue({
                 url: createThresholdUrl,
                 success: function (result) {
                     self.newThreshold.id = result.thresholdId;
-
                     var added = false;
-
                     //Add threshold to measured event
                     self.thresholds.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === self.newThreshold.measuredEvent.id) {
