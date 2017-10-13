@@ -106,8 +106,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
-
-        adjustChartButton.click()
+        clickAdjustChartButton()
 
         when: "User edits title"
         waitFor { chartTitleInputField.displayed }
