@@ -277,7 +277,11 @@ integrationTest {
     if (System.getProperty('webdriver.chrome.driver')){
         systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     }
-    systemProperty 'grails.env', 'test'
-    systemProperty 'geb.env', 'chrome'
+    if (System.getProperty('grails.env')){
+        systemProperty 'grails.env', 'test'
+    }
+    if (System.getProperty('geb.env')){
+        systemProperty 'geb.env', 'chrome'
+    }
 }
 
