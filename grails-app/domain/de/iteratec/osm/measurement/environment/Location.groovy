@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.gorm.annotation.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
@@ -24,6 +25,7 @@ import groovy.transform.EqualsAndHashCode
  * Uniquely identified through {@link #location} and {@link #wptServer}.
  */
 @EqualsAndHashCode
+@Entity
 class Location {
 
     String label
