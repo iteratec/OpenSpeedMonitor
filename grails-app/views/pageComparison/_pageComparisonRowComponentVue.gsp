@@ -4,7 +4,6 @@
         <g:message code="de.iteratec.osm.pageComparison.firstPageTitle"
                    default="First Page:"/>
     </label>
-
     <div class="col-sm-3">
         <select name="firstJobGroupSelect" v-model="comparisondata.jobGroupId1"
                 class="form-control jobgroupselect">
@@ -39,6 +38,13 @@
                 {{page.name}}
             </option>
         </select>
+
     </div>
+    <div v-if="index"class="col-sm-2">
+        <a href="#" role="button" v-bind:id="'removeComparisonRow'+index"   >
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </a>
+    </div>
+
 </div>
 </script>

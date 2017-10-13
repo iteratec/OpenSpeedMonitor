@@ -19,10 +19,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
             comparisons: []
         },
         created: function () {
-            var that = this;
             this.addComparisonRow();
+            var that = this;
             $(window).on("selectIntervalTimeframeCardLoaded", function () {
                 that.loadJobGroupMap();
+                that.addListener();
                 var timeFrameChangedFunction = function () {
                     that.loadJobGroupMap();
                 };
@@ -75,6 +76,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
             addComparisonRow: function () {
                 this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1})
             },
+            removeComparisonRow: function (index) {
+                this.comparisons.splice(index,1)
+            },
             getComparisons: function () {
                 return this.comparisons
             },
@@ -97,6 +101,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 });
                 return ids;
 
+            },
+            addListener: function () {
+                var that = this;
+                $('#addComparison').on('click', function () {
+                    that.addComparisonRow()
+                })
             }
         }
     });

@@ -28,10 +28,8 @@
 <div class="row">
     <div class="col-md-12">
         <form id="dashBoardParamsForm">
-            <!-- show button -->
             <div class="action-row">
                 <div class="col-md-12">
-
                     <div class="btn-group pull-right" id="show-button-group">
                         <button type="button" id="graphButtonHtmlId"
                                 class="btn btn-primary show-button">
@@ -40,11 +38,12 @@
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
-
             <div class="card-well">
                 <div class="row">
-                    <g:render template="pageComparisonVue"/>
-                    <div class="col-md-4">
+                    <div class="col-md-7">
+                        <g:render template="pageComparisonVue"/>
+                    </div>
+                    <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                                 aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
                                 multipleMeasurands               : false,
