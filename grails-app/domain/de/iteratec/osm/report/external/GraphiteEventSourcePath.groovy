@@ -18,11 +18,13 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.gorm.annotation.Entity
 
 /**
  * GraphiteEventSourcePath
  * Defines a graphite source to fetch {@link Event}s from.
  */
+@Entity
 class GraphiteEventSourcePath {
 
     /**
@@ -35,6 +37,7 @@ class GraphiteEventSourcePath {
     String targetMetricName
 
 	static hasMany = [jobGroups:JobGroup]
+    static belongsTo = [GraphiteServer]
 
     static mapping = {
     }

@@ -272,3 +272,10 @@ sourceSets {
 'dbmChangelogSync' {
     jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
+
+integrationTest {
+    systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
+    systemProperty 'grails.env', 'test'
+    systemProperty 'geb.env', 'chrome'
+}
+

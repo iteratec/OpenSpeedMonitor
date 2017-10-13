@@ -20,6 +20,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.report.external.provider.*
 import grails.databinding.BindUsing
+import grails.gorm.annotation.Entity
 
 /**
  * A graphite server to which measured data is to be sent to.
@@ -29,6 +30,7 @@ import grails.databinding.BindUsing
  * @see GraphitePathCsiData
  * @see GraphiteEventSourcePath
  */
+@Entity
 class GraphiteServer {
 
     /**

@@ -154,6 +154,11 @@ class EventResultDashboardPage extends I18nGebPage {
         appendedInputAboveRequestSizesTextField << Keys.chord(Keys.DELETE)
     }
 
+    void clickAdjustChartButton() {
+        scrollTop()
+        adjustChartButton.click()
+    }
+
     public void clickSaveAsDashboardButton() {
         // Scroll object into view so it becomes clickable
         sleep(100)
