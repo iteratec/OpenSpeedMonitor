@@ -8,17 +8,17 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.GuiHandling = OpenSpeedMonitor.ChartModules.GuiHandling || {};
 
 
-
 OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
+
     var pageComparisonChart = OpenSpeedMonitor.ChartModules.PageComparisonChart("#page-comparison-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
 
     var init = function () {
-        $(window).on('resize', function() {
+        $(window).on('resize', function () {
             renderChart({autoWidth: true}, false);
         });
-        $(window).on('historyStateLoaded', function() {
+        $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
 
@@ -28,7 +28,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var renderChart = function (data, isStateChange) {
-       if (data) {
+        if (data) {
             pageComparisonChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
@@ -38,7 +38,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
-      renderChart(data, isStateChange)
+        renderChart(data, isStateChange)
     };
 
     var loadData = function (isStateChange) {
@@ -50,7 +50,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 from: selectedTimeFrame[0].toISOString(),
                 to: selectedTimeFrame[1].toISOString(),
                 measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.PageComparisonSelection.getValues())
+                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
             },
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
@@ -76,6 +76,5 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         });
     };
     init();
-    return {
-    }
+    return {}
 })();

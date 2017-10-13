@@ -4,7 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/></title>
-    <asset:stylesheet src="/d3Charts/barChartHorizontal.less" />
+    <asset:stylesheet src="/d3Charts/barChartHorizontal.less"/>
     <asset:stylesheet src="/csiBenchmark/show.less"/>
 
 </head>
@@ -43,12 +43,7 @@
 
             <div class="card-well">
                 <div class="row">
-                    <div class="col-md-8">
-                        <g:render template="pagesComparisonSelectionCard"
-                                  model="${['pages'    : pages,
-                                            'jobGroups': jobGroups]}"/>
-                    </div>
-
+                    <g:render template="pageComparisonVue"/>
                     <div class="col-md-4">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                                 aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
@@ -58,6 +53,7 @@
                         ]"/>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <g:render template="/_resultSelection/selectIntervalTimeframeCard"
@@ -80,7 +76,6 @@
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
-
     </asset:script>
 </content>
 

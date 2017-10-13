@@ -5,12 +5,13 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
+OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
-OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
+OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
     var loadedState = "";
 
     var initWaitForPostload = function () {
-        var dependencies = ["pageComparison", "resultSelection"];
+        var dependencies = ["pageComparison", "resultSelection", "selectIntervalTimeframeCard"];
         OpenSpeedMonitor.postLoader.onLoaded(dependencies, function () {
             loadState(OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter());
             addEventHandlers();
@@ -39,19 +40,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state['firstPage'] = [];
         state['secondJobGroup'] = [];
         state['secondPage'] = [];
-
-        var comparisonRows = $(".addPageComparisonRow");
-        // leave out last select as it's the "hidden clone"
-        for (var i = 0; i < comparisonRows.length ; i++) {
-            var firstJobGroup = $(comparisonRows[i]).find("select[name=firstJobGroupSelect]").val();
-            var firstPage = $(comparisonRows[i]).find("select[name=firstPageSelect]").val();
-            var secondJobGroup = $(comparisonRows[i]).find("select[name=secondJobGroupSelect]").val();
-            var secondPage = $(comparisonRows[i]).find("select[name=secondPageSelect]").val();
-            state['firstJobGroup'].push(firstJobGroup);
-            state['firstPage'].push(firstPage);
-            state['secondJobGroup'].push(secondJobGroup);
-            state['secondPage'].push(secondPage);
-        }
+        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons().forEach(function (comparison) {
+            state['firstJobGroup'].push(comparison['jobGroupId1']);
+            state['firstPage'].push(comparison['pageId1']);
+            state['secondJobGroup'].push(comparison['jobGroupId2']);
+            state['secondPage'].push(comparison['pageId2']);
+        });
         var encodedState = urlEncodeState(state);
         if (encodedState !== loadedState) {
             loadedState = encodedState;
@@ -68,10 +62,10 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             return;
         }
         setTimeFrame(state);
-        setPages(state);
+        setComparisons(state);
         setMeasurand(state);
         loadedState = encodedState;
-        if(state['firstJobGroup'] && state['firstPage'] && state['secondJobGroup'] && state['secondPage']){
+        if (state['firstJobGroup'] && state['firstPage'] && state['secondJobGroup'] && state['secondPage']) {
             $(window).trigger("historyStateLoaded");
         }
     };
@@ -85,39 +79,32 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
     };
 
-    var setPages = function (params) {
+    var setComparisons = function (params) {
         var firstPages = params['firstPage'];
         var secondPages = params['secondPage'];
         var firstJobGroup = params['firstJobGroup'];
         var secondJobGroup = params['secondJobGroup'];
         var rows = firstJobGroup.length;
         var isArray = firstJobGroup.constructor == Array;
-        var firstJobGroupSelects = $("select[name=firstJobGroupSelect]");
-        var firstPageSelects = $("select[name=firstPageSelect]");
-        var secondJobGroupSelects = $("select[name=secondJobGroupSelect]");
-        var secondPageSelects = $("select[name=secondPageSelect]");
-
-        if(isArray){
-            ensureComparisonRowAmount(rows);
-            for (var i = 0; i<rows; i++) {
-                $(firstJobGroupSelects[i]).val(firstJobGroup[i]);
-                $(secondJobGroupSelects[i]).val(secondJobGroup[i]);
-                $(firstPageSelects[i]).val(firstPages[i]);
-                $(secondPageSelects[i]).val(secondPages[i]);
+        var comparisons = [];
+        if (isArray) {
+            for (var i = 0; i < rows; i++) {
+                var comparison = {};
+                comparison['jobGroupId1'] = firstJobGroup[i];
+                comparison['jobGroupId2'] = secondJobGroup[i];
+                comparison['pageId1'] = firstPages[i];
+                comparison['pageId2'] = secondPages[i];
+                comparisons.push(comparison);
             }
-        } else{
-                $(firstJobGroupSelects[0]).val(firstJobGroup);
-                $(secondJobGroupSelects[0]).val(secondJobGroup);
-                $(firstPageSelects[0]).val(firstPages);
-                $(secondPageSelects[0]).val(secondPages);
+        } else {
+            var comparison = {};
+            comparison['jobGroupId1'] = firstJobGroup;
+            comparison['jobGroupId2'] = secondJobGroup;
+            comparison['pageId1'] = firstPages;
+            comparison['pageId2'] = secondPages;
+            comparisons.push(comparison);
         }
-    };
-
-    var ensureComparisonRowAmount = function(amount){
-      var addButton = $("#addPageComparison");
-      for(var i= 0; i<amount-1; ++i){
-            addButton.click();
-      }
+        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setComparisons(comparisons);
     };
 
     var setMeasurand = function (params) {
@@ -129,6 +116,5 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     initWaitForPostload();
-    return {
-    };
+    return {};
 })();
