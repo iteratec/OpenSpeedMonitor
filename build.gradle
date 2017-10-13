@@ -274,7 +274,9 @@ sourceSets {
 }
 
 integrationTest {
-    systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
+    if (System.getProperty('webdriver.chrome.driver')){
+        systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
+    }
     systemProperty 'grails.env', 'test'
     systemProperty 'geb.env', 'chrome'
 }
