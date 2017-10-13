@@ -36,15 +36,15 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         state["to"] = $("#toDatepicker").val();
         state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
         state['measurand'] = $("#selectedAggrGroupValuesUnCached").val();
-        state['firstJobGroup'] = [];
-        state['firstPage'] = [];
-        state['secondJobGroup'] = [];
-        state['secondPage'] = [];
+        state['jobGroupId1'] = [];
+        state['pageId1'] = [];
+        state['jobGroupId2'] = [];
+        state['pageId2'] = [];
         OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons().forEach(function (comparison) {
-            state['firstJobGroup'].push(comparison['jobGroupId1']);
-            state['firstPage'].push(comparison['pageId1']);
-            state['secondJobGroup'].push(comparison['jobGroupId2']);
-            state['secondPage'].push(comparison['pageId2']);
+            state['jobGroupId1'].push(comparison['jobGroupId1']);
+            state['pageId1'].push(comparison['pageId1']);
+            state['jobGroupId2'].push(comparison['jobGroupId2']);
+            state['pageId2'].push(comparison['pageId2']);
         });
         var encodedState = urlEncodeState(state);
         if (encodedState !== loadedState) {
@@ -65,7 +65,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         setComparisons(state);
         setMeasurand(state);
         loadedState = encodedState;
-        if (state['firstJobGroup'] && state['firstPage'] && state['secondJobGroup'] && state['secondPage']) {
+        if (state['jobGroupId1'] && state['pageId1'] && state['jobGroupId2'] && state['pageId2']) {
             $(window).trigger("historyStateLoaded");
         }
     };
@@ -80,28 +80,28 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
     };
 
     var setComparisons = function (params) {
-        var firstPages = params['firstPage'];
-        var secondPages = params['secondPage'];
-        var firstJobGroup = params['firstJobGroup'];
-        var secondJobGroup = params['secondJobGroup'];
-        var rows = firstJobGroup.length;
-        var isArray = firstJobGroup.constructor == Array;
+        var pageId1s = params['pageId1'];
+        var pageId2s = params['pageId2'];
+        var jobGroupId1 = params['jobGroupId1'];
+        var jobGroupId2 = params['jobGroupId2'];
+        var rows = jobGroupId1.length;
+        var isArray = jobGroupId1.constructor == Array;
         var comparisons = [];
         if (isArray) {
             for (var i = 0; i < rows; i++) {
                 var comparison = {};
-                comparison['jobGroupId1'] = firstJobGroup[i];
-                comparison['jobGroupId2'] = secondJobGroup[i];
-                comparison['pageId1'] = firstPages[i];
-                comparison['pageId2'] = secondPages[i];
+                comparison['jobGroupId1'] = jobGroupId1[i];
+                comparison['jobGroupId2'] = jobGroupId2[i];
+                comparison['pageId1'] = pageId1s[i];
+                comparison['pageId2'] = pageId2s[i];
                 comparisons.push(comparison);
             }
         } else {
             var comparison = {};
-            comparison['jobGroupId1'] = firstJobGroup;
-            comparison['jobGroupId2'] = secondJobGroup;
-            comparison['pageId1'] = firstPages;
-            comparison['pageId2'] = secondPages;
+            comparison['jobGroupId1'] = jobGroupId1;
+            comparison['jobGroupId2'] = jobGroupId2;
+            comparison['pageId1'] = pageId1s;
+            comparison['pageId2'] = pageId2s;
             comparisons.push(comparison);
         }
         OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setComparisons(comparisons);

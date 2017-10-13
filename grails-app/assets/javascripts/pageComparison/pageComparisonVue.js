@@ -80,7 +80,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
             },
             setComparisons: function (comparisons) {
                 this.comparisons = comparisons;
-                console.log(comparisons);
             },
             getPageIds: function () {
                 var ids = [];
