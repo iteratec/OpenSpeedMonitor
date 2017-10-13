@@ -16,7 +16,7 @@ class SelectedMeasurand {
             throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
 
-        if (isNoUserTiming(optionValue)) {
+        if (isMeasurand(optionValue)) {
             name = optionValue
             selectedType = SelectedMeasurandType.MEASURAND
         } else if (optionValue.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)) {
@@ -61,7 +61,7 @@ class SelectedMeasurand {
     static Map createDataMapForOptGroupSelect() {
         Map result = [:]
         MeasurandGroup.values().each { measurandGroup ->
-            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup })
+            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {it.toString()})
             if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 result.put("USER_TIMINGS", [])
             }
@@ -69,7 +69,7 @@ class SelectedMeasurand {
         return result
     }
 
-    static boolean isNoUserTiming(String name) {
+    static boolean isMeasurand(String name) {
         return Measurand.values().any { it.toString() == name }
     }
 
@@ -79,6 +79,6 @@ class SelectedMeasurand {
 
     boolean isValid(String name) {
         name = name ?: ""
-        return isNoUserTiming(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
+        return isMeasurand(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
     }
 }
