@@ -62,7 +62,7 @@ class Location {
         active(nullable: false)
         wptServer(nullable: false)
         location(maxSize: 255)
-        browser()
+        browser(nullable: false)
         activeagents(nullable: true, min: -2147483648, max: 2147483647)
         queuethreshold(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdgreenlimit(nullable: true, min: -2147483648, max: 2147483647)
