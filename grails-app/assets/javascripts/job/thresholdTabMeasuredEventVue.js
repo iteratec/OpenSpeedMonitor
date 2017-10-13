@@ -1,8 +1,8 @@
 //= require bower_components/vue/dist/vue.js
-
+//= require job/thresholdTabMeasurandVue.js
 "use strict"
 
     Vue.component('threshold-measured-event', {
-        props: ['threshold'],
+        props: ['thresholds'],
         template: '#threshold-tab-measured-event-vue'
     });

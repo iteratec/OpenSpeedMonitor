@@ -1,7 +1,8 @@
 //= require bower_components/vue/dist/vue.js
 //= require bower_components/jquery/jquery.min.js
 //= require job/thresholdTabMeasuredEventVue.js
-
+//= require job/thresholdTabMeasurandVue.js
+//= require job/thresholdTabThresholdRowVue.js
 "use strict";
 
 
