@@ -3,6 +3,11 @@
 "use strict"
 
 Vue.component('threshold-measurand', {
-    props: ['measurand'],
-    template: '#threshold-tab-measurand-vue'
+    props: ['threshold'],
+    template: '#threshold-tab-measurand-vue',
+    methods: {
+        deleteThreshold: function (threshold) {
+            this.$emit('delete-threshold', threshold);
+        }
+    }
 });

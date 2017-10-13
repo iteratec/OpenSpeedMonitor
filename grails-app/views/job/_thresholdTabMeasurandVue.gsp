@@ -1,5 +1,9 @@
 <script type="text/x-template" id="threshold-tab-measurand-vue">
-    <label class="thresholdMeasurand">{{ measurand.name }}</label>
+<div>
+    <label class="thresholdMeasurand">{{ threshold.threshold.measurand.name }}</label>
+    <threshold-row :threshold="threshold" v-on:delete-threshold="deleteThreshold"></threshold-row>
+</div>
 </script>
 
+<g:render template="thresholdTabThresholdRowVue"/>
 <asset:javascript src="job/thresholdTabMeasurandVue.js"/>

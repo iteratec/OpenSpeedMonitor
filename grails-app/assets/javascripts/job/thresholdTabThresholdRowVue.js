@@ -4,5 +4,10 @@
 
 Vue.component('threshold-row', {
     props: ['threshold'],
-    template: '#threshold-tab-threshold-row-vue'
+    template: '#threshold-tab-threshold-row-vue',
+    methods: {
+        deleteThreshold: function (threshold) {
+            this.$emit('delete-threshold', threshold);
+        }
+    }
 });

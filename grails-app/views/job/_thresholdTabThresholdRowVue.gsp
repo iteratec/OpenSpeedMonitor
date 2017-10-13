@@ -61,7 +61,7 @@
                 @click="changeEditMode(threshold, true)">edit</button>
         <button type="button"
                 class="thresholdButton btn btn-danger btn-xs"
-                @click="deleteThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'deleteAsync'])}')">delete</button>
+                @click="deleteThreshold(threshold)">delete</button>
     </span>
 </div>
 </script>

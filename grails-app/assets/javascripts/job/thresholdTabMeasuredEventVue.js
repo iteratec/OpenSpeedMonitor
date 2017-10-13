@@ -3,5 +3,10 @@
 
     Vue.component('threshold-measured-event', {
         props: ['thresholds'],
-        template: '#threshold-tab-measured-event-vue'
+        template: '#threshold-tab-measured-event-vue',
+        methods: {
+            deleteThreshold: function (threshold) {
+                this.$emit('delete-threshold', threshold);
+            }
+        }
     });

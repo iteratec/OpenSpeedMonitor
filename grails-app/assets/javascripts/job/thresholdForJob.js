@@ -125,7 +125,7 @@ new Vue({
                 }
             });
         },
-        deleteThreshold: function (threshold, deleteThresholdUrl) {
+        deleteThreshold: function (threshold) {
             var self = this;
             var deletedThreshold = threshold;
             $.ajax({
@@ -133,7 +133,7 @@ new Vue({
                 data: {
                     thresholdId: deletedThreshold.threshold.id
                 },
-                url: deleteThresholdUrl,
+                url: "/threshold/deleteAsync",
                 success: function () {
                     self.thresholds.forEach(function (measuredEventItem) {
                         //remove threshold from measured event
