@@ -38,6 +38,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
+        $("#chart-card").removeClass("hidden");
         renderChart(data, isStateChange)
     };
 
