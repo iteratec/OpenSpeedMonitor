@@ -197,7 +197,7 @@ class DetailAnalysisPersisterService implements iResultListener {
         def client = httpRequestService.getRestClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-        String apiKey = MicroServiceApiKey.findByMicroService(MicroserviceType.DETAIL_ANALYSIS).secretKey
+        String apiKey = configService.getDetailAnalysisApiKey()
         String callbackUrl = "/rest/receiveCallback"
 
         def resp

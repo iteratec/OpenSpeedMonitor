@@ -42,7 +42,7 @@
     </div>
 
     <div id="svg-container">
-        <svg id="job-group-aggregation-svg" width="100%"></svg>
+        <svg id="job-group-aggregation-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
 <g:render template="/jobGroupAggregation/adjustBarchartModal"/>
