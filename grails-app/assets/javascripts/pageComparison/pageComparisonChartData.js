@@ -89,7 +89,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var calculateChartBarsHeight = function () {
         var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
         var barGap = OpenSpeedMonitor.ChartComponents.common.barGap;
-        var numberOfBars = allPageData[0].length;
+        var numberOfBars = allPageData[0]? allPageData[0].length: 0;
         return (numberOfBars * barGap) + (numberOfBars * barBand);
     };
 

@@ -4,7 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/></title>
-    <asset:stylesheet src="/d3Charts/barChartHorizontal.less" />
+    <asset:stylesheet src="/d3Charts/barChartHorizontal.less"/>
     <asset:stylesheet src="/csiBenchmark/show.less"/>
 
 </head>
@@ -28,10 +28,8 @@
 <div class="row">
     <div class="col-md-12">
         <form id="dashBoardParamsForm">
-            <!-- show button -->
             <div class="action-row">
                 <div class="col-md-12">
-
                     <div class="btn-group pull-right" id="show-button-group">
                         <button type="button" id="graphButtonHtmlId"
                                 class="btn btn-primary show-button">
@@ -40,16 +38,12 @@
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
-
             <div class="card-well">
                 <div class="row">
-                    <div class="col-md-8">
-                        <g:render template="pagesComparisonSelectionCard"
-                                  model="${['pages'    : pages,
-                                            'jobGroups': jobGroups]}"/>
+                    <div class="col-md-7">
+                        <g:render template="pageComparisonVue"/>
                     </div>
-
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                                 aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
                                 multipleMeasurands               : false,
@@ -58,6 +52,7 @@
                         ]"/>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <g:render template="/_resultSelection/selectIntervalTimeframeCard"
@@ -80,7 +75,6 @@
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
-
     </asset:script>
 </content>
 

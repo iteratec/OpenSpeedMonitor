@@ -41,7 +41,8 @@
     "bootstrap-colorpicker": "^2.4.0",
     "saveSvgAsPng": "^1.1.0",
     "air-datepicker": "^2.2.3",
-    "bootstrap-validator": "v0.11.9"
+    "bootstrap-validator": "v0.11.9",
+    "vue": "v2.4.4"
   },
   "resolutions": {
     "d3": "^3.5.17",
