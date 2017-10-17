@@ -8,7 +8,6 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
 @Transactional
@@ -16,7 +15,6 @@ class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
-    PerformanceLoggingService performanceLoggingService
     BarchartMedianService barchartMedianService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
@@ -60,9 +58,7 @@ class BarchartAggregationService {
         List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
         List<BarchartAggregation> medians = []
         if (selectedAggregationValue == 'median') {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "get medians total", 1, {
-                medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
-            })
+            medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
         }
         return mergeWithMedians(averages, medians)
     }

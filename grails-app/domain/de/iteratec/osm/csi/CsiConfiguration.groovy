@@ -18,8 +18,9 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.gorm.annotation.Entity
 
-
+@Entity
 class CsiConfiguration {
 
     String label

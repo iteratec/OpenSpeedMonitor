@@ -3,7 +3,6 @@ package de.iteratec.osm.barchart
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand

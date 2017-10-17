@@ -1,10 +1,12 @@
 package de.iteratec.osm.result
 
+import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 @ToString(includeNames=true, includeFields=true)
 @EqualsAndHashCode(includeFields = true)
+@Entity
 class UserTiming {
 
     String name
