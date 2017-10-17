@@ -53,7 +53,9 @@
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
         distributionChartShow: "${createLink(action: 'show', controller: 'distributionChart')}",
         pageComparisonShow: "${createLink(action: 'show', controller: 'pageComparison')}",
+        pageComparisonGetData: "${createLink(controller: 'pageComparison', action: 'getBarchartData')}",
         pageComparisonGetPages: "${createLink(controller: 'resultSelection', action: 'getPages')}",
+        pageComparisonGetJobGroupToPagesMap: "${createLink(controller: 'resultSelection', action: 'getJobGroupToPagesMap')}",
         getScriptNames: "${createLink(controller: 'measurementSetup', action: 'getScriptNames')}",
         getJobNames: "${createLink(controller: 'measurementSetup', action: 'getJobNames')}",
         cronExpressionNextExecution: "${createLink(controller: 'cronExpression', action: 'nextExecutionTime')}"

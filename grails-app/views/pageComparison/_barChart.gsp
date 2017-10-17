@@ -1,4 +1,4 @@
-<div id="chart-container">
+<div id="chart-container hidden">
     <div class="in-chart-buttons">
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
@@ -8,6 +8,7 @@
     </div>
 
     <div id="svg-container">
+        <svg id="page-comparison-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
 <asset:script type="text/javascript">
