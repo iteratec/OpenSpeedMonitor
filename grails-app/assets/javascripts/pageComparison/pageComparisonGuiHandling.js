@@ -21,7 +21,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
-
+        $("input[name='aggregationValue']").on("change", function () {
+            loadData(true);
+        });
         drawGraphButton.click(function () {
             loadData(true);
         });
@@ -37,8 +39,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         pageComparisonChart.render();
     };
 
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
+    };
+
     var handleNewData = function (data, isStateChange) {
         $("#chart-card").removeClass("hidden");
+        data.aggregationValue = getAggregationValue();
         renderChart(data, isStateChange)
     };
 
@@ -51,7 +58,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 from: selectedTimeFrame[0].toISOString(),
                 to: selectedTimeFrame[1].toISOString(),
                 measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
+                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons()),
+                selectedAggregationValue: getAggregationValue()
             },
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",

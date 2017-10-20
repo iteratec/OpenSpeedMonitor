@@ -46,6 +46,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
             state['jobGroupId2'].push(comparison['jobGroupId2']);
             state['pageId2'].push(comparison['pageId2']);
         });
+        state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         var encodedState = urlEncodeState(state);
         if (encodedState !== loadedState) {
             loadedState = encodedState;
@@ -64,6 +65,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         setTimeFrame(state);
         setComparisons(state);
         setMeasurand(state);
+        setAggregationValue(state);
         loadedState = encodedState;
         if (state['jobGroupId1'] && state['pageId1'] && state['jobGroupId2'] && state['pageId2']) {
             $(window).trigger("historyStateLoaded");
@@ -105,6 +107,17 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
             comparisons.push(comparison);
         }
         OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setComparisons(comparisons);
+    };
+
+    var setAggregationValue = function (state) {
+        if (!state["selectedAggregationValue"]) {
+            return
+        }
+        var isAvg = state["selectedAggregationValue"] === "avg";
+        $("#averageButton input").prop("checked", isAvg);
+        $("#averageButton").toggleClass("active", isAvg);
+        $("#medianButton input").prop("checked", !isAvg);
+        $("#medianButton").toggleClass("active", !isAvg);
     };
 
     var setMeasurand = function (params) {

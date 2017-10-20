@@ -17,11 +17,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var autoWidth = true;
     var dataAvailalbe = false;
     var hasLoadTime = false;
+    var aggregationValue = "avg";
     var max = 0;
     var i18n = {};
 
     var setData = function (data) {
         rawSeries = data || rawSeries;
+        aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
         i18n = data.i18nMap || i18n;
         if (data.series) {
             filterData();
@@ -62,12 +64,12 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
                     id: dataElement.grouping,
                     label: filterPageName(dataElement.grouping),
                     showLabelOnTop: true,
-                    value: dataElement.value,
+                    value: dataElement[aggregationValue],
                     unit: series.dimensionalUnit
                 };
                 if(series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[index].push(add);
-                if(dataElement.value > newMax) newMax = dataElement.value;
+                if(dataElement[aggregationValue] > newMax) newMax = dataElement[aggregationValue];
                 ++index;
             })
         });
