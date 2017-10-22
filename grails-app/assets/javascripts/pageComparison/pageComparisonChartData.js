@@ -32,7 +32,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         fullWidth = data.width || fullWidth;
         autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
         fullWidth = getActualSvgWidth();
-        // chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
         chartBarsWidth = fullWidth - chartSideLabelsWidth - OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailalbe = data.series ? true : dataAvailalbe;
@@ -54,15 +53,17 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         allPageData = [];
         var newMax = -1;
         hasLoadTime = false;
+        var colors = OpenSpeedMonitor.ChartColorProvider().getColorScaleForComparison();
         rawSeries.series.forEach(function (series,comparisonIndex) {
             series.data.forEach(function (dataElement, pageIndex) {
                 allPageData[pageIndex] = allPageData[pageIndex] || [];
+                var id = dataElement.grouping+comparisonIndex;
                 var add = {
-                    id: dataElement.grouping+comparisonIndex,
-                    label: filterPageName(dataElement.grouping),
-                    showLabelOnTop: true,
+                    id: id,
+                    label: dataElement.grouping,
                     value: dataElement.value,
-                    unit: series.dimensionalUnit
+                    unit: series.dimensionalUnit,
+                    color: colors(id)
                 };
                 if(series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[pageIndex].push(add);
@@ -115,16 +116,35 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
 
 
     var getDataForBars = function (firstOrSecond) {
-        var colorProvider = OpenSpeedMonitor.ChartColorProvider().getColorscaleForMeasurandGroup("ms");
         var series = allPageData[firstOrSecond];
         return {
             id: "page"+firstOrSecond,
-            color: colorProvider(firstOrSecond),
+            individualColors: true,
             values: series,
             min: 0,
             max: max,
             width: chartBarsWidth,
             height: chartBarsHeight
+        }
+    };
+
+    var getDataForLegend = function () {
+        return {
+            entries: allPageData[0].map(function (page, i) {
+                return [
+                    extractLegendEntry(page),
+                    extractLegendEntry(allPageData[1][i])
+                ]
+            }),
+            width: chartBarsWidth
+        };
+    };
+
+    var extractLegendEntry = function (entry) {
+        return {
+            id: entry.id,
+            color: entry.color,
+            label: entry.label
         }
     };
 
@@ -164,7 +184,8 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         getChartBarsHeight: getChartBarsHeight,
         getChartSideLabelsWidth: getChartSideLabelsWidth,
         getComparisonAmount: getComparisonAmount,
-        hasLoadTimes: hasLoadTimes
+        hasLoadTimes: hasLoadTimes,
+        getDataForLegend: getDataForLegend
     }
 });
 OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin = 15;
