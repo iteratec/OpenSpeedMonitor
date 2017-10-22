@@ -1,4 +1,4 @@
-<div id="chart-container hidden">
+<div id="chart-container">
     <div class="in-chart-buttons">
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
