@@ -54,21 +54,19 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         allPageData = [];
         var newMax = -1;
         hasLoadTime = false;
-        rawSeries.series.forEach(function (series) {
-            var index = 0;
-            series.data.forEach(function (dataElement) {
-                allPageData[index] = allPageData[index] || [];
+        rawSeries.series.forEach(function (series,comparisonIndex) {
+            series.data.forEach(function (dataElement, pageIndex) {
+                allPageData[pageIndex] = allPageData[pageIndex] || [];
                 var add = {
-                    id: dataElement.grouping,
+                    id: dataElement.grouping+comparisonIndex,
                     label: filterPageName(dataElement.grouping),
                     showLabelOnTop: true,
                     value: dataElement.value,
                     unit: series.dimensionalUnit
                 };
                 if(series.dimensionalUnit === "ms") hasLoadTime = true;
-                allPageData[index].push(add);
+                allPageData[pageIndex].push(add);
                 if(dataElement.value > newMax) newMax = dataElement.value;
-                ++index;
             })
         });
         max = newMax;
