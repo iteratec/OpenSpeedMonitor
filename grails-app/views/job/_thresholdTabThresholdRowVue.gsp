@@ -8,14 +8,12 @@
     </label>
     <input v-if="threshold.edit" id="lowerBoundaryEdit" class="form-control" type="number"
            min="1"
-           name="lowerBoundary" cols="30"
-           rows="5"
+           name="lowerBoundary"
            maxlength="150"
            v-model="threshold.threshold.lowerBoundary"/>
     <input v-else id="lowerBoundaryShow" class="form-control float-right" type="number"
            min="1"
-           name="lowerBoundary" cols="30"
-           rows="5"
+           name="lowerBoundary"
            maxlength="150"
            readonly
            v-model="threshold.threshold.lowerBoundary"/>
@@ -30,14 +28,12 @@
     </label>
     <input v-if="threshold.edit" id="upperBoundaryEdit" class="form-control" type="number"
            min="1"
-           name="upperBoundary" cols="40"
-           rows="5"
+           name="upperBoundary"
            maxlength="150"
            v-model="threshold.threshold.upperBoundary"/>
     <input v-else id="upperBoundaryShow" class="form-control float-right" type="number"
            min="1"
-           name="upperBoundary" cols="40"
-           rows="5"
+           name="upperBoundary"
            maxlength="150"
            readonly
            v-model="threshold.threshold.upperBoundary"/>
@@ -50,7 +46,7 @@
     <span v-if="threshold.edit">
         <button type="button"
                 class="thresholdButton margins btn btn-primary btn-xs"
-                @click="updateThreshold(threshold, '${g.createLink([controller: 'threshold', action: 'updateAsync'])}')">submit</button>
+                @click="updateThreshold(threshold)">submit</button>
         <button type="button"
                 class="thresholdButton btn btn-danger btn-xs"
                 @click="changeEditMode(threshold, false)">discard</button>

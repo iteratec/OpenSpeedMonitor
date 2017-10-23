@@ -7,6 +7,9 @@
         methods: {
             deleteThreshold: function (threshold) {
                 this.$emit('delete-threshold', threshold);
+            },
+            updateThreshold: function (threshold) {
+                this.$emit('update-threshold', threshold);
             }
         }
     });

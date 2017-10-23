@@ -7,7 +7,9 @@
         <div id="thresholdList">
             <div>
                 <div v-for="thresholdItem in thresholds">
-                    <threshold-measured-event :thresholds="thresholdItem" v-on:delete-threshold="deleteThreshold"></threshold-measured-event>
+                    <threshold-measured-event :thresholds="thresholdItem"
+                                              v-on:delete-threshold="deleteThreshold"
+                                              v-on:update-threshold="updateThreshold"></threshold-measured-event>
                     <br>
                 </div>
             </div>
@@ -79,6 +81,7 @@
         </span>
     </div>
 </div>
+
 <g:render template="thresholdTabMeasuredEventVue"/>
 <asset:javascript src="job/thresholdForJob.js"/>
 

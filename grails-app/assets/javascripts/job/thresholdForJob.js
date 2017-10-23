@@ -153,7 +153,7 @@ new Vue({
                 }
             });
         },
-        updateThreshold: function (threshold, updateThresholdUrl) {
+        updateThreshold: function (threshold) {
             if (threshold.threshold.lowerBoundary < threshold.threshold.upperBoundary) {
                 var self = this;
                 var updatedThreshold = threshold;
@@ -166,7 +166,7 @@ new Vue({
                         lowerBoundary: updatedThreshold.threshold.lowerBoundary,
                         upperBoundary: updatedThreshold.threshold.upperBoundary
                     },
-                    url: updateThresholdUrl,
+                    url: "/threshold/updateAsync",
                     success: function () {
                         self.thresholds.forEach(function (measuredEventItem) {
                             if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {
@@ -194,20 +194,6 @@ new Vue({
         },
         changeNewThresholdState: function () {
             this.newThresholdState = !this.newThresholdState
-        },
-        changeEditMode: function (threshold, state) {
-            if (state) {
-                if (Object.keys(this.tmpThreshold).length === 0) {
-                    //shadow copy
-                    this.tmpThreshold = Object.assign({}, threshold.threshold);
-                    threshold.edit = state;
-                }
-            } else {
-                threshold.threshold = this.tmpThreshold;
-                this.tmpThreshold = {};
-                threshold.edit = state;
-            }
-
         }
     }
 });

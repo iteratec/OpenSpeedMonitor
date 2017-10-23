@@ -3,10 +3,13 @@
         <label class="measuredEventLabel">{{ thresholds.measuredEvent.name }}</label>
 
         <div v-for="threshold in thresholds.thresholdList">
-            <threshold-measurand :threshold="threshold" v-on:delete-threshold="deleteThreshold"></threshold-measurand>
+            <threshold-measurand :threshold="threshold"
+                                 v-on:delete-threshold="deleteThreshold"
+                                 v-on:update-threshold="updateThreshold"></threshold-measurand>
         </div>
     </div>
 </script>
+
 <g:render template="thresholdTabMeasurandVue"/>
 
 <asset:javascript src="job/thresholdTabMeasuredEventVue.js"/>
