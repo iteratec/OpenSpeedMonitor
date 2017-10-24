@@ -65,25 +65,43 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
         entryGroup.append('rect')
             .attr('width', colorPreviewSize)
             .attr('height', colorPreviewSize)
-            .attr('name', 'colorPreview');
+            .attr('name', 'colorPreview')
+            .on("mouseover", function (d) {
+                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("mouseout", function (d) {
+                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("click", function (d) {
+                clickEntry([d['entries'][0].id,d['entries'][1].id])
+            });
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
-            .attr('name', 'common');
+            .attr('name', 'common')
+            .on("mouseover", function (d) {
+                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("mouseout", function (d) {
+                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("click", function (d) {
+                clickEntry([d['entries'][0].id,d['entries'][1].id])
+            });
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'firstText')
             .on("mouseover", function (d) {
-                mouseOverEntry(d['entries'][0])
+                mouseOverEntry([d['entries'][0].id])
             })
             .on("mouseout", function (d) {
-                mouseOutEntry(d['entries'][0])
+                mouseOutEntry([d['entries'][0].id])
             })
             .on("click", function (d) {
-                clickEntry(d['entries'][0])
+                clickEntry([d['entries'][0].id])
             });
 
         entryGroup.append("text")
@@ -91,20 +109,29 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'compareSymbol')
-            .text(function() { return '\uf07e' });
+            .text(function() { return '\uf07e' })
+            .on("mouseover", function (d) {
+                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("mouseout", function (d) {
+                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("click", function (d) {
+                clickEntry([d['entries'][0].id,d['entries'][1].id])
+            });
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'secondText')
             .on("mouseover", function (d) {
-                mouseOverEntry(d['entries'][1])
+                mouseOverEntry([d['entries'][1].id])
             })
             .on("mouseout", function (d) {
-                mouseOutEntry(d['entries'][1])
+                mouseOutEntry([d['entries'][1].id])
             })
             .on("click", function (d) {
-                clickEntry(d['entries'][1])
+                clickEntry([d['entries'][1].id])
             });
     };
 
@@ -212,64 +239,71 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
         return d3.max(labelWidths) + colorPreviewSize + entryMargin + colorPreviewMargin;
     };
 
-    var mouseOverEntry = function (data) {
+    var mouseOverEntry = function (ids) {
         if (isAnyEntrySelected()) {
             return;
         }
         entryData.forEach(function (entry) {
-            entry['entries'][0].highlighted = entry['entries'][0].id === data.id;
-            entry['entries'][1].highlighted = entry['entries'][1].id === data.id;
+            entry['entries'][0].highlighted = ids.indexOf(entry['entries'][0].id)>-1;
+            entry['entries'][1].highlighted = ids.indexOf(entry['entries'][1].id)>-1;
         });
         render();
         callEventHandler("highlight", {
-            id: data.id,
+            ids: ids,
             highlighted: true,
             anyHighlighted: true
         });
     };
 
-    var mouseOutEntry = function (data) {
+    var mouseOutEntry = function (ids) {
         if (isAnyEntrySelected()) {
             return;
         }
         entryData.forEach(function (entry) {
             var firstEntry = entry['entries'][0];
             var secondEntry = entry['entries'][1];
-            if (firstEntry.id === data.id) {
+            if (ids.indexOf(firstEntry.id) > -1) {
                 firstEntry.highlighted = false;
             }
-            if (secondEntry.id === data.id) {
+            if (ids.indexOf(secondEntry.id) > -1) {
                 secondEntry.highlighted = false;
             }
         });
         render();
         callEventHandler("highlight", {
-            id: data.id,
-            highlighted: false,
+            ids: ids,
             anyHighlighted: false
         });
     };
 
-    var clickEntry = function (data) {
-        var idIsSelected = false;
+    var clickEntry = function (ids) {
         entryData.forEach(function (entry) {
             var firstEntry = entry['entries'][0];
             var secondEntry = entry['entries'][1];
-            firstEntry.selected = (firstEntry.id === data.id) ? !firstEntry.selected : false;
-            secondEntry.selected = (secondEntry.id === data.id) ? !secondEntry.selected : false;
+            var firstWasSelected = ids.indexOf(firstEntry.id) > -1;
+            var secondWasSelected = ids.indexOf(secondEntry.id) > -1;
+
+
+            if(ids.length === 1 && (!firstEntry.selected || !secondEntry.selected)){
+                //only one should be selected and only one was selected
+                firstEntry.selected = firstWasSelected ? !firstEntry.selected : false;
+                secondEntry.selected = secondWasSelected ? !secondEntry.selected : false;
+            } else if(firstEntry.selected && firstWasSelected && secondEntry.selected && secondWasSelected) {
+                //both where selected and should now be selected, so we assume the user want's to remove his selection
+                firstEntry.selected = false;
+                secondEntry.selected = false;
+            }else {
+                //we need that case to add or remove selections instead of reversing them
+                //e.g. one page was selected but now the whole comparison should be selected
+                firstEntry.selected = firstWasSelected;
+                secondEntry.selected = secondWasSelected;
+            }
             firstEntry.highlighted = false;
             secondEntry.highlighted = false;
-            if (firstEntry.id === data.id) {
-                idIsSelected = firstEntry.selected;
-            }
-            if (secondEntry.id === data.id) {
-                idIsSelected = secondEntry.selected;
-            }
         });
         render();
         callEventHandler("select", {
-            id: data.id,
-            selected: idIsSelected,
+            ids: ids,
             anySelected: isAnyEntrySelected()
         });
     };

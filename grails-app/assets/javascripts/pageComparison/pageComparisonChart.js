@@ -23,20 +23,20 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartMultiLegend();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
-    var highlightedId = "";
+    var highlightedIds = "";
     var anyHighlighted = false;
-    var selectedId = "";
+    var selectedIds = "";
     var anySelected = false;
 
 
     chartLegendComponent.on("select", function (selectEvent) {
-        selectedId = selectEvent.id;
+        selectedIds = selectEvent.ids;
         anySelected = selectEvent.anySelected;
         render()
     });
 
     chartLegendComponent.on("highlight", function (highlightEvent) {
-        highlightedId = highlightEvent.id;
+        highlightedIds = highlightEvent.ids;
         anyHighlighted = highlightEvent.anyHighlighted;
         render()
     });
@@ -66,13 +66,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     var registerBarEvents = function () {
         chartBarsComponents.forEach(function (barGroup) {
             barGroup.on("click", function (bar) {
-                chartLegendComponent.clickEntry({id: bar.id});
+                chartLegendComponent.clickEntry([bar.id]);
             });
             barGroup.on("mouseover", function (bar) {
-                chartLegendComponent.mouseOverEntry({id: bar.id})
+                chartLegendComponent.mouseOverEntry([bar.id])
             });
             barGroup.on("mouseout", function (bar) {
-                chartLegendComponent.mouseOutEntry({id: bar.id})
+                chartLegendComponent.mouseOutEntry([bar.id])
             });
         });
     };
@@ -81,11 +81,11 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var opacity = 1;
         if(anyHighlighted){
             opacity = 0.2;
-            if(highlightedId === d.id) opacity = 1;
+            if(highlightedIds.indexOf(d.id) > -1) opacity = 1;
         }
         if(anySelected){
             opacity = 0.2;
-            if(selectedId === d.id) opacity = 1;
+            if(selectedIds.indexOf(d.id) > -1) opacity = 1;
         }
         return opacity
     };
