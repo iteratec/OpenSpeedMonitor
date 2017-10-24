@@ -71,7 +71,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         setJobGroups(state);
         setMeasurands(state);
         setSelectedFilter(state);
-        setAggregationValue(state)
+        setAggregationValue(state);
         loadedState = encodedState;
         if (state.selectedFolder) {
             $(window).trigger("historyStateLoaded");

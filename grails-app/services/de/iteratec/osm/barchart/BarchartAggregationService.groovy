@@ -60,23 +60,7 @@ class BarchartAggregationService {
             case 'avg': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
             case 'median': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
         }
-//        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
-//        List<BarchartAggregation> medians = []
-//        if (selectedAggregationValue == 'median') {
-//           return  medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
-//        }
-//        return mergeWithMedians(averages, medians)
     }
-
-//    private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {
-//        if (medians) {
-//            avgs.each { avg ->
-//                BarchartAggregation median = medians.find { it == avg }
-//                avg.median = median.value
-//            }
-//        }
-//        return avgs
-//    }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
         List<PageComparisonAggregation> comparisons = []

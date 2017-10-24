@@ -24,7 +24,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $("input[name='aggregationValue']").on("change", function () {
-            loadData();
+            renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -70,10 +70,14 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        jobGroupAggregationChart.render();
+        if (!data.groupData) jobGroupAggregationChart.render();
+        if (data.groupData && getAggregationValue() === data.groupData[0].aggregationValue) {
+            jobGroupAggregationChart.render();
+        }
     };
 
-    var loadData = function (isStateChanged) {
+    var loadData = function (isStateChange) {
+        console.log('loading Data');
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
@@ -83,10 +87,15 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
                 return $(e).text()
             })),
-            selectedSeries: JSON.stringify(selectedSeries),
-            selectedAggregationValue: JSON.stringify(getAggregationValue())
+            selectedSeries: JSON.stringify(selectedSeries)
         };
 
+        getDataForAggregationValue("median", queryData, isStateChange);
+        getDataForAggregationValue("avg", queryData, isStateChange);
+    };
+
+    function getDataForAggregationValue(aggregationValue, queryData, isStateChanged) {
+        queryData.selectedAggregationValue = aggregationValue;
         spinner.start();
         $.ajax({
             type: 'POST',
@@ -109,7 +118,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
                 }
             }
         });
-    };
+    }
 
     init();
     return {};

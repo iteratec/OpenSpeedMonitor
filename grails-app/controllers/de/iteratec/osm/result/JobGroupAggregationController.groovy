@@ -67,9 +67,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
             return
         }
 
-        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()
-//        List<String> measurandFieldName= allMeasurands.collect { (it as Measurand).getEventResultField() }
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(allMeasurands[0], CachedView.UNCACHED)
         List<BarchartAggregation> allEventResults = barchartAggregationService.getBarchartAggregationsFor(cmd)
 
@@ -92,7 +90,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         //Jobgroup groups and their values
         jobGroupAggregationChartDTO.groupData = allEventResults.collect {
-           new JobGroupDTO(jobGroup: it.jobGroup.name, avg: it.value, median: it.median)
+           new JobGroupDTO(jobGroup: it.jobGroup.name, value: it.value, aggregationValue: it.aggregationValue)
         }
 
         ControllerUtils.sendObjectAsJSON(response, jobGroupAggregationChartDTO)
