@@ -29,7 +29,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             return;
         }
 
-        var entries = svg.selectAll(".legend-entry").data(entryData, function(e) { return e[0].id + e[1].id });
+        var entries = svg.selectAll(".legend-entry").data(entryData, function(e) { return e['entries'][0].id + e['entries'][1].id });
         renderExit(entries.exit());
         renderEnter(entries.enter());
         renderUpdate(entries);
@@ -65,25 +65,25 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
         entryGroup.append('rect')
             .attr('width', colorPreviewSize)
             .attr('height', colorPreviewSize)
-            .attr('name', 'firstColor');
+            .attr('name', 'colorPreview');
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
-            .attr('name', 'similarity');
+            .attr('name', 'common');
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'firstText')
             .on("mouseover", function (d) {
-                mouseOverEntry(d[0])
+                mouseOverEntry(d['entries'][0])
             })
             .on("mouseout", function (d) {
-                mouseOutEntry(d[0])
+                mouseOutEntry(d['entries'][0])
             })
             .on("click", function (d) {
-                clickEntry(d[0])
+                clickEntry(d['entries'][0])
             });
 
         entryGroup.append("text")
@@ -98,13 +98,13 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .attr('y', colorPreviewSize)
             .attr('name', 'secondText')
             .on("mouseover", function (d) {
-                mouseOverEntry(d[1])
+                mouseOverEntry(d['entries'][1])
             })
             .on("mouseout", function (d) {
-                mouseOutEntry(d[1])
+                mouseOutEntry(d['entries'][1])
             })
             .on("click", function (d) {
-                clickEntry(d[1])
+                clickEntry(d['entries'][1])
             });
     };
 
@@ -121,13 +121,13 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             })
             .transition()
             .duration(transitionDuration);
-        updateSelection.select("[name=firstColor]")
+        updateSelection.select("[name=colorPreview]")
             .style('fill', function (d,i) {
                 var parent = d3.select(d3.select(this).node().parentNode);
                 parent.selectAll("[name=firstStop]")
-                    .attr("stop-color", d[0].color);
+                    .attr("stop-color", d['entries'][0].color);
                 parent.selectAll("[name=secondStop]")
-                    .attr("stop-color", d[1].color);
+                    .attr("stop-color", d['entries'][1].color);
                 parent.selectAll("[name=gradient]")
                     .attr("id","gradient"+i);
                 return "url(#gradient"+i+")";
@@ -135,44 +135,51 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .transition()
             .duration(transitionDuration)
             .style('opacity', function (d) {
-                return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d[0]), opacityFunction(anyIsSelected,anyIsHighlighted,d[1])])
+                return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])])
 
             });
-        updateSelection.select("[name=secondColor]")
-            .transition()
-            .duration(transitionDuration)
-            .style('fill', function (d) {
-                return d[1].color;
-            })
-            .style('opacity', function (d) {
-                return opacityFunction(anyIsSelected,anyIsHighlighted,d[1]);
-            });
-        updateSelection.select("[name=firstText")
+        updateSelection.select("[name=common]")
             .text(function (d) {
-                return d[0].label ;
+                return d.common ;
             })
             .transition()
             .duration(transitionDuration)
             .style('opacity', function (d) {
-                return opacityFunction(anyIsSelected,anyIsHighlighted,d[0]);
+                return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])]);
+            });
+        updateSelection.select("[name=firstText]")
+            .text(function (d) {
+                return d['entries'][0].label ;
+            })
+            .attr('x', function(d){
+                var commonWidth = d3.select(d3.select(this).node().parentNode).select("[name=common]").node().getBBox().width;
+                var commonWidthSpace = d.common !== ""? colorPreviewMargin:0;
+                return commonWidth + colorPreviewSize + colorPreviewMargin + commonWidthSpace
+            })
+            .transition()
+            .duration(transitionDuration)
+            .style('opacity', function (d) {
+                return opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][0]);
             });
 
         var symbolWidth = updateSelection.select("[name=compareSymbol]").node().getBBox().width;
 
         updateSelection.select("[name=compareSymbol")
             .attr('x', function(){
-                var firstWidth = d3.select(d3.select(this).node().parentNode).select("[name=firstText]").node().getBBox().width;
-                return firstWidth + colorPreviewSize + colorPreviewMargin * 2
+                var firstText = d3.select(d3.select(this).node().parentNode).select("[name=firstText]");
+                var firstWidth = firstText.node().getBBox().width;
+                var firstTextPosition = parseFloat(firstText.attr('x'));
+                return firstTextPosition + firstWidth + colorPreviewMargin
             })
             .transition()
             .duration(transitionDuration)
             .style('opacity', function (d) {
-                return d3.min([opacityFunction(anyIsSelected, anyIsHighlighted,d[0]), opacityFunction(anyIsSelected,anyIsHighlighted,d[1])])
+                return d3.min([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])])
             });
 
         updateSelection.select("[name=secondText")
             .text(function (d) {
-                return d[1].label ;
+                return d['entries'][1].label ;
             })
             .attr('x', function(){
                 var symbolX = d3.select(d3.select(this).node().parentNode).select("[name=compareSymbol]").attr('x');
@@ -181,7 +188,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .transition()
             .duration(transitionDuration)
             .style('opacity', function (d) {
-                return opacityFunction(anyIsSelected,anyIsHighlighted,d[1]);
+                return opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1]);
             });
     };
 
@@ -199,7 +206,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
 
     var calculateMaxEntryGroupWidth = function (svgForEstimation) {
         var labels = entryData.map(function (d) {
-            return d[0].label+ "<>" + d[1].label;
+            return d['common']+d['entries'][0].label+ "<>" + d['entries'][1].label;
         });
         var labelWidths = OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svgForEstimation, labels);
         return d3.max(labelWidths) + colorPreviewSize + entryMargin + colorPreviewMargin;
@@ -210,8 +217,8 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             return;
         }
         entryData.forEach(function (entry) {
-            entry[0].highlighted = entry[0].id === data.id;
-            entry[1].highlighted = entry[1].id === data.id;
+            entry['entries'][0].highlighted = entry['entries'][0].id === data.id;
+            entry['entries'][1].highlighted = entry['entries'][1].id === data.id;
         });
         render();
         callEventHandler("highlight", {
@@ -226,11 +233,13 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             return;
         }
         entryData.forEach(function (entry) {
-            if (entry[0].id === data.id) {
-                entry[0].highlighted = false;
+            var firstEntry = entry['entries'][0];
+            var secondEntry = entry['entries'][1];
+            if (firstEntry.id === data.id) {
+                firstEntry.highlighted = false;
             }
-            if (entry[1].id === data.id) {
-                entry[1].highlighted = false;
+            if (secondEntry.id === data.id) {
+                secondEntry.highlighted = false;
             }
         });
         render();
@@ -244,15 +253,17 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
     var clickEntry = function (data) {
         var idIsSelected = false;
         entryData.forEach(function (entry) {
-            entry[0].selected = (entry[0].id === data.id) ? !entry[0].selected : false;
-            entry[1].selected = (entry[1].id === data.id) ? !entry[1].selected : false;
-            entry[0].highlighted = false;
-            entry[1].highlighted = false;
-            if (entry[0].id === data.id) {
-                idIsSelected = entry[0].selected;
+            var firstEntry = entry['entries'][0];
+            var secondEntry = entry['entries'][1];
+            firstEntry.selected = (firstEntry.id === data.id) ? !firstEntry.selected : false;
+            secondEntry.selected = (secondEntry.id === data.id) ? !secondEntry.selected : false;
+            firstEntry.highlighted = false;
+            secondEntry.highlighted = false;
+            if (firstEntry.id === data.id) {
+                idIsSelected = firstEntry.selected;
             }
-            if (entry[1].id === data.id) {
-                idIsSelected = entry[1].selected;
+            if (secondEntry.id === data.id) {
+                idIsSelected = secondEntry.selected;
             }
         });
         render();
@@ -265,13 +276,13 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
 
     var isAnyEntrySelected = function () {
         return entryData.some(function(entry) {
-            return !!entry[0].selected || !!entry[1].selected;
+            return !!entry['entries'][0].selected || !!entry['entries'][1].selected;
         });
     };
 
     var isAnyEntryHighlighted = function () {
         return entryData.some(function(entry) {
-            return !!entry[0].highlighted || !!entry[1].highlighted;
+            return !!entry['entries'][0].highlighted || !!entry['entries'][1].highlighted;
         });
     };
 
