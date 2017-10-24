@@ -5,10 +5,10 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.EventResultProjection
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Unroll
-
 /**
  * Test-suite for {@link BarchartQueryAndCalculationService}.
  */
@@ -24,6 +24,7 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
     private SelectedMeasurand userTimingMeasurand
     private Page page_one, page_two
     private JobGroup jobGroup_one, jobGroup_two, jobGroup_three
+    private def TEST
 
     def setup() {
         OsmConfiguration.build()
@@ -32,8 +33,8 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
         userTimingMeasurand = new SelectedMeasurand(name: "mapsapi_apiboot2_firstmap", cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.USERTIMING_MARK)
     }
 
-    void "Test median for measurand and usertimings"() {
-        when: "Median service is called with query parameters"
+    void "Test service for measurand and usertimings"() {
+        when: "BarchartQueryAndCalculationService is called with query parameters"
         def medians = barchartQueryAndCalculationService.getMediansFor(
                 [jobGroup_one, jobGroup_two],
                 [page_one, page_two],
@@ -41,15 +42,29 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
                 tomorrow(),
                 [measurand, userTimingMeasurand]
         )
-        then: "Get calculated medians in EventResultProjections"
-        medians[0].projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
-        medians[0].projectedProperties.get(userTimingMeasurand.getDatabaseRelevantName()) == 2000
-        medians[1].projectedProperties.get(measurand.getDatabaseRelevantName()) == 1750
-        medians[2].projectedProperties.get(measurand.getDatabaseRelevantName()) == 3000
+        def avgs = barchartQueryAndCalculationService.getAveragesFor(
+                [jobGroup_one, jobGroup_two],
+                [page_one, page_two],
+                yesterday(),
+                tomorrow(),
+                [measurand, userTimingMeasurand]
+        )
+        then: "Get averages and calculated medians in EventResultProjections"
+
+
+        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_one, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
+        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_one, page_one).projectedProperties.get(userTimingMeasurand.getDatabaseRelevantName()) == 2000
+        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_two, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 3000
+        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_two, page_two).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1750
+
+        findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_one, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
+        findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_one, page_one).projectedProperties.get(userTimingMeasurand.getDatabaseRelevantName()) == 2000
+        findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_two, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 3000
+        findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_two, page_two).projectedProperties.get(measurand.getDatabaseRelevantName()) == 168000
     }
 
-    void "Test median for jobGroups only"() {
-        when: "Median service is called with query parameters"
+    void "Test service for jobGroups only"() {
+        when: "BarchartQueryAndCalculationService is called with query parameters"
         def medians = barchartQueryAndCalculationService.getMediansFor(
                 [jobGroup_one, jobGroup_two],
                 [],
@@ -57,14 +72,32 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
                 tomorrow(),
                 [measurand]
         )
-        then: "Get medians for jobGroupAggregation"
-        medians[0].projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
-        medians[1].projectedProperties.get(measurand.getDatabaseRelevantName()) == 2000
+        def avgs = barchartQueryAndCalculationService.getAveragesFor(
+                [jobGroup_one, jobGroup_two],
+                [],
+                yesterday(),
+                tomorrow(),
+                [measurand]
+        )
+        then: "Get averages and calculated medians for jobGroupAggregation"
+
+        findEventResultProjectionByJobGroup(medians, jobGroup_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
+        findEventResultProjectionByJobGroup(medians, jobGroup_two).projectedProperties.get(measurand.getDatabaseRelevantName()) == 2000
+
+        findEventResultProjectionByJobGroup(avgs, jobGroup_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
+        Math.round(findEventResultProjectionByJobGroup(avgs, jobGroup_two).projectedProperties.get(measurand.getDatabaseRelevantName())) == 144429
     }
 
-    void "Test median for jobGroups with no results"() {
-        when: "Median service is called with query parameters"
+    void "Test service for jobGroup with no results"() {
+        when: "BarchartQueryAndCalculationService is called with query parameters"
         def medians = barchartQueryAndCalculationService.getMediansFor(
+                [jobGroup_three],
+                [],
+                yesterday(),
+                tomorrow(),
+                [measurand]
+        )
+        def avgs = barchartQueryAndCalculationService.getAveragesFor(
                 [jobGroup_three],
                 [],
                 yesterday(),
@@ -73,12 +106,33 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
         )
         then: "Get no EventResultProjections since jobGroup is empty"
         medians.size() == 0
+        avgs.size() == 0
     }
 
     private buildTestJobGroups() {
         jobGroup_one = JobGroup.build(name: "test job one")
         jobGroup_two = JobGroup.build(name: "test job two")
         jobGroup_three = JobGroup.build(name: "test job three")
+    }
+
+    private EventResultProjection findEventResultProjectionByJobGroupAndPage(List eventResultProjections, JobGroup jobGroup, Page page) {
+        EventResultProjection result
+        eventResultProjections.each {
+            if (it.jobGroup == jobGroup && it.page == page) {
+                result = it
+            }
+        }
+        return result
+    }
+
+    private EventResultProjection findEventResultProjectionByJobGroup(List eventResultProjections, JobGroup jobGroup) {
+        EventResultProjection result
+        eventResultProjections.each {
+            if (it.jobGroup == jobGroup) {
+                result = it
+            }
+        }
+        return result
     }
 
     private buildTestPages() {
