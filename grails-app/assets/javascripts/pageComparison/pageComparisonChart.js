@@ -57,6 +57,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         firstPage.setOpacitiyFunction(determineBarOpacity);
         var secondPage = OpenSpeedMonitor.ChartComponents.ChartBars();
         secondPage.setData(data.getDataForBars(1));
+        secondPage.setOpacitiyFunction(determineBarOpacity);
         componentsToRender.push(secondPage);
         componentsToRender.push(firstPage);
         chartBarsComponents = componentsToRender;
