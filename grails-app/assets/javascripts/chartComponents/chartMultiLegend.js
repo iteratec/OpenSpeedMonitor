@@ -51,7 +51,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'common');
-        registerEventHandler(commonTextPart);
+        registerMouseEventsForComparison(commonTextPart);
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
@@ -164,7 +164,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .style('opacity', function (d) {
                 return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])]);
             });
-        
+
         updateSelection.select("[name=firstText]")
             .text(function (d) {
                 return d['entries'][0].label ;
