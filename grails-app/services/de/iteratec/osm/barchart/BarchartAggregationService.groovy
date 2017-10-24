@@ -15,7 +15,7 @@ class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
-    BarchartMedianService barchartMedianService
+    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -57,8 +57,8 @@ class BarchartAggregationService {
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
         switch(selectedAggregationValue) {
-            case 'avg': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
-            case 'median': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
+            case 'avg': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
+            case 'median': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
         }
     }
 

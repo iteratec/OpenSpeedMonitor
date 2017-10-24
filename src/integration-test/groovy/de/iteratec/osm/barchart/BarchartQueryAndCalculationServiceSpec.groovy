@@ -10,15 +10,15 @@ import grails.transaction.Rollback
 import spock.lang.Unroll
 
 /**
- * Test-suite for {@link BarchartMedianService}.
+ * Test-suite for {@link BarchartQueryAndCalculationService}.
  */
 
 @Integration
 @Rollback
 @Unroll
-class BarchartMedianServiceSpec extends NonTransactionalIntegrationSpec {
+class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegrationSpec {
 
-    BarchartMedianService barchartMedianService
+    BarchartQueryAndCalculationService barchartMedianService
 
     private SelectedMeasurand measurand
     private SelectedMeasurand userTimingMeasurand

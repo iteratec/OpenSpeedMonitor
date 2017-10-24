@@ -24,6 +24,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var autoWidth = true;
     var dataAvailalbe = false;
     var i18n = {};
+    var dataLength = 0;
 
     var setData = function (data) {
         transformAndMergeData(data);
@@ -34,7 +35,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         i18n = data.i18nMap || i18n;
         if (data.series || data.filterRules || data.selectedFilter || data.aggregationValue) {
             var filteredSeries = filterSeries(rawSeries);
-            if (filteredSeries.length === 2) filteredSeries.splice(1,1);
+            if (filteredSeries.length === dataLength*2) filteredSeries.splice(dataLength);
             Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
@@ -77,7 +78,8 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var transformAndMergeData = function (data) {
         if (data.series && !rawSeries.length > 0) {
-            rawSeries = data.series || rawSeries;
+            rawSeries = data.series;
+            dataLength = rawSeries.length;
             rawSeries.forEach(function (it) {
                 it[data.series[0].aggregationValue] = it.value;
                 delete it.value;

@@ -2,7 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarchartMedianService
+import de.iteratec.osm.barchart.BarchartQueryAndCalculationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -35,7 +35,7 @@ class DistributionChartController extends ExceptionHandlerController {
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
-    BarchartMedianService barchartMedianService
+    BarchartQueryAndCalculationService barchartQueryAndCalculationService
     PerformanceLoggingService performanceLoggingService
 
     def index() {
@@ -185,7 +185,7 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
-        List<EventResultProjection> aggregations = barchartMedianService.getRawDataFor(allJobGroups, allPages, from, to, selectedMeasurand)
+        List<EventResultProjection> aggregations = barchartQueryAndCalculationService.getRawDataFor(allJobGroups, allPages, from, to, selectedMeasurand)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {

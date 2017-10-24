@@ -13,7 +13,7 @@ import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
-class BarchartMedianService {
+class BarchartQueryAndCalculationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
