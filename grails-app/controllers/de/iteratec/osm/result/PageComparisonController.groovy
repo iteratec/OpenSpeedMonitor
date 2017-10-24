@@ -72,8 +72,8 @@ class PageComparisonController extends ExceptionHandlerController {
     private BarchartDatum mapToSeriesFor(BarchartAggregation aggregation) {
         return new BarchartDatum(
                 measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.selectedMeasurand.name}", aggregation.selectedMeasurand.name),
-                avg: aggregation.value,
-                median: aggregation.median,
+                value: aggregation.value,
+                aggregationValue: aggregation.aggregationValue,
                 grouping: "${aggregation.jobGroup.name} | ${aggregation.page.name}")
     }
 }

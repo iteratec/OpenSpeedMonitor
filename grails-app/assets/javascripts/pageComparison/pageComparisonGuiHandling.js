@@ -22,7 +22,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             loadData(false);
         });
         $("input[name='aggregationValue']").on("change", function () {
-            loadData(true);
+            renderChart({aggregationValue: getAggregationValue()}, true);
         });
         drawGraphButton.click(function () {
             loadData(true);
@@ -36,7 +36,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        pageComparisonChart.render();
+        if (!data.series)  pageComparisonChart.render();
+        if (data.series && getAggregationValue() === data.series[0].aggregationValue) {
+            pageComparisonChart.render();
+        }
     };
 
     var getAggregationValue = function () {
@@ -51,16 +54,23 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var loadData = function (isStateChange) {
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+        var queryData = {
+            from: selectedTimeFrame[0].toISOString(),
+            to: selectedTimeFrame[1].toISOString(),
+            measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
+            selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
+        };
+
+        getDataForAggregationValue("median", queryData, isStateChange);
+        getDataForAggregationValue("avg", queryData, isStateChange);
+    };
+
+    function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
+        queryData.selectedAggregationValue = aggregationValue;
         spinner.start();
         $.ajax({
             type: 'POST',
-            data: {
-                from: selectedTimeFrame[0].toISOString(),
-                to: selectedTimeFrame[1].toISOString(),
-                measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons()),
-                selectedAggregationValue: getAggregationValue()
-            },
+            data: queryData,
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
             success: function (data) {
@@ -84,6 +94,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         });
     };
+
     init();
     return {}
 })();
