@@ -26,7 +26,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var i18n = {};
 
     var setData = function (data) {
-        rawSeries = data.series || rawSeries;
+        transformAndMergeData(data);
         aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
         comparitiveValue = aggregationValue + "Comparative";
         filterRules = data.filterRules || filterRules;
@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             dataOrder = createDataOrder();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(dataOrder, data.i18nMap);
             headerText = chartLabelUtils.getCommonLabelParts(true);
-            headerText += getAggregationValueLabel();
+            headerText += headerText ? " - "+getAggregationValueLabel() : getAggregationValueLabel();
             sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
                 return s.label;
             });
@@ -57,6 +57,38 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var validateSelectedFilter = function (selectedFilter) {
         return (selectedFilter === "asc" || selectedFilter === "desc" || filterRules[selectedFilter]) ? selectedFilter : "desc";
+    };
+
+    var addAggregationToSeriesEntry = function(jobGroup, page, measurand, aggregationValue, value, valueComparative) {
+      rawSeries.forEach(function (it) {
+          if(it.jobGroup === jobGroup && it.page === page && it.measurand === measurand) {
+              it[aggregationValue] = value;
+              if (valueComparative) {it[aggregationValue+'Comparative'] = valueComparative}
+          }
+      })
+    };
+
+    var transformAndMergeData = function(data) {
+        if(data.series && !rawSeries.length > 0) {
+            rawSeries = data.series || rawSeries;
+            rawSeries.forEach(function(it){
+                it[data.series[0].aggregationValue] = it.value;
+                delete it.value;
+                if(data.hasComparativeData) {
+                    it[data.series[0].aggregationValue+'Comparative'] = it.valueComparative;
+                    delete it.valueComparative;
+                }
+            })
+        }
+        if(data.series && rawSeries && !rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)) {
+            data.series.forEach(function(it){
+                if(data.hasComparativeData) {
+                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value, it.valueComparative);
+                } else {
+                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value);
+                }
+            })
+        }
     };
 
     var getAggregationValueLabel = function () {

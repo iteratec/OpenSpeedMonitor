@@ -118,12 +118,11 @@ class PageAggregationController extends ExceptionHandlerController {
                         measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
                         measurand: it.selectedMeasurand.name,
                         measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
-                        avg: it.value,
-                        median: it.median,
-                        avgComparative: it.valueComparative,
-                        medianComparative: it.medianComparative,
+                        value: it.value,
+                        valueComparative: it.valueComparative,
                         page: it.page,
-                        jobGroup: it.jobGroup
+                        jobGroup: it.jobGroup,
+                        aggregationValue: it.aggregationValue
                 )
                 chartDto.series.add(seriesDto)
             }

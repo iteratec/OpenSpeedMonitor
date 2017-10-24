@@ -12,9 +12,8 @@ import groovy.transform.EqualsAndHashCode
 class BarchartAggregation {
     Double value
     Double valueComparative
-    Double median
-    Double medianComparative
     SelectedMeasurand selectedMeasurand
     Page page
     JobGroup jobGroup
+    String aggregationValue
 }

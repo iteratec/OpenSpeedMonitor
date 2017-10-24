@@ -55,23 +55,28 @@ class BarchartAggregationService {
             return []
         }
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
-        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
-        List<BarchartAggregation> medians = []
-        if (selectedAggregationValue == 'median') {
-            medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
+
+        switch(selectedAggregationValue) {
+            case 'avg': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
+            case 'median': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
         }
-        return mergeWithMedians(averages, medians)
+//        List<BarchartAggregation> averages = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
+//        List<BarchartAggregation> medians = []
+//        if (selectedAggregationValue == 'median') {
+//           return  medians = createListForEventResultProjection(selectedMeasurands, barchartMedianService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
+//        }
+//        return mergeWithMedians(averages, medians)
     }
 
-    private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {
-        if (medians) {
-            avgs.each { avg ->
-                BarchartAggregation median = medians.find { it == avg }
-                avg.median = median.value
-            }
-        }
-        return avgs
-    }
+//    private List<BarchartAggregation> mergeWithMedians(List<BarchartAggregation> avgs, List<BarchartAggregation> medians) {
+//        if (medians) {
+//            avgs.each { avg ->
+//                BarchartAggregation median = medians.find { it == avg }
+//                avg.median = median.value
+//            }
+//        }
+//        return avgs
+//    }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
         List<PageComparisonAggregation> comparisons = []
@@ -85,7 +90,7 @@ class BarchartAggregationService {
         }
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
         List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue)
-        cmd.selectedPageComparisons.each { comparison ->
+        cmd.selectedPageCompaFrisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
             pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId1 as long) && aggr.page.id == (comparison.pageId1 as long) }
             pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId2 as long) && aggr.page.id == (comparison.pageId2 as long) }
@@ -100,13 +105,12 @@ class BarchartAggregationService {
             comparativeValues.each { comparative ->
                 BarchartAggregation matches = values.find { it == comparative }
                 matches.valueComparative = comparative.value
-                matches.medianComparative = comparative.median
             }
         }
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
@@ -115,6 +119,7 @@ class BarchartAggregationService {
                         selectedMeasurand: selected,
                         jobGroup: aggregation.jobGroup,
                         page: aggregation.page,
+                        aggregationValue: selectedAggregationValue,
                 )
             }
         }
