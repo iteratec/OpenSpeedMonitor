@@ -25,11 +25,14 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         transformAndMergeData(data);
         aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue : aggregationValue;
         i18n = data.i18nMap || i18n;
-        if (data.series) {
+        if (data.series || data.aggregationValue) {
             filterData();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(createLabelFilterData(), data.i18nMap);
             headerText = chartLabelUtils.getCommonLabelParts(true);
-            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
+            headerText += headerText ? " - " + getAggregationValueLabel() : getAggregationValueLabel();
+            sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
+                return s.label;
+            });
         }
         fullWidth = data.width || fullWidth;
         autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
@@ -39,90 +42,99 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         dataAvailalbe = data.series ? true : dataAvailalbe;
     };
 
-    var createLabelFilterData = function () {
-      return [].concat.apply([], allPageData.map(function (groups) {
-          return groups.map(function (page) {
-              return {
-                  page: filterPageName(page.id),
-                  jobGroup: filterJobGroup(page.id),
-                  id: page.id
-              }
-          })
-      }))
+    var resetData = function () {
+        rawSeries = [];
     };
 
-    var addAggregationToSeriesEntry = function(jobGroup, page, measurand, aggregationValue, value, valueComparative) {
-        rawSeries.forEach(function (it) {
-            if(it.jobGroup === jobGroup && it.page === page && it.measurand === measurand) {
-                it[aggregationValue] = value;
-                if (valueComparative) {it[aggregationValue+'Comparative'] = valueComparative}
-            }
+    var createLabelFilterData = function () {
+        return [].concat.apply([], allPageData.map(function (groups) {
+            return groups.map(function (page) {
+                return {
+                    page: filterPageName(page.id),
+                    jobGroup: filterJobGroup(page.id),
+                    id: page.id
+                }
+            })
+        }))
+    };
+
+    var getAggregationValueLabel = function () {
+        if (aggregationValue === 'avg') {
+            return 'Average'
+        } else {
+            return 'Median'
+        }
+    };
+
+    var addAggregationToSeriesEntry = function (grouping, measurand, aggregationValue, value) {
+        rawSeries.forEach(function (compareTuple) {
+            compareTuple.data.forEach(function (it) {
+                if (it.grouping === grouping && it.measurand === measurand) {
+                    it[aggregationValue] = value;
+                }
+            })
         })
     };
 
-    var transformAndMergeData = function(data) {
-        if(data.series && !rawSeries.length > 0) {
+    var transformAndMergeData = function (data) {
+        if (data.series && !rawSeries.length > 0) {
             rawSeries = data.series || rawSeries;
-            rawSeries.forEach(function(it){
-                it[data.series[0].aggregationValue] = it.value;
-                delete it.value;
-                if(data.hasComparativeData) {
-                    it[data.series[0].aggregationValue+'Comparative'] = it.valueComparative;
-                    delete it.valueComparative;
-                }
+            rawSeries.forEach(function (compareTuple) {
+                compareTuple.data.forEach(function (it) {
+                    it[it.aggregationValue] = it.value;
+                    delete it.value;
+                });
             })
         }
-        if(data.series && rawSeries && !rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)) {
-            data.series.forEach(function(it){
-                if(data.hasComparativeData) {
-                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value, it.valueComparative);
-                } else {
-                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value);
-                }
+        if (data.series && rawSeries && !rawSeries[0].data[0].hasOwnProperty(data.series[0].data[0].aggregationValue)) {
+            data.series.forEach(function (compareTuple) {
+                compareTuple.data.forEach(function (it) {
+                    addAggregationToSeriesEntry(it.grouping, it.measurand, it.aggregationValue, it.value);
+                });
             })
         }
     };
 
-    var filterData = function(){
+    var filterData = function () {
         allPageData = [];
         var newMax = -1;
         hasLoadTime = false;
         var colors = OpenSpeedMonitor.ChartColorProvider().getColorScaleForComparison();
-        rawSeries.series.forEach(function (series,comparisonIndex) {
+        rawSeries.forEach(function (series, comparisonIndex) {
             series.data.forEach(function (dataElement, pageIndex) {
                 allPageData[pageIndex] = allPageData[pageIndex] || [];
-                var id = dataElement.grouping+comparisonIndex;
+                var id = dataElement.grouping + comparisonIndex;
                 var add = {
                     id: id,
                     label: dataElement.grouping,
-                    value: dataElement.value,
+                    value: dataElement[aggregationValue],
                     unit: series.dimensionalUnit,
                     color: colors(id)
                 };
-                if(series.dimensionalUnit === "ms") hasLoadTime = true;
+                if (series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[pageIndex].push(add);
-                if(dataElement.value > newMax) newMax = dataElement.value;
+                if (dataElement[aggregationValue] > newMax) newMax = dataElement[aggregationValue];
             })
         });
         max = newMax;
     };
 
     var filterPageName = function (grouping) {
-        return grouping.substring(grouping.lastIndexOf("|")+1,grouping.length).trim()
+        return grouping.substring(grouping.lastIndexOf("|") + 1, grouping.length).trim()
     };
 
-    var filterJobGroup= function (grouping) {
+    var filterJobGroup = function (grouping) {
         return grouping.substring(0, grouping.lastIndexOf("|")).trim()
     };
 
-    var getActualSvgWidth = function() {
+    var getActualSvgWidth = function () {
         return svg.node().getBoundingClientRect().width;
     };
 
     var calculateChartBarsHeight = function () {
         var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
         var barGap = OpenSpeedMonitor.ChartComponents.common.barGap;
-        var numberOfBars = allPageData[0]? allPageData[0].length: 0;
+        var numberOfBars = allPageData[0] ? allPageData[0].length : 0;
         return (numberOfBars * barGap) + (numberOfBars * barBand);
     };
 
@@ -152,7 +164,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var getDataForBars = function (firstOrSecond) {
         var series = allPageData[firstOrSecond];
         return {
-            id: "page"+firstOrSecond,
+            id: "page" + firstOrSecond,
             individualColors: true,
             values: series,
             min: 0,
@@ -209,6 +221,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
 
     return {
         setData: setData,
+        resetData: resetData,
         getDataForHeader: getDataForHeader,
         getDataForBarScore: getDataForBarScore,
         getDataForSideLabels: getDataForSideLabels,

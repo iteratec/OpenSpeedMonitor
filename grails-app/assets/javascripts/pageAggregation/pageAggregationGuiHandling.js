@@ -199,6 +199,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var loadData = function (isStateChange) {
+        pageAggregationChart.resetData();
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();

@@ -37,7 +37,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         }
         if (!data.series)  pageComparisonChart.render();
-        if (data.series && getAggregationValue() === data.series[0].aggregationValue) {
+        if (data.series && getAggregationValue() === data.series[0].data[0].aggregationValue) {
             pageComparisonChart.render();
         }
     };
@@ -53,6 +53,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var loadData = function (isStateChange) {
+        pageComparisonChart.resetData();
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var queryData = {
             from: selectedTimeFrame[0].toISOString(),

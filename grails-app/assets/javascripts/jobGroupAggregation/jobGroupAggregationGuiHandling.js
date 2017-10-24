@@ -77,7 +77,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     };
 
     var loadData = function (isStateChange) {
-        console.log('loading Data');
+        jobGroupAggregationChart.resetData();
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 

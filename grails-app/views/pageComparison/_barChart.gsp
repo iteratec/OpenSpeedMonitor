@@ -1,5 +1,4 @@
 <div id="chart-container">
-<<<<<<< HEAD
     <div id="filter-dropdown-group" class="btn-group">
         <div class="btn-group pull-left" data-toggle="buttons" id="aggregationValueSwitch">
             <label class="btn btn-sm btn-default active" id="averageButton"><input type="radio" name="aggregationValue"
@@ -9,9 +8,6 @@
                                                                            value="median">Median</label>
         </div>
     </div>
-
-=======
->>>>>>> develop
     <div class="in-chart-buttons">
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"

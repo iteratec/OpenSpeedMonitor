@@ -49,6 +49,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         dataAvailable = rawSeries.groupData ? true : dataAvailable;
     };
 
+    var resetData = function () {
+        rawSeries = []
+    };
+
     var getDataForHeader = function () {
         return {
             width: fullWidth,
@@ -190,6 +194,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
 
     return {
         setData: setData,
+        resetData: resetData,
         getDataForHeader: getDataForHeader,
         getDataForBarScore: getDataForBarScore,
         getDataForSideLabels: getDataForSideLabels,

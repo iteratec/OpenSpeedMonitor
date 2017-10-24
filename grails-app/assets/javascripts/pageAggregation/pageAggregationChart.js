@@ -33,6 +33,10 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         toggleBarComponentHighlight(highlightEvent.id, highlightEvent.anyHighlighted, highlightEvent.highlighted);
     });
 
+    var resetData = function () {
+        data.resetData();
+    }
+
     var setData = function (inputData) {
         data.setData(inputData);
         chartHeaderComponent.setData(data.getDataForHeader());
@@ -199,7 +203,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     return {
         render: render,
-        setData: setData
+        setData: setData,
+        resetData: resetData
     };
 
 });
