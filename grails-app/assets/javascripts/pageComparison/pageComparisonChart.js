@@ -8,7 +8,7 @@
 //= require /chartComponents/chartHeader
 //= require /chartComponents/chartBarScore
 //= require /chartComponents/chartBars
-
+//= require /chartComponents/chartMultiLegend.js
 
 "use strict";
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
@@ -16,43 +16,77 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) {
 
-    var svg = d3.select(chartIdentifier),
-        allBarsGroup,
-        trafficLightBars,
-        transitionDuration = 600,
-        headerLine;
+    var svg = d3.select(chartIdentifier);
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var data = OpenSpeedMonitor.ChartModules.PageComparisonData(svg);
     var chartBarsComponents = {};
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
-    // var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
+    var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartMultiLegend();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
+    var highlightedId = "";
+    var anyHighlighted = false;
+    var selectedId = "";
+    var anySelected = false;
+
+
+    chartLegendComponent.on("select", function (selectEvent) {
+        selectedId = selectEvent.id;
+        anySelected = selectEvent.anySelected;
+        render()
+    });
+
+    chartLegendComponent.on("highlight", function (highlightEvent) {
+        highlightedId = highlightEvent.id;
+        anyHighlighted = highlightEvent.anyHighlighted;
+        render()
+    });
 
     var setData = function (inputData) {
         data.setData(inputData);
         chartHeaderComponent.setData(data.getDataForHeader());
         chartBarScoreComponent.setData(data.getDataForBarScore());
+        chartLegendComponent.setData(data.getDataForLegend());
         setBarChartData();
-
-    };
-
-
-    var initChart = function () {
-        svg = d3.select(chartIdentifier);
-
-        headerLine = svg.append("g");
-        allBarsGroup = svg.append("g");
-        trafficLightBars = svg.append("g");
+        registerBarEvents();
     };
 
     var setBarChartData = function () {
         var componentsToRender = [];
         var firstPage = OpenSpeedMonitor.ChartComponents.ChartBars();
         firstPage.setData(data.getDataForBars(0));
+        firstPage.setOpacitiyFunction(determineBarOpacity);
         var secondPage = OpenSpeedMonitor.ChartComponents.ChartBars();
         secondPage.setData(data.getDataForBars(1));
         componentsToRender.push(secondPage);
         componentsToRender.push(firstPage);
         chartBarsComponents = componentsToRender;
+    };
+
+    var registerBarEvents = function () {
+        chartBarsComponents.forEach(function (barGroup) {
+            barGroup.on("click", function (bar) {
+                chartLegendComponent.clickEntry({id: bar.id});
+            });
+            barGroup.on("mouseover", function (bar) {
+                chartLegendComponent.mouseOverEntry({id: bar.id})
+            });
+            barGroup.on("mouseout", function (bar) {
+                chartLegendComponent.mouseOutEntry({id: bar.id})
+            });
+        });
+    };
+
+    var determineBarOpacity = function (d) {
+        var opacity = 1;
+        if(anyHighlighted){
+            opacity = 0.2;
+            if(highlightedId === d.id) opacity = 1;
+        }
+        if(anySelected){
+            opacity = 0.2;
+            if(selectedId === d.id) opacity = 1;
+        }
+        return opacity
     };
 
     var render = function () {
@@ -61,8 +95,9 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
         var barScorePosY = data.getChartBarsHeight() + OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin*2;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
-        var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight ;
-
+        var legendPosY = barScorePosY;
+        var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
+        var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
         svg.transition()
             .duration(transitionDuration)
             .style("height", chartHeight)
@@ -80,9 +115,24 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
         renderHeader(svg);
         renderBars(contentGroup);
-        renderBarScore(svg, shouldShowScore, barScorePosY)
-
+        renderBarScore(svg, shouldShowScore, barScorePosY);
+        renderLegend(contentGroup, legendPosY);
     };
+
+    var renderLegend = function (svg, posY) {
+        var legend = svg.selectAll(".chart-legend-group").data([chartLegendComponent]);
+        legend.exit()
+            .remove();
+        legend.enter()
+            .append("g")
+            .attr("class", "chart-legend-group")
+            .attr("transform", "translate(0, " + posY + ")");
+        legend.call(chartLegendComponent.render)
+            .transition()
+            .duration(transitionDuration)
+            .attr("transform", "translate(0, " + posY + ")");
+    };
+
     var rerenderIfWidthChanged = function () {
         if (data.needsAutoResize()) {
             setData({autoWidth: true});
@@ -135,8 +185,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + posY + ")");
     };
-
-    initChart();
 
     return {
         setData: setData,

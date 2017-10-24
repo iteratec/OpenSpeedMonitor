@@ -174,7 +174,11 @@ describe("PageComparisonChartData data transformation", function () {
         });
         var barsOfFirstPage = pageComparisonData.getDataForBars(0);
         var barsOfSecondPage = pageComparisonData.getDataForBars(1);
-        expect(barsOfFirstPage.color).toEqual("#1660A7");
-        expect(barsOfSecondPage.color).toEqual("#558BBF");
+        expect(barsOfFirstPage.values[0].color).toEqual("#1f77b4");
+        expect(barsOfSecondPage.values[0].color).toEqual("#aec7e8");
+        expect(barsOfFirstPage.values[1].color).toEqual("#ff7f0e");
+        expect(barsOfSecondPage.values[1].color).toEqual("#ffbb78");
+        expect(barsOfFirstPage.values[2].color).toEqual("#2ca02c");
+        expect(barsOfSecondPage.values[2].color).toEqual("#98df8a");
     });
 });
