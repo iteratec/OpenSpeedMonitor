@@ -18,6 +18,13 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var eventHandlers = {};
 
+    //the triangles got 4 points instead of 3, so the transition to a square will work
+    var upperTriangle = '0,' +colorPreviewSize +' 0,0 '+ colorPreviewSize+',0 ' +colorPreviewSize/2 + ','+colorPreviewSize/2;
+    var upperTriangleClosed = '0,' +colorPreviewSize +' '+ '0,0' +' '+colorPreviewSize+',0 ' + colorPreviewSize+',0';
+    var lowerTriangleClosed = '0,' +colorPreviewSize +' '+ colorPreviewSize + ','+colorPreviewSize +' '+colorPreviewSize+',0 ' + colorPreviewSize+','+colorPreviewSize;
+    var lowerTriangle = '0,' +colorPreviewSize +' '+ colorPreviewSize/2 + ','+colorPreviewSize/2 +' '+colorPreviewSize+',0 ' + colorPreviewSize+','+colorPreviewSize;
+    var square = '0,' +colorPreviewSize +' 0,0 '+colorPreviewSize+',0 ' + colorPreviewSize+','+colorPreviewSize;
+
     var setData = function (data) {
         width = data.width || 300;
         entryData = data.entries || entryData;
@@ -40,55 +47,11 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .attr("class", "legend-entry")
             .classed("d3chart-legend-entry", true);
 
-        var gradient = entryGroup.append("defs")
-            .append("linearGradient")
-            .attr("id", "gradient")
-            .attr("name", "gradient")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradient.append("stop")
-            .attr("name","firstStop")
-            .attr("offset", "0%")
-            .attr("stop-color", "#fff")
-            .attr("stop-opacity", 1);
-
-        gradient.append("stop")
-            .attr("id","secondStop")
-            .attr("offset", "100%")
-            .attr("stop-color", "#fff")
-            .attr("stop-opacity", 1);
-
-        entryGroup.append('rect')
-            .attr('width', colorPreviewSize)
-            .attr('height', colorPreviewSize)
-            .attr('name', 'colorPreview')
-            .on("mouseover", function (d) {
-                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
-            })
-            .on("mouseout", function (d) {
-                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
-            })
-            .on("click", function (d) {
-                clickEntry([d['entries'][0].id,d['entries'][1].id])
-            });
-
-        entryGroup.append("text")
+        var commonTextPart = entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
-            .attr('name', 'common')
-            .on("mouseover", function (d) {
-                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
-            })
-            .on("mouseout", function (d) {
-                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
-            })
-            .on("click", function (d) {
-                clickEntry([d['entries'][0].id,d['entries'][1].id])
-            });
+            .attr('name', 'common');
+        registerEventHandler(commonTextPart);
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
@@ -104,7 +67,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
                 clickEntry([d['entries'][0].id])
             });
 
-        entryGroup.append("text")
+        var compareSymbol = entryGroup.append("text")
             .attr('font-family', 'FontAwesome')
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
@@ -119,6 +82,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .on("click", function (d) {
                 clickEntry([d['entries'][0].id,d['entries'][1].id])
             });
+        registerMouseEventsForComparison(compareSymbol);
 
         entryGroup.append("text")
             .attr('x', colorPreviewSize + colorPreviewMargin)
@@ -133,6 +97,26 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .on("click", function (d) {
                 clickEntry([d['entries'][1].id])
             });
+
+        var firstColorTriangle = entryGroup.append("polygon")
+            .attr('name', 'firstColor')
+            .attr('points', upperTriangle)
+            .on("mouseover", function (d) {
+                mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("mouseout", function (d) {
+                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("click", function (d) {
+                clickEntry([d['entries'][0].id,d['entries'][1].id])
+            });
+        registerMouseEventsForComparison(firstColorTriangle);
+
+        var secondColorTriangle = entryGroup.append("polygon")
+            .attr('name', 'secondColor')
+            .attr('points', lowerTriangle);
+        registerMouseEventsForComparison(secondColorTriangle);
+
     };
 
     var renderUpdate = function(updateSelection) {
@@ -148,23 +132,29 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             })
             .transition()
             .duration(transitionDuration);
-        updateSelection.select("[name=colorPreview]")
-            .style('fill', function (d,i) {
-                var parent = d3.select(d3.select(this).node().parentNode);
-                parent.selectAll("[name=firstStop]")
-                    .attr("stop-color", d['entries'][0].color);
-                parent.selectAll("[name=secondStop]")
-                    .attr("stop-color", d['entries'][1].color);
-                parent.selectAll("[name=gradient]")
-                    .attr("id","gradient"+i);
-                return "url(#gradient"+i+")";
+
+        updateSelection.select('[name=firstColor')
+            .style('fill', function (d) {
+                return d['entries'][0].color;
             })
             .transition()
             .duration(transitionDuration)
             .style('opacity', function (d) {
                 return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])])
+            })
+            .attr('points', firstColorTriangleFunction);
 
-            });
+        updateSelection.select('[name=secondColor')
+            .style('fill', function (d) {
+                return d['entries'][1].color;
+            })
+            .transition()
+            .duration(transitionDuration)
+            .style('fill-opacity', function (d) {
+                return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])])
+            })
+            .attr('points', secondColorTriangleFunction);
+
         updateSelection.select("[name=common]")
             .text(function (d) {
                 return d.common ;
@@ -174,6 +164,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             .style('opacity', function (d) {
                 return d3.max([opacityFunction(anyIsSelected, anyIsHighlighted,d['entries'][0]), opacityFunction(anyIsSelected,anyIsHighlighted,d['entries'][1])]);
             });
+        
         updateSelection.select("[name=firstText]")
             .text(function (d) {
                 return d['entries'][0].label ;
@@ -219,8 +210,44 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             });
     };
 
+    var secondColorTriangleFunction = function (d) {
+        var first = d['entries'][0];
+        var second = d['entries'][1];
+        if((first.selected || first.highlighted) && !second.highlighted && !second.selected){
+            return lowerTriangleClosed
+        } else if(!first.highlighted && !first.selected && (second.highlighted || second.selected)) {
+            return square
+        } else {
+            return lowerTriangle
+        }
+    };
+
+    var firstColorTriangleFunction = function (d) {
+        var first = d['entries'][0];
+        var second = d['entries'][1];
+        if((first.highlighted || first.selected) && !second.highlighted && !second.selected){
+            return square
+        } else if(!first.highlighted && !first.selected && (second.highlighted || second.selected)) {
+            return upperTriangleClosed
+        } else {
+            return upperTriangle
+        }
+    };
+
     var opacityFunction = function (anyIsSelected, anyIsHighlighted, d) {
         return (anyIsSelected && !d.selected) || (anyIsHighlighted && !d.highlighted) ? 0.2 : 1;
+    };
+
+    var registerMouseEventsForComparison = function (element) {
+        element.on("mouseover", function (d) {
+            mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("mouseout", function (d) {
+                mouseOutEntry([d['entries'][0].id,d['entries'][1].id])
+            })
+            .on("click", function (d) {
+                clickEntry([d['entries'][0].id,d['entries'][1].id])
+            });
     };
 
     var renderExit = function (exitSelection) {
