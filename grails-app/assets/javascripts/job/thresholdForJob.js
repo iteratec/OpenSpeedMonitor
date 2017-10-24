@@ -3,31 +3,36 @@
 //= require job/thresholdTabMeasuredEventVue.js
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
+//= require job/thresholdTabNewThresholdVue.js
 
 "use strict";
 
 new Vue({
     el: '#threshold',
-    props:['jobId'],
     data: {
         thresholds: [],
         measuredEvents: [],
         measurands: [],
-        newThreshold: {},
         tmpThreshold: {},
-        newThresholdState: false
+        newThresholdState: false,
+        jobId: "",
+        scriptId: ""
+    },
+    beforeMount: function () {
+        this.jobId = this.$el.attributes['jobId'].value;
+        this.scriptId = this.$el.attributes['scriptId'].value;
     },
     computed: {},
-    created: function () {
+    mounted: function () {
         this.getMeasurands("/job/getMeasurands");
-        this.getMeasuredEvents(148, "/script/getMeasuredEventsForScript");
+        this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
         this.fetchData();
     },
     methods: {
         fetchData: function () {
             this.thresholds = [];
             var self = this;
-            this.getThresholdsForJob(277).success(function (result) {
+            this.getThresholdsForJob(this.jobId).success(function (result) {
                 result.forEach(function (resultEvent) {
                     var thresholdsForEvent = [];
                     resultEvent.thresholds.forEach(function (threshold) {
@@ -77,26 +82,27 @@ new Vue({
                 });
             }
         },
-        addThreshold: function (job, createThresholdUrl) {
+        createThreshold: function (newThreshold) {
             var self = this;
             $.ajax({
                 type: 'POST',
                 data: {
-                    job: job,
-                    measurand: this.newThreshold.measurand.name,
-                    measuredEvent: this.newThreshold.measuredEvent.id,
-                    lowerBoundary: this.newThreshold.lowerBoundary,
-                    upperBoundary: this.newThreshold.upperBoundary
+                    job: this.jobId,
+                    measurand: newThreshold.measurand.name,
+                    measuredEvent: newThreshold.measuredEvent.id,
+                    lowerBoundary: newThreshold.lowerBoundary,
+                    upperBoundary: newThreshold.upperBoundary
                 },
-                url: createThresholdUrl,
+                url: "/threshold/createAsync",
                 success: function (result) {
-                    self.newThreshold.id = result.thresholdId;
+                    newThreshold.id = result.thresholdId;
+
                     var added = false;
                     //Add threshold to measured event
                     self.thresholds.forEach(function (measuredEventItem) {
-                        if (measuredEventItem.measuredEvent.id === self.newThreshold.measuredEvent.id) {
+                        if (measuredEventItem.measuredEvent.id === newThreshold.measuredEvent.id) {
                             measuredEventItem.thresholdList.push({
-                                threshold: self.newThreshold,
+                                threshold: newThreshold,
                                 edit: false
                             });
 
@@ -107,13 +113,13 @@ new Vue({
                     //Add measured event if it is not existing
                     if (!added) {
                         var list = [{
-                            threshold: self.newThreshold,
+                            threshold: newThreshold,
                             edit: false
-                        }]
+                        }];
                         self.thresholds.push({
-                            measuredEvent: self.newThreshold.measuredEvent,
+                            measuredEvent: newThreshold.measuredEvent,
                             thresholdList: list
-                        })
+                        });
                     }
 
                     self.newThreshold = {};
@@ -138,7 +144,7 @@ new Vue({
                     self.thresholds.forEach(function (measuredEventItem) {
                         //remove threshold from measured event
                         if (measuredEventItem.measuredEvent.id === deletedThreshold.threshold.measuredEvent.id) {
-                            measuredEventItem.thresholdList.splice(measuredEventItem.thresholdList.indexOf(deletedThreshold), 1)
+                            measuredEventItem.thresholdList.splice(measuredEventItem.thresholdList.indexOf(deletedThreshold), 1);
 
                             //remove measured event
                             if (measuredEventItem.thresholdList.length === 0) {
@@ -146,7 +152,6 @@ new Vue({
                             }
                         }
                     });
-
                 },
                 error: function (e) {
                     console.log(e);

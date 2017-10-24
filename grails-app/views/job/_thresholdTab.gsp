@@ -1,17 +1,11 @@
-<%@ page import="de.iteratec.osm.result.Threshold" %>
-<%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
-<%@ page import="de.iteratec.osm.result.Measurand" %>
-
-<div id="threshold" :jobId="${job?.id}" :scriptId="${job?.script?.id}">
+<div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
     <div>
         <div id="thresholdList">
-            <div>
-                <div v-for="thresholdItem in thresholds">
-                    <threshold-measured-event :thresholds="thresholdItem"
-                                              v-on:delete-threshold="deleteThreshold"
-                                              v-on:update-threshold="updateThreshold"></threshold-measured-event>
-                    <br>
-                </div>
+            <div v-for="thresholdItem in thresholds">
+                <threshold-measured-event :thresholds="thresholdItem"
+                                          v-on:delete-threshold="deleteThreshold"
+                                          v-on:update-threshold="updateThreshold"></threshold-measured-event>
+                <br>
             </div>
         </div>
     </div>
@@ -29,60 +23,16 @@
         </button><br>
 
         <span v-if="newThresholdState">
-            <div>
-                <select id="measuredEvent" name="measuredEvent" class="form-control thresholdSelects"
-                        v-model="newThreshold.measuredEvent">
-                    <option v-for="measuredEvent in measuredEvents"
-                            :value="measuredEvent">{{measuredEvent.name}}</option>
-                </select>
-            </div>
-            <select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand"
-                    v-model="newThreshold.measurand">
-                <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
-            </select>
-
-            <div class="thresholdBoundaries form-inline thresholdSelects">
-                <label class="labelGood">
-                    Good
-                </label>
-                <label>
-                    <
-                </label>
-                <input id="lowerBoundary" class="form-control" type="number" min="1"
-                       name="lowerBoundary" cols="30"
-                       rows="5"
-                       maxlength="150"
-                       v-model="newThreshold.lowerBoundary"/>
-                <label>
-                    ms <
-                </label>
-                <label class="labelOk">
-                    OK
-                </label>
-                <label>
-                    <
-                </label>
-                <input id="upperBoundary" class="form-control" type="number" min="1"
-                       name="upperBoundary" cols="40"
-                       rows="5"
-                       maxlength="150"
-                       v-model="newThreshold.upperBoundary"/>
-                <label>
-                    ms <
-                </label>
-                <label class="labelBad">
-                    Bad
-                </label>
-                <button type="button" class="margins btn btn-default"
-                        @click="addThreshold('${job}', '${g.createLink([controller: 'threshold', action: 'createAsync'])}')">
-                    <i class="fa text-success fa-lg fa-plus"></i>
-                </button>
-            </div>
+            <threshold-new-threshold :measured-events="measuredEvents"
+                                     :measurands="measurands"
+                                     v-on:create-threshold="createThreshold"></threshold-new-threshold>
         </span>
     </div>
 </div>
 
 <g:render template="thresholdTabMeasuredEventVue"/>
+<g:render template="thresholdTabNewThresholdVue"/>
+
 <asset:javascript src="job/thresholdForJob.js"/>
 
 %{--
