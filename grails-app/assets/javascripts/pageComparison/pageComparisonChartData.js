@@ -131,20 +131,31 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var getDataForLegend = function () {
         return {
             entries: allPageData[0].map(function (page, i) {
-                return [
-                    extractLegendEntry(page),
-                    extractLegendEntry(allPageData[1][i])
-                ]
+                var commonText = extractCommonPart(page,allPageData[1][i]);
+                return {
+                    entries: [extractLegendEntry(page, commonText), extractLegendEntry(allPageData[1][i], commonText)],
+                    common: removeHeaderTextFromCommonPart(commonText)
+                }
             }),
             width: chartBarsWidth
         };
     };
 
-    var extractLegendEntry = function (entry) {
+    var removeHeaderTextFromCommonPart = function (commonText) {
+        return commonText.replace('|','').trim() === headerText?"":commonText
+    };
+
+    var extractCommonPart = function (firstPage, secondPage) {
+        var firstPageGroup = firstPage.label.substring(0,firstPage.label.indexOf('|') + 1);
+        var secondPageGroup = secondPage.label.substring(0,firstPage.label.indexOf('|') + 1);
+        return firstPageGroup === secondPageGroup? firstPageGroup.trim(): ""
+    };
+
+    var extractLegendEntry = function (entry, commonPart) {
         return {
             id: entry.id,
             color: entry.color,
-            label: entry.label
+            label: entry.label.replace(commonPart,"").trim()
         }
     };
 
