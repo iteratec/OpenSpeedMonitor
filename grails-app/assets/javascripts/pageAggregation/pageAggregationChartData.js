@@ -34,6 +34,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         i18n = data.i18nMap || i18n;
         if (data.series || data.filterRules || data.selectedFilter || data.aggregationValue) {
             var filteredSeries = filterSeries(rawSeries);
+            if (filteredSeries.length === 2) filteredSeries.splice(1,1);
             Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
