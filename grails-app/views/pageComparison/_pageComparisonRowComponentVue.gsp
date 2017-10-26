@@ -40,7 +40,7 @@
         </select>
 
     </div>
-    <div v-if="index"class="col-sm-2">
+    <div v-bind:class="[isOnlyRow()? 'hidden':'', 'col-sm-2']">
         <a href="#" role="button" v-bind:id="'removeComparisonRow'+index"   >
             <i class="fa fa-times" aria-hidden="true"></i>
         </a>

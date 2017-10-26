@@ -4,7 +4,7 @@
         <div v-for="(comparison,index) in comparisons" id="measurandSeries-clone"
              class="row form-group addPageComparisonRow">
             <comparison-component v-bind:comparisonData="comparison" v-bind:jobgroups="jobGroups"
-                                  v-bind:grouptopagesmap="groupToPagesMap" v-bind:index="index"></comparison-component>
+                                  v-bind:grouptopagesmap="groupToPagesMap" v-bind:index="index" v-bind:amount="comparisons.length"></comparison-component>
         </div>
         <div class="col-md-2"></div>
         <div class="col-md-8">
