@@ -28,10 +28,12 @@
                                      v-on:create-threshold="createThreshold"></threshold-new-threshold>
         </span>
     </div>
+    <threshold-generate-script class="justify-content-md-center"></threshold-generate-script>
 </div>
 
 <g:render template="thresholdTabMeasuredEventVue"/>
 <g:render template="thresholdTabNewThresholdVue"/>
+<g:render template="thresholdTabGenerateScriptVue"/>
 
 <asset:javascript src="job/thresholdForJob.js"/>
 
