@@ -311,9 +311,6 @@ class JobController {
         toggleActive(false)
     }
 
-    def addThreshold(){
-    }
-
     def nextExecution() {
         Map model = [:]
         model['cronstring'] = params.value
@@ -384,12 +381,29 @@ class JobController {
     }
 
     /**
+     * Returns a ci script which checks whether the measurements matches the thresholds.
      *
      * @param jobId
+     * @param params
      * @return
      */
-    def getMeasurands() {
+    def getCiScript(String jobId){
+        Long job = Long.parseLong(jobId)
+        String intervalTime = params['intervalTime']
+        String numberOfIntervals = params['numberOfIntervals']
 
+
+
+        return ""
+    }
+
+    /**
+     *
+     * Returns all measurands.
+     *
+     * @return All available measurands.
+     */
+    def getMeasurands() {
         render Measurand.collect() as JSON
     }
 

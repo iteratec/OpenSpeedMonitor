@@ -28,6 +28,7 @@
                                      v-on:create-threshold="createThreshold"></threshold-new-threshold>
         </span>
     </div>
+    <br> <br>
     <threshold-generate-script class="justify-content-md-center"></threshold-generate-script>
 </div>
 
