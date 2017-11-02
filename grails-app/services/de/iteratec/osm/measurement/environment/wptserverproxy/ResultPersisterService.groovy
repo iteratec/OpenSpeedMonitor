@@ -31,7 +31,6 @@ import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
-import grails.util.CollectionUtils
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
 import org.springframework.transaction.annotation.Propagation
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Propagation
 import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
 /**
  * Persists locations and results. Observer of ProxyService.
  * @author rschuett , nkuhn
@@ -519,9 +517,9 @@ class ResultPersisterService implements iResultListener {
 
     private void informDependent(EventResult result) {
 
-        if (result.medianValue && !result.measuredEvent.testedPage.isUndefinedPage()) {
+        if (result.medianValue) {
 
-            if (result.cachedView == CachedView.UNCACHED) {
+            if (result.cachedView == CachedView.UNCACHED && !result.measuredEvent.testedPage.isUndefinedPage()) {
                 log.debug('informing dependent measured values ...')
                 informDependentCsiAggregations(result)
                 log.debug('informing dependent measured values ... DONE')
