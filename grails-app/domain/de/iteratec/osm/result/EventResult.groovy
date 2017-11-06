@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.gorm.annotation.Entity
 
 
 /**
@@ -44,6 +45,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
  * @author mze
  * @see JobResult
  */
+@Entity
 class EventResult implements CsiValue {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
