@@ -1,5 +1,6 @@
 //= require bower_components/vue/dist/vue.js
 //= require bower_components/jquery/jquery.min.js
+//= require bower_components/file-saver/FileSaver.min.js
 //= require job/thresholdTabMeasuredEventVue.js
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
@@ -201,6 +202,7 @@ new Vue({
             this.newThresholdState = !this.newThresholdState
         },
         createScript: function () {
+            var self = this;
             $.ajax({
                 type: 'GET',
                 url: "/job/getCiScript",
@@ -209,6 +211,13 @@ new Vue({
                 },
                 success: function (result) {
                     console.log(result)
+                    var filename = "CI_Script_" + self.jobId + ".groovy";
+
+                    var blob = new Blob([result], {
+                        type: "text/plain;charset=utf-8"
+                    });
+
+                    saveAs(blob, filename);
                 },
                 error: function () {
                     return ""
