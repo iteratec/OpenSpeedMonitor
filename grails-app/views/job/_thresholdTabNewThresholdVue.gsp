@@ -19,13 +19,17 @@
         <label>
             <
         </label>
-        <input id="lowerBoundary" class="form-control" type="number" min="1"
-               name="lowerBoundary" cols="30"
-               rows="5"
-               maxlength="150"
-               v-model="newThreshold.lowerBoundary"/>
+
+        <div class="input-group">
+            <input id="lowerBoundary" class="form-control" type="number" min="1"
+                   name="lowerBoundary" cols="30"
+                   rows="5"
+                   maxlength="100"
+                   v-model="newThreshold.lowerBoundary"/>
+            <span class="input-group-addon">ms</span>
+        </div>
         <label>
-            ms <
+            <
         </label>
         <label class="labelOk">
             OK
@@ -33,11 +37,15 @@
         <label>
             <
         </label>
-        <input id="upperBoundary" class="form-control" type="number" min="1"
-               name="upperBoundary" cols="40"
-               rows="5"
-               maxlength="150"
-               v-model="newThreshold.upperBoundary"/>
+
+        <div class="input-group">
+            <input id="upperBoundary" class="form-control" type="number" min="1"
+                   name="upperBoundary" cols="40"
+                   rows="5"
+                   maxlength="100"
+                   v-model="newThreshold.upperBoundary"/>
+            <span class="input-group-addon">ms</span>
+        </div>
         <label>
             ms <
         </label>
