@@ -10,7 +10,9 @@ class MeasurementResultDto {
 
     Integer measuredValue
 
-    Integer missedValue
+    Integer lowerBoundary
+
+    Integer upperBoundary
 
     String evaluatedResult
 }

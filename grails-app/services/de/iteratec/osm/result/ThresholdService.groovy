@@ -30,25 +30,21 @@ class ThresholdService {
 
         return thresholds.collect {
 
-            Integer missedValue
-
             String evaluatedResult
             if (eventResult."$it.measurand.eventResultField" < it.lowerBoundary) {
                 evaluatedResult = ThresholdResult.GOOD.getResult()
-                missedValue = null
             } else if (eventResult."$it.measurand.eventResultField" > it.upperBoundary) {
                 evaluatedResult = ThresholdResult.BAD.getResult()
-                missedValue = it.upperBoundary
             } else {
                 evaluatedResult = ThresholdResult.OK.getResult()
-                missedValue = it.lowerBoundary
             }
 
             new MeasurementResultDto(
                     evaluatedResult: evaluatedResult,
                     measuredEvent: eventResult.measuredEvent.name,
                     measuredValue: eventResult."$it.measurand.eventResultField",
-                    missedValue: missedValue,
+                    lowerBoundary: it.lowerBoundary,
+                    upperBoundary: it.upperBoundary,
                     measurand: it.measurand)
         }
     }
