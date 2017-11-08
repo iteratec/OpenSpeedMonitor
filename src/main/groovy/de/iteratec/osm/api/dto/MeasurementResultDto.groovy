@@ -10,5 +10,7 @@ class MeasurementResultDto {
 
     Integer measuredValue
 
+    Integer missedValue
+
     String evaluatedResult
 }
