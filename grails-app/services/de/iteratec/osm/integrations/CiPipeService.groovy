@@ -6,6 +6,11 @@ import grails.transaction.Transactional
 @Transactional
 class CiPipeService {
 
+    /**
+     *
+     * @param job
+     * @return
+     */
     String getCiIntegrationScriptFor(Job job) {
 
         return this.class.classLoader.getResourceAsStream('OsmCiPipeCheck.groovy.template').text

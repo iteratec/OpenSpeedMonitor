@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.integrations.CiPipeService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
@@ -54,6 +55,7 @@ class JobController {
     InMemoryConfigService inMemoryConfigService
     ThresholdService thresholdService
     I18nService i18nService
+    CiPipeService ciPipeService
 
     private String getJobI18n() {
         return message(code: 'de.iteratec.isj.job', default: 'Job')
@@ -397,13 +399,9 @@ class JobController {
      * @return
      */
     def getCiScript(String jobId){
-        def job = jobId
-
-        String ciScript = new File("src\\main\\resources\\checkThresholds.groovy").getText('UTF-8')
-
-        ciScript = ciScript.replace('${jobId}', job)
-
-        render ciScript
+        Job job = Job.findById(Long.parseLong(jobId))
+        
+        render ciPipeService.getCiIntegrationScriptFor(job)
     }
 
     /**
