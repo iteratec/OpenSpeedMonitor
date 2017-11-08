@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
+import grails.gorm.annotation.Entity
 import grails.plugins.taggable.Taggable
 import grails.util.Environment
 
@@ -33,6 +34,7 @@ import org.quartz.CronExpression
  *
  * @see Script
  */
+@Entity
 class Job implements Taggable {
 
     def jobProcessingService

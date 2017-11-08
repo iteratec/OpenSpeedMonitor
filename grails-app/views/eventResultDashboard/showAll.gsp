@@ -205,7 +205,6 @@
             <div class="tab-pane" id="tabVariableSelection">
                 <g:render template="/_resultSelection/selectMeasuredVariables"
                           model="${['selectedAggrGroupValuesUnCached'   : selectedAggrGroupValuesUnCached,
-                                    'docCompleteTimeInMillisecsUncached': docCompleteTimeInMillisecsUncached,
                                     'aggrGroupValuesUnCached'           : aggrGroupValuesUnCached,
                                     'aggrGroupValuesCached'             : aggrGroupValuesCached,
                                     'selectedAggrGroupValuesCached'     : selectedAggrGroupValuesCached,

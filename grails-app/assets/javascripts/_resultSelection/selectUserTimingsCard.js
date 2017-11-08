@@ -14,7 +14,7 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     }
 
     function loopOverOptGroups(executeOperation, userTimings) {
-        $('.measurands-select-opt-groups').each(function (index, optGroupElement) {
+        $('.measurand-select').each(function (index, optGroupElement) {
             var optGroupUserTimings = $(optGroupElement).find('.measurand-opt-group-USER_TIMINGS');
             if (optGroupUserTimings) {
                 executeOperation(optGroupUserTimings, userTimings);
@@ -34,7 +34,18 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     }
 
     function executeUpdate(optGroupUserTimings, userTimings) {
+        var selectedOptions = [];
+        optGroupUserTimings.find('option:selected').each(function (index, option){
+            selectedOptions.push(option.value);
+        });
         OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, userTimings, null);
+        selectedOptions.forEach(function (value) {
+            optGroupUserTimings.find('option').each(function (index2, option){
+                if(option.value == value){
+                    option.selected = true;
+                }
+            });
+        });
     }
 
     init();

@@ -12,9 +12,6 @@ grails:
     iteratec:
       osm:
         security:
-          # if key contains special characters it must be quoted with single quotes, e.g. 'key-123'. It must NOT be quoted with ""!
-          # apiKey should only have alphanumerical characters and dashes [a-zA-Z0-9\-]+
-          initialDetailAnalysisApiKey: [apikey-for-communication-with-detailAnalysis-microservice]
           initialOsmAdminUser:
             username: [username-of-admin-user-to-be-bootsrapped]
             password: [password-of-admin-user-to-be-bootsrapped]
@@ -37,7 +34,10 @@ environments:
       serverURL: "http://localhost:8080" #the server needs to know its URL to communicate with the microservice
       de.iteratec.osm.detailAnalysis:
         enablePersistenceOfDetailAnalysisData: false
-        detailAnalysisMicroserviceUrl: "[url to your DetailAnalysisService instance]"
+        microserviceUrl: "[url to your DetailAnalysisService instance]"
+        # if key contains special characters it must be quoted with single quotes, e.g. 'key-123'. It must NOT be quoted with ""!
+        # apiKey should only have alphanumerical characters and dashes [a-zA-Z0-9\-]+
+        apiKey: [apikey-for-communication-with-detailAnalysis-microservice]
     dataSource:
       # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
       # So you can see all prepared sql statements hibernate creates and fires against your data
@@ -66,7 +66,10 @@ environments:
       serverURL: 'https://[base-url-of-your-prod-osm-instance]'
       de.iteratec.osm.detailAnalysis:
         enablePersistenceOfDetailAnalysisData: false
-        detailAnalysisMicroserviceUrl: "[url to your DetailAnalysisService instance]"
+        microserviceUrl: "[url to your DetailAnalysisService instance]"
+        # if key contains special characters it must be quoted with single quotes, e.g. 'key-123'. It must NOT be quoted with ""!
+        # apiKey should only have alphanumerical characters and dashes [a-zA-Z0-9\-]+
+        apiKey: [apikey-for-communication-with-detailAnalysis-microservice]
       mail:
         disabled: true # set this to true if you want to enable user registration and forgot passwort function
         #host: '[smtp.your.domain.com]'

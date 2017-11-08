@@ -6,10 +6,6 @@
     </h2>
 
     <div id="measurandSeries" class="measurandSeries">
-        %{--<g:if test="${selectedAggrGroupValuesUnCached.size() == 0}">--}%
-            <g:set var="selectedAggrGroupValuesUnCached"
-            value="${['docCompleteTimeInMillisecsUncached']}"/>
-        %{--</g:if>--}%
         <div id="measurands">
             <div class="row form-group addMeasurandRow">
 
@@ -58,5 +54,6 @@
 <asset:script type="text/javascript">
     $(window).load(function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectBarchartMeasurings.js"/>', 'barchartMeasurings');
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectUserTimingsCard.js" />');
     });
 </asset:script>

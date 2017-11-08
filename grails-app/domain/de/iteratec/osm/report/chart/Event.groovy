@@ -18,12 +18,13 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import groovy.json.StringEscapeUtils
+import grails.gorm.annotation.Entity
 
 /**
  * Represents an arbitrary event to be shown in dashboard diagrams as vertical lines with info text as hover info.
  * Could be deployments of measured web application for example.
  */
+@Entity
 class Event {
 
     Date eventDate

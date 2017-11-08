@@ -13,6 +13,8 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -51,7 +53,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put('pages', pages)
 
         // Measurands
-        modelToRender.put('measurandsUncached', Measurand.values().groupBy { it.measurandGroup })
+        modelToRender.put('measurandsUncached', SelectedMeasurand.createDataMapForOptGroupSelect())
 
         // JavaScript-Utility-Stuff:
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
@@ -77,53 +79,18 @@ class DistributionChartController extends ExceptionHandlerController {
 
         List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         List<Page> allPages = Page.findAllByNameInList(cmd.selectedPages)
-        //Measurand selectedMeasurand = Measurand.valueOf(cmd.selectedMeasurand)
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.selectedMeasurand, CachedView.UNCACHED)
 
-        List allEventResults = performanceLoggingService.logExecutionTime(DEBUG, "select EventResults for DistributionChart", 1) {
-            EventResult.createCriteria().list {
-                'in'('page', allPages)
-                'in'('jobGroup', allJobGroups)
-                'between'('jobResultDate', cmd.from.toDate(), cmd.to.toDate())
-                'between'(
-                    'fullyLoadedTimeInMillisecs',
-                    osmConfigCacheService.getMinValidLoadtime(),
-                    osmConfigCacheService.getMaxValidLoadtime()
-                )
-            }
-        }
-
-        // return if no data is available
-        if (!allEventResults) {
+        DistributionChartDTO distributionChartDTO = this.createSeries(selectedMeasurand, allPages, allJobGroups, cmd.from.toDate(), cmd.to.toDate())
+        if(!distributionChartDTO){
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
-
-        DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
-        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
-            allEventResults.each { result ->
-                def jobGroup = result.jobGroup.name.toString()
-                def page = result.page.toString()
-
-                def identifier = page + " | " + jobGroup
-
-                if (distributionChartDTO.series.get(identifier) == null) {
-                    distributionChartDTO.series.put(identifier, new DistributionTrace())
-                }
-
-                def newTrace = distributionChartDTO.series.get(identifier)
-                newTrace.jobGroup = jobGroup
-                newTrace.page = page
-                newTrace.data.add(selectedMeasurand.getNormalizedValueFrom(result))
-            }
-        }
-
         distributionChartDTO.dimensionalUnit = selectedMeasurand.measurandGroup.unit.label
 
-        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.isr.measurand.group."+selectedMeasurand.getMeasurandGroup(), "Measurand"))
+        distributionChartDTO.i18nMap.put("measurand", i18nService.msg("de.iteratec.isr.measurand.group." + selectedMeasurand.getMeasurandGroup(), "Measurand"))
         distributionChartDTO.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         distributionChartDTO.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
-
 
 //      TODO: see ticket [IT-1614]
         distributionChartDTO.filterRules = createFilterRules(allPages, allJobGroups)
@@ -131,7 +98,6 @@ class DistributionChartController extends ExceptionHandlerController {
 
         ControllerUtils.sendObjectAsJSON(response, distributionChartDTO)
     }
-
 
     /**
      * Creates Filter Rules for given Pages and JobGroups.
@@ -199,7 +165,6 @@ class DistributionChartController extends ExceptionHandlerController {
         return result
     }
 
-
     /**
      * Validates the command and creates an error message string if necessary.
      * @param cmd
@@ -216,5 +181,34 @@ class DistributionChartController extends ExceptionHandlerController {
             result += "<br />"
         }
         return result
+    }
+
+    private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
+        List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobGroupIn(allJobGroups)
+                .withJobResultDateBetween(from, to)
+                .withProjectedBaseProperty('jobGroup')
+                .withPageIn(allPages)
+                .withProjectedBaseProperty('page')
+                .withSelectedMeasurandsPropertyProjection([selectedMeasurand])
+                .getResults()
+        DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
+        if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
+            performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+                aggregations.each {
+                    if(it."${selectedMeasurand.getDatabaseRelevantName()}"){
+                        String identifier = "${it.page} | ${it.jobGroup}"
+                        if (!distributionChartDTO.series.get(identifier)) {
+                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: it.page, jobGroup: it.jobGroup))
+                        }
+                        def newTrace = distributionChartDTO.series.get(identifier)
+                        newTrace.data.add(selectedMeasurand.normalizeValue(it."${selectedMeasurand.getDatabaseRelevantName()}"))
+                    }
+                }
+            }
+            return distributionChartDTO
+        }else {
+            return null
+        }
     }
 }

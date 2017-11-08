@@ -1,8 +1,9 @@
 package de.iteratec.osm.measurement.script
 
-import de.iteratec.osm.csi.Page
+import grails.gorm.annotation.Entity
 import org.grails.databinding.BindUsing
 
+@Entity
 class ArchivedScript {
     /* Default (injected) attributes of GORM */
     Long	id

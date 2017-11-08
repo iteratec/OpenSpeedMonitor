@@ -147,7 +147,7 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
             i18n = i18nParameter;
             curr = 0;
             max = $('#elementsPerPage').val();
-            lastFilter = $('#elementNameFilter').val();
+            lastFilter = $('#elementNameFilter').val() || $('#elementFilter').val();
             offset = 0;
             onlyActive = onlyActiveParams || false;
 

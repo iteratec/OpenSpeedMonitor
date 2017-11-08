@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.gorm.annotation.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
@@ -24,6 +25,7 @@ import groovy.transform.EqualsAndHashCode
  * Uniquely identified through {@link #location} and {@link #wptServer}.
  */
 @EqualsAndHashCode
+@Entity
 class Location {
 
     String label
@@ -57,12 +59,12 @@ class Location {
     static belongsTo = [ wptServer: WebPageTestServer ]
 
     static constraints = {
-        label(maxSize: 150)
+        label(maxSize: 255)
         uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: ['wptServer', 'browser'])
         active(nullable: false)
         wptServer(nullable: false)
-        location(maxSize: 100)
-        browser(maxSize: 20)
+        location(maxSize: 255)
+        browser(nullable: false)
         activeagents(nullable: true, min: -2147483648, max: 2147483647)
         queuethreshold(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdgreenlimit(nullable: true, min: -2147483648, max: 2147483647)

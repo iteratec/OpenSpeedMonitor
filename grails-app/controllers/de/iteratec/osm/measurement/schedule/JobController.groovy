@@ -112,7 +112,11 @@ class JobController {
     }
 
     def index() {
-        getListModel()
+        if (flash.forceShowAllJobs) {
+            getListModel(flash.forceShowAllJobs)
+        } else {
+            getListModel()
+        }
     }
 
     def create() {
@@ -261,7 +265,12 @@ class JobController {
                 Job job = Job.get(it)
                 handler(job, massExecutionResults)
             }
-            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, performedAction: actionName, filters: params.filters])
+            flash.forceShowAllJobs = true
+            flash.selectedIds = selectedIds
+            flash.massExecutionResults = massExecutionResults
+            flash.performedAction = actionName
+            flash.filters = params.filters
+            redirect(action: 'index')
         } else {
             redirect(action: 'index', model: [filters: params.filters])
         }

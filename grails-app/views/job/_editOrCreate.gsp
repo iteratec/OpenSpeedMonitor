@@ -14,7 +14,7 @@
 <section id="${mode}-job" class="first">
     <h1><g:message code="default.${mode}.label" args="[entityDisplayName]"/></h1>
     <g:render template="messages"/>
-     <g:form resource="${entity}" method="post" role="form" class="form-horizontal" data-toggle="validator">
+    <g:form resource="${entity}" method="post" role="form" class="form-horizontal" data-toggle="validator">
 
         <g:hiddenField name="id" value="${entity?.id}"/>
         <g:hiddenField name="version" value="${entity?.version}"/>
@@ -83,7 +83,6 @@
 
                     doOnDomReady(
         ${job.label == null},
-                            "${g.createLink(action: 'nextExecution')}",
                             '${customConnNameForNative}',
         ${job.connectivityProfile ? job.connectivityProfile.id : 'null'},
         ${job.noTrafficShapingAtAll},

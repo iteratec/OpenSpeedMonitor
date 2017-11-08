@@ -16,7 +16,7 @@ class SelectedMeasurand {
             throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
 
-        if (isNoUserTiming(optionValue)) {
+        if (isMeasurand(optionValue)) {
             name = optionValue
             selectedType = SelectedMeasurandType.MEASURAND
         } else if (optionValue.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)) {
@@ -50,6 +50,10 @@ class SelectedMeasurand {
         return input / this.getMeasurandGroup().getUnit().getDivisor()
     }
 
+    String getDatabaseRelevantName() {
+        return this.selectedType.getDatabaseName(this.name)
+    }
+
     static Map createUserTimingOptionFor(String name, UserTimingType type) {
         return [name: name, id: type.selectedMeasurandType.optionPrefix + name]
     }
@@ -57,7 +61,7 @@ class SelectedMeasurand {
     static Map createDataMapForOptGroupSelect() {
         Map result = [:]
         MeasurandGroup.values().each { measurandGroup ->
-            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup })
+            result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {it.toString()})
             if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 result.put("USER_TIMINGS", [])
             }
@@ -65,16 +69,16 @@ class SelectedMeasurand {
         return result
     }
 
-    static boolean isNoUserTiming(String name) {
+    static boolean isMeasurand(String name) {
         return Measurand.values().any { it.toString() == name }
     }
 
-    static boolean couldBeUserTiming(UserTimingType userTimingType, String name){
-        return name.length() > userTimingType.selectedMeasurandType.optionPrefix.length() &&  name.startsWith(userTimingType.selectedMeasurandType.optionPrefix)
+    static boolean couldBeUserTiming(UserTimingType userTimingType, String name) {
+        return name.length() > userTimingType.selectedMeasurandType.optionPrefix.length() && name.startsWith(userTimingType.selectedMeasurandType.optionPrefix)
     }
 
     boolean isValid(String name) {
         name = name ?: ""
-        return isNoUserTiming(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
+        return isMeasurand(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
     }
 }

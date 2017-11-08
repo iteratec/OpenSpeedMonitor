@@ -11,7 +11,9 @@ import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 //TODO: save, edit and delete are altered to support on-the-fly start/stop of health reporting
 class GraphiteServerController {
+
     HealthReportService healthReportService
+
     static scaffold = GraphiteServer
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -69,7 +71,7 @@ class GraphiteServerController {
             return
         }
 
-        graphiteServer.save flush:true
+        graphiteServer.save(flush:true, failOnError: true)
         healthReportService.handleGraphiteServer(graphiteServer)
 
         request.withFormat {

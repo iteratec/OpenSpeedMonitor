@@ -8,6 +8,7 @@
     </div>
 
     <div id="svg-container">
+        <svg id="page-comparison-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
 <asset:script type="text/javascript">

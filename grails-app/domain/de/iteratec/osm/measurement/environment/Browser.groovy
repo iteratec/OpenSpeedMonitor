@@ -17,9 +17,11 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.gorm.annotation.Entity
 import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode(includes = 'name')
+@Entity
 class Browser {
 
     /**

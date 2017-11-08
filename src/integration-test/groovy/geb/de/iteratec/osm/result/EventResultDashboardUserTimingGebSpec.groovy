@@ -13,13 +13,11 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.ResultSelectionInformation
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
-import de.iteratec.osm.result.UserTimingSelectionInfomation
+import de.iteratec.osm.result.UserTimingSelectionInformation
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -226,7 +224,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
-            UserTimingSelectionInfomation.list().each {
+            UserTimingSelectionInformation.list().each {
                 it.delete()
             }
             ResultSelectionInformation.list().each {
@@ -683,15 +681,15 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     location: location2
             ).save()
 
-            List<UserTimingSelectionInfomation> userTimingSelectionInfomationForJobResult2 = []
+            List<UserTimingSelectionInformation> userTimingSelectionInfomationForJobResult2 = []
             userTimingSelectionInfomationForJobResult2.add(
-                    new UserTimingSelectionInfomation(
+                    new UserTimingSelectionInformation(
                             name: userTimingMarkName,
                             type: UserTimingType.MARK
                     )
             )
             userTimingSelectionInfomationForJobResult2.add(
-                    new UserTimingSelectionInfomation(
+                    new UserTimingSelectionInformation(
                             name: userTimingMeasureName,
                             type: UserTimingType.MEASURE
                     )

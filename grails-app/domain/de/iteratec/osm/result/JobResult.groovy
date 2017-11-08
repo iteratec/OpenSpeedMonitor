@@ -18,6 +18,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.JobStatisticService
+import grails.gorm.annotation.Entity
 import grails.util.Environment
 import org.grails.databinding.BindUsing
 
@@ -41,6 +42,7 @@ import org.grails.databinding.BindUsing
  * @see Job
  * @see EventResult
  */
+@Entity
 class JobResult {
 
     JobStatisticService jobStatisticService

@@ -1,7 +1,9 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -13,6 +15,8 @@ import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
+
+import java.util.concurrent.ConcurrentHashMap
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -175,7 +179,9 @@ class ResultSelectionController extends ExceptionHandlerController {
                     }
                 }
             })
-            return userTimings.collect{SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])}
+            return userTimings.collect {
+                SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
+            }.unique { a, b -> a.id <=> b.id }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
@@ -221,6 +227,37 @@ class ResultSelectionController extends ExceptionHandlerController {
                         name: it.name
                 ]
             }.sort { it.name }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
+    def getJobGroupToPagesMap(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            println 'send error'
+            sendError(command)
+            return
+        }
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+            def jobGroupAndPages = query(command, null, { existing ->
+                projections {
+                    distinct(['jobGroup','page'])
+                }
+            })
+            Map<Long, Map> map = [:].withDefault {[name:"", pages:[] as Set]}
+            jobGroupAndPages.each {
+                JobGroup jobGroup = it[0] as JobGroup
+                Page page = it[1] as Page
+                Map jobGroupMap = map[jobGroup.id]
+                jobGroupMap.name = jobGroup.name
+                jobGroupMap.pages << page
+            }
+            def nMap = [:].withDefault {[:]}
+            map.each{k,v ->
+                nMap[k].name = v.name
+                nMap[k].pages = v.pages.collect {[name: it.name, id: it.id]}.sort{it.name}
+            }
+            return nMap as ConcurrentHashMap
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

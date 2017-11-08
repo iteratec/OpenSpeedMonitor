@@ -26,6 +26,7 @@ module.exports = function (config) {
             {pattern: ASSET_PATH + '/javascripts/d3/chartColorProvider.js', watched: true},
             {pattern: ASSET_PATH +'/javascripts/chartComponents/*.js', watched: true},
             {pattern: ASSET_PATH +'/javascripts/pageAggregation/pageAggregationChartData.js', watched: true},
+            {pattern: ASSET_PATH +'/javascripts/pageComparison/pageComparisonChartData.js', watched: true},
             {pattern: ASSET_PATH +'/javascripts/d3/trafficLightDataProvider.js', watched: true},
             {pattern: TEST_PATH + '/specs/**/*.js', watched: true}
         ],
