@@ -48,8 +48,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             svg
                 .transition()
                 .duration(transitionDuration)
-                .style("height", chartHeight)
-                .each("end", rerenderIfWidthChanged);
+                .style("height", chartHeight);
 
             renderHeader(svg);
             renderSideLabels(svg, headerHeight);
@@ -117,13 +116,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             .transition()
             .style("opacity", 1)
             .duration(transitionDuration)
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var toggleBarHighlight = function (highlightGroupId) {

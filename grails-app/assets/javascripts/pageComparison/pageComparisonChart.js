@@ -101,8 +101,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
         svg.transition()
             .duration(transitionDuration)
-            .style("height", chartHeight)
-            .each("end", rerenderIfWidthChanged);
+            .style("height", chartHeight);
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
             .append("g")
@@ -132,13 +131,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .transition()
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + posY + ")");
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var renderBars = function (contentGroup) {

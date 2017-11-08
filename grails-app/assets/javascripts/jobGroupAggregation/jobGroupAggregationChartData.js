@@ -16,7 +16,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var chartBarsWidth = 700;
     var chartBarsHeight = 400;
     var fullWidth = chartSideLabelsWidth + chartBarsWidth;
-    var autoWidth = true;
     var dataAvailable = false;
     var labelList = [];
 
@@ -40,7 +39,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
             return s.label;
         });
-        fullWidth = autoWidth ? getActualSvgWidth() : fullWidth;
+        fullWidth = getActualSvgWidth();
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
         chartBarsWidth = fullWidth - OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
@@ -131,10 +130,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         return chartSideLabelsWidth;
     };
 
-    var needsAutoResize = function () {
-        return autoWidth && (Math.abs(getActualSvgWidth() - fullWidth) >= 1);
-    };
-
     var calculateChartBarsHeight = function () {
         var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
         var barGap = OpenSpeedMonitor.ChartComponents.common.barGap;
@@ -154,7 +149,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         isDataAvailable: isDataAvailable,
         getDataForBars: getDataForBars,
         hasLoadTimes: hasLoadTimes,
-        needsAutoResize: needsAutoResize,
         getChartBarsHeight: getChartBarsHeight,
         getChartSideLabelsWidth: getChartSideLabelsWidth
     }

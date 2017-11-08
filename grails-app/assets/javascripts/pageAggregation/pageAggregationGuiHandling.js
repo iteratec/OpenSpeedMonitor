@@ -73,7 +73,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             loadData(false);
         });
         $(window).on('resize', function() {
-            renderChart({autoWidth: true}, false);
+            renderChart({}, false);
         });
         $("input[name='stackBars']").on("change", function() {
             renderChart({stackBars: getStackBars()}, true);

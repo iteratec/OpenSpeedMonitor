@@ -77,8 +77,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         svg
             .transition()
             .duration(transitionDuration)
-            .style("height", chartHeight)
-            .each("end", rerenderIfWidthChanged);
+            .style("height", chartHeight);
 
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);
@@ -180,13 +179,6 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         return measurands.map(function (measurand) {
             return chartBarsComponents[measurand]
         });
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {

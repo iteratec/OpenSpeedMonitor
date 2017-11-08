@@ -16,7 +16,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var init = function () {
         $(window).on('resize', function () {
-            renderChart({autoWidth: true}, false);
+            renderChart({}, false);
         });
         $(window).on('historyStateLoaded', function () {
             loadData(false);

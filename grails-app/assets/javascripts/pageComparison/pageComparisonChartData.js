@@ -14,7 +14,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
     var sideLabelData = [];
     var rawSeries = [];
     var headerText = "";
-    var autoWidth = true;
     var dataAvailalbe = false;
     var hasLoadTime = false;
     var max = 0;
@@ -29,8 +28,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
             headerText = chartLabelUtils.getCommonLabelParts(true);
             sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
         }
-        fullWidth = data.width || fullWidth;
-        autoWidth = data.autoWidth !== undefined ? data.autoWidth : autoWidth;
         fullWidth = getActualSvgWidth();
         chartBarsWidth = fullWidth - chartSideLabelsWidth - OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
         chartBarsHeight = calculateChartBarsHeight();
@@ -163,10 +160,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         return allPageData[0].length
     };
 
-    var needsAutoResize = function () {
-        return autoWidth && (Math.abs(getActualSvgWidth() - fullWidth) >= 1);
-    };
-
     var getChartBarsHeight = function () {
         return chartBarsHeight;
     };
@@ -191,7 +184,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         getDataForSideLabels: getDataForSideLabels,
         isDataAvailable: isDataAvailable,
         getDataForBars: getDataForBars,
-        needsAutoResize: needsAutoResize,
         getChartBarsHeight: getChartBarsHeight,
         getChartSideLabelsWidth: getChartSideLabelsWidth,
         getComparisonAmount: getComparisonAmount,
