@@ -1,0 +1,140 @@
+@Grapes([
+  @Grab('io.github.http-builder-ng:http-builder-ng-core:1.0.2'),
+  @Grab('org.slf4j:slf4j-simple:1.7.25')
+])
+import groovyx.net.http.HttpBuilder
+import static groovyx.net.http.HttpBuilder.configure
+
+abstract class AsciiArtPatterns{
+
+  public static final TITLE = '''
+
+_______                    ________                 ______________  ___            __________              
+__  __ \\_____________________  ___/_______________________  /__   |/  /_______________(_)_  /______________
+_  / / /__  __ \\  _ \\_  __ \\____ \\___  __ \\  _ \\  _ \\  __  /__  /|_/ /_  __ \\_  __ \\_  /_  __/  __ \\_  ___/
+/ /_/ /__  /_/ /  __/  / / /___/ /__  /_/ /  __/  __/ /_/ / _  /  / / / /_/ /  / / /  / / /_ / /_/ /  /    
+\\____/ _  .___/\\___//_/ /_//____/ _  .___/\\___/\\___/\\__,_/  /_/  /_/  \\____//_/ /_//_/  \\__/ \\____//_/     
+       /_/                        /_/                                                                      
+________            _____________________            ______                                                
+___  __ \\______________  __/_  ____/__  /_______________  /__                                              
+__  /_/ /  _ \\_  ___/_  /_ _  /    __  __ \\  _ \\  ___/_  //_/                                              
+_  ____//  __/  /   _  __/ / /___  _  / / /  __/ /__ _  ,<                                                 
+/_/     \\___//_/    /_/    \\____/  /_/ /_/\\___/\\___/ /_/|_|                                                
+                                                                                                           
+
+      '''
+  public static final BAD = '''
+▄▄▄█████▓ ▒█████   ▒█████       ██████  ██▓     ▒█████   █     █░               
+▓  ██▒ ▓▒▒██▒  ██▒▒██▒  ██▒   ▒██    ▒ ▓██▒    ▒██▒  ██▒▓█░ █ ░█░               
+▒ ▓██░ ▒░▒██░  ██▒▒██░  ██▒   ░ ▓██▄   ▒██░    ▒██░  ██▒▒█░ █ ░█                
+░ ▓██▓ ░ ▒██   ██░▒██   ██░     ▒   ██▒▒██░    ▒██   ██░░█░ █ ░█                
+  ▒██▒ ░ ░ ████▓▒░░ ████▓▒░   ▒██████▒▒░██████▒░ ████▓▒░░░██▒██▓  ██▓  ██▓  ██▓ 
+  ▒ ░░   ░ ▒░▒░▒░ ░ ▒░▒░▒░    ▒ ▒▓▒ ▒ ░░ ▒░▓  ░░ ▒░▒░▒░ ░ ▓░▒ ▒   ▒▓▒  ▒▓▒  ▒▓▒ 
+    ░      ░ ▒ ▒░   ░ ▒ ▒░    ░ ░▒  ░ ░░ ░ ▒  ░  ░ ▒ ▒░   ▒ ░ ░   ░▒   ░▒   ░▒  
+  ░      ░ ░ ░ ▒  ░ ░ ░ ▒     ░  ░  ░    ░ ░   ░ ░ ░ ▒    ░   ░   ░    ░    ░   
+             ░ ░      ░ ░           ░      ░  ░    ░ ░      ░      ░    ░    ░  
+                                                                   ░    ░    ░  
+      '''
+  public static final OK = '''
+_____________ __
+__  __ \\__  //_/
+_  / / /_  ,<   
+/ /_/ /_  /| |  
+\\____/ /_/ |_|  
+      '''
+  public static final GOOD = '''
+________            ________          _____ 
+___  __ \\______________  __/____________  /_
+__  /_/ /  _ \\_  ___/_  /_ _  _ \\  ___/  __/
+_  ____//  __/  /   _  __/ /  __/ /__ / /_  
+/_/     \\___//_/    /_/    \\___/\\___/ \\__/  
+      '''
+  public static final FAILED = '''
+
+  █████▒▄▄▄       ██▓ ██▓    ▓█████ ▓█████▄ 
+▓██   ▒▒████▄    ▓██▒▓██▒    ▓█   ▀ ▒██▀ ██▌
+▒████ ░▒██  ▀█▄  ▒██▒▒██░    ▒███   ░██   █▌
+░▓█▒  ░░██▄▄▄▄██ ░██░▒██░    ▒▓█  ▄ ░▓█▄   ▌
+░▒█░    ▓█   ▓██▒░██░░██████▒░▒████▒░▒████▓ 
+ ▒ ░    ▒▒   ▓▒█░░▓  ░ ▒░▓  ░░░ ▒░ ░ ▒▒▓  ▒ 
+ ░       ▒   ▒▒ ░ ▒ ░░ ░ ▒  ░ ░ ░  ░ ░ ▒  ▒ 
+ ░ ░     ░   ▒    ▒ ░  ░ ░      ░    ░ ░  ░ 
+             ░  ░ ░      ░  ░   ░  ░   ░    
+                                     ░      
+      '''
+
+}
+
+final class PerformanceCheck{
+
+  long jobId
+
+  static final Map wptStatus = [100: 'Pending', 101: 'Running', 200: 'Ready'].withDefault{->'unknown'}
+
+  static final HttpBuilder osmRestClient = configure {
+    request.uri = '{{wptServerBaseUrl}}'
+    request.contentType = 'application/json'
+    request.headers['Accept'] = 'application/json'
+  }
+
+  public void fail(String msg){
+    println "\n${msg}"
+    println(AsciiArtPatterns.FAILED)
+    System.exit(1)
+  }
+
+  public String runMeasurement(){
+    String testId
+    try{
+      testId = osmRestClient.get{
+        request.uri.path = "/rest/job/run/${this.jobId}"
+        request.uri.query = [priority: 1]
+      }.target
+      if(!testId || testId == 'false'){
+        this.fail("FAILED: Didn't get a valid testId when starting measurement job with id=${this.jobId}.")
+      }
+    }catch(Exception e){
+      this.fail("FAILED: PerformanceCheck (jobId=${this.jobId}) couldn't get started.")
+    }
+    return testId
+  }
+
+  public def getResult(String testId) {
+    def thresholdResult
+    try{
+      for(int i = 0; i < 30; i++){
+        sleep(5000)
+        print("Waiting for testId ${testId}... ")
+        thresholdResult = osmRestClient.get{
+          request.uri.path = "/rest/job/getThresholdResults/${testId}"
+        }
+        println "status=${wptStatus[thresholdResult?.target?.status]}"
+        if(thresholdResult?.target?.status == 200){
+          break
+        }
+      }
+    }catch(Exception e){
+      this.fail("FAILED: Couldn't get the Result for testId=${testId} from OpenSpeedMonitor.")
+    }
+    if(thresholdResult?.target?.status != 200){
+      this.fail("FAILED: Measurement with testId '${testId}' couldn't get finished within 150 seconds!")
+    }
+    return thresholdResult
+  }
+
+}
+
+// script ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+println(AsciiArtPatterns.TITLE)
+
+PerformanceCheck check = new PerformanceCheck(jobId: {{jobId}})
+String testId = check.runMeasurement()
+def result = check.getResult(testId)
+
+println('\n')
+result.target.results.each{currentResult->
+  println("${currentResult.measuredEvent} => ${currentResult.evaluatedResult.toUpperCase()} (${currentResult.measurand}=${currentResult.measuredValue}ms)")
+}
+String overallResult = result.target.results.any{it.evaluatedResult == 'bad'} ? 'BAD' : result.target.results.any{it.evaluatedResult == 'ok'} ? 'OK' : 'GOOD'
+println(AsciiArtPatterns."$overallResult")
