@@ -4,7 +4,6 @@
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
 //= require job/thresholdTabNewThresholdVue.js
-//= require job/thresholdTabGenerateScriptVue.js
 
 "use strict";
 
@@ -200,6 +199,21 @@ new Vue({
         },
         changeNewThresholdState: function () {
             this.newThresholdState = !this.newThresholdState
+        },
+        createScript: function () {
+            $.ajax({
+                type: 'GET',
+                url: "/job/getCiScript",
+                data: {
+                    jobId: this.jobId
+                },
+                success: function (result) {
+                    console.log(result)
+                },
+                error: function () {
+                    return ""
+                }
+            });
         }
     }
 });

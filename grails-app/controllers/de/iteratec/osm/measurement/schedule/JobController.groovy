@@ -388,13 +388,13 @@ class JobController {
      * @return
      */
     def getCiScript(String jobId){
-        Long job = Long.parseLong(jobId)
-        String intervalTime = params['intervalTime']
-        String numberOfIntervals = params['numberOfIntervals']
+        def job = jobId
 
+        String ciScript = new File("src\\main\\resources\\checkThresholds.groovy").getText('UTF-8')
 
+        ciScript = ciScript.replace('${jobId}', job)
 
-        return ""
+        render ciScript
     }
 
     /**

@@ -18,7 +18,10 @@
             <span v-if="newThresholdState">Hide new Threshold</span>
             <span v-else>New Threshold</span>
         </button>
-        <button class="btn btn-default ciButton" type="button" id="copyToClipboard">
+        <button class="btn btn-default ciButton"
+                type="button"
+                id="copyToClipboard"
+                @click="createScript()">
             <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
         </button><br>
 
@@ -28,13 +31,10 @@
                                      v-on:create-threshold="createThreshold"></threshold-new-threshold>
         </span>
     </div>
-    <br> <br>
-    <threshold-generate-script class="justify-content-md-center"></threshold-generate-script>
 </div>
 
 <g:render template="thresholdTabMeasuredEventVue"/>
 <g:render template="thresholdTabNewThresholdVue"/>
-<g:render template="thresholdTabGenerateScriptVue"/>
 
 <asset:javascript src="job/thresholdForJob.js"/>
 
