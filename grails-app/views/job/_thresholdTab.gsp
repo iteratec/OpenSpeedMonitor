@@ -1,6 +1,6 @@
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
-    <div>
-        <div id="thresholdList">
+    <div class="container">
+        <div id="thresholdList" class="col-md-offset-1">
             <div v-for="thresholdItem in thresholds">
                 <threshold-measured-event :thresholds="thresholdItem"
                                           v-on:delete-threshold="deleteThreshold"
@@ -18,7 +18,7 @@
             <span v-if="newThresholdState">Hide new Threshold</span>
             <span v-else>New Threshold</span>
         </button>
-        <button class="btn btn-default ciButton"
+        <button class="btn btn-default"
                 type="button"
                 id="copyToClipboard"
                 @click="createScript()">

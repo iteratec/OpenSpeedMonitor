@@ -6,11 +6,12 @@
     <label>
         <
     </label>
-    <div class="input-group">
+    <div class="input-group thresholdInput">
     <input v-if="threshold.edit" id="lowerBoundaryEdit" class="form-control" type="number"
            min="1"
            name="lowerBoundary"
-           maxlength="100"
+           size="40"
+           maxlength="12"
            v-model="threshold.threshold.lowerBoundary"/>
     <input v-else id="lowerBoundaryShow" class="form-control float-right" type="number"
            min="1"
@@ -29,8 +30,8 @@
     <label>
         <
     </label>
-    <div class="input-group">
-        <input v-if="threshold.edit" id="upperBoundaryEdit" class="form-control" type="number"
+    <div class="input-group thresholdInput">
+        <input v-if="threshold.edit" id="upperBoundaryEdit" class="form-control thresholdInput" type="number"
                min="1"
                name="upperBoundary"
                maxlength="100"

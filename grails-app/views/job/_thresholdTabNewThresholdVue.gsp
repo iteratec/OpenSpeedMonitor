@@ -1,5 +1,5 @@
 <script type="text/x-template" id="threshold-tab-new-threshold-vue">
-<div>
+<div data-fv-framework="bootstrap">
     <div>
         <select id="measuredEvent" name="measuredEvent" class="form-control thresholdSelects"
                 v-model="newThreshold.measuredEvent">
@@ -20,12 +20,13 @@
             <
         </label>
 
-        <div class="input-group">
+        <div class="input-group thresholdInput">
             <input id="lowerBoundary" class="form-control" type="number" min="1"
                    name="lowerBoundary" cols="30"
                    rows="5"
                    maxlength="100"
-                   v-model="newThreshold.lowerBoundary"/>
+                   v-model="newThreshold.lowerBoundary"
+            required/>
             <span class="input-group-addon">ms</span>
         </div>
         <label>
@@ -38,7 +39,7 @@
             <
         </label>
 
-        <div class="input-group">
+        <div class="input-group thresholdInput">
             <input id="upperBoundary" class="form-control" type="number" min="1"
                    name="upperBoundary" cols="40"
                    rows="5"
