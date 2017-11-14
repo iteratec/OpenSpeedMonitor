@@ -1,12 +1,5 @@
 <script type="text/x-template" id="threshold-tab-new-threshold-vue">
 <div data-fv-framework="bootstrap">
-    <div>
-        <select id="measuredEvent" name="measuredEvent" class="form-control thresholdSelects"
-                v-model="newThreshold.measuredEvent">
-            <option v-for="measuredEvent in measuredEvents"
-                    :value="measuredEvent">{{measuredEvent.name}}</option>
-        </select>
-    </div>
     <select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand"
             v-model="newThreshold.measurand">
         <option v-for="measurand in measurands" :value="measurand">{{measurand.name}}</option>
@@ -48,15 +41,19 @@
             <span class="input-group-addon">ms</span>
         </div>
         <label>
-            ms <
+            <
         </label>
         <label class="labelBad">
             Bad
         </label>
-        <button type="button" class="margins btn btn-default"
-                @click="createThreshold(newThreshold)">
-            <i class="fa text-success fa-lg fa-plus"></i>
-        </button>
+        <span>
+            <button type="button"
+                    class="thresholdButton margins btn btn-success btn-xs"
+                    @click="createThreshold(threshold)">add</button>
+            <button type="button"
+                    class="thresholdButton btn btn-danger btn-xs"
+                    @click="removeThreshold(threshold)">remove</button>
+        </span>
     </div>
 </div>
 </script>

@@ -3,8 +3,10 @@
         <div id="thresholdList" class="col-md-offset-1">
             <div v-for="thresholdItem in thresholds">
                 <threshold-measured-event :thresholds="thresholdItem"
+                                          :measurands="measurands"
                                           v-on:delete-threshold="deleteThreshold"
-                                          v-on:update-threshold="updateThreshold"></threshold-measured-event>
+                                          v-on:update-threshold="updateThreshold"
+                                          v-on:create-threshold="createThreshold"></threshold-measured-event>
                 <br>
             </div>
         </div>
@@ -24,12 +26,6 @@
                 @click="createScript()">
             <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
         </button><br>
-
-        <span v-if="newThresholdState">
-            <threshold-new-threshold :measured-events="measuredEvents"
-                                     :measurands="measurands"
-                                     v-on:create-threshold="createThreshold"></threshold-new-threshold>
-        </span>
     </div>
 </div>
 

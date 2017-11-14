@@ -2,7 +2,7 @@
 "use strict";
 
 Vue.component('threshold-new-threshold', {
-    props: ['measured-events', 'measurands'],
+    props: ['threshold', 'measured-events', 'measurands'],
     data: function() {
         return {
             newThreshold: {}
@@ -12,6 +12,9 @@ Vue.component('threshold-new-threshold', {
     methods: {
         createThreshold: function (threshold) {
             this.$emit('create-threshold', threshold);
+        },
+        removeThreshold: function () {
+            this.$emit('remove-new-threshold', this.threshold);
         }
     }
 });
