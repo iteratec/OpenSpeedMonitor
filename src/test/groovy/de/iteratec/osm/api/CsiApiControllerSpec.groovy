@@ -1,5 +1,6 @@
 package de.iteratec.osm.api
 
+import de.iteratec.osm.api.dto.CsiConfigurationDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
@@ -7,39 +8,71 @@ import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import grails.buildtestdata.mixin.Build
+import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
-
-@TestFor(RestApiController)
+/**
+ * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
+ */
+@TestFor(CsiApiController)
 @Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup])
-@Build([Page, CsiConfiguration, JobGroup])
-class TranslateToCustomerSatisfactionSpec extends Specification {
+@Build([CsiConfiguration, Page, JobGroup])
+class CsiApiControllerSpec extends Specification {
 
     public static final String CSI_CONFIGURATION_LABEL = "csiConfiguration"
-    RestApiController controllerUnderTest
-
     CsiConfiguration csiConfiguration
     Page page
     JobGroup jobGroup
 
-    void "setup"() {
-        controllerUnderTest = controller
+    def setup() {
         createTestDataCommonToAllTests()
         mockTimeToCsMappingsService()
+    }
+
+    void "existing csiConfiguration by id as JSON"() {
+        given: "1 CsiConfiguration exists"
+        int csiConfigurationId = csiConfiguration.id
+        CsiConfigurationDto jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
+
+        when: "REST method to get the CsiConfiguration is called"
+        params.id = csiConfigurationId
+        controller.getCsiConfiguration()
+
+        then: "it returns the DTO representation of the CsiConfiguration"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.has('target')
+        resultJSON.target != null
+        resultJSON.target.each { key, value ->
+            value == jsonCsiConfiguration.getProperty(key)
+        }
+    }
+
+    void "return 404 when asking for non-existing csiConfiguration"() {
+        given: "no CsiConfiguration exists for given ID"
+        int csiConfigurationId = Integer.MAX_VALUE
+
+        when: "CsiConfiguration is queried for that ID"
+        params.id = csiConfigurationId
+        controller.getCsiConfiguration()
+
+        then: "response status is 404 (Not Found)"
+        response.status == 404
     }
 
     void "test translateToCustomerSatisfaction with pageName and system set"() {
         given:
         TranslateCustomerSatisfactionCommand cmd = new TranslateCustomerSatisfactionCommand(
-            pageName: page.name,
-            loadTimeInMillisecs: 100,
-            system: jobGroup.name
+                pageName: page.name,
+                loadTimeInMillisecs: 100,
+                system: jobGroup.name
         )
         String expectedCustomerSatisfaction = "customerSatisfactionInPercent:50.0"
 
         when:
-        controllerUnderTest.translateToCustomerSatisfaction(cmd)
+        controller.translateToCustomerSatisfaction(cmd)
 
         then:
         response.status == 200
@@ -49,14 +82,14 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
     void "test translateToCustomerSatisfaction with pageName and csiConfiguration set" () {
         given:
         TranslateCustomerSatisfactionCommand cmd = new TranslateCustomerSatisfactionCommand(
-            csiConfiguration: CSI_CONFIGURATION_LABEL,
-            pageName: page.name,
-            loadTimeInMillisecs: 100
+                csiConfiguration: CSI_CONFIGURATION_LABEL,
+                pageName: page.name,
+                loadTimeInMillisecs: 100
         )
         String expectedCustomerSatisfaction = "customerSatisfactionInPercent:50.0"
 
         when:
-        controllerUnderTest.translateToCustomerSatisfaction(cmd)
+        controller.translateToCustomerSatisfaction(cmd)
 
         then:
         response.status == 200
@@ -72,7 +105,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
         String expectedResponse = "Params loadTimeInMillisecs AND pageName AND (csiConfiguration or system) must be set."
 
         when: "translateToCustomerSatisfaction is called with that invalid command"
-        controllerUnderTest.translateToCustomerSatisfaction(cmd)
+        controller.translateToCustomerSatisfaction(cmd)
 
         then: "responses status is 400 and its text is the correct error message"
         response.status == 400
@@ -88,7 +121,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
         String expectedResponse = "Params loadTimeInMillisecs AND pageName AND (csiConfiguration or system) must be set."
 
         when: "translateToCustomerSatisfaction is called with that invalid command"
-        controllerUnderTest.translateToCustomerSatisfaction(cmd)
+        controller.translateToCustomerSatisfaction(cmd)
 
         then: "responses status is 400 and its text is the correct error message"
         response.status == 400
@@ -104,7 +137,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
         String expectedResponse = "Params loadTimeInMillisecs AND pageName AND (csiConfiguration or system) must be set."
 
         when: "translateToCustomerSatisfaction is called with that invalid command"
-        controllerUnderTest.translateToCustomerSatisfaction(cmd)
+        controller.translateToCustomerSatisfaction(cmd)
 
         then: "responses status is 400 and its text is the correct error message"
         response.status == 400
@@ -136,7 +169,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
     }
 
     void mockTimeToCsMappingsService() {
-        controllerUnderTest.timeToCsMappingService = Stub(TimeToCsMappingService){
+        controller.timeToCsMappingService = Stub(TimeToCsMappingService){
             getCustomerSatisfactionInPercent(_, _, _) >> { loadTimeInMilliSecs, page, csiConfig ->
                 TimeToCsMapping mapping = csiConfig.timeToCsMappings.find {
                     (it.loadTimeInMilliSecs == loadTimeInMilliSecs) && (it.page = page)
@@ -145,4 +178,5 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
             }
         }
     }
+
 }

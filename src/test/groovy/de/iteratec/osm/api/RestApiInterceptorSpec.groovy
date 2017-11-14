@@ -5,6 +5,8 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
+import static de.iteratec.osm.util.Constants.*
+
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
@@ -56,7 +58,7 @@ class RestApiInterceptorSpec extends Specification {
         interceptorUnderTest.before()
         then:
         interceptorUnderTest.response.status == 403
-        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+        interceptorUnderTest.response.text.equals(DEFAULT_ACCESS_DENIED_MESSAGE)
     }
     void "Test restApi interceptor - ApiKey param without matching ApiKey in db leads to status of 404"(){
         when:
@@ -64,7 +66,7 @@ class RestApiInterceptorSpec extends Specification {
         interceptorUnderTest.before()
         then:
         interceptorUnderTest.response.status == 403
-        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+        interceptorUnderTest.response.text.equals(DEFAULT_ACCESS_DENIED_MESSAGE)
     }
     void "Test restApi interceptor - Invalid ApiKey leads to status of 403"(){
         setup:
@@ -75,7 +77,7 @@ class RestApiInterceptorSpec extends Specification {
         interceptorUnderTest.before()
         then:
         interceptorUnderTest.response.status == 403
-        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+        interceptorUnderTest.response.text.equals(DEFAULT_ACCESS_DENIED_MESSAGE)
     }
 
 }

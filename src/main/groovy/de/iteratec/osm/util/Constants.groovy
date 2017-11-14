@@ -22,8 +22,5 @@ abstract class Constants {
     public static final String UNIQUE_STRING_DELIMITTER = ':::'
     public static final String HIGHCHART_LEGEND_DELIMITTER = ' | '
     public static final String COOKIE_KEY_CSI_DASHBOARD_TITLE = 'de-iteratec-osm-p13n-default-csi-dashboard-title'
-    public static final String COOKIE_KEY_CHARTING_LIB_TO_USE = 'de-iteratec-osm-p13n-charting-lib-to-use'
-    public static final String DECIMAL_FORMAT_PATTERN = "###,###.###"
-    /** Each list contains: load time in ms, customer satisfaction for five default mappings from
-     * impatient (index 1 in list) to patient (index 5 in list). */
+    public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 }
