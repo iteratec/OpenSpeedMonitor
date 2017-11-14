@@ -21,7 +21,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var data = OpenSpeedMonitor.ChartModules.JobGroupAggregationData(svg);
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var highlightedGroupId = null;
 
     var setData = function (inputData) {
@@ -57,10 +57,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             contentGroup.enter()
                 .append("g")
                 .classed("bars-content-group", true);
-            contentGroup
-                .transition()
-                .duration(transitionDuration)
-                .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+            contentGroup.attr("transform",
+                "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
             renderBars(contentGroup);
             renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         }

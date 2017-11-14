@@ -86,10 +86,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         contentGroup.enter()
             .append("g")
             .classed("bars-content-group", true);
-        contentGroup
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+        contentGroup.attr("transform",
+            "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
         renderBars(contentGroup);
         renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         renderLegend(contentGroup, legendPosY);

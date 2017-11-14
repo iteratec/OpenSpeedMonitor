@@ -107,10 +107,8 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .append("g")
             .classed("bars-content-group", true);
 
-        contentGroup
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", "translate(" + (data.getChartSideLabelsWidth()) + ", " + headerHeight + ")");
+        contentGroup.attr("transform",
+            "translate(" + (data.getChartSideLabelsWidth()) + ", " + headerHeight + ")");
 
 
         renderHeader(svg);

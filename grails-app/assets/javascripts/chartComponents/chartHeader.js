@@ -35,11 +35,11 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
           })
           .style("opacity", 0);
       text
+          .attr("x", width/2)
+          .attr("y", height)
           .transition()
           .duration(transitionDuration)
-          .style("opacity", 1)
-          .attr("x", width/2)
-          .attr("y", height);
+          .style("opacity", 1);
     };
 
     return {
