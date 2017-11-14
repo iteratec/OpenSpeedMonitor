@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
         fullWidth = getActualSvgWidth();
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
-        chartBarsWidth = fullWidth - OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin - chartSideLabelsWidth;
+        chartBarsWidth = fullWidth - 2*OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailalbe = data.series ? true : dataAvailalbe;
     };
@@ -332,7 +332,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         sortByMeasurandOrder: sortByMeasurandOrder
     }
 });
-OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin = 15;
 OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder = [
     "CS_BY_WPT_VISUALLY_COMPLETE",
     "CS_BY_WPT_DOC_COMPLETE",

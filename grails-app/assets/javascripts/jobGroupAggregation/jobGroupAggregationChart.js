@@ -39,7 +39,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
     var render = function () {
         if (data.isDataAvailable()) {
             var shouldShowScore = data.hasLoadTimes();
-            var componentMargin = OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin;
+            var componentMargin = OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
             var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
             var barScorePosY = data.getChartBarsHeight() + componentMargin;
             var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;

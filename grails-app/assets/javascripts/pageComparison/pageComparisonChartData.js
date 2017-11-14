@@ -29,7 +29,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
             sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) { return s.label;});
         }
         fullWidth = getActualSvgWidth();
-        chartBarsWidth = fullWidth - chartSideLabelsWidth - OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
+        chartBarsWidth = fullWidth - chartSideLabelsWidth - 2*OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailalbe = data.series ? true : dataAvailalbe;
     };
@@ -191,4 +191,3 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         getDataForLegend: getDataForLegend
     }
 });
-OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin = 15;

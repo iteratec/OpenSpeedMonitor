@@ -41,7 +41,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         });
         fullWidth = getActualSvgWidth();
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
-        chartBarsWidth = fullWidth - OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin - chartSideLabelsWidth;
+        chartBarsWidth = fullWidth - 2*OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailable = rawSeries.groupData ? true : dataAvailable;
     };
@@ -153,4 +153,3 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         getChartSideLabelsWidth: getChartSideLabelsWidth
     }
 });
-OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin = 15;
