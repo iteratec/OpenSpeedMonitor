@@ -5,14 +5,10 @@ package de.iteratec.osm.api.dto
  */
 class MeasurementResultDto {
     String measuredEvent
-
     String measurand
-
+    String unit
     Integer measuredValue
-
     Integer lowerBoundary
-
     Integer upperBoundary
-
     String evaluatedResult
 }

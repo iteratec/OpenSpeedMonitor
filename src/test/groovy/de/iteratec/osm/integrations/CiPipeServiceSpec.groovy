@@ -23,11 +23,10 @@ class CiPipeServiceSpec extends Specification {
 
         when:"CiIntegrationScript gets parametrized with that Jobs data"
         String ciScript = service.getCiIntegrationScriptFor(job)
-        println ciScript
 
         then: "Resulting script will run correct Job (id=#jobId) on correct OpenSpeedMonitor instance (baseUrl=#baseUrlWptServer)"
         //(?m) makes the regex multiline - allows you to use beginning (^) and end ($) of string operators
-        ciScript ==~ /(?ms).*new\sPerformanceCheck\(jobId\:\s${jobId}\).*/
+        ciScript ==~ /(?ms).*new\sPerformanceCheck\(${jobId}\).*/
         //(?s) - dotall flag - makes the regex match newlines with . (dot) operators
         ciScript ==~ /(?ms).*request\.uri\s\=\s\'${baseUrlWptServer}\'.*/
 

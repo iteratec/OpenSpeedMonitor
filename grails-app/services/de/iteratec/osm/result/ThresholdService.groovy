@@ -45,7 +45,9 @@ class ThresholdService {
                     measuredValue: eventResult."$it.measurand.eventResultField",
                     lowerBoundary: it.lowerBoundary,
                     upperBoundary: it.upperBoundary,
-                    measurand: it.measurand)
+                    measurand: it.measurand,
+                    unit: it.measurand.measurandGroup.unit.label
+            )
         }
     }
 

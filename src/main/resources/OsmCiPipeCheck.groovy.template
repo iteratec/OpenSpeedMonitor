@@ -5,136 +5,172 @@
 import groovyx.net.http.HttpBuilder
 import static groovyx.net.http.HttpBuilder.configure
 
+/**
+*   Ascii art for console output.
+*   @author nkuhn
+*/
 abstract class AsciiArtPatterns{
 
   public static final TITLE = '''
 
-_______                    ________                 ______________  ___            __________              
+_______                    ________                 ______________  ___            __________
 __  __ \\_____________________  ___/_______________________  /__   |/  /_______________(_)_  /______________
 _  / / /__  __ \\  _ \\_  __ \\____ \\___  __ \\  _ \\  _ \\  __  /__  /|_/ /_  __ \\_  __ \\_  /_  __/  __ \\_  ___/
-/ /_/ /__  /_/ /  __/  / / /___/ /__  /_/ /  __/  __/ /_/ / _  /  / / / /_/ /  / / /  / / /_ / /_/ /  /    
-\\____/ _  .___/\\___//_/ /_//____/ _  .___/\\___/\\___/\\__,_/  /_/  /_/  \\____//_/ /_//_/  \\__/ \\____//_/     
-       /_/                        /_/                                                                      
-________            _____________________            ______                                                
-___  __ \\______________  __/_  ____/__  /_______________  /__                                              
-__  /_/ /  _ \\_  ___/_  /_ _  /    __  __ \\  _ \\  ___/_  //_/                                              
-_  ____//  __/  /   _  __/ / /___  _  / / /  __/ /__ _  ,<                                                 
-/_/     \\___//_/    /_/    \\____/  /_/ /_/\\___/\\___/ /_/|_|                                                
-                                                                                                           
-
-      '''
-  public static final BAD = '''
-▄▄▄█████▓ ▒█████   ▒█████       ██████  ██▓     ▒█████   █     █░               
-▓  ██▒ ▓▒▒██▒  ██▒▒██▒  ██▒   ▒██    ▒ ▓██▒    ▒██▒  ██▒▓█░ █ ░█░               
-▒ ▓██░ ▒░▒██░  ██▒▒██░  ██▒   ░ ▓██▄   ▒██░    ▒██░  ██▒▒█░ █ ░█                
-░ ▓██▓ ░ ▒██   ██░▒██   ██░     ▒   ██▒▒██░    ▒██   ██░░█░ █ ░█                
-  ▒██▒ ░ ░ ████▓▒░░ ████▓▒░   ▒██████▒▒░██████▒░ ████▓▒░░░██▒██▓  ██▓  ██▓  ██▓ 
-  ▒ ░░   ░ ▒░▒░▒░ ░ ▒░▒░▒░    ▒ ▒▓▒ ▒ ░░ ▒░▓  ░░ ▒░▒░▒░ ░ ▓░▒ ▒   ▒▓▒  ▒▓▒  ▒▓▒ 
-    ░      ░ ▒ ▒░   ░ ▒ ▒░    ░ ░▒  ░ ░░ ░ ▒  ░  ░ ▒ ▒░   ▒ ░ ░   ░▒   ░▒   ░▒  
-  ░      ░ ░ ░ ▒  ░ ░ ░ ▒     ░  ░  ░    ░ ░   ░ ░ ░ ▒    ░   ░   ░    ░    ░   
-             ░ ░      ░ ░           ░      ░  ░    ░ ░      ░      ░    ░    ░  
-                                                                   ░    ░    ░  
+/ /_/ /__  /_/ /  __/  / / /___/ /__  /_/ /  __/  __/ /_/ / _  /  / / / /_/ /  / / /  / / /_ / /_/ /  /
+\\____/ _  .___/\\___//_/ /_//____/ _  .___/\\___/\\___/\\__,_/  /_/  /_/  \\____//_/ /_//_/  \\__/ \\____//_/
+       /_/                        /_/
+________            _____________________            ______
+___  __ \\______________  __/_  ____/__  /_______________  /__
+__  /_/ /  _ \\_  ___/_  /_ _  /    __  __ \\  _ \\  ___/_  //_/
+_  ____//  __/  /   _  __/ / /___  _  / / /  __/ /__ _  ,<
+/_/     \\___//_/    /_/    \\____/  /_/ /_/\\___/\\___/ /_/|_|
       '''
   public static final OK = '''
 _____________ __
 __  __ \\__  //_/
-_  / / /_  ,<   
-/ /_/ /_  /| |  
-\\____/ /_/ |_|  
+_  / / /_  ,<
+/ /_/ /_  /| |
+\\____/ /_/ |_|
       '''
   public static final GOOD = '''
-________            ________          _____ 
+________            ________          _____
 ___  __ \\______________  __/____________  /_
 __  /_/ /  _ \\_  ___/_  /_ _  _ \\  ___/  __/
-_  ____//  __/  /   _  __/ /  __/ /__ / /_  
-/_/     \\___//_/    /_/    \\___/\\___/ \\__/  
+_  ____//  __/  /   _  __/ /  __/ /__ / /_
+/_/     \\___//_/    /_/    \\___/\\___/ \\__/
       '''
   public static final FAILED = '''
 
-  █████▒▄▄▄       ██▓ ██▓    ▓█████ ▓█████▄ 
+  █████▒▄▄▄       ██▓ ██▓    ▓█████ ▓█████▄
 ▓██   ▒▒████▄    ▓██▒▓██▒    ▓█   ▀ ▒██▀ ██▌
 ▒████ ░▒██  ▀█▄  ▒██▒▒██░    ▒███   ░██   █▌
 ░▓█▒  ░░██▄▄▄▄██ ░██░▒██░    ▒▓█  ▄ ░▓█▄   ▌
-░▒█░    ▓█   ▓██▒░██░░██████▒░▒████▒░▒████▓ 
- ▒ ░    ▒▒   ▓▒█░░▓  ░ ▒░▓  ░░░ ▒░ ░ ▒▒▓  ▒ 
- ░       ▒   ▒▒ ░ ▒ ░░ ░ ▒  ░ ░ ░  ░ ░ ▒  ▒ 
- ░ ░     ░   ▒    ▒ ░  ░ ░      ░    ░ ░  ░ 
-             ░  ░ ░      ░  ░   ░  ░   ░    
-                                     ░      
+░▒█░    ▓█   ▓██▒░██░░██████▒░▒████▒░▒████▓
+ ▒ ░    ▒▒   ▓▒█░░▓  ░ ▒░▓  ░░░ ▒░ ░ ▒▒▓  ▒
+ ░       ▒   ▒▒ ░ ▒ ░░ ░ ▒  ░ ░ ░  ░ ░ ▒  ▒
+ ░ ░     ░   ▒    ▒ ░  ░ ░      ░    ░ ░  ░
+             ░  ░ ░      ░  ░   ░  ░   ░
+                                     ░
       '''
 
 }
 
-final class PerformanceCheck{
+/**
+*   Util class to run performance checks with runnig OpenSpeedMonitor instance.
+*   @author nkuhn
+*/
+final class PerformanceCheck {
 
   long jobId
+  def result
+  String testId
+  def thresholdResult
+  boolean testStatusAlreadyOk = false
 
-  static final Map wptStatus = [100: 'Pending', 101: 'Running', 200: 'Ready'].withDefault{->'unknown'}
+  public PerformanceCheck(long jobId){
+    this.jobId = jobId
+    println("${AsciiArtPatterns.TITLE}\n")
+  }
 
-  static final HttpBuilder osmRestClient = configure {
+  private static final Map wptStatus = [100: '...Pending', 101: '...Running', 200: '-> READY'].withDefault{->'unknown'}
+
+  private static final HttpBuilder osmRestClient = configure {
     request.uri = '{{wptServerBaseUrl}}'
     request.contentType = 'application/json'
     request.headers['Accept'] = 'application/json'
   }
 
-  public void fail(String msg){
+  private void fail(String msg){
     println "\n${msg}"
     println(AsciiArtPatterns.FAILED)
     System.exit(1)
   }
 
-  public String runMeasurement(){
-    String testId
+  /**
+  *   Starts the test.
+  */
+  public PerformanceCheck runMeasurement(){
+    println ("Running measurement (Job id=${this.jobId}).\n")
     try{
-      testId = osmRestClient.get{
-        request.uri.path = "/rest/job/run/${this.jobId}"
+      this.testId = osmRestClient.post{
+        request.uri.path = "/rest/job/${this.jobId}/run/"
         request.uri.query = [priority: 1]
       }.target
-      if(!testId || testId == 'false'){
+      if(!this.testId || this.testId == 'false'){
         this.fail("FAILED: Didn't get a valid testId when starting measurement job with id=${this.jobId}.")
       }
     }catch(Exception e){
       this.fail("FAILED: PerformanceCheck (jobId=${this.jobId}) couldn't get started.")
     }
-    return testId
+    return this
   }
 
-  public def getResult(String testId) {
-    def thresholdResult
+  /**
+  *   Waiting for the test to complete.
+  */
+  public PerformanceCheck waitForResult() {
     try{
       for(int i = 0; i < 30; i++){
         sleep(5000)
-        print("Waiting for testId ${testId}... ")
-        thresholdResult = osmRestClient.get{
-          request.uri.path = "/rest/job/getThresholdResults/${testId}"
+        this.printTestStatus("Waiting for testId ${this.testId} ")
+        this.thresholdResult = osmRestClient.get{
+          request.uri.path = "/rest/job/thresholdResult/${this.testId}"
         }
-        println "status=${wptStatus[thresholdResult?.target?.status]}"
-        if(thresholdResult?.target?.status == 200){
-          break
+        this.printTestStatus("${wptStatus[this.thresholdResult?.target?.status]}\n")
+        if(this.thresholdResult?.target?.status == 200){
+          this.printTestStatus("\nProcessing Result...\n")
+          this.testStatusAlreadyOk = true
+          if(this.thresholdResult?.target?.results?.size()){
+            break
+          }
         }
       }
     }catch(Exception e){
-      this.fail("FAILED: Couldn't get the Result for testId=${testId} from OpenSpeedMonitor.")
+      this.fail("FAILED: Couldn't get the Result for testId=${this.testId} from OpenSpeedMonitor.")
     }
-    if(thresholdResult?.target?.status != 200){
-      this.fail("FAILED: Measurement with testId '${testId}' couldn't get finished within 150 seconds!")
+    if(this.thresholdResult?.target?.status != 200){
+      this.fail("FAILED: Measurement with testId '${this.testId}' couldn't get finished within 150 seconds!")
     }
-    return thresholdResult
+    return this
+  }
+  /*
+  *   Evaluate the result and print it to the console.
+  */
+  public void evaluateAndPrint(){
+    if(!this.thresholdResult?.target?.results?.size()){
+      this.fail("Measurement Job with id '${this.jobId}' seems to have no Tresholds configured.")
+    }
+    println("")
+    this.thresholdResult.target.results.each{currentResult->
+      println("${currentResult.measuredEvent.padRight(25)} ${currentResult.measurand.padRight(25)} => ${currentResult.evaluatedResult.toUpperCase().padRight(5)} because ${getBecauseMsg(currentResult)}")
+    }
+    String overallResult = this.thresholdResult.target.results.any{it.evaluatedResult == 'bad'} ? 'FAILED' : this.thresholdResult.target.results.any{it.evaluatedResult == 'ok'} ? 'OK' : 'GOOD'
+    println(AsciiArtPatterns."$overallResult")
+  }
+  private String getBecauseMsg(def currentResult){
+    String msg = ''
+    switch(currentResult.evaluatedResult){
+      case 'good':
+        msg += "${currentResult.measuredValue} ${currentResult.unit} < ${currentResult.lowerBoundary} ${currentResult.unit}"
+        break
+      case 'bad':
+        msg += "${currentResult.measuredValue} ${currentResult.unit} > ${currentResult.upperBoundary} ${currentResult.unit}"
+        break
+      case 'ok':
+        msg += "${currentResult.lowerBoundary} ${currentResult.unit} < ${currentResult.measuredValue} ${currentResult.unit} < ${currentResult.upperBoundary} ${currentResult.unit}"
+        break
+      default:
+        this.fail("Measured result returned with an invalid value: ${currentResult.evaluatedResult}")
+    }
+    return msg
+  }
+  private void printTestStatus(String testStatus){
+    if(!this.testStatusAlreadyOk) print testStatus
   }
 
 }
 
-// script ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-println(AsciiArtPatterns.TITLE)
-
-PerformanceCheck check = new PerformanceCheck(jobId: {{jobId}})
-String testId = check.runMeasurement()
-def result = check.getResult(testId)
-
-println('\n')
-result.target.results.each{currentResult->
-  println("${currentResult.measuredEvent} => ${currentResult.evaluatedResult.toUpperCase()} (${currentResult.measurand}=${currentResult.measuredValue}ms)")
-}
-String overallResult = result.target.results.any{it.evaluatedResult == 'bad'} ? 'BAD' : result.target.results.any{it.evaluatedResult == 'ok'} ? 'OK' : 'GOOD'
-println(AsciiArtPatterns."$overallResult")
+new PerformanceCheck({{jobId}})
+  .runMeasurement()
+  .waitForResult()
+  .evaluateAndPrint()
