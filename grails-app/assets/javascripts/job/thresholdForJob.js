@@ -39,7 +39,8 @@ new Vue({
                     resultEvent.thresholds.forEach(function (threshold) {
                         thresholdsForEvent.push({
                             threshold: threshold,
-                            edit: false
+                            edit: false,
+                            saved: true
                         })
                     });
                     self.thresholds.push({
@@ -89,42 +90,22 @@ new Vue({
                 type: 'POST',
                 data: {
                     job: this.jobId,
-                    measurand: newThreshold.measurand.name,
-                    measuredEvent: newThreshold.measuredEvent.id,
-                    lowerBoundary: newThreshold.lowerBoundary,
-                    upperBoundary: newThreshold.upperBoundary
+                    measurand: newThreshold.threshold.measurand.name,
+                    measuredEvent: newThreshold.threshold.measuredEvent.id,
+                    lowerBoundary: newThreshold.threshold.lowerBoundary,
+                    upperBoundary: newThreshold.threshold.upperBoundary
                 },
                 url: "/threshold/createAsync",
                 success: function (result) {
-                    newThreshold.id = result.thresholdId;
-
-                    var added = false;
                     //Add threshold to measured event
                     self.thresholds.forEach(function (measuredEventItem) {
-                        if (measuredEventItem.measuredEvent.id === newThreshold.measuredEvent.id) {
-                            measuredEventItem.thresholdList.push({
-                                threshold: newThreshold,
-                                edit: false
-                            });
-
-                            added = true;
+                        if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
+                            var savedThreshold = measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(newThreshold)];
+                            savedThreshold.id = result.thresholdId;
+                            savedThreshold.saved = true;
                         }
                     });
 
-                    //Add measured event if it is not existing
-                    if (!added) {
-                        var list = [{
-                            threshold: newThreshold,
-                            edit: false
-                        }];
-                        self.thresholds.push({
-                            measuredEvent: newThreshold.measuredEvent,
-                            thresholdList: list
-                        });
-                    }
-
-                    self.newThreshold = {};
-                    self.changeNewThresholdState();
                     console.log("success");
                 },
                 error: function (e) {

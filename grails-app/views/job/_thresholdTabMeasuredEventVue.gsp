@@ -7,7 +7,7 @@
 
         <div v-for="threshold in thresholds.thresholdList">
             <div>
-                <threshold-measurand v-if="threshold.threshold"
+                <threshold-measurand v-if="threshold.saved"
                                      :threshold="threshold"
                                      v-on:delete-threshold="deleteThreshold"
                                      v-on:update-threshold="updateThreshold"></threshold-measurand>

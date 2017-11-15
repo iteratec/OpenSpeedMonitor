@@ -4,6 +4,7 @@
             <div v-for="thresholdItem in thresholds">
                 <threshold-measured-event :thresholds="thresholdItem"
                                           :measurands="measurands"
+                                          v-on:create-threshold="createThreshold"
                                           v-on:delete-threshold="deleteThreshold"
                                           v-on:update-threshold="updateThreshold"
                                           v-on:create-threshold="createThreshold"></threshold-measured-event>

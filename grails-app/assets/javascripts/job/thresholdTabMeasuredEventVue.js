@@ -2,21 +2,19 @@
 "use strict";
 
     Vue.component('threshold-measured-event', {
-        data: function() {
-            return{
-                newThresholdCount: 0
-            }
-        },
         props: ['thresholds', 'measurands'],
         template: '#threshold-tab-measured-event-vue',
         methods: {
             addMetric: function () {
-                this.newThresholdCount++;
-                this.thresholds.thresholdList.push({newThresholdId: this.newThresholdCount,
-                                                    edit: false,
-                                                    threshold: null})
+                this.thresholds.thresholdList.push({
+                    edit: false,
+                    saved: false,
+                    threshold: {
+                        measuredEvent: this.thresholds.measuredEvent
+                    }
+                })
             },
-            removeNewThreshold: function(newThreshold){
+            removeNewThreshold: function (newThreshold) {
                 this.thresholds.thresholdList.splice(this.thresholds.thresholdList.indexOf(newThreshold), 1)
             },
             deleteThreshold: function (threshold) {
