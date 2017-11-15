@@ -95,7 +95,8 @@ class GeneralMeasurementApiController {
                     paramType = "query",
                     required = false,
                     value = "Whether to include inactive Locations in response.",
-                    dataType = "boolean")
+                    dataType = "boolean"
+            )
     ])
     public Map<String, Object> allLocations() {
         Collection<Location> locations = Location.list()
@@ -118,7 +119,7 @@ class GeneralMeasurementApiController {
             nickname = "event/create",
             produces = "application/json",
             httpMethod = "POST",
-            response = Event,
+            response = Event.class,
             authorizations = @Authorization(value = "apiKey")
     )
     @ApiResponses([

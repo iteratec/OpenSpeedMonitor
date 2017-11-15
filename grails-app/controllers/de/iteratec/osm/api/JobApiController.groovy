@@ -37,20 +37,35 @@ class JobApiController {
     ])
     @ApiImplicitParams([
         @ApiImplicitParam(
-            name = "jobId",
+            name = "id",
             paramType = "path",
             required = true,
-            value = "Job Id",
-            dataType = "string")
+            value = "Id of Measurement Job to run.",
+            dataType = "long"
+        ),
+        @ApiImplicitParam(
+                name = "priority",
+                paramType = "query",
+                required = false,
+                value = "Priority the test should be queued with. May be an Integer between 1 (high) and 9 (low)",
+                dataType = "int",
+                allowableValues = 'range[1,9]',
+                defaultValue = '5'
+        )
     ])
-    Map<String, Object> runJob() {
+    Map<String, Object> runJob(Long id, Long priority) {
 
-        Job job = Job.get(params.id)
+        Job job = Job.get(id)
         if (job == null) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${id} doesn't exist!")
         }
 
-        String testId = jobProcessingService.launchJobRun(job)
+        String testId
+        if (priority){
+            testId = jobProcessingService.launchJobRun(job, priority)
+        }else{
+            testId = jobProcessingService.launchJobRun(job)
+        }
 
         ControllerUtils.sendObjectAsJSON(response, [target: testId], true)
 

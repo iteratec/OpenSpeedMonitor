@@ -103,8 +103,8 @@ class JobProcessingService {
      *
      * @return A map of parameters suitable for POSTing a valid request to runtest.php
      */
-    private def fillRequestParameters(Job job) {
-        def parameters = [
+    private Map fillRequestParameters(Job job) {
+        Map parameters = [
                 url            : '',
                 label          : job.label,
                 location       : job.location.uniqueIdentifierForServer,
@@ -332,7 +332,7 @@ class JobProcessingService {
      * If they are not enabled nothing happens.
      * @return whether the job was launched successfully
      */
-    public String launchJobRun(Job job) {
+    public String launchJobRun(Job job, priority = 5) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
             log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
@@ -346,7 +346,8 @@ class JobProcessingService {
         int statusCode
         String testId
         try {
-            def parameters = fillRequestParameters(job);
+            def parameters = fillRequestParameters(job)
+            parameters['priority'] = priority
 
             WebPageTestServer wptserver = job.location.wptServer
             if (!wptserver) {

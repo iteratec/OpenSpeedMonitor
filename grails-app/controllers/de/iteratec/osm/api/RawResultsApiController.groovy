@@ -375,7 +375,7 @@ class RawResultsApiController {
             produces = "application/json",
             httpMethod = "PUT",
             authorizations = @Authorization(value = "apiKey"),
-            response = String
+            response = String.class
     )
     @ApiResponses([
             @ApiResponse(
