@@ -1,11 +1,6 @@
 import ch.qos.logback.classic.AsyncAppender
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.filter.ThresholdFilter
-import ch.qos.logback.core.ConsoleAppender
-import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
-import ch.qos.logback.core.rolling.RollingFileAppender
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
 import grails.util.BuildSettings
 import grails.util.Environment
 
@@ -110,7 +105,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
             pattern = "%logger %m%n"
         }
         filter(ThresholdFilter) {
-            level = WARN
+            level = DEBUG
         }
     }
     appenders << "CONSOLE"

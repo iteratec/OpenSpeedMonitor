@@ -35,8 +35,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         state["to"] = $("#toDatepicker").val();
         state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
         state["selectedFolder"] = $("#folderSelectHtmlId").val();
-        state['selectedAggrGroupValuesUnCached'] = [];
+        state["selectedAggrGroupValuesUnCached"] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
+        state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -70,8 +71,9 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         setJobGroups(state);
         setMeasurands(state);
         setSelectedFilter(state);
+        setAggregationValue(state);
         loadedState = encodedState;
-        if(state.selectedFolder){
+        if (state.selectedFolder) {
             $(window).trigger("historyStateLoaded");
         }
     };
@@ -97,7 +99,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         }
         $(".measurandSeries-clone").remove();
         var currentAddButton = $("#addMeasurandButton");
-        for (var i = 0; i < measurands.length -1; i++) {
+        for (var i = 0; i < measurands.length - 1; i++) {
             currentAddButton.click();
         }
         var selects = $(".measurand-select");
@@ -110,10 +112,21 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         if (!state["selectedFilter"]) {
             return;
         }
-        $(".chart-filter").each(function() {
+        $(".chart-filter").each(function () {
             var $this = $(this);
             $this.toggleClass("selected", $this.data("filter") === state["selectedFilter"]);
         });
+    };
+
+    var setAggregationValue = function (state) {
+        if (!state["selectedAggregationValue"]) {
+            return
+        }
+        var isAvg = state["selectedAggregationValue"] === "avg";
+        $("#averageButton input").prop("checked", isAvg);
+        $("#averageButton").toggleClass("active", isAvg);
+        $("#medianButton input").prop("checked", !isAvg);
+        $("#medianButton").toggleClass("active", !isAvg);
     };
 
     var setMultiSelect = function (id, values) {
@@ -122,6 +135,5 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
     };
 
     initWaitForPostload();
-    return {
-    };
+    return {};
 })();

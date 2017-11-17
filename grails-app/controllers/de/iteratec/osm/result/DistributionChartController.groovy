@@ -2,6 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.barchart.BarchartQueryAndCalculationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -14,7 +15,6 @@ import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
@@ -34,8 +34,9 @@ class DistributionChartController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    PerformanceLoggingService performanceLoggingService
     OsmConfigCacheService osmConfigCacheService
+    BarchartQueryAndCalculationService barchartQueryAndCalculationService
+    PerformanceLoggingService performanceLoggingService
 
     def index() {
         redirect(action: 'show')
@@ -184,14 +185,7 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
-        List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobGroupIn(allJobGroups)
-                .withJobResultDateBetween(from, to)
-                .withProjectedBaseProperty('jobGroup')
-                .withPageIn(allPages)
-                .withProjectedBaseProperty('page')
-                .withSelectedMeasurandsPropertyProjection([selectedMeasurand])
-                .getResults()
+        List<EventResultProjection> aggregations = barchartQueryAndCalculationService.getRawDataFor(allJobGroups, allPages, from, to, selectedMeasurand)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {

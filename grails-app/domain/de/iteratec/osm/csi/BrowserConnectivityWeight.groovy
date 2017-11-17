@@ -19,11 +19,13 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import grails.gorm.annotation.Entity
 
 /**
  * BrowserConnectivityWeight
  * A domain class describes the data object and it's mapping to the database
  */
+@Entity
 class BrowserConnectivityWeight {
 
     Browser browser

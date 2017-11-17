@@ -50,6 +50,10 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         registerBarEvents();
     };
 
+    var resetData = function () {
+        data.resetData()
+    };
+
     var setBarChartData = function () {
         var componentsToRender = [];
         var firstPage = OpenSpeedMonitor.ChartComponents.ChartBars();
@@ -179,6 +183,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
     return {
         setData: setData,
+        resetData: resetData,
         render: render
     };
 

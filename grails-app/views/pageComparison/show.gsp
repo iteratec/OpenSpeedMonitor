@@ -38,11 +38,13 @@
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
+
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
                         <g:render template="pageComparisonVue"/>
                     </div>
+
                     <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                                 aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
@@ -72,8 +74,8 @@
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
+             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
+             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
     </asset:script>
 </content>
