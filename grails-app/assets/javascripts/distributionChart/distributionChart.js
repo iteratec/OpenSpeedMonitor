@@ -29,7 +29,21 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             draw();
         });
 
-        $(window).resize(draw);
+        $(window).resize(drawUpdatedSize);
+    };
+
+    var drawUpdatedSize = function () {
+        var svg = d3.select(svgContainer).select("svg");
+        var domain = getDomain();
+
+        width = svgContainer.clientWidth;
+        violinWidth = calculateViolinWidth();
+        svg.attr("width", width);
+
+        drawXAxis(svg);
+        drawViolins(svg, domain);
+        svg.select("#header-text").attr("transform", getHeaderTransform());
+        chartStyling();
     };
 
     var drawChart = function (distributionChartData) {
@@ -88,16 +102,19 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         });
     };
 
-    var drawHeader = function (svg) {
+    var getHeaderTransform = function() {
         var widthOfAllViolins = Object.keys(chartData.series).length * violinWidth;
+        return "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)";
+    };
 
+    var drawHeader = function (svg) {
         svg.append("g").selectAll("text")
             .data([commonLabelParts])
             .enter()
             .append("text")
             .text(commonLabelParts)
             .attr("id", "header-text")
-            .attr("transform", "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)");
+            .attr("transform", getHeaderTransform());
     };
 
     var drawXAxis = function (svg) {
@@ -111,6 +128,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .scale(x)
             .orient("bottom");
 
+        svg.selectAll(".d3chart-xAxis").remove();
         svg.append("g")
             .attr("class", "d3chart-axis d3chart-xAxis")
             .call(xAxis)
@@ -140,6 +158,9 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var drawViolins = function (svg, domain) {
+        svg.selectAll("clipPath").remove();
+        svg.select("[clip-path]").remove();
+
         var violinGroup = svg.append("g");
         createClipPathAroundViolins(svg, violinGroup);
         Object.keys(chartData.series).forEach(function (trace, i) {
