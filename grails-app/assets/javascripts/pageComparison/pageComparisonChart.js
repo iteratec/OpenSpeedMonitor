@@ -28,7 +28,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
     var selectedIds = "";
     var anySelected = false;
 
-
     chartLegendComponent.on("select", function (selectEvent) {
         selectedIds = selectEvent.ids;
         anySelected = selectEvent.anySelected;
@@ -99,9 +98,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
-        svg.transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight);
+        svg.style("height", chartHeight);
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
             .append("g")
@@ -109,7 +106,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
         contentGroup.attr("transform",
             "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
-
 
         renderHeader(svg);
         renderBars(contentGroup);

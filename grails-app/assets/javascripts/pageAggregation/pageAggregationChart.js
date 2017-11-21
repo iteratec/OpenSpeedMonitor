@@ -74,10 +74,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = legendPosY + legendHeight + headerHeight;
 
-        svg
-            .transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight);
+        svg.style("height", chartHeight);
 
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);

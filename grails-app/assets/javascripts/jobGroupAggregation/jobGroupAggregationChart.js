@@ -45,10 +45,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
             var chartHeight = barScorePosY + barScoreHeight + headerHeight;
 
-            svg
-                .transition()
-                .duration(transitionDuration)
-                .style("height", chartHeight);
+            svg.style("height", chartHeight);
 
             renderHeader(svg);
             renderSideLabels(svg, headerHeight);
