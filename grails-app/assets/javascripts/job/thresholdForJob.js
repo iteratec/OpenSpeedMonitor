@@ -13,17 +13,27 @@ new Vue({
     data: {
         thresholds: [],
         measuredEvents: [],
+        measuredEventCount: 0,
         measurands: [],
-        tmpThreshold: {},
-        newThresholdState: false,
         jobId: "",
         scriptId: ""
+    },
+    computed: {
+        availableMeasuredEvents: function () {
+            var self = this;
+            this.thresholds.forEach(function (threshold) {
+                if(self.measuredEvents.indexOf(threshold.measuredEvent) !== -1) {
+                    self.measuredEvents.splice(self.measuredEvents.indexOf(threshold.measuredEvent), 1)
+                }
+            });
+            return this.measuredEvents;
+        }
+
     },
     beforeMount: function () {
         this.jobId = this.$el.attributes['jobId'].value;
         this.scriptId = this.$el.attributes['scriptId'].value;
     },
-    computed: {},
     mounted: function () {
         this.getMeasurands("/job/getMeasurands");
         this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
@@ -44,7 +54,9 @@ new Vue({
                         })
                     });
                     self.thresholds.push({
-                        measuredEvent: resultEvent.measuredEvent,
+                        measuredEvent: self.measuredEvents.find(function (element) {
+                            return element.id === resultEvent.measuredEvent.id;
+                        }),
                         thresholdList: thresholdsForEvent
                     })
                 })
@@ -61,6 +73,7 @@ new Vue({
                     data: {scriptId: scriptId},
                     success: function (result) {
                         self.measuredEvents = result;
+                        self.measuredEventCount = self.measuredEvents.length;
                     },
                     error: function () {
                         return ""
@@ -97,9 +110,9 @@ new Vue({
                 },
                 url: "/threshold/createAsync",
                 success: function (result) {
-                    //Add threshold to measured event
                     self.thresholds.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
+                            //Add id to the threshold and set status to saved
                             var savedThreshold = measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(newThreshold)];
                             savedThreshold.id = result.thresholdId;
                             savedThreshold.saved = true;
@@ -131,6 +144,7 @@ new Vue({
                             //remove measured event
                             if (measuredEventItem.thresholdList.length === 0) {
                                 self.thresholds.splice(self.thresholds.indexOf(measuredEventItem), 1);
+                                self.measuredEvents.push(measuredEventItem.measuredEvent);
                             }
                         }
                     });
@@ -179,8 +193,25 @@ new Vue({
                 data: {jobId: jobId}
             });
         },
-        changeNewThresholdState: function () {
-            this.newThresholdState = !this.newThresholdState
+        addMeasuredEvent: function () {
+            if(this.measuredEvents.length > 0 && this.thresholds.length < this.measuredEventCount) {
+                this.thresholds.push({
+                    measuredEvent: {},
+                    thresholdList: [{
+                        edit: false,
+                        saved: false,
+                        threshold: {
+                            measuredEvent: {}
+                        }
+                    }]
+                })
+            }
+        },
+        removeMeasuredEvent: function(measuredEvent){
+            if(Object.keys(measuredEvent.measuredEvent).length) {
+                this.measuredEvents.push(measuredEvent.measuredEvent);
+            }
+            this.thresholds.splice(this.thresholds.indexOf(measuredEvent), 1)
         },
         createScript: function () {
             var self = this;

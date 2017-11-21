@@ -2,12 +2,16 @@
     <div class="container">
         <div id="thresholdList" class="col-md-offset-1">
             <div v-for="thresholdItem in thresholds">
-                <threshold-measured-event :thresholds="thresholdItem"
-                                          :measurands="measurands"
-                                          v-on:create-threshold="createThreshold"
-                                          v-on:delete-threshold="deleteThreshold"
-                                          v-on:update-threshold="updateThreshold"
-                                          v-on:create-threshold="createThreshold"></threshold-measured-event>
+                <threshold-measured-event
+                        :thresholds="thresholdItem"
+                        :test="availableMeasuredEvents"
+                        :measurands="measurands"
+                        v-on:create-threshold="createThreshold"
+                        v-on:delete-threshold="deleteThreshold"
+                        v-on:update-threshold="updateThreshold"
+                        v-on:create-threshold="createThreshold"
+                        v-on:remove-measured-event="removeMeasuredEvent">
+                </threshold-measured-event>
                 <br>
             </div>
         </div>
@@ -17,10 +21,7 @@
 
     <div>
         <button type="button" class="btn btn-primary"
-                @click="changeNewThresholdState()">
-            <span v-if="newThresholdState">Hide new Threshold</span>
-            <span v-else>New Threshold</span>
-        </button>
+                @click="addMeasuredEvent()">New measured event</button>
         <button class="btn btn-default"
                 type="button"
                 id="copyToClipboard"

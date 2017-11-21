@@ -1,9 +1,15 @@
 <script type="text/x-template" id="threshold-tab-measured-event-vue">
     <div>
-        <div>
+        <div v-if="Object.keys(thresholds.measuredEvent).length">
         <label class="measuredEventLabel">{{ thresholds.measuredEvent.name }}</label>
             <button type="button" @click="addMetric()">Add</button>
         </div>
+        <div v-else>
+            <select class="form-control thresholdSelects"  v-model="thresholds.measuredEvent">
+                <option v-for="measuredEvent in test" :value="measuredEvent">{{measuredEvent.name}}</option>
+            </select>
+        </div>
+
 
         <div v-for="threshold in thresholds.thresholdList">
             <div>

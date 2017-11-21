@@ -31,7 +31,6 @@ class ThresholdController {
 
     def save(Threshold threshold) {
         if (threshold == null) {
-            
             notFound()
             return
         }
