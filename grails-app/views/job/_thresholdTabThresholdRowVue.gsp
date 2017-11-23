@@ -1,55 +1,10 @@
 <script type="text/x-template" id="threshold-tab-threshold-row-vue">
 <div class="thresholdBoundaries form-inline">
-    <label class="labelGood">
-        Good
-    </label>
-    <label>
-        <
-    </label>
-    <div class="input-group thresholdInput">
-    <input v-if="threshold.edit" id="lowerBoundaryEdit" class="form-control" type="number"
-           min="1"
-           name="lowerBoundary"
-           size="40"
-           maxlength="12"
-           v-model="threshold.threshold.lowerBoundary"/>
-    <input v-else id="lowerBoundaryShow" class="form-control float-right" type="number"
-           min="1"
-           name="lowerBoundary"
-           maxlength="100"
-           readonly
-           v-model="threshold.threshold.lowerBoundary"/>
-        <span class="input-group-addon">ms</span>
-    </div>
-    <label>
-        <
-    </label>
-    <label class="labelOk">
-        OK
-    </label>
-    <label>
-        <
-    </label>
-    <div class="input-group thresholdInput">
-        <input v-if="threshold.edit" id="upperBoundaryEdit" class="form-control thresholdInput" type="number"
-               min="1"
-               name="upperBoundary"
-               maxlength="100"
-               v-model="threshold.threshold.upperBoundary"/>
-        <input v-else id="upperBoundaryShow" class="form-control float-right" type="number"
-               min="1"
-               name="upperBoundary"
-               maxlength="100"
-               readonly
-               v-model="threshold.threshold.upperBoundary"/>
-        <span class="input-group-addon">ms</span>
-    </div>
-    <label>
-        <
-    </label>
-    <label class="labelBad">
-        Bad
-    </label>
+    <threshold-row-label name="Good"/>
+    <threshold-row-input :editable="threshold.edit" :thresholdField="threshold.threshold.lowerBoundary" isUpperBoundary="false" v-on:update-boundary="updateThresholdBoundary"/>
+    <threshold-row-label name="Ok" />
+    <threshold-row-input :editable="threshold.edit" :thresholdField="threshold.threshold.upperBoundary" isUpperBoundary="true" v-on:update-boundary="updateThresholdBoundary"/>
+    <threshold-row-label name="Bad"/>
     <span v-if="threshold.edit">
         <button type="button"
                 class="thresholdButton margins btn btn-primary btn-xs"
@@ -68,5 +23,6 @@
     </span>
 </div>
 </script>
-
+<g:render template="thresholdTabThresholdRowLabel"/>
+<g:render template="thresholdTabThresholdRowInputVue"/>
 <asset:javascript src="job/thresholdTabThresholdRowVue.js"/>

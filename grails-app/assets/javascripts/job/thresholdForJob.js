@@ -5,6 +5,8 @@
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
 //= require job/thresholdTabNewThresholdVue.js
+//= require job/thresholdTabThresholdRowLabel.js
+//= require job/thresholdTabThresholdRowInput.js
 
 "use strict";
 

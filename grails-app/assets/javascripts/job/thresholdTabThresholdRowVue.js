@@ -28,7 +28,13 @@ Vue.component('threshold-row', {
                 this.tmpThreshold = {};
                 threshold.edit = state;
             }
-
+        },
+        updateThresholdBoundary: function (message) {
+            if(message.isUpper){
+                this.threshold.threshold.upperBoundary = message.value;
+            }else{
+                this.threshold.threshold.lowerBoundary = message.value;
+            }
         }
     }
 
