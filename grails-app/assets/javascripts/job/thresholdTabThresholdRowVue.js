@@ -11,12 +11,6 @@ Vue.component('threshold-row', {
     props: ['threshold'],
     template: '#threshold-tab-threshold-row-vue',
     methods: {
-        deleteThreshold: function (threshold) {
-            this.$emit('delete-threshold', threshold);
-        },
-        updateThreshold: function (threshold) {
-            this.$emit('update-threshold', threshold);
-        },
         changeEditMode: function (threshold, state) {
             if (state) {
                 //shadow copy
@@ -35,7 +29,23 @@ Vue.component('threshold-row', {
             }else{
                 this.threshold.threshold.lowerBoundary = message.value;
             }
+        },
+        buttonClicked: function (message) {
+            if(message.isPositiveButton){
+                if(this.threshold.edit === true) {
+                    this.$emit('update-threshold', this.threshold);
+                    this.threshold.edit = message.editMode;
+                } else {
+                    this.changeEditMode(this.threshold, message.editMode);
+                }
+            }else{
+                if(this.threshold.edit === false) {
+                    this.$emit('delete-threshold', this.threshold);
+                    this.threshold.edit = message.editMode;
+                } else {
+                    this.changeEditMode(this.threshold, message.editMode);
+                }
+            }
         }
     }
-
 });
