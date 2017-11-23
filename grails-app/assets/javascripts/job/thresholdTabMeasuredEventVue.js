@@ -7,6 +7,11 @@
             'measurands',
             'test'
         ],
+        data: function() {
+            return {
+                selectedEvent: {}
+            }
+        },
         template: '#threshold-tab-measured-event-vue',
         create:{
 
@@ -35,6 +40,10 @@
                 this.$emit('update-threshold', threshold);
             },
             createThreshold: function (threshold) {
+                if(!Object.keys(this.thresholds.measuredEvent).length){
+                    this.thresholds.measuredEvent = this.selectedEvent;
+                }
+
                 threshold.threshold.measuredEvent = this.thresholds.measuredEvent;
 
                 this.$emit('create-threshold', threshold);

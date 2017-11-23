@@ -28,7 +28,6 @@ new Vue({
             });
             return this.measuredEvents;
         }
-
     },
     beforeMount: function () {
         this.jobId = this.$el.attributes['jobId'].value;
@@ -114,7 +113,7 @@ new Vue({
                         if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
                             //Add id to the threshold and set status to saved
                             var savedThreshold = measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(newThreshold)];
-                            savedThreshold.id = result.thresholdId;
+                            savedThreshold.threshold.id = result.thresholdId;
                             savedThreshold.saved = true;
                         }
                     });
