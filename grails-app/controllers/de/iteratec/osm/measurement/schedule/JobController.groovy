@@ -411,7 +411,17 @@ class JobController {
      * @return All available measurands.
      */
     def getMeasurands() {
-        render Measurand.collect() as JSON
+
+        List<Measurand> measurands = Measurand.collect()
+        def output = []
+        measurands.each {
+            output.add([
+                    name: it.name(),
+                    unit: it.measurandGroup.unit
+            ])
+        }
+
+        render output as JSON
     }
 
     def getRunningAndRecentlyFinishedJobs() {
