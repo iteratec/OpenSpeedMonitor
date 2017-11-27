@@ -25,6 +25,7 @@
             <div id="resize-east">
                 <div id="not-resize-east">
                     <div id="download-chart-container"></div>
+                    <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-grip-diagonal-se"></div>
                 </div>
             </div>
             <div class="modal-footer">

@@ -1,4 +1,5 @@
 @import "bower_components/bootstrap/less/bootstrap.less";
+@import (inline) "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css";
 @import "variables-corporate";
 @import "sidebar";
 @import "cards";
@@ -480,11 +481,16 @@ a.btn.disabled {
 }
 
 #resize-east {
-  cursor: e-resize;
+  cursor: ew-resize;
   padding-right: 1px;
   display: inline-block;
   background-color: @iteratec-gray;
   margin-left: 15px;
+  position: relative;
+}
+
+#resize-east .ui-resizable-se {
+  cursor: ew-resize;
 }
 
 #not-resize-east {

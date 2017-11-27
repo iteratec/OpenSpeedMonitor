@@ -53,7 +53,7 @@ function initPngDownloadModal() {
     }
 
     function initDrag(e) {
-        document.body.style.cursor = svgElement.style.cursor = "e-resize";
+        document.body.style.cursor = svgElement.style.cursor = "ew-resize";
         startX = e.clientX;
         width = downloadContainer.offsetWidth;
         document.documentElement.addEventListener("mousemove", doDrag);
