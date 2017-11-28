@@ -379,7 +379,9 @@ class JobController {
             }
 
             def thresholdList = thresholdsForEvent.collect {[id: it.id,
-                                            measurand: it.measurand,
+                                            measurand: [
+                                                name: it.measurand.name(),
+                                                unit: it.measurand.measurandGroup.unit],
                                             measuredEvent: it.measuredEvent,
                                             upperBoundary: it.upperBoundary,
                                             lowerBoundary: it.lowerBoundary]}

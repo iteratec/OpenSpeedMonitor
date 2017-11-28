@@ -116,7 +116,7 @@ class ThresholdController {
      */
     def createAsync() {
         Job job = Job.findById(Long.parseLong(params['job']))
-        Measurand measurand = params['measurand'];
+        Measurand measurand = Measurand.valueOf(params['measurand']);
         MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
         Integer lowerBoundary = Integer.parseInt(params['lowerBoundary'])
         Integer upperBoundary = Integer.parseInt(params['upperBoundary'])
