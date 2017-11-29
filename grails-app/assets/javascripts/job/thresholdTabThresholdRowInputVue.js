@@ -3,8 +3,8 @@
 "use strict"
 
 Vue.component('threshold-row-input', {
-    props: ['thresholdField', 'editable', 'isUpperBoundary'],
-    data: function() {
+    props: ['thresholdField', 'editable', 'fieldName'],
+    data: function () {
         return {
             value: this.thresholdField
         }
@@ -12,7 +12,7 @@ Vue.component('threshold-row-input', {
     template: '#threshold-tab-threshold-row-input-vue',
     watch: {
         value: function (newValue) {
-            this.$emit('update-boundary', {value: newValue, isUpper:this.isUpperBoundary});
+            this.$emit('update-boundary', {value: newValue, fieldName: this.fieldName});
         },
         editable: function () {
             this.value = this.thresholdField;

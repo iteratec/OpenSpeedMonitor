@@ -37,13 +37,6 @@ Vue.component('threshold-row-button', {
             }
         }
     },
-    watch: {
-        saved: function (newValue) {
-        },
-        editable: function (newValue) {
-            console.log("editable changed")
-        }
-    },
     template: '#threshold-tab-threshold-row-button-vue',
     methods: {
         onClick: function (isPositiveButton) {

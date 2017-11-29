@@ -9,17 +9,30 @@
         ],
         data: function() {
             return {
-                selectedEvent: {}
+                copiedMeasurands: this.measurands.slice()
+            }
+        },
+        computed: {
+            availableMeasurands: function () {
+                var self = this;
+                self.thresholds.thresholdList.forEach(function (threshold) {
+                    if(threshold.threshold.measurand) {
+                        var compareTo = threshold.threshold.measurand;
+                        self.copiedMeasurands = self.copiedMeasurands.filter(function (element) {
+                            return element.name !== compareTo.name;
+                        })
+                    }
+                });
+                return this.copiedMeasurands;
             }
         },
         template: '#threshold-tab-measured-event-vue',
         create:{
-
         },
         methods: {
             addMetric: function () {
                 this.thresholds.thresholdList.push({
-                    edit: false,
+                    edit: true,
                     saved: false,
                     threshold: {
                         measuredEvent: this.thresholds.measuredEvent
@@ -40,11 +53,9 @@
                 this.$emit('update-threshold', threshold);
             },
             createThreshold: function (threshold) {
-                if(!Object.keys(this.thresholds.measuredEvent).length){
-                    this.thresholds.measuredEvent = this.selectedEvent;
+                if(threshold.threshold.measuredEvent) {
+                    threshold.threshold.measuredEvent = this.thresholds.measuredEvent;
                 }
-
-                threshold.threshold.measuredEvent = this.thresholds.measuredEvent;
 
                 this.$emit('create-threshold', threshold);
             }

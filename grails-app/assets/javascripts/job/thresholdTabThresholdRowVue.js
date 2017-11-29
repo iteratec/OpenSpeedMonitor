@@ -5,7 +5,9 @@
 Vue.component('threshold-row', {
     data: function() {
         return {
-            tmpThreshold: {}
+            tmpThreshold: {},
+            upperField: "upperField",
+            lowerField: "lowerField"
         }
     },
     props: ['threshold'],
@@ -15,16 +17,15 @@ Vue.component('threshold-row', {
             if (state) {
                 //shadow copy
                 this.tmpThreshold = Object.assign({}, threshold.threshold);
-                threshold.edit = state;
-
             } else {
                 threshold.threshold = this.tmpThreshold;
                 this.tmpThreshold = {};
-                threshold.edit = state;
             }
+
+            threshold.edit = state;
         },
         updateThresholdBoundary: function (message) {
-            if(message.isUpper){
+            if(message.fieldName  === this.upperField){
                 this.threshold.threshold.upperBoundary = message.value;
             }else{
                 this.threshold.threshold.lowerBoundary = message.value;
@@ -32,16 +33,19 @@ Vue.component('threshold-row', {
         },
         buttonClicked: function (message) {
             if(message.isPositiveButton){
-                if(this.threshold.edit === true) {
+                if(!this.threshold.saved){
+                    this.$emit('create-threshold', this.threshold);
+                } else if(!message.editMode) {
                     this.$emit('update-threshold', this.threshold);
                     this.threshold.edit = message.editMode;
                 } else {
                     this.changeEditMode(this.threshold, message.editMode);
                 }
             }else{
-                if(this.threshold.edit === false) {
+                if(!this.threshold.saved){
+                    this.$emit('remove-new-threshold', this.threshold);
+                } else if(message.editMode) {
                     this.$emit('delete-threshold', this.threshold);
-                    this.threshold.edit = message.editMode;
                 } else {
                     this.changeEditMode(this.threshold, message.editMode);
                 }

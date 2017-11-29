@@ -4,10 +4,9 @@
 //= require job/thresholdTabMeasuredEventVue.js
 //= require job/thresholdTabMeasurandVue.js
 //= require job/thresholdTabThresholdRowVue.js
-//= require job/thresholdTabNewThresholdVue.js
 //= require job/thresholdTabThresholdRowLabelVue.js
 //= require job/thresholdTabThresholdRowInputVue.js
-//= require job/thresholdTabThresholdRowButtonPositiveVue.js
+//= require job/thresholdTabThresholdRowButtonVue.js
 
 "use strict";
 
@@ -16,20 +15,23 @@ new Vue({
     data: {
         thresholds: [],
         measuredEvents: [],
-        measuredEventCount: 0,
         measurands: [],
         jobId: "",
-        scriptId: ""
+        scriptId: "",
+        copiedMeasuredEvents: []
     },
     computed: {
         availableMeasuredEvents: function () {
             var self = this;
-            this.thresholds.forEach(function (threshold) {
-                if(self.measuredEvents.indexOf(threshold.measuredEvent) !== -1) {
-                    self.measuredEvents.splice(self.measuredEvents.indexOf(threshold.measuredEvent), 1)
+            self.thresholds.forEach(function (threshold) {
+                if(threshold.measuredEvent) {
+                    var compareTo = threshold.measuredEvent;
+                    self.copiedMeasuredEvents = self.copiedMeasuredEvents.filter(function (element) {
+                        return element.id !== compareTo.id;
+                    })
                 }
             });
-            return this.measuredEvents;
+            return this.copiedMeasuredEvents;
         }
     },
     beforeMount: function () {
@@ -75,6 +77,7 @@ new Vue({
                     data: {scriptId: scriptId},
                     success: function (result) {
                         self.measuredEvents = result;
+                        self.copiedMeasuredEvents = self.measuredEvents.slice();
                         self.measuredEventCount = self.measuredEvents.length;
                     },
                     error: function () {
@@ -118,6 +121,7 @@ new Vue({
                             var savedThreshold = measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(newThreshold)];
                             savedThreshold.threshold.id = result.thresholdId;
                             savedThreshold.saved = true;
+                            savedThreshold.edit = false;
                         }
                     });
 
@@ -145,8 +149,7 @@ new Vue({
 
                             //remove measured event
                             if (measuredEventItem.thresholdList.length === 0) {
-                                self.thresholds.splice(self.thresholds.indexOf(measuredEventItem), 1);
-                                self.measuredEvents.push(measuredEventItem.measuredEvent);
+                                self.removeMeasuredEvent(measuredEventItem);
                             }
                         }
                     });
@@ -196,11 +199,12 @@ new Vue({
             });
         },
         addMeasuredEvent: function () {
-            if(this.measuredEvents.length > 0 && this.thresholds.length < this.measuredEventCount) {
+            if (this.availableMeasuredEvents.length > 0 &&
+                this.thresholds.length < this.measuredEvents.length) {
                 this.thresholds.push({
                     measuredEvent: {},
                     thresholdList: [{
-                        edit: false,
+                        edit: true,
                         saved: false,
                         threshold: {
                             measuredEvent: {}
@@ -211,9 +215,13 @@ new Vue({
         },
         removeMeasuredEvent: function(measuredEvent){
             if(Object.keys(measuredEvent.measuredEvent).length) {
-                this.measuredEvents.push(measuredEvent.measuredEvent);
+                this.copiedMeasuredEvents.push(measuredEvent.measuredEvent);
             }
-            this.thresholds.splice(this.thresholds.indexOf(measuredEvent), 1)
+
+            var compareTo = measuredEvent;
+            this.thresholds = this.thresholds.filter(function (element) {
+                return element.measuredEvent.id !== compareTo.measuredEvent.id;
+            });
         },
         createScript: function () {
             var self = this;

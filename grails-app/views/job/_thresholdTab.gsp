@@ -32,7 +32,6 @@
 </div>
 
 <g:render template="thresholdTabMeasuredEventVue"/>
-<g:render template="thresholdTabNewThresholdVue"/>
 
 <asset:javascript src="job/thresholdForJob.js"/>
 
