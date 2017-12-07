@@ -3,32 +3,29 @@
 "use strict"
 
 Vue.component('threshold-measurand', {
-    props: ['threshold', 'availableMeasurands'],
+    props: ['availableMeasurands', 'thresholdMeasurand'],
     data: function () {
         return {
             avaMeasurands: this.availableMeasurands,
-            selectedMeasurand: {}
+            selectedMeasurand: this.thresholdMeasurand
+        }
+    },
+    created: function () {
+        if(this.avaMeasurands.indexOf(this.selectedMeasurand) === -1){
+            this.avaMeasurands.push(this.selectedMeasurand)
         }
     },
     watch: {
         availableMeasurands: function () {
             this.avaMeasurands = this.availableMeasurands.slice();
-            this.avaMeasurands.push(this.threshold.threshold.measurand)
+            this.avaMeasurands.push(this.thresholdMeasurand)
+        },
+        selectedMeasurand: function (newMeausrand) {
+            this.$emit('update-measurand', newMeausrand);
+        },
+        thresholdMeasurand: function (newMeausrand) {
+            this.selectedMeasurand = newMeausrand;
         }
     },
-    template: '#threshold-tab-measurand-vue',
-    methods: {
-        deleteThreshold: function (threshold) {
-            this.$emit('delete-threshold', threshold);
-        },
-        updateThreshold: function (threshold) {
-            this.$emit('update-threshold', threshold);
-        },
-        createThreshold: function (threshold) {
-            this.$emit('create-threshold', threshold);
-        },
-        removeNewThreshold: function (threshold) {
-            this.$emit('remove-new-threshold', threshold);
-        }
-    }
+    template: '#threshold-tab-measurand-vue'
 });

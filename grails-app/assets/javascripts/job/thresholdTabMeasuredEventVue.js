@@ -15,6 +15,7 @@
         computed: {
             availableMeasurands: function () {
                 var self = this;
+                self.copiedMeasurands = this.measurands.slice();
                 self.thresholds.thresholdList.forEach(function (threshold) {
                     if(threshold.threshold.measurand) {
                         var compareTo = threshold.threshold.measurand;
@@ -35,7 +36,8 @@
                     edit: true,
                     saved: false,
                     threshold: {
-                        measuredEvent: this.thresholds.measuredEvent
+                        measuredEvent: this.thresholds.measuredEvent,
+                        measurand: this.availableMeasurands[0]
                     }
                 })
             },

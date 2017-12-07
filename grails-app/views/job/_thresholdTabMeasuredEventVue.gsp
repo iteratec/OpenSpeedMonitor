@@ -28,6 +28,6 @@
 </div>
 </script>
 
-<g:render template="thresholdTabMeasurandVue"/>
+<g:render template="thresholdTabThresholdRowVue"/>
 
 <asset:javascript src="job/thresholdTabMeasuredEventVue.js"/>

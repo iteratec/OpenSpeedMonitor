@@ -34,6 +34,9 @@ Vue.component('threshold-row', {
 
             threshold.edit = state;
         },
+        updateMeasurand: function (newMeasurand) {
+            this.threshold.threshold.measurand = newMeasurand;
+        },
         updateThresholdBoundary: function (message) {
             if(message.fieldName  === this.upperField){
                 this.threshold.threshold.upperBoundary = message.value;

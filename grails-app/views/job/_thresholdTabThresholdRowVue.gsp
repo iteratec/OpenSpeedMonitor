@@ -5,10 +5,15 @@
 </div>
 
 <div v-else>
-    <select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand"
-            v-model="threshold.threshold.measurand">
-        <option v-for="measurand in avaMeasurands" :value="measurand">{{measurand.name}}</option>
-    </select>
+    <threshold-measurand
+        :availableMeasurands="availableMeasurands"
+        :thresholdMeasurand="threshold.threshold.measurand"
+        v-on:update-measurand="updateMeasurand"
+    />
+    %{--<select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand"--}%
+            %{--v-model="threshold.threshold.measurand">--}%
+        %{--<option v-for="measurand in avaMeasurands" :value="measurand">{{measurand.name}}</option>--}%
+    %{--</select>--}%
 </div>
 
 <div class="thresholdBoundaries form-inline">
@@ -26,4 +31,6 @@
 <g:render template="thresholdTabThresholdRowLabel"/>
 <g:render template="thresholdTabThresholdRowInputVue"/>
 <g:render template="thresholdTabThresholdRowButtonVue"/>
+<g:render template="thresholdTabMeasurandVue"/>
+
 <asset:javascript src="job/thresholdTabThresholdRowVue.js"/>
