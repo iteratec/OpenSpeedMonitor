@@ -7,11 +7,21 @@ Vue.component('threshold-row', {
         return {
             tmpThreshold: {},
             upperField: "upperField",
-            lowerField: "lowerField"
+            lowerField: "lowerField",
+            avaMeasurands: this.availableMeasurands
         }
     },
-    props: ['threshold'],
+    props: ['threshold', 'availableMeasurands'],
     template: '#threshold-tab-threshold-row-vue',
+    watch: {
+        availableMeasurands: function () {
+            this.avaMeasurands = this.availableMeasurands.slice();
+            if(this.threshold.threshold.measurand){
+                this.avaMeasurands.push(this.threshold.threshold.measurand)
+            }
+
+        }
+    },
     methods: {
         changeEditMode: function (threshold, state) {
             if (state) {

@@ -16,14 +16,13 @@
 
     <div v-for="threshold in thresholds.thresholdList">
         <div>
-            <threshold-measurand
-                    :threshold="threshold"
-                    :availableMeasurands="availableMeasurands"
-                    v-on:delete-threshold="deleteThreshold"
-                    v-on:update-threshold="updateThreshold"
-                    v-on:create-threshold="createThreshold"
-                    v-on:remove-new-threshold="removeNewThreshold">
-            </threshold-measurand>
+            <threshold-row :threshold="threshold"
+                           :availableMeasurands="availableMeasurands"
+                           v-on:delete-threshold="deleteThreshold"
+                           v-on:update-threshold="updateThreshold"
+                           v-on:create-threshold="createThreshold"
+                           v-on:remove-new-threshold="removeNewThreshold">
+            </threshold-row>
         </div>
     </div>
 </div>

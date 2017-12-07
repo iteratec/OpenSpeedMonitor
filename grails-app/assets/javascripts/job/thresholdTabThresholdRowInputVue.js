@@ -16,6 +16,9 @@ Vue.component('threshold-row-input', {
         },
         editable: function () {
             this.value = this.thresholdField;
+        },
+        thresholdField: function (newValue) {
+            this.value = newValue;
         }
     }
 });

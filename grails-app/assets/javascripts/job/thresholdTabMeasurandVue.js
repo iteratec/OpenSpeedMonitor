@@ -6,7 +6,8 @@ Vue.component('threshold-measurand', {
     props: ['threshold', 'availableMeasurands'],
     data: function () {
         return {
-            avaMeasurands: this.availableMeasurands
+            avaMeasurands: this.availableMeasurands,
+            selectedMeasurand: {}
         }
     },
     watch: {
