@@ -1,9 +1,9 @@
 //= require bower_components/vue/dist/vue.js
-//= require job/thresholdTabThresholdRow.js
+//= require job/thresholdTabThreshold.js
 "use strict"
 
-Vue.component('threshold-row-input', {
-    props: ['thresholdField', 'thresholdMeasurand','editable', 'fieldName'],
+Vue.component('threshold-input', {
+    props: ['threshold-field', 'threshold-measurand','editable', 'fieldName'],
     data: function () {
         return {
             value: this.thresholdField
@@ -25,7 +25,7 @@ Vue.component('threshold-row-input', {
             }
         }
     },
-    template: '#threshold-tab-threshold-row-input-vue',
+    template: '#threshold-tab-threshold-input-vue',
     watch: {
         value: function (newValue) {
             this.$emit('update-boundary', {value: newValue, fieldName: this.fieldName});

@@ -2,11 +2,7 @@
 "use strict";
 
     Vue.component('threshold-measured-event', {
-        props: [
-            'thresholds',
-            'measurands',
-            'test'
-        ],
+        props: ['measured-event-item', 'measurands', 'available-measured-events'],
         data: function() {
             return {
                 copiedMeasurands: this.measurands.slice()
@@ -16,52 +12,50 @@
             availableMeasurands: function () {
                 var self = this;
                 self.copiedMeasurands = this.measurands.slice();
-                self.thresholds.thresholdList.forEach(function (threshold) {
-                    if(threshold.threshold.measurand) {
-                        var compareTo = threshold.threshold.measurand;
+                self.measuredEventItem.thresholdList.forEach(function (thresholdItem) {
+                    if(thresholdItem.threshold.measurand) {
+                        var compareTo = thresholdItem.threshold.measurand;
                         self.copiedMeasurands = self.copiedMeasurands.filter(function (element) {
                             return element.name !== compareTo.name;
                         })
                     }
                 });
-                return this.copiedMeasurands;
+                return self.copiedMeasurands;
             }
         },
         template: '#threshold-tab-measured-event-vue',
-        create:{
-        },
         methods: {
             addMetric: function () {
-                this.thresholds.thresholdList.push({
+                this.measuredEventItem.thresholdList.push({
                     edit: true,
                     saved: false,
                     threshold: {
-                        measuredEvent: this.thresholds.measuredEvent,
+                        measuredEvent: this.measuredEventItem.measuredEvent,
                         measurand: this.availableMeasurands[0],
                         lowerBoundary: 0,
                         upperBoundary: 0
                     }
                 })
             },
-            removeNewThreshold: function (newThreshold) {
-                this.thresholds.thresholdList.splice(this.thresholds.thresholdList.indexOf(newThreshold), 1)
+            removeNewThreshold: function (newThresholdItem) {
+                this.measuredEventItem.thresholdList.splice(this.measuredEventItem.thresholdList.indexOf(newThresholdItem), 1);
 
-                if(this.thresholds.thresholdList.length === 0){
-                    this.$emit('remove-measured-event', this.thresholds);
+                if(this.measuredEventItem.thresholdList.length === 0){
+                    console.log("remove")
+                    this.$emit('remove-measured-event', this.measuredEventItem);
                 }
             },
-            deleteThreshold: function (threshold) {
-                this.$emit('delete-threshold', threshold);
+            deleteThreshold: function (newThresholdItem) {
+                this.$emit('delete-threshold', newThresholdItem);
             },
-            updateThreshold: function (threshold) {
-                this.$emit('update-threshold', threshold);
+            updateThreshold: function (newThresholdItem) {
+                this.$emit('update-threshold', newThresholdItem);
             },
-            createThreshold: function (threshold) {
-                if(threshold.threshold.measuredEvent) {
-                    threshold.threshold.measuredEvent = this.thresholds.measuredEvent;
+            createThreshold: function (newThresholdItem) {
+                if(newThresholdItem.threshold.measuredEventItem) {
+                    newThresholdItem.threshold.measuredEventItem = this.measuredEventItem.measuredEvent;
                 }
-
-                this.$emit('create-threshold', threshold);
+                this.$emit('create-threshold', newThresholdItem);
             }
         }
     });

@@ -1,8 +1,9 @@
 //= require bower_components/vue/dist/vue.js
 //= require job/thresholdTabMeasurandVue.js
-"use strict"
+"use strict";
 
-Vue.component('threshold-row', {
+Vue.component('threshold', {
+    props: ['threshold-item', 'available-measurands'],
     data: function() {
         return {
             tmpThreshold: {},
@@ -11,15 +12,19 @@ Vue.component('threshold-row', {
             avaMeasurands: this.availableMeasurands
         }
     },
-    props: ['threshold', 'availableMeasurands'],
-    template: '#threshold-tab-threshold-row-vue',
+    template: '#threshold-tab-threshold-vue',
     watch: {
         availableMeasurands: function () {
             this.avaMeasurands = this.availableMeasurands.slice();
-            if(this.threshold.threshold.measurand){
-                this.avaMeasurands.push(this.threshold.threshold.measurand)
+            if(this.thresholdItem.threshold.measurand){
+                this.avaMeasurands.push(this.thresholdItem.threshold.measurand)
             }
 
+        }
+    },
+    created: function () {
+        if(this.thresholdItem.threshold.measurand === {}){
+            this.thresholdItem.threshold.measurand = this.avaMeasurands[0];
         }
     },
     methods: {
@@ -32,35 +37,35 @@ Vue.component('threshold-row', {
                 this.tmpThreshold = {};
             }
 
-            threshold.edit = state;
+            this.thresholdItem.edit = state;
         },
         updateMeasurand: function (newMeasurand) {
-            this.threshold.threshold.measurand = newMeasurand;
+            this.thresholdItem.threshold.measurand = newMeasurand;
         },
         updateThresholdBoundary: function (message) {
             if(message.fieldName  === this.upperField){
-                this.threshold.threshold.upperBoundary = message.value;
+                this.thresholdItem.threshold.upperBoundary = message.value;
             }else{
-                this.threshold.threshold.lowerBoundary = message.value;
+                this.thresholdItem.threshold.lowerBoundary = message.value;
             }
         },
         buttonClicked: function (message) {
             if(message.isPositiveButton){
-                if(!this.threshold.saved){
-                    this.$emit('create-threshold', this.threshold);
+                if(!this.thresholdItem.saved){
+                    this.$emit('create-threshold', this.thresholdItem);
                 } else if(!message.editMode) {
-                    this.$emit('update-threshold', this.threshold);
-                    this.threshold.edit = message.editMode;
+                    this.$emit('update-threshold', this.thresholdItem);
+                    this.thresholdItem.edit = message.editMode;
                 } else {
-                    this.changeEditMode(this.threshold, message.editMode);
+                    this.changeEditMode(this.thresholdItem, message.editMode);
                 }
             }else{
-                if(!this.threshold.saved){
-                    this.$emit('remove-new-threshold', this.threshold);
+                if(!this.thresholdItem.saved){
+                    this.$emit('remove-new-threshold', this.thresholdItem);
                 } else if(message.editMode) {
-                    this.$emit('delete-threshold', this.threshold);
+                    this.$emit('delete-threshold', this.thresholdItem);
                 } else {
-                    this.changeEditMode(this.threshold, message.editMode);
+                    this.changeEditMode(this.thresholdItem, message.editMode);
                 }
             }
         }

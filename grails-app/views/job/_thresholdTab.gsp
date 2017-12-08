@@ -1,10 +1,10 @@
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
     <div class="container">
         <div id="thresholdList" class="col-md-offset-1">
-            <div v-for="thresholdItem in thresholds">
+            <div v-for="measuredEvent in activeMeasuredEvents">
                 <threshold-measured-event
-                        :thresholds="thresholdItem"
-                        :test="availableMeasuredEvents"
+                        :measured-event-item="measuredEvent"
+                        :available-measured-events="availableMeasuredEvents"
                         :measurands="measurands"
                         v-on:create-threshold="createThreshold"
                         v-on:delete-threshold="deleteThreshold"

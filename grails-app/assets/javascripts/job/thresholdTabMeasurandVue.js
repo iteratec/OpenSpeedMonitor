@@ -1,6 +1,7 @@
 //= require bower_components/vue/dist/vue.js
+//= require job/thresholdTabThreshold.js
 
-"use strict"
+"use strict";
 
 Vue.component('threshold-measurand', {
     props: ['availableMeasurands', 'thresholdMeasurand'],
@@ -12,13 +13,13 @@ Vue.component('threshold-measurand', {
     },
     created: function () {
         if(this.avaMeasurands.indexOf(this.selectedMeasurand) === -1){
-            this.avaMeasurands.push(this.selectedMeasurand)
+            this.avaMeasurands.unshift(this.selectedMeasurand)
         }
     },
     watch: {
         availableMeasurands: function () {
             this.avaMeasurands = this.availableMeasurands.slice();
-            this.avaMeasurands.push(this.thresholdMeasurand)
+            this.avaMeasurands.unshift(this.thresholdMeasurand)
         },
         selectedMeasurand: function (newMeausrand) {
             this.$emit('update-measurand', newMeausrand);

@@ -3,17 +3,17 @@
 //= require bower_components/file-saver/FileSaver.min.js
 //= require job/thresholdTabMeasuredEventVue.js
 //= require job/thresholdTabMeasurandVue.js
-//= require job/thresholdTabThresholdRowVue.js
-//= require job/thresholdTabThresholdRowLabelVue.js
-//= require job/thresholdTabThresholdRowInputVue.js
-//= require job/thresholdTabThresholdRowButtonVue.js
+//= require job/thresholdTabThresholdVue.js
+//= require job/thresholdTabThresholdLabelVue.js
+//= require job/thresholdTabThresholdInputVue.js
+//= require job/thresholdTabThresholdButtonVue.js
 
 "use strict";
 
 new Vue({
     el: '#threshold',
     data: {
-        thresholds: [],
+        activeMeasuredEvents: [],
         measuredEvents: [],
         measurands: [],
         jobId: "",
@@ -23,7 +23,7 @@ new Vue({
     computed: {
         availableMeasuredEvents: function () {
             var self = this;
-            self.thresholds.forEach(function (threshold) {
+            self.activeMeasuredEvents.forEach(function (threshold) {
                 if(threshold.measuredEvent) {
                     var compareTo = threshold.measuredEvent;
                     self.copiedMeasuredEvents = self.copiedMeasuredEvents.filter(function (element) {
@@ -39,34 +39,13 @@ new Vue({
         this.scriptId = this.$el.attributes['scriptId'].value;
     },
     mounted: function () {
-        this.getMeasurands("/job/getMeasurands");
-        this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
         this.fetchData();
     },
     methods: {
         fetchData: function () {
-            this.thresholds = [];
-            var self = this;
-            this.getThresholdsForJob(this.jobId).success(function (result) {
-                result.forEach(function (resultEvent) {
-                    var thresholdsForEvent = [];
-                    resultEvent.thresholds.forEach(function (threshold) {
-                        thresholdsForEvent.push({
-                            threshold: threshold,
-                            edit: false,
-                            saved: true
-                        })
-                    });
-                    self.thresholds.push({
-                        measuredEvent: self.measuredEvents.find(function (element) {
-                            return element.id === resultEvent.measuredEvent.id;
-                        }),
-                        thresholdList: thresholdsForEvent
-                    })
-                })
-            }).error(function (e) {
-                console.log(e);
-            });
+            this.getMeasurands("/job/getMeasurands");
+            this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
+            this.getThresholds();
         },
         getMeasuredEvents: function (scriptId, targetUrl) {
             var self = this;
@@ -102,7 +81,32 @@ new Vue({
                 });
             }
         },
+        getThresholds: function () {
+            this.activeMeasuredEvents = [];
+            var self = this;
+            this.getThresholdsForJob(this.jobId).success(function (result) {
+                result.forEach(function (resultEvent) {
+                    var thresholdsForEvent = [];
+                    resultEvent.thresholds.forEach(function (threshold) {
+                        thresholdsForEvent.push({
+                            threshold: threshold,
+                            edit: false,
+                            saved: true
+                        })
+                    });
+                    self.activeMeasuredEvents.push({
+                        measuredEvent: self.measuredEvents.find(function (element) {
+                            return element.id === resultEvent.measuredEvent.id;
+                        }),
+                        thresholdList: thresholdsForEvent
+                    })
+                })
+            }).error(function (e) {
+                console.log(e);
+            });
+        },
         createThreshold: function (newThreshold) {
+            console.dir(newThreshold);
             var self = this;
             $.ajax({
                 type: 'POST',
@@ -115,16 +119,16 @@ new Vue({
                 },
                 url: "/threshold/createAsync",
                 success: function (result) {
-                    self.thresholds.forEach(function (measuredEventItem) {
+                    self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
                             //Add id to the threshold and set status to saved
                             var savedThreshold = measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(newThreshold)];
+
                             savedThreshold.threshold.id = result.thresholdId;
                             savedThreshold.saved = true;
                             savedThreshold.edit = false;
                         }
                     });
-
                     console.log("success");
                 },
                 error: function (e) {
@@ -142,7 +146,7 @@ new Vue({
                 },
                 url: "/threshold/deleteAsync",
                 success: function () {
-                    self.thresholds.forEach(function (measuredEventItem) {
+                    self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         //remove threshold from measured event
                         if (measuredEventItem.measuredEvent.id === deletedThreshold.threshold.measuredEvent.id) {
                             measuredEventItem.thresholdList.splice(measuredEventItem.thresholdList.indexOf(deletedThreshold), 1);
@@ -174,10 +178,9 @@ new Vue({
                     },
                     url: "/threshold/updateAsync",
                     success: function () {
-                        self.thresholds.forEach(function (measuredEventItem) {
+                        self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                             if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {
                                 updatedThreshold.edit = false;
-                                self.tmpThreshold = {};
                                 measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
                             }
                         });
@@ -200,14 +203,17 @@ new Vue({
         },
         addMeasuredEvent: function () {
             if (this.availableMeasuredEvents.length > 0 &&
-                this.thresholds.length < this.measuredEvents.length) {
-                this.thresholds.push({
+                this.activeMeasuredEvents.length < this.measuredEvents.length) {
+                this.activeMeasuredEvents.push({
                     measuredEvent: {},
                     thresholdList: [{
                         edit: true,
                         saved: false,
                         threshold: {
-                            measuredEvent: {}
+                            measuredEvent: {},
+                            measurand: this.measurands[0],
+                            lowerBoundary: 0,
+                            upperBoundary: 0
                         }
                     }]
                 })
@@ -219,7 +225,7 @@ new Vue({
             }
 
             var compareTo = measuredEvent;
-            this.thresholds = this.thresholds.filter(function (element) {
+            this.activeMeasuredEvents = this.activeMeasuredEvents.filter(function (element) {
                 return element.measuredEvent.id !== compareTo.measuredEvent.id;
             });
         },

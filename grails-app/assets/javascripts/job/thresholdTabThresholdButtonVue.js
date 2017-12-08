@@ -1,8 +1,8 @@
 //= require bower_components/vue/dist/vue.js
-//= require job/thresholdTabThresholdRow.js
+//= require job/thresholdTabThreshold.js
 "use strict"
 
-Vue.component('threshold-row-button', {
+Vue.component('threshold-button', {
     props: ['saved', 'editable'],
     computed: {
         computedClass: function () {
@@ -37,7 +37,7 @@ Vue.component('threshold-row-button', {
             }
         }
     },
-    template: '#threshold-tab-threshold-row-button-vue',
+    template: '#threshold-tab-threshold-button-vue',
     methods: {
         onClick: function (isPositiveButton) {
             this.$emit('button-clicked', {
