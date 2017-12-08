@@ -1,4 +1,4 @@
-<script type="text/x-template" id="threshold-tab-measured-event-vue">
+<script type="text/x-template" id="threshold-measured-event-vue">
 <div>
     <div v-if="Object.keys(measuredEventItem.measuredEvent).length">
         <label class="measuredEventLabel">{{ measuredEventItem.measuredEvent.name }}</label>
@@ -8,7 +8,7 @@
         </button>
     </div>
     <div v-else>
-        <select class="form-control thresholdSelects" v-model="measuredEventItem.measuredEvent">
+        <select class="form-control thresholdSelects" v-model="selectedMeasuredEvent">
             <option v-for="measuredEvent in availableMeasuredEvents" :value="measuredEvent">{{measuredEvent.name}}</option>
         </select>
     </div>
@@ -28,6 +28,6 @@
 </div>
 </script>
 
-<g:render template="thresholdTabThresholdVue"/>
+<g:render template="/job/threshold/thresholdVue"/>
 
-<asset:javascript src="job/thresholdTabMeasuredEventVue.js"/>
+<asset:javascript src="/job/threshold/measuredEventVue.js"/>

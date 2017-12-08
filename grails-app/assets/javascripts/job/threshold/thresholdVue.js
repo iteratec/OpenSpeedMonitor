@@ -1,5 +1,10 @@
 //= require bower_components/vue/dist/vue.js
-//= require job/thresholdTabMeasurandVue.js
+//= require job/threshold/measuredEventVue.js
+//= require job/threshold/thresholdComponents/labelVue.js
+//= require job/threshold/thresholdComponents/inputVue.js
+//= require job/threshold/thresholdComponents/buttonVue.js
+//= require job/threshold/thresholdComponents/measurandSelect.js
+
 "use strict";
 
 Vue.component('threshold', {
@@ -12,7 +17,7 @@ Vue.component('threshold', {
             avaMeasurands: this.availableMeasurands
         }
     },
-    template: '#threshold-tab-threshold-vue',
+    template: '#threshold-vue',
     watch: {
         availableMeasurands: function () {
             this.avaMeasurands = this.availableMeasurands.slice();

@@ -1,4 +1,4 @@
-<script type="text/x-template" id="threshold-tab-threshold-input-vue">
+<script type="text/x-template" id="threshold-input-vue">
 <span class="form-inline">
     <div class="input-group thresholdInput">
         <input class="form-control" type="number"
@@ -13,4 +13,4 @@
 </span>
 </script>
 
-<asset:javascript src="thresholdTabThresholdInput.js"/>
+<asset:javascript src="/job/threshold/thresholdComponents/inputVue.js"/>

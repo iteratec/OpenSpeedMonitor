@@ -1,4 +1,4 @@
-<script type="text/x-template" id="threshold-tab-threshold-button-vue">
+<script type="text/x-template" id="threshold-button-vue">
 <span class="form-inline">
     <button type="button"
             :class="computedClass"
@@ -9,4 +9,4 @@
 </span>
 </script>
 
-<asset:javascript src="thresholdTabThresholdButtonVue.js"/>
+<asset:javascript src="/job/threshold/thresholdComponents/buttonVue.js"/>

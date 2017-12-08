@@ -66,7 +66,7 @@
                 <g:render template="customTab" model="${['job': job]}"/>
             </div>
             <div id="ThresholdContent" class="tab-pane">
-                <g:render template="thresholdTab" model="${['job': job]}"/>
+                <g:render template="threshold/thresholdTab" model="${['job': job]}"/>
             </div>
         </div>
     </div>

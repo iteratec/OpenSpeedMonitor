@@ -1,5 +1,5 @@
 //= require bower_components/vue/dist/vue.js
-//= require job/thresholdTabThreshold.js
+//= require job/threshold/thresholdTabThreshold.js
 "use strict"
 
 Vue.component('threshold-input', {
@@ -25,7 +25,7 @@ Vue.component('threshold-input', {
             }
         }
     },
-    template: '#threshold-tab-threshold-input-vue',
+    template: '#threshold-input-vue',
     watch: {
         value: function (newValue) {
             this.$emit('update-boundary', {value: newValue, fieldName: this.fieldName});

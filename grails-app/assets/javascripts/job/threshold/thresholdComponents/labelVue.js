@@ -1,10 +1,10 @@
 //= require bower_components/vue/dist/vue.js
-//= require job/thresholdTabThreshold.js
+//= require job/threshold/thresholdTabThreshold.js
 "use strict"
 
 Vue.component('threshold-label', {
     props: ['name'],
-    template: '#threshold-tab-threshold-label-vue',
+    template: '#threshold-label-vue',
     computed: {
         classObject: function () {
             return 'label'+this.name;

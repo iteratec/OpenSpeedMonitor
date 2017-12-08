@@ -31,15 +31,6 @@
     </div>
 </div>
 
-<g:render template="thresholdTabMeasuredEventVue"/>
+<g:render template="threshold/measuredEventVue"/>
 
-<asset:javascript src="job/thresholdForJob.js"/>
-
-%{--
-
-<asset:script type="text/javascript">
-    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/thresholdForJob.js"/>');
-    $(window).load(function() {
-      OpenSpeedMonitor.thresholdforJobs.initVue({jobId: "${job?.id}", scriptId: "${job?.script?.id}"});
-    });
-</asset:script>--}%
+<asset:javascript src="/job/threshold/root.js"/>

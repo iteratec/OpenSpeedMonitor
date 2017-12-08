@@ -1,4 +1,4 @@
-<script type="text/x-template" id="threshold-tab-measurand-vue">
+<script type="text/x-template" id="measurand-select-vue">
 <div>
     <select class="thresholdMeasurand form-control thresholdSelects" id="measurand" name="measurand"
             v-model="selectedMeasurand">
@@ -7,4 +7,4 @@
 </div>
 </script>
 
-<asset:javascript src="job/thresholdTabMeasurandVue.js"/>
+<asset:javascript src="/job/threshold/thresholdComponents/measurandSelectVue.js"/>

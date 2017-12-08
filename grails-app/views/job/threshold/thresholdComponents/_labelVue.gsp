@@ -1,4 +1,4 @@
-<script type="text/x-template" id="threshold-tab-threshold-label-vue">
+<script type="text/x-template" id="threshold-label-vue">
 <span class="form-inline">
     <label v-if="showFront">
         <
@@ -12,4 +12,4 @@
 </span>
 </script>
 
-<asset:javascript src="thresholdTabThresholdLabel.js"/>
+<asset:javascript src="/job/threshold/thresholdComponents/labelVue.js"/>

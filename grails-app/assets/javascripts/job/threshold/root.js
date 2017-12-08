@@ -1,12 +1,12 @@
 //= require bower_components/vue/dist/vue.js
 //= require bower_components/jquery/jquery.min.js
 //= require bower_components/file-saver/FileSaver.min.js
-//= require job/thresholdTabMeasuredEventVue.js
-//= require job/thresholdTabMeasurandVue.js
-//= require job/thresholdTabThresholdVue.js
-//= require job/thresholdTabThresholdLabelVue.js
-//= require job/thresholdTabThresholdInputVue.js
-//= require job/thresholdTabThresholdButtonVue.js
+//= require job/threshold/measuredEventVue.js
+//= require job/threshold/thresholdVue.js
+//= require job/threshold/thresholdComponents/measurandSelectVue.js
+//= require job/threshold/thresholdComponents/labelVue.js
+//= require job/threshold/thresholdComponents/inputVue.js
+//= require job/threshold/thresholdComponents/buttonVue.js
 
 "use strict";
 
@@ -106,7 +106,6 @@ new Vue({
             });
         },
         createThreshold: function (newThreshold) {
-            console.dir(newThreshold);
             var self = this;
             $.ajax({
                 type: 'POST',
@@ -238,12 +237,11 @@ new Vue({
                     jobId: this.jobId
                 },
                 success: function (result) {
-                    console.log(result)
                     var filename = "CI_Script_" + self.jobId + ".groovy";
 
-                    var blob = new Blob([result], {
-                        type: "text/plain;charset=utf-8"
-                    });
+                    var blob = new Blob(
+                        [result],
+                        {type: "text/plain;charset=utf-8"});
 
                     saveAs(blob, filename);
                 },
