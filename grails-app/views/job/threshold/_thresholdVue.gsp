@@ -21,7 +21,11 @@
                              :threshold-measurand="thresholdItem.threshold.measurand"
                              :fieldName="upperField" v-on:update-boundary="updateThresholdBoundary"></threshold-input>
         <threshold-label name="Bad"></threshold-label>
-        <threshold-button :saved="thresholdItem.saved" :editable="thresholdItem.edit" v-on:button-clicked="buttonClicked"></threshold-button>
+        <threshold-button :saved="thresholdItem.saved"
+                          :editable="thresholdItem.edit"
+                          :valid="validThreshold"
+                          v-on:button-clicked="buttonClicked">
+        </threshold-button>
     </div>
 </div>
 </script>

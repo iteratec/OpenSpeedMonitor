@@ -2,7 +2,9 @@
 <div>
     <div v-if="Object.keys(measuredEventItem.measuredEvent).length">
         <label class="measuredEventLabel">{{ measuredEventItem.measuredEvent.name }}</label>
-        <button type="button" class="margins btn btn-default"
+        <button type="button"
+                class="margins btn btn-default"
+                :disabled="availableMeasurands.length === 0"
                 @click="addMetric()">
             <i class="fa text-success fa-lg fa-plus"></i>
         </button>

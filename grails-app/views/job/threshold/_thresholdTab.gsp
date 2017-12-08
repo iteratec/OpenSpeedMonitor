@@ -17,20 +17,29 @@
         </div>
     </div>
 
-    <br> <br>
+    <br>
 
-    <div>
+    <span v-if="this.activeMeasuredEvents.length === 0"
+          class="col-sm-offset-5">
         <button type="button" class="btn btn-primary"
-                @click="addMeasuredEvent()">New measured event</button>
+                @click="addMeasuredEvent()"
+                :disabled="availableMeasuredEvents.length === 0">Add first threshold</button>
+    </span>
+    <span v-else class="col-sm-offset-7">
+        <button type="button" class="btn btn-primary"
+                @click="addMeasuredEvent()"
+                :disabled="availableMeasuredEvents.length === 0">Add measured event</button>
+
         <button class="btn btn-default"
                 type="button"
                 id="copyToClipboard"
                 @click="createScript()">
             <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
-        </button><br>
-    </div>
+        </button>
+    </span>
+
 </div>
 
 <g:render template="threshold/measuredEventVue"/>
 
-<asset:javascript src="/job/threshold/root.js"/>
+<asset:javascript src="/job/threshold/rootVue.js"/>

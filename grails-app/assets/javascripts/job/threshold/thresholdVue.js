@@ -18,6 +18,11 @@ Vue.component('threshold', {
         }
     },
     template: '#threshold-vue',
+    computed: {
+        validThreshold: function () {
+            return (Number(this.thresholdItem.threshold.upperBoundary) > Number(this.thresholdItem.threshold.lowerBoundary));
+        }
+    },
     watch: {
         availableMeasurands: function () {
             this.avaMeasurands = this.availableMeasurands.slice();
@@ -60,7 +65,6 @@ Vue.component('threshold', {
                     this.$emit('create-threshold', this.thresholdItem);
                 } else if(!message.editMode) {
                     this.$emit('update-threshold', this.thresholdItem);
-                    this.thresholdItem.edit = message.editMode;
                 } else {
                     this.changeEditMode(this.thresholdItem, message.editMode);
                 }

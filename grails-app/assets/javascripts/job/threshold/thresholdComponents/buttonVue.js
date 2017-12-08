@@ -3,7 +3,7 @@
 "use strict";
 
 Vue.component('threshold-button', {
-    props: ['saved', 'editable'],
+    props: ['saved', 'editable', 'valid'],
     computed: {
         computedClass: function () {
             var baseClasses = "thresholdButton margins btn btn-xs ";
