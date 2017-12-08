@@ -4,10 +4,11 @@
         <input class="form-control" type="number"
                min="1"
                size="40"
+               onClick="this.select()"
                maxlength="12"
                :readonly="!editable"
                v-model="value"/>
-        <span class="input-group-addon">ms</span>
+        <span class="input-group-addon">{{ computedUnit }}</span>
     </div>
 </span>
 </script>

@@ -37,7 +37,9 @@
                     saved: false,
                     threshold: {
                         measuredEvent: this.thresholds.measuredEvent,
-                        measurand: this.availableMeasurands[0]
+                        measurand: this.availableMeasurands[0],
+                        lowerBoundary: 0,
+                        upperBoundary: 0
                     }
                 })
             },
