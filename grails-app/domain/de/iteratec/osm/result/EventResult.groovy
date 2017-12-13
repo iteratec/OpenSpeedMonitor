@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.RepresentableWptResult
 import grails.gorm.annotation.Entity
 
 
@@ -46,7 +47,7 @@ import grails.gorm.annotation.Entity
  * @see JobResult
  */
 @Entity
-class EventResult implements CsiValue {
+class EventResult implements CsiValue, RepresentableWptResult {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
 

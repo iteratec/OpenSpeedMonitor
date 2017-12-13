@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.Constants
 import groovy.transform.InheritConstructors
 
@@ -35,7 +36,7 @@ class SelectedMeasurand {
         return this.name + Constants.UNIQUE_STRING_DELIMITTER + this.cachedView.toString()
     }
 
-    Double getNormalizedValueFrom(EventResult eventResult) {
+    Double getNormalizedValueFrom(EventResultProjection eventResult) {
         return normalizeValue(selectedType.getValue(eventResult, name))
     }
 

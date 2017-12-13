@@ -1,10 +1,13 @@
 package de.iteratec.osm.result
+
+import de.iteratec.osm.report.chart.RepresentableWptResult
+
 /**
  * Created by mwg on 02.08.2017.
  */
 enum SelectedMeasurandType {
     MEASURAND{
-        Double getValue(EventResult eventResult, String name) {
+        Double getValue(RepresentableWptResult eventResult, String name) {
             Measurand measurand = name as Measurand
             return eventResult."$measurand.eventResultField" != null ? Double.valueOf(eventResult."$measurand.eventResultField") : null
         }
@@ -26,7 +29,7 @@ enum SelectedMeasurandType {
         }
     },
     USERTIMING_MARK{
-        Double getValue(EventResult eventResult, String name) {
+        Double getValue(RepresentableWptResult eventResult, String name) {
             UserTiming userTiming = eventResult.userTimings.find { it.name == name && it.type == UserTimingType.MARK }
             return userTiming?.getValue()
         }
@@ -48,7 +51,7 @@ enum SelectedMeasurandType {
         }
     },
     USERTIMING_MEASURE{
-        Double getValue(EventResult eventResult, String name) {
+        Double getValue(RepresentableWptResult eventResult, String name) {
             UserTiming userTiming = eventResult.userTimings.find {
                 it.name == name && it.type == UserTimingType.MEASURE
             }
@@ -74,7 +77,7 @@ enum SelectedMeasurandType {
 
     abstract boolean isUserTiming()
 
-    abstract Double getValue(EventResult eventResult, String name)
+    abstract Double getValue(RepresentableWptResult eventResult, String name)
 
     abstract MeasurandGroup getMeasurandGroup(String name)
 
