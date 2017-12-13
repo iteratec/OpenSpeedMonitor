@@ -35,8 +35,7 @@ import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
-
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 /**
  * <p>
  * A utility service for the event result dashboard and related operations.
@@ -380,22 +379,22 @@ public class EventResultDashboardService {
                     Location location = locationMap[graphLabel.locationId] ?: Location.get(graphLabel.locationId)
 
                     if (group && measuredEvent && location) {
-                        String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
-                                "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
-                                "${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.connectivity}"
+                        String newGraphLabel = "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${group.name}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                                "${measuredEvent.name}${TIMESERIES_CHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
+                                "${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.connectivity}"
                         graphs.add(new OsmChartGraph(
                                 label: newGraphLabel,
                                 measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     } else {
                         graphs.add(new OsmChartGraph(
-                                label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                                label: "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.tag}",
                                 measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     }
                 } else {
                     graphs.add(new OsmChartGraph(
-                            label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                            label: "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.tag}",
                             measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                             points: highChartPoints))
                 }
