@@ -26,7 +26,7 @@
     "jquery": "2.0.3",
     "jquery-ui": "1.10.4",
     "reductio": "^0.6.3",
-    "clipboard": "1.5.12",
+    "clipboard": "1.7.1",
     "jQuery-contextMenu": "^2.2.4",
     "eonasdan-bootstrap-datetimepicker": "^4.17.43",
     "moment": "^2.15.2",
