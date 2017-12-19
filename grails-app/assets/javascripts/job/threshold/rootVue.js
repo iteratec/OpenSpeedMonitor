@@ -12,7 +12,7 @@
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
-OpenSpeedMonitor.i18n.measurandLabel = OpenSpeedMonitor.i18n.measurandLabel || {};
+OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};
 
 new Vue({
     el: '#threshold',
@@ -78,8 +78,7 @@ new Vue({
                     data: {},
                     success: function (result) {
                         result.forEach(function (measurand) {
-                            console.dir(OpenSpeedMonitor.i18n.measurandLabel);
-                            measurand.translatedName = OpenSpeedMonitor.i18n.measurandLabel[measurand.name];
+                            measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];
                         });
 
                         self.measurands = result;

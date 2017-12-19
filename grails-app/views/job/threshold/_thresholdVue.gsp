@@ -1,7 +1,7 @@
 <script type="text/x-template" id="threshold-vue">
 <div>
     <div v-if="thresholdItem.saved">
-        <label class="thresholdMeasurand">{{ thresholdItem.threshold.measurand.name }}</label>
+        <label class="thresholdMeasurand">{{ translatedMeasurand }}</label>
     </div>
 
     <div v-else>

@@ -6,7 +6,11 @@
 "use strict";
 
     Vue.component('threshold-measured-event', {
-        props: ['measured-event-item', 'measurands', 'available-measured-events'],
+        props: [
+            'measured-event-item',
+            'measurands',
+            'available-measured-events'
+        ],
         data: function() {
             return {
                 copiedMeasurands: this.measurands.slice(),

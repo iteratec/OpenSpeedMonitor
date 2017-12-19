@@ -1,6 +1,9 @@
 //= require bower_components/vue/dist/vue.js
 //= require job/threshold/thresholdTabThreshold.js
 "use strict";
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
+OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
+OpenSpeedMonitor.i18n.thresholdButtons = OpenSpeedMonitor.i18n.thresholdButtons || {};
 
 Vue.component('threshold-button', {
     props: ['saved', 'editable', 'valid'],
@@ -15,24 +18,24 @@ Vue.component('threshold-button', {
         },
         computedLabelPositive: function () {
             if (!this.saved) {
-                return "save";
+                return OpenSpeedMonitor.i18n.thresholdButtons["save"];
             } else {
                 if (this.editable) {
-                    return "submit";
+                    return OpenSpeedMonitor.i18n.thresholdButtons["submit"];
 
                 } else {
-                    return "edit";
+                    return OpenSpeedMonitor.i18n.thresholdButtons["edit"];
                 }
             }
         },
         computedLabelNegative: function () {
             if (!this.saved) {
-                return "remove"
+                return OpenSpeedMonitor.i18n.thresholdButtons["remove"];
             } else {
                 if (this.editable) {
-                    return "discard";
+                    return OpenSpeedMonitor.i18n.thresholdButtons["discard"];
                 } else {
-                    return "delete";
+                    return OpenSpeedMonitor.i18n.thresholdButtons["delete"];
                 }
             }
         }

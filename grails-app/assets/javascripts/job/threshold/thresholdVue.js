@@ -7,6 +7,8 @@
 
 "use strict";
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
+OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
+OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};
 
 Vue.component('threshold', {
     props: ['threshold-item', 'available-measurands'],
@@ -22,6 +24,9 @@ Vue.component('threshold', {
     computed: {
         validThreshold: function () {
             return (Number(this.thresholdItem.threshold.upperBoundary) > Number(this.thresholdItem.threshold.lowerBoundary));
+        },
+        translatedMeasurand: function () {
+            return OpenSpeedMonitor.i18n.measurands[this.thresholdItem.threshold.measurand.name];
         }
     },
     watch: {
