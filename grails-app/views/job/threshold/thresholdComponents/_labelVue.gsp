@@ -6,7 +6,7 @@
     <label :class="classObject">
         {{ name }}
     </label>
-    <label v-if="showBehind">
+    <label v-if="showBehind" class="thresholdLabel">
         <
     </label>
 </span>

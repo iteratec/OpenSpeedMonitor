@@ -3,10 +3,10 @@
     <button type="button"
             :disabled="!valid"
             :class="computedClass"
-            @click="onClick(true)">{{computedLabelPositive}}</button>
+            @click="onClick(true)">{{ computedLabelPositive }}</button>
     <button type="button"
-            class="thresholdButton margins btn btn-xs btn-danger"
-            @click="onClick(false)">{{computedLabelNegative}}</button>
+            class="thresholdButton btn btn-xs btn-danger"
+            @click="onClick(false)">{{ computedLabelNegative }}</button>
 </span>
 </script>
 

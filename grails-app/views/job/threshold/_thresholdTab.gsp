@@ -20,13 +20,14 @@
     <br>
 
     <span v-if="activeMeasuredEvents.length === 0"
-          class="col-sm-offset-5">
+          class="col-md-offset-5">
         <button type="button" class="btn btn-primary"
                 @click="addMeasuredEvent()"
                 :disabled="availableMeasuredEvents.length === 0">Add first threshold</button>
     </span>
-    <span v-else class="col-sm-offset-7">
-        <button type="button" class="btn btn-primary"
+    <span v-else class="col-sm-offset-1">
+        <button type="button"
+                class="btn btn-primary"
                 @click="addMeasuredEvent()"
                 :disabled="availableMeasuredEvents.length === 0">
             <g:message code="job.threshold.addMeasuredEvent" default="Add measured Event"/>
@@ -34,7 +35,6 @@
 
         <button class="btn btn-default"
                 type="button"
-                id="copyToClipboard"
                 @click="createScript()">
             <g:message code="job.threshold.downloadScript" default="Download CI-Script"/>
         </button>

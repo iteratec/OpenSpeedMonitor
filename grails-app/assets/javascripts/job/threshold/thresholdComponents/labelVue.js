@@ -7,7 +7,7 @@ Vue.component('threshold-label', {
     template: '#threshold-label-vue',
     computed: {
         classObject: function () {
-            return 'label'+this.name;
+            return 'thresholdLabel label'+this.name;
         },
         showFront: function () {
             return this.name!=="Good";
