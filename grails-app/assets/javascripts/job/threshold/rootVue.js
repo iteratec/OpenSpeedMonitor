@@ -10,6 +10,10 @@
 
 "use strict";
 
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
+OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
+OpenSpeedMonitor.i18n.measurandLabel = OpenSpeedMonitor.i18n.measurandLabel || {};
+
 new Vue({
     el: '#threshold',
     data: {
@@ -24,7 +28,7 @@ new Vue({
         availableMeasuredEvents: function () {
             var self = this;
             self.activeMeasuredEvents.forEach(function (threshold) {
-                if(threshold.measuredEvent) {
+                if (threshold.measuredEvent) {
                     var compareTo = threshold.measuredEvent;
                     self.copiedMeasuredEvents = self.copiedMeasuredEvents.filter(function (element) {
                         return element.id !== compareTo.id;
@@ -73,6 +77,11 @@ new Vue({
                     url: targetUrl,
                     data: {},
                     success: function (result) {
+                        result.forEach(function (measurand) {
+                            console.dir(OpenSpeedMonitor.i18n.measurandLabel);
+                            measurand.translatedName = OpenSpeedMonitor.i18n.measurandLabel[measurand.name];
+                        });
+
                         self.measurands = result;
                     },
                     error: function () {
@@ -163,34 +172,30 @@ new Vue({
             });
         },
         updateThreshold: function (threshold) {
-            if (threshold.threshold.lowerBoundary < threshold.threshold.upperBoundary) {
-                var self = this;
-                var updatedThreshold = threshold;
-                $.ajax({
-                    type: 'POST',
-                    data: {
-                        thresholdId: updatedThreshold.threshold.id,
-                        measurand: updatedThreshold.threshold.measurand.name,
-                        measuredEvent: updatedThreshold.threshold.measuredEvent.id,
-                        lowerBoundary: updatedThreshold.threshold.lowerBoundary,
-                        upperBoundary: updatedThreshold.threshold.upperBoundary
-                    },
-                    url: "/threshold/updateAsync",
-                    success: function () {
-                        self.activeMeasuredEvents.forEach(function (measuredEventItem) {
-                            if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {
-                                updatedThreshold.edit = false;
-                                measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
-                            }
-                        });
-                    },
-                    error: function (e) {
-                        console.log(e);
-                    }
-                });
-            } else {
-                alert("Die obere Grenze muss größer als die untere Grenze sein!")
-            }
+            var self = this;
+            var updatedThreshold = threshold;
+            $.ajax({
+                type: 'POST',
+                data: {
+                    thresholdId: updatedThreshold.threshold.id,
+                    measurand: updatedThreshold.threshold.measurand.name,
+                    measuredEvent: updatedThreshold.threshold.measuredEvent.id,
+                    lowerBoundary: updatedThreshold.threshold.lowerBoundary,
+                    upperBoundary: updatedThreshold.threshold.upperBoundary
+                },
+                url: "/threshold/updateAsync",
+                success: function () {
+                    self.activeMeasuredEvents.forEach(function (measuredEventItem) {
+                        if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {
+                            updatedThreshold.edit = false;
+                            measuredEventItem.thresholdList[measuredEventItem.thresholdList.indexOf(updatedThreshold)] = updatedThreshold;
+                        }
+                    });
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            });
         },
         getThresholdsForJob: function (jobId) {
             var targetUrl = "/job/getThresholdsForJob";
@@ -218,8 +223,8 @@ new Vue({
                 })
             }
         },
-        removeMeasuredEvent: function(measuredEvent){
-            if(Object.keys(measuredEvent.measuredEvent).length) {
+        removeMeasuredEvent: function (measuredEvent) {
+            if (Object.keys(measuredEvent.measuredEvent).length) {
                 this.copiedMeasuredEvents.push(measuredEvent.measuredEvent);
             }
 

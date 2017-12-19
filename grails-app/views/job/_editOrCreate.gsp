@@ -123,6 +123,7 @@
 
                     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
+                    OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");
                 });
     </asset:script>
 </content>

@@ -1,5 +1,6 @@
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
-    <div class="container">
+    <div v-if="activeMeasuredEvents.length !== 0"
+         class="container">
         <div id="thresholdList" class="col-md-offset-1">
             <div v-for="measuredEvent in activeMeasuredEvents">
                 <threshold-measured-event
@@ -16,10 +17,9 @@
             </div>
         </div>
     </div>
-
     <br>
 
-    <span v-if="this.activeMeasuredEvents.length === 0"
+    <span v-if="activeMeasuredEvents.length === 0"
           class="col-sm-offset-5">
         <button type="button" class="btn btn-primary"
                 @click="addMeasuredEvent()"
@@ -28,13 +28,15 @@
     <span v-else class="col-sm-offset-7">
         <button type="button" class="btn btn-primary"
                 @click="addMeasuredEvent()"
-                :disabled="availableMeasuredEvents.length === 0">Add measured event</button>
+                :disabled="availableMeasuredEvents.length === 0">
+            <g:message code="job.threshold.addMeasuredEvent" default="Add measured Event"/>
+        </button>
 
         <button class="btn btn-default"
                 type="button"
                 id="copyToClipboard"
                 @click="createScript()">
-            <g:message code="job.threshold.copyToClipboard" default="Copy To Clipboard"/>
+            <g:message code="job.threshold.downloadScript" default="Download CI-Script"/>
         </button>
     </span>
 
@@ -42,4 +44,4 @@
 
 <g:render template="threshold/measuredEventVue"/>
 
-<asset:javascript src="/job/threshold/rootVue.js"/>
+%{--<asset:javascript src="/job/threshold/rootVue.js"/>--}%

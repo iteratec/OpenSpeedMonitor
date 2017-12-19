@@ -117,4 +117,5 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         getJobGroupIds: pageComparisonVue.getJobGroupIds
     }
 });
+
 OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons();

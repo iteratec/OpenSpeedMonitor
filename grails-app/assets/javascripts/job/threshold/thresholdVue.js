@@ -6,6 +6,7 @@
 //= require job/threshold/thresholdComponents/measurandSelect.js
 
 "use strict";
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 Vue.component('threshold', {
     props: ['threshold-item', 'available-measurands'],
