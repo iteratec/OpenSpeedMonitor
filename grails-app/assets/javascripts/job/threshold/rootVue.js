@@ -7,6 +7,7 @@
 //= require job/threshold/thresholdComponents/labelVue.js
 //= require job/threshold/thresholdComponents/inputVue.js
 //= require job/threshold/thresholdComponents/buttonVue.js
+//= require job/threshold/thresholdComponents/confirmButtonVue.js
 
 "use strict";
 

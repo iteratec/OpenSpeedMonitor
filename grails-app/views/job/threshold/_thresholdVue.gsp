@@ -14,12 +14,12 @@
     <div class="thresholdBoundaries form-inline">
         <threshold-label name="Good"></threshold-label>
         <threshold-input :editable="thresholdItem.edit" :threshold-field="thresholdItem.threshold.lowerBoundary"
-                             :threshold-measurand="thresholdItem.threshold.measurand"
-                             :fieldName="lowerField" v-on:update-boundary="updateThresholdBoundary"></threshold-input>
+                         :threshold-measurand="thresholdItem.threshold.measurand"
+                         :fieldName="lowerField" v-on:update-boundary="updateThresholdBoundary"></threshold-input>
         <threshold-label name="Ok"></threshold-label>
         <threshold-input :editable="thresholdItem.edit" :threshold-field="thresholdItem.threshold.upperBoundary"
-                             :threshold-measurand="thresholdItem.threshold.measurand"
-                             :fieldName="upperField" v-on:update-boundary="updateThresholdBoundary"></threshold-input>
+                         :threshold-measurand="thresholdItem.threshold.measurand"
+                         :fieldName="upperField" v-on:update-boundary="updateThresholdBoundary"></threshold-input>
         <threshold-label name="Bad"></threshold-label>
         <threshold-button :saved="thresholdItem.saved"
                           :editable="thresholdItem.edit"

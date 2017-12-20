@@ -7,6 +7,11 @@ OpenSpeedMonitor.i18n.thresholdButtons = OpenSpeedMonitor.i18n.thresholdButtons 
 
 Vue.component('threshold-button', {
     props: ['saved', 'editable', 'valid'],
+    data: function () {
+        return {
+            confirmDelete: false
+        }
+    },
     computed: {
         computedClass: function () {
             var baseClasses = "thresholdButton margins btn btn-xs ";
@@ -43,11 +48,22 @@ Vue.component('threshold-button', {
     template: '#threshold-button-vue',
     methods: {
         onClick: function (isPositiveButton) {
-            this.$emit('button-clicked', {
-                editMode: !this.editable,
-                saved: this.saved,
-                isPositiveButton: isPositiveButton
-            });
+            if(!this.confirmDelete && !this.editable && !isPositiveButton){
+                this.confirmDelete = true;
+            }else {
+                this.$emit('button-clicked', {
+                    editMode: !this.editable,
+                    saved: this.saved,
+                    isPositiveButton: isPositiveButton
+                });
+            }
+        },
+        deleteThreshold: function (confirmed) {
+            if(confirmed) {
+                this.onClick(false);
+            }
+            this.confirmDelete = false;
+
         }
     }
 });
