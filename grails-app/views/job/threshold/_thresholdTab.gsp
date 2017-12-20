@@ -36,7 +36,7 @@
         <button class="btn btn-default"
                 type="button"
                 @click="createScript()">
-            <g:message code="job.threshold.createScript" default="Download CI-Script"/>
+            <g:message code="job.threshold.createScript" default="Create CI-Script"/>
         </button>
     </span>
 
