@@ -1,7 +1,6 @@
 //= require bower_components/vue/dist/vue.js
 //= require job/threshold/thresholdComponents/buttonVue.js
 "use strict"
-
 Vue.component('threshold-confirm-button', {
     props: {},
     data: function() {

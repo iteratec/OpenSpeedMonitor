@@ -1,15 +1,15 @@
 <script type="text/x-template" id="threshold-confirm-button-vue">
 <span>
     <span class="btn ">
-        Sure?
+        <g:message code="job.threshold.deleteSure" default="Sure?"/>
     </span>
     <button class="btn btn-success confirmButton"
             @click.prevent="confirmDelete(true)">
-        Yes
+        <g:message code="job.threshold.deleteYes" default="Yes"/>
     </button>
     <button class="btn btn-danger confirmButton"
             @click.prevent="confirmDelete(false)">
-        No
+        <g:message code="job.threshold.deleteNo" default="No"/>
     </button>
 </span>
 </script>

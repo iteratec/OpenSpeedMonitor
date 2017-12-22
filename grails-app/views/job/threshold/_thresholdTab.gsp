@@ -23,7 +23,9 @@
           class="col-md-offset-5">
         <button type="button" class="btn btn-primary"
                 @click="addMeasuredEvent()"
-                :disabled="availableMeasuredEvents.length === 0">Add first threshold</button>
+                :disabled="availableMeasuredEvents.length === 0">
+            <g:message code="job.threshold.addFirstThreshold" default="Add first measured Event"/>
+        </button>
     </span>
     <span v-else class="col-sm-offset-1">
         <button type="button"
