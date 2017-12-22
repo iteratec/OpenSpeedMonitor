@@ -50,7 +50,6 @@ new Vue({
         fetchData: function () {
             this.getMeasurands("/job/getMeasurands");
             this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
-            this.getThresholds();
         },
         getMeasuredEvents: function (scriptId, targetUrl) {
             var self = this;
@@ -63,6 +62,7 @@ new Vue({
                         self.measuredEvents = result;
                         self.copiedMeasuredEvents = self.measuredEvents.slice();
                         self.measuredEventCount = self.measuredEvents.length;
+                        self.getThresholds();
                     },
                     error: function () {
                         return ""
@@ -103,8 +103,10 @@ new Vue({
                             saved: true
                         })
                     });
+                    console.dir(self.measuredEvents);
                     self.activeMeasuredEvents.push({
                         measuredEvent: self.measuredEvents.find(function (element) {
+                            console.log(element.id);
                             return element.id === resultEvent.measuredEvent.id;
                         }),
                         thresholdList: thresholdsForEvent
