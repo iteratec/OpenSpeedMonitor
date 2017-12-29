@@ -1,424 +1,336 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.dao.CriteriaSorting
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.*
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import grails.test.mixin.Mock
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
+import de.iteratec.osm.dao.CriteriaSorting
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.result.*
 
-/**
- *
- */
+
 @Integration
 @Rollback
+@Mock([ConnectivityProfile, Job, MeasuredEvent])
 class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpec {
 
     EventResultDaoService eventResultDaoService
 
-    public static final String CUSTOM_CONN_NAME_1 = 'Custom (6000/512 Kbps, 100ms, 0% PLR)'
-    public static final String CUSTOM_CONN_NAME_2 = 'Custom (50000/6000 Kbps, 100ms, 0% PLR)'
+    public static final String CUSTOM_CONNECTIVITY_NAME_1 = 'Custom (6000/512 Kbps, 100ms, 0% PLR)'
+    public static final String CUSTOM_CONNECTIVITY_NAME_2 = 'Custom (50000/6000 Kbps, 100ms, 0% PLR)'
 
-    DateTime runDate
-    private Job jobWithPredefinedConnectivity
-    private Job jobWithNativeConnectivity
-    private Job jobWithCustomConnectivity
-    private MeasuredEvent measuredEvent
+    private DateTime runDate = new DateTime(2013, 5, 29, 0, 0, 0, DateTimeZone.UTC)
 
-    private EventResult withPredefinedProfile1
-    private EventResult withPredefinedProfile2
-    private EventResult withNativeConnectivity
-    private EventResult withCustomConnectivityMatchingRegex
-    private EventResult withCustomConnectivityNotMatchingRegex
-    private ConnectivityProfile predefinedProfile1
-    private ConnectivityProfile predefinedProfile2
+    private ConnectivityProfile predefinedConnectivityProfile1
+    private ConnectivityProfile predefinedConnectivityProfile2
 
-    def setupTest() {
+    private EventResult eventResultWithPredefinedProfile1
+    private EventResult eventResultWithPredefinedProfile2
+    private EventResult eventResultWithCustomConnectivity1
+    private EventResult eventResultWithCustomConnectivity2
+    private EventResult eventResultWithNativeConnectivity
+
+
+    def setupForFeatureMethod() {
         EventResult.withNewSession { session ->
-            createTestDataCommonToAllTests();
+            createTestDataCommonToAllTests()
             session.flush()
         }
     }
 
-    // selection by one type of selector: predefined profile(s), custom conn or native conn ///////////////////////////////////////////
-    void "select by single predefined profile"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by single predefined connectivity profile"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for one single predefined connectivity profile is executed"
         EventResult.withNewSession {
 
             MvQueryParams queryParams = new ErQueryParams()
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
-            queryParams.measuredEventIds.add(measuredEvent.id)
-            queryParams.pageIds.add(measuredEvent.testedPage.id)
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
-            queryParams.connectivityProfileIds.add(predefinedProfile1.ident())
+            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "the only event result with this connectivity profile is found"
         results.size() == 1
-        results[0].connectivityProfile.ident() == predefinedProfile1.ident()
+        results[0].connectivityProfile.id == predefinedConnectivityProfile1.id
         results[0].customConnectivityName == null
     }
 
-    void "select by a list of predefined profiles"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by a list of predefined connectivity profiles"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for two connectivity profiles is executed"
         EventResult.withNewSession {
             MvQueryParams queryParams = new ErQueryParams()
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
-            queryParams.measuredEventIds.add(measuredEvent.id)
-            queryParams.pageIds.add(measuredEvent.testedPage.id)
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
-            queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident(), predefinedProfile2.ident()])
+            queryParams.connectivityProfileIds.addAll([
+                    predefinedConnectivityProfile1.id,
+                    predefinedConnectivityProfile2.id
+            ])
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "both event results with the corresponding connectivity profile is found"
         results.size() == 2
-        List idsOfConnProfilesAssociatedToResults = results*.connectivityProfile*.ident()
-        idsOfConnProfilesAssociatedToResults.contains(predefinedProfile1.ident())
-        idsOfConnProfilesAssociatedToResults.contains(predefinedProfile2.ident())
+        List connectivityProfileIdsOfQueriedEventResults = results*.connectivityProfile*.id
+        connectivityProfileIdsOfQueriedEventResults.contains(predefinedConnectivityProfile1.id)
+        connectivityProfileIdsOfQueriedEventResults.contains(predefinedConnectivityProfile2.id)
         results[0].customConnectivityName == null
         results[1].customConnectivityName == null
     }
 
-    void "select by custom conn name regex: not matching all"() {
-        setup:
-        setupTest()
+    def "select event results by one custom connectivity name"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
         Collection<EventResult> results
 
-        when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(measuredEvent.testedPage.id)
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
+        when: "a query for one custom connectivity name is executed"
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
 
         results = eventResultDaoService.getLimitedMedianEventResultsBy(
                 runDate.toDate(),
                 runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
                 queryParams,
                 [:],
                 new CriteriaSorting(sortingActive: false)
         )
 
-        then:
+        then: "the only event result with this custom connectivity is found"
         results.size() == 1
         results[0].connectivityProfile == null
-        results[0].customConnectivityName == CUSTOM_CONN_NAME_1
+        results[0].customConnectivityName == CUSTOM_CONNECTIVITY_NAME_1
     }
 
-    void "select by custom conn name regex: matching all"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by all present custom connectivity names"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query with all custom connectivity names is executed"
         EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams();
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-            queryParams.measuredEventIds.add(measuredEvent.id);
-            queryParams.pageIds.add(measuredEvent.testedPage.id);
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
-            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_2)
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.customConnectivityNames.addAll([
+                    CUSTOM_CONNECTIVITY_NAME_1,
+                    CUSTOM_CONNECTIVITY_NAME_2
+            ])
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "both event results (one for each custom connectivity) are found"
         results.size() == 2
-        List associatedPredefinedProfiles = results*.connectivityProfile
-        associatedPredefinedProfiles[0] == null
-        associatedPredefinedProfiles[1] == null
-        results*.customConnectivityName.contains(withCustomConnectivityMatchingRegex.customConnectivityName)
-        results*.customConnectivityName.contains(withCustomConnectivityNotMatchingRegex.customConnectivityName)
+        List predefinedProfilesOfQueriedEventResults = results*.connectivityProfile
+        predefinedProfilesOfQueriedEventResults[0] == null
+        predefinedProfilesOfQueriedEventResults[1] == null
+        results*.customConnectivityName.contains(eventResultWithCustomConnectivity1.customConnectivityName)
+        results*.customConnectivityName.contains(eventResultWithCustomConnectivity2.customConnectivityName)
     }
 
-    void "select only native conn"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select only event results with native connectivity"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for event results with native connectivity is executed"
         EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams();
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-            queryParams.measuredEventIds.add(measuredEvent.id);
-            queryParams.pageIds.add(measuredEvent.testedPage.id);
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            MvQueryParams queryParams = new ErQueryParams()
             queryParams.includeNativeConnectivity = true
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "the only event result with native connectivity is found"
         results.size() == 1
         results[0].connectivityProfile == null
     }
 
-    // selection by combinations of multiple types of selectors: predefined profile(s)/custom conn/native conn ///////////////////////////////////////////
-    void "select by custom conn name regex AND native conn"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by custom connectivity name regex AND native connectivity"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for all event results with one specific custom connectivity name or native connectivity is executed"
         EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams();
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-            queryParams.measuredEventIds.add(measuredEvent.id);
-            queryParams.pageIds.add(measuredEvent.testedPage.id);
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
             queryParams.includeNativeConnectivity = true
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "both event results, one for custom and one for native connectivity are found"
         results.size() == 2
         results.findAll { it.connectivityProfile }.size() == 0
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
+        results.findAll { it.customConnectivityName == CUSTOM_CONNECTIVITY_NAME_1 }.size() == 1
     }
 
-    void "select by custom conn name regex AND predefined conn"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by custom connectivity name regex AND predefined connectivity"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for all custom connectivity names or a specific predefined connectivity profile is executed"
         EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams();
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-            queryParams.measuredEventIds.add(measuredEvent.id);
-            queryParams.pageIds.add(measuredEvent.testedPage.id);
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
-            queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_2)
-            queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident()])
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.customConnectivityNames.addAll([
+                    CUSTOM_CONNECTIVITY_NAME_1,
+                    CUSTOM_CONNECTIVITY_NAME_2
+            ])
+            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "all three event results, one for each custom connectivity and one with a predefined connectivity profile are found"
         results.size() == 3
         results.findAll { it.connectivityProfile }.size() == 1
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_2) }.size() == 1
+        results.findAll { it.customConnectivityName == CUSTOM_CONNECTIVITY_NAME_1 }.size() == 1
+        results.findAll { it.customConnectivityName == CUSTOM_CONNECTIVITY_NAME_2 }.size() == 1
     }
 
-    void "select by native conn AND predefined conn"() {
-        setup:
-        setupTest()
-        Collection<EventResult> results
+    def "select event results by native connectivity AND predefined connectivity"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for event results with native connectivity and one predefined connectivity is executed"
         EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams();
-            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-            queryParams.measuredEventIds.add(measuredEvent.id);
-            queryParams.pageIds.add(measuredEvent.testedPage.id);
-            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-            queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
             queryParams.includeNativeConnectivity = true
 
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "then two event results, one for each case are found"
         results.size() == 2
         results.findAll { it.connectivityProfile }.size() == 1
+        results.findAll { it.noTrafficShapingAtAll }.size() == 1
     }
 
-    void "select by custom conn name regex AND native conn AND predefined conn"() {
-        setup:
-        setupTest()
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
-        queryParams.includeNativeConnectivity = true
-        queryParams.customConnectivityNames.add(CUSTOM_CONN_NAME_1)
-        Collection<EventResult> results
+    def "select event results by custom connectivity name regex AND native connectivity AND predefined connectivity"() {
+        setup: "database with a variety of event results, each with a different connectivity specification"
+        setupForFeatureMethod()
+        Collection<EventResult> results = null
 
-        when:
+        when: "a query for one custom, one predefined and native connectivity is executed"
         EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
+            queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
+            queryParams.includeNativeConnectivity = true
+
             results = eventResultDaoService.getLimitedMedianEventResultsBy(
                     runDate.toDate(),
                     runDate.plusHours(1).toDate(),
-                    [
-                            CachedView.CACHED,
-                            CachedView.UNCACHED
-                    ] as Set,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
 
-        then:
+        then: "three event results, one for each case are found"
         results.size() == 3
-        ArrayList<EventResult> resultsWithPredefinedProfiles = results.findAll { it.connectivityProfile }
-        resultsWithPredefinedProfiles.size() == 1
-        resultsWithPredefinedProfiles[0].connectivityProfile.ident() == predefinedProfile2.ident()
-        results.findAll { it.customConnectivityName.equals(CUSTOM_CONN_NAME_1) }.size() == 1
+        results.findAll { it.connectivityProfile }.size() == 1
+        results.findAll { it.connectivityProfile }.first().connectivityProfile.id == predefinedConnectivityProfile2.id
+        results.findAll { it.customConnectivityName == CUSTOM_CONNECTIVITY_NAME_1 }.size() == 1
+        results.findAll { it.noTrafficShapingAtAll }.size() == 1
     }
 
 
     private void createTestDataCommonToAllTests() {
+        predefinedConnectivityProfile1 = ConnectivityProfile.build(name: 'predefined connectivity profile 1')
+        eventResultWithPredefinedProfile1 = EventResult.build(
+                connectivityProfile: predefinedConnectivityProfile1,
+                jobResultDate: runDate.toDate(),
+                medianValue: true,
+        )
 
-        predefinedProfile1 = TestDataUtil.createConnectivityProfile('connProfile 1: name')
-        predefinedProfile2 = TestDataUtil.createConnectivityProfile('connProfile 2: name')
-
-        WebPageTestServer server =
-                TestDataUtil.createWebPageTestServer('server 1 - wpt server', 'server 1 - wpt server', true, 'http://server1.wpt.server.de')
-
-        JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup")
-
-        Browser fireFoxBrowser = TestDataUtil.createBrowser('FF')
-
-        Location ffAgent1 = TestDataUtil.createLocation(server, 'physNetLabAgent01-FF', fireFoxBrowser, true)
-
-        Page homepage = TestDataUtil.createPage('homepage')
-
-        Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
-        jobWithPredefinedConnectivity = TestDataUtil.createJob('job with predefined connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60)
-        jobWithNativeConnectivity = new Job(label: 'job with native connectivity', script: script, location: ffAgent1, jobGroup: jobGroup, description: 'irrelevantDescription', runs: 1, active: false, maxDownloadTimeInMinutes: 60, noTrafficShapingAtAll: true, customConnectivityProfile: false, connectivityProfile: null, executionSchedule: '0 0 */2 * * ? *').save(failOnError: true)
-        jobWithCustomConnectivity = TestDataUtil.createJob('job with custom connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60, predefinedProfile1)
-
-        measuredEvent = TestDataUtil.createMeasuredEvent('Test event', homepage)
-
-        /* Create TestData */
-        runDate = new DateTime(2013, 5, 29, 0, 0, 0, DateTimeZone.UTC)
-
-        JobResult jobRunWithPredefinedConnectivity = TestDataUtil.createJobResult('1', runDate.toDate(), jobWithPredefinedConnectivity, jobWithPredefinedConnectivity.location)
-        JobResult jobRunWithNativeConnectivity = TestDataUtil.createJobResult('2', runDate.toDate(), jobWithNativeConnectivity, jobWithNativeConnectivity.location)
-        JobResult jobRunWithCustomConnectivity = TestDataUtil.createJobResult('3', runDate.toDate(), jobWithCustomConnectivity, jobWithCustomConnectivity.location)
-
-        withPredefinedProfile1 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser, predefinedProfile1)
-
-        withPredefinedProfile2 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser, predefinedProfile2)
-
-        withNativeConnectivity = TestDataUtil.createEventResult(jobWithNativeConnectivity, jobRunWithNativeConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser)
-
-        withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser)
-        withCustomConnectivityMatchingRegex.connectivityProfile = null
-        withCustomConnectivityMatchingRegex.noTrafficShapingAtAll = false
-        withCustomConnectivityMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_1
-        withCustomConnectivityMatchingRegex.save(failOnError: true)
-
-        withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, fireFoxBrowser)
-        withCustomConnectivityNotMatchingRegex.connectivityProfile = null
-        withCustomConnectivityNotMatchingRegex.noTrafficShapingAtAll = false
-        withCustomConnectivityNotMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_2
-        withCustomConnectivityNotMatchingRegex.save(failOnError: true)
-
+        predefinedConnectivityProfile2 = ConnectivityProfile.build(name: 'predefined connectivity profile 2')
+        eventResultWithPredefinedProfile2 = EventResult.build(
+                connectivityProfile: predefinedConnectivityProfile2,
+                jobResultDate: runDate.toDate(),
+                medianValue: true,
+        )
+        eventResultWithCustomConnectivity1 = EventResult.build(
+                customConnectivityName: CUSTOM_CONNECTIVITY_NAME_1,
+                connectivityProfile: null,
+                noTrafficShapingAtAll: false,
+                jobResultDate: runDate.toDate(),
+                medianValue: true,
+        )
+        eventResultWithCustomConnectivity2 = EventResult.build(
+                customConnectivityName: CUSTOM_CONNECTIVITY_NAME_2,
+                connectivityProfile: null,
+                noTrafficShapingAtAll: false,
+                jobResultDate: runDate.toDate(),
+                medianValue: true,
+        )
+        eventResultWithNativeConnectivity = EventResult.build(
+                connectivityProfile: null,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: true,
+                jobResultDate: runDate.toDate(),
+                medianValue: true
+        )
     }
-
 }
