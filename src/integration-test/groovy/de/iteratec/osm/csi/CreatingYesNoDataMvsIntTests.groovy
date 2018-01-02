@@ -17,12 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
@@ -50,17 +45,10 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
      * Creating testdata.
      */
 
-    def setup(){
-        CsiAggregationInterval.withNewTransaction {
-            TestDataUtil.createCsiAggregationIntervals()
-            createPagesAndEvents()
-            createBrowsers()
-            createHoursOfDay()
-            createServer()
-            createLocations()
-            createJobGroups()
-            createJobs()
-        }
+    def setup() {
+        createInterval()
+        createPagesAndEvents()
+        createJobGroups()
     }
 
     /**
@@ -68,16 +56,20 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
      */
     void "Creating weekly page values test"() {
         given:
-        DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
+        Date endDate = startOfCreatingWeeklyPageValues.plusWeeks(1).toDate()
+        Date startDate = startOfCreatingWeeklyPageValues.toDate()
         CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        Integer countPages = 7
+        List<JobGroup> jobGroups = JobGroup.findAllByCsiConfigurationIsNotNull()
+        List<Page> pages = Page.list()
+        Integer countPages = pages.size()
         Integer countWeeks = 2
-        when:
-        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate(), weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
 
-        then:
+        when: "The weekly page CSIAggregation was calculated"
+        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, endDate, weeklyInterval, jobGroups, pages)
+
+        then: "We should get exactly one aggregation per week and page and every should be calculated"
         wpmvs.size() == countWeeks * countPages
-        wpmvs.each {
+        wpmvs.every {
             it.isCalculated()
         }
     }
@@ -87,177 +79,38 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
      */
     void "Creating weekly shop values test"() {
         given:
-        DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
+        Date endDate = startOfCreatingWeeklyShopValues.plusWeeks(1).toDate()
+        Date startDate = startOfCreatingWeeklyShopValues.toDate()
+        List<JobGroup> jobGroups = JobGroup.list()
+        List<Page> pages = Page.list()
+        Integer countPages = pages.size()
         Integer countWeeks = 2
-        Integer countPages = 7
-        when:
-        List<CsiAggregation> wsmvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
-        then:
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+
+        when: "The CsiAggregations of the given data was calculated"
+        List<CsiAggregation> wsmvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, endDate, weeklyInterval, jobGroups)
+
+        then: "We should get exactly the amount of weeks as aggregations and every aggregations should be calculated"
         wsmvs.size() == countWeeks
-        wsmvs.each {
+        wsmvs.every {
             it.isCalculated()
         }
-        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list(), Page.list()).size() == countWeeks * countPages
-
+        pageCsiAggregationService.findAll(startDate, endDate, weeklyInterval, jobGroups, pages).size() == countWeeks * countPages
     }
 
     private static void createJobGroups() {
-        CsiDay csiDay = new CsiDay()
-        0..23.each {csiDay.setHourWeight(it, 0.5)}
-        String csiGroupName = 'CSI'
-        CsiConfiguration csiConfiguration = new CsiConfiguration(
-            label: "TestLabel",
-            description:  "TestDescription",
-            csiDay: csiDay,
-            browserConnectivityWeights: [],
-            pageWeights: [],
-            timeToCsMappings: []).save()
-        JobGroup.findByName(csiGroupName) ?: new JobGroup(
-                name: csiGroupName, csiConfiguration: csiConfiguration ).save(failOnError: true)
-    }
-
-    private static void createJobs() {
-        Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
-        Location locationFf = Location.findByLabel('ffLocationLabel')
-        Location locationIe = Location.findByLabel('ieLocationLabel')
-        JobGroup jobGroup = JobGroup.findByName('CSI')
-        Page pageHp = Page.findByName('HP')
-        Page pageMes = Page.findByName('MES')
-
-        Job testjob_HP = new Job(
-                label: 'testjob_HP',
-                location: locationFf,
-                page: pageHp,
-                active: false,
-                description: '',
-                runs: 1,
-                jobGroup: jobGroup,
-                script: script,
-                maxDownloadTimeInMinutes: 60,
-                noTrafficShapingAtAll: true
-        ).save(failOnError: true)
-
-        Job testjob_MES = new Job(
-                label: 'testjob_MES',
-                location: locationIe,
-                page: pageMes,
-                active: false,
-                description: '',
-                runs: 1,
-                jobGroup: jobGroup,
-                script: script,
-                maxDownloadTimeInMinutes: 60,
-                noTrafficShapingAtAll: true
-        ).save(failOnError: true)
-    }
-
-    private static void createHoursOfDay() {
-        CsiDay day = new CsiDay()
-        day.with {
-            hour0Weight = 2.9
-            hour1Weight = 0.4
-            hour2Weight = 0.2
-            hour3Weight = 0.1
-            hour4Weight = 0.1
-            hour5Weight = 0.2
-            hour6Weight = 0.7
-            hour7Weight = 1.7
-            hour8Weight = 3.2
-            hour9Weight = 4.8
-            hour10Weight = 5.6
-            hour11Weight = 5.7
-            hour12Weight = 5.5
-            hour13Weight = 5.8
-            hour14Weight = 5.9
-            hour15Weight = 6.0
-            hour16Weight = 6.7
-            hour17Weight = 7.3
-            hour18Weight = 7.7
-            hour19Weight = 8.8
-            hour20Weight = 9.3
-            hour21Weight = 7.0
-            hour22Weight = 3.6
-            hour23Weight = 0.9
-        }
-        day.save(failOnError: true)
+        CsiDay csiDay = CsiDay.build()
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(label: "TestLabel", csiDay: csiDay)
+        JobGroup.build(name: 'CSI', csiConfiguration: csiConfiguration)
     }
 
     private static void createPagesAndEvents() {
         ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', Page.UNDEFINED].each { pageName ->
-            Double weight = 0
-            switch (pageName) {
-                case 'HP': weight = 6; break
-                case 'MES': weight = 9; break
-                case 'SE': weight = 36; break
-                case 'ADS': weight = 43; break
-                case 'WKBS': weight = 3; break
-                case 'WK': weight = 3; break
-            }
-            Page page = Page.findByName(pageName) ?: new Page(name: pageName).save(failOnError: true)
-
-            // Simply create one event
-            new MeasuredEvent(
-                    name: 'CreatingYesNoDataMvsIntTests-' + pageName,
-                    testedPage: page
-            ).save(failOnError: true)
+            Page page = Page.build(name: pageName)
+            MeasuredEvent.build(name: 'CreatingYesNoDataMvsIntTests-' + pageName, testedPage: page)
         }
     }
-
-    private static void createBrowsers() {
-        String browserName = "undefined"
-        Browser.findByName(browserName) ?: new Browser(name: browserName)
-                .addToBrowserAliases(alias: "undefined")
-                .save(failOnError: true)
-        browserName = "IE"
-        Browser browserIE = Browser.findByName(browserName) ?: new Browser(name: browserName)
-                .addToBrowserAliases(alias: "IE")
-                .addToBrowserAliases(alias: "IE8")
-                .addToBrowserAliases(alias: "Internet Explorer")
-                .addToBrowserAliases(alias: "Internet Explorer 8")
-                .save(failOnError: true)
-        browserName = "FF"
-        Browser browserFF = Browser.findByName(browserName) ?: new Browser(name: browserName)
-                .addToBrowserAliases(alias: "FF")
-                .addToBrowserAliases(alias: "FF7")
-                .addToBrowserAliases(alias: "Firefox")
-                .addToBrowserAliases(alias: "Firefox7")
-                .save(failOnError: true)
-    }
-
-    private static void createServer() {
-        WebPageTestServer server1
-        server1 = new WebPageTestServer(
-                baseUrl: 'http://wpt.server.de',
-                active: true,
-                label: 'server 1 - wpt server',
-                proxyIdentifier: 'server 1 - wpt server',
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true)
-    }
-
-    private static void createLocations() {
-        WebPageTestServer server1 = WebPageTestServer.findByLabel('server 1 - wpt server')
-        Browser browserFF = Browser.findByName("FF")
-        Browser browserIE = Browser.findByName("IE")
-        Location ffAgent1, ieAgent1
-        ffAgent1 = new Location(
-                active: true,
-                location: 'ffLocationLocation',
-                label: 'ffLocationLabel',
-                browser: browserFF,
-                wptServer: server1,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true)
-        ieAgent1 = new Location(
-                active: true,
-                location: 'ieLocationLocation',
-                label: 'ieLocationLabel',
-                browser: browserIE,
-                wptServer: server1,
-                dateCreated: new Date(),
-                lastUpdated: new Date()
-        ).save(failOnError: true)
+    private static void createInterval(){
+        CsiAggregationInterval.build(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY)
     }
 }
