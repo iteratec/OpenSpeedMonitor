@@ -330,7 +330,7 @@ class JobProcessingService {
     /**
      * If measurements are generally enabled: Launches the given Job and creates a Quartz trigger to poll for new results every x seconds.
      * If they are not enabled nothing happens.
-     * @return whether the job was launched successfully
+     * @return the testId of the running job.
      */
     public String launchJobRun(Job job, priority = 5) {
 
@@ -348,6 +348,7 @@ class JobProcessingService {
         try {
             def parameters = fillRequestParameters(job)
             parameters['priority'] = priority
+
 
             WebPageTestServer wptserver = job.location.wptServer
             if (!wptserver) {
