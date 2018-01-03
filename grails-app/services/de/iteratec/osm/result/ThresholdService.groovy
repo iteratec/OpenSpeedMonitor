@@ -52,9 +52,10 @@ class ThresholdService {
     }
 
     /**
+     * Collects all thresholds for a job.
      *
-     * @param job
-     * @return
+     * @param job The selected job.
+     * @return All thresholds for the given job.
      */
     List<Threshold> getThresholdsForJob(Job job){
         return Threshold.findAllByJob(job)
