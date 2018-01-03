@@ -23,35 +23,42 @@ class ThresholdSpec extends Specification {
     }
 
     void "test duplications for measurands in measured events of a job"() {
-        when:
+        given: "a threshold"
         Job job1 = Job.build()
         MeasuredEvent measuredEvent = MeasuredEvent.build()
         Threshold threshold1 = new Threshold(job: job1, measuredEvent: measuredEvent, measurand: measurand1, upperBoundary: 100, lowerBoundary: 10)
         threshold1.save(flush: true)
+
+        when: "another threshold gets created with same/different measurand"
         Threshold threshold2 = new Threshold(job: job1, measuredEvent: measuredEvent, measurand: measurand2, upperBoundary: 100, lowerBoundary: 10)
 
-        then:
+        then: "threshold creation fails/succeeds"
         threshold1.validate()
         threshold2.validate() == shouldBeValid
 
-        where:
+        where: "the thresholds have the same/different measurands"
         shouldBeValid | measurand1                            | measurand2
         false         | Measurand.DOC_COMPLETE_INCOMING_BYTES | Measurand.DOC_COMPLETE_INCOMING_BYTES
         true          | Measurand.DOC_COMPLETE_INCOMING_BYTES | Measurand.DOC_COMPLETE_TIME
     }
 
     void "test constraints for upperBoundary and lowerBoundary"() {
-        when:
-        Threshold threshold = Threshold.build()
-        threshold.upperBoundary = upperBoundary
-        threshold.lowerBoundary = lowerBoundary
+        when: "a threshold gets created"
+        Threshold threshold = new Threshold(
+                job: Job.build(),
+                measuredEvent: MeasuredEvent.build(),
+                measurand: Measurand.DOC_COMPLETE_TIME,
+                upperBoundary: upperBoundary,
+                lowerBoundary: lowerBoundary
+        )
 
-        then:
-        (threshold.upperBoundary > threshold.lowerBoundary) == shouldBeValid
+        then: "threshold creation fails/succeeds"
+        threshold.validate() == shouldBeValid
 
-        where:
+        where: "the upper boundary is higher/lower/equal than the lower boundary "
         shouldBeValid | upperBoundary   | lowerBoundary
         false         | 10              | 100
+        false         | 100             | 100
         true          | 100             | 10
     }
 }
