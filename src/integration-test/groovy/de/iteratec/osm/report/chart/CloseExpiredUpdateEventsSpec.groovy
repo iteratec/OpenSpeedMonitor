@@ -22,15 +22,12 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.terracotta.quartz.wrappers.JobFacade
 import spock.util.mop.ConfineMetaClassChanges
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ServiceMocker
 
 

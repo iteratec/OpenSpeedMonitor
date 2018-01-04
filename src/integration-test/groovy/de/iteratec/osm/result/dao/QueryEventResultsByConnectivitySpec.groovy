@@ -14,7 +14,6 @@ import de.iteratec.osm.result.*
 
 @Integration
 @Rollback
-@Mock([ConnectivityProfile, Job, MeasuredEvent])
 class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpec {
 
     EventResultDaoService eventResultDaoService
