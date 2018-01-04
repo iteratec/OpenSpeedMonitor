@@ -4,11 +4,9 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import grails.test.mixin.Mock
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.*
 
 

@@ -36,8 +36,9 @@ import de.iteratec.osm.util.ServiceMocker
 @ConfineMetaClassChanges([CsiAggregationUtilService, BatchActivityService])
 class CloseExpiredUpdateEventsSpec extends NonTransactionalIntegrationSpec {
 
-    CsiAggregationUtilService csiAggregationUtilService
     CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
+
+    CsiAggregationUtilService csiAggregationUtilService
     CsiAggregationDaoService csiAggregationDaoService
     InMemoryConfigService inMemoryConfigService
 
@@ -46,15 +47,19 @@ class CloseExpiredUpdateEventsSpec extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval hourlyInterval
 
     final DateTime mockedExecutionTimeOfCleanup = new DateTime(2014, 7, 7, 5, 30, 0, DateTimeZone.UTC)
+
     DateTime actualWeekStart
     DateTime lastWeekStart
     DateTime secondToLastWeekStart
+
     DateTime actualDayStart
     DateTime lastDayStart
     DateTime secondToLastDayStart
+
     DateTime actualHourStart
     DateTime lastHourStart
     DateTime secondLastHourStart
+
     DateTime dateOfUpdate
 
     def setup() {
