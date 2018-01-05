@@ -263,4 +263,4 @@ Although it works with an H2 in memory database out of the box it's highly recom
 [17]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
 [18]: https://github.com/iteratec/OsmDetailAnalysis
 [19]: https://dc-js.github.io/dc.js/
-[20]: https://https://docs.docker.com/compose/install/
+[20]: https://docs.docker.com/compose/install/
