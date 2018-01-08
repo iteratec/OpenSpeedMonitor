@@ -28,12 +28,8 @@ function initPngDownloadModal() {
         return modalDialog.offsetWidth - sideMargin - resizeHandleMargin;
     }
 
-    function getValidatedWidth(width) {
-        return Math.min(Math.max(width, minWidthEstimate), getSvgMaxWidth())
-    }
-
     function setContainerWidth(containerWidth) {
-        downloadContainer.style.width = getValidatedWidth(containerWidth) + "px";
+        downloadContainer.style.width = Math.min(Math.max(containerWidth, minWidthEstimate), getSvgMaxWidth()) + "px";
         widthField.value = downloadContainer.offsetWidth;
         window.dispatchEvent(new Event("resize"));
     }
