@@ -7,7 +7,11 @@ function initPngDownloadModal() {
     var svgElement = originalContainer.getElementsByTagName("svg")[0];
     var placeholder = svgElement.cloneNode(true);
     var width = originalContainer.offsetWidth;
-    var sideMargin = OpenSpeedMonitor.ChartComponents ? OpenSpeedMonitor.ChartComponents.common.ComponentMargin : 3;
+    //OpenSpeedMonitor.ChartComponents.common.ComponentMargin is only defined for bar charts.
+    //A sideMargin of 25px looks good for distribution charts
+    var sideMargin = OpenSpeedMonitor.ChartComponents && OpenSpeedMonitor.ChartComponents.common &&
+                        OpenSpeedMonitor.ChartComponents.common.ComponentMargin ?
+                            OpenSpeedMonitor.ChartComponents.common.ComponentMargin + 10 : 25;
     var minWidthEstimate = 200 + 2 * sideMargin;
     var startX;
     var origCursor = document.body.style.cursor;
@@ -17,27 +21,27 @@ function initPngDownloadModal() {
     downloadContainer.appendChild(svgElement);
     originalContainer.appendChild(placeholder);
 
-    function getMaxWidth() {
+    function getSvgMaxWidth() {
         //We need to encapsulated this inside a function and can't store it in a variable because the modalDialog
         //is hidden at the beginning when initPngDownloadModal() executes and it therefore has width 0.
-        return modalDialog.offsetWidth - sideMargin -
-            parseInt(window.getComputedStyle(resizeHandle).marginLeft.slice(0, -2));
+        var resizeHandleMargin = parseInt(window.getComputedStyle(resizeHandle).marginLeft.slice(0, -2));
+        return modalDialog.offsetWidth - sideMargin - resizeHandleMargin;
     }
 
-    function getValidatedWith(width) {
-        return Math.min(Math.max(width, minWidthEstimate), getMaxWidth())
+    function getValidatedWidth(width) {
+        return Math.min(Math.max(width, minWidthEstimate), getSvgMaxWidth())
     }
 
     function setContainerWidth(containerWidth) {
-        downloadContainer.style.width = getValidatedWith(containerWidth) + "px";
+        downloadContainer.style.width = getValidatedWidth(containerWidth) + "px";
         widthField.value = downloadContainer.offsetWidth;
         window.dispatchEvent(new Event("resize"));
     }
 
     function reactToModalDialogResize() {
-        if (downloadContainer.offsetWidth > getMaxWidth()) {
+        if (downloadContainer.offsetWidth > getSvgMaxWidth()) {
             setContainerWidth(0);
-            widthField.max = getMaxWidth();
+            widthField.max = getSvgMaxWidth();
         }
     }
 
@@ -67,7 +71,7 @@ function initPngDownloadModal() {
     downloadContainer.style.width = width + "px";
     widthField.value = width;
     widthField.min = minWidthEstimate;
-    widthField.max = getMaxWidth();
+    widthField.max = getSvgMaxWidth();
     window.addEventListener("resize", reactToModalDialogResize);
     resizeHandle.addEventListener("mousedown", initDrag);
     widthField.addEventListener("change", onWidthFieldInput);

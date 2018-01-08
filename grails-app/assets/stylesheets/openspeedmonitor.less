@@ -478,6 +478,9 @@ a.btn.disabled {
   background-color: #fff;
   cursor: default;
   display: inline-block;
+  border-width: 1px 0 1px 1px;
+  border-color: @iteratec-gray;
+  border-style: solid;
 }
 
 #resize-east {
@@ -485,18 +488,8 @@ a.btn.disabled {
   padding-right: 1px;
   display: inline-block;
   background-color: @iteratec-gray;
-  margin-left: 15px;
   position: relative;
-}
-
-#resize-east .ui-resizable-se {
-  cursor: ew-resize;
-}
-
-#not-resize-east {
-  padding-left: 1px;
-  padding-top: 1px;
-  padding-bottom: 1px;
-  background-color: @iteratec-gray;
-  cursor: default;
+  .ui-resizable-se {
+    cursor: ew-resize;
+  }
 }

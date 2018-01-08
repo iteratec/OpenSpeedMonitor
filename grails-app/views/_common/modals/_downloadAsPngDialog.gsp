@@ -9,24 +9,26 @@
                                                                    default="Download as PNG"/></h4>
             </div>
 
-            <form class="form-horizontal modal-body">
-                <div class="form-group">
-                    <label for="inputFilename" class="col-xs-2 control-label"><g:message code="de.iteratec.osm.pngDownloader.modal.filename"
-                                                                                         default="filename"/></label>
-                    <div class="col-xs-4">
-                        <input type="text" class="form-control" id="inputFilename" value="download.png">
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="inputFilename" class="col-xs-2 control-label"><g:message code="de.iteratec.osm.pngDownloader.modal.filename"
+                                                                                             default="filename"/></label>
+                        <div class="col-xs-4">
+                            <input type="text" class="form-control" id="inputFilename" value="download.png">
+                        </div>
+                        <label for="pngWidth" class="col-xs-2 control-label"><g:message code="de.iteratec.chart.width.name"/></label>
+                        <div class="col-xs-2">
+                            <input type="number" class="form-control" id="pngWidth" min="0" step="1"/>
+                        </div>
                     </div>
-                    <label for="pngWidth" class="col-xs-2 control-label"><g:message code="de.iteratec.chart.width.name"/></label>
-                    <div class="col-xs-2">
-                        <input type="number" id="pngWidth" min="0" step="1"/>
-                    </div>
-                </div>
-            </form>
+                </form>
             <div id="resize-east">
                 <div id="not-resize-east">
                     <div id="download-chart-container"></div>
                     <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-grip-diagonal-se"></div>
                 </div>
+            </div>
             </div>
             <div class="modal-footer">
                 <button href="#" class="btn btn-primary pull-right" id="downloadConfirm"
