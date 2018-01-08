@@ -19,11 +19,9 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
@@ -63,93 +61,66 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     void "Results get persisted even after failed csi aggregation."() {
 
         setup:
-        //create test-specific data
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        //test specific mocks
         mockCsiAggregationUpdateService(true)
         mockMetricReportingService(false)
-        //expected values
-        int runs = 1
-        int events = 2
-        int cachedViews = 2
-        int expectedNumberOfResults = runs * events * cachedViews
 
         when:
         resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == 1
-        EventResult.list().size == expectedNumberOfResults
-
+        EventResult.list().size == 4 // 1 run, 2 successful events + 2 cached Views
     }
 
     void "Results get persisted even after failed metric reporting."() {
 
         setup:
-        //create test-specific data
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(true)
-        //expected values
-        int runs = 1
-        int events = 2
-        int cachedViews = 2
-        int expectedNumberOfResults = runs * events * cachedViews
 
         when:
         resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == 1
-        EventResult.list().size == expectedNumberOfResults
+        EventResult.list().size == 4 // 1 run, 2 successful events + 2 cached Views
 
     }
 
     void "No EventResults get persisted when Persistence of JobResults  throws an Exception."() {
 
         setup:
-        //create test-specific data
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        //test specific mocks
+
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)
         letPersistingJobResultThrowAnException(true)
-        //expected values
-        int expectedNumberOfResults = 0
 
         when:
         resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
-        JobResult.list().size() == expectedNumberOfResults
-        EventResult.list().size == expectedNumberOfResults
+        JobResult.list().size() == 0
+        EventResult.list().size == 0
 
     }
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
 
         setup:
-        //create test-specific data
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)
         letPersistingEventResultsOfSpecificStepThrowAnException(0)
-        //expected values
-        int runs = 1
-        int events = 2
-        int failedEvents = 1
-        int cachedViews = 2
-        int expectedNumberOfJobResults = 1
-        int expectedNumberOfEventResults = runs * (events - failedEvents) * cachedViews
 
         when:
         resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
-        JobResult.list().size() == expectedNumberOfJobResults
-        EventResult.list().size == expectedNumberOfEventResults
+        JobResult.list().size() == 1
+        EventResult.list().size == 2 // 1 run, 1 successful event + 1 cached Views
 
     }
 
@@ -164,35 +135,18 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
      * happen in an own transaction.
      */
     private createTestDataCommonToAllTests() {
-
-        TestDataUtil.createPages(['HP', 'MES', Page.UNDEFINED])
-        Browser undefBrowser = TestDataUtil.createBrowser(Browser.UNDEFINED)
-        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
-        server1 = TestDataUtil.createWebPageTestServer(
-                "TestServer 1",
-                "TestServer1",
-                true,
-                "http://osm.intgerationtest.org"
+        ['HP', 'MES', Page.UNDEFINED].each{ pageName ->
+            Page.build(name: pageName)
+        }
+        server1 = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
+        Location loc = Location.build(
+                wptServer: server1,
+                uniqueIdentifierForServer: LOCATION_IDENTIFIER,
         )
-        Location loc = TestDataUtil.createLocation(
-                server1,
-                LOCATION_IDENTIFIER,
-                undefBrowser,
-                true
+        Job.build(
+                label: 'FF_BV1_Multistep_2',
+                location: loc
         )
-        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala')
-        TestDataUtil.createJob(
-                'FF_BV1_Multistep_2',
-                script,
-                loc,
-                jobGroup,
-                'jobWithPredefinedConnectivity description',
-                1,
-                true,
-                60
-        )
-        TestDataUtil.createOsmConfig()
-
     }
 
     void mocksCommonToAllTests() {
