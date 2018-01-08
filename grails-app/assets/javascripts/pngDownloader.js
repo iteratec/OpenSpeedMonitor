@@ -40,7 +40,7 @@ function initPngDownloadModal() {
 
     function reactToModalDialogResize() {
         if (downloadContainer.offsetWidth > getSvgMaxWidth()) {
-            setContainerWidth(0);
+            setContainerWidth(downloadContainer.offsetWidth);
             widthField.max = getSvgMaxWidth();
         }
     }
