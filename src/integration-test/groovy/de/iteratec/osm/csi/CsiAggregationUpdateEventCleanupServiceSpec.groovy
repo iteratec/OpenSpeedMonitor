@@ -1,11 +1,11 @@
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.integration.Integration
 import org.springframework.test.annotation.Rollback
 
@@ -31,211 +31,206 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     void "already calculated daily page csi aggregations get closed"() {
         setup:
-        Serializable idDailyPageMvInitiallyOpenAndCalculated
+        long idDailyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation csiAggregationDailyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
-            idDailyPageMvInitiallyOpenAndCalculated = csiAggregationDailyPageCalculated.ident()
-            TestDataUtil.createUpdateEvent(idDailyPageMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            CsiAggregation csiAggregationDailyPageCalculated = CsiAggregation.build(started: new Date(100), interval: daily, aggregationType: AggregationType.PAGE, closedAndCalculated: false)
+            idDailyPageMvInitiallyOpenAndCalculated = csiAggregationDailyPageCalculated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idDailyPageMvInitiallyOpenAndCalculated, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 1
-            assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
+            assert !CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
-            CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
+            CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated
         }
     }
 
 
     void "outdated daily page csi aggregations get calculated and closed"() {
         setup:
-        Serializable idDailyPageMvInitiallyOpenAndOutdated
+        long idDailyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.PAGE, false)
-            idDailyPageMvInitiallyOpenAndOutdated = mvDailyPageOutdated.ident()
-            TestDataUtil.createUpdateEvent(idDailyPageMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+            CsiAggregation mvDailyPageOutdated = CsiAggregation.build(started: new Date(100), interval: daily, aggregationType: AggregationType.PAGE, closedAndCalculated: false)
+            idDailyPageMvInitiallyOpenAndOutdated = mvDailyPageOutdated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idDailyPageMvInitiallyOpenAndOutdated, updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndOutdated).size() == 1
-            assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
+            assert !CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndOutdated).size() == 0
-            CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndOutdated).size() == 0
+            CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated
         }
     }
 
 
     void "already calculated weekly page csi aggregations get closed"() {
         setup:
-        Serializable idWeeklyPageMvInitiallyOpenAndCalculated
+        long idWeeklyPageMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyPageCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.PAGE, false)
-            idWeeklyPageMvInitiallyOpenAndCalculated = mvWeeklyPageCalculated.ident()
-            TestDataUtil.createUpdateEvent(idWeeklyPageMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            CsiAggregation mvWeeklyPageCalculated = CsiAggregation.build(started: new Date(100), interval: weekly, aggregationType: AggregationType.PAGE, closedAndCalculated: false)
+            idWeeklyPageMvInitiallyOpenAndCalculated = mvWeeklyPageCalculated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idWeeklyPageMvInitiallyOpenAndCalculated, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 1
-            assert CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
+            assert !CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 0
-            CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 0
+            CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated
         }
     }
 
 
     void "outdated weekly page csi aggregations get calculated and closed"() {
         setup:
-        Serializable idWeeklyPageMvInitiallyOpenAndOutdated
+        long idWeeklyPageMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyPageOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.PAGE, false)
-            idWeeklyPageMvInitiallyOpenAndOutdated = mvWeeklyPageOutdated.ident()
-            TestDataUtil.createUpdateEvent(idWeeklyPageMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+            CsiAggregation mvWeeklyPageOutdated = CsiAggregation.build(started: new Date(100), interval: weekly, aggregationType: AggregationType.PAGE, closedAndCalculated: false)
+            idWeeklyPageMvInitiallyOpenAndOutdated = mvWeeklyPageOutdated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idWeeklyPageMvInitiallyOpenAndOutdated, updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndOutdated).size() == 1
-            assert CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
+            assert !CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndOutdated).size() == 0
-            CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyPageMvInitiallyOpenAndOutdated).size() == 0
+            CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated
         }
     }
 
 
     void "already calculated daily shop csi aggregations get closed"() {
         setup:
-        Serializable idDailyShopMvInitiallyOpenAndCalculated
+        long idDailyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.JOB_GROUP, false)
-            idDailyShopMvInitiallyOpenAndCalculated = mvDailyShopCalculated.ident()
-            TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            CsiAggregation mvDailyShopCalculated = CsiAggregation.build(started: new Date(100), interval: daily, aggregationType: AggregationType.JOB_GROUP, closedAndCalculated: false)
+            idDailyShopMvInitiallyOpenAndCalculated = mvDailyShopCalculated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idDailyShopMvInitiallyOpenAndCalculated, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndCalculated).size() == 1
-            assert CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
+            assert !CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndCalculated).size() == 0
-            CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndCalculated).size() == 0
+            CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated
         }
     }
 
 
     void "outdated daily shop csi aggregations get calculated and closed"() {
         setup:
-        Serializable idDailyShopMvInitiallyOpenAndOutdated
+        long idDailyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvDailyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, AggregationType.JOB_GROUP, false)
-            idDailyShopMvInitiallyOpenAndOutdated = mvDailyShopOutdated.ident()
-            TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+            CsiAggregation mvDailyShopOutdated = CsiAggregation.build(started: new Date(100), interval: daily, aggregationType: AggregationType.JOB_GROUP, closedAndCalculated: false)
+            idDailyShopMvInitiallyOpenAndOutdated = mvDailyShopOutdated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idDailyShopMvInitiallyOpenAndOutdated, updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndOutdated).size() == 1
-            assert CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
+            assert !CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndOutdated).size() == 0
-            CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndOutdated).size() == 0
+            CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated
         }
     }
 
 
     void "already calculated weekly shop csi aggregations get closed"() {
         setup:
-        Serializable idWeeklyShopMvInitiallyOpenAndCalculated
+        long idWeeklyShopMvInitiallyOpenAndCalculated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.JOB_GROUP, false)
-            idWeeklyShopMvInitiallyOpenAndCalculated = mvWeeklyShopCalculated.ident()
-            TestDataUtil.createUpdateEvent(idWeeklyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            CsiAggregation mvWeeklyShopCalculated = CsiAggregation.build(started: new Date(100), interval: weekly, aggregationType: AggregationType.JOB_GROUP, closedAndCalculated: false)
+            idWeeklyShopMvInitiallyOpenAndCalculated = mvWeeklyShopCalculated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idWeeklyShopMvInitiallyOpenAndCalculated, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 1
-            assert CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
+            assert !CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 0
-            CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 0
+            CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated
         }
     }
 
 
     void "outdated weekly shop csi aggregations get calculated and closed"() {
         setup:
-        Serializable idWeeklyShopMvInitiallyOpenAndOutdated
+        long idWeeklyShopMvInitiallyOpenAndOutdated
         CsiAggregation.withNewSession {
-            CsiAggregation mvWeeklyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, AggregationType.JOB_GROUP, false)
-            idWeeklyShopMvInitiallyOpenAndOutdated = mvWeeklyShopOutdated.ident()
-            TestDataUtil.createUpdateEvent(idWeeklyShopMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+            CsiAggregation mvWeeklyShopOutdated = CsiAggregation.build(started: new Date(100), interval: weekly, aggregationType: AggregationType.JOB_GROUP, closedAndCalculated: false)
+            idWeeklyShopMvInitiallyOpenAndOutdated = mvWeeklyShopOutdated.id
+            CsiAggregationUpdateEvent.build(csiAggregationId: idWeeklyShopMvInitiallyOpenAndOutdated, updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
 
         when:
         CsiAggregation.withNewSession {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndOutdated).size() == 1
-            assert CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
+            assert !CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
         CsiAggregation.withNewSession {
-            CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndOutdated).size() == 0
-            CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
+            assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idWeeklyShopMvInitiallyOpenAndOutdated).size() == 0
+            CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated
         }
     }
 
     void createTestDataCommonForAllTests() {
         JobGroup.withNewTransaction {
-
-            List<CsiAggregationInterval> intervals = TestDataUtil.createCsiAggregationIntervals()
-            daily = intervals.find { it.intervalInMinutes == CsiAggregationInterval.DAILY }
-            weekly = intervals.find { it.intervalInMinutes == CsiAggregationInterval.WEEKLY }
-
-            new Page(id: 1, name: "unused page").save(failOnError: true, flush: true)
-            new JobGroup(id: 1, name: "unused JobGroup").save(failOnError: true, flush: true)
+            daily = CsiAggregationInterval.build(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY)
+            weekly = CsiAggregationInterval.build(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY)
         }
     }
 
     void addMocksCommonForAllTests() {
-        csiAggregationUpdateEventCleanupService.inMemoryConfigService.metaClass {
-            areMeasurementsGenerallyEnabled { -> return true }
-        }
-        ServiceMocker.create().mockBatchActivityService(csiAggregationUpdateEventCleanupService)
+        def stub = Stub(InMemoryConfigService)
+        stub.areMeasurementsGenerallyEnabled() >> { true }
+        csiAggregationUpdateEventCleanupService.inMemoryConfigService = stub
     }
+
 }
