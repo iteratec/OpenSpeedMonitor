@@ -71,7 +71,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         setMeasurands(state);
         setSelectedFilter(state);
         loadedState = encodedState;
-        if(state.selectedFolder){
+        if (state.selectedFolder) {
             $(window).trigger("historyStateLoaded");
         }
     };
@@ -97,11 +97,24 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         }
         $(".measurandSeries-clone").remove();
         var currentAddButton = $("#addMeasurandButton");
-        for (var i = 0; i < measurands.length -1; i++) {
+        for (var i = 0; i < measurands.length - 1; i++) {
             currentAddButton.click();
         }
+
         var selects = $(".measurand-select");
+
         measurands.forEach(function (measurand, i) {
+            if (measurand.startsWith("_UTM")) {
+
+                var optGroupUserTimings = $(selects[i]).find('.measurand-opt-group-USER_TIMINGS');
+                var alreadyThere = optGroupUserTimings.size() > 1;
+                if (!alreadyThere) {
+                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{
+                        id: measurand,
+                        name: measurand
+                    }])
+                }
+            }
             $(selects[i]).val(measurand);
         });
     };
@@ -110,7 +123,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         if (!state["selectedFilter"]) {
             return;
         }
-        $(".chart-filter").each(function() {
+        $(".chart-filter").each(function () {
             var $this = $(this);
             $this.toggleClass("selected", $this.data("filter") === state["selectedFilter"]);
         });
@@ -122,6 +135,5 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
     };
 
     initWaitForPostload();
-    return {
-    };
+    return {};
 })();
