@@ -110,6 +110,10 @@ class ConfigService {
         return getConfig().maxBatchActivityStorageTimeInDays
 	}
 
+	String getGlobalUserAgentSuffix(){
+		return getConfig().globalUserAgentSuffix
+	}
+
 	/**
 	 * Get status of databaseCleanupEnabled
 	 * If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldCsiAggregationsWithDependenciesJob})

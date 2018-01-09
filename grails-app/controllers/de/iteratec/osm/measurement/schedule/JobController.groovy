@@ -402,7 +402,8 @@ class JobController {
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
                 connectivites                  : ConnectivityProfile.findAllByActive(true),
                 customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
-                isPrivate                      : true
+                isPrivate                      : true,
+                globalUserAgentSuffix          : configService.globalUserAgentSuffix
         ]
     }
 
@@ -411,7 +412,8 @@ class JobController {
                 defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
                 connectivites                  : ConnectivityProfile.findAllByActive(true),
                 customConnNameForNative        : ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE,
-                executionSchedule              : job.executionSchedule.substring(2)
+                executionSchedule              : job.executionSchedule.substring(2),
+                globalUserAgentSuffix          : configService.globalUserAgentSuffix
         ]
     }
 

@@ -2,5 +2,5 @@
 <%=packageName%>
 <g:render
         template="editOrCreate"
-        model="['mode': 'edit', 'entityDisplayName': message(code: 'de.iteratec.isj.job', default: 'Job'), 'entity': job, controllerLink:g.createLink(action: 'createDeleteConfirmationText')]"
+        model="['mode': 'edit', 'entityDisplayName': message(code: 'de.iteratec.isj.job', default: 'Job'), 'entity': job, 'globalUserAgentSuffix': globalUserAgentSuffix, controllerLink:g.createLink(action: 'createDeleteConfirmationText')]"
 />

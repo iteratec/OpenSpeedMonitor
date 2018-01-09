@@ -38,7 +38,7 @@
     <div class="col-md-6">
         <div class="tab-content" style="margin-top: 5px">
             <div id="AdvancedContent" class="tab-pane active">
-                <g:render template="advancedTab" model="${['job': job]}"/>
+                <g:render template="advancedTab" model="${['job': job, 'globalUserAgentSuffix': globalUserAgentSuffix]}"/>
             </div>
 
             <div id="ChromeContent" class="tab-pane">
