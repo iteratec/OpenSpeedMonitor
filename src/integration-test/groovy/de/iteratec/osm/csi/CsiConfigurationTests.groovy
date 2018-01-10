@@ -4,45 +4,55 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import spock.lang.Specification
+
 @Integration
 @Rollback
 class CsiConfigurationTests extends NonTransactionalIntegrationSpec {
 
     CsiConfiguration csiConfiguration
 
-    def setupTest() {
+    def setup() {
         createTestDataCommonForAllTests()
     }
 
     void 'delete csiConfig and cascading elements'() {
-        setup:
-        setupTest()
-
         when: "delete a csiConfiguration"
         csiConfiguration.delete(failOnError: true)
+
         then: "csiConfiguration and all weights belonging to it, shall be deleted"
         CsiConfiguration.count == 0
         PageWeight.count == 0
         CsiDay.count == 0
         TimeToCsMapping.count == 0
         BrowserConnectivityWeight.count == 0
+    }
 
-        Page.count > 0  // pages shall not be deleted
-        ConnectivityProfile.count > 0  // connectivityProfiles shall not be deleted
-        Browser.count > 0   // browsers shall not be deleted
+    void 'delete csiConfig should not delete associated pages, connectivity profiles and browser'() {
+        given:
+        int pageCountBefore = Page.count()
+        int connectivityCountBefore = ConnectivityProfile.count()
+        int browserCountBefore = Browser.count()
+
+        when: "delete a csiConfiguration"
+        csiConfiguration.delete(failOnError: true)
+
+
+        then: "The associated pages, connectivity profiles and browser should remain"
+        Page.count() == pageCountBefore
+        ConnectivityProfile.count() == connectivityCountBefore
+        Browser.count() == browserCountBefore
 
     }
 
     private void createTestDataCommonForAllTests() {
-        Page page = TestDataUtil.createPage("aPage")
-        Browser browser = TestDataUtil.createBrowser("a")
-        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("testCon")
+        Page page = Page.build()
+        Browser browser = Browser.build()
+        ConnectivityProfile profile = ConnectivityProfile.build()
 
-        csiConfiguration = TestDataUtil.createCsiConfiguration()
-        csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page])
-        csiConfiguration.pageWeights = [TestDataUtil.createPageWeight(page, 0)]
-        csiConfiguration.browserConnectivityWeights = [TestDataUtil.createBrowserConnectivityWeight(browser,connectivityProfile,0.5)]
+        csiConfiguration = CsiConfiguration.build()
+        csiConfiguration.timeToCsMappings = [TimeToCsMapping.build(page: page)]
+        csiConfiguration.pageWeights = [PageWeight.build()]
+        csiConfiguration.browserConnectivityWeights = [BrowserConnectivityWeight.build(browser: browser, connectivity: profile)]
         csiConfiguration.save(failOnError: true)
 
     }
