@@ -38,13 +38,12 @@
 
     <div class="in-chart-buttons">
         <a href="#downloadAsPngModal" id="download-as-png-button"
-           data-toggle="modal" role="button" onclick="setDefaultValues('svg-container')"
+           data-toggle="modal" role="button" onclick="initPngDownloadModal()"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
             <i class="fa fa-download"></i>
         </a>
         <input type="number" name="quantity" min="1" id="data-trim-value" class="form-control" step="50" />
     </div>
-
 
     <div id="svg-container"></div>
 </div>
