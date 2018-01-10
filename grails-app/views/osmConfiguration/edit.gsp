@@ -23,7 +23,7 @@
                     <f:all bean="osmConfiguration"/>
                 </fieldset>
                 <div>
-                    <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+                    <button class="btn btn-primary" onclick="confirm()">${message(code: 'default.button.update.label', default: 'Update')}</button>
                     <g:render template="/_common/modals/deleteSymbolLink"/>
                     <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
@@ -31,3 +31,11 @@
         </div>
     </body>
 </html>
+
+<content tag="include.bottom">
+    <asset:script type="text/javascript">
+        $(window).load(function() {
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="osmConfiguration/update.js"/>', "update");
+        });
+    </asset:script>
+</content>
