@@ -10,7 +10,7 @@ import static org.springframework.http.HttpStatus.*
 class OsmConfigurationController {
 
     static scaffold = OsmConfiguration
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [update: "PUT", delete: "DELETE"]
 
     ConfigService configService
 
@@ -38,30 +38,6 @@ class OsmConfigurationController {
 
     def show(OsmConfiguration osmConfiguration) {
         respond osmConfiguration
-    }
-
-    def save(OsmConfiguration osmConfiguration) {
-        if (osmConfiguration == null) {
-            
-            notFound()
-            return
-        }
-
-        if (osmConfiguration.hasErrors()) {
-
-            respond osmConfiguration.errors, view:'create'
-            return
-        }
-
-        osmConfiguration.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'osmConfiguration.label', default: 'OsmConfiguration'), osmConfiguration.id])
-                redirect osmConfiguration
-            }
-            '*' { respond osmConfiguration, [status: CREATED] }
-        }
     }
 
     def edit(OsmConfiguration osmConfiguration) {
