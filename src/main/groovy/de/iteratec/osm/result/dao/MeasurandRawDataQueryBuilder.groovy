@@ -9,11 +9,9 @@ import de.iteratec.osm.result.SelectedMeasurand
 class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
 
     List<SelectedMeasurand> selectedMeasurands
-    boolean isAggregated = false
 
     @Override
     Closure buildProjection(List<ProjectionProperty> baseProjections) {
-        isAggregated = false
         List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
         if (!measurands) {
             return null

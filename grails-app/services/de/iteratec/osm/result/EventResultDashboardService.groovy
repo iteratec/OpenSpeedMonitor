@@ -190,7 +190,11 @@ public class EventResultDashboardService {
         }
         log.debug("getting event-results - Got ${eventResults.size()} EventResultProjections")
 
-        return calculateResultMap(eventResults, selectedMeasurands, interval)
+        OsmRickshawChart osmRickshawChart
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculateResultMap', 1) {
+            osmRickshawChart = calculateResultMap(eventResults, selectedMeasurands, interval)
+        }
+        return osmRickshawChart
     }
 
     private void appendConnectivity(EventResultQueryBuilder queryBuilder, ErQueryParams queryParams) {
@@ -246,31 +250,62 @@ public class EventResultDashboardService {
 
     private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResultProjection> eventResults) {
 
-        Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:].withDefault { [] }
+        performanceLoggingService.resetExecutionTimeLoggingSession()
+
+        Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:]
         selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
 
             eventResults.each { EventResultProjection eventResult ->
 
-                Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
+                Double value
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', 2){
+                    value = selectedMeasurand.getNormalizedValueFrom(eventResult)
+                }
 
                 if (selectedMeasurand.cachedView == eventResult.cachedView && value != null) {
 
-                    GraphLabel graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
-                    URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
-                    WptEventResultInfo chartPointWptInfo = getChartPointsWptInfos(eventResult)
+                    GraphLabel graphLabel
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', 2){
+                        graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
+                    }
+                    URL testsDetailsURL
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2){
+                        testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
+                    }
+                    WptEventResultInfo chartPointWptInfo
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2){
+                        chartPointWptInfo = getChartPointsWptInfos(eventResult)
+                    }
 
                     try {
-                        OsmChartPoint chartPoint = new OsmChartPoint(
-                                time: eventResult.jobResultDate.time,
-                                csiAggregation: value,
-                                countOfAggregatedResults: 1,
-                                sourceURL: testsDetailsURL,
-                                testingAgent: eventResult.testAgent,
-                                chartPointWptInfo: chartPointWptInfo
-                        )
-                        // customer satisfaction can be 0.
-                        if (chartPoint.isValid() || (selectedMeasurand.getMeasurandGroup() == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null)){
-                            chartPointsForEachGraph[graphLabel].add(chartPoint)
+                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', 2){
+                            long time
+                            String agent
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', 3){
+                                time = eventResult.jobResultDate.time
+                                agent = eventResult.testAgent
+                            }
+                            OsmChartPoint chartPoint
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', 3){
+                                chartPoint = new OsmChartPoint(
+                                        time: time,
+                                        csiAggregation: value,
+                                        countOfAggregatedResults: 1,
+                                        sourceURL: testsDetailsURL,
+                                        testingAgent: agent,
+                                        chartPointWptInfo: chartPointWptInfo
+                                )
+                            }
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3){
+                                if (chartPoint.isValid()){
+                                    // The following is a bit more verbose than using a groovy MapWithDefault, but significantly faster
+                                    List<OsmChartPoint> pointsForLabel = chartPointsForEachGraph[graphLabel]
+                                    if (pointsForLabel == null) {
+                                        chartPointsForEachGraph[graphLabel] = []
+                                    }
+                                    pointsForLabel.add(chartPoint)
+                                }
+                            }
                         }
                     } catch (Exception e) {
                         log.error("The following EventResultProjection couldn't be used to create an OsmChartPoint: $eventResult")
@@ -279,6 +314,8 @@ public class EventResultDashboardService {
 
             }
         }
+
+        log.debug(performanceLoggingService.getExecutionTimeLoggingSessionData(LogLevel.DEBUG))
 
         return chartPointsForEachGraph
     }
