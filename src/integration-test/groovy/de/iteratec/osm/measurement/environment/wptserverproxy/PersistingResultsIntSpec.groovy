@@ -41,7 +41,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     private static Closure originalPersistJobResultsMethod
     private static Closure originalPersistEventResultsMethod
-    WebPageTestServer server1
+    WebPageTestServer server
 
     def setup() {
 
@@ -60,48 +60,45 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     void "Results get persisted even after failed csi aggregation."() {
 
-        setup:
+        given: "a wpt result and a failing CsiAggregationUpdateService"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         mockCsiAggregationUpdateService(true)
-        mockMetricReportingService(false)
 
-        when:
-        resultPersisterService.listenToResult(xmlResult, server1)
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server)
 
-        then:
+        then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
-        EventResult.list().size == 4 // 1 run, 2 successful events + 2 cached Views
+        EventResult.list().size == 4
+
     }
 
     void "Results get persisted even after failed metric reporting."() {
 
-        setup:
+        given: "a wpt result and a failing MetricReportingService"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockCsiAggregationUpdateService(false)
         mockMetricReportingService(true)
 
-        when:
-        resultPersisterService.listenToResult(xmlResult, server1)
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server)
 
-        then:
+        then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
-        EventResult.list().size == 4 // 1 run, 2 successful events + 2 cached Views
+        EventResult.list().size == 4
 
     }
 
-    void "No EventResults get persisted when Persistence of JobResults  throws an Exception."() {
+    void "No EventResults get persisted when Persistence of JobResults throws an exception."() {
 
-        setup:
+        given: "a wpt result"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-
-        mockCsiAggregationUpdateService(false)
-        mockMetricReportingService(false)
         letPersistingJobResultThrowAnException(true)
 
-        when:
-        resultPersisterService.listenToResult(xmlResult, server1)
+        when: "the results get persisted but the resultPersisterService throws an exception"
+        letPersistingJobResultThrowAnException(true)
+        resultPersisterService.listenToResult(xmlResult, server)
 
-        then:
+        then: "nothing should be persisted"
         JobResult.list().size() == 0
         EventResult.list().size == 0
 
@@ -109,18 +106,16 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
 
-        setup:
+        given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockCsiAggregationUpdateService(false)
-        mockMetricReportingService(false)
+
+        when: "the results get persisted but the first step throws an exception"
         letPersistingEventResultsOfSpecificStepThrowAnException(0)
+        resultPersisterService.listenToResult(xmlResult, server)
 
-        when:
-        resultPersisterService.listenToResult(xmlResult, server1)
-
-        then:
+        then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
-        EventResult.list().size == 2 // 1 run, 1 successful event + 1 cached Views
+        EventResult.list().size == 2
 
     }
 
@@ -138,9 +133,9 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         ['HP', 'MES', Page.UNDEFINED].each{ pageName ->
             Page.build(name: pageName)
         }
-        server1 = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
+        server = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
         Location loc = Location.build(
-                wptServer: server1,
+                wptServer: server,
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
         )
         Job.build(
