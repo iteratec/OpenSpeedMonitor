@@ -41,6 +41,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
 
     registerEvents();
     triggerTimeFrameChanged(); // initial event
+    window.scrollTo(0, 0);
   };
 
   var defaultValueForInterval = function () {
