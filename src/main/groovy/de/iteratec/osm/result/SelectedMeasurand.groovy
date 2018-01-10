@@ -37,7 +37,8 @@ class SelectedMeasurand {
     }
 
     Double getNormalizedValueFrom(EventResultProjection eventResult) {
-        return normalizeValue(selectedType.getValue(eventResult, name))
+        Double value = selectedType.getValue(eventResult, name)
+        return normalizeValue(value)
     }
 
     MeasurandGroup getMeasurandGroup() {

@@ -36,11 +36,11 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> additionalProjections, List<MeasurandTrim> trims) {
+    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims) {
         List<Closure> filters = []
         filters.addAll(baseFilters)
         filters.add(buildUserTimingFilter(trims))
-        filters.add(buildProjection(additionalProjections))
+        filters.add(buildProjection(baseProjections))
         return createEventResultProjections(executeQuery(filters))
     }
 
@@ -72,8 +72,11 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     List<EventResultProjection> createEventResultProjections(List<Map> dataFromDb) {
         List<EventResultProjection> projections = []
         dataFromDb.each { Map dbResult ->
-            def relevantValue = dbResult.type == UserTimingType.MEASURE ? dbResult.duration : dbResult.startTime
-            getRelevantProjection(dbResult, projections).projectedProperties.put(dbResult.name, relevantValue)
+            def userTimingValue = dbResult.type == UserTimingType.MEASURE ? dbResult.duration : dbResult.startTime
+            EventResultProjection projection = getRelevantProjection(dbResult, projections)
+            dbResult.remove('id')
+            projection.projectedProperties.putAll(dbResult)
+            projection.projectedProperties.put(dbResult.name, userTimingValue)
         }
         return projections
     }

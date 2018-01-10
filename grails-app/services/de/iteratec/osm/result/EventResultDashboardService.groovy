@@ -352,17 +352,17 @@ public class EventResultDashboardService {
         return inBound
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Integer interval) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResultProjection> eventResults, Integer interval) {
 
         Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:].withDefault { [] }
         Map<GraphLabel, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
-            eventResults.each { EventResult eventResult ->
+            eventResults.each { EventResultProjection eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
                         Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
-                        if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
+                        if (value != null){
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult, millisStartOfInterval, selectedMeasurand)
                             eventResultsToAggregate[key] << value

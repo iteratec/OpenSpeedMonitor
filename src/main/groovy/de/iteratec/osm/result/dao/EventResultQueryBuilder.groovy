@@ -147,10 +147,10 @@ class EventResultQueryBuilder {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
         }
-//        if (userTimings) {
-//            initUserTimingsQueryBuilder()
-//            userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
-//        }
+        if (userTimings) {
+            initUserTimingsQueryBuilder()
+            userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
+        }
 
         return this
     }

@@ -30,8 +30,7 @@ enum SelectedMeasurandType {
     },
     USERTIMING_MARK{
         Double getValue(RepresentableWptResult eventResult, String name) {
-            UserTiming userTiming = eventResult.userTimings.find { it.name == name && it.type == UserTimingType.MARK }
-            return userTiming?.getValue()
+            return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
@@ -52,10 +51,7 @@ enum SelectedMeasurandType {
     },
     USERTIMING_MEASURE{
         Double getValue(RepresentableWptResult eventResult, String name) {
-            UserTiming userTiming = eventResult.userTimings.find {
-                it.name == name && it.type == UserTimingType.MEASURE
-            }
-            return userTiming?.getValue()
+            return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
