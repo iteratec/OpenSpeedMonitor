@@ -58,4 +58,5 @@ databaseChangeLog = {
     include file: '2017-09-21-SCHEME-v432.groovy'
     include file: '2017-09-26-SCHEME-v433.groovy'
     include file: '2017-10-10-v440-fixGraphitePaths.groovy'
+    include file: '2017-12-19-v440-improveTimeSeriesPerformance.groovy'
 }
