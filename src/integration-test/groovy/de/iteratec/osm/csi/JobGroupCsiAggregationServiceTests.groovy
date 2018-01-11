@@ -30,6 +30,7 @@ import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
+import spock.lang.Shared
 import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.assertEquals
@@ -43,168 +44,179 @@ import static org.junit.Assert.assertTrue
 @ConfineMetaClassChanges([WeightingService])
 class JobGroupCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
-    JobGroup jobGroup1, jobGroup2, jobGroup3
-    Page page1
+    @Shared JobGroup jobGroup1, jobGroup2, jobGroup3
+    Page page
 
     Browser browser
 
     static final double DELTA = 1e-15
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
-    String jobGroupName1 = 'myJobGroup1'
-    String jobGroupName2 = 'myJobGroup2'
-    String jobGroupName3 = 'myJobGroup3'
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     def setup() {
-        weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
-        dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
-        hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
-
-        jobGroup1 = TestDataUtil.createJobGroup(jobGroupName1)
-        jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
-        jobGroup3 = TestDataUtil.createJobGroup(jobGroupName3)
-
-        page1 = new Page(name: "page1", weight: 1).save(failOnError: true)
-
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true)
-
-        //with existing JobGroup:
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup1, null, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup2, null, null, "", false)
-        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, AggregationType.JOB_GROUP, jobGroup3, null, null, "", false)
+        createTestDataCommonToAllTests()
     }
 
     def cleanup() {
-        // undo mocked service
         jobGroupCsiAggregationService.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
     }
 
     void "test findAll"() {
-        Integer countMvs = 3
+        Integer countCsiAgg = 3
 
-        expect:
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, JobGroup.list()).size() == countMvs
+        expect: "find all csiAgg"
+        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, JobGroup.list()).size() == countCsiAgg
     }
 
     void "test findAllByJobGroups"() {
-        when:
-        Integer with_group1to3 = 3
-        Integer with_group2to3 = 2
-        Integer with_group1or3 = 2
-        Integer with_group2 = 1
+        when: "job groups are searched"
+        def numberOfJobGroups = jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, jobGroups).size()
 
-        then:
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup2, jobGroup3]).size() == with_group1to3
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2, jobGroup3]).size() == with_group2to3
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup1, jobGroup3]).size() == with_group1or3
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [jobGroup2]).size() == with_group2
+        then: "the number of jobs is equal to the expected number"
+        numberOfJobGroups == expectedNumberOfJobGroups
+
+        where: "the job groups are searched"
+        expectedNumberOfJobGroups | jobGroups
+        3                         | [jobGroup1, jobGroup2, jobGroup3]
+        2                         | [jobGroup1, jobGroup2]
+        2                         | [jobGroup2, jobGroup3]
+        1                         | [jobGroup2]
+
     }
 
     /**
      * Tests calculation of daily-shopAggregator{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * In this test one single pageAggregator-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-shopAggregator-{@link CsiAggregation}.
      */
-    void "test calculation_DailyInterval_SingleDailyMv"() {
-        given:
+    void "test calculation_DailyInterval_SingleDailyCsiAgg"() {
+        given: "a start time and a mocked CsiValueService with weighted csi values"
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
-
-        //mocking inner services
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
-        //precondition
-        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
-        assertEquals(0, mvs.size())
+        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        assertEquals(0, csiAgg.size())
 
-        when:
-        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        when: "a csi is calculated"
+        List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
-        then:
-        assertEquals(1, calculatedMvs.size())
-        assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(12d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
-        assertEquals(1, mvs.size())
+        then: "there is one calculated csiAgg"
+        assertEquals(1, calculatedCsiAgg.size())
+        assertTrue(calculatedCsiAgg[0].isCalculated())
+        assertEquals(12d, calculatedCsiAgg[0].csByWptDocCompleteInPercent, DELTA)
+        assertEquals(1, csiAgg.size())
     }
 
     /**
      * Tests calculation of daily-shopAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * In this test pageAggregator-{@link CsiAggregation}s with different weights exist.
      */
-    void "test calculation_DailyInterval_MultipleDailyMv"() {
-        given:
+    void "test calculation_DailyInterval_MultipleDailyCsiAgg"() {
+        given: "a start time and a mocked CsiValueService with three weighted csi values"
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-        double valueFirstMv = 12d
-        double pageWeightFirstMv = 1d
-        double valueSecondMv = 10d
-        double pageWeightSecondMv = 2d
-        double valueThirdMv = 13d
-        double pageWeightThirdMv = 1d
+        double valueFirstCsiAgg = 12d
+        double pageWeightFirstCsiAgg = 1d
+        double valueSecondCsiAgg = 10d
+        double pageWeightSecondCsiAgg = 2d
+        double valueThirdCsiAgg = 13d
+        double pageWeightThirdCsiAgg = 1d
         double sumOfAllWeights = 4d
 
-        //mocking inner services
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3]),
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 10d, weight: 2d), underlyingEventResultIds: [4]),
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 13d, weight: 1d), underlyingEventResultIds: [5, 6])]
-
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueFirstCsiAgg, weight: pageWeightFirstCsiAgg), underlyingEventResultIds: [1, 2, 3]),
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueSecondCsiAgg, weight: pageWeightSecondCsiAgg), underlyingEventResultIds: [4]),
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueThirdCsiAgg, weight: pageWeightThirdCsiAgg), underlyingEventResultIds: [5, 6])]
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
-        //precondition
-        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
-        assertEquals(0, mvs.size())
+        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        assertEquals(0, csiAgg.size())
 
-        when:
-        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        when:"a csi is calculated"
+        List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
-        then:
-        assertEquals(1, calculatedMvs.size())
-        assertEquals(AggregationType.JOB_GROUP, calculatedMvs[0].aggregationType)
-        assertTrue(calculatedMvs[0].isCalculated())
+        then: "there is one calculated csiAgg"
+        assertEquals(1, calculatedCsiAgg.size())
+        assertEquals(AggregationType.JOB_GROUP, calculatedCsiAgg[0].aggregationType)
+        assertTrue(calculatedCsiAgg[0].isCalculated())
         assertEquals(
-                (((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights),
-                calculatedMvs[0].csByWptDocCompleteInPercent,
+                (((valueFirstCsiAgg * pageWeightFirstCsiAgg) + (valueSecondCsiAgg * pageWeightSecondCsiAgg) + (valueThirdCsiAgg * pageWeightThirdCsiAgg)) / sumOfAllWeights),
+                calculatedCsiAgg[0].csByWptDocCompleteInPercent,
                 DELTA
         )
-        assertEquals(1, mvs.size())
+        assertEquals(1, csiAgg.size())
     }
 
     /**
      * Tests calculation of daily-shopAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * In this test no pageAggregator-{@link CsiAggregation}s exist, which are database of the calculation of daily-shopAggregator-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
-    void "test calculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData"() {
-        given:
+    void "test calculation_DailyInterval_MultipleHourlyCsiAgg_YesCalculatedNoData"() {
+        given: "a start time and a mocked CsiValueService with no weighted csi values"
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-
-        //mocking inner services
         mockCsiValueService([], [])
+        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        assertEquals(0, csiAgg.size())
 
-        //precondition
+        when:"a csi is calculated"
+        List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
-        List<CsiAggregation> mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
-        assertEquals(0, mvs.size())
+        then: "there is one calculated csiAgg with no data"
+        assertEquals(1, calculatedCsiAgg.size())
+        assertTrue(calculatedCsiAgg[0].isCalculated())
+        assertEquals(null, calculatedCsiAgg[0].csByWptDocCompleteInPercent)
+        assertEquals(0, calculatedCsiAgg[0].getUnderlyingEventResultsByWptDocComplete().size())
+        assertEquals(1, csiAgg.size())
+    }
 
-        when:
-        List<CsiAggregation> calculatedMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        mvs = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
-        then:
-        assertEquals(1, calculatedMvs.size())
-        assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(null, calculatedMvs[0].csByWptDocCompleteInPercent)
-        assertEquals(0, calculatedMvs[0].getUnderlyingEventResultsByWptDocComplete().size())
-        assertEquals(1, mvs.size())
+    // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * All test data created here has to be deleted in cleanup method after every test!!!
+     * That's because these integration tests have to run without an own transaction which would be
+     * rolled back in the end of every test.
+     *
+     * Integration tests that test code with own separate transactions wouldn't see test data if creation in test would
+     * happen in an own transaction.
+     */
+    private createTestDataCommonToAllTests() {
+        weeklyInterval = CsiAggregationInterval.build(
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
+        )
+
+        dailyInterval = CsiAggregationInterval.build(
+                intervalInMinutes: CsiAggregationInterval.DAILY
+        )
+
+        hourlyInterval = CsiAggregationInterval.build(
+                intervalInMinutes: CsiAggregationInterval.HOURLY
+        )
+
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
+
+        page = Page.build(name: "page")
+        browser = Browser.build(name: "Test")
+
+        [jobGroup1, jobGroup2, jobGroup3].each { jobGroup ->
+            CsiAggregation.build(
+                    started: startDate.toDate(),
+                    interval: weeklyInterval,
+                    aggregationType: AggregationType.JOB_GROUP,
+                    jobGroup: jobGroup
+            )
+        }
     }
 
     /**
      * Mocks methods of {@link WeightingService}.
      */
-
     private void mockCsiValueService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
         jobGroupCsiAggregationService.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> toReturnFromGetWeightedCsiValues
