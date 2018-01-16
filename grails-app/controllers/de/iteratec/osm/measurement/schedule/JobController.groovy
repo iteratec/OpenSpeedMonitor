@@ -412,7 +412,7 @@ class JobController {
      *
      * @return All available measurands.
      */
-    def getMeasurands() {
+    def getAllMeasurands() {
 
         List<Measurand> measurands = Measurand.collect()
         def output = []

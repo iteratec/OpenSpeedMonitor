@@ -48,7 +48,7 @@ new Vue({
     },
     methods: {
         fetchData: function () {
-            this.getMeasurands("/job/getMeasurands");
+            this.getMeasurands("/job/getAllMeasurands");
             this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
         },
         getMeasuredEvents: function (scriptId, targetUrl) {
