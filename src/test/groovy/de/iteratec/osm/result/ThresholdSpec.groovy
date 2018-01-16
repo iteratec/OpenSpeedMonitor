@@ -23,17 +23,27 @@ class ThresholdSpec extends Specification {
     }
 
     void "test duplications for measurands in measured events of a job"() {
-        given: "a threshold"
+        given: "a threshold with measurand #measurand1"
         Job job1 = Job.build()
         MeasuredEvent measuredEvent = MeasuredEvent.build()
-        Threshold threshold1 = new Threshold(job: job1, measuredEvent: measuredEvent, measurand: measurand1, upperBoundary: 100, lowerBoundary: 10)
+
+        Threshold threshold1 = Threshold.build(
+                job: job1,
+                measurand: measurand1,
+                measuredEvent: measuredEvent,
+                upperBoundary: 100,
+                lowerBoundary: 10)
         threshold1.save(flush: true)
 
-        when: "another threshold gets created with same/different measurand"
-        Threshold threshold2 = new Threshold(job: job1, measuredEvent: measuredEvent, measurand: measurand2, upperBoundary: 100, lowerBoundary: 10)
+        when: "another threshold gets created with measurand #measurand2"
+        Threshold threshold2 = new Threshold(
+                job: job1,
+                measurand: measurand2,
+                measuredEvent: measuredEvent,
+                upperBoundary: 100,
+                lowerBoundary: 10)
 
-        then: "threshold creation fails/succeeds"
-        threshold1.validate()
+        then: "threshold creation succeeds: #shouldBeValid"
         threshold2.validate() == shouldBeValid
 
         where: "the thresholds have the same/different measurands"
@@ -43,7 +53,7 @@ class ThresholdSpec extends Specification {
     }
 
     void "test constraints for upperBoundary and lowerBoundary"() {
-        when: "a threshold gets created"
+        when: "a threshold gets created with upperBoundary: #upperBoundary and lowerBoundary: #lowerBoundary"
         Threshold threshold = new Threshold(
                 job: Job.build(),
                 measuredEvent: MeasuredEvent.build(),
@@ -52,7 +62,7 @@ class ThresholdSpec extends Specification {
                 lowerBoundary: lowerBoundary
         )
 
-        then: "threshold creation fails/succeeds"
+        then: "threshold creation succeeds: #shouldBeValid"
         threshold.validate() == shouldBeValid
 
         where: "the upper boundary is higher/lower/equal than the lower boundary "
