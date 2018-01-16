@@ -34,10 +34,8 @@ import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
-import spock.lang.Shared
 import spock.lang.Unroll
 
-import static org.junit.Assert.*
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
