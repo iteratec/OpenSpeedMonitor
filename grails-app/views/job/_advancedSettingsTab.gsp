@@ -32,11 +32,13 @@
                     <g:message code="job.tab.custom.label" default="Custom Metrics"/>
                 </a>
             </li>
-            <li>
-                <a data-toggle="pill" href="#ThresholdContent">
-                    <g:message code="job.tab.threshold.label" default="Thresholds"/>
-                </a>
-            </li>
+            <g:if test="${job.id != null}">
+                <li>
+                    <a data-toggle="pill" href="#ThresholdContent">
+                        <g:message code="job.tab.threshold.label" default="Thresholds"/>
+                    </a>
+                </li>
+            </g:if>
         </ul>
     </div>
 
@@ -65,9 +67,11 @@
             <div id="CustomContent" class="tab-pane">
                 <g:render template="customTab" model="${['job': job]}"/>
             </div>
-            <div id="ThresholdContent" class="tab-pane">
-                <g:render template="threshold/thresholdTab" model="${['job': job]}"/>
-            </div>
+            <g:if test="${job.id != null}">
+                <div id="ThresholdContent" class="tab-pane">
+                    <g:render template="threshold/thresholdTab" model="${['job': job]}"/>
+                </div>
+            </g:if>
         </div>
     </div>
 
@@ -79,7 +83,7 @@
             </div>
 
             <div class="panel-body">
-                <p><g:message code="job.description"default="The options on this page are equivalent to those on the www.webpagetest.org website. More information about the API can be found here"/></p>
+                <p><g:message code="job.description" default="The options on this page are equivalent to those on the www.webpagetest.org website. More information about the API can be found here"/></p>
                 <a href="https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis" target="_blank">
                     <img class="infoImage thumbnail" id="infoImage"
                          src="${resource(dir: 'images', file: 'api.png')}"
