@@ -299,11 +299,10 @@ public class EventResultDashboardService {
                             performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3){
                                 if (chartPoint.isValid()){
                                     // The following is a bit more verbose than using a groovy MapWithDefault, but significantly faster
-                                    List<OsmChartPoint> pointsForLabel = chartPointsForEachGraph[graphLabel]
-                                    if (pointsForLabel == null) {
+                                    if (chartPointsForEachGraph[graphLabel] == null) {
                                         chartPointsForEachGraph[graphLabel] = []
                                     }
-                                    pointsForLabel.add(chartPoint)
+                                    chartPointsForEachGraph[graphLabel].add(chartPoint)
                                 }
                             }
                         }
