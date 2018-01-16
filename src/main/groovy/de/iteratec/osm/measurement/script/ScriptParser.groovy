@@ -506,7 +506,7 @@ class ScriptParser {
      * @param navigationScript
      * @return
      */
-    List<MeasuredEvent> getAllMeasuredEvent(String navigationScript) {
+    List<MeasuredEvent> getAllMeasuredEvents(String navigationScript) {
         if (!navigationScript)
             return null
 

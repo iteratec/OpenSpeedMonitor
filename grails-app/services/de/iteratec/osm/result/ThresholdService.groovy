@@ -8,7 +8,7 @@ import grails.transaction.Transactional
 class ThresholdService {
 
     /**
-     * Checks all even results.
+     * Checks all event results.
      *
      * @param eventResults The Event results
      * @return A list with the threshold results of the event results.
