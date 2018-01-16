@@ -103,10 +103,8 @@ new Vue({
                             saved: true
                         })
                     });
-                    console.dir(self.measuredEvents);
                     self.activeMeasuredEvents.push({
                         measuredEvent: self.measuredEvents.find(function (element) {
-                            console.log(element.id);
                             return element.id === resultEvent.measuredEvent.id;
                         }),
                         thresholdList: thresholdsForEvent
@@ -139,7 +137,6 @@ new Vue({
                             savedThreshold.edit = false;
                         }
                     });
-                    console.log("success");
                 },
                 error: function (e) {
                     console.log(e);
