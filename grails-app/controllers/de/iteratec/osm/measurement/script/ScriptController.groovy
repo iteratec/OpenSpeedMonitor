@@ -194,7 +194,7 @@ class ScriptController {
 		Script script = Script.get(id)
 		ScriptParser parser = new ScriptParser(pageService, script.navigationScript)
 
-		def output = parser.getAllMeasuredEvent(script.navigationScript).collect()
+		def output = parser.getAllMeasuredEvents(script.navigationScript).collect()
 
 		render output as JSON
 	}
