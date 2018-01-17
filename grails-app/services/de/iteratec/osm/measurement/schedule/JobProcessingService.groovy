@@ -32,6 +32,7 @@ import grails.transaction.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.http.HttpStatus
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
@@ -332,15 +333,15 @@ class JobProcessingService {
      * If they are not enabled nothing happens.
      * @return the testId of the running job.
      */
-    public String launchJobRun(Job job, priority = 5) {
+    String launchJobRun(Job job, priority = 5) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
             log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
-            return false
+            return HttpStatus.SC_BAD_REQUEST.toString()
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            return false
+            return HttpStatus.SC_BAD_REQUEST.toString()
         }
 
         int statusCode
@@ -387,7 +388,7 @@ class JobProcessingService {
         } catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return null
+            return HttpStatus.SC_BAD_REQUEST.toString()
         }
     }
 
