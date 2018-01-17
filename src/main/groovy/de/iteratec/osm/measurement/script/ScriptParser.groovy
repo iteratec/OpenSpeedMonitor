@@ -502,17 +502,19 @@ class ScriptParser {
     }
 
     /**
+     * Collects all measured events of the given script.
      *
-     * @param navigationScript
-     * @return
+     * @param navigationScript that is given.
+     * @return all measured events of the navigationScript.
      */
     List<MeasuredEvent> getAllMeasuredEvents(String navigationScript) {
         if (!navigationScript)
             return null
 
         List names = parse(navigationScript).collect {
-            if (it.keyword == setEventNameCmd && it.parameter.split(":::").length == 2) {
-                it.parameter.split(":::")[1]
+            if (it.keyword == setEventNameCmd) {
+                def eventSpecification = it.parameter.split(":::")
+                eventSpecification.length == 2 ? eventSpecification[1] : eventSpecification[0]
             }
         }
 
