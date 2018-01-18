@@ -336,12 +336,11 @@ class JobProcessingService {
     String launchJobRun(Job job, priority = 5) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
-            log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
-            return HttpStatus.SC_BAD_REQUEST.toString()
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause measurements are generally disabled.")
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            return HttpStatus.SC_BAD_REQUEST.toString()
+            throw new Exception("Job run of Job ${job} is skipped cause the location is overloaded.")
         }
 
         int statusCode
@@ -365,7 +364,6 @@ class JobProcessingService {
             if (testId){
                 log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
             } else {
-                testId = "DID_NOT_RECEIVE"
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
             }
 
@@ -386,9 +384,8 @@ class JobProcessingService {
 
             return testId
         } catch (Exception e) {
-            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return HttpStatus.SC_BAD_REQUEST.toString()
+            throw new Exception("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
 
