@@ -340,7 +340,7 @@ class JobProcessingService {
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            throw new Exception("Job run of Job ${job} is skipped cause the location is overloaded.")
+            throw new ResourceException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
         int statusCode
@@ -385,7 +385,7 @@ class JobProcessingService {
             return testId
         } catch (Exception e) {
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            throw new Exception("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
+            throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
 
