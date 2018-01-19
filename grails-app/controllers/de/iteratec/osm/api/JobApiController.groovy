@@ -2,6 +2,7 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.api.dto.JobDto
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.util.ControllerUtils
@@ -61,10 +62,24 @@ class JobApiController {
         }
 
         String testId
-        if (priority){
-            testId = jobProcessingService.launchJobRun(job, priority)
-        }else{
-            testId = jobProcessingService.launchJobRun(job)
+        try {
+            if (priority){
+                testId = jobProcessingService.launchJobRun(job, priority)
+            } else {
+                testId = jobProcessingService.launchJobRun(job)
+            }
+        } catch(IllegalStateException exception) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
+            log.error(exception.getMessage(), exception)
+        } catch(JobExecutionException exception) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
+            log.error(exception.getMessage(), exception)
+        } catch(RuntimeException exception) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
+            log.error(exception.getMessage(), exception)
+        } catch(Exception exception) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
+            log.error(exception.getMessage(), exception)
         }
 
         ControllerUtils.sendObjectAsJSON(response, [target: testId], true)

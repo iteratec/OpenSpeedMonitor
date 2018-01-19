@@ -340,7 +340,7 @@ class JobProcessingService {
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            throw new ResourceException("Job run of Job ${job} is skipped cause overloaded locations.")
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
         int statusCode

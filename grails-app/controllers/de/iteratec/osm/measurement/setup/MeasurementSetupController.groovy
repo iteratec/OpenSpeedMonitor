@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.script.Script
@@ -57,7 +58,17 @@ class MeasurementSetupController extends ExceptionHandlerController {
             job.active = true
             job.save(failOnError: true)
             scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
-            jobProcessingService.launchJobRun(job)
+            try {
+                jobProcessingService.launchJobRun(job)
+            } catch(IllegalStateException exception) {
+                log.error(exception.getMessage(), exception)
+            } catch(JobExecutionException exception) {
+                log.error(exception.getMessage(), exception)
+            } catch(RuntimeException exception) {
+                log.error(exception.getMessage(), exception)
+            } catch(Exception exception) {
+                log.error(exception.getMessage(), exception)
+            }
             redirect(controller: 'job', action: 'index')
             return
         }

@@ -280,10 +280,21 @@ class JobController {
 
     def execute() {
         handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
-            if (jobProcessingService.launchJobRun(job))
+            try {
+                jobProcessingService.launchJobRun(job)
                 massExecutionResults[job.id] = [status: 'success']
-            else
+            } catch(IllegalStateException exception) {
                 massExecutionResults[job.id] = [status: 'failure']
+                log.error(exception.getMessage(), exception)
+            } catch(JobExecutionException exception) {
+                massExecutionResults[job.id] = [status: 'failure']
+                log.error(exception.getMessage(), exception)
+            } catch(RuntimeException exception) {
+                massExecutionResults[job.id] = [status: 'failure']
+                log.error(exception.getMessage(), exception)
+            } catch(Exception exception) {
+                log.error(exception.getMessage(), exception)
+            }
         }
     }
 
