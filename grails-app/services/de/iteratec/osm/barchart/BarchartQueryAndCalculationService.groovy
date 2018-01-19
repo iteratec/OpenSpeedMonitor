@@ -7,6 +7,7 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.dao.BarchartEventResultProjection
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
@@ -163,7 +164,7 @@ class BarchartQueryAndCalculationService {
     private List<EventResultProjection> createEventResultProjectionsForMeasurands(List<Map> transformedAggregations) {
         List<EventResultProjection> eventResultProjections = []
         transformedAggregations.each {
-            EventResultProjection eventResultProjection = new EventResultProjection(
+            EventResultProjection eventResultProjection = new BarchartEventResultProjection(
                     jobGroup: it.jobGroup,
                     page: it.page,
                     isAggregation: true,
@@ -190,7 +191,7 @@ class BarchartQueryAndCalculationService {
             it.page == transformedAggregation.page && it.jobGroup == transformedAggregation.jobGroup && it."$transformedAggregation.name" == null
         }
         if (!relevantProjection) {
-            relevantProjection = new EventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page, isAggregation: true)
+            relevantProjection = new BarchartEventResultProjection(jobGroup: transformedAggregation.jobGroup, page: transformedAggregation.page, isAggregation: true)
             result.add(relevantProjection)
         }
         return relevantProjection
@@ -250,7 +251,7 @@ class BarchartQueryAndCalculationService {
             groupededAggregations.each { key, valueMap ->
                 Long jobGroupId = key.split("_")[0] as Long
                 Long pageId = key.split("_")[1] as Long
-                EventResultProjection erp = new EventResultProjection()
+                EventResultProjection erp = new BarchartEventResultProjection()
                 erp.jobGroup = jobGroups.find { it.id == jobGroupId }
                 erp.page = pages.find { it.id == pageId }
                 valueMap.each { nameKey, valueList ->
@@ -266,7 +267,7 @@ class BarchartQueryAndCalculationService {
             }
             groupededAggregations.each { key, valueMap ->
                 Long jobGroupId = key as Long
-                EventResultProjection erp = new EventResultProjection()
+                EventResultProjection erp = new BarchartEventResultProjection()
                 erp.jobGroup = jobGroups.find { it.id == jobGroupId }
                 valueMap.each { nameKey, valueList ->
                     erp.projectedProperties.put(nameKey, getMedian(valueList))
@@ -298,7 +299,7 @@ class BarchartQueryAndCalculationService {
             }
 
             groupedList.each { k, v ->
-                EventResultProjection erp = new EventResultProjection()
+                EventResultProjection erp = new BarchartEventResultProjection()
                 erp.jobGroup = v[0].jobGroup
                 erp.page = v[0].page
                 groupedAggs.put(erp, v)
@@ -318,7 +319,7 @@ class BarchartQueryAndCalculationService {
             }
 
             groupedList.each { k, v ->
-                EventResultProjection erp = new EventResultProjection()
+                EventResultProjection erp = new BarchartEventResultProjection()
                 erp.jobGroup = v[0].jobGroup
                 groupedAggs.put(erp, v)
             }
@@ -363,7 +364,7 @@ class BarchartQueryAndCalculationService {
     List<EventResultProjection> createProjectionForSelectedMeasurand(List<Map> transformedData, SelectedMeasurand selectedMeasurand) {
         List<EventResultProjection> result = []
         transformedData.each {
-            EventResultProjection erp = new EventResultProjection(jobGroup: it.jobGroup, page: it.page)
+            EventResultProjection erp = new BarchartEventResultProjection(jobGroup: it.jobGroup, page: it.page)
             if (selectedMeasurand.selectedType.isUserTiming()) {
                 def relevantValue = it.type == UserTimingType.MEASURE ? it.duration : it.startTime
                 erp.projectedProperties.put(it.name, relevantValue)

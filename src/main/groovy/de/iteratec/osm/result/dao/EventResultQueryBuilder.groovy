@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 
@@ -17,10 +18,12 @@ class EventResultQueryBuilder {
     private List<Closure> filters = []
     private List<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
+    private PerformanceLoggingService performanceLoggingService
 
     private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, userTimingRawQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        performanceLoggingService = new PerformanceLoggingService()
         filters.add(initBaseClosure(minValidLoadtime, maxValidLoadtime))
         baseProjections = initBaseProjections()
     }
@@ -163,14 +166,23 @@ class EventResultQueryBuilder {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
-        if (userTimingsBuilder) {
-            userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims)
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get usertiming results', 3) {
+            if (userTimingsBuilder) {
+                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
+            }
         }
-        if (measurandsBuilder) {
-            measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims)
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get measurand results', 3) {
+            if (measurandsBuilder) {
+                measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
+            }
         }
 
-        return mergeResults(measurandResult, userTimingsResult)
+        List<EventResultProjection> merged
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
+            merged = mergeResults(measurandResult, userTimingsResult)
+        }
+
+        return merged
     }
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResult, List<EventResultProjection> userTimingResult) {

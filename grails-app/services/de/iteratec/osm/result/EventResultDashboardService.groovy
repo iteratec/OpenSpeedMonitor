@@ -55,7 +55,6 @@ public class EventResultDashboardService {
     OsmChartProcessingService osmChartProcessingService
     OsmConfigCacheService osmConfigCacheService
 
-
     /**
      * The Grails engine to generate links.
      *
@@ -173,19 +172,28 @@ public class EventResultDashboardService {
         Collection<EventResultProjection> eventResults
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - with builder', 1) {
 
-            EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobResultDateBetween(startDate, endDate)
-                .withJobGroupIdsIn(queryParams.jobGroupIds as List)
-                .withPageIdsIn(queryParams.pageIds as List)
-                .withLocationIdsIn(queryParams.locationIds as List)
-                .withBrowserIdsIn(queryParams.browserIds as List)
-                .withMeasuredEventIdsIn(queryParams.measuredEventIds as List)
-                .withSelectedMeasurands(selectedMeasurands)
+            EventResultQueryBuilder queryBuilder
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
+                queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                        .withJobResultDateBetween(startDate, endDate)
+                        .withJobGroupIdsIn(queryParams.jobGroupIds as List)
+                        .withPageIdsIn(queryParams.pageIds as List)
+                        .withLocationIdsIn(queryParams.locationIds as List)
+                        .withBrowserIdsIn(queryParams.browserIds as List)
+                        .withMeasuredEventIdsIn(queryParams.measuredEventIds as List)
+                        .withSelectedMeasurands(selectedMeasurands)
+            }
 
-            appendConnectivity(queryBuilder, queryParams)
-            appendTrims(queryBuilder, queryParams)
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append connectivities', 2) {
+                appendConnectivity(queryBuilder, queryParams)
+            }
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append trims', 2) {
+                appendTrims(queryBuilder, queryParams)
+            }
 
-            eventResults = queryBuilder.getRawData()
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - actually query the data', 2) {
+                eventResults = queryBuilder.getRawData()
+            }
 
         }
         log.debug("getting event-results - Got ${eventResults.size()} EventResultProjections")

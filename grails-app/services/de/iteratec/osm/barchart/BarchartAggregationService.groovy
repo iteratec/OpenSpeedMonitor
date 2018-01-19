@@ -5,8 +5,8 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 
@@ -57,8 +57,12 @@ class BarchartAggregationService {
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
         switch(selectedAggregationValue) {
-            case 'avg': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands))
-            case 'median': return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands))
+            case 'avg':
+                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands)
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+            case 'median':
+                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands)
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
         }
     }
 

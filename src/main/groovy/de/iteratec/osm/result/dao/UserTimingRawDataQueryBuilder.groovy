@@ -5,6 +5,8 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.util.PerformanceLoggingService
+
 /**
  * Created by mwg on 11.10.2017.
  */
@@ -36,12 +38,26 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims) {
+    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
         List<Closure> filters = []
-        filters.addAll(baseFilters)
-        filters.add(buildUserTimingFilter(trims))
-        filters.add(buildProjection(baseProjections))
-        return createEventResultProjections(executeQuery(filters))
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - add base filters', 4) {
+            filters.addAll(baseFilters)
+        }
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - build and add ut filters', 4) {
+            filters.add(buildUserTimingFilter(trims))
+        }
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - build and add projections', 4) {
+            filters.add(buildProjection(baseProjections))
+        }
+        List<Map> dbResult
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - execute ut query', 4) {
+            dbResult = executeQuery(filters)
+        }
+        List<EventResultProjection> projections
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create EventResultProjections from db maps', 4) {
+            projections = createEventResultProjections(dbResult)
+        }
+        return projections
     }
 
     private Closure buildUserTimingFilter(List<MeasurandTrim> trims){

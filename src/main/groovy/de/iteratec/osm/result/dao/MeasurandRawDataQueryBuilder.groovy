@@ -3,6 +3,8 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.util.PerformanceLoggingService
+
 /**
  * Created by mwg on 11.10.2017.
  */
@@ -34,7 +36,7 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims) {
+    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
         List<Closure> filters = []
         filters.addAll(baseFilters)
         filters.addAll(buildTrim(trims))
