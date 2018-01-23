@@ -394,24 +394,24 @@ class TestDataUtil implements OsmTestLogin {
         List<Browser> browsers = []
         String browserName = "undefined"
         browsers.add(new Browser(name: browserName)
-                        .addToBrowserAliases(alias: "undefined"
-                ).save(failOnError: true)
+                .addToBrowserAliases(alias: "undefined"
+        ).save(failOnError: true)
         )
         browserName = "IE"
         browsers.add(new Browser(name: browserName)
-                        .addToBrowserAliases(alias: "IE")
-                        .addToBrowserAliases(alias: "IE8")
-                        .addToBrowserAliases(alias: "Internet Explorer")
-                        .addToBrowserAliases(alias: "Internet Explorer 8"
-                ).save(failOnError: true)
+                .addToBrowserAliases(alias: "IE")
+                .addToBrowserAliases(alias: "IE8")
+                .addToBrowserAliases(alias: "Internet Explorer")
+                .addToBrowserAliases(alias: "Internet Explorer 8"
+        ).save(failOnError: true)
         )
         browserName = "FF"
         browsers.add(new Browser(name: browserName)
-                        .addToBrowserAliases(alias: "FF")
-                        .addToBrowserAliases(alias: "FF7")
-                        .addToBrowserAliases(alias: "Firefox")
-                        .addToBrowserAliases(alias: "Firefox7"
-                ).save(failOnError: true)
+                .addToBrowserAliases(alias: "FF")
+                .addToBrowserAliases(alias: "FF7")
+                .addToBrowserAliases(alias: "Firefox")
+                .addToBrowserAliases(alias: "Firefox7"
+        ).save(failOnError: true)
         )
         return browsers
     }
@@ -890,7 +890,6 @@ class TestDataUtil implements OsmTestLogin {
         return event;
     }
 
-
     /**
      * Writes new {@link CsiAggregation} to db without validating it.
      * @param date
@@ -920,7 +919,6 @@ class TestDataUtil implements OsmTestLogin {
                 page: page
         ).save(validate: false)
     }
-
 
     /**
      * * Writes new {@link CsiAggregation} to db.
@@ -1013,7 +1011,7 @@ class TestDataUtil implements OsmTestLogin {
     public static User createAdminUser() {
         String adminUserName = getConfiguredUsername()
         User user = User.findByUsername(adminUserName)
-        if (!user){
+        if (!user) {
             user = User.build(
                     username: adminUserName,
                     password: getConfiguredPassword(),
@@ -1035,9 +1033,9 @@ class TestDataUtil implements OsmTestLogin {
                 lastUpdate: new Date()).save(flush: true, failOnError: true)
     }
 
-    public static void setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus status){
+    public static void setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus status) {
         OsmConfiguration configuration = OsmConfiguration.list()[0]
-        if (!configuration){
+        if (!configuration) {
             configuration = OsmConfiguration.build()
         }
         configuration.infrastructureSetupRan = status
