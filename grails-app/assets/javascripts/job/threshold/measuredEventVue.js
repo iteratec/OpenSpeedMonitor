@@ -48,25 +48,25 @@ Vue.component('threshold-measured-event', {
                 })
             }
         },
-        removeNewThreshold: function (newThresholdItem) {
-            this.measuredEventItem.thresholdList.splice(this.measuredEventItem.thresholdList.indexOf(newThresholdItem), 1);
+        removeThreshold: function (thresholdItem) {
+            this.measuredEventItem.thresholdList.splice(this.measuredEventItem.thresholdList.indexOf(thresholdItem), 1);
 
             if (this.measuredEventItem.thresholdList.length === 0) {
                 this.$emit('remove-measured-event', this.measuredEventItem);
             }
         },
-        deleteThreshold: function (newThresholdItem) {
-            this.$emit('delete-threshold', newThresholdItem);
+        deleteThreshold: function (thresholdItem) {
+            this.$emit('delete-threshold', thresholdItem);
         },
-        updateThreshold: function (newThresholdItem) {
-            this.$emit('update-threshold', newThresholdItem);
+        updateThreshold: function (thresholdItem) {
+            this.$emit('update-threshold', thresholdItem);
         },
-        createThreshold: function (newThresholdItem) {
-            if (!Object.keys(newThresholdItem.threshold.measuredEvent).length) {
+        createThreshold: function (thresholdItem) {
+            if (!Object.keys(thresholdItem.threshold.measuredEvent).length) {
                 this.measuredEventItem.measuredEvent = this.selectedMeasuredEvent;
-                newThresholdItem.threshold.measuredEvent = this.measuredEventItem.measuredEvent;
+                thresholdItem.threshold.measuredEvent = this.measuredEventItem.measuredEvent;
             }
-            this.$emit('create-threshold', newThresholdItem);
+            this.$emit('create-threshold', thresholdItem);
         }
     }
 });
