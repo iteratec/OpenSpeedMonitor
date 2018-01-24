@@ -6,9 +6,11 @@
             <span class="addMetricButton fa text-success fa-lg fa-plus"></span>
         </a>
     </div>
+
     <div v-else>
         <select class="form-control thresholdSelects" v-model="selectedMeasuredEvent">
-            <option v-for="measuredEvent in availableMeasuredEvents" :value="measuredEvent">{{measuredEvent.name}}</option>
+            <option v-for="measuredEvent in availableMeasuredEvents"
+                    :value="measuredEvent">{{measuredEvent.name}}</option>
         </select>
     </div>
 
@@ -16,15 +18,15 @@
     <div v-for="thresholdList in measuredEventItem.thresholdList">
         <div>
             <threshold :threshold-item="thresholdList"
-                           :available-measurands="availableMeasurands"
-                           v-on:delete-threshold="deleteThreshold"
-                           v-on:update-threshold="updateThreshold"
-                           v-on:create-threshold="createThreshold"
-                           v-on:remove-new-threshold="removeNewThreshold">
+                       :available-measurands="availableMeasurands"
+                       v-on:delete-threshold="deleteThreshold"
+                       v-on:update-threshold="updateThreshold"
+                       v-on:create-threshold="createThreshold"
+                       v-on:remove-new-threshold="removeNewThreshold">
             </threshold>
         </div>
     </div>
-</div>
+</div>or
 </script>
 
 <g:render template="/job/threshold/thresholdVue"/>

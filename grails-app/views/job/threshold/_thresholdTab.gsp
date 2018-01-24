@@ -45,5 +45,3 @@
 </div>
 
 <g:render template="threshold/measuredEventVue"/>
-
-%{--<asset:javascript src="/job/threshold/rootVue.js"/>--}%

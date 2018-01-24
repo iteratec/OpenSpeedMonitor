@@ -1,6 +1,6 @@
 //= require bower_components/vue/dist/vue.js
 //= require job/threshold/thresholdTabThreshold.js
-"use strict"
+"use strict";
 
 Vue.component('threshold-input', {
     props: ['threshold-field', 'threshold-measurand','editable', 'fieldName'],
