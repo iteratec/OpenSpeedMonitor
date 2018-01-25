@@ -151,7 +151,7 @@ new Vue({
                 data: {
                     thresholdId: deletedThreshold.threshold.id
                 },
-                url: "/threshold/delete",
+                url: "/threshold/deleteThreshold",
                 success: function () {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         //remove threshold from measured event

@@ -41,7 +41,7 @@ class ThresholdController {
      *
      * @return http status
      */
-    def delete() {
+    def deleteThreshold() {
         Long id = Long.parseLong(params['thresholdId'])
         Threshold threshold = Threshold.findById(id)
         if (threshold == null) {
@@ -51,8 +51,7 @@ class ThresholdController {
 
         try {
             threshold.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'threshold.label', default: 'Threshold'), params.id])
-            redirect(action: "index")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
         }
         catch (DataIntegrityViolationException e) {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'threshold.label', default: 'Threshold'), params.id])
