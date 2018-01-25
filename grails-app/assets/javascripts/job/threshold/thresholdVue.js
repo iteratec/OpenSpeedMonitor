@@ -11,7 +11,7 @@ OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};
 
 Vue.component('threshold', {
-    props: ['threshold-item', 'available-measurands'],
+    props: ['thresholdItem', 'availableMeasurands'],
     data: function() {
         return {
             tmpThreshold: {},

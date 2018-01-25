@@ -3,7 +3,7 @@
 "use strict";
 
 Vue.component('threshold-input', {
-    props: ['threshold-field', 'threshold-measurand','editable', 'fieldName'],
+    props: ['thresholdField', 'thresholdMeasurand','editable', 'fieldName'],
     data: function () {
         return {
             value: this.thresholdField

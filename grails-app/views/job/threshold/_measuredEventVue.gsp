@@ -22,11 +22,11 @@
                        v-on:delete-threshold="deleteThreshold"
                        v-on:update-threshold="updateThreshold"
                        v-on:create-threshold="createThreshold"
-                       v-on:remove-new-threshold="removeNewThreshold">
+                       v-on:remove-new-threshold="removeThreshold">
             </threshold>
         </div>
     </div>
-</div>or
+</div>
 </script>
 
 <g:render template="/job/threshold/thresholdVue"/>

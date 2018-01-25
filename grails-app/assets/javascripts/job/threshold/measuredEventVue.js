@@ -7,9 +7,9 @@
 
 Vue.component('threshold-measured-event', {
     props: [
-        'measured-event-item',
+        'measuredEventItem',
         'measurands',
-        'available-measured-events'
+        'availableMeasuredEvents'
     ],
     data: function () {
         return {
