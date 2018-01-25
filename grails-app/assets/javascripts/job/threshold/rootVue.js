@@ -125,7 +125,7 @@ new Vue({
                     lowerBoundary: newThreshold.threshold.lowerBoundary,
                     upperBoundary: newThreshold.threshold.upperBoundary
                 },
-                url: "/threshold/createAsync",
+                url: "/threshold/create",
                 success: function (result) {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
@@ -151,7 +151,7 @@ new Vue({
                 data: {
                     thresholdId: deletedThreshold.threshold.id
                 },
-                url: "/threshold/deleteAsync",
+                url: "/threshold/delete",
                 success: function () {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         //remove threshold from measured event
@@ -182,7 +182,7 @@ new Vue({
                     lowerBoundary: updatedThreshold.threshold.lowerBoundary,
                     upperBoundary: updatedThreshold.threshold.upperBoundary
                 },
-                url: "/threshold/updateAsync",
+                url: "/threshold/update",
                 success: function () {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {

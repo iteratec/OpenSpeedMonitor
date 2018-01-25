@@ -19,7 +19,7 @@ class ThresholdController {
      *
      * @return The id of the new threshold.
      */
-    def createAsync() {
+    def create() {
         Job job = Job.findById(Long.parseLong(params['job']))
         Measurand measurand = Measurand.valueOf(params['measurand']);
         MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
@@ -41,7 +41,7 @@ class ThresholdController {
      *
      * @return http status
      */
-    def deleteAsync() {
+    def delete() {
         Long id = Long.parseLong(params['thresholdId'])
         Threshold threshold = Threshold.findById(id)
         if (threshold == null) {
@@ -65,7 +65,7 @@ class ThresholdController {
      *
      * @return The id of the threshold.
      */
-    def updateAsync() {
+    def update() {
         //get params
         Long id = Long.parseLong(params['thresholdId'])
         Measurand measurand = params['measurand'];
