@@ -99,8 +99,11 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
+<<<<<<< HEAD
         svg.transition()
             .duration(transitionDuration)
+=======
+>>>>>>> 6d1eadb... [IT-1974] fix d3Charts height for firefox
 
         var svgName = chartIdentifier.substr(1);
         document.getElementById(svgName).setAttribute("height",chartHeight);
