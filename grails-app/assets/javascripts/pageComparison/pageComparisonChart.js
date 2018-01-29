@@ -101,7 +101,10 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
         svg.transition()
             .duration(transitionDuration)
-            .style("height", chartHeight);
+
+        var svgName = chartIdentifier.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
+
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
             .append("g")

@@ -48,8 +48,9 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             svg
                 .transition()
                 .duration(transitionDuration)
-                .style("height", chartHeight);
 
+            var svgName = selector.substr(1);
+            document.getElementById(svgName).setAttribute("height",chartHeight);
             renderHeader(svg);
             renderSideLabels(svg, headerHeight);
 
