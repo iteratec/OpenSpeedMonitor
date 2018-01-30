@@ -48,15 +48,15 @@ new Vue({
     },
     methods: {
         fetchData: function () {
-            this.getMeasurands("/job/getAllMeasurands");
-            this.getMeasuredEvents(this.scriptId, "/script/getMeasuredEventsForScript");
+            this.getMeasurands();
+            this.getMeasuredEvents(this.scriptId);
         },
-        getMeasuredEvents: function (scriptId, targetUrl) {
+        getMeasuredEvents: function (scriptId) {
             var self = this;
-            if (scriptId && targetUrl) {
+            if (scriptId) {
                 $.ajax({
                     type: 'GET',
-                    url: targetUrl,
+                    url: "/script/getMeasuredEventsForScript",
                     data: {scriptId: scriptId},
                     success: function (result) {
                         self.measuredEvents = result;
@@ -70,25 +70,23 @@ new Vue({
                 });
             }
         },
-        getMeasurands: function (targetUrl) {
+        getMeasurands: function () {
             var self = this;
-            if (targetUrl) {
-                $.ajax({
-                    type: 'GET',
-                    url: targetUrl,
-                    data: {},
-                    success: function (result) {
-                        result.forEach(function (measurand) {
-                            measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];
-                        });
+            $.ajax({
+                type: 'GET',
+                url: "/job/getAllMeasurands",
+                data: {},
+                success: function (result) {
+                    result.forEach(function (measurand) {
+                        measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];
+                    });
 
-                        self.measurands = result;
-                    },
-                    error: function () {
-                        return ""
-                    }
-                });
-            }
+                    self.measurands = result;
+                },
+                error: function () {
+                    return ""
+                }
+            });
         },
         getThresholds: function () {
             this.activeMeasuredEvents = [];
@@ -125,7 +123,7 @@ new Vue({
                     lowerBoundary: newThreshold.threshold.lowerBoundary,
                     upperBoundary: newThreshold.threshold.upperBoundary
                 },
-                url: "/threshold/create",
+                url: "/threshold/createThreshold",
                 success: function (result) {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === newThreshold.threshold.measuredEvent.id) {
@@ -182,7 +180,7 @@ new Vue({
                     lowerBoundary: updatedThreshold.threshold.lowerBoundary,
                     upperBoundary: updatedThreshold.threshold.upperBoundary
                 },
-                url: "/threshold/update",
+                url: "/threshold/updateThreshold",
                 success: function () {
                     self.activeMeasuredEvents.forEach(function (measuredEventItem) {
                         if (measuredEventItem.measuredEvent.id === updatedThreshold.threshold.measuredEvent.id) {

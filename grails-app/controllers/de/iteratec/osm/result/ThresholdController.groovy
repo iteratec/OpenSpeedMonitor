@@ -19,7 +19,7 @@ class ThresholdController {
      *
      * @return The id of the new threshold.
      */
-    def create() {
+    def createThreshold() {
         Job job = Job.findById(Long.parseLong(params['job']))
         Measurand measurand = Measurand.valueOf(params['measurand']);
         MeasuredEvent measuredEvent =  MeasuredEvent.findById(Long.parseLong(params['measuredEvent']))
@@ -64,7 +64,7 @@ class ThresholdController {
      *
      * @return The id of the threshold.
      */
-    def update() {
+    def updateThreshold() {
         //get params
         Long id = Long.parseLong(params['thresholdId'])
         Measurand measurand = params['measurand'];
