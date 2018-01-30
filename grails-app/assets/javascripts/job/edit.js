@@ -473,3 +473,11 @@ function selectAllGraphiteServer(select) {
         obj.options[i].selected = select;
     }
 }
+
+function hideWptInfoPanel(){
+    document.getElementById('wptInfoPanel').setAttribute("class", "hidden");
+}
+
+function showWptInfoPanel(){
+    document.getElementById('wptInfoPanel').setAttribute("class", "col-sm-3");
+}

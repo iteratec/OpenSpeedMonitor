@@ -3,38 +3,38 @@
     <div class="col-md-2">
         <ul class="nav nav-pills nav-stacked">
             <li class="active">
-                <a data-toggle="pill" href="#AdvancedContent">
+                <a data-toggle="pill" href="#AdvancedContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.advanced.label" default="Advanced"/>
                 </a>
             </li>
             <li>
-                <a data-toggle="pill" id="chromeTabLink" href="#ChromeContent">
+                <a data-toggle="pill" id="chromeTabLink" href="#ChromeContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.chrome.label" default="Chrome"/>
                 </a>
             </li>
             <li>
-                <a data-toggle="pill" href="#AuthContent">
+                <a data-toggle="pill" href="#AuthContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.auth.label" default="Authentication"/>
                 </a>
             </li>
             <li>
-                <a data-toggle="pill" href="#BlockContent">
+                <a data-toggle="pill" href="#BlockContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.block.label" default="Block URLs"/>
                 </a>
             </li>
             <li>
-                <a data-toggle="pill" href="#SPOFContent">
+                <a data-toggle="pill" href="#SPOFContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.spof.label" default="SPOF"/>
                 </a>
             </li>
             <li>
-                <a data-toggle="pill" href="#CustomContent">
+                <a data-toggle="pill" href="#CustomContent" onClick="showWptInfoPanel()">
                     <g:message code="job.tab.custom.label" default="Custom Metrics"/>
                 </a>
             </li>
             <g:if test="${job.id != null}">
                 <li>
-                    <a data-toggle="pill" href="#ThresholdContent">
+                    <a data-toggle="pill" href="#ThresholdContent" onClick="hideWptInfoPanel()">
                         <g:message code="job.tab.threshold.label" default="Thresholds"/>
                     </a>
                 </li>
@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-3" id="wptInfoPanel">
         <div class="panel panel-info">
             <div class="panel-heading">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
