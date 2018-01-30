@@ -20,7 +20,11 @@
     <br>
 
     <span v-if="activeMeasuredEvents.length === 0"
-          class="col-md-offset-5">
+          class="">
+        <div>
+            <g:message code="job.threshold.description"/>
+        </div>
+        <br>
         <button type="button" class="btn btn-primary"
                 @click="addMeasuredEvent()"
                 :disabled="availableMeasuredEvents.length === 0">
