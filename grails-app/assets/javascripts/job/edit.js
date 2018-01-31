@@ -159,11 +159,9 @@ var cronStringInputField = $("#executionSchedule");
 var cronInputHelpBlock = $("#cronInputHelpBlock");
 
 function registerEventHandlers() {
-    $("#location").on("change", toggleChromeTab);
     inputEmulateMobile.on("change", toggleMobileOptions);
     $("#chkbox-captureTimeline").on("change", toggleTimelineOptions);
     $("#chkbox-trace").on("change", toggleTraceOptions);
-    toggleChromeTab();
     toggleMobileOptions();
     toggleTimelineOptions();
     toggleTraceOptions();
@@ -257,10 +255,6 @@ function toggleTimelineOptions() {
 
 function toggleTraceOptions() {
     $("#traceCategories").toggleClass("hidden", !$("#chkbox-trace").prop("checked"));
-}
-
-function toggleChromeTab() {
-    $("#chromeTabLink").toggleClass("hidden", !($("#location option:selected").text()).includes("Chrome"));
 }
 
 function updateJobName() {

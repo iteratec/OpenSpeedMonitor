@@ -8,8 +8,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.distributionChart = (function () {
-    var svgContainer = null,
-        svg = null,
+    var svg = null,
         chartData = null,
         width = 600,
         height = 600,
@@ -23,8 +22,6 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
     var init = function () {
-        svgContainer = document.querySelector("#svg-container");
-
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
             draw();
@@ -36,9 +33,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var drawUpdatedSize = function () {
         var domain = getDomain();
 
-        width = svgContainer.clientWidth;
+        width = svg.node().getBoundingClientRect().width;
         violinWidth = calculateViolinWidth();
-        svg.attr("width", width);
 
         drawXAxis();
         drawViolins(domain);
@@ -82,11 +78,11 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         if (svg)
             svg.remove();
 
-        width = svgContainer.clientWidth;
-        svg = d3.select(svgContainer).append("svg")
+        svg = d3.select("#svg-container").append("svg")
             .attr("class", "d3chart")
             .attr("height", height)
-            .attr("width", width);
+            .attr("width", "100%");
+        width = svg.node().getBoundingClientRect().width;
     };
 
     var assignShortLabels = function () {
@@ -200,7 +196,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var calculateViolinWidth = function () {
-        var svgWidth = svgContainer.clientWidth - margin.left;
+        var svgWidth = width - margin.left;
         var numberOfViolins = Object.keys(chartData.series).length;
 
         if (numberOfViolins * maxViolinWidth > svgWidth) {

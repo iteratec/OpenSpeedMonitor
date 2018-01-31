@@ -45,8 +45,15 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
             var chartHeight = barScorePosY + barScoreHeight + headerHeight;
 
-            svg.style("height", chartHeight);
+<<<<<<< HEAD
+            svg
+                .transition()
+                .duration(transitionDuration)
 
+=======
+>>>>>>> 6d1eadb... [IT-1974] fix d3Charts height for firefox
+            var svgName = selector.substr(1);
+            document.getElementById(svgName).setAttribute("height",chartHeight);
             renderHeader(svg);
             renderSideLabels(svg, headerHeight);
 

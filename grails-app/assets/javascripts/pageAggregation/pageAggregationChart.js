@@ -74,7 +74,14 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = legendPosY + legendHeight + headerHeight;
 
-        svg.style("height", chartHeight);
+<<<<<<< HEAD
+        svg
+            .transition()
+            .duration(transitionDuration)
+=======
+>>>>>>> 6d1eadb... [IT-1974] fix d3Charts height for firefox
+        var svgName = selector.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
 
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);
