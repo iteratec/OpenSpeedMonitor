@@ -283,16 +283,8 @@ class JobController {
             try {
                 jobProcessingService.launchJobRun(job)
                 massExecutionResults[job.id] = [status: 'success']
-            } catch(IllegalStateException exception) {
-                massExecutionResults[job.id] = [status: 'failure']
-                log.error(exception.getMessage(), exception)
-            } catch(JobExecutionException exception) {
-                massExecutionResults[job.id] = [status: 'failure']
-                log.error(exception.getMessage(), exception)
-            } catch(RuntimeException exception) {
-                massExecutionResults[job.id] = [status: 'failure']
-                log.error(exception.getMessage(), exception)
             } catch(Exception exception) {
+                massExecutionResults[job.id] = [status: 'failure']
                 log.error(exception.getMessage(), exception)
             }
         }

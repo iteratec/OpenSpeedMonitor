@@ -69,13 +69,7 @@ class JobApiController {
                 testId = jobProcessingService.launchJobRun(job)
             }
         } catch(IllegalStateException exception) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
-            log.error(exception.getMessage(), exception)
-        } catch(JobExecutionException exception) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
-            log.error(exception.getMessage(), exception)
-        } catch(RuntimeException exception) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.CONFLICT, exception.getMessage())
             log.error(exception.getMessage(), exception)
         } catch(Exception exception) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage())

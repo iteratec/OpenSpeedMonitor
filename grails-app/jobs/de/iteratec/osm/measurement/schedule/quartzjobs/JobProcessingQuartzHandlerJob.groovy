@@ -92,12 +92,6 @@ class JobProcessingQuartzHandlerJob {
         performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
             try {
                 jobProcessingService.launchJobRun(job)
-            } catch(IllegalStateException exception) {
-                log.error(exception.getMessage(), exception)
-            } catch(JobExecutionException exception) {
-                log.error(exception.getMessage(), exception)
-            } catch(RuntimeException exception) {
-                log.error(exception.getMessage(), exception)
             } catch(Exception exception) {
                 log.error(exception.getMessage(), exception)
             }

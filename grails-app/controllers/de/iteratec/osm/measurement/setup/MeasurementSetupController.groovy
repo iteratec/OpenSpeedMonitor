@@ -60,12 +60,6 @@ class MeasurementSetupController extends ExceptionHandlerController {
             scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
             try {
                 jobProcessingService.launchJobRun(job)
-            } catch(IllegalStateException exception) {
-                log.error(exception.getMessage(), exception)
-            } catch(JobExecutionException exception) {
-                log.error(exception.getMessage(), exception)
-            } catch(RuntimeException exception) {
-                log.error(exception.getMessage(), exception)
             } catch(Exception exception) {
                 log.error(exception.getMessage(), exception)
             }
