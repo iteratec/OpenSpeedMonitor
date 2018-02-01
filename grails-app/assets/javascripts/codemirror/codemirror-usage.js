@@ -133,7 +133,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
             },
             success : function(result) {
                 clipboard = new Clipboard("#copyToClipboard",{
-                    text :function (trigger) {
+                    text: function (trigger) {
                         return result
                     }
                 });

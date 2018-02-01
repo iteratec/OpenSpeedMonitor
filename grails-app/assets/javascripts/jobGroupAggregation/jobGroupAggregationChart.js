@@ -21,7 +21,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
     var data = OpenSpeedMonitor.ChartModules.JobGroupAggregationData(svg);
-    var transitionDuration = 500;
+    var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var highlightedGroupId = null;
 
     var setData = function (inputData) {
@@ -39,18 +39,21 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
     var render = function () {
         if (data.isDataAvailable()) {
             var shouldShowScore = data.hasLoadTimes();
-            var componentMargin = OpenSpeedMonitor.ChartModules.JobGroupAggregationData.ComponentMargin;
+            var componentMargin = OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
             var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
             var barScorePosY = data.getChartBarsHeight() + componentMargin;
             var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
             var chartHeight = barScorePosY + barScoreHeight + headerHeight;
 
+<<<<<<< HEAD
             svg
                 .transition()
                 .duration(transitionDuration)
-                .style("height", chartHeight)
-                .each("end", rerenderIfWidthChanged);
 
+=======
+>>>>>>> 6d1eadb... [IT-1974] fix d3Charts height for firefox
+            var svgName = selector.substr(1);
+            document.getElementById(svgName).setAttribute("height",chartHeight);
             renderHeader(svg);
             renderSideLabels(svg, headerHeight);
 
@@ -58,10 +61,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             contentGroup.enter()
                 .append("g")
                 .classed("bars-content-group", true);
-            contentGroup
-                .transition()
-                .duration(transitionDuration)
-                .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+            contentGroup.attr("transform",
+                "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
             renderBars(contentGroup);
             renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         }
@@ -117,13 +118,6 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             .transition()
             .style("opacity", 1)
             .duration(transitionDuration)
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var toggleBarHighlight = function (highlightGroupId) {

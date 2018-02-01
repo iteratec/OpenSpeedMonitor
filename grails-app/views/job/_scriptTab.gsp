@@ -27,7 +27,7 @@
 <g:render template="/script/codemirror"
           model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}"/>
 
-<button class="btn btn-default" id="script_button_copyToClipboard"  type="button" id="copyToClipboard">
+<button class="btn btn-default" type="button" id="copyToClipboard">
     <g:message code="job.script.copyToClipboard" default="Copy To Clipboard"/>
 </button>
 <a href="" target="_blank" id="editScriptLink">

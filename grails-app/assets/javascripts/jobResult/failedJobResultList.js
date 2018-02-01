@@ -34,9 +34,8 @@ OpenSpeedMonitor.jobResult = (function (url) {
     };
 
     var fillTable = function (result) {
-        var resultJSON = jQuery.parseJSON(result);
-        $jobLabel.text(resultJSON["jobLabel"]);
-        var jobResults = resultJSON["jobResults"];
+        $jobLabel.text(result["jobLabel"]);
+        var jobResults = result["jobResults"];
         if (!jobResults || jobResults.length <= 0) {
             $noResultsHint.removeClass("hidden");
             return;

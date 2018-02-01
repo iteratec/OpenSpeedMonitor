@@ -59,18 +59,17 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     var render = function (svg) {
         var scale = d3.scale.linear().rangeRound([0, width]).domain([min, max]);
         var scoreBars = svg.selectAll(".scoreBar").data(barsToRender, function (d) { return d.id });
-        renderExit(scoreBars.exit(), scale);
-        renderEnter(scoreBars.enter(), scale);
+        renderExit(scoreBars.exit());
+        renderEnter(scoreBars.enter());
         renderUpdate(scoreBars, scale);
     };
 
-    var renderEnter = function(enterSelection, scale) {
+    var renderEnter = function(enterSelection) {
         var barGroup = enterSelection
             .append("g")
             .attr("class", "scoreBar");
         barGroup.append("rect")
             .attr("height", barHeight)
-            .attr("width", 0)
             .attr("fill", function (d) { return d.fill; });
         barGroup.append("text")
             .attr("class", function (d) { return d.cssClass; })
@@ -82,40 +81,28 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
     };
 
     var renderUpdate = function (updateSelection, scale) {
-        var transition = updateSelection
-            .transition()
-            .duration(transitionDuration);
-        transition.attr("transform", function (d) {
-                return "translate(" + scale(d.start) + ", 0)";
-            });
-        transition.select('rect')
+        updateSelection.select('rect')
             .attr("width", function (d) {
                 return scale(d.end) - scale(d.start);
             });
-        transition.select('text')
+        updateSelection.select('text')
             .attr("x", function (d) {
                 return (scale(d.end) - scale(d.start)) / 2;
-            })
+            });
+        updateSelection.attr("transform", function (d) {
+            return "translate(" + scale(d.start) + ", 0)";
+        });
+        var transition = updateSelection
+            .transition()
+            .duration(transitionDuration);
+        transition.select('text')
             .style("opacity", function(d) {
                 return ((this.getComputedTextLength() + 20) > ((scale(d.end) - scale(d.start)) / 2)) ? 0 : 1;
             });
     };
 
-    var renderExit = function (exitSelection, scale) {
-        var exitTransition = exitSelection.transition()
-            .duration(transitionDuration);
-        exitTransition
-            .select('rect')
-            .attr("width", 0);
-        exitTransition
-            .select('text')
-            .style("opacity", 0)
-            .attr("x", 0);
-        exitTransition
-            .attr("transform", function (d) {
-                return "translate(" + scale(d.start) + ", 0)";
-            })
-            .remove();
+    var renderExit = function (exitSelection) {
+        exitSelection.remove();
     };
 
     return {

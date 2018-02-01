@@ -68,7 +68,7 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             });
 
         var compareSymbol = entryGroup.append("text")
-            .attr('font-family', 'FontAwesome')
+            .attr('style', 'font-family: FontAwesome')
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'compareSymbol')

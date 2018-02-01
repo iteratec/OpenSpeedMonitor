@@ -92,31 +92,34 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
     var render = function () {
         var shouldShowScore = data.hasLoadTimes();
-        var componentMargin = OpenSpeedMonitor.ChartModules.PageComparisonData.ComponentMargin;
+        var componentMargin = OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
-        var barScorePosY = data.getChartBarsHeight() + OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin*2;
+        var barScorePosY = data.getChartBarsHeight() + componentMargin;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
-        var legendPosY = barScorePosY;
+        var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
+<<<<<<< HEAD
         svg.transition()
             .duration(transitionDuration)
-            .style("height", chartHeight)
-            .each("end", rerenderIfWidthChanged);
+=======
+>>>>>>> 6d1eadb... [IT-1974] fix d3Charts height for firefox
+
+        var svgName = chartIdentifier.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
+
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
             .append("g")
             .classed("bars-content-group", true);
 
-        contentGroup
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", "translate(" + (data.getChartSideLabelsWidth()) + ", " + headerHeight + ")");
+        contentGroup.attr("transform",
+            "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
 
 
         renderHeader(svg);
         renderBars(contentGroup);
-        renderBarScore(svg, shouldShowScore, barScorePosY);
+        renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         renderLegend(contentGroup, legendPosY);
     };
 
@@ -132,13 +135,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .transition()
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + posY + ")");
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var renderBars = function (contentGroup) {

@@ -23,6 +23,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.async.Promise
 import groovy.util.slurpersupport.GPathResult
+import groovyx.net.http.NativeHandlers
 
 import java.util.concurrent.locks.ReentrantLock
 
@@ -87,8 +88,9 @@ class ProxyService {
         Map paramsNotNull = params.findAll {k,v-> v != null  }
         return httpRequestService.getRestClientFrom(wptserver).post {
             request.uri.path = '/runtest.php'
-            request.uri.query = paramsNotNull
-            request.contentType = 'application/xml'
+            request.body = paramsNotNull
+            request.contentType = 'application/x-www-form-urlencoded'
+            request.encoder('application/x-www-form-urlencoded', NativeHandlers.Encoders.&form)
             request.headers['Accept'] = 'application/xml'
         }
     }
