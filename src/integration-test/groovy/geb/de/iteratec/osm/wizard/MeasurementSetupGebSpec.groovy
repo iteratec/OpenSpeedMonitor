@@ -127,7 +127,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         expect: "the location and connectivity to be preselected and all connectivities should appear"
         msPage.locationSelect.value() == location.ident().toString()
         msPage.getConnectivities().size() == ConnectivityProfile.count()
-        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.text())
+        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.value())
         msPage.canContinueToJob()
     }
 
