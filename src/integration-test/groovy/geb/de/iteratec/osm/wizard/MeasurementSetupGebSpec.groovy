@@ -143,7 +143,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
     void "job create defaults"(){
         expect: "the job name to be set and a valid schedule to be selected, so that the setup could be finished"
         msPage.jobNameInput.value() == jobName
-        msPage.executionScheduleSelect.text() == msPage.getI18nMessage("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly")
+        msPage.executionScheduleSelect.value() == "0 * * * ? *"
         msPage.executionScheduleInput.@readonly
         msPage.canClickCreateButton()
     }
