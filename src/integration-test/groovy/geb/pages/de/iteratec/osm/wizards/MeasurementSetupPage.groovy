@@ -124,7 +124,7 @@ class MeasurementSetupPage extends I18nGebPage {
         scriptName { $("#inputScriptName") }
         scriptDescirption { $("#inputScriptDescription") }
         scriptHelpBlock { $("#navigationScriptHelpBlock") }
-        locationSelect { $("#inputLocation_chosen") }
+        locationSelect { $("#inputLocation") }
         connectivitySelect { $("#inputConnectivity_chosen") }
         jobNameInput { $("#inputJobName") }
         executionScheduleSelect { $("#selectExecutionSchedule_chosen") }
