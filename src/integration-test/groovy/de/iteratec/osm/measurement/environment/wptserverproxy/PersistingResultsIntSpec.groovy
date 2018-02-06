@@ -37,28 +37,21 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     ResultPersisterService resultPersisterService
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
-    private static Closure originalPersistJobResultsMethod
-    private static Closure originalPersistEventResultsMethod
     WebPageTestServer server
 
     def setup() {
-
-
-        originalPersistJobResultsMethod = resultPersisterService.&persistJobResult
-        originalPersistEventResultsMethod = resultPersisterService.&persistResultsOfOneTeststep
         WebPageTestServer.withNewTransaction {
             OsmConfiguration.build()
             createTestDataCommonToAllTests()
         }
-        mocksCommonToAllTests()
-
+        createMocksCommonToAllTests()
     }
 
     void "Results get persisted even after failed csi aggregation."() {
 
         given: "a wpt result and a failing CsiAggregationUpdateService"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockCsiAggregationUpdateService(true)
+        mockCsiAggregationUpdateService()
 
         when: "the results get persisted"
         resultPersisterService.listenToResult(xmlResult, server)
@@ -73,7 +66,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         given: "a wpt result and a failing MetricReportingService"
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockMetricReportingService(true)
+        mockMetricReportingService()
 
         when: "the results get persisted"
         resultPersisterService.listenToResult(xmlResult, server)
@@ -99,31 +92,20 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     }
 
-//    void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
-//
-//        given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
-//        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-//
-//        when: "the results get persisted but the first step throws an exception"
-//        letPersistingEventResultsOfSpecificStepThrowAnException(0)
-//        resultPersisterService.listenToResult(xmlResult, server)
-//
-//        then: "1 run, 1 successful events + 1 cached views should be persisted"
-//        JobResult.list().size() == 1
-//        EventResult.list().size() == 2
-//
-//    }
+    void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
 
-    // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
+        WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
+        xmlResult.getStepNode(0) >> null
 
-    /**
-     * All test data created here has to be deleted in cleanup method after every test!!!
-     * That's because these integration tests have to run without an own transaction which would be
-     * rolled back in the end of every test.
-     *
-     * Integration tests that test code with own separate transactions wouldn't see test data if creation in test would
-     * happen in an own transaction.
-     */
+        when: "the results get persisted but the first step throws an exception"
+        resultPersisterService.listenToResult(xmlResult, server)
+
+        then: "1 run, 1 successful events + 1 cached views should be persisted"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 2
+    }
+
     private createTestDataCommonToAllTests() {
         ['HP', 'MES', Page.UNDEFINED].each { pageName ->
             Page.build(name: pageName)
@@ -139,47 +121,25 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         )
     }
 
-    void mocksCommonToAllTests() {
-        mockTimeToCsMappingService()
-    }
-
-    // mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void mockTimeToCsMappingService() {
+    void createMocksCommonToAllTests() {
         TimeToCsMappingService timeToCsMappingService = Stub(TimeToCsMappingService)
         timeToCsMappingService.getCustomerSatisfactionInPercent(_, _, _) >> 42
-
         resultPersisterService.timeToCsMappingService = timeToCsMappingService
     }
 
-    void mockCsiAggregationUpdateService(boolean shouldFail) {
+    void mockCsiAggregationUpdateService() {
         CsiAggregationUpdateService csiAggregationUpdateService = Stub(CsiAggregationUpdateService)
         csiAggregationUpdateService.createOrUpdateDependentMvs(_) >> {
-            if (shouldFail) throw new RuntimeException('Faked failing of csi aggregation in integration test')
+             throw new RuntimeException('Faked failing of csi aggregation in integration test')
         }
-
         resultPersisterService.csiAggregationUpdateService = csiAggregationUpdateService
     }
 
-    void mockMetricReportingService(boolean shouldFail) {
+    void mockMetricReportingService() {
         MetricReportingService metricReportingService = Stub(MetricReportingService)
         metricReportingService.reportEventResultToGraphite(_) >> {
-            if (shouldFail) throw new RuntimeException('Faked failing of metric reporting in integration test')
+            throw new RuntimeException('Faked failing of metric reporting in integration test')
         }
-
         resultPersisterService.metricReportingService = metricReportingService
-    }
-
-    void letPersistingEventResultsOfSpecificStepThrowAnException(int stepNumber) {
-        ResultPersisterService stubbedResultPersisterService = Stub(ResultPersisterService)
-        stubbedResultPersisterService.persistResultsOfOneTeststep(_, _) >> { Integer testStepZeroBasedIndex, WptResultXml resultXml ->
-            if (testStepZeroBasedIndex == stepNumber) {
-                throw new OsmResultPersistanceException('Faked failing of EventResult persistance in integration test')
-            } else {
-                originalPersistEventResultsMethod(testStepZeroBasedIndex, resultXml)
-            }
-        }
-
-        resultPersisterService = stubbedResultPersisterService
     }
 }
