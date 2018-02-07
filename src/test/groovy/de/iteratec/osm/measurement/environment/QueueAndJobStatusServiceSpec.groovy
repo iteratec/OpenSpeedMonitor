@@ -1,7 +1,6 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -88,10 +87,11 @@ class QueueAndJobStatusServiceSpec extends Specification {
     }
 
     private void createTestDataCommonForAllTests() {
-        TestDataUtil.createOsmConfig()
-        TestDataUtil.createCsiAggregationIntervals()
-        server1 = TestDataUtil.createWebPageTestServer(WPTSERVER_URL, WPTSERVER_URL, true, "http://${WPTSERVER_URL}/")
-        server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")
+        //Commented, so we can remove TestDataUtil. IT-1703, see TestDataUtil in history, to reproduce test data, if needed.
+//        TestDataUtil.createOsmConfig()
+//        TestDataUtil.createCsiAggregationIntervals()
+//        server1 = TestDataUtil.createWebPageTestServer(WPTSERVER_URL, WPTSERVER_URL, true, "http://${WPTSERVER_URL}/")
+//        server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")
 
     }
 }

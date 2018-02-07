@@ -1,7 +1,7 @@
 package geb.de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
@@ -30,8 +30,8 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to page list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
         }
         doLogin()
 
@@ -152,7 +152,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
 
         Page.withNewTransaction {
             count.times {
-                pageIDs << TestDataUtil.createPage("gebPage" + it).id
+                pageIDs << Page.build().id
             }
         }
 

@@ -1,9 +1,9 @@
 package geb.de.iteratec.osm.batch
 
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -43,12 +43,16 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
 
     private void createData() {
         BatchActivity.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
-            TestDataUtil.createBatchActivity("activeActivity", Status.ACTIVE)
-            TestDataUtil.createBatchActivity("inactiveActivity 1", Status.DONE)
-            TestDataUtil.createBatchActivity("inactiveActivity 2", Status.DONE)
-            TestDataUtil.createBatchActivity("inactiveActivity 3", Status.DONE)
+            OsmConfiguration.build()
+            createAdminUser()
+//            BatchActivity.build(status: Status.ACTIVE, startDate: new Date()-1, endDate: new Date(), maximumStages: 1)
+            new BatchActivity(name: "test", domain: "irrelevant domain", activity: Activity.UPDATE,
+                    status: Status.ACTIVE, startDate: new Date(), lastUpdate: new Date()).save()
+            3.times{
+                new BatchActivity(name: "test$it", domain: "irrelevant domain", activity: Activity.UPDATE,
+                        status: Status.DONE, maximumStages: 1, startDate: new Date(),
+                        lastUpdate: new Date()).save()
+            }
         }
     }
 
