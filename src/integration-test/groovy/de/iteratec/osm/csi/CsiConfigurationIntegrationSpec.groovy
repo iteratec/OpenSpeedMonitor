@@ -7,7 +7,7 @@ import grails.transaction.Rollback
 
 @Integration
 @Rollback
-class CsiConfigurationTests extends NonTransactionalIntegrationSpec {
+class CsiConfigurationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiConfiguration csiConfiguration
 

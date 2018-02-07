@@ -33,7 +33,7 @@ import org.joda.time.DateTime
  */
 @Integration
 @Rollback
-class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
+class CreatingYesNoDataMvsIntegrationSpec extends NonTransactionalIntegrationSpec {
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
@@ -107,7 +107,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     private static void createPagesAndEvents() {
         ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', Page.UNDEFINED].each { pageName ->
             Page page = Page.build(name: pageName)
-            MeasuredEvent.build(name: 'CreatingYesNoDataMvsIntTests-' + pageName, testedPage: page)
+            MeasuredEvent.build(name: 'CreatingYesNoDataMvsIntegrationSpec-' + pageName, testedPage: page)
         }
     }
     private static void createInterval(){

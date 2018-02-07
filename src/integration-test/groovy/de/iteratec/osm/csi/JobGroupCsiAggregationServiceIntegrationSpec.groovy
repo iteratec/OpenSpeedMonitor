@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue
 @Integration
 @Rollback
 @ConfineMetaClassChanges([WeightingService])
-class JobGroupCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
+class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     @Shared JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page

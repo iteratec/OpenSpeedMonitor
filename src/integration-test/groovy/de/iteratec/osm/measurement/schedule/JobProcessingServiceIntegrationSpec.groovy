@@ -33,6 +33,7 @@ import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
+
 /**
  * Integration test for JobProcessingService
  *
@@ -40,7 +41,7 @@ import org.quartz.impl.triggers.CronTriggerImpl
  */
 @Integration
 @Rollback
-class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
+class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     JobProcessingService jobProcessingService
     QueueAndJobStatusService queueAndJobStatusService
     JobDaoService jobDaoService
@@ -77,7 +78,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
             }/</jsonUrl>
                         </data>
                     </response>
-			""")
+            """)
         }
         jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
 
@@ -241,7 +242,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
             statusCode == recentRuns[i]['status']
         }
 
-        where:"the input status codes are the expected status codes"
+        where: "the input status codes are the expected status codes"
         inputStatusCodes || expectedStatusCodes
         [100]            || [100]
         [200]            || [200]

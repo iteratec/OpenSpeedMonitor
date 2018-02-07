@@ -33,7 +33,7 @@ import grails.transaction.Rollback
  */
 @Integration
 @Rollback
-class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
+class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     ResultPersisterService resultPersisterService
 
     WptResultXml xmlResult

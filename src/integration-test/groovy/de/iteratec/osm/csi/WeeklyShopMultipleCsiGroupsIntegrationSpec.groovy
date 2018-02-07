@@ -35,7 +35,7 @@ import de.iteratec.osm.result.MeasuredEvent
 
 @Integration
 @Rollback
-class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
+class WeeklyShopMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     ResultPersisterService resultPersisterService

@@ -44,7 +44,7 @@ import spock.util.mop.ConfineMetaClassChanges
 @Integration
 @Rollback
 @ConfineMetaClassChanges([WeightingService])
-class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
+class PageCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3

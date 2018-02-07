@@ -42,7 +42,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 @Integration
 @Rollback
 @ConfineMetaClassChanges([CsiByEventResultsService])
-class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
+class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-10
 

@@ -32,7 +32,7 @@ import grails.transaction.Rollback
 
 @Integration
 @Rollback
-class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
+class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     ResultPersisterService resultPersisterService
 

@@ -12,11 +12,11 @@ import org.springframework.test.annotation.Rollback
 /**
  * Created by nkuhn on 22.05.15.
  *
- * Has to be an integration test beacause detachedCriteria is not supported in unit tests
+ * Has to be an integration test because detachedCriteria is not supported in unit tests
  */
 @Integration
 @Rollback
-class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegrationSpec {
+class CsiAggregationUpdateEventCleanupServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
 

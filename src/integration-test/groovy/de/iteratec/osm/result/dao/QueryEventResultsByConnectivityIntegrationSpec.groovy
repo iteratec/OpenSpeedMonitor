@@ -12,7 +12,7 @@ import de.iteratec.osm.result.*
 
 @Integration
 @Rollback
-class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpec {
+class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     EventResultDaoService eventResultDaoService
 

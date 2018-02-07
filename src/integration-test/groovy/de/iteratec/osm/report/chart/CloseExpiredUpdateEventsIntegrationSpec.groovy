@@ -34,7 +34,7 @@ import de.iteratec.osm.util.ServiceMocker
 @Integration
 @Rollback
 @ConfineMetaClassChanges([CsiAggregationUtilService, BatchActivityService])
-class CloseExpiredUpdateEventsSpec extends NonTransactionalIntegrationSpec {
+class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
 

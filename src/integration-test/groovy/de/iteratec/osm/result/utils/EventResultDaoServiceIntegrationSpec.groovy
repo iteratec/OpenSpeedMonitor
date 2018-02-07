@@ -34,7 +34,7 @@ import org.apache.commons.lang.time.DateUtils
 
 @Integration
 @Rollback
-class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
+class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     EventResultDaoService eventResultDaoService
 

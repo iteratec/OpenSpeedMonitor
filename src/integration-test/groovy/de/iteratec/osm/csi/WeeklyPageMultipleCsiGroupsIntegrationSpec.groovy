@@ -33,7 +33,7 @@ import org.springframework.test.annotation.Rollback
 
 @Integration
 @Rollback
-class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
+class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
