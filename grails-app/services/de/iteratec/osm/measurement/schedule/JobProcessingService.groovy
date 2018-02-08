@@ -30,6 +30,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.time.TimeCategory
+import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.apache.http.HttpStatus
@@ -286,13 +287,13 @@ class JobProcessingService {
         return result.save(failOnError: true, flush: true)
     }
 
-    private void validateRuntestResponse(NodeChild runtestResponseXml, WebPageTestServer wptserver) {
-        Integer statusCode = runtestResponseXml?.statusCode?.toInteger()
-        if (statusCode != 200) {
-            throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode} for wptserver ${wptserver}")
-        }
-        if (!runtestResponseXml?.data?.testId) {
-            throw new JobExecutionException("No testId was provided for wptserver ${wptserver}.")
+    private NodeChild parseResponse(def runtestResponse, WebPageTestServer wptserver){
+        NodeChild runtestResponseXml
+        if(runtestResponse instanceof NodeChild || runtestResponse instanceof GPathResult){
+            runtestResponseXml = runtestResponse
+            return runtestResponseXml
+        } else {
+            throw new JobExecutionException("Response is not XML from wptserver ${wptserver}")
         }
     }
 
@@ -359,12 +360,17 @@ class JobProcessingService {
             performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
                 result = proxyService.runtest(wptserver, parameters);
             }
-            validateRuntestResponse(result, wptserver)
-            testId = result.data.testId
-            if (testId){
-                log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
-            } else {
+
+            NodeChild runtestResponseXml = parseResponse(result, wptserver)
+            statusCode = runtestResponseXml?.statusCode?.toInteger()
+            testId = runtestResponseXml?.data?.testId
+            if(statusCode != 200){
+                throw new JobExecutionException("Got status code ${statusCode} from wptserver ${wptserver}")
+            }
+            if(!testId){
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
+            } else {
+                log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
             }
 
             use(TimeCategory) {
@@ -384,7 +390,8 @@ class JobProcessingService {
 
             return testId
         } catch (Exception e) {
-            persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
+            statusCode = statusCode? statusCode : 500
+            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
