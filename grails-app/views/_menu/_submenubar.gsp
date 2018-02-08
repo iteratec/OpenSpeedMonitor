@@ -9,6 +9,7 @@ This menu is used to show function that can be triggered on the content (an obje
 			&&	params.controller != 'script'
 			&&	params.controller != 'job'
 			&&  params.controller != 'connectivityProfile'
+			&&  params.controller != 'osmConfiguration'
 }">
 	<ul id="Menu" class="nav nav-pills">
 
