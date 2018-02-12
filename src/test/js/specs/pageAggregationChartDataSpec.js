@@ -119,7 +119,7 @@ describe("PageAggregationChartData data transformation", function () {
         expect(pageAggregationData.hasStackedBars()).toBe(true);
         pageAggregationData.setData({ stackBars: false });
         expect(pageAggregationData.hasStackedBars()).toBe(false);
-        pageAggregationData.setData({ autoWidth: 1});
+        pageAggregationData.setData({});
         expect(pageAggregationData.hasStackedBars()).toBe(false);
         pageAggregationData.setData({ stackBars: true });
         expect(pageAggregationData.hasStackedBars()).toBe(true);

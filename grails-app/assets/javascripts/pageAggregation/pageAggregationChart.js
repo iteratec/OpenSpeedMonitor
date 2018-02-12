@@ -66,7 +66,7 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
 
     var render = function () {
         var shouldShowScore = data.hasLoadTimes();
-        var componentMargin = OpenSpeedMonitor.ChartModules.PageAggregationData.ComponentMargin;
+        var componentMargin = OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
         var headerHeight = OpenSpeedMonitor.ChartComponents.ChartHeader.Height + componentMargin;
         var barScorePosY = data.getChartBarsHeight() + componentMargin;
         var barScoreHeight = shouldShowScore ? OpenSpeedMonitor.ChartComponents.common.barBand + componentMargin : 0;
@@ -74,11 +74,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = legendPosY + legendHeight + headerHeight;
 
-        svg
-            .transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight)
-            .each("end", rerenderIfWidthChanged);
+        svg.transition()
+          .duration(transitionDuration);
+
+        var svgName = selector.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
 
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);
@@ -87,10 +87,8 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         contentGroup.enter()
             .append("g")
             .classed("bars-content-group", true);
-        contentGroup
-            .transition()
-            .duration(transitionDuration)
-            .attr("transform", "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
+        contentGroup.attr("transform",
+            "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
         renderBars(contentGroup);
         renderBarScore(contentGroup, shouldShowScore, barScorePosY);
         renderLegend(contentGroup, legendPosY);
@@ -180,13 +178,6 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         return measurands.map(function (measurand) {
             return chartBarsComponents[measurand]
         });
-    };
-
-    var rerenderIfWidthChanged = function () {
-        if (data.needsAutoResize()) {
-            setData({autoWidth: true});
-            render();
-        }
     };
 
     var toggleBarComponentHighlight = function (measurandToHighlight, anyHighlighted, doHighlight) {

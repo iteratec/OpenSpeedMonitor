@@ -19,10 +19,15 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.integrations.CiPipeService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.Measurand
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.Threshold
+import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -48,7 +53,9 @@ class JobController {
     PerformanceLoggingService performanceLoggingService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
+    ThresholdService thresholdService
     I18nService i18nService
+    CiPipeService ciPipeService
 
     private String getJobI18n() {
         return message(code: 'de.iteratec.isj.job', default: 'Job')
@@ -273,10 +280,13 @@ class JobController {
 
     def execute() {
         handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
-            if (jobProcessingService.launchJobRun(job))
+            try {
+                jobProcessingService.launchJobRun(job)
                 massExecutionResults[job.id] = [status: 'success']
-            else
+            } catch(Exception exception) {
                 massExecutionResults[job.id] = [status: 'failure']
+                log.error(exception.getMessage(), exception)
+            }
         }
     }
 
@@ -344,6 +354,79 @@ class JobController {
     def getScriptSource(long scriptId) {
         Script script = Script.get(scriptId)
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, script?.navigationScript)
+    }
+
+    /**
+     * Get thresholds for the submitted job.
+     *
+     * @param jobId
+     * @return
+     */
+    def getThresholdsForJob(String jobId) {
+        Job job = Job.get(Long.parseLong(jobId))
+        List<Threshold> thresholds = thresholdService.getThresholdsForJob(job)
+
+        List<MeasuredEvent> measuredEvents = [];
+
+        thresholds.each {
+            if(!measuredEvents.contains(it.measuredEvent)){
+                measuredEvents.add(it.measuredEvent)
+            }
+        }
+
+        def output = []
+
+        measuredEvents.each {
+            List<Threshold> thresholdsForEvent = thresholds.findAll{
+                threshold -> threshold.measuredEvent == it
+            }
+
+            def thresholdList = thresholdsForEvent.collect {[id: it.id,
+                                            measurand: [
+                                                name: it.measurand.name(),
+                                                unit: it.measurand.measurandGroup.unit],
+                                            measuredEvent: it.measuredEvent,
+                                            upperBoundary: it.upperBoundary,
+                                            lowerBoundary: it.lowerBoundary]}
+
+            output.add([measuredEvent: it,
+                        thresholds: thresholdList])
+        }
+
+        render output as JSON
+    }
+
+    /**
+     * Returns a ci script which checks whether the measurements matches the thresholds.
+     *
+     * @param jobId
+     * @param params
+     * @return
+     */
+    def getCiScript(String jobId){
+        Job job = Job.findById(Long.parseLong(jobId))
+        
+        render ciPipeService.getCiIntegrationScriptFor(job)
+    }
+
+    /**
+     *
+     * Returns all measurands.
+     *
+     * @return All available measurands.
+     */
+    def getAllMeasurands() {
+
+        List<Measurand> measurands = Measurand.collect()
+        def output = []
+        measurands.each {
+            output.add([
+                    name: it.name(),
+                    unit: it.measurandGroup.unit
+            ])
+        }
+
+        render output as JSON
     }
 
     def getRunningAndRecentlyFinishedJobs() {

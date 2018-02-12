@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.schedule.quartzjobs
 
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.TriggerGroup
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -89,7 +90,11 @@ class JobProcessingQuartzHandlerJob {
 
     private void handleLaunching(Job job) {
         performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
-            jobProcessingService.launchJobRun(job)
+            try {
+                jobProcessingService.launchJobRun(job)
+            } catch(Exception exception) {
+                log.error(exception.getMessage(), exception)
+            }
         }
     }
 

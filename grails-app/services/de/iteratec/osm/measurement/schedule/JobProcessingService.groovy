@@ -32,6 +32,7 @@ import grails.transaction.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.http.HttpStatus
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
@@ -103,8 +104,8 @@ class JobProcessingService {
      *
      * @return A map of parameters suitable for POSTing a valid request to runtest.php
      */
-    private def fillRequestParameters(Job job) {
-        def parameters = [
+    private Map fillRequestParameters(Job job) {
+        Map parameters = [
                 url            : '',
                 label          : job.label,
                 location       : job.location.uniqueIdentifierForServer,
@@ -330,23 +331,24 @@ class JobProcessingService {
     /**
      * If measurements are generally enabled: Launches the given Job and creates a Quartz trigger to poll for new results every x seconds.
      * If they are not enabled nothing happens.
-     * @return whether the job was launched successfully
+     * @return the testId of the running job.
      */
-    public boolean launchJobRun(Job job) {
+    String launchJobRun(Job job, priority = 5) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
-            log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
-            return false
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause measurements are generally disabled.")
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            return false
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
         int statusCode
         String testId
         try {
-            def parameters = fillRequestParameters(job);
+            def parameters = fillRequestParameters(job)
+            parameters['priority'] = priority
+
 
             WebPageTestServer wptserver = job.location.wptServer
             if (!wptserver) {
@@ -362,7 +364,6 @@ class JobProcessingService {
             if (testId){
                 log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
             } else {
-                testId = "DID_NOT_RECEIVE"
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
             }
 
@@ -381,11 +382,10 @@ class JobProcessingService {
                 JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
             }
 
-            return true
+            return testId
         } catch (Exception e) {
-            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
             persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return false
+            throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
 

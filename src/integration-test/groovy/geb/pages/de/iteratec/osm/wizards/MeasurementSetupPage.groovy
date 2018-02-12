@@ -101,7 +101,7 @@ class MeasurementSetupPage extends I18nGebPage {
     }
 
     void selectExecutionPlan(String i18nMessage) {
-        executionScheduleSelect.click()
+        executionScheduleSelectChosen.click()
         $("#selectExecutionSchedule_chosen").find(".group-option").find { it.text() == getI18nMessage(i18nMessage) }.click()
     }
 
@@ -124,10 +124,11 @@ class MeasurementSetupPage extends I18nGebPage {
         scriptName { $("#inputScriptName") }
         scriptDescirption { $("#inputScriptDescription") }
         scriptHelpBlock { $("#navigationScriptHelpBlock") }
-        locationSelect { $("#inputLocation_chosen") }
-        connectivitySelect { $("#inputConnectivity_chosen") }
+        locationSelect { $("#inputLocation") }
+        connectivitySelect { $("#inputConnectivity") }
         jobNameInput { $("#inputJobName") }
-        executionScheduleSelect { $("#selectExecutionSchedule_chosen") }
+        executionScheduleSelectChosen { $("#selectExecutionSchedule_chosen") }
+        executionScheduleSelect { $("#selectExecutionSchedule") }
         executionScheduleInput { $("#executionSchedule") }
         createButton { $("#createJobTabCreationButton") }
     }

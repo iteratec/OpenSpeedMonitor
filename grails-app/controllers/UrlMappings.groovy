@@ -22,197 +22,204 @@
  */
 class UrlMappings {
 
-	static mappings = {
+    static mappings = {
 
-		/* Landing page */
-		'/' (controller: 'landing')
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // Landing page
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        '/'(controller: 'landing')
 
-		/*
-		 * Pages without controller
-		 */
-		"/releasenotes"		(view:"/siteinfo/releasenotes")
-		"/about"		(view:"/siteinfo/about")
-		"/systeminfo"	(view:"/siteinfo/systeminfo")
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pages without controller
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        "/releasenotes"(view: "/siteinfo/releasenotes")
+        "/about"(view: "/siteinfo/about")
+        "/systeminfo"(view: "/siteinfo/systeminfo")
 
-		/*
-		 * Pages with controller
-		 * WARN: No domain/controller should be named "api" or "mobile" or "web"!
-		 */
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pages with controller
+        // WARN: No domain/controller should be named "api" or "mobile" or "web"!
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        "/$controller/$action?/$id?(.$format)?"()
 
-		"/$controller/$action?/$id?(.$format)?"()
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // System Pages without controller
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        "403"(view: '/_errors/403')
+        "404"(view: '/_errors/404')
+        "405"(view: '/_errors/error')
+        "500"(view: '/_errors/error')
+        "503"(view: '/_errors/503')
 
-		/*
-		 * For app-info-plugin
-		 */
-		"/admin/manage/$action?"(controller: "adminManage")
-		"/adminManage/$action?"(controller: "errors", action: "urlMapping")
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // wpt-server-proxy-mappings
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
-		/*
-		 * System Pages without controller
-		 */
-		"403"	(view:'/_errors/403')
-		"404"	(view:'/_errors/404')
-		"405"   (view:'/_errors/error')
-		"500"	(view:'/_errors/error')
-		"503"	(view:'/_errors/503')
+        "/proxy/$wptserver/getLocations.php" {
+            controller = "WptProxy"
+            action = [GET: "getLocations"]
+        }
 
-		/*
-		 * wpt-server-proxy-mappings
-		 */
+        "/proxy/$wptserver/runtest.php" {
+            controller = "WptProxy"
+            action = [POST: "runtest"]
+        }
 
-		"/proxy/$wptserver/getLocations.php" {
-			controller = "WptProxy"
-			action = [GET: "getLocations"]
-		}
+        "/proxy/$wptserver/results/$resultYear/$resultMonth/$resultDay/$resultFolder/$resultId/$fileToDownload" {
+            controller = "WptProxy"
+            action = [GET: "resultFileDownload"]
+        }
 
-		"/proxy/$wptserver/runtest.php" {
-			controller = "WptProxy"
-			action = [POST: "runtest"]
-		}
+        "/proxy/$wptserver/result/$resultId/" {
+            controller = "WptProxy"
+            action = [GET: "result"]
+        }
 
-		"/proxy/$wptserver/results/$resultYear/$resultMonth/$resultDay/$resultFolder/$resultId/$fileToDownload" {
-			controller = "WptProxy"
-			action = [GET: "resultFileDownload"]
-		}
+        "/proxy/$wptserver/xmlResult/$resultId/" {
+            controller = "WptProxy"
+            action = [GET: "xmlResult"]
+        }
 
-		"/proxy/$wptserver/result/$resultId/" {
-			controller = "WptProxy"
-			action = [GET: "result"]
-		}
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // rest api of osm
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
-		"/proxy/$wptserver/xmlResult/$resultId/" {
-			controller = "WptProxy"
-			action = [GET: "xmlResult"]
-		}
+        "/rest/man/$action?/$id?" {
+            controller = "apiDoc"
+            action = "getDocuments"
+        }
 
-		/*
-		 * rest api of osm
-		 */
+        // RawResultsApiController //////////////////////////////////////////
 
-		"/rest/$system/resultsbetween/$timestampFrom/$timestampTo" {
-			controller = "RestApi"
-			action = [GET: "getResults"]
-		}
+        "/rest/$system/resultsbetween/$timestampFrom/$timestampTo" {
+            controller = "RawResultsApi"
+            action = [GET: "getResults"]
+        }
 
-		/* Since IT-81 */
-		"/rest/man" {
-			controller = "RestApi"
-			action = [GET: "man"]
-		}
+        "/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
+            controller = "RawResultsApi"
+            action = [GET: "getResultUrls"]
+        }
 
-		/* Since IT-81 */
-		"/rest/allSystems" {
-			controller = "RestApi"
-			action = [GET: "allSystems"]
-		}
+        "/rest/job/thresholdResult/$testId" {
+            controller = "RawResultsApi"
+            action = [GET: "getThresholdResults"]
+        }
 
-		/* Since IT-81 */
-		"/rest/allBrowsers" {
-			controller = "RestApi"
-			action = [GET: "allBrowsers"]
-		}
+        "/rest/handleOldJobResults" {
+            controller = "RawResultsApi"
+            action = [PUT: "securedViaApiKeyHandleOldJobResults"]
+        }
 
-		/* Since IT-81 */
-		"/rest/allPages" {
-			controller = "RestApi"
-			action = [GET: "allPages"]
-		}
+        // JobApiController //////////////////////////////////////////
 
-		/* Since IT-81 */
-		"/rest/allLocations" {
-			controller = "RestApi"
-			action = [GET: "allLocations"]
-		}
+        "/rest/job/$id/run" {
+            controller = "JobApi"
+            action = [POST: "runJob"]
+        }
 
-		/* Since IT-81 */
-		"/rest/allSteps" {
-			controller = "RestApi"
-			action = [GET: "allSteps"]
-		}
+        "/rest/job/$id/activate" {
+            controller = "JobApi"
+            action = [PUT: "securedViaApiKeyActivateJob"]
+        }
+        "/rest/job/$id/deactivate" {
+            controller = "JobApi"
+            action = [PUT: "securedViaApiKeyDeactivateJob"]
+        }
+        "/rest/job/$id/setExecutionSchedule" {
+            controller = "JobApi"
+            action = [PUT: "securedViaApiKeySetExecutionSchedule"]
+        }
 
-		/* Since IT-248 */
-		"/rest/$system/csi/$timestampFrom/$timestampTo" {
-			controller = "RestApi"
-			action = [GET: "getEventResultBasedCsi"]
-		}
+        // CsiApiController //////////////////////////////////////////
+
+        /* Since IT-248 */
+        "/rest/$system/csi/$timestampFrom/$timestampTo" {
+            controller = "CsiApi"
+            action = [GET: "getEventResultBasedJobGroupCsi"]
+        }
 
         /* Since IT-1007 */
         "/rest/$system/$page/csi/$timestampFrom/$timestampTo" {
-            controller = "RestApi"
-            action = [GET: "getEventResultBasedCsi"]
+            controller = "CsiApi"
+            action = [GET: "getEventResultBasedPageCsi"]
         }
 
-		"/rest/csi/translateToCustomerSatisfaction" {
-			controller = "RestApi"
-			action = [GET: "translateToCustomerSatisfaction"]
-		}
-		"/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
-			controller = "RestApi"
-			action = [GET: "getResultUrls"]
-		}
-		/* Since IT-977 */
-		"/rest/csi/csiConfiguration" {
-			controller = "RestApi"
-			action = [GET: "getCsiConfiguration"]
-		}
-		/* Since IT-1115 */
-		"/rest/domain/idsForNames/$requestedDomains" {
-			controller = "RestApi"
-			action = [GET: "getIdsForNames"]
-		}
-        /* Since IT-1115 */
-		"/rest/domain/namesForIds/$requestedDomains" {
-			controller = "RestApi"
-			action = [GET: "getNamesForIds"]
-		}
-		"/rest/receiveCallback" {
-			controller = "RestApi"
-			action = [POST: "receiveCallback"]
-		}
-
-		/*
-		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by
-		 * naming convention of action methods.
-		 */
-		"/rest/job/$id/activate" {
-			controller = "RestApi"
-			action = [PUT: "securedViaApiKeyActivateJob"]
-		}
-		"/rest/job/$id/deactivate" {
-			controller = "RestApi"
-			action = [PUT: "securedViaApiKeyDeactivateJob"]
-		}
-        "/rest/job/$id/setExecutionSchedule" {
-            controller = "RestApi"
-            action = [PUT: "securedViaApiKeySetExecutionSchedule"]
+        "/rest/csi/translateToCustomerSatisfaction" {
+            controller = "CsiApi"
+            action = [GET: "translateToCustomerSatisfaction"]
         }
-		"/rest/event/create" {
-            controller = "RestApi"
+
+        /* Since IT-977 */
+        "/rest/csi/csiConfiguration" {
+            controller = "CsiApi"
+            action = [GET: "getCsiConfiguration"]
+        }
+
+        // GeneralMeasurementApiController //////////////////////////////////////////
+
+        "/rest/event/create" {
+            controller = "GeneralMeasurementApi"
             action = [POST: "securedViaApiKeyCreateEvent"]
         }
         "/rest/config/activateMeasurementsGenerally" {
-            controller = "RestApi"
-            action = [PUT: "securedViaApiKeySetMeasurementActivation"]
-            activationToSet = true
+            controller = "GeneralMeasurementApi"
+            action = [PUT: "securedViaApiKeyActivateMeasurement"]
         }
         "/rest/config/deactivateMeasurementsGenerally" {
-            controller = "RestApi"
-            action = [PUT: "securedViaApiKeySetMeasurementActivation"]
-            activationToSet = false
+            controller = "GeneralMeasurementApi"
+            action = [PUT: "securedViaApiKeyDeactivateMeasurement"]
         }
-		"/rest/config/activateNightlyDatabaseCleanup" {
-			controller = "RestApi"
-			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
-			activationToSet = true
-		}
-		"/rest/config/deactivateNightlyDatabaseCleanup" {
-			controller = "RestApi"
-			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
-			activationToSet = false
-		}
-		"/rest/handleOldJobResults" {
-			controller = "RestApi"
-			action = [PUT: "securedViaApiKeyHandleOldJobResults"]
-		}
-	}
+        "/rest/config/activateNightlyDatabaseCleanup" {
+            controller = "GeneralMeasurementApi"
+            action = [PUT: "securedViaApiKeyActivateNightlyCleanup"]
+        }
+        "/rest/config/deactivateNightlyDatabaseCleanup" {
+            controller = "GeneralMeasurementApi"
+            action = [PUT: "securedViaApiKeyDeactivateNightlyCleanup"]
+        }
+        /* Since IT-81 */
+        "/rest/allSystems" {
+            controller = "GeneralMeasurementApi"
+            action = [GET: "allSystems"]
+        }
+        /* Since IT-81 */
+        "/rest/allBrowsers" {
+            controller = "GeneralMeasurementApi"
+            action = [GET: "allBrowsers"]
+        }
+        /* Since IT-81 */
+        "/rest/allPages" {
+            controller = "GeneralMeasurementApi"
+            action = [GET: "allPages"]
+        }
+        /* Since IT-81 */
+        "/rest/allLocations" {
+            controller = "GeneralMeasurementApi"
+            action = [GET: "allLocations"]
+        }
+        /* Since IT-81 */
+        "/rest/allSteps" {
+            controller = "InfrastructureApi"
+            action = [GET: "allSteps"]
+        }
+
+        // DetailDataApiController //////////////////////////////////////////
+
+        /* Since IT-1115 */
+        "/rest/domain/idsForNames/$requestedDomains" {
+            controller = "DetailDataApi"
+            action = [GET: "getIdsForNames"]
+        }
+        /* Since IT-1115 */
+        "/rest/domain/namesForIds/$requestedDomains" {
+            controller = "DetailDataApi"
+            action = [GET: "getNamesForIds"]
+        }
+        "/rest/receiveCallback" {
+            controller = "DetailDataApi"
+            action = [POST: "receiveCallback"]
+        }
+
+    }
 }

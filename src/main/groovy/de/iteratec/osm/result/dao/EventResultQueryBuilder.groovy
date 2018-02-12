@@ -92,7 +92,7 @@ class EventResultQueryBuilder {
         if (measurandResult && userTimingResult) {
             measurandResult.each { result ->
                 EventResultProjection match = userTimingResult.find { it == result }
-                result.projectedProperties.putAll(match.projectedProperties)
+                if(match) result.projectedProperties.putAll(match.projectedProperties)
             }
         } else {
             return measurandResult ? measurandResult : userTimingResult

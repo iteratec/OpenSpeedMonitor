@@ -16,7 +16,7 @@
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
-<div class="card" id="chart-card">
+<div class="card hidden" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>

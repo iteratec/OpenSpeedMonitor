@@ -16,6 +16,7 @@
 */
 package de.iteratec.osm.api
 
+import static de.iteratec.osm.util.Constants.*
 /**
  * Checks whether ...
  * <ul>
@@ -34,16 +35,16 @@ class RestApiInterceptor {
 
     boolean before() {
         if( params.apiKey == null ) {
-            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+            prepareErrorResponse(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         ApiKey apiKey = ApiKey.findBySecretKey(params.apiKey)
         if( apiKey == null ) {
-            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+            prepareErrorResponse(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         if( !apiKey.valid ) {
-            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
+            prepareErrorResponse(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         params['validApiKey'] = apiKey

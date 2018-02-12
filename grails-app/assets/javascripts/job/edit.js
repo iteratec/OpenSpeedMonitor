@@ -16,6 +16,7 @@
  */
 //= require prettycron/prettycronManifest.js
 //= require bower_components/tagit/js/tag-it.min.js
+//= require bower_components/vue/dist/vue.js
 //= require_self
 function doOnDomReady(newJob,
                       customConnNameForNative,
@@ -159,11 +160,9 @@ var cronStringInputField = $("#executionSchedule");
 var cronInputHelpBlock = $("#cronInputHelpBlock");
 
 function registerEventHandlers() {
-    $("#location").on("change", toggleChromeTab);
     inputEmulateMobile.on("change", toggleMobileOptions);
     $("#chkbox-captureTimeline").on("change", toggleTimelineOptions);
     $("#chkbox-trace").on("change", toggleTraceOptions);
-    toggleChromeTab();
     toggleMobileOptions();
     toggleTimelineOptions();
     toggleTraceOptions();
@@ -257,10 +256,6 @@ function toggleTimelineOptions() {
 
 function toggleTraceOptions() {
     $("#traceCategories").toggleClass("hidden", !$("#chkbox-trace").prop("checked"));
-}
-
-function toggleChromeTab() {
-    $("#chromeTabLink").toggleClass("hidden", !($("#location option:selected").text()).includes("Chrome"));
 }
 
 function updateJobName() {
@@ -464,6 +459,7 @@ function createJobGroup(createJobGroupUrl) {
         }
     });
 }
+
 
 function selectAllGraphiteServer(select) {
     var obj = $("#graphiteServers")[0];

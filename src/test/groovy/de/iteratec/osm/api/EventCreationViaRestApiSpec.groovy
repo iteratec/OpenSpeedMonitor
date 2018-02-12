@@ -1,5 +1,6 @@
 package de.iteratec.osm.api
 
+import de.iteratec.osm.de.iteratec.osm.api.CreateEventCommand
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.Event
@@ -12,12 +13,12 @@ import org.joda.time.DateTimeZone
 import org.joda.time.Duration
 import spock.lang.Specification
 
-@TestFor(RestApiController)
+import static de.iteratec.osm.util.Constants.*
+
+@TestFor(GeneralMeasurementApiController)
 @Mock([Job, ApiKey, JobGroup, Event])
 @Build([ApiKey, JobGroup])
 class EventCreationViaRestApiSpec extends Specification {
-
-    private RestApiController controllerUnderTest
 
     static String APIKEY_ALLOWED = 'allowed'
     static String APIKEY_NOT_ALLOWED = 'not-allowed'
@@ -28,9 +29,8 @@ class EventCreationViaRestApiSpec extends Specification {
     }
 
     void setup(){
-        controllerUnderTest = controller
         createTestDataCommonToAllTests()
-        controllerUnderTest.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
+        controller.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
     }
 
     //apiKey constraint violation ////////////////////////////////////
@@ -54,13 +54,13 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
         Event.list().size() == 0
         response.status == 400
-        response.contentAsString == "Error field apiKey: "+RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE+"\n"
+        response.contentAsString == "Error field apiKey: "+ DEFAULT_ACCESS_DENIED_MESSAGE + "\n"
     }
 
     //shortName constraint violation ////////////////////////////////////
@@ -84,7 +84,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -113,7 +113,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -143,7 +143,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -172,7 +172,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -231,7 +231,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -269,7 +269,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 system: [group1.name, group2.name],
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
+        controller.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
