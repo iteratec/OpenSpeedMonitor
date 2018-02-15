@@ -94,22 +94,6 @@ class TestDataUtil implements OsmTestLogin {
         return result
     }
 
-    static createCsTargetGraph(CsTargetValue pointOne, CsTargetValue pointTwo) {
-        new CsTargetGraph(
-                label: 'TestCsTargetGraph',
-                pointOne: pointOne,
-                pointTwo: pointTwo,
-                defaultVisibility: true
-        ).save(failOnError: true)
-    }
-
-    static CsTargetValue createCsTargetValue() {
-        return new CsTargetValue(
-                date: new Date(),
-                csInPercent: 42
-        ).save(failOnError: true)
-    }
-
     static createCustomerFrustration(Page page) {
         new CustomerFrustration(
                 page: page,

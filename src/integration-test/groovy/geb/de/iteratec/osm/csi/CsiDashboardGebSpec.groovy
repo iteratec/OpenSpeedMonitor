@@ -353,7 +353,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
         CsiDay csiDay = TestDataUtil.createCsiDay([0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 11, 13: 10, 14: 9, 15: 8, 16: 7, 17: 6, 18: 5, 19: 4, 20: 3, 21: 2, 22: 1, 23: 0])
         CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName, "TestDescription", csiDay, [browserConnectivityWeight], [pageWeight], [timeToCsMapping])
-        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(), TestDataUtil.createCsTargetValue())
+        createCsTargetGraph()
         JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
         JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
         WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
@@ -384,6 +384,15 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
+    }
+
+    private void createCsTargetGraph() {
+        CsTargetGraph.build(
+                label: 'TestCsTargetGraph',
+                pointOne: CsTargetValue.build(date: new Date(), csInPercent: 42),
+                pointTwo: CsTargetValue.build(date: new Date(), csInPercent: 42),
+                defaultVisibility: true
+        )
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {
