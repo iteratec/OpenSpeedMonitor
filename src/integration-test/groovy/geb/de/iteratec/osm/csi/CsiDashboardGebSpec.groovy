@@ -350,7 +350,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
         Page page1 = TestDataUtil.createPage(page1Name)
         PageWeight pageWeight = TestDataUtil.createPageWeight(page1, 3)
-        TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
+        TimeToCsMapping timeToCsMapping = createTimeToCsMapping(page1)
         CsiDay csiDay = TestDataUtil.createCsiDay([0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 11, 13: 10, 14: 9, 15: 8, 16: 7, 17: 6, 18: 5, 19: 4, 20: 3, 21: 2, 22: 1, 23: 0])
         CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName, "TestDescription", csiDay, [browserConnectivityWeight], [pageWeight], [timeToCsMapping])
         createCsTargetGraph()
@@ -384,6 +384,15 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
+    }
+
+    private void createTimeToCsMapping(Page page) {
+        TimeToCsMapping.build(
+                page: page,
+                loadTimeInMilliSecs: 1,
+                customerSatisfaction: 0.9,
+                mappingVersion: 1
+        )
     }
 
     private void createCsTargetGraph() {

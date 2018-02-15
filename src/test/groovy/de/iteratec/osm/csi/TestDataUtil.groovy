@@ -102,15 +102,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static createTimeToCsMapping(Page page) {
-        new TimeToCsMapping(
-                page: page,
-                loadTimeInMilliSecs: 1,
-                customerSatisfaction: 0.9,
-                mappingVersion: 1
-        ).save(failOnError: true)
-    }
-
     static CsiConfiguration createCsiConfiguration(
             String label = 'testCsiConfiguration',
             String description = 'CsiConfiguration for tests',
