@@ -120,16 +120,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static PageWeight createPageWeight(
-            Page page,
-            double weight
-    ) {
-        return new PageWeight(
-                page: page,
-                weight: weight
-        ).save(failOnError: true)
-    }
-
     static CsiSystem createCsiSystem(
             String label = "testCsiSystem",
             List<JobGroupWeight> jobGroupWeights
