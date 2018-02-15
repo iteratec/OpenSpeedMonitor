@@ -120,18 +120,6 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
-    static BrowserConnectivityWeight createBrowserConnectivityWeight(
-            Browser browser,
-            ConnectivityProfile connectivityProfile,
-            double weight
-    ) {
-        return new BrowserConnectivityWeight(
-                browser: browser,
-                connectivity: connectivityProfile,
-                weight: weight
-        ).save(failOnError: true)
-    }
-
     static PageWeight createPageWeight(
             Page page,
             double weight

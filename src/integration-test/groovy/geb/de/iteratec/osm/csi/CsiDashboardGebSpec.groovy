@@ -347,7 +347,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
         Browser browser = TestDataUtil.createBrowser("TestFireFox")
         ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
-        BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
+        BrowserConnectivityWeight browserConnectivityWeight = createBrowserConnectivityWeight(browser, connectivityProfile, 2)
         Page page1 = TestDataUtil.createPage(page1Name)
         PageWeight pageWeight = TestDataUtil.createPageWeight(page1, 3)
         TimeToCsMapping timeToCsMapping = createTimeToCsMapping(page1)
@@ -384,6 +384,14 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
+    }
+
+    private BrowserConnectivityWeight createBrowserConnectivityWeight(Browser browser, ConnectivityProfile connectivityProfile, double weight) {
+        return BrowserConnectivityWeight.build(
+                browser: browser,
+                connectivity: connectivityProfile,
+                weight: weight
+        )
     }
 
     private void createTimeToCsMapping(Page page) {
