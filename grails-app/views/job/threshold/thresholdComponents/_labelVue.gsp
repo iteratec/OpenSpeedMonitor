@@ -12,4 +12,8 @@
 </span>
 </script>
 
-<asset:javascript src="/job/threshold/thresholdComponents/labelVue.js"/>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/job/threshold/thresholdComponents/labelVue.js"/>');
+    });
+</asset:script>

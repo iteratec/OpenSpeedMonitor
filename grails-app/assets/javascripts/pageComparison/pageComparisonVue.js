@@ -1,6 +1,5 @@
 "use strict";
 
-//= require bower_components/vue/dist/vue.js
 //= require bower_components/jquery/jquery.min.js
 //= require pageComparison/pageComparisonRowComponentVue.js
 

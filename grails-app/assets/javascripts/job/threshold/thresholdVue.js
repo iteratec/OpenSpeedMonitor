@@ -1,4 +1,3 @@
-//= require bower_components/vue/dist/vue.js
 //= require job/threshold/measuredEventVue.js
 //= require job/threshold/thresholdComponents/labelVue.js
 //= require job/threshold/thresholdComponents/inputVue.js

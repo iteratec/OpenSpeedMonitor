@@ -215,6 +215,7 @@ task bowerSyncJavascript(type: Sync) {
     include "air-datepicker/dist/js/i18n/datepicker.de.js"
     include "bootstrap-validator/js/validator.js"
     include "vue/dist/vue.js"
+    include "vue/dist/vue.min.js"
     dependsOn bowerInstall
 }
 

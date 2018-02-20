@@ -20,7 +20,7 @@
 //= require_tree bower_components/bootstrap-colorpicker/dist/js/
 //= require_tree bower_components/chosen
 //= require_tree bower_components/clipboard
-//= require_tree bower_components/vue/dist/vue.js
+//= require ${grails.util.Environment.currentEnvironment == grails.util.Environment.PRODUCTION ? 'bower_components/vue/dist/vue.min.js' : 'bower_components/vue/dist/vue.js'}
 //= require kickstart/checkboxes
 //= require spinner
 //= require bower_components/bootstrap-validator/js/validator

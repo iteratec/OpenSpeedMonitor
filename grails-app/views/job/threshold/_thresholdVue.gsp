@@ -34,4 +34,8 @@
 <g:render template="threshold/thresholdComponents/buttonVue"/>
 <g:render template="threshold/thresholdComponents/measurandSelect"/>
 
-<asset:javascript src="/job/threshold/thresholdVue.js"/>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/job/threshold/thresholdVue.js"/>');
+    });
+</asset:script>
