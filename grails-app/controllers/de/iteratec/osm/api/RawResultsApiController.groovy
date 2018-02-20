@@ -397,12 +397,11 @@ class RawResultsApiController {
             )
     ])
     public Map<String, Object> securedViaApiKeyHandleOldJobResults() {
-        def apiKey = ApiKey.findBySecretKey(params.apiKey)
-        if (apiKey && apiKey.allowedForMeasurementActivation) {
-            def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
-            return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
-        } else {
+
+        if (!params?.validApiKey?.allowedForMeasurementActivation) {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
         }
+        def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
+        return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
     }
 }
