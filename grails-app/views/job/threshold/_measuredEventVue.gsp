@@ -31,4 +31,8 @@
 
 <g:render template="/job/threshold/thresholdVue"/>
 
-<asset:javascript src="/job/threshold/measuredEventVue.js"/>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/job/threshold/measuredEventVue.js"/>');
+    });
+</asset:script>

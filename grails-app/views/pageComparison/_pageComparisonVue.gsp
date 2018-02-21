@@ -16,4 +16,8 @@
     </div>
 </div>
 <g:render template="pageComparisonRowComponentVue"/>
-<asset:javascript src="pageComparison/pageComparisonVue.js"/>
+<asset:script type="text/javascript">
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparisonVue.js"/>');
+    });
+</asset:script>
