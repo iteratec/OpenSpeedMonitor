@@ -25,30 +25,16 @@ class RestApiInterceptorSpec extends Specification {
 
     }
 
-    void "Test restApi interceptor - wrong controller, correct action won't match"() {
+    void "Test restApi interceptor - wrong action won't match"() {
         when:"A request does not match the interceptor"
-        withRequest(controller:"script", action: "securedViaApiKeySetNightlyDatabaseCleanupActivation")
+        withRequest(action: "allBrowsers")
 
-        then:"The interceptor does match"
+        then:"The interceptor does not match"
         !interceptorUnderTest.doesMatch()
     }
-    void "Test restApi interceptor - correct controller, wrong action won't match"() {
-        when:"A request does not match the interceptor"
-        withRequest(controller:"restApi", action: "allBrowsers")
-
-        then:"The interceptor does match"
-        !interceptorUnderTest.doesMatch()
-    }
-    void "Test restApi interceptor - wrong controller, wrong action won't match"() {
-        when:"A request does not match the interceptor"
-        withRequest(controller:"script", action: "list")
-
-        then:"The interceptor does match"
-        !interceptorUnderTest.doesMatch()
-    }
-    void "Test restApi interceptor - correct controller, correct action will match"() {
+    void "Test restApi interceptor - correct action will match"() {
         when:"A request matches the interceptor"
-        withRequest(controller:"restApi", action: "securedViaApiKeySetNightlyDatabaseCleanupActivation")
+        withRequest(action: "securedViaApiKeySetNightlyDatabaseCleanupActivation")
 
         then:"The interceptor does match"
         interceptorUnderTest.doesMatch()
