@@ -1,4 +1,3 @@
-//= require bower_components/vue/dist/vue.js
 //= require bower_components/jquery/jquery.min.js
 //= require bower_components/file-saver/FileSaver.min.js
 //= require job/threshold/measuredEventVue.js

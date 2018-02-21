@@ -30,7 +30,7 @@ import static de.iteratec.osm.util.Constants.*
 class RestApiInterceptor {
 
     public RestApiInterceptor(){
-        match(controller: "restApi", action: ~/securedViaApiKey.*/)
+        match(action: ~/securedViaApiKey.*/)
     }
 
     boolean before() {
