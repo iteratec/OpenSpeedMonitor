@@ -307,9 +307,9 @@ class RawResultsApiController {
         Map<String, String> visualizingLinks = jobLinkService.getResultVisualizingLinksFor(job, start, end)
 
         Map objectToSend = [
-            'job' : job.label,
-            'from': start,
-            'to'  : end
+                'job' : job.label,
+                'from': start,
+                'to'  : end
         ]
         objectToSend += visualizingLinks
         return ControllerUtils.sendObjectAsJSON(response, [target: objectToSend], params.pretty && params.pretty == 'true')
@@ -343,23 +343,23 @@ class RawResultsApiController {
     Map<String, Object> getThresholdResults() {
         String testId = params.testId
 
-        if(testId == null){
+        if (testId == null) {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "No test id available!")
         }
 
         JobResult jobResult = JobResult.findByTestId(testId)
 
-        if(jobResult != null) {
+        if (jobResult != null) {
             List results = thresholdService.checkResults(jobResult.eventResults)
 
             Map objectToSend = [
-                    'status': jobResult.httpStatusCode,
-                    'job': jobResult.job.label,
+                    'status' : jobResult.httpStatusCode,
+                    'job'    : jobResult.job.label,
                     'results': results.flatten()
             ]
 
             return ControllerUtils.sendObjectAsJSON(response, [target: objectToSend], true)
-        } else{
+        } else {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Test with id ${params.testId} doesn't exist!")
         }
     }
