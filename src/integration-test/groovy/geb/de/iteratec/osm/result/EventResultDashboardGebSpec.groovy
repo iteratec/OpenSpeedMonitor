@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -867,11 +868,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
-            ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
+            ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
             MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
 
             Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
-            TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
+            createConnectivityProfile("NotUsedConnectivityProfile")
             TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
 
             new EventResult(
@@ -1126,6 +1127,23 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             ).save()
         }
 
+    }
+
+    private ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
+        ConnectivityProfile result = ConnectivityProfile.build(
+                name: profileName,
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        )
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {

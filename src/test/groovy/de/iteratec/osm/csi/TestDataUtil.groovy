@@ -70,23 +70,6 @@ import static org.junit.Assert.assertNotNull
 @Build([CsiSystem, JobGroup, CsiConfiguration])
 class TestDataUtil implements OsmTestLogin {
 
-    static ConnectivityProfile createConnectivityProfile(String profileName) {
-        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
-        if (existingWithName) {
-            return existingWithName
-        }
-        ConnectivityProfile result = new ConnectivityProfile(
-                name: profileName,
-                bandwidthDown: 6000,
-                bandwidthUp: 512,
-                latency: 40,
-                packetLoss: 0,
-                active: true
-        ).save(failOnError: true)
-        result.connectivityProfileService = new ConnectivityProfileService()
-        return result
-    }
-
     static CsiConfiguration createCsiConfiguration(
             String label = 'testCsiConfiguration',
             String description = 'CsiConfiguration for tests',

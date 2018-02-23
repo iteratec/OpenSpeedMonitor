@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -426,7 +427,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
         Browser browser = TestDataUtil.createBrowser("TestFireFox")
-        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
+        ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
         BrowserConnectivityWeight browserConnectivityWeight = createBrowserConnectivityWeight(browser, connectivityProfile, 2)
         Page page1 = TestDataUtil.createPage(page1Name)
         PageWeight pageWeight = createPageWeight(page1, 3)
@@ -461,9 +462,26 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         new CsiAggregation([started: new DateTime(2016, 6, 17, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started: new DateTime(2016, 6, 18, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
-        TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
+        createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
+    }
+
+    private ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
+        ConnectivityProfile result = ConnectivityProfile.build(
+                name: profileName,
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        )
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
     }
 
     private PageWeight createPageWeight(Page page, double weight) {
