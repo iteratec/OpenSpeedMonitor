@@ -373,9 +373,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowLoadTimesTextField.displayed }
-        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.DELETE)
-
+        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputBelowLoadTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal time"() {
@@ -398,8 +399,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputAboveLoadTimesTextField.displayed }
-        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
+        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputAboveLoadTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim minimal requests"() {
@@ -425,8 +428,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
-        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
+        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.END)
+        3.times {
+            appendedInputBelowRequestCountsTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal requests"() {
@@ -451,8 +456,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
-        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
+        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.END)
+        3.times {
+            appendedInputAboveRequestCountsTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim minimal size"() {
@@ -478,8 +485,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
-        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
+        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.END)
+        4.times {
+            appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal size"() {
@@ -504,7 +513,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         scrollBottom()
         clickVariableSelectionTab()
-        clearAboveRequestSizeTextField()
+        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputAboveRequestSizesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Load time graph is shown"() {
