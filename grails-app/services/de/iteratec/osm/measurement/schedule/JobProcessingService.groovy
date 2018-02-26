@@ -152,7 +152,7 @@ class JobProcessingService {
             parameters.bodies = true
         }
 
-        if (configService.globalUserAgentSuffix && Job.useGlobalUASuffix) {
+        if (configService.globalUserAgentSuffix && job.useGlobalUASuffix) {
             parameters.appendua = configService.globalUserAgentSuffix
         }
         else {
