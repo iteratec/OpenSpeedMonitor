@@ -70,6 +70,7 @@
                          'LocationController',
                          'MeasuredEventController',
                          'PageController',
+                         'ThresholdController',
                          'UserspecificCsiDashboardController',
                          'UserspecificEventResultDashboardController',
                          'WebPageTestServerController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.') + 1))}">

@@ -1,17 +1,20 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.de.iteratec.osm.api.MeasurementActivationCommand
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+
+import static de.iteratec.osm.util.Constants.*
+
 /**
  * Created by nkuhn on 12.05.15.
  */
-@TestFor(RestApiController)
+@TestFor(GeneralMeasurementApiController)
 @Mock([ApiKey])
 class MeasurementActivationViaRestApiSpec extends Specification {
 
-    private RestApiController controllerUnderTest
     InMemoryConfigService inMemoryConfigService
 
     static String apiKeyAllowed = 'allowed'
@@ -22,16 +25,14 @@ class MeasurementActivationViaRestApiSpec extends Specification {
     }
 
     void setup(){
-        controllerUnderTest = controller
         //test data common to all tests
         ApiKey.withTransaction {
             new ApiKey(secretKey: apiKeyAllowed, valid: true, allowedForMeasurementActivation: true).save(failOnError: true)
             new ApiKey(secretKey: apiKeyNotAllowed, valid: true, allowedForMeasurementActivation: false).save(failOnError: true)
         }
         //mocks common to all tests
-//        mockFilters(SecureApiFunctionsFilters)
         inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
-        controllerUnderTest.inMemoryConfigService = inMemoryConfigService
+        controller.inMemoryConfigService = inMemoryConfigService
     }
 
     // successful calls /////////////////////////////////////////////////////////////////////
@@ -40,11 +41,10 @@ class MeasurementActivationViaRestApiSpec extends Specification {
         when:
         params.apiKey = apiKeyAllowed
         MeasurementActivationCommand cmd = new MeasurementActivationCommand(
-                apiKey: apiKeyAllowed,
-                activationToSet: true
+                apiKey: apiKeyAllowed
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
+        controller.securedViaApiKeyActivateMeasurement(cmd)
 
         then:
         response.status == 200
@@ -56,11 +56,10 @@ class MeasurementActivationViaRestApiSpec extends Specification {
         when:
         params.apiKey = apiKeyAllowed
         MeasurementActivationCommand cmd = new MeasurementActivationCommand(
-                apiKey: apiKeyAllowed,
-                activationToSet: false
+                apiKey: apiKeyAllowed
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
+        controller.securedViaApiKeyDeactivateMeasurement(cmd)
 
         then:
         response.status == 200
@@ -77,33 +76,15 @@ class MeasurementActivationViaRestApiSpec extends Specification {
         when:
         params.apiKey = apiKeyNotAllowed
         MeasurementActivationCommand cmd = new MeasurementActivationCommand(
-                apiKey: apiKeyNotAllowed,
-                activationToSet: true
+                apiKey: apiKeyNotAllowed
         )
         cmd.validate()
-        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
+        controller.securedViaApiKeyActivateMeasurement(cmd)
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
         response.status == 400
-        response.contentAsString == "Error field apiKey: "+RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE+"\n"
+        response.contentAsString == "Error field apiKey: " + DEFAULT_ACCESS_DENIED_MESSAGE + "\n"
     }
 
-    void "should fail cause of missing boolean activationToSet"(){
-        setup:
-        boolean defaultPermission = false
-
-        when:
-        params.apiKey = apiKeyAllowed
-        MeasurementActivationCommand cmd = new MeasurementActivationCommand(
-                apiKey: apiKeyAllowed
-        )
-        cmd.validate()
-        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
-
-        then:
-        inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
-        response.status == 400
-        response.text == "Error field activationToSet: nullable\n"
-    }
 }

@@ -1,6 +1,7 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.de.iteratec.osm.api.ResultsRequestCommand
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup

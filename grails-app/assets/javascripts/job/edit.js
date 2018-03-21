@@ -459,6 +459,7 @@ function createJobGroup(createJobGroupUrl) {
     });
 }
 
+
 function selectAllGraphiteServer(select) {
     var obj = $("#graphiteServers")[0];
     for (var i = 0; i < obj.options.length; i++) {

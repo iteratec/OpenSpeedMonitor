@@ -86,6 +86,11 @@ input[type="text"], textarea {
   margin-top: -25px
 }
 
+#threshold_button_edit {
+  float: left;
+  margin-right: 12px;
+}
+
 #cronInfoPanel table {
   margin: 10px 0;
 }
@@ -93,4 +98,75 @@ input[type="text"], textarea {
 
 .tab-has-error{
   color: @state-danger-text !important;
+}
+
+.ciButton{
+  float: right;
+}
+
+.thresholdBoundaries{
+  margin-left:4em;
+  min-height: 1.5em;
+}
+
+.thresholdMeasurand{
+  margin-top: 0.4em;
+  margin-left:2em;
+  font-size: 1.2em;
+}
+
+.margins {
+  margin-left: 1em;
+  border: none;
+}
+
+.borderlessButton{
+  border: none;
+}
+
+.thresholdButton{
+  width: 7em;
+  height: 2em;
+  font-size: 0.9em;
+}
+
+.confirmButton{
+  .thresholdButton;
+  width: 4.75em;
+}
+
+.measuredEventLabel{
+  font-size: 1.25em;
+}
+
+.thresholdSelects{
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  width: auto;
+  font-size: 1.2em;
+}
+
+.thresholdLabel{
+  font-size: 1.15em;
+}
+
+.labelGood{
+  color: @brand-success;
+}
+.labelOk{
+  color: @brand-warning;
+}
+.labelBad{
+  color: @brand-danger;
+}
+.thresholdInput{
+  max-width: 9.4em;
+  font-size: 1.2em;
+  text-align: right;
+}
+
+.addMetricButton{
+  margin-left: 0.5em;
+  cursor: pointer;
+
 }

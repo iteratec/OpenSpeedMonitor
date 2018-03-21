@@ -274,6 +274,7 @@ grails:
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
                             {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},
                             {pattern: '/rest/**',                                       access: ["permitAll"]},
+                            {pattern: '/webjars/swagger-ui/**',                         access: ["permitAll"]},
                             {pattern: '/resultSelection/**',                            access: ["permitAll"]},
                             {pattern: '/login/**',                                      access: ["permitAll"]},
                             {pattern: '/logout/**',                                     access: ["permitAll"]},
@@ -353,3 +354,20 @@ grails:
 endpoints:
     jmx:
         unique-names: true
+
+swagger:
+    info:
+        description: 'OpenSpeedMonitor Rest API Documentation'
+        version: '@info.app.version@'
+        title: 'OpenSpeedMonitor Rest API'
+        termsOfServices: 'http://swagger.io/'
+        license:
+            name: 'Licenced under Apache 2.0'
+            url: 'http://www.apache.org/licenses/LICENSE-2.0'
+        contact:
+            name: 'OpenSpeedMonitor'
+            url: 'http://www.openspeedmonitor.de'
+            email: 'osm@iteratec.de'
+    consumes:
+        - 'application/json'
+

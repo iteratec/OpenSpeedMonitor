@@ -16,7 +16,7 @@
     <g:render template="messages"/>
     <g:form resource="${entity}" method="post" role="form" class="form-horizontal" data-toggle="validator">
 
-        <g:hiddenField name="id" value="${entity?.id}"/>
+        <g:hiddenField name="id" value="${entity?.id}" id="entityId"/>
         <g:hiddenField name="version" value="${entity?.version}"/>
 
         <div class="card">
@@ -119,7 +119,14 @@
                             editor.update();
                         });
                         $('#script').change();
+
+                        if (${job?.id != null}) {
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdVue.js"/>', "thresholdVue");
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdComponents/buttonVue.js"/>', "buttonVue");
+                        }
                     });
+
                     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });

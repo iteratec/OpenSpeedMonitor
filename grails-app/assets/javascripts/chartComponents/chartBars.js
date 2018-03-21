@@ -99,6 +99,12 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .attr("y", function (d) {
                 return yScale(d.id)
             })
+            .attr("x", function (d) {
+                return barStart(xScale, d.value)
+            })
+            .attr("width", function (d) {
+                return barWidth(xScale, d.value);
+            })
             .each(function (d) {
                 var color = individualColors?d.color: barColor;
                 d3.select(this).attr("fill", color);

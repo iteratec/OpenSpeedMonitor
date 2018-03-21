@@ -76,4 +76,34 @@
         visuallyCompleteInMillisecs: '${message(code: 'de.iteratec.isr.measurand.short.visuallyCompleteInMillisecs')}',
         csByWptVisuallyCompleteInPercent: '${message(code: 'de.iteratec.isr.measurand.short.csByWptVisuallyCompleteInPercent')}'
     };
+    OpenSpeedMonitor.i18n.measurands = {
+        DOC_COMPLETE_TIME: '${message(code: 'de.iteratec.isr.measurand.DOC_COMPLETE_TIME')}',
+        DOM_TIME: '${message(code: 'de.iteratec.isr.measurand.DOM_TIME')}',
+        FIRST_BYTE: '${message(code: 'de.iteratec.isr.measurand.FIRST_BYTE')}',
+        FULLY_LOADED_REQUEST_COUNT: '${message(code: 'de.iteratec.isr.measurand.FULLY_LOADED_REQUEST_COUNT')}',
+        FULLY_LOADED_TIME: '${message(code: 'de.iteratec.isr.measurand.FULLY_LOADED_TIME')}',
+        LOAD_TIME: '${message(code: 'de.iteratec.isr.measurand.LOAD_TIME')}',
+        START_RENDER: '${message(code: 'de.iteratec.isr.measurand.START_RENDER')}',
+        DOC_COMPLETE_INCOMING_BYTES: '${message(code: 'de.iteratec.isr.measurand.DOC_COMPLETE_INCOMING_BYTES')}',
+        DOC_COMPLETE_REQUESTS: '${message(code: 'de.iteratec.isr.measurand.DOC_COMPLETE_REQUESTS')}',
+        FULLY_LOADED_INCOMING_BYTES: '${message(code: 'de.iteratec.isr.measurand.FULLY_LOADED_INCOMING_BYTES')}',
+        SPEED_INDEX: '${message(code: 'de.iteratec.isr.measurand.SPEED_INDEX')}',
+        VISUALLY_COMPLETE_85: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE_85')}',
+        VISUALLY_COMPLETE_90: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE_90')}',
+        VISUALLY_COMPLETE_95: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE_95')}',
+        VISUALLY_COMPLETE_99: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE_99')}',
+        VISUALLY_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE')}',
+        CS_BY_WPT_DOC_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.CS_BY_WPT_DOC_COMPLETE')}',
+        CS_BY_WPT_VISUALLY_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.CS_BY_WPT_VISUALLY_COMPLETE')}',
+        FIRST_INTERACTIVE: '${message(code: 'de.iteratec.isr.measurand.FIRST_INTERACTIVE')}',
+        CONSISTENTLY_INTERACTIVE: '${message(code: 'de.iteratec.isr.measurand.CONSISTENTLY_INTERACTIVE')}'
+    };
+    OpenSpeedMonitor.i18n.thresholdButtons = {
+        submit: '${message(code: 'job.threshold.submit')}',
+        edit: '${message(code: 'job.threshold.edit')}',
+        save: '${message(code: 'job.threshold.save')}',
+        discard: '${message(code: 'job.threshold.discard')}',
+        delete: '${message(code: 'job.threshold.delete')}',
+        remove: '${message(code: 'job.threshold.remove')}'
+    }
 </script>

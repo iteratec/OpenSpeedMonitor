@@ -290,7 +290,7 @@ OpenSpeedMonitor.chartContextUtil = (function(){
     if (rickshawGraphBuilder.graph.selectedPoints.length > 0) {
       var server = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl;
 
-      if (server != nearestPoint.value.wptResultInfo.wptServerBaseurl) {
+      if (server !== nearestPoint.value.wptResultInfo.wptServerBaseurl) {
         $("#ContextMenuErrorModal").modal();
         return;
       }
