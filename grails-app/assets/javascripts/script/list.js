@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-//= require bower_components/StickyTableHeaders/js/jquery.stickytableheaders.js
+//= require node_modules/StickyTableHeaders/js/jquery.stickytableheaders.js
 //= require_self
 
 function filterScriptList() {

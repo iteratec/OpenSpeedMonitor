@@ -17,9 +17,9 @@
 
 "use strict";
 
-//= require /bower_components/air-datepicker/dist/js/datepicker.min.js
-//= require /bower_components/air-datepicker/dist/js/i18n/datepicker.en.js
-//= require /bower_components/moment/min/moment.min.js
+//= require /node_modules/air-datepicker/dist/js/datepicker.min.js
+//= require /node_modules/air-datepicker/dist/js/i18n/datepicker.en.js
+//= require /node_modules/moment/min/moment.min.js
 //= require_self
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};

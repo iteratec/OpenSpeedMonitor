@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 
 "use strict";
 

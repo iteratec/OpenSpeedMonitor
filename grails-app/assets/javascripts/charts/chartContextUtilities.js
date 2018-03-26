@@ -21,7 +21,7 @@
  * select/deselect datapoints for comparison in the filmstrip view of the WPT
  */
 
-//= require bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.js
+//= require node_modules/jQuery-contextMenu/dist/jquery.contextMenu.min.js
 
 // context menu on all dots of all graphs
 $.contextMenu({

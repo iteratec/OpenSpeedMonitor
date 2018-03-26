@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-//= require bower_components/spin.js/spin.js
+//= require node_modules/spin.js/spin.js
 //= require_self
 
 "use strict";

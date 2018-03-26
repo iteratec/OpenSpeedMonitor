@@ -1,6 +1,6 @@
 "use strict";
 
-//= require bower_components/jquery/jquery.min.js
+//= require node_modules/jquery/jquery.min.js
 //= require pageComparison/pageComparisonRowComponentVue.js
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};

@@ -12,7 +12,7 @@
  * [application.less](application.less) defines the global stylesheet bundle. No code belongs here.
  * [openspeedmonitor.less](openspeedmonitor.less) defines our main application styles, imports, adapts and uses
    bootstrap.
- * [bower_components/](bower_components) contains third party libraries and is generated via bower and gradle.
+ * [node_modules/](node_modules) contains third party libraries and is generated via bower and gradle.
    Never put your own code in here.
  * Other files that are not part of the global bundle should be located in a separate directory named after the view
    it's used in.

@@ -1,5 +1,5 @@
-//= require bower_components/jquery/jquery.min.js
-//= require bower_components/file-saver/FileSaver.min.js
+//= require node_modules/jquery/jquery.min.js
+//= require node_modules/file-saver/FileSaver.min.js
 //= require job/threshold/measuredEventVue.js
 //= require job/threshold/thresholdVue.js
 //= require job/threshold/thresholdComponents/measurandSelectVue.js
