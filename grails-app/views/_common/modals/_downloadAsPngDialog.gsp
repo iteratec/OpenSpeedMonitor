@@ -41,7 +41,7 @@
 <asset:script type="text/javascript">
     $(window).load(function () {
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" />', 'pngDownloadModal');
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/bower_components/saveSvgAsPng/saveSvgAsPng.js"/>', 'pngDownloader');
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/node_modules/save-svg-as-png/saveSvgAsPng.js"/>', 'pngDownloader');
     });
 
     function downloadPNG() {

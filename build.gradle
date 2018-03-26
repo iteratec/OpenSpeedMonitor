@@ -141,7 +141,7 @@ assets {
     minifyJs = true
     minifyCss = true
     configOptions = [:]
-    excludes = ['bower_components/**/*.less']
+    excludes = ['nodel_modules/**/*.less']
 }
 
 node {
@@ -159,17 +159,11 @@ node {
     nodeModulesDir = file("${project.projectDir}")
 }
 
-//task npmInstallGit(type: NpmTask){
-//    inputs.file('package.json')
-//    outputs.upToDateWhen { file('node_modules').exists() }
-//    args = ['install']
-//}
-
 npmInstall {
     outputs.files file('node_modules')
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['bowerPackages']) {
+task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
@@ -181,41 +175,28 @@ task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
 
 test.dependsOn jasmineRun
 
-
-
-//task bowerInstall(type: NodeTask) {
-//    script = file('node_modules/bower/bin/bower')
-//    args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
-//            "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
-//            "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
-//            'install']
-//    inputs.files file('bower.json')
-//    outputs.files file('bower_components')
-//    dependsOn npmInstall
-//}
-
-task bowerSyncJavascript(type: Sync) {
+task nodeSyncJavascript(type: Sync) {
     from 'node_modules'
     into "grails-app/assets/javascripts/node_modules"
-    include 'jquery/jquery.min.js'
-    include 'jquery-ui/ui/minified/jquery-ui.min.js'
+    include 'jquery/dist/jquery.min.js'
+    include 'jquery-ui-dist/jquery-ui.min.js'
     include 'bootstrap/dist/js/bootstrap.min.js'
     include 'clipboard/dist/clipboard.min.js'
-    include 'jQuery-contextMenu/dist/jquery.contextMenu.min.js'
-    include 'chosen/chosen.jquery.js'
+    include 'jquery-contextmenu/dist/jquery.contextMenu.min.js'
+    include 'chosen-js/chosen.jquery.js'
     include 'd3/d3.min.js'
     include 'later/later.min.js'
     include 'moment/min/moment.min.js'
     include 'prettycron/prettycron.js'
-    include 'spin.js/spin.js'
+    include 'spin/dist/spin.min.js'
     include 'tagit/js/tag-it.min.js'
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
-    include 'StickyTableHeaders/js/jquery.stickytableheaders.js'
+    include 'sticky-table-headers/js/jquery.stickytableheaders.js'
     include 'file-saver/FileSaver.min.js'
     include 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
-    include 'saveSvgAsPng/saveSvgAsPng.js'
+    include 'save-svg-as-png/saveSvgAsPng.js'
     include "air-datepicker/dist/js/datepicker.min.js"
     include "air-datepicker/dist/js/i18n/datepicker.en.js"
     include "air-datepicker/dist/js/i18n/datepicker.de.js"
@@ -225,7 +206,7 @@ task bowerSyncJavascript(type: Sync) {
     dependsOn npmInstall
 }
 
-task bowerSyncStylesheets(type: Sync) {
+task nodeSyncStylesheets(type: Sync) {
     from 'node_modules'
     into "grails-app/assets/stylesheets/node_modules"
     include 'bootstrap/dist/css/bootstrap*.min.css'
@@ -233,7 +214,7 @@ task bowerSyncStylesheets(type: Sync) {
     include 'bootstrap/less/mixins/*.less'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
-    include 'jQuery-contextMenu/dist/jquery.contextMenu.min.css'
+    include 'jquery-contextmenu/dist/jquery.contextMenu.min.css'
     include 'bootstrap-chosen/bootstrap-chosen.less'
     include 'bootstrap-chosen/bootstrap-chosen-variables.less'
     include 'bootstrap-chosen/chosen-sprite.png'
@@ -250,17 +231,16 @@ task bowerSyncStylesheets(type: Sync) {
 }
 
 
-task bowerPackages() {
-    dependsOn bowerSyncJavascript, bowerSyncStylesheets
+task nodePackages() {
+    dependsOn nodeSyncJavascript, nodeSyncStylesheets
 }
 
-processResources.dependsOn bowerPackages
-assetCompile.dependsOn bowerPackages
+processResources.dependsOn nodePackages
+assetCompile.dependsOn nodePackages
 
-clean.delete << file('grails-app/assets/javascripts/bower_components')
-clean.delete << file('grails-app/assets/stylesheets/bower_components')
+clean.delete << file('grails-app/assets/javascripts/node_modules')
+clean.delete << file('grails-app/assets/stylesheets/node_modules')
 clean.delete << file('node_modules')
-//clean.delete << file('bower_components')
 
 
 

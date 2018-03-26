@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 //= require_tree node_modules/jquery
-//= require_tree node_modules/jquery-ui
+//= require_tree node_modules/jquery-ui-dist
 //= require_tree node_modules/bootstrap
 //= require_tree node_modules/bootstrap-colorpicker/dist/js/
-//= require_tree node_modules/chosen
+//= require_tree node_modules/chosen-js
 //= require_tree node_modules/clipboard
 //= require ${grails.util.Environment.currentEnvironment == grails.util.Environment.PRODUCTION ? 'node_modules/vue/dist/vue.min.js' : 'node_modules/vue/dist/vue.js'}
 //= require kickstart/checkboxes
