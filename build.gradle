@@ -159,6 +159,11 @@ node {
     nodeModulesDir = file("${project.projectDir}")
 }
 
+//task npmInstallGit(type: NpmTask){
+//    inputs.file('package.json')
+//    outputs.upToDateWhen { file('node_modules').exists() }
+//    args = ['install']
+//}
 
 npmInstall {
     outputs.files file('node_modules')
@@ -177,20 +182,21 @@ task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
 test.dependsOn jasmineRun
 
 
-task bowerInstall(type: NodeTask) {
-    script = file('node_modules/bower/bin/bower')
-    args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
-            "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
-            "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
-            'install']
-    inputs.files file('bower.json')
-    outputs.files file('bower_components')
-    dependsOn npmInstall
-}
+
+//task bowerInstall(type: NodeTask) {
+//    script = file('node_modules/bower/bin/bower')
+//    args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
+//            "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
+//            "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
+//            'install']
+//    inputs.files file('bower.json')
+//    outputs.files file('bower_components')
+//    dependsOn npmInstall
+//}
 
 task bowerSyncJavascript(type: Sync) {
-    from 'bower_components'
-    into "grails-app/assets/javascripts/bower_components"
+    from 'node_modules'
+    into "grails-app/assets/javascripts/node_modules"
     include 'jquery/jquery.min.js'
     include 'jquery-ui/ui/minified/jquery-ui.min.js'
     include 'bootstrap/dist/js/bootstrap.min.js'
@@ -216,12 +222,12 @@ task bowerSyncJavascript(type: Sync) {
     include "bootstrap-validator/js/validator.js"
     include "vue/dist/vue.js"
     include "vue/dist/vue.min.js"
-    dependsOn bowerInstall
+    dependsOn npmInstall
 }
 
 task bowerSyncStylesheets(type: Sync) {
-    from 'bower_components'
-    into "grails-app/assets/stylesheets/bower_components"
+    from 'node_modules'
+    into "grails-app/assets/stylesheets/node_modules"
     include 'bootstrap/dist/css/bootstrap*.min.css'
     include 'bootstrap/less/*.less'
     include 'bootstrap/less/mixins/*.less'
@@ -240,7 +246,7 @@ task bowerSyncStylesheets(type: Sync) {
     include 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'
     include 'bootstrap-colorpicker/dist/img/bootstrap-colorpicker/*'
     include 'air-datepicker/dist/css/datepicker.min.css'
-    dependsOn bowerInstall
+    dependsOn npmInstall
 }
 
 
@@ -254,7 +260,7 @@ assetCompile.dependsOn bowerPackages
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
 clean.delete << file('node_modules')
-clean.delete << file('bower_components')
+//clean.delete << file('bower_components')
 
 
 
