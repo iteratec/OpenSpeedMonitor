@@ -13,7 +13,6 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -414,8 +413,8 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     private void createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
             initCsiData()
             createTestSpecificData()
         }
@@ -423,8 +422,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
     }
 
     private void createTestSpecificData() {
-
-
         Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
         Browser browser = TestDataUtil.createBrowser("TestFireFox")
         ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
