@@ -382,8 +382,8 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     private void createData() {
 
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
 
             Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
             Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
