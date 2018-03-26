@@ -1,8 +1,8 @@
 package geb.de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsTargetGraph
 import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
@@ -16,7 +16,6 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Tests the CRUD View of {@link de.iteratec.osm.csi.CsTargetGraph}* Most TestCases can't be run agains liveInstance beacause there have to be some CsTargetValues
  */
@@ -54,8 +53,8 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to csTargetGraph list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
         }
         doLogin()
 
