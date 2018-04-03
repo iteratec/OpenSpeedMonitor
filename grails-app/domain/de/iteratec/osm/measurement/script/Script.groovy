@@ -53,11 +53,12 @@ class Script {
 
     Collection<Page> testedPages = []
 
-    static hasMany = [ testedPages: Page ]
+    static hasMany = [ testedPages: Page, archivedScripts: ArchivedScript ]
 
     static mapping = {
         sort 'label'
         navigationScript(type: 'text')
+        archivedScripts cascade: 'all-delete-orphan'
     }
 
     static constraints = {
