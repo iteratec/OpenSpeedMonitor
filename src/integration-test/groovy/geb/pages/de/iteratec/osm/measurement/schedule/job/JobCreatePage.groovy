@@ -64,7 +64,7 @@ class JobCreatePage extends I18nGebPage {
 
     static content = {
         nameText{$("input",name:"label")}
-        location(wait: truegit ){$("#location_chosen")}
+        location(wait: true){$("#location_chosen")}
         executionScheduleInput {$("#executionSchedule")}
         tags{$("#tags").find("input")}
         jobGroup{$("#jobgroup_chosen")}
