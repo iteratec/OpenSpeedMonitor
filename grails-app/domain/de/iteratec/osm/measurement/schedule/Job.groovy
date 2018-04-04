@@ -160,6 +160,7 @@ class Job implements Taggable {
     boolean trace
     String  traceCategories = "blink,v8,cc,gpu,blink.net,netlog,disabled-by-default-v8.runtime_stats"
     String  spof
+    boolean useGlobalUASuffix = true
 
     enum TakeScreenshots {
         NONE,

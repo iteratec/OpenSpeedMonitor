@@ -45,7 +45,7 @@
     <div class="col-md-10">
         <div class="tab-content" style="margin-top: 5px">
             <div id="AdvancedContent" class="tab-pane active">
-                <g:render template="advancedSettingsTabContent" model="${['targetTabTemplate': 'advancedTab', 'job': job, 'showWptInfoPanel': true]}" />
+                <g:render template="advancedSettingsTabContent" model="${['targetTabTemplate': 'advancedTab', 'job': job, 'showWptInfoPanel': true, 'globalUserAgentSuffix': globalUserAgentSuffix]}" />
             </div>
 
             <div id="ChromeContent" class="tab-pane">

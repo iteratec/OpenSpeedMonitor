@@ -154,15 +154,21 @@ class JobProcessingService {
             parameters.bodies = true
         }
 
-        if(job.userAgent == Job.UserAgent.ORIGINAL) {
-            parameters.keepua = true
+        if (configService.globalUserAgentSuffix && job.useGlobalUASuffix) {
+            parameters.appendua = configService.globalUserAgentSuffix
         }
-        else if(job.userAgent == Job.UserAgent.APPEND) {
-            parameters.appendua = job.appendUserAgent
+        else {
+            if(job.userAgent == Job.UserAgent.ORIGINAL) {
+                parameters.keepua = true
+            }
+            else if(job.userAgent == Job.UserAgent.APPEND) {
+                parameters.appendua = job.appendUserAgent
+            }
+            else if(job.userAgent == Job.UserAgent.OVERWRITE) {
+                parameters.uastring = job.userAgentString
+            }
         }
-        else if(job.userAgent == Job.UserAgent.OVERWRITE) {
-            parameters.uastring = job.userAgentString
-        }
+
 
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"

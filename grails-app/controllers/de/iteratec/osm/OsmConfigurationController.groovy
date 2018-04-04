@@ -1,5 +1,7 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.ConfigService
 import org.springframework.dao.DataIntegrityViolationException
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
@@ -8,7 +10,9 @@ import static org.springframework.http.HttpStatus.*
 class OsmConfigurationController {
 
     static scaffold = OsmConfiguration
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [update: "PUT", delete: "DELETE"]
+
+    ConfigService configService
 
     def create() {
         redirect(action: 'list')
@@ -34,31 +38,6 @@ class OsmConfigurationController {
 
     def show(OsmConfiguration osmConfiguration) {
         respond osmConfiguration
-    }
-
-
-    def save(OsmConfiguration osmConfiguration) {
-        if (osmConfiguration == null) {
-            
-            notFound()
-            return
-        }
-
-        if (osmConfiguration.hasErrors()) {
-
-            respond osmConfiguration.errors, view:'create'
-            return
-        }
-
-        osmConfiguration.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'osmConfiguration.label', default: 'OsmConfiguration'), osmConfiguration.id])
-                redirect osmConfiguration
-            }
-            '*' { respond osmConfiguration, [status: CREATED] }
-        }
     }
 
     def edit(OsmConfiguration osmConfiguration) {
@@ -89,7 +68,13 @@ class OsmConfigurationController {
         }
     }
 
-
+    def globalUserAgentSuffix() {
+        def suffix = configService.getGlobalUserAgentSuffix()
+        if (suffix == null) {
+            suffix = ""
+        }
+        ControllerUtils.sendObjectAsJSON(response, [globalUserAgentSuffix: suffix])
+    }
 
     protected void notFound() {
         request.withFormat {

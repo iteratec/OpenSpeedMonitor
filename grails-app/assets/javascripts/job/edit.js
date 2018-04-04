@@ -152,6 +152,7 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
 }
 
 var inputUserAgent = $("#inputField-userAgent");
+var inputGlobalUserAgent = $("#globalUserAgent input[type=checkbox]");
 var inputEmulateMobile = $("#chkbox-emulateMobile");
 
 var predefinedCronSelectBox = $("#selectExecutionSchedule");
@@ -168,6 +169,10 @@ function registerEventHandlers() {
 
     $("#inputField-takeScreenshots").on("change", toggleScreenshotOptions);
     inputUserAgent.on("change", toggleUserAgentOptions);
+    if (inputGlobalUserAgent.length) {
+        inputGlobalUserAgent.first().on("change", toggleGlobalUserAgentOptions);
+        toggleGlobalUserAgentOptions();
+    }
     toggleScreenshotOptions();
     toggleUserAgentOptions();
 
@@ -237,6 +242,10 @@ function toggleMedianOptions() {
 
 function toggleScreenshotOptions() {
     $("#imageQuality").toggleClass("hidden", $("#inputField-takeScreenshots").val() !== "DEFAULT");
+}
+
+function toggleGlobalUserAgentOptions() {
+    $("#userAgent").toggleClass("hidden", inputGlobalUserAgent.first().prop('checked'));
 }
 
 function toggleUserAgentOptions() {
