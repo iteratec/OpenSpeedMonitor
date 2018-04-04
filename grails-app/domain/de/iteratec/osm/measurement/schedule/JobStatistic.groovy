@@ -26,9 +26,9 @@ class JobStatistic {
     }
 
     private String getJobStatusCssClass(Double percentageSuccessfulTests){
-         if (percentageSuccessfulTests == null){
-             return "job-status-nodata"
-         }
+        if (percentageSuccessfulTests == null){
+            return "job-status-nodata"
+        }
         String statusLast5CssClass
         if (percentageSuccessfulTests >= 90){
             statusLast5CssClass = "job-status-good"
