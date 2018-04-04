@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
+    <g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
     <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>
 
     <asset:stylesheet src="job/edit.css"/>
