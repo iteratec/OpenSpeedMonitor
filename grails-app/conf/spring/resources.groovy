@@ -17,9 +17,15 @@
 
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import grails.boot.config.GrailsApplicationPostProcessor
+import grails.core.GrailsApplication
+import grails.plugins.GrailsPluginManager
 // Place your Spring DSL code here
 
 beans = {
     jobGroupDaoService(DefaultJobGroupDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
+    grailsApplication(GrailsApplication)
+    pluginManager(GrailsPluginManager)
+    grailsConfigurator(GrailsApplicationPostProcessor, ref("grailsApplication"))
 }
