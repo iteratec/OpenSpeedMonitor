@@ -15,6 +15,8 @@
 * limitations under the License.
 */
 
+package osm
+
 /**
  * Base-URL-mappings for the application openSpeedMonitor.
  * @author nkuhn
