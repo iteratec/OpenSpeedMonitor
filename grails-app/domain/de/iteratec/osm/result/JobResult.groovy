@@ -16,14 +16,11 @@
 */
 
 package de.iteratec.osm.result
-
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobStatisticService
+import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
 import grails.util.Environment
-import org.grails.databinding.BindUsing
-
-import de.iteratec.osm.measurement.schedule.Job
-import org.grails.databinding.BindUsing
 
 /**
  * <p>
