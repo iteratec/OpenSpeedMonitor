@@ -1,13 +1,9 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.annotations.RestAction
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 
 class ExceptionHandlerController {
-    static Logger log = LoggerFactory.getLogger(ControllerUtils.class)
-
     def handleException(Exception exception) {
         // get the controller method which was called
         def controllerAction = controllerClass.getClazz().declaredMethods.find { it.name == actionName }
