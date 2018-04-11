@@ -93,7 +93,7 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
-    profile "org.grails.profiles:web:3.1.5"
+    profile "org.grails.profiles:web:3.2.0"
 
     testCompile "org.grails.plugins:hibernate5:6.1.9"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
