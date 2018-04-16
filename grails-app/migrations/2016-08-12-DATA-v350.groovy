@@ -16,7 +16,7 @@ databaseChangeLog = {
     // it wouldn't run successfully, because h2 doesn't have a DATE function.
     changeSet(author: "mmi", id: "1472807664000-1") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 1, 'select count(id)>0 from csi_aggregation;')
+            sqlCheck(expectedResult: '1', 'select count(id)>0 from csi_aggregation;')
         }
         grailsChange {
             change {

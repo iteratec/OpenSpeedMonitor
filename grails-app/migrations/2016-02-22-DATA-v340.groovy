@@ -13,9 +13,9 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072000-1") {
         preConditions(onFail: 'MARK_RAN') {
             and {
-                sqlCheck(expectedResult: 0, 'select count(*) from page_weight')
+                sqlCheck(expectedResult: '0', 'select count(*) from page_weight')
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from page')
+                    sqlCheck(expectedResult: '0', 'select count(*) from page')
                 }
             }
 
@@ -29,9 +29,9 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072000-4") {
         preConditions(onFail: 'MARK_RAN') {
             and {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration')
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from csi_day')
+                    sqlCheck(expectedResult: '0', 'select count(*) from csi_day')
                 }
             }
         }
@@ -42,12 +42,12 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072000-5") {
         preConditions(onFail: 'MARK_RAN') {
             and {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_browser_connectivity_weight')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration_browser_connectivity_weight')
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
+                    sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration')
                 }
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from browser_connectivity_weight')
+                    sqlCheck(expectedResult: '0', 'select count(*) from browser_connectivity_weight')
                 }
             }
         }
@@ -62,12 +62,12 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072000-6") {
         preConditions(onFail: 'MARK_RAN') {
             and {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_page_weight')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration_page_weight')
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
+                    sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration')
                 }
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from page_weight')
+                    sqlCheck(expectedResult: '0', 'select count(*) from page_weight')
                 }
             }
         }
@@ -82,12 +82,12 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072000-7") {
         preConditions(onFail: 'MARK_RAN') {
             and {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_time_to_cs_mapping')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration_time_to_cs_mapping')
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
+                    sqlCheck(expectedResult: '0', 'select count(*) from csi_configuration')
                 }
                 not {
-                    sqlCheck(expectedResult: 0, 'select count(*) from time_to_cs_mapping')
+                    sqlCheck(expectedResult: '0', 'select count(*) from time_to_cs_mapping')
                 }
             }
         }
@@ -120,10 +120,10 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1453106072001-1") {
         preConditions(onFail: 'MARK_RAN') {
             // The old changelog is not already ran
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1453106072000-9'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1453106072000-9'")
             // The application is not started with empty database
             not {
-                sqlCheck(expectedResult: 0, "select count(*) from csi_aggregation")
+                sqlCheck(expectedResult: '0', "select count(*) from csi_aggregation")
             }
         }
         // add a valid connectivity-profile to every hourly-measured-value
@@ -293,7 +293,7 @@ databaseChangeLog = {
          * the case we can safely execute the rewritten changelog
          **/
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1456135825000-1'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1456135825000-1'")
         }
         change {
             sql("UPDATE aggregator_type SET name = 'csByWptDocCompleteInPercentCached' WHERE name = 'customerSatisfactionInPercentCached'")
