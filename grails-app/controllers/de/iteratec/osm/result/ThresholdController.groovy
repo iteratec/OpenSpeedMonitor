@@ -51,7 +51,7 @@ class ThresholdController {
 
         try {
             threshold.delete(flush: true)
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+            ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, "")
         }
         catch (DataIntegrityViolationException e) {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'threshold.label', default: 'Threshold'), params.id])

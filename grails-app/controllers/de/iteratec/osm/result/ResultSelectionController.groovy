@@ -67,7 +67,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             }
         })
         def result = count < MAX_RESULT_COUNT ? count : -1
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, result.toString())
     }
 
     @RestAction
@@ -201,7 +201,6 @@ class ResultSelectionController extends ExceptionHandlerController {
             }
             return dtos
         })
-
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
@@ -319,7 +318,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     private def sendError(ResultSelectionCommand command) {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
-                "Invalid parameters: " + command.getErrors().fieldErrors.each { it.field }.join(", "))
+                "Invalid parameters: " + command.getErrors().fieldErrors.collect { it.field }.join(", "))
     }
 
     private def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {

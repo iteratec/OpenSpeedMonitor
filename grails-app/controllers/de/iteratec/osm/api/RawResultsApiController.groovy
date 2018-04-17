@@ -402,6 +402,6 @@ class RawResultsApiController {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
         }
         def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
-        return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
+        return ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
     }
 }

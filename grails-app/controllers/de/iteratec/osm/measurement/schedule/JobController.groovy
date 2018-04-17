@@ -103,7 +103,7 @@ class JobController {
             model << ['filters': ['filterInactiveJobs': true]]
         if (request.xhr) {
             String templateAsPlainText = g.render(template: 'jobTable', model: model)
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
+            ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, templateAsPlainText)
         } else {
             return model
         }
@@ -353,7 +353,7 @@ class JobController {
 
     def getScriptSource(long scriptId) {
         Script script = Script.get(scriptId)
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, script?.navigationScript)
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, script?.navigationScript)
     }
 
     /**
@@ -465,7 +465,7 @@ class JobController {
         Job job = Job.get(jobId)
         jobProcessingService.cancelJobRun(job, testId)
 
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, '')
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, '')
     }
 
     /**
@@ -513,7 +513,7 @@ class JobController {
             job.removeTag(tag)
             job.save(failOnError: true)
         }
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, "")
     }
 
     def addTagToJobs(String tag) {
@@ -523,7 +523,7 @@ class JobController {
             job.addTag(tag)
             job.save(failOnError: true)
         }
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "")
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, "")
     }
 
     def showLastResultForJob(Long id) {
