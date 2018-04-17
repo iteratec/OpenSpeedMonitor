@@ -50,9 +50,9 @@ class PerformanceLoggingServiceSpec extends Specification {
         Appender appender = addAppender { String m -> message = m }
         String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
 
-        when: "We set the log level to Info and execute a operation which logs on Fatal"
+        when: "We set the log level to Info and execute a operation which logs on Error"
         serviceLogger.setLevel(Level.INFO)
-        serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, 0) {
+        serviceUnderTest.logExecutionTime(LogLevel.ERROR, descriptionOfClosureToMeasure, 0) {
             Thread.sleep(1100)
         }
 

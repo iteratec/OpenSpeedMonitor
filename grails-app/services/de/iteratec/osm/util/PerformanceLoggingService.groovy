@@ -30,7 +30,6 @@ class PerformanceLoggingService {
     static final INDENTATION_CHAR = "-"
 
 	enum LogLevel{
-		FATAL(5),
         ERROR(4),
         WARN(3),
         INFO(2),
@@ -49,9 +48,7 @@ class PerformanceLoggingService {
     def logExecutionTime(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
 		DateTime started = new DateTime()
 		def returnValue = toMeasure.call()
-		if (level==LogLevel.FATAL && log.fatalEnabled) {
-			log.fatal(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.ERROR && log.errorEnabled) {
+		if (level==LogLevel.ERROR && log.errorEnabled) {
 			log.error(getMessage(started, description, indentationDepth))
 		}else if (level==LogLevel.WARN && log.warnEnabled) {
 			log.warn(getMessage(started, description, indentationDepth))
