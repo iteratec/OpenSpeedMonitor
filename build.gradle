@@ -26,7 +26,7 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'org.grails.plugins:database-migration:3.0.3'
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.2"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
         classpath "org.grails.plugins:hibernate5:6.1.9"
         classpath 'com.moowork.gradle:gradle-node-plugin:1.0.1'
@@ -73,6 +73,7 @@ dependencies {
     // Default Grails-Stuff
     runtime 'org.grails.plugins:grails-console:2.0.8'
     compile "org.grails:grails-core"
+    compile 'org.grails:grails-logging'
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.springframework.boot:spring-boot-starter-actuator"
@@ -112,12 +113,12 @@ dependencies {
     runtime 'org.grails.plugins:database-migration:3.0.3'
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'org.grails.plugins:joda-time:2.0.0'
-    compile 'org.grails.plugins:spring-security-core:3.1.1'
-    compile 'org.grails.plugins:spring-security-ui:3.0.2'
+    compile 'org.grails.plugins:spring-security-core:3.2.1'
+    compile 'org.grails.plugins:spring-security-ui:3.1.2'
     compile 'org.grails.plugins:greenmail:2.0.0.M1'
     compile 'org.grails.plugins:mail:2.0.0.RC6'
     compile 'org.grails.plugins:quartz:2.0.8'
-    compile 'org.grails.plugins:taggable:2.0.1-SNAPSHOT'
+    compile 'org.grails.plugins:taggable:2.1.0-SNAPSHOT'
     compile 'org.grails.plugins:cookie:2.0.4'
     compile 'xml-apis:xml-apis:1.4.01'
     compile 'io.dropwizard.metrics:metrics-core:3.2.3'
