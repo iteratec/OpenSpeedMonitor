@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package osm
+package de.iteratec.osm
 
 /**
  * Base-URL-mappings for the application openSpeedMonitor.

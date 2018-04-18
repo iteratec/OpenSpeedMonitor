@@ -15,8 +15,6 @@
 * limitations under the License.
 */
 
-package osm
-
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
@@ -138,8 +136,8 @@ class BootStrap {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 12,
                 defaultMaxDownloadTimeInMinutes: 60,
-                minValidLoadtime: OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME,
-                maxValidLoadtime: OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME,
+                minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
+                maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME,
                 maxDataStorageTimeInMonths: 13,
                 csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
