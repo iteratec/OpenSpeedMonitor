@@ -48,15 +48,15 @@ class PerformanceLoggingService {
     def logExecutionTime(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
 		DateTime started = new DateTime()
 		def returnValue = toMeasure.call()
-		if (level==LogLevel.ERROR && log.errorEnabled) {
+		if (level==LogLevel.ERROR) {
 			log.error(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.WARN && log.warnEnabled) {
+		}else if (level==LogLevel.WARN) {
 			log.warn(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.INFO && log.infoEnabled) {
+		}else if (level==LogLevel.INFO) {
 			log.info(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.DEBUG && log.debugEnabled) {
+		}else if (level==LogLevel.DEBUG) {
 			log.debug(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.TRACE && log.traceEnabled) {
+		}else if (level==LogLevel.TRACE) {
 			log.trace(getMessage(started, description, indentationDepth))
 		}
 		return returnValue

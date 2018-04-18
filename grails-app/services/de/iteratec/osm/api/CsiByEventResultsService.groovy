@@ -81,7 +81,7 @@ class CsiByEventResultsService {
 
         CsiByEventResultsDto csiDto
         performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', 2){
-            if (log.infoEnabled) {log.info("retrieveCsi: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
+            log.info("retrieveCsi: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")
             if (weightedCsiValues.size()>0) {
                 double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
                 double targetCsi = 100d
