@@ -303,7 +303,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
             Location.build(wptServer: wpt, uniqueIdentifierForServer: "NotUsedLocation", browser: notUsedBrowser, active: true)
 
             JobResult jobResult1 = JobResult.build(testId:"Test1", date: new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
-            JobResult jobResultWithUserTimings1 = JobResult.build(testId:"Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
+            JobResult jobResultWithUserTimings1 = JobResult.build(testId:"Test2", date: new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
             JobResult jobResult2 = JobResult.build(testId:"Test3", date: new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
             JobResult jobResult3 = JobResult.build(testId:"Test1", date: new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job: job2, locationLocation: location2)
             JobResult jobResultWithUserTimings2 = JobResult.build(testId:"Test2", date: new DateTime(2016, 06, 22, 3, 19, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
