@@ -296,7 +296,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
 
             MeasuredEvent measuredEvent1 = MeasuredEvent.build(name: measureEvent1Name, testedPage: page1)
             MeasuredEvent measuredEvent2 = MeasuredEvent.build(name: measureEvent2Name, testedPage: page2)
-            MeasuredEvent measuredEvent3 = MeasuredEvent.build(name: measureEvent3Name, testedPage: page3)
+            MeasuredEvent measuredEvent3 = MeasuredEvent.build(name: measureEvent3Name, testedPage: page2)
 
             Browser notUsedBrowser = Browser.build(name: "NotUsedBrowser")
             createConnectivityProfile("NotUsedConnectivityProfile")
