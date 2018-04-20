@@ -275,9 +275,10 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
 
     private createData() {
         Job.withNewTransaction {
-            OsmConfiguration.build()
+            if (OsmConfiguration.count == 0) {
+                OsmConfiguration.build().save(failOnError: true)
+            }
             createAdminUser()
-
 
             Script script1 = Script.build(label: script1Name, description: "This is for test purposes", navigationScript: "stuff")
             Script script2 = Script.build(label: script2Name, description: "This is also for test purposes", navigationScript: "stuff")
