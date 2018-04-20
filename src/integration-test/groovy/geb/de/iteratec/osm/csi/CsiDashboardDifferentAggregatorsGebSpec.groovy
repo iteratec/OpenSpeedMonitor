@@ -476,7 +476,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
                 latency: 40,
                 packetLoss: 0,
                 active: true
-        )
+        ).save(failOnError: true)
         result.connectivityProfileService = new ConnectivityProfileService()
         return result
     }
