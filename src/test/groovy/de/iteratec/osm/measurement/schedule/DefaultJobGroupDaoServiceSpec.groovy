@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -29,7 +30,7 @@ import spock.lang.Specification
 @TestFor(DefaultJobGroupDaoService)
 @Mock([JobGroup, CsiConfiguration, CsiDay])
 @Build([JobGroup, CsiConfiguration])
-class DefaultJobGroupDaoServiceSpec extends Specification{
+class DefaultJobGroupDaoServiceSpec extends Specification implements BuildDataTest {
 
     void "testFindCSIGroups"() {
         given: "3 existing JobGroups, 2 csi, 1 non csi"

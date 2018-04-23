@@ -30,6 +30,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -46,7 +47,7 @@ import spock.lang.Specification
 @TestFor(LocationPersisterService)
 @Build([WebPageTestServer, Location, Browser])
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
-class PersistingLocationsSpec extends Specification{
+class PersistingLocationsSpec extends Specification implements BuildDataTest {
 
     def doWithSpring = {
         browserService(BrowserService)

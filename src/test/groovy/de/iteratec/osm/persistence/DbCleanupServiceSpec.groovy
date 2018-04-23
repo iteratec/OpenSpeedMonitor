@@ -25,6 +25,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -34,7 +35,7 @@ import spock.lang.Specification
 @TestFor(DbCleanupService)
 @Mock([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity])
 @Build([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent])
-class DbCleanupServiceSpec extends Specification{
+class DbCleanupServiceSpec extends Specification implements BuildDataTest {
 
     static final Date OLDER_12_MONTHS = new DateTime(2014,2,9,0,0,0).toDate()
     static final Date NEWER_12_MONTHS = new DateTime().toDate()

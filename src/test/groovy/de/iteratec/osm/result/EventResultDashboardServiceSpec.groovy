@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
@@ -35,7 +36,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 @TestFor(EventResultDashboardService)
 @Mock([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
 @Build([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
-class EventResultDashboardServiceSpec extends Specification {
+class EventResultDashboardServiceSpec extends Specification implements BuildDataTest {
 
     Browser browser
     Location location

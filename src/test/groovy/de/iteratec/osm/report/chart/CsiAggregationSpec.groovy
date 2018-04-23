@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
@@ -39,7 +40,7 @@ import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause
 @TestMixin(GrailsUnitTestMixin)
 @Mock([CsiAggregation, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page, Browser, Location])
 @Build([CsiAggregation, JobGroup])
-class CsiAggregationSpec extends Specification{
+class CsiAggregationSpec extends Specification implements BuildDataTest {
 
     Date dateOfMv1
     Date dateOfMv2

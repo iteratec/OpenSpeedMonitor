@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.buildtestdata.mixin.Build
@@ -12,7 +13,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 @TestFor(ResultSelectionController)
 @Mock([JobGroup])
 @Build([JobGroup])
-class ResultSelectionControllerSpec extends Specification {
+class ResultSelectionControllerSpec extends Specification implements BuildDataTest {
     JobGroup jobGroup1
     JobGroup jobGroup2
     JobGroup jobGroup3

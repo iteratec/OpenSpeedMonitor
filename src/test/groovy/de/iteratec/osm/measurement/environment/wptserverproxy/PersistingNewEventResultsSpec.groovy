@@ -33,6 +33,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -51,7 +52,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
 @TestFor(ResultPersisterService)
 @Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
-class PersistingNewEventResultsSpec extends Specification {
+class PersistingNewEventResultsSpec extends Specification implements BuildDataTest {
 
     def doWithSpring = {
         performanceLoggingService(PerformanceLoggingService)

@@ -21,6 +21,7 @@ import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -32,7 +33,7 @@ import spock.lang.Specification
 @TestFor(CustomerSatisfactionWeightService)
 @Build([Browser, ConnectivityProfile, Page, CsiConfiguration, BrowserConnectivityWeight, PageWeight, CsiDay])
 @Mock([Page, Browser, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping, CsiConfiguration, PageWeight, CsiDay])
-class CustomerSatisfactionWeightServiceSpec extends Specification {
+class CustomerSatisfactionWeightServiceSpec extends Specification implements BuildDataTest {
 
     void "validate csv format"(String path, String fileNameExtension, WeightFactor weightFactor, int expectedEmptyfErrors, int expectedLineErrors, int expectedHeaderErrors, int nonFormatErrors) {
         setup: "I18Service mock with expected calls"

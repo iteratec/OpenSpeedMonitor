@@ -30,6 +30,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -42,7 +43,7 @@ import static spock.util.matcher.HamcrestSupport.that
 @TestFor(CsiByEventResultsService)
 @Mock([JobGroup, CsiConfiguration])
 @Build([EventResult, CsiConfiguration, JobGroup])
-class CsiByEventResultsServiceSpec extends Specification{
+class CsiByEventResultsServiceSpec extends Specification implements BuildDataTest {
 
     static final double DELTA = 1e-15
     static final double EXPECTED_TARGET_CSI = 34d

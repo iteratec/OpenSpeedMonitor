@@ -14,6 +14,7 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
 import grails.test.mixin.Mock
@@ -27,7 +28,7 @@ import spock.lang.Specification
 @TestFor(DetailDataApiController)
 @Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
 @Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
-class DetailDataApiControllerSpec extends Specification {
+class DetailDataApiControllerSpec extends Specification implements BuildDataTest {
 
     public static final String LABEL_JOB_1 = "job1"
     public static final String LABEL_JOB_2 = "job2"

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -30,7 +31,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_INITIAL_CHART_HEIGHT_IN_P
 @TestFor(ConfigService)
 @Build([OsmConfiguration])
 @Mock([OsmConfiguration])
-class ConfigServiceSpec extends Specification {
+class ConfigServiceSpec extends Specification implements BuildDataTest {
 
     void "one config is fine"() {
         when: "only one config has been saved with a value"

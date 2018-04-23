@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.databinding.SimpleMapDataBindingSource
 import grails.test.mixin.Mock
@@ -20,7 +21,7 @@ import javax.persistence.NoResultException
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Page, JobGroup, Browser, Location])
 @Build([Page, JobGroup])
-class ResultsBetweenCmdPageBindingSpec extends Specification {
+class ResultsBetweenCmdPageBindingSpec extends Specification implements BuildDataTest {
 
     def dataBinder
     ResultsRequestCommand cmd

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -26,7 +27,7 @@ import spock.lang.Specification
 @TestFor(PageService)
 @Mock([Page])
 @Build([Page])
-class PageServiceSpec extends Specification {
+class PageServiceSpec extends Specification implements BuildDataTest {
 
     PageService serviceUnderTest
 

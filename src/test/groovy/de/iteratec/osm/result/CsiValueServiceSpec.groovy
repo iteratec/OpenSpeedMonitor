@@ -21,6 +21,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -29,7 +30,7 @@ import spock.lang.Specification
 @TestFor(CsiValueService)
 @Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent])
 @Build([EventResult, CsiAggregation])
-class CsiValueServiceSpec extends Specification {
+class CsiValueServiceSpec extends Specification implements BuildDataTest {
 
     CsiValueService serviceUnderTest
 

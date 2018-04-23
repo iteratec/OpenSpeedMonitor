@@ -18,6 +18,7 @@
 
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
@@ -37,7 +38,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 @TestFor(EventCsiAggregationService)
 @Mock([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult, CsiAggregation])
 @Build([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult])
-class UpdateEventResultDependentCsiAggregationsSpec extends Specification {
+class UpdateEventResultDependentCsiAggregationsSpec extends Specification implements BuildDataTest {
 
     static final DateTime eventResultDateTime = new DateTime(DateTimeZone.UTC)
 

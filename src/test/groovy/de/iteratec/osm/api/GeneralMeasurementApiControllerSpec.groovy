@@ -14,6 +14,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
 import grails.test.mixin.Mock
@@ -26,7 +27,7 @@ import spock.lang.Specification
 @TestFor(GeneralMeasurementApiController)
 @Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
 @Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
-class GeneralMeasurementApiControllerSpec extends Specification {
+class GeneralMeasurementApiControllerSpec extends Specification implements BuildDataTest {
 
     public static final String NAME_PAGE1 = "testPage1"
     public static final String NAME_PAGE2 = "testPage2"

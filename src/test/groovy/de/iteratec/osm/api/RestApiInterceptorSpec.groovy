@@ -1,5 +1,6 @@
 package de.iteratec.osm.api
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -13,7 +14,7 @@ import static de.iteratec.osm.util.Constants.*
 @TestFor(RestApiInterceptor)
 @Mock([ApiKey])
 @Build(ApiKey)
-class RestApiInterceptorSpec extends Specification {
+class RestApiInterceptorSpec extends Specification implements BuildDataTest {
 
     RestApiInterceptor interceptorUnderTest
 

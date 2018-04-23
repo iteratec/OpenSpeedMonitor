@@ -14,6 +14,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -33,7 +34,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
         MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 @Build([Location, Job, Page, WebPageTestServer, CsiConfiguration])
-class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification {
+class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification implements BuildDataTest {
 
     WebPageTestServer server1, server2
 

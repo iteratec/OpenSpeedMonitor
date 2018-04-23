@@ -5,6 +5,7 @@ import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
@@ -17,7 +18,7 @@ import spock.lang.*
 @TestMixin(GrailsUnitTestMixin)
 @Build([EventResult, UserTiming])
 @Mock([EventResult, UserTiming])
-class SelectedMeasurandTypeSpec extends Specification {
+class SelectedMeasurandTypeSpec extends Specification implements BuildDataTest {
 
     void "test getValue for Measurand"() {
         setup: "EventResult is initiated"

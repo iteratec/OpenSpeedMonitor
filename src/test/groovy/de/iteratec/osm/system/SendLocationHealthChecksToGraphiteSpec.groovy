@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.MockedGraphiteSocket
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -16,7 +17,7 @@ import spock.lang.Specification
 @TestFor(LocationHealthCheckService)
 @Mock([LocationHealthCheck, GraphiteServer])
 @Build([Location, LocationHealthCheck, WebPageTestServer, GraphiteServer])
-class SendLocationHealthChecksToGraphiteSpec extends Specification {
+class SendLocationHealthChecksToGraphiteSpec extends Specification implements BuildDataTest {
 
     public static final String GRAPHITESERVERS_HEALTH_PREFIX = "osm.health"
     public static final String WPTSERVERS_LABEL = "mywptserver.com"

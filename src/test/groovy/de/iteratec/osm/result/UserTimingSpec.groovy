@@ -1,12 +1,13 @@
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @Mock([UserTiming])
 @Build([UserTiming])
-class UserTimingSpec extends Specification {
+class UserTimingSpec extends Specification implements BuildDataTest {
 
 
     void "test constraints for duration"(duration, userTimingType, expectedResult) {

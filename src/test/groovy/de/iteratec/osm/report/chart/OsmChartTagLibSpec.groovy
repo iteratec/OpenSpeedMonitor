@@ -21,8 +21,8 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.NodeChild
 import org.cyberneko.html.parsers.SAXParser
@@ -33,7 +33,7 @@ import spock.lang.Specification
  */
 @TestFor(OsmChartTagLib)
 @Build([OsmConfiguration])
-class OsmChartTagLibSpec extends Specification {
+class OsmChartTagLibSpec extends Specification implements BuildDataTest {
 
     static def HTML_FRAGMENT_PARSER
 

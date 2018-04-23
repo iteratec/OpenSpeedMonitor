@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -31,7 +32,7 @@ import spock.lang.Specification
 @TestFor(EventCsiAggregationService)
 @Build([JobGroup, Page])
 @Mock([JobGroup, Page])
-class EventCsiAggregationServiceSpec extends Specification{
+class EventCsiAggregationServiceSpec extends Specification implements BuildDataTest {
     Date from
     Date to
 

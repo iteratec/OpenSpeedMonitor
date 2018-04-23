@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
 /**
@@ -34,7 +35,7 @@ import spock.lang.Specification
  * @since IT-81
  */
 @Build([Page, MeasuredEvent, JobResult, EventResult, WebPageTestServer, Location, Job])
-class ResultTestsSpec extends Specification{
+class ResultTestsSpec extends Specification implements BuildDataTest {
 
     private static final String WPT_SERVER_BASE_URL = 'http://my-wpt-server.com/'
     private static final String TEST_ID = 'my-test-id'

@@ -3,6 +3,7 @@ package de.iteratec.osm.integrations
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -14,7 +15,7 @@ import spock.lang.Unroll
 @TestFor(CiPipeService)
 @Build([Job, WebPageTestServer, Location])
 @Unroll
-class CiPipeServiceSpec extends Specification {
+class CiPipeServiceSpec extends Specification implements BuildDataTest {
 
     void "OsmCiPipeCheck script gets parametrized correctly for job #jobLabel (id=#jobId) and baseUrl #baseUrlWptServer"() {
         given: "Job with id #jobId associated to WebPageTestServer with baseUrl #baseUrlWptServer"

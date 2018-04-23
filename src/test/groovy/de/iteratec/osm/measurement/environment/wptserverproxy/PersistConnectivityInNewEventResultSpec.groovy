@@ -30,6 +30,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -52,7 +53,7 @@ import spock.lang.Specification
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
         MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 @Build([Job, Location, WebPageTestServer, MeasuredEvent, ConnectivityProfile])
-class PersistConnectivityInNewEventResultSpec extends Specification {
+class PersistConnectivityInNewEventResultSpec extends Specification implements BuildDataTest {
 
     static WebPageTestServer WPT_SERVER
 

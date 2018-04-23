@@ -26,6 +26,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -42,7 +43,7 @@ import static spock.util.matcher.HamcrestSupport.that
         JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiDay, ConnectivityProfile])
-class WeightedAverageCalculationSpec extends Specification {
+class WeightedAverageCalculationSpec extends Specification implements BuildDataTest {
 
     private static final double DELTA = 1e-15
 

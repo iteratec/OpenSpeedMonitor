@@ -7,6 +7,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
 import grails.test.mixin.Mock
@@ -19,7 +20,7 @@ import spock.lang.Specification
 @TestFor(CsiApiController)
 @Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup])
 @Build([CsiConfiguration, Page, JobGroup])
-class CsiApiControllerSpec extends Specification {
+class CsiApiControllerSpec extends Specification implements BuildDataTest {
 
     public static final String CSI_CONFIGURATION_LABEL = "csiConfiguration"
     CsiConfiguration csiConfiguration

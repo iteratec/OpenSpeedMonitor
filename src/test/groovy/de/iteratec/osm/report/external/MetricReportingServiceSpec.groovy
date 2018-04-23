@@ -37,6 +37,7 @@ import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -53,7 +54,7 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 @Mock([EventResult,  JobGroup, BatchActivity, GraphiteServer,  CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration, ConnectivityProfile])
 @Build([Page,MeasuredEvent,Location, Browser, JobGroup])
-class MetricReportingServiceSpec extends Specification {
+class MetricReportingServiceSpec extends Specification implements BuildDataTest {
     MetricReportingService serviceUnderTest
     static final double DELTA = 1e-15
     static final DateTime REPORTING_TIMESTAMP = new DateTime(2014, 1, 22, 13, 42, 0)

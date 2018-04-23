@@ -20,6 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.OsmConfiguration
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -31,7 +32,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 @TestFor(OsmConfigCacheService)
 @Build([OsmConfiguration])
 @Mock([OsmConfiguration])
-class OsmConfigCacheServiceSpec extends Specification {
+class OsmConfigCacheServiceSpec extends Specification implements BuildDataTest {
 
     def doWithSpring = {
         configService(ConfigService)

@@ -33,6 +33,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -49,7 +50,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 @Build([Job, MeasuredEvent, Location, WebPageTestServer, Page])
 @Unroll
-class PersistScreenshotDependentWptMetricsSpec extends Specification{
+class PersistScreenshotDependentWptMetricsSpec extends Specification implements BuildDataTest {
 
     static WebPageTestServer WPT_SERVER
 

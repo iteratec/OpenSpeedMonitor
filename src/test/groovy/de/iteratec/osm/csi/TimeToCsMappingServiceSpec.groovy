@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
@@ -37,7 +38,7 @@ class ExpectedCustomerSatisfaction {
 @TestFor(TimeToCsMappingService)
 @Mock([Page, CsiConfiguration, TimeToCsMapping])
 @Build([Page, CsiConfiguration])
-class TimeToCsMappingServiceTests extends Specification {
+class TimeToCsMappingServiceTests extends Specification implements BuildDataTest {
 
     TimeToCsMappingService serviceUnderTest
 

@@ -125,7 +125,7 @@ dependencies {
     compile 'io.dropwizard.metrics:metrics-graphite:3.2.3'
     compile 'io.dropwizard.metrics:metrics-jvm:3.2.3'
     compile 'p6spy:p6spy:3.0.0'
-    compile 'org.grails.plugins:build-test-data:3.0.1'
+    compile 'org.grails.plugins:build-test-data:3.3.0.RC2'
     compile 'io.github.http-builder-ng:http-builder-ng-core:0.17.0'
     compile 'org.grails.plugins:http-builder-helper:1.0.2'
 

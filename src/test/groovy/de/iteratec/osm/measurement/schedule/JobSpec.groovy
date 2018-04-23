@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
@@ -32,7 +33,7 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Job, Location, Script])
 @Build([Job, ConnectivityProfile])
-class JobSpec extends Specification {
+class JobSpec extends Specification implements BuildDataTest {
 
     void "connectivityProfile: not custom or all set manually"() {
         when:

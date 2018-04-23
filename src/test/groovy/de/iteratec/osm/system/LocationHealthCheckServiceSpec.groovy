@@ -9,6 +9,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -20,7 +21,7 @@ import spock.lang.Specification
 @Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
         OsmConfiguration, BatchActivity])
 @Build([Location, JobResult, OsmConfiguration, LocationHealthCheck])
-class LocationHealthCheckServiceSpec extends Specification {
+class LocationHealthCheckServiceSpec extends Specification implements BuildDataTest {
 
     private List<JobResult> jobResults
     private int expectedNumberOfAgents = 2

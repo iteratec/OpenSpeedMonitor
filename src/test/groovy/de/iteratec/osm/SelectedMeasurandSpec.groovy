@@ -7,6 +7,7 @@ import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
@@ -19,7 +20,7 @@ import spock.lang.*
 @TestMixin(GrailsUnitTestMixin)
 @Mock([EventResult, UserTiming])
 @Build([EventResult, UserTiming])
-class SelectedMeasurandSpec extends Specification {
+class SelectedMeasurandSpec extends Specification implements BuildDataTest {
     CachedView cachedView = CachedView.UNCACHED
 
     void "test if constructor works as intended"() {

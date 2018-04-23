@@ -25,6 +25,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -38,7 +39,7 @@ import static spock.util.matcher.HamcrestSupport.that
 @Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration, CsiSystem])
 @Mock([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
         CsiSystem, JobGroup, CsiAggregationUpdateEvent])
-class CsiSystemCsiAggregationServiceSpec extends Specification {
+class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildDataTest {
 
     CsiAggregationInterval dailyInterval
 

@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -18,7 +19,7 @@ import static de.iteratec.osm.util.Constants.*
 @TestFor(GeneralMeasurementApiController)
 @Mock([Job, ApiKey, JobGroup, Event])
 @Build([ApiKey, JobGroup])
-class EventCreationViaRestApiSpec extends Specification {
+class EventCreationViaRestApiSpec extends Specification implements BuildDataTest {
 
     static String APIKEY_ALLOWED = 'allowed'
     static String APIKEY_NOT_ALLOWED = 'not-allowed'

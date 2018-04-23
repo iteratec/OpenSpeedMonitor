@@ -18,6 +18,7 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -32,7 +33,7 @@ import spock.lang.Specification
 @TestFor(CsiAggregationDaoService)
 @Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval])
 @Build([CsiAggregation])
-class CsiAggregationDaoServiceSpec extends Specification {
+class CsiAggregationDaoServiceSpec extends Specification implements BuildDataTest {
 
     CsiAggregationDaoService serviceUnderTest
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval

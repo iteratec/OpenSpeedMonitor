@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.buildtestdata.mixin.Build
@@ -28,7 +29,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 @TestFor(CsiConfigurationController)
 @Mock([CsiConfiguration, CsiDay, JobGroup])
 @Build([CsiConfiguration, CsiDay, JobGroup])
-class CsiConfigurationControllerSpec extends Specification {
+class CsiConfigurationControllerSpec extends Specification implements BuildDataTest {
 
     def doWithSpring = {
         performanceLoggingService(PerformanceLoggingService)

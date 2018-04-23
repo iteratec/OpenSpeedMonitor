@@ -1,12 +1,13 @@
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.TestDataBuilder
 import org.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
 import org.hibernate.cfg.Configuration
 import org.hibernate.tool.hbm2ddl.SchemaExport
 import spock.lang.Shared
 import spock.lang.Specification
 
-class NonTransactionalIntegrationSpec extends Specification {
+class NonTransactionalIntegrationSpec extends Specification implements TestDataBuilder {
 
     @Shared
     private static Configuration _configuration

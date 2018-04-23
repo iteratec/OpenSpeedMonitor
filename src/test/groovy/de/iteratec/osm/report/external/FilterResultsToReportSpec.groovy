@@ -5,6 +5,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -20,7 +21,7 @@ import spock.lang.*
 @Unroll
 @Mock([Page, EventResult, MeasuredEvent])
 @Build([Page, EventResult, MeasuredEvent])
-class FilterResultsToReportSpec extends Specification {
+class FilterResultsToReportSpec extends Specification implements BuildDataTest {
 
     static final PAGE_NAME_HOMEPAGE = 'Homepage'
 

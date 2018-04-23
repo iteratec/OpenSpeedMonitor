@@ -30,6 +30,7 @@ import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.TimeSeriesShowCommandBaseSpec
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.plugins.taggable.TagLink
 import grails.test.mixin.Mock
@@ -43,7 +44,7 @@ import spock.lang.Specification
 @TestFor(CsiDashboardController)
 @Build([Location, JobGroup, Page, Browser, CsiConfiguration, MeasuredEvent])
 @Mock([Location, JobGroup, Page, Browser, ConnectivityProfile, CsiSystem, TagLink, CsiConfiguration])
-class CsiDashboardControllerSpec extends Specification {
+class CsiDashboardControllerSpec extends Specification implements BuildDataTest {
 
     DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime()
     CsiDashboardController controllerUnderTest

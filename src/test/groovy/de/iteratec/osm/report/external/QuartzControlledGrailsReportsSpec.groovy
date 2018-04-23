@@ -39,6 +39,7 @@ import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -56,7 +57,7 @@ import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
 @TestFor(MetricReportingService)
 @Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity, ConnectivityProfile])
 @Build([JobGroup, CsiAggregation, GraphiteServer, Page, JobGroup, MeasuredEvent, Location, Browser])
-class QuartzControlledGrailsReportsSpec extends Specification{
+class QuartzControlledGrailsReportsSpec extends Specification implements BuildDataTest {
 
     static final String jobGroupWithServersName = 'csiGroupWithServers'
     static final String jobGroupWithoutServersName = 'csiGroupWithoutServers'

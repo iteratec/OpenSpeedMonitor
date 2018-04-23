@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -29,7 +30,7 @@ import static spock.util.matcher.HamcrestSupport.that
 @TestFor(CsTargetGraph)
 @Build([CsTargetValue, CsTargetGraph])
 @Mock([CsTargetValue, CsTargetGraph])
-class CsTargetGraphSpec extends Specification {
+class CsTargetGraphSpec extends Specification implements BuildDataTest {
     final static double error = 0.01
 
     def "test percent calculation by date"() {

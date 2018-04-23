@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -32,7 +33,7 @@ import spock.lang.Specification
 @TestFor(EventDaoService)
 @Mock([Event, JobGroup])
 @Build([JobGroup])
-class EventCreationSpec extends Specification {
+class EventCreationSpec extends Specification implements BuildDataTest {
 
     EventDaoService serviceUnderTest
 

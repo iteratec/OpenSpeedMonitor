@@ -19,13 +19,14 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 @TestFor(BrowserConnectivityWeight)
 @Build([Browser,ConnectivityProfile])
-class BrowserConnectivityWeightSpec extends Specification {
+class BrowserConnectivityWeightSpec extends Specification implements BuildDataTest {
 
     void "BrowserConnectivityWeight without attributes is invalid"() {
         expect:

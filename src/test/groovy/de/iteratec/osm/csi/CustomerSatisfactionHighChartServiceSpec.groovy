@@ -30,6 +30,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -48,7 +49,7 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
 @Mock([CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
         Script, WebPageTestServer])
 @Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval])
-class CustomerSatisfactionHighChartServiceSpec extends Specification {
+class CustomerSatisfactionHighChartServiceSpec extends Specification implements BuildDataTest {
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly

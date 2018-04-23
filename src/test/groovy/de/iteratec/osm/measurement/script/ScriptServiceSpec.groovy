@@ -4,6 +4,7 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -18,7 +19,7 @@ import spock.lang.*
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Page, MeasuredEvent])
 @Build([Page])
-class ScriptServiceSpec extends Specification {
+class ScriptServiceSpec extends Specification implements BuildDataTest {
 
     def doWithSpring = {
         pageService(PageService)

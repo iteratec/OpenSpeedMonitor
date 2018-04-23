@@ -1,6 +1,7 @@
 package de.iteratec.osm.csi.transformation
 
 import de.iteratec.osm.csi.*
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -9,7 +10,7 @@ import spock.lang.Specification
 @TestFor(DefaultTimeToCsMappingService)
 @Build([DefaultTimeToCsMapping, Page, CsiConfiguration])
 @Mock([DefaultTimeToCsMapping, Page, CsiConfiguration, CsiDay, TimeToCsMapping])
-class DefaultTimeToCsMappingServiceSpec extends Specification{
+class DefaultTimeToCsMappingServiceSpec extends Specification implements BuildDataTest {
 
     final String DEFAULT_TTCS_MAPPING_1_NAME = "mapping1"
     final String DEFAULT_TTCS_MAPPING_2_NAME = "mapping2"

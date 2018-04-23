@@ -11,6 +11,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -29,7 +30,7 @@ import static spock.util.matcher.HamcrestSupport.that
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiSystem, CsiDay, ConnectivityProfile, CsiAggregationUpdateEvent, JobGroupWeight])
 @Unroll
-class CsiValueProcessingSpec extends Specification {
+class CsiValueProcessingSpec extends Specification implements BuildDataTest {
 
     CsiValueService serviceUnderTest
 

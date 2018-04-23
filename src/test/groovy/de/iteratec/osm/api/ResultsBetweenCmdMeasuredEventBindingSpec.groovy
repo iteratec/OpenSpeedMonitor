@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.databinding.SimpleMapDataBindingSource
 import grails.test.mixin.Mock
@@ -18,7 +19,7 @@ import javax.persistence.NoResultException
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Page, JobGroup, Browser, Location])
 @Build([Page, JobGroup])
-class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
+class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification implements BuildDataTest {
 
     public static final String NAME_PAGE_1 = "homepage"
     public static final String NAME_PAGE_2 = "category"

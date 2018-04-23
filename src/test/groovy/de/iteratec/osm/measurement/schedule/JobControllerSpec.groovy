@@ -4,6 +4,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.plugins.taggable.Tag
 import grails.plugins.taggable.TagLink
@@ -16,7 +17,7 @@ import spock.lang.Specification
 @TestFor(JobController)
 @Build([Job])
 @Mock([Tag, TagLink])
-class JobControllerSpec extends Specification {
+class JobControllerSpec extends Specification implements BuildDataTest {
 
     def setup() {
         Holders.applicationContext.metaClass.taggableService = new TaggableService()

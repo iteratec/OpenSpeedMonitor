@@ -2,6 +2,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.BrowserConnectivityWeight
 import de.iteratec.osm.report.chart.CsiAggregation
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -10,7 +11,7 @@ import spock.lang.Specification
 @TestFor(ConnectivityProfileController)
 @Build([ConnectivityProfile, CsiAggregation, Job])
 @Mock([ConnectivityProfile, CsiAggregation, Job, BrowserConnectivityWeight])
-class ConnectivityProfileControllerSpec extends Specification {
+class ConnectivityProfileControllerSpec extends Specification implements BuildDataTest {
 
     void "setup"() {
         controller.jobDaoService = new JobDaoService()

@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -9,7 +10,7 @@ import spock.lang.Specification
 @TestFor(WptServerService)
 @Mock([WebPageTestServer, Location])
 @Build([Location, Browser, WebPageTestServer])
-class WptServerServiceSpec extends Specification {
+class WptServerServiceSpec extends Specification implements BuildDataTest {
 
     void "Create official wpt-server (webpagetest.org)"() {
         setup: "ProxyService returns 3 locations for the server to create."

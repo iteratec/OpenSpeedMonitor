@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import spock.lang.Specification
@@ -30,7 +31,7 @@ import spock.lang.Specification
  */
 @Mock([Script])
 @Build(Script)
-class PlaceholdersUtilitySpec extends Specification{
+class PlaceholdersUtilitySpec extends Specification implements BuildDataTest {
 
     public static final String NAV_SCRIPT_USING_VARS = 'setEventName ${eventName}\nnavigate ${targeturl}'
 

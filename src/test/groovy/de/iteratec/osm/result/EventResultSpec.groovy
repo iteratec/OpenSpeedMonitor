@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
@@ -24,7 +25,7 @@ import spock.lang.Specification
 
 @Mock([EventResult, JobResult])
 @Build([EventResult, JobResult])
-class EventResultSpec extends Specification {
+class EventResultSpec extends Specification implements BuildDataTest {
 
     def "build test details url and validate url"() {
         given: "an Event Result and a Job Result"

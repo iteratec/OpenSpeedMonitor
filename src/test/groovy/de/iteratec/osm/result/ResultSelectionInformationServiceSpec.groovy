@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -21,7 +22,7 @@ import spock.lang.*
 @TestFor(ResultSelectionInformationService)
 @Mock([UserTiming, UserTimingSelectionInformation, EventResult, ResultSelectionInformation, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
 @Build([UserTiming, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
-class ResultSelectionInformationServiceSpec extends Specification {
+class ResultSelectionInformationServiceSpec extends Specification implements BuildDataTest {
     Page page
     JobGroup jobGroup
     Browser browser

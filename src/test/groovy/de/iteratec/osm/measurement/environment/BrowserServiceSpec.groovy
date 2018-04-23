@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -28,7 +29,7 @@ import spock.lang.Specification
 @TestFor(BrowserService)
 @Build([Browser])
 @Mock([Browser, BrowserAlias])
-class BrowserServiceSpec extends Specification {
+class BrowserServiceSpec extends Specification implements BuildDataTest {
 
     void "find by name or alias returns correct browsers"(String nameOrAlias, String expectedBrowserName) {
         given: "Two browsers with aliases"

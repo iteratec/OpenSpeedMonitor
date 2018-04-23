@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -27,7 +28,7 @@ import spock.lang.Specification
 @TestFor(ConnectivityProfileDaoService)
 @Mock([ConnectivityProfile])
 @Build(ConnectivityProfile)
-class ConnectivityProfileDaoServiceSpec extends Specification{
+class ConnectivityProfileDaoServiceSpec extends Specification implements BuildDataTest {
 
     void "findAll delivers all profiles"() {
         when: "4 ConnectivityProfiles exit in db."

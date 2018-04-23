@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDataTest
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
@@ -25,7 +26,7 @@ import spock.lang.Specification
 @TestFor(JobResult)
 @Mock([JobResult, EventResult])
 @Build([JobResult, EventResult])
-class JobResultSpec extends Specification {
+class JobResultSpec extends Specification implements BuildDataTest {
 
     def "find all job results connected to an event result"() {
         given: "two event results and linked to two different job results"
