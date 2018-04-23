@@ -1,6 +1,6 @@
 package geb.de.iteratec.osm.measurement.script
 
-import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptCreatePage
@@ -9,7 +9,6 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * @author nkuhn
  */
@@ -24,8 +23,8 @@ class ScriptGebSpec extends CustomUrlGebReportingSpec{
     void "test user gets to script list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
         }
         doLogin()
 

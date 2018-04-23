@@ -1,7 +1,6 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -54,7 +53,6 @@ class QueueAndJobStatusServiceSpec extends Specification {
         def start = new DateTime()
         def end = start.plusDays(1)
         mockServices()
-        createTestDataCommonForAllTests()
 
         when:
         def resultMap = serviceUnderTest.createChartData(start, end)
@@ -70,7 +68,6 @@ class QueueAndJobStatusServiceSpec extends Specification {
         def start = new DateTime()
         def end = start.plusDays(1)
         mockServices()
-        createTestDataCommonForAllTests()
 
         when:
         def resultMap = serviceUnderTest.createChartData(start, end)
@@ -85,13 +82,5 @@ class QueueAndJobStatusServiceSpec extends Specification {
         mocker = ServiceMocker.create()
         mocker.mockI18nService(serviceUnderTest)
         serviceUnderTest.jobService = Mock(JobService)
-    }
-
-    private void createTestDataCommonForAllTests() {
-        TestDataUtil.createOsmConfig()
-        TestDataUtil.createCsiAggregationIntervals()
-        server1 = TestDataUtil.createWebPageTestServer(WPTSERVER_URL, WPTSERVER_URL, true, "http://${WPTSERVER_URL}/")
-        server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")
-
     }
 }

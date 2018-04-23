@@ -1,9 +1,7 @@
 package geb.de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
@@ -11,11 +9,9 @@ import geb.pages.de.iteratec.osm.measurement.environment.*
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Tests the CRUD View of {@link Browser}*/
 @Integration
@@ -31,8 +27,8 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to browser list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
         }
         doLogin()
 
@@ -167,7 +163,7 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
         Browser.withNewTransaction {
             count.times {
-                browserIDs << TestDataUtil.createBrowser("gebBrowser" + it).id
+                browserIDs << Browser.build(name: "gebBrowser" + it).id
             }
         }
 

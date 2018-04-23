@@ -2,7 +2,6 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
@@ -12,30 +11,21 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.joda.time.DateTime
+
+import java.time.Duration
 
 @Integration
 @Rollback
 class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
-    static final String jobGroupName1 = 'jobGroupName1'
-    static final String jobGroupName2 = 'jobGroupName2'
-    static final String pageName1 = 'pageName1'
-    static final String pageName2 = 'pageName2'
-    static final String eventName1 = 'eventName1'
-    static final String eventName2 = 'eventName2'
-    static final String browserName1 = 'browserName1'
-    static final String browserName2 = 'browserName2'
-    static final String locationName1 = 'locationName1'
-    static final String locationName2 = 'locationName2'
-    static final DateTime fromHourly = new DateTime(2013, 8, 5, 6, 0, 0)
-    static final DateTime fromWeekly = new DateTime(2013, 8, 5, 0, 0, 0)
-    static final DateTime toHourly = new DateTime(2013, 8, 5, 15, 0, 0)
-    static final DateTime toWeekly = new DateTime(2013, 8, 10, 0, 0, 0)
-    static final DateTime inHourlyInterval1 = new DateTime(2013, 8, 5, 8, 0, 0)
-    static final DateTime inHourlyInterval2 = new DateTime(2013, 8, 5, 9, 0, 0)
-    static final DateTime inWeeklyInterval1 = new DateTime(2013, 8, 6, 0, 0, 0)
-    static final DateTime inWeeklyInterval2 = new DateTime(2013, 8, 9, 0, 0, 0)
+    static final Date fromHourly = new Date(2013, 8, 5, 6, 0, 0)
+    static final Date toHourly = new Date(2013, 8, 5, 15, 0, 0)
+    static final Date fromWeekly = new Date(2013, 8, 5, 0, 0, 0)
+    static final Date toWeekly = new Date(2013, 8, 10, 0, 0, 0)
+    static final Date inHourlyInterval1 = new Date(2013, 8, 5, 8, 0, 0)
+    static final Date inHourlyInterval2 = new Date(2013, 8, 5, 9, 0, 0)
+    static final Date inWeeklyInterval1 = new Date(2013, 8, 6, 0, 0, 0)
+    static final Date inWeeklyInterval2 = new Date(2013, 8, 9, 0, 0, 0)
     static final double DEFAULT_MV_VALUE = 1
 
     CsiSystemCsiAggregationService csiSystemCsiAggregationService
@@ -52,261 +42,302 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     JobGroup jobGroup2
     Page page1
     Page page2
-    MeasuredEvent measuredEvent1
-    MeasuredEvent measuredEvent2
-    Browser browser1
-    Browser browser2
-    Location location1
-    Location location2
+    MeasuredEvent measuredEvent
+    Browser browser
+    Location location
     CsiConfiguration csiConfiguration
     CsiSystem csiSystem
 
     def setup() {
-        CsiAggregation.withNewSession {session ->
-            createCommonTestData()
-            session.flush()
-        }
+        createCommonTestData()
     }
 
     def cleanup() {
         CsiAggregation.list()*.delete()
     }
 
-    void "find no csiAggregations if no existing"() {
-        when:
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), hourly, connectivityProfile)
-        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1, jobGroup2], [page1, page2])
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1, jobGroup2], [page1, page2])
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1, jobGroup2])
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1, jobGroup2])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily)
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly)
-
-        then:
-        hourlyMvs.isEmpty()
-        pageDailyMvs.isEmpty()
-        pageWeeklyMvs.isEmpty()
-        shopDailyMvs.isEmpty()
-        shopWeeklyMvs.isEmpty()
-        csiSystemDailyMvs.isEmpty()
-        csiSystemWeeklyMvs.isEmpty()
+    void "Find no hourly CsiAggregations if no existing"() {
+        expect: "No Aggregations"
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly, connectivityProfile).isEmpty()
     }
 
-    void "calculate empty csiAggregation if no existing"() {
-        given:
-        MvQueryParams getAllParams = createGetAllQueryParam()
+    void "Find no page CsiAggregations if no existing"() {
+        expect: "No Aggregations"
+        pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1, jobGroup2], [page1, page2]).isEmpty()
+        pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1, jobGroup2], [page1, page2]).isEmpty()
+    }
 
-        when:
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, CsiSystem.findAll())
+    void "Find no JobGroup CsiAggregations if no existing"() {
+        expect: "No Aggregations"
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1, jobGroup2]).isEmpty()
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1, jobGroup2]).isEmpty()
+    }
 
-        then:
-        hourlyMvs.size() == 0
+    void "Find no CsiSystem CsiAggregations if no existing"() {
+        expect: "No Aggregations"
+        csiSystemCsiAggregationService.findAll(fromHourly, toHourly, daily).isEmpty()
+        csiSystemCsiAggregationService.findAll(fromHourly, toHourly, weekly).isEmpty()
+    }
 
-        pageDailyMvs.size() == Page.count()
-        !pageDailyMvs.any {
+    void "Calculate empty Page CsiAggregation if no existing"() {
+        when: "We get daily and weekly page aggregations"
+        List<CsiAggregation> pageDailyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyMvAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
+
+        then: "for each page and interval one aggregations should exist and they are calculated"
+        pageDailyAggregations.size() == Page.count()
+        !pageDailyAggregations.any {
             it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
-        pageWeeklyMvs.size() == Page.count()
-        !pageWeeklyMvs.any {
-            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
-        }
-
-        shopDailyMvs.size() == 1
-        !shopDailyMvs.any {
-            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
-        }
-
-        shopWeeklyMvs.size() == 1
-        !shopWeeklyMvs.any {
-            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
-        }
-
-        csiSystemDailyMvs.size() == CsiSystem.count()
-        !csiSystemDailyMvs.any {
-            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
-        }
-
-        csiSystemWeeklyMvs.size() == CsiSystem.count()
-        !csiSystemWeeklyMvs.any {
+        pageWeeklyMvAggregations.size() == Page.count()
+        !pageWeeklyMvAggregations.any {
             it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
     }
 
-    void "calculate single csiAggregation if 1 is existing"() {
+    void "Calculate empty JobGroup CsiAggregation if no existing"() {
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
+
+        then: "for each jobGroup and interval one aggregation should exist and they are calculated"
+        jobGroupDailyAggregations.size() == 1
+        !jobGroupDailyAggregations.any {
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
+        }
+
+        jobGroupWeeklyAggregations.size() == 1
+        !jobGroupWeeklyAggregations.any {
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
+        }
+    }
+
+    void "Calculate empty CsiSystem CsiAggregation if no existing"() {
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> csiSystemDailyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, weekly, CsiSystem.findAll())
+
+        then:"for each CsiSystem and interval one aggregation should exist and they are calculated"
+        csiSystemDailyAggregations.size() == CsiSystem.count()
+        !csiSystemDailyAggregations.any {
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
+        }
+
+        csiSystemWeeklyAggregations.size() == CsiSystem.count()
+        !csiSystemWeeklyAggregations.any {
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
+        }
+    }
+
+    void "Calculate single Page CsiAggregation if 1 is existing"() {
         given:
-        MvQueryParams getAllParams = createGetAllQueryParam()
         createSingleHourlyCsiAggregations()
 
-        when:
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, CsiSystem.findAll())
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> pageDailyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
 
-        then:
-        hourlyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0], DEFAULT_MV_VALUE)
+        then: "for each page and interval on aggregation should exist and have the default value"
+        pageDailyAggregations.size() == Page.count()
+        isDocCompleteAndVisualComplete(pageDailyAggregations[0], DEFAULT_MV_VALUE)
+        pageWeeklyAggregations.size() == Page.count()
+        isDocCompleteAndVisualComplete(pageWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
-        pageDailyMvs.size() == Page.count()
-        csByDocCompleteAndByVisualCompleteIs(pageDailyMvs[0], DEFAULT_MV_VALUE)
+        and: "The cascading values should also be calculated"
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 1
+    }
 
-        pageWeeklyMvs.size() == Page.count()
-        csByDocCompleteAndByVisualCompleteIs(pageWeeklyMvs[0], DEFAULT_MV_VALUE)
+    void "Calculate single JobGroup CsiAggregation if 1 is existing"() {
+        given:
+        createSingleHourlyCsiAggregations()
 
-        shopDailyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(shopDailyMvs[0], DEFAULT_MV_VALUE)
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
 
-        shopWeeklyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0], DEFAULT_MV_VALUE)
+        then:"for each jobGroup and interval on aggregation should exist and have the default value"
+        jobGroupDailyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(jobGroupDailyAggregations[0], DEFAULT_MV_VALUE)
+        jobGroupWeeklyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(jobGroupWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
-        csiSystemDailyMvs.size() == CsiSystem.count()
-        csByDocCompleteAndByVisualCompleteIs(csiSystemDailyMvs[0], DEFAULT_MV_VALUE)
+        and: "The cascading values should also be calculated"
+        pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1]).size() == 1
+        pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1]).size() == 1
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 1
+    }
 
-        csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0], DEFAULT_MV_VALUE)
+    void "Calculate single CsiSystem CsiAggregation if 1 is existing"() {
+        given:
+        createSingleHourlyCsiAggregations()
+
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> csiSystemDailyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, weekly, CsiSystem.findAll())
+
+        then:"for each CsiSystem and interval on aggregation should exist and have the default value"
+        csiSystemWeeklyAggregations.size() == CsiSystem.count()
+        isDocCompleteAndVisualComplete(csiSystemWeeklyAggregations[0], DEFAULT_MV_VALUE)
+        csiSystemDailyAggregations.size() == CsiSystem.count()
+        isDocCompleteAndVisualComplete(csiSystemDailyAggregations[0], DEFAULT_MV_VALUE)
+
+        and: "The cascading values should also be calculated"
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
+        pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1]).size() == 1
+        pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1]).size() == 1
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 1
     }
 
     void "calculate single weekly Mv if 1 is existing and only highest weekly-aggregation is called"() {
         given:
-        CsiAggregation.withNewTransaction {
-            createSingleHourlyCsiAggregations()
-        }
+        createSingleHourlyCsiAggregations()
 
         when:
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [csiSystem])
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), hourly, connectivityProfile)
-        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, JobGroup.list(), Page.list())
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, JobGroup.list(), Page.list())
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily, JobGroup.list())
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), weekly, JobGroup.list())
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(), toHourly.toDate(), daily)
-
+        List<CsiAggregation> csiSystemWeeklyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, weekly, [csiSystem])
         then:
-        hourlyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0], DEFAULT_MV_VALUE)
-
-        pageDailyMvs.size() == 0
-
-        pageWeeklyMvs.size() == csiSystem.affectedJobGroups.size() * Page.count()
-        csByDocCompleteAndByVisualCompleteIs(pageWeeklyMvs[0], DEFAULT_MV_VALUE)
-
-        shopDailyMvs.size() == 0
-
-        shopWeeklyMvs.size() == csiSystem.affectedJobGroups.size()
-        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0], DEFAULT_MV_VALUE)
-
-        csiSystemDailyMvs.size() == 0
-
-        csiSystemWeeklyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0], DEFAULT_MV_VALUE)
-    }
-
-    void "aggregate to single csiAggregation if 2 hourlys are existing"() {
-        given:
-        MvQueryParams getAllParams = createGetAllQueryParam()
-        CsiAggregation.withNewTransaction {
-            createTwoHourlyCsiAggregations()
-        }
+        csiSystemWeeklyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(csiSystemWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
         when:
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(), toHourly.toDate(), getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), daily, [csiSystem])
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(), toHourly.toDate(), weekly, [csiSystem])
-
+        List<CsiAggregation> hourlyAggregations = eventCsiAggregationService.findAll(fromHourly, toHourly, hourly, connectivityProfile)
         then:
-        double expectedHourlySize = 2.0
-        hourlyMvs.size() == expectedHourlySize.toInteger()
-        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0], DEFAULT_MV_VALUE)
+        hourlyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(hourlyAggregations[0], DEFAULT_MV_VALUE)
 
+        when:
+        List<CsiAggregation> pageDailyAggregations = pageCsiAggregationService.findAll(fromHourly, toHourly, daily, JobGroup.list(), Page.list())
+        List<CsiAggregation> pageWeeklyAggregations = pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, JobGroup.list(), Page.list())
+        then:
+        pageDailyAggregations.size() == 0
+        pageWeeklyAggregations.size() == csiSystem.affectedJobGroups.size() * Page.count()
+        isDocCompleteAndVisualComplete(pageWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
-        pageDailyMvs.size() == Page.count()
-        amountEntriesWithAndWithoutCS(pageDailyMvs, 1, 1, DEFAULT_MV_VALUE)
+        when:
+        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, JobGroup.list())
+        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, JobGroup.list())
+        then:
+        jobGroupDailyAggregations.size() == 0
+        jobGroupWeeklyAggregations.size() == csiSystem.affectedJobGroups.size()
+        isDocCompleteAndVisualComplete(jobGroupWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
-
-        pageWeeklyMvs.size() == Page.count()
-        amountEntriesWithAndWithoutCS(pageWeeklyMvs, 1, 1, DEFAULT_MV_VALUE)
-
-        shopDailyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(shopDailyMvs[0], DEFAULT_MV_VALUE)
-
-        shopWeeklyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0], DEFAULT_MV_VALUE)
-
-        csiSystemDailyMvs.size() == CsiSystem.count()
-        csByDocCompleteAndByVisualCompleteIs(csiSystemDailyMvs[0], DEFAULT_MV_VALUE)
-
-        csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0], DEFAULT_MV_VALUE)
+        when:
+        List<CsiAggregation> csiSystemDailyAggregations = csiSystemCsiAggregationService.findAll(fromHourly, toHourly, daily)
+        then:
+        csiSystemDailyAggregations.size() == 0
     }
 
-    void "aggregate to 2 daily- and a single weekly-csiAggregation if 2 hourlys on different days are existing"() {
-        given:
+    void "Aggregate to single Page CsiAggregation if 2 hourlies are existing"() {
+        given: "Two Aggregations"
+        createTwoHourlyCsiAggregations()
+
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> pageDailyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
+
+        then: "for each page and interval only one aggregation should exist"
+        pageDailyAggregations.size() == Page.count()
+        areAllValuesInListAsExpected(pageDailyAggregations, 1, 1, DEFAULT_MV_VALUE)
+        pageWeeklyAggregations.size() == Page.count()
+        areAllValuesInListAsExpected(pageWeeklyAggregations, 1, 1, DEFAULT_MV_VALUE)
+
+        and: "The cascading values should also be calculated"
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 2
+    }
+
+    void "Aggregate to single JobGroup csiAggregation if 2 hourlies are existing"() {
+        given: "Two Aggregations"
+        createTwoHourlyCsiAggregations()
+
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, daily, [jobGroup1])
+        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly, toHourly, weekly, [jobGroup1])
+
+        then: "for each jobGroup and interval only one aggregation should exist"
+        jobGroupDailyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(jobGroupDailyAggregations[0], DEFAULT_MV_VALUE)
+        jobGroupWeeklyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(jobGroupWeeklyAggregations[0], DEFAULT_MV_VALUE)
+
+        and: "The cascading values should also be calculated"
+        pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1, page2]).size() == Page.count()
+        pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1, page2]).size() == Page.count()
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 2
+    }
+
+    void "Aggregate to single CsiSystem CsiAggregation if 2 hourlies are existing"() {
+        given: "Two Aggregations"
+        createTwoHourlyCsiAggregations()
+
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> csiSystemDailyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, daily, [csiSystem])
+        List<CsiAggregation> csiSystemWeeklyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly, toHourly, weekly, [csiSystem])
+
+        then: "for each CsiSystem and interval only one aggregation should exist"
+        csiSystemDailyAggregations.size() == CsiSystem.count()
+        isDocCompleteAndVisualComplete(csiSystemDailyAggregations[0], DEFAULT_MV_VALUE)
+        csiSystemWeeklyAggregations.size() == CsiSystem.count()
+        isDocCompleteAndVisualComplete(csiSystemWeeklyAggregations[0], DEFAULT_MV_VALUE)
+
+        and: "The cascading values should also be calculated"
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
+        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
+        pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1, page2]).size() == Page.count()
+        pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1, page2]).size() == Page.count()
+        eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 2
+    }
+
+    void "aggregate to 2 daily- and a single weekly-csiAggregation if 2 hourlies on different days are existing"() {
+        given: "Two hourly aggregations on different days"
         MvQueryParams getAllParams = createGetAllQueryParam()
         createTwoHourlyCsiAggregationsOnDifferentDays()
 
-        when:
-        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), getAllParams)
-        List<CsiAggregation> pageDailyMvs1 = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> pageDailyMvs2 = pageCsiAggregationService.findAll(fromWeekly.toDate(), toWeekly.toDate(), daily,[jobGroup1, jobGroup2], [page1, page2])
-        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(), toWeekly.toDate(), weekly, CsiSystem.findAll())
+        when:"We get daily and weekly aggregations"
+        List<CsiAggregation> hourlyAggregations = eventCsiAggregationService.getHourlyCsiAggregations(fromWeekly, toWeekly, getAllParams)
+        List<CsiAggregation> pageDailyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly, toWeekly, daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly, toWeekly, weekly, [jobGroup1])
+        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly, toWeekly, daily, [jobGroup1])
+        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly, toWeekly, weekly, [jobGroup1])
+        List<CsiAggregation> csiSystemDailyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly, toWeekly, daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyAggregations = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly, toWeekly, weekly, CsiSystem.findAll())
 
-        then:
+        then: "for each aggregation type a daily and a weekly aggregation should exist"
         int expectedHourlySize = 2
-        hourlyMvs.size() == expectedHourlySize
-        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0], DEFAULT_MV_VALUE)
+        hourlyAggregations.size() == expectedHourlySize
+        isDocCompleteAndVisualComplete(hourlyAggregations[0], DEFAULT_MV_VALUE)
 
-
-        int daysInInterval = (toWeekly.dayOfMonth - fromWeekly.dayOfMonth) + 1
+        int daysInInterval = (Duration.between(fromWeekly.toInstant(), toWeekly.toInstant()).toDays()) + 1
         int expectedDailyCsiAggregations = Page.count() * daysInInterval
-        pageDailyMvs1.size() == expectedDailyCsiAggregations
-        pageDailyMvs1 == pageDailyMvs2
+        pageDailyAggregations.size() == expectedDailyCsiAggregations
         int addedHourlyCsiAggregations = 2
-        amountEntriesWithAndWithoutCS(pageDailyMvs1, addedHourlyCsiAggregations, expectedDailyCsiAggregations - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
+        areAllValuesInListAsExpected(pageDailyAggregations, addedHourlyCsiAggregations, expectedDailyCsiAggregations - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
+        pageWeeklyAggregations.size() == Page.count()
+        areAllValuesInListAsExpected(pageWeeklyAggregations, 1, 1, DEFAULT_MV_VALUE)
 
-        pageWeeklyMvs.size() == Page.count()
-        amountEntriesWithAndWithoutCS(pageWeeklyMvs, 1, 1, DEFAULT_MV_VALUE)
+        jobGroupDailyAggregations.size() == daysInInterval
+        areAllValuesInListAsExpected(jobGroupDailyAggregations, addedHourlyCsiAggregations, daysInInterval - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
-        shopDailyMvs.size() == daysInInterval
-        amountEntriesWithAndWithoutCS(shopDailyMvs, addedHourlyCsiAggregations, daysInInterval - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
-
-        shopWeeklyMvs.size() == 1
-        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0], DEFAULT_MV_VALUE)
+        jobGroupWeeklyAggregations.size() == 1
+        isDocCompleteAndVisualComplete(jobGroupWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
         int expectedDailyCsiSystemAggregations = CsiSystem.count() * daysInInterval
-        csiSystemDailyMvs.size() == expectedDailyCsiSystemAggregations
-        amountEntriesWithAndWithoutCS(shopDailyMvs, addedHourlyCsiAggregations, expectedDailyCsiSystemAggregations - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
+        csiSystemDailyAggregations.size() == expectedDailyCsiSystemAggregations
+        areAllValuesInListAsExpected(jobGroupDailyAggregations, addedHourlyCsiAggregations, expectedDailyCsiSystemAggregations - addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
-        csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0], DEFAULT_MV_VALUE)
+        csiSystemWeeklyAggregations.size() == CsiSystem.count()
+        isDocCompleteAndVisualComplete(csiSystemWeeklyAggregations[0], DEFAULT_MV_VALUE)
     }
 
-    private boolean csByDocCompleteAndByVisualCompleteIs(CsiAggregation csiAggregation, double expectedValue) {
+    private boolean isDocCompleteAndVisualComplete(CsiAggregation csiAggregation, double expectedValue) {
         csiAggregation.csByWptDocCompleteInPercent == expectedValue &&
                 csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue &&
                 csiAggregation.isCalculatedWithData()
 
     }
 
-    private boolean amountEntriesWithAndWithoutCS(List<CsiAggregation> list, int expectedValueWithCs, int expectedValueWithoutCs, double expectedCsValue) {
+    private boolean areAllValuesInListAsExpected(List<CsiAggregation> list, int expectedValueWithCs, int expectedValueWithoutCs, double expectedCsValue) {
         List<CsiAggregation> withCs = list.findAll {
             it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
@@ -322,40 +353,32 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     }
 
     private void createCommonTestData() {
-        connectivityProfile = TestDataUtil.createConnectivityProfile("Conn1")
+        connectivityProfile = ConnectivityProfile.build()
+        browser = Browser.build()
+        page1 = Page.build()
+        page2 = Page.build()
 
-        browser1 = TestDataUtil.createBrowser(browserName1)
-        browser2 = TestDataUtil.createBrowser(browserName2)
+        csiConfiguration = CsiConfiguration.build(
+                pageWeights: [page1, page2].collect { PageWeight.build(page: it, weight: 1.0) },
+                browserConnectivityWeights: [BrowserConnectivityWeight.build(browser: browser, connectivity: connectivityProfile, weight: 1.0)]
+        )
 
-        page1 = TestDataUtil.createPage(pageName1)
-        page2 = TestDataUtil.createPage(pageName2)
+        jobGroup1 = JobGroup.build(csiConfiguration: csiConfiguration)
+        jobGroup2 = JobGroup.build(csiConfiguration: csiConfiguration)
 
-        csiConfiguration = TestDataUtil.createCsiConfiguration()
-        csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page1, page2])
-        csiConfiguration.pageWeights = [TestDataUtil.createPageWeight(page1, 1.0), TestDataUtil.createPageWeight(page2, 1.0)]
-        csiConfiguration.browserConnectivityWeights = [TestDataUtil.createBrowserConnectivityWeight(browser1, connectivityProfile, 1.0), TestDataUtil.createBrowserConnectivityWeight(browser2, connectivityProfile, 1.0)]
-
-        jobGroup1 = TestDataUtil.createJobGroup(jobGroupName1)
-        jobGroup1.csiConfiguration = csiConfiguration
-        jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
-        jobGroup2.csiConfiguration = csiConfiguration
-
-        csiSystem = TestDataUtil.createCsiSystem("label", [])
-        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup1, 1.0))
-        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup2, 1.0))
+        csiSystem = CsiSystem.buildWithoutSave(jobGroupWeights: [jobGroup1, jobGroup2].collect {
+            new JobGroupWeight(jobGroup: it, weight: 1.0)
+        })
+        csiSystem.jobGroupWeights*.csiSystem = csiSystem
         csiSystem.save(failOnError: true)
 
+        measuredEvent = MeasuredEvent.build(testedPage: page1)
 
-        measuredEvent1 = TestDataUtil.createMeasuredEvent(eventName1, page1)
-        measuredEvent2 = TestDataUtil.createMeasuredEvent(eventName2, page2)
+        location = Location.build()
 
-        WebPageTestServer server = TestDataUtil.createWebPageTestServer("test", "test", true, "http://test.com")
-        location1 = TestDataUtil.createLocation(server, locationName1, browser1, true)
-        location2 = TestDataUtil.createLocation(server, locationName2, browser2, true)
-
-        hourly = new CsiAggregationInterval(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY).save(validate: false)
-        daily = new CsiAggregationInterval(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY).save(validate: false)
-        weekly = new CsiAggregationInterval(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY).save(validate: false)
+        hourly = CsiAggregationInterval.build(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY)
+        daily = CsiAggregationInterval.build(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY)
+        weekly = CsiAggregationInterval.build(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY)
     }
 
     private MvQueryParams createGetAllQueryParam() {
@@ -384,21 +407,21 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         createCsiAggregations(inWeeklyInterval2)
     }
 
-    private void createCsiAggregations(DateTime started) {
-        new CsiAggregation(
-                started: started.toDate(),
+    private void createCsiAggregations(Date started) {
+        CsiAggregation.build(
+                started: started,
                 interval: hourly,
                 aggregationType: AggregationType.MEASURED_EVENT,
                 jobGroup: jobGroup1,
-                measuredEvent: measuredEvent1,
+                measuredEvent: measuredEvent,
                 page: page1,
-                browser: browser1,
-                location: location1,
+                browser: browser,
+                location: location,
                 csiSystem: csiSystem,
                 csByWptDocCompleteInPercent: DEFAULT_MV_VALUE,
                 csByWptVisuallyCompleteInPercent: DEFAULT_MV_VALUE,
                 closedAndCalculated: true,
                 connectivityProfile: connectivityProfile,
-                underlyingEventResultsByWptDocComplete: '1,2,3,4').save(failOnError: true)
+                underlyingEventResultsByWptDocComplete: '1,2,3,4')
     }
 }
