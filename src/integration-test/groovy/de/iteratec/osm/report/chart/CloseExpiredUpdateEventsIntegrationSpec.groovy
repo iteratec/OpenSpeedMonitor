@@ -20,7 +20,7 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.result.MeasuredEvent
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.util.mop.ConfineMetaClassChanges
 import de.iteratec.osm.InMemoryConfigService

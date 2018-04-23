@@ -25,7 +25,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
 /**

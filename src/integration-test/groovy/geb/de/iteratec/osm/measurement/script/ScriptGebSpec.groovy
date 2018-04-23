@@ -5,7 +5,7 @@ import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptCreatePage
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptListPage
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Shared
 import spock.lang.Stepwise

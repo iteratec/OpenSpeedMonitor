@@ -6,7 +6,7 @@ import de.iteratec.osm.measurement.environment.WptServerService
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.wizards.InfrastructureSetupPage
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import grails.util.Holders
 import spock.lang.Shared

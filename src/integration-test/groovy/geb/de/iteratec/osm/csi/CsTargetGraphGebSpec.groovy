@@ -10,7 +10,7 @@ import geb.pages.de.iteratec.osm.csi.CsTargetGraphCreatePage
 import geb.pages.de.iteratec.osm.csi.CsTargetGraphEditPage
 import geb.pages.de.iteratec.osm.csi.CsTargetGraphIndexPage
 import geb.pages.de.iteratec.osm.csi.CsTargetGraphShowPage
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf

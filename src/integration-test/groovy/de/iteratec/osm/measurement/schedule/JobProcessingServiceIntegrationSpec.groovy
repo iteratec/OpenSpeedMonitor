@@ -26,7 +26,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils

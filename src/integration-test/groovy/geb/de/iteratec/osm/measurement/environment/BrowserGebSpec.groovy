@@ -6,7 +6,7 @@ import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
 import geb.pages.de.iteratec.osm.measurement.environment.*
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf

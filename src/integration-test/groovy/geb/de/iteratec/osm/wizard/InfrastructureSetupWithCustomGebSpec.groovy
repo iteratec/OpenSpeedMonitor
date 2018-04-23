@@ -2,7 +2,7 @@ package geb.de.iteratec.osm.wizard
 
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.wizards.InfrastructureSetupPage
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Stepwise
 
