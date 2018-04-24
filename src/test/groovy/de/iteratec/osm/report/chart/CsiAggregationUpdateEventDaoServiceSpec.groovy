@@ -17,48 +17,44 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.buildtestdata.BuildDomainTest
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
-
-import grails.test.mixin.*
 
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(CsiAggregationUpdateEventDaoService)
-@Mock([CsiAggregationUpdateEvent])
-class CsiAggregationUpdateEventDaoServiceSpec extends Specification{
+class CsiAggregationUpdateEventDaoServiceSpec extends Specification implements
+        BuildDomainTest<CsiAggregationUpdateEvent>, ServiceUnitTest<CsiAggregationUpdateEventDaoService> {
 
-	CsiAggregationUpdateEventDaoService serviceUnderTest
-	
-	def setup(){
-		serviceUnderTest = service
-	} 
-	
-	def "test writing update events"() {
-		given:
-		Long idOutdatedCsiAggregation = 1
-		Long idCalculatedCsiAggregation = 1
-		DateTime oneMinuteAgo = new DateTime().minusMinutes(1)
-		
-		when:
-		serviceUnderTest.createUpdateEvent(idOutdatedCsiAggregation, OUTDATED)
-		serviceUnderTest.createUpdateEvent(idCalculatedCsiAggregation, CALCULATED)
-		List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
-		CsiAggregationUpdateEvent outdatedEvent = updateEvents.find{ it.updateCause == OUTDATED }
-		CsiAggregationUpdateEvent calculatedEvent = updateEvents.find{ it.updateCause == CALCULATED }
+    CsiAggregationUpdateEventDaoService serviceUnderTest
 
-		then:
-		updateEvents.size() == 2
+    def setup(){
+        serviceUnderTest = service
+    }
 
-		outdatedEvent.csiAggregationId == idOutdatedCsiAggregation
-		new DateTime(outdatedEvent.dateOfUpdate).isAfter(oneMinuteAgo)
+    def "test writing update events"() {
+        given:
+        Long idOutdatedCsiAggregation = 1
+        Long idCalculatedCsiAggregation = 1
+        DateTime oneMinuteAgo = new DateTime().minusMinutes(1)
 
-		calculatedEvent.csiAggregationId == idCalculatedCsiAggregation
-		new DateTime(calculatedEvent.dateOfUpdate).isAfter(oneMinuteAgo)
+        when:
+        serviceUnderTest.createUpdateEvent(idOutdatedCsiAggregation, OUTDATED)
+        serviceUnderTest.createUpdateEvent(idCalculatedCsiAggregation, CALCULATED)
+        List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
+        CsiAggregationUpdateEvent outdatedEvent = updateEvents.find{ it.updateCause == OUTDATED }
+        CsiAggregationUpdateEvent calculatedEvent = updateEvents.find{ it.updateCause == CALCULATED }
+
+        then:
+        updateEvents.size() == 2
+
+        outdatedEvent.csiAggregationId == idOutdatedCsiAggregation
+        new DateTime(outdatedEvent.dateOfUpdate).isAfter(oneMinuteAgo)
+
+        calculatedEvent.csiAggregationId == idCalculatedCsiAggregation
+        new DateTime(calculatedEvent.dateOfUpdate).isAfter(oneMinuteAgo)
     }
 }

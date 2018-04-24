@@ -3,14 +3,14 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.measurement.environment.Location
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(JobDaoService)
 @Build([Job, Location, ConnectivityProfile, JobGroup])
-@Mock([Job, Location, ConnectivityProfile, JobGroup])
-class JobDaoServiceSpec extends Specification implements BuildDataTest {
+class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<JobDaoService> {
+    void setupSpec() {
+        mockDomains(Job, Location, ConnectivityProfile, JobGroup)
+    }
 
     void "getAllJobs returns all jobs but deleted ones"() {
         given: "three jobs, one marked as deleted"

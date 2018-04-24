@@ -96,11 +96,8 @@ dependencies {
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
     profile "org.grails.profiles:web:3.2.0"
 
-    //The following dependency can be removed after the Unit Test have been refactored to use the Grails Testing Support
-    //Framework of Grails version 3.3. See
-    //http://docs.grails.org/3.3.4/guide/upgrading.html#__testmixin_testfor_etc_deprecated
-    testCompile "org.grails:grails-test-mixins:3.3.0"
-
+    testCompile "org.grails:grails-gorm-testing-support:1.1.4"
+    testCompile "org.grails:grails-web-testing-support:1.1.4"
     testCompile "org.grails.plugins:hibernate5:6.1.9"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"

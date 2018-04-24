@@ -18,16 +18,12 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.report.external.GraphitePathRawData
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-@TestFor(GraphitePathRawData)
-@Mock([GraphitePathRawData])
 @Build([GraphitePathRawData])
-class GraphitePathRawDataSpec extends Specification implements BuildDataTest {
+class GraphitePathRawDataSpec extends Specification implements BuildDomainTest<GraphitePathRawData> {
 
     void "alphanumerical prefixes with trailing dot are valid"(String prefix) {
         given: "a valid built GraphitePath"

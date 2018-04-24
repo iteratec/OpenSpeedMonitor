@@ -2,19 +2,13 @@ package de.iteratec.osm.api
 
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.interceptor.InterceptorUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.*
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
-@TestFor(RestApiInterceptor)
-@Mock([ApiKey])
 @Build(ApiKey)
-class RestApiInterceptorSpec extends Specification implements BuildDataTest {
+class RestApiInterceptorSpec extends Specification implements BuildDataTest, InterceptorUnitTest<RestApiInterceptor> {
 
     RestApiInterceptor interceptorUnderTest
 
@@ -22,8 +16,11 @@ class RestApiInterceptorSpec extends Specification implements BuildDataTest {
         interceptorUnderTest = interceptor
     }
 
-    def cleanup() {
+    void setupSpec() {
+        mockDomain(ApiKey)
+    }
 
+    def cleanup() {
     }
 
     void "Test restApi interceptor - wrong action won't match"() {

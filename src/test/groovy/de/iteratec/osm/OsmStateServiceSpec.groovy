@@ -2,16 +2,14 @@ package de.iteratec.osm
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(OsmStateService)
-@Mock([WebPageTestServer])
 @Build([WebPageTestServer, Job])
-class OsmStateServiceSpec extends Specification implements BuildDataTest {
+class OsmStateServiceSpec extends Specification implements BuildDomainTest<WebPageTestServer>,
+        ServiceUnitTest<OsmStateService> {
 
     void "State is untouched with initial state data."() {
         when: "No server and no job exist."

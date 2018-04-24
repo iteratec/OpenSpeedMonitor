@@ -27,15 +27,12 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(DbCleanupService)
-@Mock([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity])
 @Build([JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent])
-class DbCleanupServiceSpec extends Specification implements BuildDataTest {
+class DbCleanupServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<DbCleanupService> {
 
     static final Date OLDER_12_MONTHS = new DateTime(2014,2,9,0,0,0).toDate()
     static final Date NEWER_12_MONTHS = new DateTime().toDate()
@@ -46,6 +43,10 @@ class DbCleanupServiceSpec extends Specification implements BuildDataTest {
                 return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages, 5000)
             }
         }
+    }
+
+    void setupSpec() {
+        mockDomains(JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity)
     }
 
     void "JobResults and EventResults before given Date get deleted correctly"() {

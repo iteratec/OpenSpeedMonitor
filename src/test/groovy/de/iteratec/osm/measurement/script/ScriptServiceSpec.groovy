@@ -1,28 +1,24 @@
 package de.iteratec.osm.measurement.script
 
-import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestFor(ScriptService)
-@TestMixin(GrailsUnitTestMixin)
-@Mock([Page, MeasuredEvent])
 @Build([Page])
-class ScriptServiceSpec extends Specification implements BuildDataTest {
+class ScriptServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<ScriptService> {
 
-    def doWithSpring = {
-        pageService(PageService)
+    Closure doWithSpring() {
+        return {
+            pageService(PageService)
+        }
+    }
+
+    void setupSpec() {
+        mockDomains(Page, MeasuredEvent)
     }
 
     void "don't create new pages if they already exist"() {

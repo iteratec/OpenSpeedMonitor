@@ -3,21 +3,18 @@ package de.iteratec.osm.result
 import de.iteratec.osm.measurement.schedule.Job
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Unroll
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
-@TestFor(Threshold)
-@Mock([Threshold, Job, MeasuredEvent])
 @Build([Job, MeasuredEvent, Threshold])
 @Unroll
 class ThresholdSpec extends Specification implements BuildDataTest {
 
     def setup() {
+    }
+
+    void setupSpec() {
+        mockDomains(Threshold, Job, MeasuredEvent)
     }
 
     def cleanup() {

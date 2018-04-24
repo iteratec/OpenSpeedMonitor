@@ -35,8 +35,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.result.CachedView.CACHED
@@ -49,20 +48,26 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  * @see {@link ProxyService}
  *
  */
-@TestFor(ResultPersisterService)
 @Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
-class PersistingNewEventResultsSpec extends Specification implements BuildDataTest {
+class PersistingNewEventResultsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        pageService(PageService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            pageService(PageService)
+            jobDaoService(JobDaoService)
+        }
     }
 
     void "setup"() {
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay)
     }
 
     void "result persistance with old (single step) WPT server"(String fileName, String jobLabel, String pageName) {

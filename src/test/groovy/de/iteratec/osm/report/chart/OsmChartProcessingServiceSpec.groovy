@@ -19,7 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.CsiType
 import de.iteratec.osm.util.I18nService
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
@@ -30,8 +30,7 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  * <b>Note: </b>Method {@link de.iteratec.osm.report.chart.OsmChartProcessingService#summarizeEventResultGraphs(java.util.List)}
  *      isn't tested here cause it is tested in class {@link de.iteratec.osm.result.SummarizedChartLegendEntriesSpec} already.
  */
-@TestFor(OsmChartProcessingService)
-class OsmChartProcessingServiceSpec extends Specification {
+class OsmChartProcessingServiceSpec extends Specification implements ServiceUnitTest<OsmChartProcessingService> {
 
     OsmChartProcessingService serviceUnderTest
 

@@ -23,7 +23,7 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.TestFor
+import grails.testing.web.taglib.TagLibUnitTest
 import groovy.util.slurpersupport.NodeChild
 import org.cyberneko.html.parsers.SAXParser
 import spock.lang.Specification
@@ -31,14 +31,15 @@ import spock.lang.Specification
 /**
  * Test-suite for {@link OsmChartTagLib}.
  */
-@TestFor(OsmChartTagLib)
 @Build([OsmConfiguration])
-class OsmChartTagLibSpec extends Specification implements BuildDataTest {
+class OsmChartTagLibSpec extends Specification implements BuildDataTest, TagLibUnitTest<OsmChartTagLib> {
 
     static def HTML_FRAGMENT_PARSER
 
-    def doWithSpring = {
-        configService(ConfigService)
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+        }
     }
 
     void setup() {

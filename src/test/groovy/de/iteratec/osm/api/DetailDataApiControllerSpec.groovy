@@ -17,18 +17,13 @@ import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
-@TestFor(DetailDataApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
 @Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
-class DetailDataApiControllerSpec extends Specification implements BuildDataTest {
+class DetailDataApiControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<DetailDataApiController> {
 
     public static final String LABEL_JOB_1 = "job1"
     public static final String LABEL_JOB_2 = "job2"
@@ -56,16 +51,21 @@ class DetailDataApiControllerSpec extends Specification implements BuildDataTest
     JobGroup jobGroupWithoutCsiConfiguration1
     JobGroup jobGroupWithoutCsiConfiguration2
 
-    def doWithSpring = {
-        defaultJobGroupDaoService(DefaultJobGroupDaoService)
-        browserService(BrowserService)
+    Closure doWithSpring() {
+        return {
+            defaultJobGroupDaoService(DefaultJobGroupDaoService)
+            browserService(BrowserService)
+        }
     }
 
     void setup() {
-
         createTestDataCommonToAllTests()
         initInnerServices()
+    }
 
+    void setupSpec() {
+        mockDomains(CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location,
+                WebPageTestServer, Job, Script)
     }
 
     void "getting correct mappings for domain classes"() {

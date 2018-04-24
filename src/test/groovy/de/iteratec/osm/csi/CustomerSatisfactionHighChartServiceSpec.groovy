@@ -32,8 +32,7 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.apache.commons.lang.time.DateUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -45,11 +44,9 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
 /**
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
  */
-@TestFor(CustomerSatisfactionHighChartService)
-@Mock([CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
-        Script, WebPageTestServer])
 @Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval])
-class CustomerSatisfactionHighChartServiceSpec extends Specification implements BuildDataTest {
+class CustomerSatisfactionHighChartServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CustomerSatisfactionHighChartService> {
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
@@ -111,20 +108,25 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification implements 
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
-    def doWithSpring = {
-        csiAggregationUtilService(CsiAggregationUtilService)
-        osmChartProcessingService(OsmChartProcessingService)
-        eventResultDashboardService(EventResultDashboardService)
+    Closure doWithSpring() {
+        return {
+            csiAggregationUtilService(CsiAggregationUtilService)
+            osmChartProcessingService(OsmChartProcessingService)
+            eventResultDashboardService(EventResultDashboardService)
+        }
     }
 
     void setup() {
-
         serviceUnderTest = service
 
         createDataCommonForAllTests()
 
         mockServicesCommonForAllTests()
+    }
 
+    void setupSpec() {
+        mockDomains(CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup,
+                MeasuredEvent, Browser, Location, Script, WebPageTestServer)
     }
 
     void "correct graph labels get created for hourly event csiAggregations"() {

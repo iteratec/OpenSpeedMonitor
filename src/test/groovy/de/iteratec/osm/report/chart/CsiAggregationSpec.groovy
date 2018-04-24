@@ -24,9 +24,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
@@ -37,8 +34,6 @@ import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause
 /**
  * Test-suite for {@link CsiAggregation}.
  */
-@TestMixin(GrailsUnitTestMixin)
-@Mock([CsiAggregation, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page, Browser, Location])
 @Build([CsiAggregation, JobGroup])
 class CsiAggregationSpec extends Specification implements BuildDataTest {
 
@@ -58,6 +53,10 @@ class CsiAggregationSpec extends Specification implements BuildDataTest {
         CsiAggregation.build(started: dateOfMv2, interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, underlyingEventResultsByWptDocComplete: '1,2')
     }
 
+    void setupSpec() {
+        mockDomains(CsiAggregation, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page,
+                Browser, Location)
+    }
 
     void testAccessingResultIds() {
         given:

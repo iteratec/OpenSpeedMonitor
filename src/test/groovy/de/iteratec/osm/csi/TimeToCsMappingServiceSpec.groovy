@@ -18,9 +18,8 @@
 package de.iteratec.osm.csi
 
 import grails.buildtestdata.BuildDataTest
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
@@ -35,10 +34,9 @@ class ExpectedCustomerSatisfaction {
     Double customerSatisfaction
 }
 
-@TestFor(TimeToCsMappingService)
-@Mock([Page, CsiConfiguration, TimeToCsMapping])
 @Build([Page, CsiConfiguration])
-class TimeToCsMappingServiceTests extends Specification implements BuildDataTest {
+class TimeToCsMappingServiceTests extends Specification implements BuildDataTest,
+        ServiceUnitTest<TimeToCsMappingService> {
 
     TimeToCsMappingService serviceUnderTest
 
@@ -54,6 +52,10 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         csiConfigurationSetup()
         frustrationsSetup()
         parseExpectedValues()
+    }
+
+    void setupSpec() {
+        mockDomains(Page, CsiConfiguration, TimeToCsMapping)
     }
 
     def "an undefined page has no customer satisfaction"() {

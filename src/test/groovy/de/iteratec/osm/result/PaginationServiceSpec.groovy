@@ -18,20 +18,16 @@
 
 package de.iteratec.osm.result
 
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
+import grails.testing.services.ServiceUnitTest
 import grails.web.mapping.LinkGenerator
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.report.ui.PaginationListing
 
-
-@TestFor(PaginationService)
-@Mock([Job])
 @Build([Job])
-class PaginationServiceSpec extends Specification implements BuildDataTest {
+class PaginationServiceSpec extends Specification implements BuildDomainTest<Job>, ServiceUnitTest<PaginationService> {
 
     PaginationService serviceUnderTest
 

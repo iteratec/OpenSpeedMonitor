@@ -5,17 +5,13 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(CiPipeService)
 @Build([Job, WebPageTestServer, Location])
 @Unroll
-class CiPipeServiceSpec extends Specification implements BuildDataTest {
+class CiPipeServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<CiPipeService> {
 
     void "OsmCiPipeCheck script gets parametrized correctly for job #jobLabel (id=#jobId) and baseUrl #baseUrlWptServer"() {
         given: "Job with id #jobId associated to WebPageTestServer with baseUrl #baseUrlWptServer"

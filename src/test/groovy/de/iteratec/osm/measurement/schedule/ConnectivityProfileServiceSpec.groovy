@@ -17,11 +17,10 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(ConnectivityProfileService)
-class ConnectivityProfileServiceSpec extends Specification{
+class ConnectivityProfileServiceSpec extends Specification implements ServiceUnitTest<ConnectivityProfileService> {
     static int validBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN
     static int invalidBwDown = ConnectivityProfile.BANDWIDTH_DOWN_MIN - 1
     static int validBwUp = ConnectivityProfile.BANDWIDTH_UP_MIN

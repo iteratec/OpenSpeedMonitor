@@ -22,24 +22,27 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.OsmConfiguration
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 
-@TestFor(OsmConfigCacheService)
 @Build([OsmConfiguration])
-@Mock([OsmConfiguration])
-class OsmConfigCacheServiceSpec extends Specification implements BuildDataTest {
+class OsmConfigCacheServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<OsmConfigCacheService> {
 
-    def doWithSpring = {
-        configService(ConfigService)
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+        }
     }
 
     void setup() {
         OsmConfiguration.build()
+    }
+
+    void setupSpec() {
+        mockDomain(OsmConfiguration)
     }
 
     void "test accessing cached configs min doc complete time"() {

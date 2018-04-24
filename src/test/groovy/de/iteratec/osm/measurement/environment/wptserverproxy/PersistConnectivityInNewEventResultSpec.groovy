@@ -32,10 +32,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 /**
@@ -48,12 +45,9 @@ import spock.lang.Specification
  *      * Native Connectivity (no traffic shaping)
  *
  */
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(ResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
-        MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 @Build([Job, Location, WebPageTestServer, MeasuredEvent, ConnectivityProfile])
-class PersistConnectivityInNewEventResultSpec extends Specification implements BuildDataTest {
+class PersistConnectivityInNewEventResultSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
     static WebPageTestServer WPT_SERVER
 
@@ -63,15 +57,22 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
     public static Job MULTISTEP_JOB
     public static Job SINGLESTEP_JOB
 
-    def doWithSpring = {
-        pageService(PageService)
-        performanceLoggingService(PerformanceLoggingService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            pageService(PageService)
+            performanceLoggingService(PerformanceLoggingService)
+            jobDaoService(JobDaoService)
+        }
     }
 
     void setup() {
         createTestDataCommonForAllTests()
         createMocksCommonForAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script, ConnectivityProfile)
     }
 
     void "Every written EventResult of MULTISTEP_1RUN_3EVENTS test get assigned to Jobs connectivity profile correctly."() {

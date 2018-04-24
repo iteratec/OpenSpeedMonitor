@@ -29,8 +29,8 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
 import org.junit.Rule
 import software.betamax.Configuration
@@ -42,14 +42,13 @@ import spock.lang.Specification
 
 import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertThat
+
 /**
  * Unit tests in this class test fetching of results from wptservers. In that they use wptservers getLocations.php function to
  * get xml result and proof the data registered {@link iResultListener}s get in their called fetchResults() method.
  */
-@TestFor(ProxyService)
-@Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
 @Ignore('[IT-1703] Re-Write these tests without mocking http requests (e.g. without betamax or similar library')
-class FetchResultsFromWptserverTests extends Specification {
+class FetchResultsFromWptserverTests extends Specification implements ServiceUnitTest<ProxyService>, DataTest {
 
     public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
     public static final String WPTSERVER_SINGLESTEP_URL = 'www.webpagetest.org'
@@ -61,16 +60,22 @@ class FetchResultsFromWptserverTests extends Specification {
     @Rule
     public RecorderRule recorder = new RecorderRule(configuration)
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        httpRequestService(HttpRequestService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            httpRequestService(HttpRequestService)
+        }
     }
 
     void setup() {
-
         serviceUnderTest = service
         mockHttpBuilderToUseBetamax()
         serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, EventResult, JobResult, OsmConfiguration, CsiAggregationInterval, Browser,
+                BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration)
     }
 
     private void mockHttpBuilderToUseBetamax() {

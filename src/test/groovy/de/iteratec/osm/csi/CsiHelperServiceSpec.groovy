@@ -20,14 +20,10 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.OsmCookieService
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-/**
- * Test-suite of {@link CsiHelperService}.
- */
-@TestFor(CsiHelperService)
-class CsiHelperServiceSpec extends Specification {
+class CsiHelperServiceSpec extends Specification implements ServiceUnitTest<CsiHelperService> {
 
     void "check getCsiChartDefaultTitle"(String fromConfig, String fromCookie, String fromI18n, int expectedI18nInterations, String expectedOutcome) {
         setup: "init Mocks and specify wanted invocations"

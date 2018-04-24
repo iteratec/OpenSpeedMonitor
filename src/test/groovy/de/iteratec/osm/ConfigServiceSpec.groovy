@@ -17,10 +17,9 @@
 
 package de.iteratec.osm
 
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
@@ -28,10 +27,8 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 
-@TestFor(ConfigService)
 @Build([OsmConfiguration])
-@Mock([OsmConfiguration])
-class ConfigServiceSpec extends Specification implements BuildDataTest {
+class ConfigServiceSpec extends Specification implements BuildDomainTest<OsmConfiguration>, ServiceUnitTest<ConfigService> {
 
     void "one config is fine"() {
         when: "only one config has been saved with a value"

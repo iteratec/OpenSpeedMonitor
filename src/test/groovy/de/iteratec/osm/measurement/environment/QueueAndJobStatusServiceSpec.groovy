@@ -8,8 +8,8 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ServiceMocker
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.junit.Rule
 import software.betamax.Configuration
@@ -19,9 +19,11 @@ import software.betamax.junit.RecorderRule
 import spock.lang.Ignore
 import spock.lang.Specification
 
-@TestFor(QueueAndJobStatusService)
-@Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, CsiAggregationInterval])
-class QueueAndJobStatusServiceSpec extends Specification {
+class QueueAndJobStatusServiceSpec extends Specification implements ServiceUnitTest<QueueAndJobStatusService>, DataTest {
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration,
+                CsiAggregationInterval)
+    }
 
     //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
 
@@ -43,9 +45,12 @@ class QueueAndJobStatusServiceSpec extends Specification {
     private String labelJobWithExecutionSchedule = 'BV1 - Step 01'
     String jobGroupName
 
-    def doWithSpring = {
-        httpRequestService(HttpRequestService)
+    Closure doWithSpring() {
+        return {
+            httpRequestService(HttpRequestService)
+        }
     }
+
     @Ignore
     @Betamax(tape = 'CreateChartData_creates_a_map_entry_per_server')
     def "CreateChartData creates a map entry per server"() {

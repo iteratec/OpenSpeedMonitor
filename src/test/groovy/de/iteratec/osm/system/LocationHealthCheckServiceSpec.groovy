@@ -11,17 +11,14 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(LocationHealthCheckService)
-@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
-        OsmConfiguration, BatchActivity])
 @Build([Location, JobResult, OsmConfiguration, LocationHealthCheck])
-class LocationHealthCheckServiceSpec extends Specification implements BuildDataTest {
+class LocationHealthCheckServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationHealthCheckService> {
 
     private List<JobResult> jobResults
     private int expectedNumberOfAgents = 2
@@ -38,12 +35,21 @@ class LocationHealthCheckServiceSpec extends Specification implements BuildDataT
         createTestDataCommonForAllTests()
         prepareMocksCommonForAllTests()
     }
+
+    void setupSpec() {
+        mockDomains(Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
+                OsmConfiguration, BatchActivity)
+    }
+
     static doWithConfig(c) {
         c.internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     }
-    static doWithSpring = {
-        configService(ConfigService)
-        batchActivityService(BatchActivityService)
+
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+            batchActivityService(BatchActivityService)
+        }
     }
 
 

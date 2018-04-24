@@ -18,9 +18,8 @@
 package de.iteratec.osm.result
 
 import grails.buildtestdata.BuildDataTest
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
+import grails.testing.services.ServiceUnitTest
 import grails.web.mapping.LinkGenerator
 import spock.lang.Specification
 
@@ -34,26 +33,30 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 
-
-@TestFor(EventResultDashboardService)
-@Mock([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page])
 @Build([EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page])
-class SummarizedChartLegendEntriesSpec extends Specification implements BuildDataTest {
+class SummarizedChartLegendEntriesSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<EventResultDashboardService> {
 
     EventResultDashboardService serviceUnderTest
 
-    def doWithSpring = {
-        eventResultDaoService(EventResultDaoService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        osmChartProcessingService(OsmChartProcessingService)
-        i18nService(I18nService)
-        performanceLoggingService(PerformanceLoggingService)
+    Closure doWithSpring() {
+        return {
+            eventResultDaoService(EventResultDaoService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            osmChartProcessingService(OsmChartProcessingService)
+            i18nService(I18nService)
+            performanceLoggingService(PerformanceLoggingService)
+        }
     }
 
     def setup() {
         serviceUnderTest = service
         mockGrailsLinkGenerator()
         mockI18NServices()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page)
     }
 
     def "no summarization possible because every legend part in every event result is different"(int csiAggregationInterval) {

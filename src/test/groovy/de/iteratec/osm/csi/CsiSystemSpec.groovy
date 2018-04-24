@@ -3,14 +3,14 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.JobGroup
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-@TestFor(CsiSystem)
 @Build([JobGroup, CsiConfiguration])
-@Mock([JobGroup, CsiConfiguration, CsiDay, JobGroupWeight])
 class CsiSystemSpec extends Specification implements BuildDataTest {
+
+    void setupSpec() {
+        mockDomains(CsiSystem, JobGroup, CsiConfiguration, CsiDay, JobGroupWeight)
+    }
 
     void "test empty CsiSystem is invalid"() {
         when: "an empty CsiSystem is created"

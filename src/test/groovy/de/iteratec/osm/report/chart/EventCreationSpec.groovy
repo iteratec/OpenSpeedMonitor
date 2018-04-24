@@ -20,20 +20,14 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.measurement.schedule.JobGroup
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(EventDaoService)
-@Mock([Event, JobGroup])
 @Build([JobGroup])
-class EventCreationSpec extends Specification implements BuildDataTest {
+class EventCreationSpec extends Specification implements BuildDataTest, ServiceUnitTest<EventDaoService> {
 
     EventDaoService serviceUnderTest
 
@@ -44,6 +38,10 @@ class EventCreationSpec extends Specification implements BuildDataTest {
         //test data common to all tests
         group1 = JobGroup.build()
         group2 = JobGroup.build()
+    }
+
+    void setupSpec() {
+        mockDomains(Event, JobGroup)
     }
 
     void "successful creation of event"() {

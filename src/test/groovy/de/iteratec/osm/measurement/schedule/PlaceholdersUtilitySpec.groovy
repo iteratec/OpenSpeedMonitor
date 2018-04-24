@@ -19,9 +19,8 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
 /**
@@ -29,9 +28,8 @@ import spock.lang.Specification
  * @see pts.js Contains regex pattern used for syntax highlighting  
  * @author dri
  */
-@Mock([Script])
 @Build(Script)
-class PlaceholdersUtilitySpec extends Specification implements BuildDataTest {
+class PlaceholdersUtilitySpec extends Specification implements BuildDomainTest<Script> {
 
     public static final String NAV_SCRIPT_USING_VARS = 'setEventName ${eventName}\nnavigate ${targeturl}'
 

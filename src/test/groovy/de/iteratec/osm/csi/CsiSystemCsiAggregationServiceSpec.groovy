@@ -27,26 +27,25 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsiSystemCsiAggregationService)
 @Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration, CsiSystem])
-@Mock([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
-        CsiSystem, JobGroup, CsiAggregationUpdateEvent])
-class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildDataTest {
+class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CsiSystemCsiAggregationService> {
 
     CsiAggregationInterval dailyInterval
 
-    def doWithSpring = {
-        csiAggregationUpdateEventDaoService(CsiAggregationUpdateEventDaoService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        meanCalcService(MeanCalcService)
+    Closure doWithSpring() {
+        return {
+            csiAggregationUpdateEventDaoService(CsiAggregationUpdateEventDaoService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            meanCalcService(MeanCalcService)
+        }
     }
 
     void setup() {
@@ -54,6 +53,11 @@ class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildD
         service.jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService) {
             getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.buildWithoutSave()]
         }
+    }
+
+    void setupSpec() {
+        mockDomains(CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job,
+                CsiConfiguration, CsiSystem, JobGroup, CsiAggregationUpdateEvent)
     }
 
     void "calculate CsiAggregation from single weighted value"() {

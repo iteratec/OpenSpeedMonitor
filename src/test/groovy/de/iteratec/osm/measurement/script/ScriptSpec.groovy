@@ -1,13 +1,11 @@
 package de.iteratec.osm.measurement.script
 
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
-@Mock(ArchivedScript)
 @Build([ArchivedScript, Script])
-class ScriptSpec extends Specification implements BuildDataTest {
+class ScriptSpec extends Specification implements BuildDomainTest<ArchivedScript> {
 
     def "Test that scripts without parameter doesnt change on parse"(){
         given: "a script without parameters"

@@ -23,15 +23,13 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.AppenderBase
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.PerformanceLoggingService.INDENTATION_CHAR
 
-
-@TestFor(PerformanceLoggingService)
-class PerformanceLoggingServiceSpec extends Specification {
+class PerformanceLoggingServiceSpec extends Specification implements ServiceUnitTest<PerformanceLoggingService> {
 
     Logger serviceLogger
     PerformanceLoggingService serviceUnderTest

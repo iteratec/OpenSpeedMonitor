@@ -18,9 +18,8 @@
 package de.iteratec.osm.result
 
 import grails.buildtestdata.BuildDataTest
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
 import grails.buildtestdata.mixin.Build
+import grails.testing.services.ServiceUnitTest
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -33,10 +32,9 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 
-@TestFor(EventResultDashboardService)
-@Mock([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
 @Build([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
-class EventResultDashboardServiceSpec extends Specification implements BuildDataTest {
+class EventResultDashboardServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<EventResultDashboardService> {
 
     Browser browser
     Location location
@@ -47,12 +45,14 @@ class EventResultDashboardServiceSpec extends Specification implements BuildData
 
     DateTime runDate
 
-    def doWithSpring = {
-        osmChartProcessingService(OsmChartProcessingService)
-        performanceLoggingService(PerformanceLoggingService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        i18nService(I18nService)
-        browserSerivce(BrowserService)
+    Closure doWithSpring() {
+        return {
+            osmChartProcessingService(OsmChartProcessingService)
+            performanceLoggingService(PerformanceLoggingService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            i18nService(I18nService)
+            browserSerivce(BrowserService)
+        }
     }
 
     void setup() {
@@ -60,6 +60,11 @@ class EventResultDashboardServiceSpec extends Specification implements BuildData
 
         mockI18NServices()
         mockGrailsLinkGenerator()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile,
+                CsiAggregation)
     }
 
     void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedMeasurandType selectedType, UserTimingType userTimingType) {

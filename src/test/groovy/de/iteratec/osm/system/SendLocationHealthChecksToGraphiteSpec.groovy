@@ -9,15 +9,13 @@ import de.iteratec.osm.report.external.MockedGraphiteSocket
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(LocationHealthCheckService)
-@Mock([LocationHealthCheck, GraphiteServer])
 @Build([Location, LocationHealthCheck, WebPageTestServer, GraphiteServer])
-class SendLocationHealthChecksToGraphiteSpec extends Specification implements BuildDataTest {
+class SendLocationHealthChecksToGraphiteSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationHealthCheckService> {
 
     public static final String GRAPHITESERVERS_HEALTH_PREFIX = "osm.health"
     public static final String WPTSERVERS_LABEL = "mywptserver.com"
@@ -28,9 +26,16 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
     def setup() {
         mockGraphiteSocketProvider()
     }
-    static doWithSpring = {
-        configService(ConfigService)
-        batchActivityService(BatchActivityService)
+
+    void setupSpec() {
+        mockDomains(LocationHealthCheck, GraphiteServer)
+    }
+
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+            batchActivityService(BatchActivityService)
+        }
     }
 
     void "reportToGraphiteServers sends no LocationHealthChecks to graphite if no graphite server exists"(){

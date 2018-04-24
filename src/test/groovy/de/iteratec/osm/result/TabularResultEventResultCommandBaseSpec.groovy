@@ -18,17 +18,15 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.buildtestdata.BuildDomainTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
 
-
-@TestFor(TabularResultPresentationController)
-@Mock([ConnectivityProfile])
-class TabularResultEventResultCommandBaseSpec extends Specification {
+class TabularResultEventResultCommandBaseSpec extends Specification implements BuildDomainTest<ConnectivityProfile>,
+        ControllerUnitTest<TabularResultPresentationController> {
 
     TabularResultPresentationController controllerForTest = controller
 

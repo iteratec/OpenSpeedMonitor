@@ -32,8 +32,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Specification
 
@@ -44,13 +43,19 @@ import spock.lang.Specification
  * @see {@link ProxyService}
  *
  */
-@TestFor(LocationPersisterService)
 @Build([WebPageTestServer, Location, Browser])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
-class PersistingLocationsSpec extends Specification implements BuildDataTest {
+class PersistingLocationsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationPersisterService> {
 
-    def doWithSpring = {
-        browserService(BrowserService)
+    Closure doWithSpring() {
+        return {
+            browserService(BrowserService)
+        }
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script)
     }
 
     void "when listening to a WPT location respons, missing locations are added for this server"() {

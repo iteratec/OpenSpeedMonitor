@@ -23,14 +23,11 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(CsiValueService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent])
 @Build([EventResult, CsiAggregation])
-class CsiValueServiceSpec extends Specification implements BuildDataTest {
+class CsiValueServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<CsiValueService> {
 
     CsiValueService serviceUnderTest
 
@@ -40,8 +37,10 @@ class CsiValueServiceSpec extends Specification implements BuildDataTest {
     EventResult eventResult
     CsiAggregation csiAggregation
 
-    def doWithSpring = {
-        osmConfigCacheService(OsmConfigCacheService)
+    Closure doWithSpring() {
+        return {
+            osmConfigCacheService(OsmConfigCacheService)
+        }
     }
 
     void setup() {
@@ -52,6 +51,10 @@ class CsiValueServiceSpec extends Specification implements BuildDataTest {
         }
         eventResult = EventResult.build(csByWptDocCompleteInPercent: 50, docCompleteTimeInMillisecs: 300)
         csiAggregation = CsiAggregation.build(csByWptDocCompleteInPercent: 50.0)
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent)
     }
 
     void "Different functionality is applied respective polymorphism of CsiValue implementations"() {

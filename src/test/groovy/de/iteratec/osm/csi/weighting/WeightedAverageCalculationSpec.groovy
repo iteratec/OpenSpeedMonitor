@@ -28,8 +28,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -38,12 +37,9 @@ import static de.iteratec.osm.csi.weighting.WeightFactor.*
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(WeightingService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
-        JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiDay, ConnectivityProfile])
-class WeightedAverageCalculationSpec extends Specification implements BuildDataTest {
+class WeightedAverageCalculationSpec extends Specification implements BuildDataTest, ServiceUnitTest<WeightingService> {
 
     private static final double DELTA = 1e-15
 
@@ -61,12 +57,19 @@ class WeightedAverageCalculationSpec extends Specification implements BuildDataT
 
     static CsiConfiguration CSI_CONFIGURATION
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+        }
     }
 
     void setup() {
         createTestDataCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem)
     }
 
     void "Without WeightFactors weight is always 1 when calculated for EventResults"() {

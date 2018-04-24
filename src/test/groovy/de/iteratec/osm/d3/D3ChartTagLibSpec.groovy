@@ -18,15 +18,11 @@
 package de.iteratec.osm.d3
 
 import de.iteratec.osm.util.I18nService
-import grails.test.mixin.*
+import grails.testing.web.taglib.TagLibUnitTest
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.web.GroovyPageUnitTestMixin} for usage instructions
- */
-@TestFor(D3ChartTagLib)
-class D3ChartTagLibSpec extends Specification {
+class D3ChartTagLibSpec extends Specification implements TagLibUnitTest<D3ChartTagLib> {
 
     static def HTML_FRAGMENT_PARSER
 

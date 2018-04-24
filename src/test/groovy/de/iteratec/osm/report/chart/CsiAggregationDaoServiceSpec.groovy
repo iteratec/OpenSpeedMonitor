@@ -20,36 +20,35 @@ package de.iteratec.osm.report.chart
 
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
-
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(CsiAggregationDaoService)
-@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval])
 @Build([CsiAggregation])
-class CsiAggregationDaoServiceSpec extends Specification implements BuildDataTest {
+class CsiAggregationDaoServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CsiAggregationDaoService> {
 
     CsiAggregationDaoService serviceUnderTest
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
 
-    def doWithSpring = {
-        csiAggregationUtilService(CsiAggregationUtilService)
+    Closure doWithSpring() {
+        return {
+            csiAggregationUtilService(CsiAggregationUtilService)
+        }
     }
 
     def setup() {
-
         serviceUnderTest = service
 
         //test data common to all tests
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
         hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
+    }
+
+    void setupSpec() {
+        mockDomains(CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval)
     }
 
     def "test getUpdateEvents"() {

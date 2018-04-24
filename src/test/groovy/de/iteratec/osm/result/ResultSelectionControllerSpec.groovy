@@ -1,19 +1,16 @@
 package de.iteratec.osm.result
 
-import grails.buildtestdata.BuildDataTest
+import grails.buildtestdata.BuildDomainTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import de.iteratec.osm.measurement.schedule.JobGroup
 
-
-@TestFor(ResultSelectionController)
-@Mock([JobGroup])
 @Build([JobGroup])
-class ResultSelectionControllerSpec extends Specification implements BuildDataTest {
+class ResultSelectionControllerSpec extends Specification implements BuildDomainTest<JobGroup>,
+        ControllerUnitTest<ResultSelectionController> {
     JobGroup jobGroup1
     JobGroup jobGroup2
     JobGroup jobGroup3

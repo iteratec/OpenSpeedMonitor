@@ -17,17 +17,13 @@ import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
-@TestFor(GeneralMeasurementApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
+
 @Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
-class GeneralMeasurementApiControllerSpec extends Specification implements BuildDataTest {
+class GeneralMeasurementApiControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<GeneralMeasurementApiController> {
 
     public static final String NAME_PAGE1 = "testPage1"
     public static final String NAME_PAGE2 = "testPage2"
@@ -48,15 +44,21 @@ class GeneralMeasurementApiControllerSpec extends Specification implements Build
     JobGroup jobGroupWithoutCsiConfiguration1
     JobGroup jobGroupWithoutCsiConfiguration2
 
-
-    def doWithSpring = {
-        defaultJobGroupDaoService(DefaultJobGroupDaoService)
-        browserService(BrowserService)
+    Closure doWithSpring() {
+        return {
+            defaultJobGroupDaoService(DefaultJobGroupDaoService)
+            browserService(BrowserService)
+        }
     }
 
     def setup() {
         createTestDataCommonToAllTests()
         initInnerServices()
+    }
+
+    void setupSpec() {
+        mockDomains(CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location,
+                WebPageTestServer, Job, Script)
     }
 
     def cleanup() {

@@ -36,25 +36,15 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
-import de.iteratec.osm.util.I18nService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestFor(MetricReportingService)
-@TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult,  JobGroup, BatchActivity, GraphiteServer,  CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration, ConnectivityProfile])
 @Build([Page,MeasuredEvent,Location, Browser, JobGroup])
-class MetricReportingServiceSpec extends Specification implements BuildDataTest {
+class MetricReportingServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<MetricReportingService> {
     MetricReportingService serviceUnderTest
     static final double DELTA = 1e-15
     static final DateTime REPORTING_TIMESTAMP = new DateTime(2014, 1, 22, 13, 42, 0)
@@ -82,10 +72,12 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest 
     Location location
     TestSocket testSocket
 
-    def doWithSpring = {
-        batchActivityService(BatchActivityService)
-        configService(ConfigService)
-        inMemoryConfigService(InMemoryConfigService)
+    Closure doWithSpring() {
+        return {
+            batchActivityService(BatchActivityService)
+            configService(ConfigService)
+            inMemoryConfigService(InMemoryConfigService)
+        }
     }
 
     void setup() {
@@ -94,6 +86,11 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest 
         serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService') as InMemoryConfigService
         serviceUnderTest.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService') as BatchActivityService
         createTestDataCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult,  JobGroup, BatchActivity, GraphiteServer,  CsiAggregationInterval, Page, MeasuredEvent,
+                Browser, Location, OsmConfiguration, ConnectivityProfile)
     }
 
     void createTestDataCommonToAllTests() {

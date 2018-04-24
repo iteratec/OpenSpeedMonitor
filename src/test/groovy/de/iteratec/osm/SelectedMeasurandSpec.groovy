@@ -9,19 +9,15 @@ import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, UserTiming])
 @Build([EventResult, UserTiming])
 class SelectedMeasurandSpec extends Specification implements BuildDataTest {
     CachedView cachedView = CachedView.UNCACHED
+
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming)
+    }
 
     void "test if constructor works as intended"() {
         when: "selected is constructed for optionValue"

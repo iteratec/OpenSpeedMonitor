@@ -13,8 +13,7 @@ import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -24,13 +23,10 @@ import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsiValueService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
-        JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiSystem, CsiDay, ConnectivityProfile, CsiAggregationUpdateEvent, JobGroupWeight])
 @Unroll
-class CsiValueProcessingSpec extends Specification implements BuildDataTest {
+class CsiValueProcessingSpec extends Specification implements BuildDataTest, ServiceUnitTest<CsiValueService> {
 
     CsiValueService serviceUnderTest
 
@@ -53,19 +49,24 @@ class CsiValueProcessingSpec extends Specification implements BuildDataTest {
     static CsiConfiguration CSI_CONFIGURATION
     static CsiSystem CSI_SYSTEM
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        weightingService(WeightingService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            weightingService(WeightingService)
+        }
     }
 
     void setup() {
-
         serviceUnderTest = service
 
         mocksCommonToAllTests()
         createTestDataCommonToAllTests()
         initSpringBeans()
+    }
 
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem)
     }
 
     void "Method getWeightedCsiValues works as expected without any WeightFactors for EventResults."() {

@@ -16,8 +16,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Specification
@@ -30,24 +29,29 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
  * Tests persistence of wpt infrastructure domains like locations, browsers, WebPagetestserver, etc
  * while new EventResults get persisted.
  */
-@TestFor(ResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
-        MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 @Build([Location, Job, Page, WebPageTestServer, CsiConfiguration])
-class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification implements BuildDataTest {
+class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
     WebPageTestServer server1, server2
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        pageService(PageService)
-        csiValueService(CsiValueService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            pageService(PageService)
+            csiValueService(CsiValueService)
+            jobDaoService(JobDaoService)
+        }
     }
 
     def setup() {
         createTestDataCommonToAllTests()
         mocksCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay)
     }
 
     @Test

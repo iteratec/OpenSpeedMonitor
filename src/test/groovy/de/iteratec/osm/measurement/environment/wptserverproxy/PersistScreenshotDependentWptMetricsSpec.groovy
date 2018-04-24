@@ -35,22 +35,18 @@ import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static de.iteratec.osm.result.CachedView.CACHED
 import static de.iteratec.osm.result.CachedView.UNCACHED
 
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(ResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 @Build([Job, MeasuredEvent, Location, WebPageTestServer, Page])
 @Unroll
-class PersistScreenshotDependentWptMetricsSpec extends Specification implements BuildDataTest {
+class PersistScreenshotDependentWptMetricsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
     static WebPageTestServer WPT_SERVER
 
@@ -58,14 +54,21 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
     public static final String NAME_EVENT_2 = 'otto_search_shoes'
     public static final String NAME_EVENT_3 = 'otto_product_boots'
 
-    def doWithSpring = {
-        pageService(PageService)
-        performanceLoggingService(PerformanceLoggingService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            pageService(PageService)
+            performanceLoggingService(PerformanceLoggingService)
+            jobDaoService(JobDaoService)
+        }
     }
     void setup() {
         createTestDataCommonForAllTests()
         createMocksCommonForAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script)
     }
 
     void "Screenshot dependent measurands get persisted for step #eventName of Multistep1Run3EventsFvOnlyWithVideo correctly."() {

@@ -9,15 +9,12 @@ import grails.buildtestdata.mixin.Build
 import grails.plugins.taggable.Tag
 import grails.plugins.taggable.TagLink
 import grails.plugins.taggable.TaggableService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import grails.util.Holders
 import spock.lang.Specification
 
-@TestFor(JobController)
 @Build([Job])
-@Mock([Tag, TagLink])
-class JobControllerSpec extends Specification implements BuildDataTest {
+class JobControllerSpec extends Specification implements BuildDataTest, ControllerUnitTest<JobController> {
 
     def setup() {
         Holders.applicationContext.metaClass.taggableService = new TaggableService()
@@ -27,6 +24,10 @@ class JobControllerSpec extends Specification implements BuildDataTest {
         controller.jobDaoService = Mock(JobDaoService)
         controller.inMemoryConfigService = Mock(InMemoryConfigService)
         controller.jobService = Mock(JobService)
+    }
+
+    void setupSpec() {
+        mockDomains(Tag, TagLink)
     }
 
     void bindData(Job job) {
