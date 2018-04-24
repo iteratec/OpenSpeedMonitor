@@ -24,17 +24,6 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 
 /**
- * <p>
- * A test-utility to load data from customers CSV-files
- * in "pre CSI-Dashboard times".
- * </p>
- *
- * <p>
- * <em>DEV-Note:</em>
- * Because this utility is used in both, unit and integration tests, it must
- * be placed in the productive source folder.
- * </p>
- *
  * @author mze
  * @since IT-8
  */
