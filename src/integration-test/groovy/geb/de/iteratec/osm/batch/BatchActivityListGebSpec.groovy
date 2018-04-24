@@ -45,13 +45,9 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
         BatchActivity.withNewTransaction {
             OsmConfiguration.build()
             createAdminUser()
-//            BatchActivity.build(status: Status.ACTIVE, startDate: new Date()-1, endDate: new Date(), maximumStages: 1)
-            new BatchActivity(name: "test", domain: "irrelevant domain", activity: Activity.UPDATE,
-                    status: Status.ACTIVE, startDate: new Date(), lastUpdate: new Date()).save()
+            BatchActivity.build(status: Status.ACTIVE, lastUpdate: new Date()).save(failOnError: true)
             3.times{
-                new BatchActivity(name: "test$it", domain: "irrelevant domain", activity: Activity.UPDATE,
-                        status: Status.DONE, maximumStages: 1, startDate: new Date(),
-                        lastUpdate: new Date()).save()
+                BatchActivity.build(status: Status.DONE, lastUpdate: new Date()).save(failOnError: true)
             }
         }
     }
