@@ -27,9 +27,6 @@ import spock.lang.Specification
 
 class TabularResultEventResultCommandBaseSpec extends Specification implements BuildDomainTest<ConnectivityProfile>,
         ControllerUnitTest<TabularResultPresentationController> {
-
-    TabularResultPresentationController controllerForTest = controller
-
     void "empty command is invalid"() {
         when: "An empty command is initialized"
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
@@ -48,7 +45,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification implements B
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
 
         when: "empty parameters are bound"
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then: "the command doesn't validate, but collections are initialized and empty"
         !command.validate()
@@ -65,7 +62,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification implements B
 
         when: "the parameters are bound"
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then: "the command validates and the correct data is bound"
         command.validate()
@@ -95,7 +92,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification implements B
 
         when:
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then:
         !command.validate()
@@ -114,7 +111,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification implements B
 
         when:
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then:
         int nowInMillis = DateTime.now().millis
