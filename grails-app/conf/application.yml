@@ -370,4 +370,5 @@ swagger:
             email: 'osm@iteratec.de'
     consumes:
         - 'application/json'
-
+    schemes:
+        - 'https'
