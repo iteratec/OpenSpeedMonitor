@@ -15,7 +15,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         data: {
             jobGroups: [],
             groupToPagesMap: {},
-            comparisons: []
+            comparisons: [],
+            showButtonCallback: function () {
+            }
         },
         created: function () {
             this.addComparisonRow();
@@ -29,6 +31,14 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 $("#select-interval-timeframe-card").on("timeFrameChanged", timeFrameChangedFunction);
             })
 
+        },
+        watch: {
+            comparisons: function () {
+                var cp = this.comparisons[0];
+                var state = cp.jobGroupId1 > 0 && cp.jobGroupId2 > 0 && cp.pageId1 > 0 && cp.pageId2 > 0;
+                console.log(state);
+                this.showButtonCallback(!state);
+            }
         },
         methods: {
             loadJobGroupMap: function () {
@@ -73,7 +83,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 this.groupToPagesMap = newJobGroupMap;
             },
             addComparisonRow: function () {
-                this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1})
+                this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1});
             },
             removeComparisonRow: function (index) {
                 this.comparisons.splice(index,1)
@@ -101,6 +111,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 return ids;
 
             },
+            setShowButtonCallback: function (callback) {
+                this.setShowButtonCallback = callback;
+            },
             addListener: function () {
                 var that = this;
                 $('#addComparison').on('click', function () {
@@ -113,7 +126,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         getComparisons: pageComparisonVue.getComparisons,
         setComparisons: pageComparisonVue.setComparisons,
         getPageIds: pageComparisonVue.getPageIds,
-        getJobGroupIds: pageComparisonVue.getJobGroupIds
+        getJobGroupIds: pageComparisonVue.getJobGroupIds,
+        setShowButtonCallback: pageComparisonVue.setShowButtonCallback
     }
 });
 

@@ -25,6 +25,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         drawGraphButton.click(function () {
             loadData(true);
         });
+
+        //set callback for disabling the show button
+        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonCallback(setShowButtonDisabled);
     };
 
     var renderChart = function (data, isStateChange) {
@@ -40,6 +43,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     var handleNewData = function (data, isStateChange) {
         $("#chart-card").removeClass("hidden");
         renderChart(data, isStateChange)
+    };
+
+    var setShowButtonDisabled = function (state) {
+        document.getElementById("graphButtonHtmlId").disabled = state;
     };
 
     var loadData = function (isStateChange) {
