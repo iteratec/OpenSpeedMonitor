@@ -21,7 +21,9 @@ import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -43,6 +45,10 @@ class ResultTestsSpec extends Specification implements BuildDataTest {
     public static final String EVENT_NAME = 'ADS for article 5'
     public static final String LOCATION_IDENTIFIER = 'agent01:IE'
     public static final String BROWSER_IN_LOCATION = 'Firefox7'
+
+    void setupSpec() {
+        mockDomains(ConnectivityProfile, Script)
+    }
 
     def "EventResultDto get constructed correctly for an EventResult with customer satisfaction"() {
         given: "an EventResult with customer satisfaction"

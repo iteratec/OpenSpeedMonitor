@@ -1,6 +1,8 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
@@ -14,7 +16,7 @@ class ThresholdSpec extends Specification implements BuildDataTest {
     }
 
     void setupSpec() {
-        mockDomains(Threshold, Job, MeasuredEvent)
+        mockDomains(Threshold, Job, MeasuredEvent, ConnectivityProfile, Script)
     }
 
     def cleanup() {

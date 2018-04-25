@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -9,7 +10,7 @@ import spock.lang.Specification
 @Build([Job, Location, ConnectivityProfile, JobGroup])
 class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<JobDaoService> {
     void setupSpec() {
-        mockDomains(Job, Location, ConnectivityProfile, JobGroup)
+        mockDomains(Job, Location, ConnectivityProfile, JobGroup, Script)
     }
 
     void "getAllJobs returns all jobs but deleted ones"() {

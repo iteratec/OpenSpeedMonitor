@@ -24,7 +24,9 @@ import de.iteratec.osm.csi.MeanCalcService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
@@ -65,7 +67,7 @@ class CsiByEventResultsServiceSpec extends Specification implements BuildDataTes
     }
 
     void setupSpec() {
-        mockDomains(JobGroup, CsiConfiguration)
+        mockDomains(JobGroup, CsiConfiguration, ConnectivityProfile, Script)
     }
 
     //tests////////////////////////////////////////////////////////////////////////////////////

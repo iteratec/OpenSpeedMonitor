@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
@@ -24,7 +26,7 @@ import spock.lang.Specification
 @Build([EventResult, JobResult])
 class EventResultSpec extends Specification implements BuildDataTest {
     void setupSpec() {
-        mockDomains(EventResult, JobResult)
+        mockDomains(EventResult, JobResult, ConnectivityProfile, Script)
     }
 
     def "build test details url and validate url"() {

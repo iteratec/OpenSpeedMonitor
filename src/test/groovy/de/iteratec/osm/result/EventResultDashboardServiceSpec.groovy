@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -64,7 +65,7 @@ class EventResultDashboardServiceSpec extends Specification implements BuildData
 
     void setupSpec() {
         mockDomains(EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile,
-                CsiAggregation)
+                CsiAggregation, Script)
     }
 
     void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedMeasurandType selectedType, UserTimingType userTimingType) {

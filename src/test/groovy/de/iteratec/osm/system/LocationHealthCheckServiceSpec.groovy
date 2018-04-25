@@ -5,6 +5,7 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -38,7 +39,7 @@ class LocationHealthCheckServiceSpec extends Specification implements BuildDataT
 
     void setupSpec() {
         mockDomains(Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
-                OsmConfiguration, BatchActivity)
+                OsmConfiguration, BatchActivity, ConnectivityProfile)
     }
 
     static doWithConfig(c) {

@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -69,7 +70,7 @@ class WeightedAverageCalculationSpec extends Specification implements BuildDataT
 
     void setupSpec() {
         mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
-                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem)
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem, Script)
     }
 
     void "Without WeightFactors weight is always 1 when calculated for EventResults"() {

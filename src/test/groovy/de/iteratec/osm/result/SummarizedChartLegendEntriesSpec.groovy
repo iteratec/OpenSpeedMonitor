@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -56,7 +57,7 @@ class SummarizedChartLegendEntriesSpec extends Specification implements BuildDat
     }
 
     void setupSpec() {
-        mockDomains(EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page)
+        mockDomains(EventResult, MeasuredEvent, JobGroup, Location, ConnectivityProfile, Browser, Page, Script)
     }
 
     def "no summarization possible because every legend part in every event result is different"(int csiAggregationInterval) {

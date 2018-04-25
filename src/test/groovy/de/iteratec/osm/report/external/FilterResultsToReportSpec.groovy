@@ -3,6 +3,8 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
@@ -24,7 +26,7 @@ class FilterResultsToReportSpec extends Specification implements BuildDataTest,
     }
 
     void setupSpec() {
-        mockDomains(Page, EventResult, MeasuredEvent)
+        mockDomains(Page, EventResult, MeasuredEvent, ConnectivityProfile, Script)
     }
 
     void "Report Results for Page #pageName"() {

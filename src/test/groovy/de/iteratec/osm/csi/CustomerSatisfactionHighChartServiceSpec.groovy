@@ -21,6 +21,7 @@ import asset.pipeline.grails.LinkGenerator
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -126,7 +127,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification implements 
 
     void setupSpec() {
         mockDomains(CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup,
-                MeasuredEvent, Browser, Location, Script, WebPageTestServer)
+                MeasuredEvent, Browser, Location, Script, WebPageTestServer, ConnectivityProfile, Script)
     }
 
     void "correct graph labels get created for hourly event csiAggregations"() {

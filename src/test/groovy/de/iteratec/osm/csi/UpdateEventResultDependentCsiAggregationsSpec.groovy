@@ -18,6 +18,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -56,7 +57,7 @@ class UpdateEventResultDependentCsiAggregationsSpec extends Specification implem
 
     void setupSpec() {
         mockDomains(EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location,
-                ConnectivityProfile, JobResult, CsiAggregation)
+                ConnectivityProfile, JobResult, CsiAggregation, Script)
     }
 
     def "calculate CSI aggregations of the first event result"() {

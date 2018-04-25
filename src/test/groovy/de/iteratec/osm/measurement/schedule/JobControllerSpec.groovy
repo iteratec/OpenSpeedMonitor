@@ -2,6 +2,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
@@ -27,7 +28,7 @@ class JobControllerSpec extends Specification implements BuildDataTest, Controll
     }
 
     void setupSpec() {
-        mockDomains(Tag, TagLink)
+        mockDomains(Tag, TagLink, ConnectivityProfile, Script)
     }
 
     void bindData(Job job) {

@@ -19,8 +19,10 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
@@ -57,7 +59,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildD
 
     void setupSpec() {
         mockDomains(CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job,
-                CsiConfiguration, CsiSystem, JobGroup, CsiAggregationUpdateEvent)
+                CsiConfiguration, CsiSystem, JobGroup, CsiAggregationUpdateEvent, ConnectivityProfile, Script)
     }
 
     void "calculate CsiAggregation from single weighted value"() {

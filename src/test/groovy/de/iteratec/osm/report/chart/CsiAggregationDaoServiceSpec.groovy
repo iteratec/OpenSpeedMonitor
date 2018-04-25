@@ -18,6 +18,10 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -48,7 +52,8 @@ class CsiAggregationDaoServiceSpec extends Specification implements BuildDataTes
     }
 
     void setupSpec() {
-        mockDomains(CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval)
+        mockDomains(CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, JobGroup, MeasuredEvent, Browser,
+                Location)
     }
 
     def "test getUpdateEvents"() {

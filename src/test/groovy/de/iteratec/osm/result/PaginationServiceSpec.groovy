@@ -18,22 +18,28 @@
 
 package de.iteratec.osm.result
 
-import grails.buildtestdata.BuildDomainTest
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.ui.PaginationListing
+import grails.buildtestdata.BuildDataTest
 import grails.testing.services.ServiceUnitTest
 import grails.web.mapping.LinkGenerator
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.report.ui.PaginationListing
 
 @Build([Job])
-class PaginationServiceSpec extends Specification implements BuildDomainTest<Job>, ServiceUnitTest<PaginationService> {
+class PaginationServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<PaginationService> {
 
     PaginationService serviceUnderTest
 
     def setup() {
         serviceUnderTest = service
         serviceUnderTest.grailsLinkGenerator = Stub(LinkGenerator)
+    }
+
+    void setupSpec() {
+        mockDomains(Job, ConnectivityProfile, Script)
     }
 
     def "test correct amount of pagination links for result list"() {

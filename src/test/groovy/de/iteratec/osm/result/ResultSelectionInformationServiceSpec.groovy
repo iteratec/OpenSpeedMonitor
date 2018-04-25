@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -24,7 +25,7 @@ class ResultSelectionInformationServiceSpec extends Specification implements Bui
 
     void setupSpec() {
         mockDomains(UserTiming, UserTimingSelectionInformation, EventResult, ResultSelectionInformation, Page, JobGroup,
-                Browser, Location, MeasuredEvent, ConnectivityProfile)
+                Browser, Location, MeasuredEvent, ConnectivityProfile, Script)
     }
 
     void "test userTimingInformation are relevant and unique"(relevantEventResults, relevantUserTimingsPerType, expectedResultSize, irrelevantEventResults, irrelevantUserTimings) {

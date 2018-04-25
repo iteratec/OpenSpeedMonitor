@@ -1,5 +1,7 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
@@ -16,7 +18,7 @@ class SelectedMeasurandSpec extends Specification implements BuildDataTest {
     CachedView cachedView = CachedView.UNCACHED
 
     void setupSpec() {
-        mockDomains(EventResult, UserTiming)
+        mockDomains(EventResult, UserTiming, ConnectivityProfile, Script)
     }
 
     void "test if constructor works as intended"() {

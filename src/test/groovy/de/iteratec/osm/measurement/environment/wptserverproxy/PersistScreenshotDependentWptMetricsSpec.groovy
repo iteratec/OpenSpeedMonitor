@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -68,7 +69,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
 
     void setupSpec() {
         mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
-                MeasuredEvent, JobGroup, Script)
+                MeasuredEvent, JobGroup, Script, ConnectivityProfile)
     }
 
     void "Screenshot dependent measurands get persisted for step #eventName of Multistep1Run3EventsFvOnlyWithVideo correctly."() {

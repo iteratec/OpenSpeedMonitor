@@ -21,6 +21,8 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdaterDummy
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -46,7 +48,8 @@ class DbCleanupServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void setupSpec() {
-        mockDomains(JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity)
+        mockDomains(JobResult, EventResult, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity,
+                ConnectivityProfile, Script)
     }
 
     void "JobResults and EventResults before given Date get deleted correctly"() {

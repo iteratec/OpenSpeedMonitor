@@ -19,6 +19,8 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import grails.buildtestdata.BuildDataTest
@@ -54,7 +56,7 @@ class CsiValueServiceSpec extends Specification implements BuildDataTest, Servic
     }
 
     void setupSpec() {
-        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent)
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, ConnectivityProfile, Script)
     }
 
     void "Different functionality is applied respective polymorphism of CsiValue implementations"() {

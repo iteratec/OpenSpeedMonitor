@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -67,7 +68,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
 
     void setupSpec() {
         mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
-                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay)
+                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay, ConnectivityProfile)
     }
 
     void "result persistance with old (single step) WPT server"(String fileName, String jobLabel, String pageName) {

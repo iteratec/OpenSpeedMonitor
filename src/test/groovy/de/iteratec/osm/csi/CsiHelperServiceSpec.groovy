@@ -18,12 +18,18 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.OsmCookieService
+import grails.buildtestdata.BuildDataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-class CsiHelperServiceSpec extends Specification implements ServiceUnitTest<CsiHelperService> {
+class CsiHelperServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<CsiHelperService> {
+    void setupSpec() {
+        mockDomains(ConnectivityProfile, Script)
+    }
 
     void "check getCsiChartDefaultTitle"(String fromConfig, String fromCookie, String fromI18n, int expectedI18nInterations, String expectedOutcome) {
         setup: "init Mocks and specify wanted invocations"

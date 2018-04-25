@@ -8,6 +8,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
@@ -65,7 +66,7 @@ class DetailDataApiControllerSpec extends Specification implements BuildDataTest
 
     void setupSpec() {
         mockDomains(CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location,
-                WebPageTestServer, Job, Script)
+                WebPageTestServer, Job, Script, ConnectivityProfile)
     }
 
     void "getting correct mappings for domain classes"() {

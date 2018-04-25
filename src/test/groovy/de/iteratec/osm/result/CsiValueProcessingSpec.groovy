@@ -8,6 +8,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -66,7 +67,7 @@ class CsiValueProcessingSpec extends Specification implements BuildDataTest, Ser
 
     void setupSpec() {
         mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
-                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem)
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem, Script)
     }
 
     void "Method getWeightedCsiValues works as expected without any WeightFactors for EventResults."() {

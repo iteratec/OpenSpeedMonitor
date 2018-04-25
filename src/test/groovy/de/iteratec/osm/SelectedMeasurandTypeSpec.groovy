@@ -1,5 +1,7 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.SelectedMeasurandType
@@ -12,7 +14,7 @@ import spock.lang.*
 @Build([EventResult, UserTiming])
 class SelectedMeasurandTypeSpec extends Specification implements BuildDataTest {
     void setupSpec() {
-        mockDomains(EventResult, UserTiming)
+        mockDomains(EventResult, UserTiming, ConnectivityProfile, Script)
     }
 
     void "test getValue for Measurand"() {

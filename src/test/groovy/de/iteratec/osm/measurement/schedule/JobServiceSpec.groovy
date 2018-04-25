@@ -46,7 +46,8 @@ class JobServiceSpec extends Specification implements BuildDataTest, ServiceUnit
     }
 
     void setupSpec() {
-        mockDomains(Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay)
+        mockDomains(Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay,
+                ConnectivityProfile)
     }
 
     void "get csi JobGroup of Job associated to a non csi JobGroup"() {
