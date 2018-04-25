@@ -41,7 +41,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
     void "reportToGraphiteServers sends no LocationHealthChecks to graphite if no graphite server exists"(){
         given: "creating a LocationHealthCheck"
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -52,9 +53,9 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(save: false,
                         uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                        wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                        wptServer: WebPageTestServer.build(save: false,label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -70,7 +71,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = false"
         GraphiteServer.build(reportHealthMetrics: false)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -81,9 +83,10 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -108,7 +111,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = true"
         GraphiteServer.build(healthMetricsReportPrefix: GRAPHITESERVERS_HEALTH_PREFIX, reportHealthMetrics: true)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -119,9 +123,9 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false,label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -144,7 +148,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = true"
         GraphiteServer.build(healthMetricsReportPrefix: GRAPHITESERVERS_HEALTH_PREFIX, reportHealthMetrics: true)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -155,12 +160,14 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 ),
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -171,12 +178,14 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 ),
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -187,9 +196,10 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification implements Bu
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 )
         ]

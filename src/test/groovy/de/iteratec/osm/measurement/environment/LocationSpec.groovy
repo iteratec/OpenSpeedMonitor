@@ -35,7 +35,7 @@ class LocationSpec extends Specification implements BuildDataTest {
     void "A location with a label of a length of #labelLength characters validates to #valid"() {
 
         when: "a location with a label of a length of #labelLength characters is created"
-        Location location = Location.buildWithoutSave(label: "*".padLeft(labelLength,"*"))
+        Location location = Location.build(save: false, label: "*".padLeft(labelLength,"*"))
 
         then: "the location validates to #valid"
         location.validate() == valid

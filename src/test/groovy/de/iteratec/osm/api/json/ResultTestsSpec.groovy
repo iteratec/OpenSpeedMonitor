@@ -79,18 +79,18 @@ class ResultTestsSpec extends Specification implements BuildDataTest {
     private EventResult getEventResult(boolean hasCustomerSatisfaction) {
         Map eventResultsAttributes = [
                 id: 1,
-                measuredEvent: MeasuredEvent.buildWithoutSave(
-                        testedPage: Page.buildWithoutSave(name: PAGE_NAME),
+                measuredEvent: MeasuredEvent.build(save: false,
+                        testedPage: Page.build(save: false, name: PAGE_NAME),
                         name: EVENT_NAME
                 ),
-                jobResult: JobResult.buildWithoutSave(
+                jobResult: JobResult.build(save: false,
                         locationLocation: 'agent01',
                         locationUniqueIdentifierForServer: LOCATION_IDENTIFIER,
                         locationBrowser: BROWSER_IN_LOCATION,
                         testId: TEST_ID,
-                        job: Job.buildWithoutSave(
-                                location: Location.buildWithoutSave(
-                                        wptServer: WebPageTestServer.buildWithoutSave(baseUrl: WPT_SERVER_BASE_URL)
+                        job: Job.build(save: false,
+                                location: Location.build(save: false,
+                                        wptServer: WebPageTestServer.build(save: false, baseUrl: WPT_SERVER_BASE_URL)
                                 )
                         )
                 )
@@ -98,7 +98,7 @@ class ResultTestsSpec extends Specification implements BuildDataTest {
         if (hasCustomerSatisfaction){
             eventResultsAttributes.csByWptDocCompleteInPercent = 1.5112d
         }
-        return EventResult.buildWithoutSave(eventResultsAttributes)
+        return EventResult.build(save: false,eventResultsAttributes)
     }
 
 }

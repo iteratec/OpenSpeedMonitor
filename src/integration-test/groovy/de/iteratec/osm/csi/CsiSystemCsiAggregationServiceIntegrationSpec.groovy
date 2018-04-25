@@ -366,7 +366,7 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         jobGroup1 = JobGroup.build(csiConfiguration: csiConfiguration)
         jobGroup2 = JobGroup.build(csiConfiguration: csiConfiguration)
 
-        csiSystem = CsiSystem.buildWithoutSave(jobGroupWeights: [jobGroup1, jobGroup2].collect {
+        csiSystem = CsiSystem.build(save: false, jobGroupWeights: [jobGroup1, jobGroup2].collect {
             new JobGroupWeight(jobGroup: it, weight: 1.0)
         })
         csiSystem.jobGroupWeights*.csiSystem = csiSystem

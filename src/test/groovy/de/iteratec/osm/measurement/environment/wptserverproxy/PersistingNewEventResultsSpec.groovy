@@ -274,8 +274,8 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
     void "check CSI value creation"() {
         setup: "mock service and create testee"
         service.timeToCsMappingService = Mock(TimeToCsMappingService)
-        JobGroup jobGroup = JobGroup.buildWithoutSave()
-        EventResult testee = EventResult.buildWithoutSave(inputVariables)
+        JobGroup jobGroup = JobGroup.build(save: false)
+        EventResult testee = EventResult.build(save: false, inputVariables)
         testee.jobGroup = jobGroup
 
         when: "customer satisfaction is set with testee"

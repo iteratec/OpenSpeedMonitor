@@ -51,7 +51,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildD
     void setup() {
         dailyInterval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         service.jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService) {
-            getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.buildWithoutSave()]
+            getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.build(save: false)]
         }
     }
 
@@ -145,7 +145,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildD
         updateEvents*.id == [csiAggregation.id]
     }
     static CsiSystem buildCsiSystem() {
-        return CsiSystem.buildWithoutSave()
+        return CsiSystem.build(save: false)
                 .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
                 .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
                 .save(flush: true, failOnError: true)

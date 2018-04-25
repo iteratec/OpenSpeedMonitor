@@ -67,8 +67,8 @@ class CsiValueServiceSpec extends Specification implements BuildDataTest, Servic
         }
 
         when:
-        CsiValue csiAgg = CsiAggregation.buildWithoutSave()
-        CsiValue eventResult = EventResult.buildWithoutSave()
+        CsiValue csiAgg = CsiAggregation.build(save: false)
+        CsiValue eventResult = EventResult.build(save: false)
 
         then:
         !serviceUnderTest.isCsiRelevant(csiAgg)

@@ -90,7 +90,7 @@ class CsiByEventResultsServiceSpec extends Specification implements BuildDataTes
     void "get system csi with one single EventResult"() {
         given: "one EventResult matches query"
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.build(save: false)]
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
@@ -132,7 +132,7 @@ class CsiByEventResultsServiceSpec extends Specification implements BuildDataTes
         int numberOfUnderlyingEventResults = 8
 
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.buildWithoutSave()]
+            List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.build(save: false)]
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> nonEmptyEventResultListNotUsedInTest
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
@@ -171,7 +171,7 @@ class CsiByEventResultsServiceSpec extends Specification implements BuildDataTes
         MvQueryParams queryParamsWithoutCsiConfiguration = new MvQueryParams()
         queryParamsWithoutCsiConfiguration.jobGroupIds.add(jobGroupWithoutCsiConfig.getId())
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.build(save: false)]
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
@@ -202,7 +202,7 @@ class CsiByEventResultsServiceSpec extends Specification implements BuildDataTes
     }
 
     private void createTestDataCommonToAllTests() {
-        CsiConfiguration csiConfiguration = CsiConfiguration.buildWithoutSave()
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(save: false)
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration)
         queryParamsIrrelevantCauseDbQueriesAreMocked = new MvQueryParams()
         queryParamsIrrelevantCauseDbQueriesAreMocked.jobGroupIds.add(jobGroup.getId())

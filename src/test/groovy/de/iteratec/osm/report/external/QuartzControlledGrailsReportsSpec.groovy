@@ -363,24 +363,25 @@ class QuartzControlledGrailsReportsSpec extends Specification implements BuildDa
         GraphitePathCsiData pathPage = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.PAGE)
         GraphitePathCsiData pathShop = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.JOB_GROUP)
 
-        GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
-                reportCsiAggregationsToGraphiteServer: true)
+        GraphiteServer serverWithPaths = GraphiteServer.build(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
+                reportCsiAggregationsToGraphiteServer: true, save: false)
 
         return [serverWithPaths]
     }
 
     static getCsiAggregation(CsiAggregationInterval interval, AggregationType aggregationType, Double value, DateTime valueForStated, String resultIds) {
-        return CsiAggregation.buildWithoutSave(
+        return CsiAggregation.build(
+            save: false,
             started: valueForStated.toDate(),
             interval: interval,
             aggregationType: aggregationType,
             csByWptDocCompleteInPercent: value,
             underlyingEventResultsByWptDocComplete: resultIds,
-            page: Page.buildWithoutSave(name: pageName),
-            jobGroup: JobGroup.buildWithoutSave(name: jobGroupWithoutServersName),
-            measuredEvent: MeasuredEvent.buildWithoutSave(name: eventName),
-            browser: Browser.buildWithoutSave(name: browserName),
-            location: Location.buildWithoutSave(location: locationLocation)
+            page: Page.build(save: false, name: pageName),
+            jobGroup: JobGroup.build(save: false, name: jobGroupWithoutServersName),
+            measuredEvent: MeasuredEvent.build(save: false, name: eventName),
+            browser: Browser.build(save: false, name: browserName),
+            location: Location.build(save: false, location: locationLocation)
         )
     }
 

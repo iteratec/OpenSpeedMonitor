@@ -540,7 +540,7 @@ class CsiValueProcessingSpec extends Specification implements BuildDataTest, Ser
         JOB_GROUP_1 = JobGroup.build(csiConfiguration: CSI_CONFIGURATION)
         JOB_GROUP_2 = JobGroup.build(csiConfiguration: CSI_CONFIGURATION)
 
-        CSI_SYSTEM = CsiSystem.buildWithoutSave()
+        CSI_SYSTEM = CsiSystem.build(save: false)
         CSI_SYSTEM.addToJobGroupWeights(jobGroup: JOB_GROUP_1, weight: WEIGHT_JOB_GROUP_1)
         CSI_SYSTEM.addToJobGroupWeights(jobGroup: JOB_GROUP_2, weight: WEIGHT_JOB_GROUP_2)
         CSI_SYSTEM.save()

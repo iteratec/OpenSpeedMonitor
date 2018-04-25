@@ -39,7 +39,7 @@ class PlaceholdersUtilitySpec extends Specification implements BuildDomainTest<S
             targeturl: 'http://example.com',
             eventName: 'HOMEPAGE'
         ]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with a variable map containing all variables"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, fullScriptVariableMap)
@@ -53,7 +53,7 @@ class PlaceholdersUtilitySpec extends Specification implements BuildDomainTest<S
         Map incompleteScriptVariableMap = [
                 targeturl: 'http://example.com',
         ]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with a variable map containing just one of two variables"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, incompleteScriptVariableMap)
@@ -66,7 +66,7 @@ class PlaceholdersUtilitySpec extends Specification implements BuildDomainTest<S
     void "parametrized navigationScript parsing given no variables"() {
         given: "a script using multiple variables"
         Map emptyScriptVariableMap = [:]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with an empty variable map"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, emptyScriptVariableMap)

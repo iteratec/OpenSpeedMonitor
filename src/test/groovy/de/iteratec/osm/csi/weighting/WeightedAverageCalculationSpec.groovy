@@ -97,7 +97,7 @@ class WeightedAverageCalculationSpec extends Specification implements BuildDataT
 
         given: "HOUROFDAY WeightFactor and some EventResults in place."
         Set<WeightFactor> weightFactors = [HOUROFDAY] as Set
-        CsiValue eventResult = EventResult.buildWithoutSave(jobResultDate: date, jobGroup: JOB_GROUP)
+        CsiValue eventResult = EventResult.build(save: false, jobResultDate: date, jobGroup: JOB_GROUP)
 
         when: "Weights get calculated."
         double weight = service.getWeight(eventResult, weightFactors, CSI_CONFIGURATION)
@@ -117,7 +117,7 @@ class WeightedAverageCalculationSpec extends Specification implements BuildDataT
 
         given: "HOUROFDAY WeightFactor and some CsiAggregations in place."
         Set<WeightFactor> weightFactors = [HOUROFDAY] as Set
-        CsiValue csiAggregation = CsiAggregation.buildWithoutSave(started: date, jobGroup: JOB_GROUP)
+        CsiValue csiAggregation = CsiAggregation.build(save: false, started: date, jobGroup: JOB_GROUP)
 
         when: "Weights get calculated."
         double weight = service.getWeight(csiAggregation, weightFactors, CSI_CONFIGURATION)
