@@ -36,7 +36,7 @@ class PerformanceLoggingServiceSpec extends Specification implements ServiceUnit
 
     void setup() {
         serviceUnderTest = service
-        serviceLogger = (Logger) LoggerFactory.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService");
+        serviceLogger = (Logger) LoggerFactory.getLogger("de.iteratec.osm.util.PerformanceLoggingService");
     }
 
     /**

@@ -283,8 +283,8 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         service.setCustomerSatisfaction(testee)
 
         then: "interactions with mocked service are as expected"
-        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
-        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.measuredEvent.testedPage, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.measuredEvent.testedPage, testee.jobGroup.csiConfiguration) >> 1.0
 
         where:
         inputVariables                                                            | expectedInteractionDocComplete | expectedInteractionVisuallyComplete
