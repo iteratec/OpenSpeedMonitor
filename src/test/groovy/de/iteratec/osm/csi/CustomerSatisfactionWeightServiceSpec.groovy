@@ -65,7 +65,7 @@ class CustomerSatisfactionWeightServiceSpec extends Specification implements Bui
         "src/test/resources/CsiData/" | "_weights_should_fail_2.csv" | WeightFactor.HOUROFDAY                        | 0                    | 0                  | 0                    | 1
     }
 
-    void "validate csv for Browser Connectivity Combination"(String path, String fileNameExtension, WeightFactor weightFactor, int expectedBrowserErrors, int expectedConnectivityErrors, int formatErrors) {
+    void "validate csv for Browser Connectivity Combination"() {
         setup: "I18Service mock with expected calls and provide needed Browsers as well as ConnectivityProfiles"
         I18nService i18nService = Mock(I18nService) {
             expectedBrowserErrors * msg("de.iteratec.osm.csi.csvErrors.browserDoesNotExist", "browser nicht vorhanden", _) >> "browser"

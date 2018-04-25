@@ -29,8 +29,7 @@ class D3ChartTagLibSpec extends Specification implements TagLibUnitTest<D3ChartT
     void setup(){
         HTML_FRAGMENT_PARSER = new org.cyberneko.html.parsers.SAXParser()
         HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true)
-        def d3ChartTagLib = mockTagLib(D3ChartTagLib)
-        d3ChartTagLib.i18nService = Mock(I18nService)
+        tagLib.i18nService = Mock(I18nService)
     }
 
     def "HTML provided by taglib iteratec:multiLineChart returns container with correct identifier"() {
