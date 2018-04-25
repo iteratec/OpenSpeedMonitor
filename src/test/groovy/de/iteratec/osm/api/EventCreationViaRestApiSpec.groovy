@@ -207,11 +207,10 @@ class EventCreationViaRestApiSpec extends Specification implements BuildDataTest
                 description: description,
                 globallyVisible: globalVisibility
         )
+        cmd.validate()
 
         then:
-        shouldFail(IllegalArgumentException){
-            cmd.validate()
-        }
+        IllegalArgumentException e = thrown()
     }
 
     // successful event creation //////////////////////////////////////////////////////////////

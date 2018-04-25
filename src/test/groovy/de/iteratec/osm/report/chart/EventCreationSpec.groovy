@@ -115,16 +115,15 @@ class EventCreationSpec extends Specification implements BuildDataTest, ServiceU
         boolean globalVisibility = true
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }
@@ -138,16 +137,15 @@ class EventCreationSpec extends Specification implements BuildDataTest, ServiceU
         boolean globalVisibility = true
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }
@@ -161,16 +159,15 @@ class EventCreationSpec extends Specification implements BuildDataTest, ServiceU
         boolean globalVisibility
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }
