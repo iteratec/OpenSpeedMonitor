@@ -169,13 +169,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
     appenders << "asyncOsmAppenderDetails"
 
     // our packages
-    logger("grails.app.controllers.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.services.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.domain.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.filters.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.conf.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.taglib.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("grails.app.jobs.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
+    logger("de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("de.iteratec.osm.da", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
 
     // other packages
