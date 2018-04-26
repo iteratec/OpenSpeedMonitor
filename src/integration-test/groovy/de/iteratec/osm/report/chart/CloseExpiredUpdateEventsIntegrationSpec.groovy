@@ -21,7 +21,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.util.mop.ConfineMetaClassChanges
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivityService

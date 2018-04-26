@@ -11,7 +11,7 @@ import geb.pages.de.iteratec.osm.measurement.environment.BrowserAliasEditPage
 import geb.pages.de.iteratec.osm.measurement.environment.BrowserAliasIndexPage
 import geb.pages.de.iteratec.osm.measurement.environment.BrowserAliasShowPage
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared

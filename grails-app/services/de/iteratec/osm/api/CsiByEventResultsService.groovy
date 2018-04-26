@@ -31,7 +31,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
 @Transactional

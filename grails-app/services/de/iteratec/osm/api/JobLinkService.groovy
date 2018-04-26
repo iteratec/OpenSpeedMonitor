@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.PageService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 /**

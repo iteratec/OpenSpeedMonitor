@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 import static de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE
 import de.iteratec.osm.ConfigService

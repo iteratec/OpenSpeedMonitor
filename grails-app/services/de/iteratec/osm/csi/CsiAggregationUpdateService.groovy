@@ -21,7 +21,7 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Propagation
 

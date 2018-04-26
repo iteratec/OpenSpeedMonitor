@@ -7,7 +7,7 @@ import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.LoginPage
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Stepwise
 /**
  * See http://www.gebish.org/manual/current/ for more instructions

@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class JobStatisticService {

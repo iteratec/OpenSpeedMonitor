@@ -16,7 +16,7 @@ import geb.pages.de.iteratec.osm.LoginPage
 import geb.pages.de.iteratec.osm.measurement.schedule.job.JobCreatePage
 import geb.pages.de.iteratec.osm.measurement.schedule.job.JobListPage
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise

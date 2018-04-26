@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class WptServerService {

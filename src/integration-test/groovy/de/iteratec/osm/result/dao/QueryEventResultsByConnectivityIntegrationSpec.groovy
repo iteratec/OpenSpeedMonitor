@@ -3,7 +3,7 @@ package de.iteratec.osm.result.dao
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile

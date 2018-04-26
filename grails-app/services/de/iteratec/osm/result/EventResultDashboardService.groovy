@@ -31,7 +31,7 @@ import de.iteratec.osm.util.I18nService
 
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 

@@ -6,7 +6,7 @@ import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptCreatePage
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptListPage
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Shared
 import spock.lang.Stepwise
 /**

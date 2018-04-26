@@ -3,7 +3,7 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class ScriptService {
