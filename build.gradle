@@ -141,7 +141,7 @@ assets {
     minifyJs = true
     minifyCss = true
     configOptions = [:]
-    excludes = ['nodel_modules/**/*.less']
+    excludes = ['node_modules/**/*.less']
 }
 
 node {
@@ -241,6 +241,8 @@ assetCompile.dependsOn nodePackages
 clean.delete << file('grails-app/assets/javascripts/node_modules')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
 clean.delete << file('node_modules')
+clean.delete << file('grails-app/assets/javascripts/bower_components')
+clean.delete << file('grails-app/assets/stylesheets/bower_components')
 
 
 
