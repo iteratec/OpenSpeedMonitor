@@ -371,4 +371,4 @@ swagger:
     consumes:
         - 'application/json'
     schemes:
-        - 'https'
+        - HTTPS
