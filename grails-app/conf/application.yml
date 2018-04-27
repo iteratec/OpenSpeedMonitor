@@ -6,6 +6,8 @@ hibernate:
         use_query_cache: false
         region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
     generate_statistics: true
+    flush:
+        mode: AUTO
 
 dataSource:
     pooled: true
