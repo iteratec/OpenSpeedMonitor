@@ -16,7 +16,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
             jobGroups: [],
             groupToPagesMap: {},
             comparisons: [],
-            showButtonCallback: function () {
+            showButtonDisableState: false,
+            showButtonDisabledCallback: function () {
             }
         },
         created: function () {
@@ -33,11 +34,22 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
 
         },
         watch: {
-            comparisons: function () {
-                var cp = this.comparisons[0];
-                var state = cp.jobGroupId1 > 0 && cp.jobGroupId2 > 0 && cp.pageId1 > 0 && cp.pageId2 > 0;
-                console.log(state);
-                this.showButtonCallback(!state);
+            comparisons: {
+                handler: function () {
+                    var self = this;
+                    this.showButtonDisableState = false;
+                    this.comparisons.some(function (comparison) {
+                        var state = comparison.jobGroupId1 > 0 && comparison.jobGroupId2 > 0 && comparison.pageId1 > 0 && comparison.pageId2 > 0;
+
+                        if (!state) {
+                            self.showButtonDisableState = true;
+                            return true;
+                        }
+                    });
+                    console.log(this.showButtonDisableState);
+                    self.showButtonDisabledCallback(this.showButtonDisableState);
+                },
+                deep: true
             }
         },
         methods: {
@@ -59,7 +71,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                         that.filterData(data);
                     },
                     error: function (e, statusText) {
-                        if (statusText != "abort") {
+                        if (statusText !== "abort") {
                             throw e;
                         }
                     },
@@ -86,7 +98,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1});
             },
             removeComparisonRow: function (index) {
-                this.comparisons.splice(index,1)
+                this.comparisons.splice(index, 1)
             },
             getComparisons: function () {
                 return this.comparisons
@@ -111,8 +123,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 return ids;
 
             },
-            setShowButtonCallback: function (callback) {
-                this.setShowButtonCallback = callback;
+            setShowButtonDisabledCallback: function (callback) {
+                this.showButtonDisabledCallback = callback;
             },
             addListener: function () {
                 var that = this;
@@ -127,7 +139,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         setComparisons: pageComparisonVue.setComparisons,
         getPageIds: pageComparisonVue.getPageIds,
         getJobGroupIds: pageComparisonVue.getJobGroupIds,
-        setShowButtonCallback: pageComparisonVue.setShowButtonCallback
+        setShowButtonDisabledCallback: pageComparisonVue.setShowButtonDisabledCallback
     }
 });
 

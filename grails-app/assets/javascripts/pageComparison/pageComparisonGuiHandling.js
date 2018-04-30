@@ -26,8 +26,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             loadData(true);
         });
 
-        //set callback for disabling the show button
-        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonCallback(setShowButtonDisabled);
+        $('#graphButtonHtmlId').attr('disabled', 'disabled');
     };
 
     var renderChart = function (data, isStateChange) {
@@ -46,7 +45,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var setShowButtonDisabled = function (state) {
-        document.getElementById("graphButtonHtmlId").disabled = state;
+        console.log("test");
+        if(!state) {
+            $('#graphButtonHtmlId').removeAttr('disabled', 'disabled');
+        } else {
+            console.log("disable");
+            $('#graphButtonHtmlId').attr('disabled', 'disabled');
+        }
     };
 
     var loadData = function (isStateChange) {
@@ -83,6 +88,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         });
     };
+    OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonDisabledCallback(setShowButtonDisabled);
     init();
     return {}
 })();
