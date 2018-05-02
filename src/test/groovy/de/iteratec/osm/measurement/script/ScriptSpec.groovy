@@ -1,7 +1,11 @@
 package de.iteratec.osm.measurement.script
 
+import grails.buildtestdata.mixin.Build
+import grails.test.mixin.Mock
 import spock.lang.Specification
 
+@Mock(ArchivedScript)
+@Build([ArchivedScript, Script])
 class ScriptSpec extends Specification{
 
     def "Test that scripts without parameter doesnt change on parse"(){
@@ -34,5 +38,14 @@ class ScriptSpec extends Specification{
 
         then: "the parameters are parsed correctly"
         parsedNavigationScript == scriptContent.replace("\${parameter}","path").replace("\${anotherParameter}","anotherPath")
+    }
+
+    def "Test that scripts can be deleted that only have ArchivedScripts"(){
+        when: "a script only has ArchivedScripts"
+        Script script = Script.build()
+        ArchivedScript.build(script: script)
+
+        then: "this script can be deleted"
+        script.delete(flush:true)
     }
 }

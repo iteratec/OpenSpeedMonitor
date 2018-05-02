@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require /chartComponents/chartBars.js
 //= require /chartComponents/chartBarScore.js
 //= require /d3/chartColorProvider.js
@@ -78,10 +78,11 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = legendPosY + legendHeight + headerHeight;
 
-        svg
-            .transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight);
+        svg.transition()
+          .duration(transitionDuration);
+
+        var svgName = selector.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
 
         renderHeader(svg);
         renderSideLabels(svg, headerHeight);

@@ -21,7 +21,7 @@
  * select/deselect datapoints for comparison in the filmstrip view of the WPT
  */
 
-//= require bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.js
+//= require node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.js
 
 // context menu on all dots of all graphs
 $.contextMenu({
@@ -290,7 +290,7 @@ OpenSpeedMonitor.chartContextUtil = (function(){
     if (rickshawGraphBuilder.graph.selectedPoints.length > 0) {
       var server = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl;
 
-      if (server != nearestPoint.value.wptResultInfo.wptServerBaseurl) {
+      if (server !== nearestPoint.value.wptResultInfo.wptServerBaseurl) {
         $("#ContextMenuErrorModal").modal();
         return;
       }

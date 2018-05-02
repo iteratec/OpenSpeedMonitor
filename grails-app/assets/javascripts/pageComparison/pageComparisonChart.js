@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/trafficLightDataProvider
 //= require /d3/chartColorProvider
@@ -103,9 +103,13 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var legendPosY = barScorePosY + barScoreHeight;
         var legendHeight = chartLegendComponent.estimateHeight(svg) + componentMargin;
         var chartHeight = headerHeight + data.getChartBarsHeight() + barScoreHeight + legendHeight + 20;
+
         svg.transition()
-            .duration(transitionDuration)
-            .style("height", chartHeight);
+            .duration(transitionDuration);
+
+        var svgName = chartIdentifier.substr(1);
+        document.getElementById(svgName).setAttribute("height",chartHeight);
+
         var contentGroup = svg.selectAll(".bars-content-group").data([1]);
         contentGroup.enter()
             .append("g")

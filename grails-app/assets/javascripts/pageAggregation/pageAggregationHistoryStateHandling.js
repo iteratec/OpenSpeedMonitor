@@ -119,7 +119,16 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             currentAddButton.click();
         }
         var selects = $(".measurand-select");
+
         measurands.forEach(function (measurand, i) {
+            if(measurand.startsWith("_UTM")) {
+
+                var optGroupUserTimings = $(selects[i]).find('.measurand-opt-group-USER_TIMINGS');
+                var alreadyThere = optGroupUserTimings.size() > 1;
+                if(!alreadyThere){
+                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{id: measurand, name: measurand}])
+                }
+            }
             $(selects[i]).val(measurand);
         });
     };

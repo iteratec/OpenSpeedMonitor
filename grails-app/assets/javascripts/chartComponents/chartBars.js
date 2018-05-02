@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require common.js
 //= require_self
 
@@ -98,6 +98,12 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             })
             .attr("y", function (d) {
                 return yScale(d.id)
+            })
+            .attr("x", function (d) {
+                return barStart(xScale, d.value)
+            })
+            .attr("width", function (d) {
+                return barWidth(xScale, d.value);
             })
             .each(function (d) {
                 var color = individualColors?d.color: barColor;

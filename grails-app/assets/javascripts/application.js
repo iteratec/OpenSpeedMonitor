@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//= require_tree bower_components/jquery
-//= require_tree bower_components/jquery-ui
-//= require_tree bower_components/bootstrap
-//= require_tree bower_components/bootstrap-colorpicker/dist/js/
-//= require_tree bower_components/chosen
-//= require_tree bower_components/clipboard
+//= require_tree node_modules/jquery
+//= require_tree node_modules/jquery-ui-dist
+//= require_tree node_modules/bootstrap
+//= require_tree node_modules/bootstrap-colorpicker/dist/js/
+//= require_tree node_modules/chosen-js
+//= require_tree node_modules/clipboard
+//= require ${grails.util.Environment.currentEnvironment == grails.util.Environment.PRODUCTION ? 'node_modules/vue/dist/vue.min.js' : 'node_modules/vue/dist/vue.js'}
 //= require kickstart/checkboxes
 //= require spinner
-//= require bower_components/bootstrap-validator/js/validator
+//= require node_modules/bootstrap-validator/js/validator
 //= require_self
 
 delete $.fn.datepicker; // so it can be replaced by air-datepicker

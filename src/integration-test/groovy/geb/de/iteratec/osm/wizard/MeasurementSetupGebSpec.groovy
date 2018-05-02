@@ -125,9 +125,9 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     void "previously created location and connectivity should appear and should be preselected"(){
         expect: "the location and connectivity to be preselected and all connectivities should appear"
-        msPage.locationSelect.text() == location.location.toString()
+        msPage.locationSelect.value() == location.ident().toString()
         msPage.getConnectivities().size() == ConnectivityProfile.count()
-        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.text())
+        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.value())
         msPage.canContinueToJob()
     }
 
@@ -143,7 +143,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
     void "job create defaults"(){
         expect: "the job name to be set and a valid schedule to be selected, so that the setup could be finished"
         msPage.jobNameInput.value() == jobName
-        msPage.executionScheduleSelect.text() == msPage.getI18nMessage("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly")
+        msPage.executionScheduleSelect.value() == "0 * * * ? *"
         msPage.executionScheduleInput.@readonly
         msPage.canClickCreateButton()
     }

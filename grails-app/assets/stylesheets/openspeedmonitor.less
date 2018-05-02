@@ -1,4 +1,5 @@
-@import "bower_components/bootstrap/less/bootstrap.less";
+@import "node_modules/bootstrap/less/bootstrap.less";
+@import (inline) "node_modules/jquery-ui-dist/jquery-ui.css";
 @import "variables-corporate";
 @import "sidebar";
 @import "cards";
@@ -466,4 +467,29 @@ a.btn.disabled {
 
 .no-left-gutter {
   padding-left: 0;
+}
+
+.modal-xl {
+  width: 98%;
+  height: 95%;
+}
+
+#download-chart-container {
+  background-color: #fff;
+  cursor: default;
+  display: inline-block;
+  border-width: 1px 0 1px 1px;
+  border-color: @iteratec-gray;
+  border-style: solid;
+}
+
+#resize-east {
+  cursor: ew-resize;
+  padding-right: 1px;
+  display: inline-block;
+  background-color: @iteratec-gray;
+  position: relative;
+  .ui-resizable-se {
+    cursor: ew-resize;
+  }
 }

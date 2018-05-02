@@ -200,9 +200,9 @@ class DetailAnalysisPersisterService implements iResultListener {
         String apiKey = configService.getDetailAnalysisApiKey()
         String callbackUrl = "/rest/receiveCallback"
 
-        def resp
+        def resp = null
         int attempts = 0
-        while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
+        while ((!resp?.target) && attempts < MAX_ATTEMPTS) {
             attempts++
             BatchActivityUpdater batchActivity
             try {

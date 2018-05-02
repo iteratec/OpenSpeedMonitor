@@ -1,7 +1,6 @@
 "use strict";
 
-//= require bower_components/vue/dist/vue.js
-//= require bower_components/jquery/jquery.min.js
+//= require node_modules/jquery/jquery.min.js
 //= require pageComparison/pageComparisonRowComponentVue.js
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
@@ -117,4 +116,5 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         getJobGroupIds: pageComparisonVue.getJobGroupIds
     }
 });
+
 OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons();

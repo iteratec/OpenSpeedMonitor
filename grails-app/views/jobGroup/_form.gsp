@@ -11,7 +11,6 @@
     </div>
 </div>
 
-
 <div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'graphiteServers', 'error')} ">
     <label for="graphiteServers" class="control-label col-md-3">
         <g:message code="jobGroup.graphiteServers.label" default="Graphite Servers"/>

@@ -23,7 +23,7 @@
       <g:render template="scriptTab" model="${['job': job]}" />
     </div>
     <div class="tab-pane" id="advancedSettingsTab" >
-      <g:render template="advancedSettingsTab" model="${['job': job]}" />
+      <g:render template="advancedSettingsTab" model="${['job': job, 'globalUserAgentSuffix': globalUserAgentSuffix]}" />
     </div>
   </div>
 </div>

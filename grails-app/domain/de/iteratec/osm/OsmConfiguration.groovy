@@ -34,7 +34,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS = 30
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
     static final Integer INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
-
+    static final String DEFAULT_GLOBAL_USER_AGENT_SUFFIX = null
 
     /* Default (injected) attributes of GORM */
     Long	id
@@ -72,6 +72,8 @@ class OsmConfiguration {
     Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     /** Did the infrastructure setup run already? */
     InfrastructureSetupStatus infrastructureSetupRan = InfrastructureSetupStatus.NOT_STARTED
+    /** Suffix for user agent that can be set to be applied to every job by default */
+    String globalUserAgentSuffix = DEFAULT_GLOBAL_USER_AGENT_SUFFIX
 
     enum InfrastructureSetupStatus {
         NOT_STARTED, ABORTED, FINISHED
@@ -89,6 +91,7 @@ class OsmConfiguration {
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
         infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        globalUserAgentSuffix defaultValue: DEFAULT_GLOBAL_USER_AGENT_SUFFIX
     }
 
     static constraints = {
@@ -103,5 +106,6 @@ class OsmConfiguration {
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
         infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        globalUserAgentSuffix nullable: true, defaultValue: DEFAULT_GLOBAL_USER_AGENT_SUFFIX
     }
 }

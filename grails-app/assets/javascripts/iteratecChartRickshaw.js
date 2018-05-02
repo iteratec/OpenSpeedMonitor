@@ -1,4 +1,4 @@
-//= require bower_components/d3/d3.min.js
+//= require node_modules/d3/d3.min.js
 //= require rickshaw/rickshaw_custom.js
 //= require rickshaw/rickshawChartCreation.js
 //= require rickshaw/html2canvas.js
