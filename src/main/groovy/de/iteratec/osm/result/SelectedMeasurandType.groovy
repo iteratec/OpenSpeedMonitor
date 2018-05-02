@@ -30,7 +30,8 @@ enum SelectedMeasurandType {
     },
     USERTIMING_MARK{
         Double getValue(RepresentableWptResult eventResult, String name) {
-            return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            //return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            return  getUsertimingValue(eventResult,name,UserTimingType.MARK)
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
@@ -51,7 +52,8 @@ enum SelectedMeasurandType {
     },
     USERTIMING_MEASURE{
         Double getValue(RepresentableWptResult eventResult, String name) {
-            return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            //return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            return  getUsertimingValue(eventResult,name,UserTimingType.MEASURE)
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
@@ -80,4 +82,19 @@ enum SelectedMeasurandType {
     abstract String getOptionPrefix()
 
     abstract String getDatabaseName(String name)
+
+    private static getUsertimingValue(RepresentableWptResult representableWptResult, String name, UserTimingType type){
+        if(representableWptResult.hasProperty("userTimings")){
+            Set<UserTiming> userTimings = representableWptResult.userTimings
+            UserTiming relevantTiming = userTimings.find({it.name == name})
+            if(relevantTiming){
+                def value = type == UserTimingType.MARK? relevantTiming.startTime : relevantTiming.duration
+                return Double.valueOf(value)
+            }
+        }
+        if(representableWptResult."$name" != null){
+            return Double.valueOf(representableWptResult."$name")
+        }
+        return null
+    }
 }
