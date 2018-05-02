@@ -7,7 +7,6 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.GuiHandling = OpenSpeedMonitor.ChartModules.GuiHandling || {};
 
-
 OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var pageComparisonChart = OpenSpeedMonitor.ChartModules.PageComparisonChart("#page-comparison-svg");
@@ -26,7 +25,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             loadData(true);
         });
 
-        $('#graphButtonHtmlId').attr('disabled', 'disabled');
+        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonDisabledCallback(setShowButtonDisabled);
+        setShowButtonDisabled(true);
     };
 
     var renderChart = function (data, isStateChange) {
@@ -45,12 +45,14 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var setShowButtonDisabled = function (state) {
-        console.log("test");
+        console.log(state);
         if(!state) {
             $('#graphButtonHtmlId').removeAttr('disabled', 'disabled');
+            $('#warning-no-page').hide();
         } else {
             console.log("disable");
             $('#graphButtonHtmlId').attr('disabled', 'disabled');
+            $('#warning-no-page').show();
         }
     };
 
@@ -88,7 +90,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         });
     };
-    OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonDisabledCallback(setShowButtonDisabled);
     init();
     return {}
 })();
