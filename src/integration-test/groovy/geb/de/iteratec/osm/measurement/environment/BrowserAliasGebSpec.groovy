@@ -1,6 +1,6 @@
 package geb.de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.security.User
@@ -16,7 +16,6 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Tests the CRUD View of {@link BrowserAlias}*
  * Most tests can't be run against live instance because an existing browserAlias is precondition
@@ -35,7 +34,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
 
     def setupData() {
         Browser.withNewTransaction {
-            existingBrowser = TestDataUtil.createBrowser("a geb test browserAlias")
+            existingBrowser = Browser.build(name: "a geb test browserAlias")
         }
     }
 
@@ -51,8 +50,8 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to browserAlias list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
         }
         doLogin()
 

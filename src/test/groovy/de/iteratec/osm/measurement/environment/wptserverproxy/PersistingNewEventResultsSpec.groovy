@@ -331,7 +331,6 @@ class PersistingNewEventResultsSpec extends Specification {
         service.persistResultsForAllTeststeps(xmlResult)
 
         then: "it throws an exception and doesn't create any measured events"
-        OsmResultPersistanceException exception = thrown()
         MeasuredEvent.list().size() == 0
     }
 }

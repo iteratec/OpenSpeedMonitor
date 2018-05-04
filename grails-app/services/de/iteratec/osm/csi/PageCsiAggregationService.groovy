@@ -118,18 +118,18 @@ class PageCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
 
-            while (!currentDateTime.isAfter(toDateTime)) {
-                List<Long> pageCsiAggregationIds
-                List<Long> pageCsiAggregationIdsToCalculate
-                pageCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups, pages)
-                pageCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(pageCsiAggregationIds)
+        while (!currentDateTime.isAfter(toDateTime)) {
+            List<Long> pageCsiAggregationIds
+            List<Long> pageCsiAggregationIdsToCalculate
+            pageCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups, pages)
+            pageCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(pageCsiAggregationIds)
 
-                if (pageCsiAggregationIdsToCalculate)
-                    calcCsiAggregations(pageCsiAggregationIdsToCalculate)
+            if (pageCsiAggregationIdsToCalculate)
+                calcCsiAggregations(pageCsiAggregationIdsToCalculate)
 
-                allCsiAggregationIds.addAll(pageCsiAggregationIds)
+            allCsiAggregationIds.addAll(pageCsiAggregationIds)
 
-                currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
+            currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
 
         }
         return CsiAggregation.getAll(allCsiAggregationIds)

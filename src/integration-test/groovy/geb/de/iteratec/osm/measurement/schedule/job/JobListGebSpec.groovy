@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm.measurement.schedule.job
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -382,22 +381,21 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     private void createData() {
 
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
 
-            Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
-            Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
-            JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
-            JobGroup jobGroup2 = TestDataUtil.createJobGroup(jobGroup2Name)
-            WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser(browserName)
-            Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
-            Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
-            TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
-            TestDataUtil.createJob(job2Name, script2, location2, jobGroup1, "This is the second test job", 1, false, 12)
-            TestDataUtil.createJob(job3Name, script1, location2, jobGroup2, "This is the third test job", 1, false, 12)
-            //the last job creation will be a test
-//            TestDataUtil.createJob("Label2",script2,location1,jobGroup2,"This is the first test job",1,false,5)
+            Script script1 = Script.build(label: script1Name, description: "This is for test purposes", navigationScript: "stuff")
+            Script script2 = Script.build(label: script2Name, description: "This is also for test purposes", navigationScript: "stuff")
+            JobGroup jobGroup1 = JobGroup.build(name: jobGroup1Name)
+            JobGroup jobGroup2 = JobGroup.build(name: jobGroup2Name)
+            WebPageTestServer wpt = WebPageTestServer.build(label: "TestWPTServer-564892#Afef1", proxyIdentifier: "TestIdentifier", active: true, baseUrl: "http://internet.de")
+
+            Browser browser = Browser.build(name: browserName)
+            Location location1 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location1Name, browser: browser, active: true)
+            Location location2 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location2Name, browser: browser, active: true)
+            Job.build(label: job1Name, script: script1, location: location1, jobGroup: jobGroup1, description: "This is the first test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
+            Job.build(label: job2Name, script: script2, location: location2, jobGroup: jobGroup1, description: "This is the second test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
+            Job.build(label: job3Name, script: script1, location: location2, jobGroup: jobGroup2, description: "This is the third test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
         }
     }
 }
