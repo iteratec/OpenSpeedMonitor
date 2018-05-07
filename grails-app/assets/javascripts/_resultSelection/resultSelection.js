@@ -35,6 +35,10 @@ OpenSpeedMonitor.resultSelection = (function () {
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
     var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
     var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
+
+    //Workaround for vue component in page comparison chart [IT-1930]
+    var pageSelectionAvailable = $("#pageSelectHtmlId").length;
+
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
     var needsNoPageSelectionDueToCsiAggregation = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
@@ -182,10 +186,16 @@ OpenSpeedMonitor.resultSelection = (function () {
 
     var validateForm = function () {
         var hasMeasurandSeries = OpenSpeedMonitor.BarchartMeasurings ? OpenSpeedMonitor.BarchartMeasurings.hasMeasurandSeries() : true;
-        warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
         warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
-        var doDisable = lastResultCount == 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
+
+        //Workaround for vue component in page comparison chart [IT-1930]
+        if(pageSelectionAvailable){
+            warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
+        }
+
+        var doDisable = lastResultCount === 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
+
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)
     };

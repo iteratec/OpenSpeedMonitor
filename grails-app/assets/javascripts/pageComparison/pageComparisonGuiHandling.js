@@ -7,7 +7,6 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.GuiHandling = OpenSpeedMonitor.ChartModules.GuiHandling || {};
 
-
 OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var pageComparisonChart = OpenSpeedMonitor.ChartModules.PageComparisonChart("#page-comparison-svg");
@@ -25,6 +24,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         drawGraphButton.click(function () {
             loadData(true);
         });
+
+        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonDisabledCallback(setShowButtonDisabled);
+        setShowButtonDisabled(true);
     };
 
     var renderChart = function (data, isStateChange) {
@@ -40,6 +42,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     var handleNewData = function (data, isStateChange) {
         $("#chart-card").removeClass("hidden");
         renderChart(data, isStateChange)
+    };
+
+    var setShowButtonDisabled = function (state) {
+        if(!state) {
+            $('#graphButtonHtmlId').removeAttr('disabled', 'disabled');
+            $('#warning-no-page').hide();
+        } else {
+            $('#graphButtonHtmlId').attr('disabled', 'disabled');
+            $('#warning-no-page').show();
+        }
     };
 
     var loadData = function (isStateChange) {

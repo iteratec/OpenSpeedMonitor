@@ -15,7 +15,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         data: {
             jobGroups: [],
             groupToPagesMap: {},
-            comparisons: []
+            comparisons: [],
+            showButtonDisableState: false,
+            showButtonDisabledCallback: function () {
+            }
         },
         created: function () {
             this.addComparisonRow();
@@ -29,6 +32,24 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 $("#select-interval-timeframe-card").on("timeFrameChanged", timeFrameChangedFunction);
             })
 
+        },
+        watch: {
+            comparisons: {
+                handler: function () {
+                    var self = this;
+                    this.showButtonDisableState = false;
+                    this.comparisons.some(function (comparison) {
+                        var state = comparison.jobGroupId1 > 0 && comparison.jobGroupId2 > 0 && comparison.pageId1 > 0 && comparison.pageId2 > 0;
+
+                        if (!state) {
+                            self.showButtonDisableState = true;
+                            return true;
+                        }
+                    });
+                    self.showButtonDisabledCallback(this.showButtonDisableState);
+                },
+                deep: true
+            }
         },
         methods: {
             loadJobGroupMap: function () {
@@ -49,7 +70,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                         that.filterData(data);
                     },
                     error: function (e, statusText) {
-                        if (statusText != "abort") {
+                        if (statusText !== "abort") {
                             throw e;
                         }
                     },
@@ -73,10 +94,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 this.groupToPagesMap = newJobGroupMap;
             },
             addComparisonRow: function () {
-                this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1})
+                this.comparisons.push({jobGroupId1: -1, pageId1: -1, jobGroupId2: -1, pageId2: -1});
             },
             removeComparisonRow: function (index) {
-                this.comparisons.splice(index,1)
+                this.comparisons.splice(index, 1)
             },
             getComparisons: function () {
                 return this.comparisons
@@ -101,6 +122,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                 return ids;
 
             },
+            setShowButtonDisabledCallback: function (callback) {
+                this.showButtonDisabledCallback = callback;
+            },
             addListener: function () {
                 var that = this;
                 $('#addComparison').on('click', function () {
@@ -113,7 +137,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
         getComparisons: pageComparisonVue.getComparisons,
         setComparisons: pageComparisonVue.setComparisons,
         getPageIds: pageComparisonVue.getPageIds,
-        getJobGroupIds: pageComparisonVue.getJobGroupIds
+        getJobGroupIds: pageComparisonVue.getJobGroupIds,
+        setShowButtonDisabledCallback: pageComparisonVue.setShowButtonDisabledCallback
     }
 });
 
