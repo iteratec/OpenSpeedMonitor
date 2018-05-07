@@ -58,7 +58,6 @@ class CsiDashboardControllerSpec extends Specification {
         controllerUnderTest = controller
         command = new CsiDashboardShowAllCommand()
 
-        controller.csiHelperService = Mock(CsiHelperService)
         controller.userspecificDashboardService = Mock(UserspecificDashboardService)
         controller.configService = Stub(ConfigService) {
             getInitialChartHeightInPixels() >> 400
@@ -525,7 +524,7 @@ class CsiDashboardControllerSpec extends Specification {
 
         then: "all relevant domain data is included in the result"
         result != null
-        result.size() == 14
+        result.size() == 13
 
         result["aggrGroupLabels"] == CsiDashboardController.AGGREGATOR_GROUP_LABELS
         result["aggrGroupValues"] == CsiDashboardController.AGGREGATOR_GROUP_VALUES
