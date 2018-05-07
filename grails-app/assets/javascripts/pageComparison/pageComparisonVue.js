@@ -46,7 +46,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons = (function
                             return true;
                         }
                     });
-                    console.log(this.showButtonDisableState);
                     self.showButtonDisabledCallback(this.showButtonDisableState);
                 },
                 deep: true

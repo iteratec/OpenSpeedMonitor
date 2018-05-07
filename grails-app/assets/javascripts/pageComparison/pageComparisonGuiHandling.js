@@ -45,12 +45,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var setShowButtonDisabled = function (state) {
-        console.log(state);
         if(!state) {
             $('#graphButtonHtmlId').removeAttr('disabled', 'disabled');
             $('#warning-no-page').hide();
         } else {
-            console.log("disable");
             $('#graphButtonHtmlId').attr('disabled', 'disabled');
             $('#warning-no-page').show();
         }
