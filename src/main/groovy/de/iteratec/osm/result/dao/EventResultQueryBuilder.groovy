@@ -32,7 +32,7 @@ class EventResultQueryBuilder {
         return {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
-            createAlias('connectivityProfile', 'connectivityProfile')
+            //createAlias('connectivityProfile', 'connectivityProfile')
             'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
@@ -103,7 +103,7 @@ class EventResultQueryBuilder {
         return this
     }
 
-    EventResultQueryBuilder withTrim(Integer trimValue, TrimQualifier trimQualifier, MeasurandGroup measurandGroup) {
+    EventResultQueryBuilder withTrim(def trimValue, TrimQualifier trimQualifier, MeasurandGroup measurandGroup) {
         trims.add(new MeasurandTrim(
                 measurandGroup: measurandGroup,
                 value: trimValue,
@@ -112,7 +112,7 @@ class EventResultQueryBuilder {
         return this
     }
 
-    EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConn) {
+    EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
         filters.add({
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             or {
@@ -122,7 +122,7 @@ class EventResultQueryBuilder {
                 if (customConnNames) {
                     'in'('customConnectivityName', customConnNames)
                 }
-                if (queryParams.includeNativeConnectivity) {
+                if (includeNativeConnectivity) {
                     eq('noTrafficShapingAtAll', true)
                 }
             }

@@ -33,7 +33,7 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    void configureForSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands){
+    void configureForSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
         this.selectedMeasurands = selectedMeasurands
     }
 
@@ -60,25 +60,25 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         return projections
     }
 
-    private Closure buildUserTimingFilter(List<MeasurandTrim> trims){
+    private Closure buildUserTimingFilter(List<MeasurandTrim> trims) {
         List<String> userTimingList = selectedMeasurands.findAll { it.selectedType.isUserTiming() }.collect {
             it.databaseRelevantName
         }
         if (!userTimingList) {
             return null
         }
-        trims = trims?:[]
-        List<MeasurandTrim> loadTimeTrims = trims.findAll{it.measurandGroup == MeasurandGroup.LOAD_TIMES}
-        return{
+        trims = trims ?: []
+        List<MeasurandTrim> loadTimeTrims = trims.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }
+        return {
             userTimings {
                 'in' 'name', userTimingList
-                loadTimeTrims.each {MeasurandTrim trim ->
-                    or{
-                        and{
-                            "${trim.qualifier.getGormSyntax()}" "startTime", trim.value
-                            eq "duration", null
+                loadTimeTrims.each { MeasurandTrim trim ->
+                    or {
+                        and {
+                            "${trim.qualifier.getGormSyntax()}" "startTime", new Double(trim.value)
+                            isNull("duration")
                         }
-                        "${trim.qualifier.getGormSyntax()}" "duration", trim.value
+                        "${trim.qualifier.getGormSyntax()}" "duration", new Double(trim.value)
                     }
                 }
             }
@@ -97,11 +97,11 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         return projections
     }
 
-    EventResultProjection getRelevantProjection(Map dbResult, List<EventResultProjection> projections){
-        EventResultProjection relevantProjection = projections.find {EventResultProjection projection ->
+    EventResultProjection getRelevantProjection(Map dbResult, List<EventResultProjection> projections) {
+        EventResultProjection relevantProjection = projections.find { EventResultProjection projection ->
             projection.id == dbResult.id
         }
-        if(!relevantProjection){
+        if (!relevantProjection) {
             relevantProjection = new EventResultProjection(id: dbResult.id)
             projections.add(relevantProjection)
         }

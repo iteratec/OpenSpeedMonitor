@@ -7,6 +7,6 @@ import de.iteratec.osm.result.MeasurandGroup
  */
 class MeasurandTrim {
     MeasurandGroup measurandGroup
-    Integer value
+    def value
     TrimQualifier qualifier
 }
