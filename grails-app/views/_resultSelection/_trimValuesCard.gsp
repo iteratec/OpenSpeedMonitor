@@ -12,7 +12,7 @@
             </label>
             <div class="input-group">
                 <input name="trimBelowLoadTimes" id="appendedInputBelowLoadTimes"
-                       value="${trimBelowLoadTimes}" class="form-control trim-selection" type="number"
+                       value="${trimBelowLoadTimes}" class="form-control trim-selection" type="number" step="any"
                        placeholder="...">
                 <span class="input-group-addon">${de.iteratec.osm.result.MeasurandGroup.LOAD_TIMES.getUnit().getLabel()}</span>
             </div>
@@ -23,7 +23,7 @@
             </label>
             <div class="input-group">
                 <input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes"
-                       value="${trimAboveLoadTimes}" class="form-control trim-selection" type="number"
+                       value="${trimAboveLoadTimes}" class="form-control trim-selection" type="number" step="any"
                        placeholder="...">
                 <span class="input-group-addon">${MeasurandGroup.LOAD_TIMES.getUnit().getLabel()}</span>
             </div>
@@ -68,7 +68,7 @@
             </label>
             <div class="input-group">
                 <input name="trimBelowRequestSizes" id="appendedInputBelowRequestSizes"
-                       value="${trimBelowRequestSizes}" class="form-control trim-selection" type="number"
+                       value="${trimBelowRequestSizes}" class="form-control trim-selection" type="number" step="any"
                        placeholder="...">
                 <span class="input-group-addon">${MeasurandGroup.REQUEST_SIZES.getUnit().getLabel()}</span>
             </div>
@@ -80,7 +80,7 @@
             </label>
             <div class="input-group">
                 <input name="trimAboveRequestSizes" id="appendedInputAboveRequestSizes"
-                       value="${trimAboveRequestSizes}" class="form-control trim-selection" type="number"
+                       value="${trimAboveRequestSizes}" class="form-control trim-selection" type="number" step="any"
                        placeholder="...">
                 <span class="input-group-addon">${MeasurandGroup.REQUEST_SIZES.getUnit().getLabel()}</span>
             </div>
