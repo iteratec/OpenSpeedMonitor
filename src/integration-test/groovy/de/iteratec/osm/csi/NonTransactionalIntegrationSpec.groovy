@@ -1,48 +1,34 @@
 package de.iteratec.osm.csi
 
 import grails.buildtestdata.TestDataBuilder
+import grails.core.GrailsApplication
+import org.grails.datastore.mapping.core.connections.ConnectionSource
+import org.grails.orm.hibernate.HibernateDatastore
+import org.hibernate.boot.MetadataBuilder
 import org.hibernate.boot.MetadataSources
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.boot.spi.MetadataImplementor
+import org.hibernate.engine.spi.SessionFactoryImplementor
 import org.hibernate.tool.hbm2ddl.SchemaExport
-import spock.lang.Shared
 import spock.lang.Specification
-
-import java.sql.Connection
-
 /*
-See https://stackoverflow.com/a/32227118
+See https://stackoverflow.com/questions/16628929/grails-recreate-database-schema-for-integration-test
  */
 class NonTransactionalIntegrationSpec extends Specification implements TestDataBuilder {
-
-    @Shared
-    private static MetadataSources metadata
-    Connection connection//Wie krieg ich die? Datasource.getConnection
-
-
-    @Shared
-    def grailsApplication
-
     static transactional = false
 
-    def cleanup() {
-        if (!metadata) {
-            metadata = new MetadataSources(new StandardServiceRegistryBuilder().applySetting(
-                    "hibernate.dialect", "org.hibernate.dialect.MySQLDialect").build())
-            // [...] adding annotated classes to metadata here...
-            configuration.addAnnotatedClass()
+    GrailsApplication grailsApplication
 
-            Properties properties = new Properties()
-            properties.setProperty 'hibernate.connection.driver_class', grailsApplication.config.dataSource.driverClassName
-            properties.setProperty 'hibernate.connection.username', grailsApplication.config.dataSource.username
-            properties.setProperty 'hibernate.connection.password', grailsApplication.config.dataSource.password ?:""
-            properties.setProperty 'hibernate.connection.url', grailsApplication.config.dataSource.url
-            properties.setProperty 'hibernate.dialect', 'org.hibernate.dialect.H2Dialect'
-        }
-        new SchemaExport(
-                (MetadataImplementor) metadata.buildMetadata(),
-                connection // pre-configured Connection here
-        ).create(false, true)
+    def cleanup() {
+        HibernateDatastore hibernateDatastore = grailsApplication.mainContext.getBean("hibernateDatastore", HibernateDatastore)
+        hibernateDatastore = hibernateDatastore.getDatastoreForConnection(ConnectionSource.DEFAULT)
+        def serviceRegistry = ((SessionFactoryImplementor)hibernateDatastore.sessionFactory).getServiceRegistry()
+                .getParentServiceRegistry()
+        final MetadataSources metadataSources = new MetadataSources( serviceRegistry )
+        final MetadataBuilder metadataBuilder = metadataSources.getMetadataBuilder()
+        def metadata = (MetadataImplementor) metadataBuilder.build()
+
+        def schemaExport = new SchemaExport(serviceRegistry, metadata)
+        schemaExport.create(false, true)
     }
 
 }
