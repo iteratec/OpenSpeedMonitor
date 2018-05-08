@@ -104,4 +104,11 @@ class OsmConfiguration {
         infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
         globalUserAgentSuffix nullable: true, defaultValue: DEFAULT_GLOBAL_USER_AGENT_SUFFIX
     }
+    def beforeInsert(){
+        if(count() != 0){
+            log.error("Osm Configuration already exists. Won't save again.")
+            return false
+        }
+        return true
+    }
 }
