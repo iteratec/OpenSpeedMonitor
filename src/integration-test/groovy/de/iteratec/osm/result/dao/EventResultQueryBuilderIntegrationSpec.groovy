@@ -204,7 +204,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             10.times {
                 EventResult.build(
                         connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
+                        fullyLoadedTimeInMillisecs: 200,
                         csByWptDocCompleteInPercent: new Double(300),
                         medianValue: true
                 )
@@ -212,7 +212,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             2.times {
                 EventResult.build(
                         connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
+                        fullyLoadedTimeInMillisecs: 200,
                         csByWptDocCompleteInPercent: new Double(200),
                         medianValue: true
                 )
@@ -220,7 +220,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             10.times {
                 EventResult.build(
                         connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
+                        fullyLoadedTimeInMillisecs: 200,
                         csByWptDocCompleteInPercent: new Double(100),
                         medianValue: true
                 )
@@ -253,9 +253,12 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             10.times {
                 EventResult.build(
                         connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
+                        fullyLoadedTimeInMillisecs: 300,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", startTime: new Double(300), duration: null, type: UserTimingType.MARK)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", startTime: new Double(300), duration: null, type: UserTimingType.MARK),
+                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
+                        ]
                 )
             }
             2.times {
@@ -263,15 +266,21 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                         connectivityProfile: connectivityProfile,
                         fullyLoadedTimeInMillisecs: 200,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", startTime: new Double(200), duration: null, type: UserTimingType.MARK)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", startTime: new Double(200), duration: null, type: UserTimingType.MARK),
+                                UserTiming.build(name: "usertimingME", duration: new Double(300), type: UserTimingType.MEASURE)
+                        ]
                 )
             }
             10.times {
                 EventResult.build(
                         connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
+                        fullyLoadedTimeInMillisecs: 100,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", startTime: new Double(100), duration: null, type: UserTimingType.MARK)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", startTime: new Double(100), duration: null, type: UserTimingType.MARK),
+                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
+                        ]
                 )
             }
             session.flush()
@@ -294,6 +303,69 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         }
     }
 
+    void "check mixed trims"() {
+        given: "two matching and 20 other Eventresults"
+        EventResult.withNewSession { session ->
+            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+
+            10.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 300,
+                        firstByteInMillisecs: 100,
+                        medianValue: true,
+                        userTimings: [
+                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                        ]
+                )
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 200,
+                        firstByteInMillisecs: 100,
+                        medianValue: true,
+                        userTimings: [
+                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                        ]
+                )
+            }
+            10.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 100,
+                        firstByteInMillisecs: 100,
+                        medianValue: true,
+                        userTimings: [
+                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                        ]
+                )
+            }
+            session.flush()
+        }
+
+
+        when: "the builder is trimmed with two selectedMeasurands"
+        SelectedMeasurand selectedMeasurandMatching = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
+        SelectedMeasurand selectedMeasurandNotMatching = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+                .withSelectedMeasurands([selectedMeasurandMatching, selectedMeasurandNotMatching])
+                .withConnectivity([connectivityProfile.id], null, false)
+                .withTrim(250, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
+                .withTrim(150, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
+                .getRawData()
+
+        then: "only both matching Eventresults are found with trimmed data"
+        result.size() == 2
+        result.every {
+            it.fullyLoadedTimeInMillisecs == 200 &&
+                    !it.userTimingMK
+        }
+    }
+
     void "check trims for UserTiming Measures"() {
         given: "two matching and 20 other Eventresults"
         EventResult.withNewSession { session ->
@@ -304,7 +376,10 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                         connectivityProfile: connectivityProfile,
                         fullyLoadedTimeInMillisecs: 200,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", duration: new Double(300), type: UserTimingType.MEASURE)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", duration: new Double(300), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
+                        ]
                 )
             }
             2.times {
@@ -312,7 +387,10 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                         connectivityProfile: connectivityProfile,
                         fullyLoadedTimeInMillisecs: 200,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", duration: new Double(200), type: UserTimingType.MEASURE)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", duration: new Double(200), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                        ]
                 )
             }
             10.times {
@@ -320,7 +398,10 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                         connectivityProfile: connectivityProfile,
                         fullyLoadedTimeInMillisecs: 200,
                         medianValue: true,
-                        userTimings: [UserTiming.build(name: "usertiming", duration: new Double(100), type: UserTimingType.MEASURE)]
+                        userTimings: [
+                                UserTiming.build(name: "usertiming", duration: new Double(100), type: UserTimingType.MEASURE),
+                                UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
+                        ]
                 )
             }
             session.flush()
@@ -368,7 +449,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         }
 
 
-        when: "the builder is trimmed"
+        when: "the builder is configured for marks"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTMK_mark2", CachedView.UNCACHED)
         List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
                 .withSelectedMeasurands([selectedMeasurand])
@@ -378,7 +459,54 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         then: "only both matching Eventresults are found"
         result.size() == 2
         result.every {
-            it.mark2 == 100
+            it.mark2 == 100 &&
+                    !it.name &&
+                    !it.startTime &&
+                    !it.duration &&
+                    !it.type
+        }
+    }
+
+    void "check if UserTimings Measures are found"() {
+        given: "two matching and 10 other Eventresults"
+        EventResult.withNewSession { session ->
+            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+
+            10.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 200,
+                        medianValue: true,
+                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
+                )
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 200,
+                        medianValue: true,
+                        userTimings: [UserTiming.build(name: "mark2", duration: new Double(100), type: UserTimingType.MEASURE)]
+                )
+            }
+            session.flush()
+        }
+
+
+        when: "the builder is configured for measurands"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark2", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+                .withSelectedMeasurands([selectedMeasurand])
+                .withConnectivity([connectivityProfile.id], null, false)
+                .getRawData()
+
+        then: "only both matching Eventresults are found"
+        result.size() == 2
+        result.every {
+            it.mark2 == 100 &&
+                    !it.name &&
+                    !it.startTime &&
+                    !it.duration &&
+                    !it.type
         }
     }
 }

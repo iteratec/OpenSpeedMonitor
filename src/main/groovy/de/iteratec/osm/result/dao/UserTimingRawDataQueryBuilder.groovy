@@ -90,9 +90,13 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         dataFromDb.each { Map dbResult ->
             def userTimingValue = dbResult.type == UserTimingType.MEASURE ? dbResult.duration : dbResult.startTime
             EventResultProjection projection = getRelevantProjection(dbResult, projections)
-            dbResult.remove('id')
-            projection.projectedProperties.putAll(dbResult)
             projection.projectedProperties.put(dbResult.name, userTimingValue)
+            dbResult.remove('id')
+            dbResult.remove('name')
+            dbResult.remove('startTime')
+            dbResult.remove('duration')
+            dbResult.remove('type')
+            projection.projectedProperties.putAll(dbResult)
         }
         return projections
     }
