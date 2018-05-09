@@ -1,11 +1,13 @@
 # Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.0.
-
 ## Dynamic lazy loading
 [Blog 1: What's new in Angular CLI 6.0](https://blog.ninja-squad.com/2018/05/04/angular-cli-6.0/)
 
 [Blog 2: Angular lazy loading](https://blog.novatec-gmbh.de/angular-2-in-a-multi-page-application/)
+
+# Angular CLI specific
+
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.0.
 
 ## Development server
 
