@@ -50,9 +50,8 @@ class WeeklyShopMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
 
     def "test creation and calculation of weekly job group CSI values"() {
         setup: "event results with document complete values and document complete customer satisfaction values in percent"
-        EventResult.withNewSession { session ->
+        CsiAggregation.withNewTransaction {
             setupData()
-            session.flush()
         }
         List<CsiAggregation> weeklyJobGroupCsiAggregations = []
         Map<String, Double> targetValues = [
@@ -61,22 +60,20 @@ class WeeklyShopMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
         ]
 
         when: "the job group CSI aggregations gets calculated"
-        EventResult.withNewSession {
+        CsiAggregation.withNewTransaction {
             weeklyJobGroupCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
         }
 
         then: "two job group CSI aggregations were created and the correct CSI values per job group were calculated"
         assertEquals(2, weeklyJobGroupCsiAggregations.size())
-        CsiAggregation.withNewSession {
-            weeklyJobGroupCsiAggregations*.id.each { id ->
-                CsiAggregation csiAggregation = CsiAggregation.get(id)
+        weeklyJobGroupCsiAggregations*.id.each { id ->
+            CsiAggregation csiAggregation = CsiAggregation.get(id)
 
-                assertEquals(AggregationType.JOB_GROUP, csiAggregation.aggregationType)
-                assertEquals(startOfWeek.toDate(), csiAggregation.started)
-                assertEquals(weeklyInterval.intervalInMinutes, csiAggregation.interval.intervalInMinutes)
-                assertTrue(csiAggregation.isCalculated())
-                assertEquals(targetValues["${csiAggregation.jobGroup.name}"], csiAggregation.csByWptDocCompleteInPercent, 0.01d)
-            }
+            assertEquals(AggregationType.JOB_GROUP, csiAggregation.aggregationType)
+            assertEquals(startOfWeek.toDate(), csiAggregation.started)
+            assertEquals(weeklyInterval.intervalInMinutes, csiAggregation.interval.intervalInMinutes)
+            assertTrue(csiAggregation.isCalculated())
+            assertEquals(targetValues["${csiAggregation.jobGroup.name}"], csiAggregation.csByWptDocCompleteInPercent, 0.01d)
         }
     }
 

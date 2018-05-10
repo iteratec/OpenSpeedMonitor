@@ -1,17 +1,7 @@
 package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.CsiSystem
-import de.iteratec.osm.csi.JobGroupWeight
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageWeight
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -23,7 +13,6 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -32,8 +21,8 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.csi.CsiDashboardPage
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys

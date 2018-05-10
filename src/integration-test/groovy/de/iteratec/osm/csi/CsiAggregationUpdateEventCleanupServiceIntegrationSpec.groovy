@@ -32,21 +32,21 @@ class CsiAggregationUpdateEventCleanupServiceIntegrationSpec extends NonTransact
     void "already calculated daily page csi aggregations get closed"() {
         setup:
         long idDailyPageMvInitiallyOpenAndCalculated
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
             CsiAggregation csiAggregationDailyPageCalculated = CsiAggregation.build(started: new Date(100), interval: daily, aggregationType: AggregationType.PAGE, closedAndCalculated: false)
             idDailyPageMvInitiallyOpenAndCalculated = csiAggregationDailyPageCalculated.id
             CsiAggregationUpdateEvent.build(csiAggregationId: idDailyPageMvInitiallyOpenAndCalculated, updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
 
         when:
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 1
             assert !CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated
             csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
         }
 
         then:
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
             assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
             CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated
         }

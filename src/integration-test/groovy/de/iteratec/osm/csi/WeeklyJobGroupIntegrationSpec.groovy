@@ -115,10 +115,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
         }
 
         when: "It get calculated."
-        CsiAggregation.withNewSession { session ->
-            jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
-            session.flush()
-        }
+        jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
         CsiAggregation csiAggWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         then: "It is marked as calculated and has a valid csByWptDocCompleteInPercent."

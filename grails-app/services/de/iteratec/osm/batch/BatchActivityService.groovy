@@ -1,7 +1,5 @@
 package de.iteratec.osm.batch
 
-import org.hibernate.engine.jdbc.batch.spi.Batch
-
 class BatchActivityService {
 
     /**
@@ -47,7 +45,7 @@ class BatchActivityService {
      */
     public boolean runningBatch(Class c, String name, Activity activity) {
         def result
-        BatchActivity.withNewSession {
+        BatchActivity.withNewTransaction {
             result = BatchActivity.findByNameAndDomainAndActivityAndStatus(name, c.name, activity, Status.ACTIVE) != null
         }
         return result

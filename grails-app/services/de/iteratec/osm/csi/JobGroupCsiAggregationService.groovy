@@ -104,7 +104,7 @@ class JobGroupCsiAggregationService {
         List<Long> allCsiAggregationIds = []
 
 
-        CsiAggregation.withNewSession { session ->
+        CsiAggregation.withNewTransaction {
 
             while (!currentDateTime.isAfter(toDateTime)) {
                 List<Long> shopCsiAggregationIds
@@ -118,9 +118,6 @@ class JobGroupCsiAggregationService {
                 allCsiAggregationIds.addAll(shopCsiAggregationIds)
 
                 currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
-
-                session.flush()
-                session.clear()
             }
 
         }

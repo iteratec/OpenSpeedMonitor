@@ -76,24 +76,19 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
         createResultDataFromCsv()
         Date startDate = START_OF_WEEK.toDate()
         long csiAggregationId
-        CsiAggregation.withNewTransaction {
-            CsiAggregation aggregation = CsiAggregation.build(
-                    started: startDate,
-                    interval: weekly,
-                    aggregationType: AggregationType.PAGE,
-                    jobGroup: JobGroup.get(jobGroupId),
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: '',
-                    page: Page.findByName(pageName)
-            )
-            csiAggregationId = aggregation.id
-        }
+        CsiAggregation aggregation = CsiAggregation.build(
+                started: startDate,
+                interval: weekly,
+                aggregationType: AggregationType.PAGE,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: '',
+                page: Page.findByName(pageName)
+        )
+        csiAggregationId = aggregation.id
 
         when: "We calculate the CsiAgg."
-        CsiAggregation.withNewSession { session ->
-            pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
-            session.flush()
-        }
+        pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
         CsiAggregation csiAggWeeklyPage = CsiAggregation.get(csiAggregationId)
 
         then: "There should be the correct value for csByWptDocCompleteInPercent."

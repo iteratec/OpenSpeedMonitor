@@ -70,7 +70,7 @@ class CsiAggregationUpdateEventCleanupService {
         }
 
         List<Long> csiAggregationsOpenAndExpiredIds = []
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
             csiAggregationsOpenAndExpiredIds = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)*.id
         }
 
@@ -127,7 +127,7 @@ class CsiAggregationUpdateEventCleanupService {
     }
 
     void calculateCsiAggregation(CsiAggregation csiAggregation) {
-        CsiAggregation.withNewSession { session ->
+        CsiAggregation.withNewTransaction {
 
             List<CsiAggregation> toClose
 
@@ -150,8 +150,6 @@ class CsiAggregationUpdateEventCleanupService {
                 aggregation.save(failOnError: true)
             }
 
-            session.flush()
-            session.clear()
         }
     }
 

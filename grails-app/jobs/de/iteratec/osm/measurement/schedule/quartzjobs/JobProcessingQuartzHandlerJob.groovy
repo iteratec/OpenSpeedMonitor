@@ -18,7 +18,6 @@
 package de.iteratec.osm.measurement.schedule.quartzjobs
 
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.TriggerGroup
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -28,7 +27,6 @@ import java.util.concurrent.locks.ReentrantLock
 
 import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
  * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
@@ -52,7 +50,7 @@ class JobProcessingQuartzHandlerJob {
      */
     def execute(JobExecutionContext context) {
 
-        Job.withNewSession {
+        Job.withNewTransaction {
 
             Long jobId = context.mergedJobDataMap.getLong("jobId")
             Job job = Job.get(jobId)

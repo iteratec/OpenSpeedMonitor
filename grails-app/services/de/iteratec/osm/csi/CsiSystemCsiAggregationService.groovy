@@ -98,7 +98,7 @@ class CsiSystemCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
 
-        CsiAggregation.withNewSession { session ->
+        CsiAggregation.withNewTransaction {
 
             while (!currentDateTime.isAfter(toDateTime)) {
                 List<Long> csiSystemCsiAggregationIds = ensurePresence(currentDateTime, interval, csiSystems)
@@ -109,9 +109,6 @@ class CsiSystemCsiAggregationService {
                 allCsiAggregationIds.addAll(csiSystemCsiAggregationIds)
 
                 currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
-
-                session.flush()
-                session.clear()
             }
         }
 
