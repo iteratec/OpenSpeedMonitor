@@ -50,10 +50,6 @@ class CsiConfigurationIntegrationSpec extends NonTransactionalIntegrationSpec {
         ConnectivityProfile profile = ConnectivityProfile.build()
 
         csiConfiguration = CsiConfiguration.build()
-        csiConfiguration.timeToCsMappings = [TimeToCsMapping.build(page: page)]
-        csiConfiguration.pageWeights = [PageWeight.build()]
-        csiConfiguration.browserConnectivityWeights = [BrowserConnectivityWeight.build(browser: browser, connectivity: profile)]
         csiConfiguration.save(failOnError: true)
-
     }
 }
