@@ -175,13 +175,19 @@ task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
     args = ['run', 'build:prod']
 }
 
-task syncFrontendFiles(type: Sync, dependsOn: compileFrontend) {
-    description = "Syncs frontend files"
+task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
+    description = "Syncs frontend javascript files"
     from 'frontend/dist/frontend'
-    include "*.js"
-    include "*.css"
+    include '*.js'
     into 'grails-app/assets/javascripts/frontend'
     rename('(main|polyfills|runtime)\\..*\\.js', '$1.js')
+}
+
+task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
+    description = "Syncs frontend stylesheet files"
+    from 'frontend/dist/frontend'
+    include '*.css'
+    into 'grails-app/assets/stylesheets/frontend'
     rename('(styles)\\..*\\.css', '$1.css')
 }
 
@@ -254,7 +260,7 @@ task nodeSyncStylesheets(type: Sync) {
 
 
 task nodePackages() {
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendFiles
+    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
 }
 
 processResources.dependsOn nodePackages
