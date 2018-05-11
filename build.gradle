@@ -179,8 +179,10 @@ task syncFrontendFiles(type: Sync, dependsOn: compileFrontend) {
     description = "Syncs frontend files"
     from 'frontend/dist/frontend'
     include "*.js"
+    include "*.css"
     into 'grails-app/assets/javascripts/frontend'
     rename('(main|polyfills|runtime)\\..*\\.js', '$1.js')
+    rename('(styles)\\..*\\.css', '$1.css')
 }
 
 task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
