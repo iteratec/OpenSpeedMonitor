@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -49,8 +48,6 @@ import grails.gorm.annotation.Entity
 class EventResult implements CsiValue {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-
-    OsmConfigCacheService osmConfigCacheService
 
     Long id
     Date dateCreated
@@ -228,7 +225,7 @@ class EventResult implements CsiValue {
 
     }
 
-    static transients = ['csiRelevant', 'osmConfigCacheService']
+    static transients = ['csiRelevant']
 
     @Override
     public Double retrieveCsByWptDocCompleteInPercent() {
