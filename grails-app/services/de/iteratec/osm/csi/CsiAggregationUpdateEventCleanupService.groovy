@@ -70,9 +70,7 @@ class CsiAggregationUpdateEventCleanupService {
         }
 
         List<Long> csiAggregationsOpenAndExpiredIds = []
-        CsiAggregation.withNewTransaction {
-            csiAggregationsOpenAndExpiredIds = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)*.id
-        }
+        csiAggregationsOpenAndExpiredIds = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)*.id
 
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${CsiAggregationUpdateEvent.count()} update events in db before cleanup.")
 
@@ -127,8 +125,6 @@ class CsiAggregationUpdateEventCleanupService {
     }
 
     void calculateCsiAggregation(CsiAggregation csiAggregation) {
-        CsiAggregation.withNewTransaction {
-
             List<CsiAggregation> toClose
 
             switch (csiAggregation.aggregationType) {
@@ -149,8 +145,6 @@ class CsiAggregationUpdateEventCleanupService {
                 aggregation.closedAndCalculated = true
                 aggregation.save(failOnError: true)
             }
-
-        }
     }
 
     void closeAllCsiAggregations(List<Long> csiAggregationIds, BatchActivityUpdater activityUpdater) {
