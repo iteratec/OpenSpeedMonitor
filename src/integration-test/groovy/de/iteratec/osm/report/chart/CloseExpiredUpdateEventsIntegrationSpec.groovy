@@ -114,13 +114,15 @@ class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegratio
         csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 
         then: "the outdated update events get deleted and CSI aggregations get closed and calculated"
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
+        CsiAggregation.withNewTransaction {
+            List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
-        CsiAggregationUpdateEvent.list().size() == 0
-        csiAggregations.size() == 2
-        csiAggregations.every { csiAggregation ->
-            csiAggregation.closedAndCalculated &&
-            csiAggregation.isCalculatedWithoutData()
+            CsiAggregationUpdateEvent.list().size() == 0
+            csiAggregations.size() == 2
+            csiAggregations.every { csiAggregation ->
+                csiAggregation.closedAndCalculated &&
+                        csiAggregation.isCalculatedWithoutData()
+            }
         }
     }
 
