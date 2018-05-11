@@ -35,6 +35,7 @@ class UrlMappings {
         "/releasenotes"(view: "/siteinfo/releasenotes")
         "/about"(view: "/siteinfo/about")
         "/systeminfo"(view: "/siteinfo/systeminfo")
+        "/setup-dashboard"(view: "/setupDashboard/index")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
