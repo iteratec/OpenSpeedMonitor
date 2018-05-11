@@ -98,20 +98,16 @@ class CsiSystemCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
 
-        CsiAggregation.withNewTransaction {
-
-            while (!currentDateTime.isAfter(toDateTime)) {
-                List<Long> csiSystemCsiAggregationIds = ensurePresence(currentDateTime, interval, csiSystems)
-                List<Long> csiSystemCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(csiSystemCsiAggregationIds)
-                if (csiSystemCsiAggregationIdsToCalculate)
-                    calcCsiAggregations(csiSystemCsiAggregationIdsToCalculate)
+        while (!currentDateTime.isAfter(toDateTime)) {
+            List<Long> csiSystemCsiAggregationIds = ensurePresence(currentDateTime, interval, csiSystems)
+            List<Long> csiSystemCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(csiSystemCsiAggregationIds)
+            if (csiSystemCsiAggregationIdsToCalculate)
+                calcCsiAggregations(csiSystemCsiAggregationIdsToCalculate)
 
                 allCsiAggregationIds.addAll(csiSystemCsiAggregationIds)
 
                 currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
             }
-        }
-
 
         return CsiAggregation.getAll(allCsiAggregationIds)
     }
