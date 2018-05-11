@@ -318,6 +318,7 @@ class Job implements Taggable {
         customConnectivityProfile defaultValue: false
         persistNonMedianResults defaultValue: '1'
         label(index: 'label_idx')
+        autowire true
     }
 
     def beforeValidate() {

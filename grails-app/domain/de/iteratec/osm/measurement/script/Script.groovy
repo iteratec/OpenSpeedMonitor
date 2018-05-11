@@ -57,6 +57,7 @@ class Script {
         sort 'label'
         navigationScript(type: 'text')
         archivedScripts cascade: 'all-delete-orphan'
+        autowire true
     }
 
     static constraints = {
