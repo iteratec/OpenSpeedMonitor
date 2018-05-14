@@ -149,6 +149,8 @@ task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
 
 [Blog 2: Angular lazy loading](https://blog.novatec-gmbh.de/angular-2-in-a-multi-page-application/)
 
+[Blog 3: Angular Elements with Angular 6](https://medium.com/@tomsu/building-web-components-with-angular-elements-746cd2a38d5b)
+
 # Angular CLI specific
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.0.
