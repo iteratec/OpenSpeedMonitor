@@ -242,7 +242,7 @@ grails:
             securityConfigType: 'InterceptUrlMap'
             interceptUrlMap: [
                             {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
-                            {pattern: "/setup-dashboard",                               access: ['permitAll']},
+                            {pattern: "/setup-dashboard",                               access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
                             {pattern: '/assets/**',                                     access: ["permitAll"]},
