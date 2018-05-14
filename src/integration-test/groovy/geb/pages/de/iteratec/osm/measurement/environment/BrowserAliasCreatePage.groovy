@@ -14,7 +14,6 @@ class BrowserAliasCreatePage extends I18nGebPage {
         createBrowserAliasButton(to: [BrowserAliasCreatePage, BrowserAliasShowPage]) { $("#create") }
 
         errorMessageBox { $("div", class: "alert alert-danger") }
-        errorMessageBoxText { errorMessageBox.attr("innerHTML") }
 
         browserAliasTextField { $("#alias") }
 

@@ -71,8 +71,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
 
         then: "an error message is shown on create page"
         at BrowserAliasCreatePage
-        errorMessageBox.isDisplayed()
-        !errorMessageBoxText.isEmpty()
+        errorMessageBox.every{it.isDisplayed() && !it.attr("innerHTML").isEmpty()}
     }
 
     @IgnoreIf(IgnoreGebLiveTest)
@@ -120,8 +119,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
         saveButton.click()
 
         then: "error message is shown"
-        errorMessageBox.isDisplayed()
-        !errorMessageBoxText.isEmpty()
+        errorMessageBox.every{it.isDisplayed() && !it.attr("innerHTML").isEmpty()}
     }
 
     @IgnoreIf(IgnoreGebLiveTest)

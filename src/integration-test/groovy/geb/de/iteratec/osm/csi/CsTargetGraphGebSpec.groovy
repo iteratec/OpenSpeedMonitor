@@ -74,8 +74,7 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
 
         then: "an error message is shown on create csTargetGraph"
         at CsTargetGraphCreatePage
-        errorMessageBox.isDisplayed()
-        !errorMessageBoxText.isEmpty()
+        errorMessageBox.every{it.isDisplayed() && !it.attr("innerHTML").isEmpty()}
     }
 
     @IgnoreIf(IgnoreGebLiveTest)
@@ -123,8 +122,7 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
         saveButton.click()
 
         then: "error message is shown"
-        errorMessageBox.isDisplayed()
-        !errorMessageBoxText.isEmpty()
+        errorMessageBox.every{it.isDisplayed() && !it.attr("innerHTML").isEmpty()}
     }
 
     @IgnoreIf(IgnoreGebLiveTest)
