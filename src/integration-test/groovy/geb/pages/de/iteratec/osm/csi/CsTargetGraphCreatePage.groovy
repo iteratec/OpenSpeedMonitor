@@ -20,6 +20,6 @@ class CsTargetGraphCreatePage extends I18nGebPage{
     }
 
     def selectPointTwo () {
-        $("#pointTwo").find("option")[1].click()
+        $("#pointTwo\\.id").find("option")[1].click()
     }
 }
