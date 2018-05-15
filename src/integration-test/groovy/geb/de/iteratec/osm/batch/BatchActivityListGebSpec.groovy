@@ -43,7 +43,7 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
 
     private void createData() {
         BatchActivity.withNewTransaction {
-            OsmConfiguration.build()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
             createAdminUser()
             BatchActivity.build(status: Status.ACTIVE, lastUpdate: new Date()).save(failOnError: true)
             3.times{

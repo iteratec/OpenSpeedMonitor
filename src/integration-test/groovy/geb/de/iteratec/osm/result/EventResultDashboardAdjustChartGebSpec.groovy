@@ -381,7 +381,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     private createData() {
         Job.withNewTransaction {
-            OsmConfiguration.build()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
             createAdminUser()
 
 

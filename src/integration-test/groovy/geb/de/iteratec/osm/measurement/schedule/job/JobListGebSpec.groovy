@@ -381,7 +381,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     private void createData() {
 
         Job.withNewTransaction {
-            OsmConfiguration.build()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
             createAdminUser()
 
             Script script1 = Script.build(label: script1Name, description: "This is for test purposes", navigationScript: "stuff")

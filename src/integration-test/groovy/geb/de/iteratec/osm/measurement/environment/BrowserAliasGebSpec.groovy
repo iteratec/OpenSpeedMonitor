@@ -50,7 +50,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to browserAlias list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            OsmConfiguration.build()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
             createAdminUser()
         }
         doLogin()
