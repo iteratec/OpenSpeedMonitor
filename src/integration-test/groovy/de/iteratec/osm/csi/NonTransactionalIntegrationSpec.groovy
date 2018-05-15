@@ -39,7 +39,6 @@ class NonTransactionalIntegrationSpec extends Specification {
           properties.setProperty 'hibernate.connection.username', grailsApplication.config.dataSource.username
           properties.setProperty 'hibernate.connection.password', grailsApplication.config.dataSource.password ?:""
           properties.setProperty 'hibernate.connection.url', grailsApplication.config.dataSource.url
-          properties.setProperty 'hibernate.dialect', 'org.hibernate.dialect.H2Dialect'
 
           _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
       }
