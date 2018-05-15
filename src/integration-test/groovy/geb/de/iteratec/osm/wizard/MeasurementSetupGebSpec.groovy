@@ -41,7 +41,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     def setupAndLogin(){
         User.withNewTransaction {
-            OsmConfiguration.build()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
             createAdminUser()
             location = Location.build(label: "location1", location: "local", active: true, wptServer: WebPageTestServer.build(active: true))
             ConnectivityProfile.build(active: true)
