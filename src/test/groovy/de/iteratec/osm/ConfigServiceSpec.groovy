@@ -44,15 +44,12 @@ class ConfigServiceSpec extends Specification {
         service.getInitialChartHeightInPixels() == DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     }
 
-    void "more than one config is bad"() {
+    void "only one config can be persisted"() {
         given: "two configs have been saved"
         2.times { OsmConfiguration.build() }
 
-        when: "trying to access any value from config service"
-        service.getDetailDataStorageTimeInWeeks()
-
-        then: "an illegalStateExpection should be thrown"
-        thrown(IllegalStateException)
+        expect: "only one configuration"
+        OsmConfiguration.count() == 1
     }
 
     void "values in config can be changed"(int from, int to) {
