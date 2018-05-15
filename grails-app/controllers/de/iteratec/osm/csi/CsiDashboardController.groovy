@@ -66,7 +66,6 @@ class CsiDashboardController {
     I18nService i18nService
 
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
-    CsiHelperService csiHelperService
     CsiAggregationUtilService csiAggregationUtilService
     EventService eventService
     SpringSecurityService springSecurityService
@@ -1004,7 +1003,6 @@ class CsiDashboardController {
             locationsOfBrowsers.put(eachBrowser.getId(), locationIds)
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers)
-        result.put('defaultChartTitle', csiHelperService.getCsiChartDefaultTitle())
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)

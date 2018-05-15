@@ -11,6 +11,10 @@ class BootstrapTagLib {
 
 	def requestDataValueProcessor = null;
 
+	def emptyLink = {text ->
+		return "<a>${text}</>"
+	}
+
 	def paginate = {
 		attrs ->
 		def writer = out
@@ -51,13 +55,13 @@ class BootstrapTagLib {
 
 		// display previous link when not on firststep
 		def disabledPrev = (currentstep > firststep) ? "" : "disabled"
+		def previousText = (attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))
+		def previousLink = disabledPrev? emptyLink(previousText): link(linkTagAttrs.clone()) {previousText }
 		//		linkTagAttrs.class = 'prevLink'
 		//		linkParams.offset = offset - max
 		writer << "<ul class='pagination'>"
 		writer << "<li class='prev ${disabledPrev}'>"
-		writer << link(linkTagAttrs.clone()) {
-			(attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))
-		}
+		writer << previousLink
 		writer << "</li>"
 
 		// display steps when steps are enabled and laststep is not firststep
@@ -113,11 +117,12 @@ class BootstrapTagLib {
 
 		// display next link when not on laststep
 		def disabledNext = (currentstep < laststep) ? "" : "disabled"
+		def nextText = (attrs.next ? attrs.next : messageSource.getMessage('paginate.next', null, messageSource.getMessage('default.paginate.next', null, 'Next', locale), locale))
+		def nextLink = disabledNext? emptyLink(nextText):link(linkTagAttrs.clone()) { nextText }
+
 		linkParams.offset = (currentstep)*max
 		writer << "<li class='next ${disabledNext}'>"
-		writer << link(linkTagAttrs.clone()) {
-			(attrs.next ? attrs.next : messageSource.getMessage('paginate.next', null, messageSource.getMessage('default.paginate.next', null, 'Next', locale), locale))
-		}
+		writer << nextLink
 		writer << "</li>"
 		writer << "</ul>"
 	}

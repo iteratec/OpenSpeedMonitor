@@ -42,7 +42,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 @Integration
 @Rollback
 @ConfineMetaClassChanges([CsiByEventResultsService])
-class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
+class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-10
 
@@ -78,12 +78,9 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     }
 
     void "test retrieveCsi with system and page"() {
-        given:
+        given: "a query for all Jobgroups and a pre-calculated expected csi"
         MvQueryParams queryParams = new MvQueryParams()
         queryParams.jobGroupIds.addAll(JobGroup.list()*.id)
-
-        when:
-        CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
 
         Double ieWeight = 45d
         Double ffWeight = 55d
@@ -95,18 +92,18 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         Double expectedCsi = ((avgHpIe * ieWeight) + (avgHpFf * ffWeight) + (avgMesIe * ieWeight) + (avgMesFf * ffWeight)) /
                 (ieWeight + ieWeight + ffWeight + ffWeight)
 
-        then:
+        when: "calculating csi for query with weightfactorbrowser connectivity"
+        CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+
+        then: "Number of event results is 12 and difference between expected csi and csi from service is below delta"
         EventResult.list().size() == 12
         Math.abs(expectedCsi - systemCsi.csiValueAsPercentage) < DELTA
     }
 
     void "test retrieveCsi only with system"() {
-        given:
+        given: "a query for all Jobgroups and a pre-calculated expected csi"
         MvQueryParams queryParams = new MvQueryParams()
         queryParams.jobGroupIds.addAll(JobGroup.list()*.id)
-
-        when:
-        CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
 
         Double ieWeight = 45d
         Double ffWeight = 55d
@@ -120,16 +117,18 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         Double expectedCsi = ((avgHpIe * hpWeight * ieWeight) + (avgHpFf * hpWeight * ffWeight) + (avgMesIe * mesWeight * ieWeight) + (avgMesFf * mesWeight * ffWeight)) /
                 ((ieWeight * hpWeight) + (ieWeight * mesWeight) + (ffWeight * hpWeight) + (ffWeight * mesWeight))
 
-        then:
+        when: "calculating csi for query with weightfactors page and browser connectivity"
+        CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+
+        then: "Number of event results is 12 and difference between expected csi and csi from service is below delta"
         EventResult.list().size() == 12
         Math.abs(expectedCsi - systemCsi.csiValueAsPercentage) < DELTA
     }
 
     void "test duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi)" () {
-        given:
+        given: "a query for all Jobgroups and a pre-calculated expected csi"
         MvQueryParams queryParams = new MvQueryParams()
         queryParams.jobGroupIds.addAll(JobGroup.list()*.id)
-
 
         Double ieWeight = 45d
         Double ffWeight = 55d
@@ -143,7 +142,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         Double expectedCsi = ((avgHpIe * hpWeight * ieWeight) + (avgHpFf * hpWeight * ffWeight) + (avgMesIe * mesWeight * ieWeight) + (avgMesFf * mesWeight * ffWeight)) /
                 ((ieWeight * hpWeight) + (ieWeight * mesWeight) + (ffWeight * hpWeight) + (ffWeight * mesWeight))
 
-        when:
+        when: "calculating csi for query with weightfactors page and browser connectivity with duplicated results"
         //duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi)
         MeasuredEvent eventHomepage = MeasuredEvent.findByName('event-HP')
         Page pageHP_ID = Page.findByName('HP')
@@ -158,11 +157,11 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
         CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
 
-        then:
+        then: "Number of event results is 12 and difference between expected csi and csi from service is below delta"
         EventResult.list().size() == 18
         Math.abs(expectedCsi - systemCsi.csiValueAsPercentage) < DELTA
 
-        cleanup:
+        cleanup: "clean up and delete the duplicated event results"
         // delete last six eventResults
         def eventResults = EventResult.list(sort: "id", order: "desc")
         (0..6).each {eventResults[it].delete()}
@@ -197,10 +196,28 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     private void createEventResult(MeasuredEvent event, Page page, Browser browser, double value) {
         //data is needed to create a JobResult
         JobGroup group = JobGroup.list()[0]
-        Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript")
-        WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label", "1", true, "http://www.url.de")
-        Location location = TestDataUtil.createLocation(webPageTestServer, "id", browser, true)
-        Job job = TestDataUtil.createJob("Label${groups++}", script, location, group, "descirpiton", 1, false, 20)
+        Script script = Script.build(
+                label:"label${groups}",
+                description:  "description",
+                navigationScript:"navigationScript")
+        WebPageTestServer webPageTestServer = WebPageTestServer.build(
+                label: "label",
+                proxyIdentifier: "1",
+                active: true,
+                baseUrl: "http://www.url.de")
+        Location location = Location.build(
+                wptServer: webPageTestServer,
+                uniqueIdentifierForServer: "id",
+                browser: browser,
+                active:  true)
+        Job job = Job.build(
+                label: "Label${groups++}",
+                script: script,
+                location: location,
+                jobGroup: group,
+                runs: 1,
+                active:  false,
+                maxDownloadTimeInMinutes: 20)
 
         JobResult expectedResult = new JobResult(jobGroupName: "Group", jobConfigLabel: "label", jobConfigRuns: 1, httpStatusCode: 200, job: job, description: "description", date: new Date(), testId: "TestJob").save(validate: false);
 
@@ -225,9 +242,9 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     }
 
     private void createJobGroup() {
-        JobGroup group = TestDataUtil.createJobGroup("JobGroup")
-        ConnectivityProfile profile = TestDataUtil.createConnectivityProfile("unused")
-        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration("CsiConfig${groups}")
+        JobGroup group = JobGroup.build(name: "JobGroup")
+        ConnectivityProfile profile = ConnectivityProfile.build(name: "unused")
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(label: "CsiConfig${groups}")
         csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: Browser.findByName("FF"), connectivity: profile, weight: 55))
         csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: Browser.findByName("IE"), connectivity: profile, weight: 45))
         csiConfiguration.pageWeights.add(new PageWeight(page: Page.findByName("HP"), weight: 6))

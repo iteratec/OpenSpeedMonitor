@@ -68,11 +68,11 @@ OpenSpeedMonitor.ChartComponents.ChartMultiLegend = (function () {
             });
 
         var compareSymbol = entryGroup.append("text")
-            .attr('style', 'font-family: FontAwesome')
+            .style('font-size', '1.8em')
             .attr('x', colorPreviewSize + colorPreviewMargin)
             .attr('y', colorPreviewSize)
             .attr('name', 'compareSymbol')
-            .text(function() { return '\uf07e' })
+            .text('\u2B0C')
             .on("mouseover", function (d) {
                 mouseOverEntry([d['entries'][0].id,d['entries'][1].id])
             })

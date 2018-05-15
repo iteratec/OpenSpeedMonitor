@@ -213,7 +213,7 @@ class ScriptController {
         if (job && script) {
             content = script.getParsedNavigationScript(job)
         }
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, content)
     }
 
     def loadArchivedScript(long archivedScriptId) {
@@ -233,6 +233,6 @@ class ScriptController {
         def archivedScript = ArchivedScript.get(archivedScriptId)
         archivedScript.versionDescription = newVersionDescription
         archivedScript.save(failOnError: true, flush: true)
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, newVersionDescription)
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, newVersionDescription)
     }
 }

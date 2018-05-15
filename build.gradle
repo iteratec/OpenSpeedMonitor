@@ -102,7 +102,7 @@ dependencies {
     testCompile "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
 
     //Custom OSM-Stuff
-    runtime 'mysql:mysql-connector-java:5.1.26'
+    runtime 'mysql:mysql-connector-java:5.1.35'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
     runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
     compile 'net.sf.supercsv:super-csv:2.4.0'

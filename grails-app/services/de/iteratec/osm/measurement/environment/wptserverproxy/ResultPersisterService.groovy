@@ -231,7 +231,7 @@ class ResultPersisterService implements iResultListener {
                 }
 
             } else {
-                throw new OsmResultPersistanceException("there is no testStep ${zeroBasedTeststepIndex + 1} for testId ${resultXml.getTestId()}")
+                log.error("there is no testStep ${zeroBasedTeststepIndex + 1} for testId ${resultXml.getTestId()}")
             }
         }
     }

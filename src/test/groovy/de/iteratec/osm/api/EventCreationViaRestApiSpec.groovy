@@ -179,7 +179,7 @@ class EventCreationViaRestApiSpec extends Specification {
         Event.list().size() == 0
         //test json representation
         response.status == 400
-        response.text == "Error field system: At least one of the submitted job groups doesn't exist.\n"
+        response.text == "Error field system: At least one of the submitted job groups doesn't exist.\n".encodeAsHTML()
     }
 
     //eventTimestamp constraint violation ////////////////////////////////////

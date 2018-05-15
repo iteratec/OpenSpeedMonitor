@@ -19,9 +19,9 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
+import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.NodeChild
@@ -32,7 +32,7 @@ import spock.lang.Specification
  * Test-suite for {@link OsmChartTagLib}.
  */
 @TestFor(OsmChartTagLib)
-@Mock([OsmConfiguration])
+@Build([OsmConfiguration])
 class OsmChartTagLibSpec extends Specification {
 
     static def HTML_FRAGMENT_PARSER
@@ -43,7 +43,7 @@ class OsmChartTagLibSpec extends Specification {
 
     void setup() {
         //test data common for all tests
-        TestDataUtil.createOsmConfig()
+        OsmConfiguration.build()
         HTML_FRAGMENT_PARSER = new SAXParser()
         HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true)
     }

@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm.wizard
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -42,8 +41,8 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     def setupAndLogin(){
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            OsmConfiguration.build()
+            createAdminUser()
             location = Location.build(label: "location1", location: "local", active: true, wptServer: WebPageTestServer.build(active: true))
             ConnectivityProfile.build(active: true)
         }

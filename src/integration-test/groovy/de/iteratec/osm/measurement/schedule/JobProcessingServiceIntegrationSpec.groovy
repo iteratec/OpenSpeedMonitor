@@ -19,7 +19,6 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
@@ -28,17 +27,13 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
-import grails.transaction.NotTransactional
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
-import spock.lang.Ignore
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
 /**
  * Integration test for JobProcessingService
  *
@@ -46,7 +41,7 @@ import static org.junit.Assert.assertNotNull
  */
 @Integration
 @Rollback
-class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
+class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     JobProcessingService jobProcessingService
     QueueAndJobStatusService queueAndJobStatusService
     JobDaoService jobDaoService
@@ -57,8 +52,8 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
      */
     private final static String CRON_STRING_1 = '* * */12 * * ?'
     private final static String CRON_STRING_2 = '* * */13 * * ?'
-    private final static String EVERY_15_SECONDS = '*/15 * * * * ? *'
 
+    ConnectivityProfile connectivityProfile
     Script script
     Location location
     JobGroup jobGroup
@@ -66,7 +61,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
     def setup() {
 
         // mocks common for all tests
-        jobProcessingService.proxyService = Stub(ProxyService){
+        jobProcessingService.proxyService = Stub(ProxyService) {
             runtest(_, _) >> new XmlSlurper().parseText("""
                     <response>
                         <statusCode>200</statusCode>
@@ -83,32 +78,28 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
             }/</jsonUrl>
                         </data>
                     </response>
-			""")
+            """)
         }
         jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
 
         //test data common for all tests
-
-
         jobProcessingService.inMemoryConfigService = new InMemoryConfigService()
         jobProcessingService.inMemoryConfigService.activateMeasurementsGenerally()
 
-        TestDataUtil.createOsmConfig()
-
-        WebPageTestServer wptServer = new WebPageTestServer(
+        WebPageTestServer wptServer = WebPageTestServer.build(
                 label: 'Unnamed server',
                 proxyIdentifier: 'proxy_identifier',
                 dateCreated: new Date(),
                 lastUpdated: new Date(),
                 active: true,
                 baseUrl: 'http://example.com').save(failOnError: true)
-        Browser browser = new Browser(name: 'browser').save(failOnError: true)
-        jobGroup = new JobGroup(
+        Browser browser = Browser.build(name: 'browser').save(failOnError: true)
+        jobGroup = JobGroup.build(
                 name: 'Unnamed group',
                 graphiteServers: []).save(failOnError: true)
 
         script = Script.createDefaultScript('Unnamed job').save(failOnError: true)
-        location = new Location(
+        location = Location.build(
                 label: 'Unnamed location',
                 dateCreated: new Date(),
                 active: true,
@@ -116,93 +107,107 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 location: 'location',
                 browser: browser
         ).save(failOnError: true)
+
+        connectivityProfile = ConnectivityProfile.build(
+                name: "unused",
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        ).save(failOnError: true)
+        connectivityProfile.connectivityProfileService = new ConnectivityProfileService()
     }
 
 
     void "scheduleJob test"() {
-        when:
+        when: "getting trigger from quartzscheduler and triggerKey from scheduled job"
         Job wptJobToSchedule = createAndScheduleJob(CRON_STRING_1)
         TriggerKey triggerKey = getTriggerKeyOf(wptJobToSchedule)
         // check if Job was scheduled with correct Trigger identifier and group
         Trigger insertedTrigger = jobProcessingService.quartzScheduler.getTrigger(triggerKey)
 
-        then:
+        then: "triggerKey from scheduled job and triggerKey from the trigger of the scheduler are the same"
         insertedTrigger != null
         triggerKey == insertedTrigger.getKey()
         // check if schedule of inserted Trigger matches Cron expression of wptJobToSchedule
-        wptJobToSchedule.executionSchedule == getCronExpressionByTriggerKey(triggerKey, wptJobToSchedule)
+        wptJobToSchedule.executionSchedule == getCronExpressionByTriggerKey(triggerKey)
     }
 
     void "unscheduleJob test"() {
-        given:
+        given: "a scheduled job"
         Job wptJobToSchedule = createAndScheduleJob(CRON_STRING_1)
 
-        when:
+        when: "unscheduling a job"
         jobProcessingService.unscheduleJob(wptJobToSchedule)
 
-        then:
+        then: "no trigger for the job is set"
         jobProcessingService.quartzScheduler.getTrigger(getTriggerKeyOf(wptJobToSchedule)) == null
     }
 
     void "rescheduleJob test"() {
-        given:
+        given: "a scheduled job"
         Job wptJobToSchedule = createAndScheduleJob(CRON_STRING_1)
         wptJobToSchedule.executionSchedule = CRON_STRING_2
 
-        when:
-        // reschedules Job if already scheduled
+        when: "scheduling or rescheduling a job"
         jobProcessingService.scheduleJob(wptJobToSchedule)
 
-        then:
-        // check if schedule matches updated Cron expression of wptJobToSchedule
-        wptJobToSchedule.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(wptJobToSchedule), wptJobToSchedule)
+        then: "check if schedule matches updated Cron expression of wptJobToSchedule"
+        wptJobToSchedule.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(wptJobToSchedule))
 
         cleanup: "Unschedule all jobs, to prevent failures in other tests"
         jobProcessingService.unscheduleJob(wptJobToSchedule)
     }
 
     void "scheduleAllJobs test"() {
-        given:
+        given: "a set of active and inactive jobs"
         Job inactiveJob = createJob(false)
         Job activeJob1 = createJob(true, CRON_STRING_1)
         Job activeJob2 = createJob(true, CRON_STRING_2)
 
-        when:
+        when: "launching all active jobs"
         jobProcessingService.scheduleAllActiveJobs();
 
-        then:
+        then: "check if the triggers in the scheduler are correctly set"
         jobProcessingService.quartzScheduler.getTrigger(getTriggerKeyOf(inactiveJob)) == null
         jobProcessingService.quartzScheduler.getTrigger(getTriggerKeyOf(activeJob1)) != null
         jobProcessingService.quartzScheduler.getTrigger(getTriggerKeyOf(activeJob2)) != null
 
-        activeJob1.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob1), activeJob1)
-        activeJob2.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob2), activeJob2)
+        activeJob1.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob1))
+        activeJob2.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob2))
 
         cleanup: "Unschedule all jobs, to prevent failures in other tests"
         jobProcessingService.unscheduleJob(activeJob1)
         jobProcessingService.unscheduleJob(activeJob2)
     }
 
+    /**
+     * This test creates several JobResults with different status codes and checks whether
+     * JobProcessingService.getRunningAndRecentlyFinishedJobs() filters these results correctly.
+     * Only results that are no errors or the most recent one should be retained.
+     */
+
     void "closeRunningAndPengingJobs test"() {
-        given:
+        given: "a set of persisted jobResults"
         // fix current date for test purposes
         DateTimeUtils.setCurrentMillisFixed(1482395596904);
         DateTime currentDate = new DateTime()
         Job jobWithMaxDownloadTime = createJob(false)
         jobWithMaxDownloadTime.maxDownloadTimeInMinutes = 60
 
-        TestDataUtil.createJobResult("running test", currentDate.toDate(), jobWithMaxDownloadTime, location, 100)
-        TestDataUtil.createJobResult("pending test", currentDate.toDate(), jobWithMaxDownloadTime, location, 101)
-        TestDataUtil.createJobResult("barely running test", currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), jobWithMaxDownloadTime, location, 100)
-        TestDataUtil.createJobResult("outdated running test", currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), jobWithMaxDownloadTime, location, 100)
-        TestDataUtil.createJobResult("outdated pending test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 101)
-        TestDataUtil.createJobResult("finished test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 200)
-        TestDataUtil.createJobResult("failed test", currentDate.minusDays(5).toDate(), jobWithMaxDownloadTime, location, 504)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, 100)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, 101)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, 100)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, 100)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, 101)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, 200)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, 504)
 
         when: "closing running and pending job results"
         jobProcessingService.closeRunningAndPengingJobResults()
 
-        then:
+        then: "find jobResults and check their httpStatusCode"
         JobResult.findByTestId("running test").httpStatusCode == 100
         JobResult.findByTestId("pending test").httpStatusCode == 101
         JobResult.findByTestId("barely running test").httpStatusCode == 100
@@ -212,78 +217,8 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         JobResult.findByTestId("failed test").httpStatusCode == 504
     }
 
-    /**
-     * Tests the following methods of JobProcessingService:
-     * 	getCurrentlyRunningJobs
-     * 	pollJobRun
-     * 	launchJobRun
-     *
-     * 	The @Transactional(propagation = Propagation.REQUIRES_NEW) annotation on persistUnfinishedJobResult requires that the method calls in this test are encapsulated in individual transactions.
-     */
-    @NotTransactional
-    @Ignore("See IT-1703")
-    void "launchJobAndPoll test"() {
-        def jobId
-        Job job
-        when:
-        Job.withNewTransaction {
-            jobId = createJob(true, EVERY_15_SECONDS).id
-        }
-
-        Job.withNewTransaction {
-            job = jobDaoService.getJobById(jobId)
-            //launchJobRun returns false, because it fails and catch the exception
-            jobProcessingService.launchJobRun(job)
-        }
-        // manual first execution
-        // cause quartz scheduling doesn't seem to work trustable in tests
-        Job.withNewTransaction {
-            job = jobDaoService.getJobById(jobId)
-            jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
-        }
-        TriggerKey subtriggerKey
-
-        Job.withNewTransaction {
-            // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
-            subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
-        }
-        Trigger subtrigger
-        // no Job in  JobStore, because no Triger was created --> returns null
-        Job.withNewTransaction {
-            subtrigger = jobProcessingService.quartzScheduler.getTrigger(subtriggerKey)
-        }
-        then:
-        subtriggerKey != null
-        subtrigger == null
-
-        for (int i = 0; i < HttpRequestServiceMock.statusCodes.length; i++) {
-            // assert that an unfinished JobResult with correct status code has been persisted
-            if (HttpRequestServiceMock.statusCodes[i] < 200) {
-                JobResult unfinishedResult
-                Job.withNewTransaction {
-                    unfinishedResult = JobResult.findByJobConfigLabelAndTestId(job.label, HttpRequestServiceMock.testId)
-                }
-                assertNotNull(unfinishedResult)
-                assertEquals(HttpRequestServiceMock.statusCodes[i], unfinishedResult.httpStatusCode)
-            }
-            Job.withNewTransaction {
-                job = jobDaoService.getJobById(jobId)
-                jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
-            }
-        }
-
-        // ensure that upon successful completion of the test (statusCode 200) pollJobRun() removed the subtrigger
-        jobProcessingService.quartzScheduler.getTrigger(subtriggerKey) == null
-    }
-
-    /**
-     * This test creates several JobResults with different status codes and checks whether
-     * JobProcessingService.getRunningAndRecentlyFinishedJobs() filters these results correctly.
-     * Only results that are no errors or the most recent one should be retained.
-     */
-
     void "statusOfRepeatedJobExecution test"() {
-        given:
+        given: "an inactive job and a date"
         Job.withNewTransaction {
             createJob(false)
         }
@@ -291,7 +226,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         Date now = new Date()
         Date oldestDate = now - 5
 
-        when:
+        when: "creating and persisting jobResults with statusCodes and a job"
         inputStatusCodes.reverse().eachWithIndex { int httpStatusCode, int i ->
             JobResult result = jobProcessingService.persistUnfinishedJobResult(job.id, null, httpStatusCode)
             result.date = now - i
@@ -300,14 +235,14 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         // test execution
         List recentRuns = queueAndJobStatusService.getRunningAndRecentlyFinishedJobs(oldestDate, oldestDate, oldestDate)[job.id]
 
-        then:
+        then: "check if the number of jobResults matches the number of statusCodes"
         inputStatusCodes.size() == JobResult.count()
         expectedStatusCodes.size() == recentRuns.size()
         expectedStatusCodes.eachWithIndex { int statusCode, int i ->
             statusCode == recentRuns[i]['status']
         }
 
-        where:
+        where: "the input status codes are the expected status codes"
         inputStatusCodes || expectedStatusCodes
         [100]            || [100]
         [200]            || [200]
@@ -326,9 +261,22 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         [400, 200, 100]  || [200, 100]
     }
 
+    private
+    static void createAndPersistJobResult(Job job, Date date, String nameOrId, Location location, Integer httpStatusCode) {
+        JobResult.build(
+                job: job,
+                date: date,
+                testId: nameOrId,
+                jobConfigLabel: job.label,
+                jobGroupName: job.jobGroup.name,
+                locationLocation: location.location,
+                locationBrowser: location.browser.name,
+                httpStatusCode: httpStatusCode,
+        ).save(failOnError: true)
+    }
 
     private Job createJob(boolean active, String executionSchedule = null) {
-        Job wptJobToSchedule = new Job(
+        Job wptJobToSchedule = Job.build(
                 label: UNNAMED_JOB_LABEL + ' ' + UUID.randomUUID() as String,
                 description: '',
                 executionSchedule: executionSchedule,
@@ -338,7 +286,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 location: location,
                 jobGroup: jobGroup,
                 maxDownloadTimeInMinutes: 60,
-                connectivityProfile: TestDataUtil.createConnectivityProfile("unused")
+                connectivityProfile: connectivityProfile
         ).save(failOnError: true)
 
         return wptJobToSchedule
@@ -350,7 +298,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         return wptJobToSchedule
     }
 
-    private String getCronExpressionByTriggerKey(TriggerKey triggerKey, Job wptJobToSchedule) {
+    private String getCronExpressionByTriggerKey(TriggerKey triggerKey) {
         Trigger insertedTrigger = jobProcessingService.quartzScheduler.getTrigger(triggerKey)
         CronTriggerImpl cronScheduleBuilder = insertedTrigger.getScheduleBuilder().build()
         return cronScheduleBuilder.cronExpression

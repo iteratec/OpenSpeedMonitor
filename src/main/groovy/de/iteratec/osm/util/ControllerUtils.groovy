@@ -91,6 +91,10 @@ class ControllerUtils {
      * @param message The message to respond
      */
     static void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message, String contentType = 'text/plain;charset=UTF-8') {
+        sendResponseAsStreamWithoutModifying(response, httpStatus, message.encodeAsHTML(), contentType)
+    }
+
+    static void sendResponseAsStreamWithoutModifying(HttpServletResponse response, HttpStatus httpStatus, String message, String contentType = 'text/plain;charset=UTF-8'){
         response.setContentType(contentType)
         response.status = httpStatus.value()
 
@@ -125,7 +129,7 @@ class ControllerUtils {
     static void sendObjectAsJSON(HttpServletResponse response, Object objectToSend, boolean prettyPrint = false) {
         JSON jsonObject = objectToSend as JSON
         jsonObject.setPrettyPrint(prettyPrint)
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonObject.toString(), 'application/json;charset=UTF-8')
+        sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, jsonObject.toString(), 'application/json;charset=UTF-8')
     }
 
     /**

@@ -22,7 +22,7 @@ services:
       API_KEY_DETAIL_ANALYSIS: 'api_key_detail_analysis'
 
   osm_mysql:
-    image: mysql:latest
+    image: mysql:5.7
     container_name: osm_mysql
     volumes:
       - osm_mysql_data:/var/lib/mysql
