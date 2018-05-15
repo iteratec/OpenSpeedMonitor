@@ -19,11 +19,13 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.result.WptStatus
 import groovy.util.slurpersupport.GPathResult
 
 class HttpRequestServiceMock extends HttpRequestService {
 	public static final String testId = '140210_6W_1'
-	public static final int[] statusCodes = [100, 101, 101, 101, 200]
+	public static final int[] statusCodes = [WptStatus.Pending.getWptStatusCode(), WptStatus.Running.getWptStatusCode(), WptStatus.Running.getWptStatusCode(),
+											 WptStatus.Running.getWptStatusCode(), WptStatus.Completed.getWptStatusCode()]
 	public static final String redirectUserUrl = "http://dev.server01.wpt.iteratec.de/result/${testId}/"
 
 	private int fetchResultCallCount = 0;
@@ -34,9 +36,9 @@ class HttpRequestServiceMock extends HttpRequestService {
 		int statusCode = fetchResultCallCount <= statusCodes.length ? statusCodes[fetchResultCallCount - 1] : 200
 		String statusText
 		switch(statusCode) {
-			case 100: statusText = 'Test Pending'; break;
-			case 101: statusText = 'Test Running'; break;
-			case 200: statusText = 'Ok'; break;
+			case WptStatus.Pending.getWptStatusCode(): statusText = 'Test Pending'; break;
+			case WptStatus.Running.getWptStatusCode(): statusText = 'Test Running'; break;
+			case WptStatus.Completed.getWptStatusCode(): statusText = 'Ok'; break;
 		}
 		String xmlHeader = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -691,7 +693,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 </run>
 </data>
 		"""
-		return parseXml([ data: [ text: xmlHeader + (statusCode == 200 ? resultData : '') + xmlFooter ]])
+		return parseXml([ data: [ text: xmlHeader + (statusCode == WptStatus.Completed.getWptStatusCode() ? resultData : '') + xmlFooter ]])
 	}
     GPathResult parseXml(Object xmlResponse) {
         assert xmlResponse != null

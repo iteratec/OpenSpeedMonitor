@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -196,25 +197,25 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         Job jobWithMaxDownloadTime = createJob(false)
         jobWithMaxDownloadTime.maxDownloadTimeInMinutes = 60
 
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, 101)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, 101)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, 200)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, 504)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, WptStatus.Running.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, WptStatus.Pending.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, WptStatus.Running.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, WptStatus.Pending.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, WptStatus.Pending.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, WptStatus.Completed.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, WptStatus.TimeOut.getWptStatusCode())
 
         when: "closing running and pending job results"
         jobProcessingService.closeRunningAndPengingJobResults()
 
         then: "find jobResults and check their httpStatusCode"
-        JobResult.findByTestId("running test").httpStatusCode == 100
-        JobResult.findByTestId("pending test").httpStatusCode == 101
-        JobResult.findByTestId("barely running test").httpStatusCode == 100
+        JobResult.findByTestId("running test").httpStatusCode == WptStatus.Running.getWptStatusCode()
+        JobResult.findByTestId("pending test").httpStatusCode == WptStatus.Pending.getWptStatusCode()
+        JobResult.findByTestId("barely running test").httpStatusCode == WptStatus.Running.getWptStatusCode()
         JobResult.findByTestId("outdated running test").httpStatusCode == 900
         JobResult.findByTestId("outdated pending test").httpStatusCode == 900
-        JobResult.findByTestId("finished test").httpStatusCode == 200
-        JobResult.findByTestId("failed test").httpStatusCode == 504
+        JobResult.findByTestId("finished test").httpStatusCode == WptStatus.Completed.getWptStatusCode()
+        JobResult.findByTestId("failed test").httpStatusCode == WptStatus.TimeOut.getWptStatusCode()
     }
 
     void "statusOfRepeatedJobExecution test"() {

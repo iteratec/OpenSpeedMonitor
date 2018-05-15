@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.system.LocationHealthCheck
 import de.iteratec.osm.system.LocationHealthCheckDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -74,19 +75,19 @@ class QueueStatusController {
         }
 
         Map queueDataOfThisLocation = [
-            dateOfOsmQueueData: healthCheck.date,
-            id                  : location.uniqueIdentifierForServer,
-            label               : location.location,
-            agents              : healthCheck.numberOfAgents,
-            jobs                : healthCheck.numberOfPendingJobsInWpt,
-            eventResultsLastHour: healthCheck.numberOfEventResultsLastHour,
-            jobResultsLastHour  : healthCheck.numberOfJobResultsLastHour,
-            errorsLastHour      : healthCheck.numberOfErrorsLastHour,
-            jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
-            eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
-            executingJobs       : executingJobs,
-            pendingJobs         : executingJobResults.findAll { it.httpStatusCode == 100 }.size(),
-            runningJobs         : executingJobResults.findAll { it.httpStatusCode == 101 }.size()
+                dateOfOsmQueueData  : healthCheck.date,
+                id                  : location.uniqueIdentifierForServer,
+                label               : location.location,
+                agents              : healthCheck.numberOfAgents,
+                jobs                : healthCheck.numberOfPendingJobsInWpt,
+                eventResultsLastHour: healthCheck.numberOfEventResultsLastHour,
+                jobResultsLastHour  : healthCheck.numberOfJobResultsLastHour,
+                errorsLastHour      : healthCheck.numberOfErrorsLastHour,
+                jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
+                eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
+                executingJobs       : executingJobs,
+                pendingJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.Pending.getWptStatusCode() }.size(),
+                runningJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.Running.getWptStatusCode() }.size()
         ]
         return queueDataOfThisLocation
     }
@@ -96,7 +97,7 @@ class QueueStatusController {
     }
 
     def list() {
-        [servers  : getServersWithQueues()]
+        [servers: getServersWithQueues()]
     }
 
     // for Ajax requests return only the table, not the entire HTML page

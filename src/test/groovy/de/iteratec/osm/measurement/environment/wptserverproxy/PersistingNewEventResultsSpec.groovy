@@ -87,14 +87,14 @@ class PersistingNewEventResultsSpec extends Specification {
         medianUncachedResults.size() == 1
         medianUncachedResults[0].docCompleteTimeInMillisecs == 5873
         medianUncachedResults[0].docCompleteRequests == 157
-        medianUncachedResults[0].wptStatus == 0
+        medianUncachedResults[0].wptStatus == WptStatus.Successful.getWptStatusCode()
         medianUncachedResults[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         List<EventResult> cachedRun3Results = EventResult.findAllByCachedViewAndNumberOfWptRun(CACHED, 3)
         cachedRun3Results.size() == 1
         cachedRun3Results[0].docCompleteTimeInMillisecs == 3977
         cachedRun3Results[0].docCompleteRequests == 36
-        cachedRun3Results[0].wptStatus == 0
+        cachedRun3Results[0].wptStatus == WptStatus.Successful.getWptStatusCode()
         cachedRun3Results[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         where:
@@ -131,7 +131,7 @@ class PersistingNewEventResultsSpec extends Specification {
         productResults[0].page.name == productPageName
         productResults[0].docCompleteTimeInMillisecs == 2218
         productResults[0].docCompleteRequests == 29
-        productResults[0].wptStatus == 99999
+        productResults[0].wptStatus == WptStatus.TestCompletedButIndividualRequestsFailed.getWptStatusCode()
         productResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen"
 
 
@@ -142,7 +142,7 @@ class PersistingNewEventResultsSpec extends Specification {
         searchResults[0].page.name == searchPageName
         searchResults[0].docCompleteTimeInMillisecs == 931
         searchResults[0].docCompleteRequests == 6
-        searchResults[0].wptStatus == 99999
+        searchResults[0].wptStatus == WptStatus.TestCompletedButIndividualRequestsFailed.getWptStatusCode()
         searchResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen"
 
         where:

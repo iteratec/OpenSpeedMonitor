@@ -31,6 +31,7 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.WptStatus
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.apache.commons.logging.LogFactory
@@ -216,7 +217,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
                     EventResult.build(
                             cachedView: CachedView.UNCACHED,
                             numberOfWptRun: 1,
-                            wptStatus: 200,
+                            wptStatus: WptStatus.Completed.getWptStatusCode(),
                             medianValue: true,
                             docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
                             csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,
