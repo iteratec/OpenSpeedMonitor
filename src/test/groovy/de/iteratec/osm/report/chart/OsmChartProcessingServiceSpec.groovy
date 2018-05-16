@@ -28,7 +28,6 @@ import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
  * These tests test processing osm chart data.
  *
  * <b>Note: </b>Method {@link de.iteratec.osm.report.chart.OsmChartProcessingService#summarizeEventResultGraphs(java.util.List)}
- *      isn't tested here cause it is tested in class {@link de.iteratec.osm.result.SummarizedChartLegendEntriesSpec} already.
  */
 @TestFor(OsmChartProcessingService)
 class OsmChartProcessingServiceSpec extends Specification {
