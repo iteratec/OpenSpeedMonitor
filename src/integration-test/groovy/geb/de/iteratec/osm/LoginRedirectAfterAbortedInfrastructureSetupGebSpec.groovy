@@ -23,12 +23,7 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
         and: "there is an admin and an osm config in db and infrastructure setup was aborted previously"
         User.withNewTransaction {
-            OsmConfiguration configuration = OsmConfiguration.list()[0]
-            if (!configuration) {
-                configuration = OsmConfiguration.build()
-            }
-            configuration.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.ABORTED
-            configuration.save(failOnError: true)
+            OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.ABORTED)
             createAdminUser()
         }
 
@@ -43,5 +38,8 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

@@ -1,8 +1,10 @@
 package geb.de.iteratec.osm.wizard
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.WptServerService
+import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.wizards.InfrastructureSetupPage
@@ -19,6 +21,9 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
 
     void "The Setup can be cancelled"(){
         given:
+        User.withNewTransaction {
+            OsmConfiguration.build()
+        }
         to InfrastructureSetupPage
         InfrastructureSetupPage currentPage = page as InfrastructureSetupPage
 
@@ -84,5 +89,11 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
         then: "the landingpage should load and show how many locations where imported"
         at LandingPage
         $(".alert").text() == currentPage.getI18nMessage("de.iteratec.osm.ui.setupwizards.infra.success",[1])
+    }
+
+    void cleanupSpec() {
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

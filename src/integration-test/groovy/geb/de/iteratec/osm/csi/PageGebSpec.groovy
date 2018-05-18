@@ -169,5 +169,8 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
 
     def cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

@@ -315,7 +315,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     private void createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
+            OsmConfiguration.build()
             TestDataUtil.createAdminUser()
             initCsiData()
             createTestSpecificData()
@@ -559,9 +559,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
             CsiSystem.list().each {
                 it.delete()
             }

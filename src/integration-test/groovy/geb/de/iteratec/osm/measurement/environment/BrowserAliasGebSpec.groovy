@@ -45,6 +45,9 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 
     void "test user gets to browserAlias list when logged in"() {

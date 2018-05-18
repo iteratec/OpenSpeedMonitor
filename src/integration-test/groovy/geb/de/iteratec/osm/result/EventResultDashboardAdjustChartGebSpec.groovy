@@ -372,9 +372,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 

@@ -372,9 +372,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 

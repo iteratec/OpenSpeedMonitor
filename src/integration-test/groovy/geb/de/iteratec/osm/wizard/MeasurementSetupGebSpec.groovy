@@ -59,7 +59,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
             WebPageTestServer.list().each { it.delete() }
             Browser.list().each { it.delete() }
             Script.list().each { it.delete() }
-            OsmConfiguration.list().each { it.delete() }
+            OsmConfiguration.first().delete()
         }
     }
 

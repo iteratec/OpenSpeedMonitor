@@ -1,5 +1,7 @@
 package geb.de.iteratec.osm.wizard
 
+import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.wizards.InfrastructureSetupPage
 import grails.testing.mixin.integration.Integration
@@ -14,6 +16,9 @@ class InfrastructureSetupWithCustomGebSpec extends CustomUrlGebReportingSpec {
 
     void "User should be able to select a custom WPT Server"() {
         given: "User starts at Infrastructure Page"
+        User.withNewTransaction {
+            OsmConfiguration.build()
+        }
         to InfrastructureSetupPage
         InfrastructureSetupPage currentPage = page as InfrastructureSetupPage
 
@@ -47,5 +52,11 @@ class InfrastructureSetupWithCustomGebSpec extends CustomUrlGebReportingSpec {
         !currentPage.hasError(currentPage.serverName)
         !currentPage.hasError(currentPage.serverUrl)
         currentPage.isSubmitEnabled()
+    }
+
+    void cleanupSpec() {
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

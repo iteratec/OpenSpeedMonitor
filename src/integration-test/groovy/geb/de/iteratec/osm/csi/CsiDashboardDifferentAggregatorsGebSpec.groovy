@@ -404,9 +404,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     private void createData() {
         Job.withNewTransaction {
-            if (OsmConfiguration.count == 0) {
-                OsmConfiguration.build().save(failOnError: true)
-            }
+            OsmConfiguration.build()
             createAdminUser()
             initCsiData()
             createTestSpecificData()
@@ -649,9 +647,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
             CsiSystem.list().each {
                 it.delete()
             }

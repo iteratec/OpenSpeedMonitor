@@ -844,15 +844,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 
     private createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
+            OsmConfiguration.build()
             TestDataUtil.createAdminUser()
 
             Script script1 = Script.build().save(failOnError: true)

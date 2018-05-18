@@ -35,6 +35,9 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 
     def setupData() {

@@ -60,7 +60,7 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
         doLogout()
         BatchActivity.withNewTransaction {
             BatchActivity.list()*.delete()
-            OsmConfiguration.list()*.delete()
+            OsmConfiguration.first().delete()
             UserRole.list()*.delete()
             User.list()*.delete()
             Role.list()*.delete()

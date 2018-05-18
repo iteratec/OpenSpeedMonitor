@@ -58,5 +58,8 @@ class LoginRedirectAfterInfrastructureSetupGebSpec extends CustomUrlGebReporting
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

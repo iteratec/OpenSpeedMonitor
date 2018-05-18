@@ -180,5 +180,8 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }
