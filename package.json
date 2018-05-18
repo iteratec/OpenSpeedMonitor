@@ -10,11 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "napa"
-  },
-  "napa": {
-    "tagit": "https://github.com/aehlke/tag-it.git"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -58,9 +54,7 @@
     "save-svg-as-png": "1.1.0",
     "spin": "^0.0.1",
     "sticky-table-headers": "0.1.19",
+    "tag-it": "^2.0.0",
     "vue": "2.4.4"
-  },
-  "devDependencies": {
-    "napa": "^3.0.0"
   }
 }
