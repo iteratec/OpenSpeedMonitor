@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -345,6 +346,9 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     void cleanupSpec() {
         doLogout()
         Job.withNewTransaction {
+            JobResult.list().each {
+                it.delete()
+            }
             Job.list().each {
                 it.delete()
             }
