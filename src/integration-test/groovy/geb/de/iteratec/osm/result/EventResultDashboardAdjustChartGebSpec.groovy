@@ -336,16 +336,16 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             MeasuredEvent.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
-                it.delete()
-            }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {

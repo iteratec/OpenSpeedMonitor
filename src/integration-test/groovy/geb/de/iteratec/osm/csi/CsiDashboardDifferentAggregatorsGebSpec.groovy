@@ -596,10 +596,13 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
             BrowserConnectivityWeight.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
+            JobResult.list().each {
                 it.delete()
             }
-            JobResult.list().each {
+            Job.list().each {
+                it.delete()
+            }
+            ConnectivityProfile.list().each {
                 it.delete()
             }
             TimeToCsMapping.list().each {
@@ -609,9 +612,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
                 it.delete()
             }
             Page.list().each {
-                it.delete()
-            }
-            Job.list().each {
                 it.delete()
             }
             Location.list().each {

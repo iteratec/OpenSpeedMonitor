@@ -215,10 +215,10 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
-            UserTimingSelectionInformation.list().each {
+            ResultSelectionInformation.list().each {
                 it.delete()
             }
-            ResultSelectionInformation.list().each {
+            UserTimingSelectionInformation.list().each {
                 it.delete()
             }
             UserTiming.list().each {

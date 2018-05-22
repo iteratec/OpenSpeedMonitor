@@ -508,10 +508,13 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             BrowserConnectivityWeight.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
+            JobResult.list().each {
                 it.delete()
             }
-            JobResult.list().each {
+            Job.list().each {
+                it.delete()
+            }
+            ConnectivityProfile.list().each {
                 it.delete()
             }
             TimeToCsMapping.list().each {
@@ -521,9 +524,6 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
                 it.delete()
             }
             Page.list().each {
-                it.delete()
-            }
-            Job.list().each {
                 it.delete()
             }
             Location.list().each {
