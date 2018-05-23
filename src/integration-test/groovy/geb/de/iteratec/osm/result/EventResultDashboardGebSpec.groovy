@@ -175,7 +175,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every{ it.displayed } }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
@@ -230,7 +230,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         clickShowButton()
 
         then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every { it.displayed } }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
