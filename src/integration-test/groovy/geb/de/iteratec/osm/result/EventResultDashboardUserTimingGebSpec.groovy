@@ -64,7 +64,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
     @Shared
     String userTimingMeasureName = "Measure1-564892#Afef1"
     @Shared
-    int userTimingsSize
+    int userTimingsSize = 2
 
 
     void cleanupSpec() {
@@ -307,22 +307,6 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
 
             ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
 
-            List<UserTiming> userTimingsForJobResult2 = []
-            userTimingsForJobResult2.add(
-                    new UserTiming(
-                            name: userTimingMarkName,
-                            type: UserTimingType.MARK,
-                            startTime: 123
-                    ))
-            userTimingsForJobResult2.add(
-                    new UserTiming(
-                            name: userTimingMeasureName,
-                            type: UserTimingType.MEASURE,
-                            startTime: 123,
-                            duration: 456
-                    ))
-            userTimingsSize = userTimingsForJobResult2.size()
-
             new EventResult(
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
@@ -384,7 +368,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -417,7 +401,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -512,7 +496,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -544,7 +528,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -607,7 +591,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -639,7 +623,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -761,4 +745,22 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
         datePicker << date
     }
 
+    private List<UserTiming> createUserTimingsForJobResult() {
+        List<UserTiming> userTimingsForJobResult = []
+        userTimingsForJobResult.add(
+                new UserTiming(
+                        name: userTimingMarkName,
+                        type: UserTimingType.MARK,
+                        startTime: 123
+                ))
+        userTimingsForJobResult.add(
+                new UserTiming(
+                        name: userTimingMeasureName,
+                        type: UserTimingType.MEASURE,
+                        startTime: 123,
+                        duration: 456
+                ))
+
+        return userTimingsForJobResult
+    }
 }
