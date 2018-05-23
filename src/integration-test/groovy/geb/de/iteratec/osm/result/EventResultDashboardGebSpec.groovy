@@ -80,7 +80,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !selectConnectivityProfilesList[0].enabled
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -115,7 +115,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-data").displayed
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -139,7 +139,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-data").displayed
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -164,7 +164,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-page").displayed
         }
         waitFor {
-            !showButton.disabled
+            !showButton.@disabled
         }
     }
 
