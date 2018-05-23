@@ -172,8 +172,8 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         addAliasButton.click()
 
         when: "User provides graph alias"
-        waitFor { graphNameSelect.displayed }
-        graphNameSelect.click()
+        waitFor { graphNameSelect[0].displayed }
+        graphNameSelect[0].click()
         sleep(200)
         graphNameSelectOptions[1].click()
         aliasInputField << "CustomAlias"
@@ -187,7 +187,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
     void "Change Graph color"() {
         when: "User changes graph color"
         waitFor{ adjustChartButton.click() }
-        waitFor { colorPicker.displayed }
+        waitFor { colorPicker[0].displayed }
         sleep(300)
         setColorPicker("#aaaaaa")
         adjustChartApply.click()
