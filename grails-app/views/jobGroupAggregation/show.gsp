@@ -33,9 +33,9 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" id="graphButtonHtmlId"
+                        <button type="button" id="graphButtonHtmlId"
                            class="btn btn-primary show-button">
-                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
