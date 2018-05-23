@@ -205,7 +205,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
         clickShowButton()
 
         then: "graphs appear with marks, measures and DOC_COMPLETE_TIME"
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every { it.displayed } }
         graphLines.size() == 9
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 9
