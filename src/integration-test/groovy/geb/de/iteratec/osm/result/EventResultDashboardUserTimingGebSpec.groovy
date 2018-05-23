@@ -221,25 +221,25 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
             UserTimingSelectionInformation.list().each {
                 it.delete()
             }
-            UserTiming.list().each {
+            EventResult.list().each {
                 it.delete()
             }
-            EventResult.list().each {
+            UserTiming.list().each {
                 it.delete()
             }
             MeasuredEvent.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
-                it.delete()
-            }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {
