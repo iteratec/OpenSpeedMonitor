@@ -8,7 +8,7 @@ import {JobGroup, JobGroupFromJson} from "./service/rest/job-group.model";
   styleUrls: ['./setup-dashboard.component.css']
 })
 export class SetupDashboardComponent implements OnInit {
-  activeJobs: JobGroup[];
+  activeJobGroups: JobGroup[];
 
   constructor(private jobGroupRestService: JobGroupRestService) {
   }
@@ -19,7 +19,7 @@ export class SetupDashboardComponent implements OnInit {
 
   getActiveJobs() {
     this.jobGroupRestService.getActiveJobGroups().subscribe((activeJobs: any[]) => {
-      this.activeJobs = activeJobs.map(jobJson => new JobGroupFromJson(jobJson));
+      this.activeJobGroups = activeJobs.map(jobJson => new JobGroupFromJson(jobJson));
     })
   }
 }
