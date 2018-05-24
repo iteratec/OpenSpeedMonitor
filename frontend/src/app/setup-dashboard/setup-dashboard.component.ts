@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {JobGroupRestService} from "./service/rest/job-group-rest.service";
+import {JobGroup, JobGroupFromJson} from "./service/rest/job-group.model";
 
 @Component({
   selector: 'app-setup-dashboard',
@@ -7,7 +8,7 @@ import {JobGroupRestService} from "./service/rest/job-group-rest.service";
   styleUrls: ['./setup-dashboard.component.css']
 })
 export class SetupDashboardComponent implements OnInit {
-  activeJobs: object;
+  activeJobs: JobGroup[];
 
   constructor(private jobGroupRestService: JobGroupRestService) {
   }
@@ -17,8 +18,8 @@ export class SetupDashboardComponent implements OnInit {
   }
 
   getActiveJobs() {
-    this.jobGroupRestService.getActiveJobGroups().subscribe((activeJobs) => {
-      this.activeJobs = activeJobs;
+    this.jobGroupRestService.getActiveJobGroups().subscribe((activeJobs: any[]) => {
+      this.activeJobs = activeJobs.map(jobJson => new JobGroupFromJson(jobJson));
     })
   }
 }

@@ -1,6 +1,4 @@
-import { Injectable } from '@angular/core';
 
-@Injectable()
-export class Configuration {
-  public getActiveJobUrl = 'jobGroup/getAllActive';
+export enum UrlStore {
+  GET_ACTIVE_JOB_URL = 'jobGroup/getAllActive'
 }
