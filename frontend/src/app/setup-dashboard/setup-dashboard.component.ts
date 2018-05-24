@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {JobGroupRestService} from "./service/rest/job-group-rest.service";
 
 @Component({
   selector: 'app-setup-dashboard',
@@ -6,10 +7,18 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./setup-dashboard.component.css']
 })
 export class SetupDashboardComponent implements OnInit {
+  activeJobs: object;
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private jobGroupRestService: JobGroupRestService) {
   }
 
+  ngOnInit() {
+    this.getActiveJobs();
+  }
+
+  getActiveJobs() {
+    this.jobGroupRestService.getActiveJobGroups().subscribe((activeJobs) => {
+      this.activeJobs = activeJobs;
+    })
+  }
 }
