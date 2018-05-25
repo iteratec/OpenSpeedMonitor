@@ -36,17 +36,17 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     DateTime runDate = new DateTime(DateTimeZone.UTC)
     URL testDetailsWaterfallURL = new URL("https://www.test.details.waterfall.url.de")
 
-    void "check minimal specification"() {
+    void "check minimal specification"(boolean medianValue, def fullyLoaded) {
         given: "two matching and 10 other Eventresults"
         EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
-
             10.times {
-                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
+                EventResult.build(
+                        fullyLoadedTimeInMillisecs: fullyLoaded,
+                        medianValue: medianValue
+                )
             }
             2.times {
                 EventResult.build(
-                        connectivityProfile: connectivityProfile,
                         fullyLoadedTimeInMillisecs: 500,
                         medianValue: true
                 )
@@ -55,16 +55,20 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         }
 
 
-        when: "the builder just has one measurand and one connectivity profile"
+        when: "the builder just has one measurand"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], null, false).getRawData()
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).getRawData()
 
         then: "only both matching event results are found"
         result.size() == 2
         result.every {
-            it.connectivityProfile == connectivityProfile.name &&
-                    it.fullyLoadedTimeInMillisecs == 500
+            it.fullyLoadedTimeInMillisecs == 500
         }
+
+        where:
+        medianValue | fullyLoaded
+        true        | 1100
+        false       | 900
     }
 
     void "check base projections"() {
@@ -508,6 +512,128 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                     !it.duration &&
                     !it.type
         }
+    }
+
+    void "check custom connectivity"() {
+        given: "two matching and 10 other Eventresults"
+        String customConnectivityName = "custom connectivity"
+        EventResult.withNewSession { session ->
+            10.times {
+                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: null,
+                        customConnectivityName: customConnectivityName,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true
+                )
+            }
+            session.flush()
+        }
+
+
+        when: "the builder just has one measurand and one connectivity profile"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity(null, [customConnectivityName], false).getRawData()
+
+        then: "only both matching event results are found"
+        result.size() == 2
+        result.every {
+            it.connectivityProfile == null &&
+                    it.customConnectivityName == customConnectivityName
+        }
+    }
+
+    void "check custom and non custom connectivity"() {
+        given: "two matching and 10 other Eventresults"
+        String customConnectivityName = "custom connectivity"
+        EventResult.withNewSession { session ->
+            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+
+            10.times {
+                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: null,
+                        customConnectivityName: customConnectivityName,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true
+                )
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true
+                )
+            }
+            session.flush()
+        }
+
+
+        when: "the builder just has one measurand and one connectivity profile"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], [customConnectivityName], false).getRawData()
+
+        then: "only both matching event results are found"
+        result.size() == 4
+        result.every {
+            it.customConnectivityName == customConnectivityName ||
+                    it.connectivityProfile == connectivityProfile.name
+        }
+    }
+
+    void "check custom, native and non custom connectivity"() {
+        given: "two matching and 10 other Eventresults"
+        String customConnectivityName = "custom connectivity"
+        EventResult.withNewSession { session ->
+            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+
+            10.times {
+                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: null,
+                        customConnectivityName: customConnectivityName,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true
+                )
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: connectivityProfile,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true
+                )
+            }
+            2.times {
+                EventResult.build(
+                        connectivityProfile: null,
+                        customConnectivityName: null,
+                        fullyLoadedTimeInMillisecs: 500,
+                        medianValue: true,
+                        noTrafficShapingAtAll: true
+                )
+            }
+            session.flush()
+        }
+
+
+        when: "the builder just has one measurand and one connectivity profile"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+                .withSelectedMeasurands([selectedMeasurand])
+                .withConnectivity([connectivityProfile.id], [customConnectivityName], true)
+                .getRawData()
+
+        then: "only both matching event results are found"
+        result.size() == 6
+        result.findAll { it.customConnectivityName == customConnectivityName }.size() == 2
+        result.findAll { it.connectivityProfile == connectivityProfile.name }.size() == 2
+        result.findAll { it.noTrafficShapingAtAll }.size() == 2
     }
 }
 

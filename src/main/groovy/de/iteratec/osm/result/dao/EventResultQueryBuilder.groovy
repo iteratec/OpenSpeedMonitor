@@ -32,7 +32,7 @@ class EventResultQueryBuilder {
         return {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
-            //createAlias('connectivityProfile', 'connectivityProfile')
+            createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
@@ -49,6 +49,7 @@ class EventResultQueryBuilder {
                 new ProjectionProperty(dbName: 'testDetailsWaterfallURL', alias: 'testDetailsWaterfallURL'),
                 new ProjectionProperty(dbName: 'connectivityProfile.name', alias: 'connectivityProfile'),
                 new ProjectionProperty(dbName: 'customConnectivityName', alias: 'customConnectivityName'),
+                new ProjectionProperty(dbName: 'noTrafficShapingAtAll', alias: 'noTrafficShapingAtAll'),
                 new ProjectionProperty(dbName: 'jobResultDate', alias: 'jobResultDate'),
                 new ProjectionProperty(dbName: 'testAgent', alias: 'testAgent'),
                 new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
@@ -114,7 +115,6 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
         filters.add({
-            createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             or {
                 if (connectivityProfileIds) {
                     'in'('connectivityProfile.id', connectivityProfileIds)
