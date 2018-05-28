@@ -111,7 +111,7 @@ class QueueAndJobStatusService {
      */
     int getFinishedJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode == WptStatus.Completed.getWptStatusCode() && job.location == location
+            date >= sinceWhen && httpStatusCode == WptStatus.COMPLETED.getWptStatusCode() && job.location == location
         }
         return query.list().size()
     }
@@ -123,7 +123,7 @@ class QueueAndJobStatusService {
      */
     int getErroneousJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode >= WptStatus.InvalidTestId.getWptStatusCode() && job.location == location
+            date >= sinceWhen && httpStatusCode >= WptStatus.INVALID_TEST_ID.getWptStatusCode() && job.location == location
         }
         return query.list().size()
     }
@@ -134,7 +134,7 @@ class QueueAndJobStatusService {
      */
     List<JobResult> getExecutingJobResults(Location location) {
         def query = JobResult.where {
-            (httpStatusCode == WptStatus.Pending.getWptStatusCode() || httpStatusCode == WptStatus.Running.getWptStatusCode()) && job.location == location
+            (httpStatusCode == WptStatus.PENDING.getWptStatusCode() || httpStatusCode == WptStatus.RUNNING.getWptStatusCode()) && job.location == location
         }
         return query.list(sort: 'date', order: 'desc')
     }
@@ -219,8 +219,8 @@ class QueueAndJobStatusService {
         // succeeded by successful/currently running results
         Map filteredJobResults = jobResults.each {
             it.value = it.value
-                    .findAll { result -> result['status'] < WptStatus.InvalidTestId.getWptStatusCode() || result == it.value.last() }
-                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == WptStatus.Pending.getWptStatusCode() || result['status'] == WptStatus.Running.getWptStatusCode())) || (result['date'] >= successfulSinceWhen && result['status'] == WptStatus.Completed.getWptStatusCode()) || (result['date'] >= errorSinceWhen && result['status'] >= WptStatus.InvalidTestId.getWptStatusCode()) }
+                    .findAll { result -> result['status'] < WptStatus.INVALID_TEST_ID.getWptStatusCode() || result == it.value.last() }
+                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == WptStatus.PENDING.getWptStatusCode() || result['status'] == WptStatus.RUNNING.getWptStatusCode())) || (result['date'] >= successfulSinceWhen && result['status'] == WptStatus.COMPLETED.getWptStatusCode()) || (result['date'] >= errorSinceWhen && result['status'] >= WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
         }
         return filteredJobResults
     }

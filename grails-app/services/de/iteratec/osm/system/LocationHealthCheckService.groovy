@@ -117,8 +117,8 @@ class LocationHealthCheckService {
         def numberOfJobResultsLastHour = queueAndJobStatusService.getFinishedJobResultCountSince(location, oneHourAgo)
         def numberOfEventResultsLastHour = queueAndJobStatusService.getEventResultCountBetween(location, oneHourAgo, now.toDate())
         def numberOfErrorsLastHour = queueAndJobStatusService.getErroneousJobResultCountSince(location, oneHourAgo)
-        def numberOfCurrentlyPendingJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.Pending.getWptStatusCode() }.size()
-        def numberOfCurrentlyRunningJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.Running.getWptStatusCode() }.size()
+        def numberOfCurrentlyPendingJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size()
+        def numberOfCurrentlyRunningJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
 
         new LocationHealthCheck(
                 date: now.toDate(),

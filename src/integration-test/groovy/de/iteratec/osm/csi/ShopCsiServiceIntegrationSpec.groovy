@@ -227,7 +227,7 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 page: page,
                 browser: browser,
                 location: location,
-                wptStatus: WptStatus.Completed.getWptStatusCode(),
+                wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                 medianValue: true,
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,

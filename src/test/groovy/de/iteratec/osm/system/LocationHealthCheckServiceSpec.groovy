@@ -71,8 +71,8 @@ class LocationHealthCheckServiceSpec extends Specification {
         locationHealthChecks[0].numberOfErrorsLastHour == expectedNumberOfErrorsLastHour
         locationHealthChecks[0].numberOfJobResultsNextHour == expectedNumberOfJobResultsNextHour
         locationHealthChecks[0].numberOfEventResultsNextHour == expectedNumberOfEventResultsNextHour
-        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll { it.httpStatusCode == WptStatus.Pending.getWptStatusCode() }.size()
-        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll { it.httpStatusCode == WptStatus.Running.getWptStatusCode() }.size()
+        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size()
+        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
     }
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
@@ -98,11 +98,11 @@ class LocationHealthCheckServiceSpec extends Specification {
         location = Location.build()
         jobResults = []
         2.times {
-            jobResults << JobResult.build(httpStatusCode: WptStatus.Pending.getWptStatusCode())
+            jobResults << JobResult.build(httpStatusCode: WptStatus.PENDING.getWptStatusCode())
         }
-        jobResults << JobResult.build(httpStatusCode: WptStatus.Running.getWptStatusCode())
+        jobResults << JobResult.build(httpStatusCode: WptStatus.RUNNING.getWptStatusCode())
         2.times {
-            jobResults << JobResult.build(httpStatusCode: WptStatus.Completed.getWptStatusCode())
+            jobResults << JobResult.build(httpStatusCode: WptStatus.COMPLETED.getWptStatusCode())
         }
         OsmConfiguration.build()
     }

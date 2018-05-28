@@ -446,13 +446,13 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
         if (!result)
             return
-        if (result.httpStatusCode < WptStatus.Completed.getWptStatusCode()) {
+        if (result.httpStatusCode < WptStatus.COMPLETED.getWptStatusCode()) {
             // poll a last time
             WptResultXml lastResult = pollJobRun(job, testId)
-            if (lastResult.statusCodeOfWholeTest < WptStatus.Completed.getWptStatusCode() || (lastResult.statusCodeOfWholeTest >= WptStatus.Completed.getWptStatusCode() && !lastResult.hasRuns())) {
+            if (lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() || (lastResult.statusCodeOfWholeTest >= WptStatus.COMPLETED.getWptStatusCode() && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < WptStatus.Completed.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                persistUnfinishedJobResult(job.id, testId, WptStatus.TimeOut.getWptStatusCode(), '', description)
+                String description = lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
+                persistUnfinishedJobResult(job.id, testId, WptStatus.TIME_OUT.getWptStatusCode(), '', description)
                 proxyService.cancelTest(job.location.wptServer, [test: testId])
             }
         }
@@ -469,7 +469,7 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, WptStatus.Completed.getWptStatusCode())
+        JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, WptStatus.COMPLETED.getWptStatusCode())
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true)
@@ -584,7 +584,7 @@ class JobProcessingService {
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(200)
+        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(WptStatus.COMPLETED.getWptStatusCode())
         jobResults = jobResults.findAll {
             // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)

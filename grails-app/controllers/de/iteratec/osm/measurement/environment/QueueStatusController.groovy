@@ -86,8 +86,8 @@ class QueueStatusController {
                 jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
                 eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
                 executingJobs       : executingJobs,
-                pendingJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.Pending.getWptStatusCode() }.size(),
-                runningJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.Running.getWptStatusCode() }.size()
+                pendingJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size(),
+                runningJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
         ]
         return queueDataOfThisLocation
     }

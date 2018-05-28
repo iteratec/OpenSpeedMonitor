@@ -217,7 +217,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
                     EventResult.build(
                             cachedView: CachedView.UNCACHED,
                             numberOfWptRun: 1,
-                            wptStatus: WptStatus.Completed.getWptStatusCode(),
+                            wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                             medianValue: true,
                             docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
                             csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,
