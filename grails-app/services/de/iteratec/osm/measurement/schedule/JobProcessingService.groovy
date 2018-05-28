@@ -591,7 +591,7 @@ class JobProcessingService {
         }
         if (jobResults) {
             jobResults.each {
-                it.httpStatusCode = 900
+                it.httpStatusCode = WptStatus.OUTDATED_JOB.getWptStatusCode()
                 it.description = "closed due to nightly cleanup of job results"
                 it.save(failOnError: true)
             }

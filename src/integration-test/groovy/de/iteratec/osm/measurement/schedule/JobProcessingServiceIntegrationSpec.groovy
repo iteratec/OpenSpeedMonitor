@@ -212,8 +212,8 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         JobResult.findByTestId("running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
         JobResult.findByTestId("pending test").httpStatusCode == WptStatus.PENDING.getWptStatusCode()
         JobResult.findByTestId("barely running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
-        JobResult.findByTestId("outdated running test").httpStatusCode == 900
-        JobResult.findByTestId("outdated pending test").httpStatusCode == 900
+        JobResult.findByTestId("outdated running test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
+        JobResult.findByTestId("outdated pending test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
         JobResult.findByTestId("finished test").httpStatusCode == WptStatus.COMPLETED.getWptStatusCode()
         JobResult.findByTestId("failed test").httpStatusCode == WptStatus.TIME_OUT.getWptStatusCode()
     }
