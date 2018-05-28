@@ -13,13 +13,13 @@ enum WptStatus{
     TEST_TIMED_OUT_CONTENT_ERRORS(99998),
     TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED(99999)
 
-    private Integer statusCode
+    private int statusCode
 
     private WptStatus(Integer value) {
         this.statusCode = value
     }
 
-    Integer getWptStatusCode(){
+    int getWptStatusCode(){
         return statusCode
     }
 }
