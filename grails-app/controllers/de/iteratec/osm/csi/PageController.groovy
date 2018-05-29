@@ -17,10 +17,15 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -31,6 +36,7 @@ import javax.servlet.http.HttpServletResponse
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
 class PageController {
+    PageService pageService
 
     I18nService i18nService
 
@@ -133,6 +139,23 @@ class PageController {
 
     def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command){
         render command.measuredEventList*.testedPageId as Set
+    }
+
+    def getPagesForJobGroup(){
+        println(params)
+        if(params['jobGroupId']){
+            Long jobGroupId = Long.parseLong(params['jobGroupId'].toString())
+            def jobGroup = JobGroup.findById(jobGroupId)
+            def jobList = Job.findAllByJobGroup(jobGroup)
+            def scriptList = jobList.findAll{it.script}.collect{it.script}
+            def result = scriptList.collect{
+                new ScriptParser(pageService, it.navigationScript).getAllMeasuredEvents(it.navigationScript).collect()
+            }
+            println(result)
+            return ControllerUtils.sendObjectAsJSON(response, result)
+        }
+
+
     }
 }
 
