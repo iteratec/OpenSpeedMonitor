@@ -10,6 +10,7 @@
 </head>
 
 <body>
+%{--<page-comparison data-module-path="src/app/pageComparison/pageComparison.module#PageComparisonModule"></page-comparison>--}%
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageComparison']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
@@ -69,6 +70,10 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
+    <asset:stylesheet src="frontend/styles.css"/>
+    <asset:javascript src="frontend/runtime.js"/>
+    <asset:javascript src="frontend/polyfills.js"/>
+    <asset:javascript src="frontend/main.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {

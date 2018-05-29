@@ -14,7 +14,7 @@
     </select>
     <select name="firstPageSelect" class="form-control pageSelect">
       <option disabled value="-1">- choose a page -</option>
-      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id"
+      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id"
               (change)="setFirstSelectedPage($event.target.value)">
         {{page.name}}
       </option>

@@ -6,30 +6,34 @@ import {PageComparisonSelection} from "./PageComparisonSelection";
 @Component({
   selector: 'page-comparison',
   templateUrl: './pageComparison.component.html'
-  // styleUrls: ['./.component.css']
 })
 export class PageComparisonComponent implements OnInit {
-  jobGroupMappings:JobGroupToPagesMapping[] = [];
+  jobGroupMappings: JobGroupToPagesMapping[] = [];
   pageComparisonSelections: PageComparisonSelection[] = [];
 
-  constructor(private resultSelectionService:ResultSelectionService) {
+  constructor(private resultSelectionService: ResultSelectionService) {
   }
 
   ngOnInit() {
-    this.getJobGroups();
     this.addComparison();
+    this.registerTimeFrameChangeEvent();
   }
 
-  addComparison(){
+  registerTimeFrameChangeEvent() {
+    document.getElementById("select-interval-timeframe-card").addEventListener("timeFrameChanged", (event: any) => {
+      this.getJobGroups(event.detail[0].toISOString(), event.detail[1].toISOString());
+    })
+  }
+
+  addComparison() {
     this.pageComparisonSelections.push(new PageComparisonSelection())
-    document.getElementById("addComparison2").dispatchEvent(new Event('test'));
   }
 
-  getJobGroups() {
-    this.resultSelectionService.getJobGroupToPagesMap("","").subscribe((map: any[]) => {
+  getJobGroups(from: string, to: string) {
+    this.resultSelectionService.getJobGroupToPagesMap(from, to).subscribe((map: any[]) => {
       this.jobGroupMappings.length = 0;
-      for (let key in map){
-        this.jobGroupMappings.push(JobGroupToPagesMapping.createFromJSON(key,map[key]))
+      for (let key in map) {
+        this.jobGroupMappings.push(JobGroupToPagesMapping.createFromJSON(key, map[key]))
       }
     })
   }
