@@ -88,7 +88,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var registerEvents = function () {
-        selectIntervalTimeframeCard.on("timeFrameChanged", setQueryArgsFromTimeFrame);
+        selectIntervalTimeframeCard.on("timeFrameChanged", setTimeFrameFromEvent);
         selectJobGroupCard.on("jobGroupSelectionChanged", setQueryArgsFromJobGroupSelection);
         selectPageLocationConnectivityCard.on("pageSelectionChanged", setQueryArgsFromPageSelection);
         selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", setQueryArgsFromMeasuredEventSelection);
@@ -97,9 +97,13 @@ OpenSpeedMonitor.resultSelection = (function () {
         selectPageLocationConnectivityCard.on("connectivitySelectionChanged", setQueryArgsFromConnectivitySelection);
     };
 
-    var setQueryArgsFromTimeFrame = function (event, timeFrameSelection) {
-        currentQueryArgs.from = timeFrameSelection[0].toISOString();
-        currentQueryArgs.to = timeFrameSelection[1].toISOString();
+    var setTimeFrameFromEvent = function(event){
+       setQueryArgsFromTimeFrame(event.detail)
+    };
+
+    var setQueryArgsFromTimeFrame = function (time) {
+        currentQueryArgs.from = time[0].toISOString();
+        currentQueryArgs.to = time[1].toISOString();
         updateCards("timeFrame");
     };
 
