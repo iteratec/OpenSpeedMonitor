@@ -70,7 +70,7 @@ OpenSpeedMonitor.resultSelection = (function () {
 
         // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
-            setQueryArgsFromTimeFrame(null, OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
+            setQueryArgsFromTimeFrame(OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
         }
         if (OpenSpeedMonitor.selectJobGroupCard) {
             setQueryArgsFromJobGroupSelection(null, OpenSpeedMonitor.selectJobGroupCard.getJobGroupSelection());
