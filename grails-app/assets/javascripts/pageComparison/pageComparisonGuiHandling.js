@@ -20,7 +20,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
-
+        $("input[name='aggregationValue']").on("change", function () {
+            renderChart({aggregationValue: getAggregationValue()}, true);
+        });
         drawGraphButton.click(function () {
             loadData(true);
         });
@@ -36,11 +38,19 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        pageComparisonChart.render();
+        if (!data.series)  pageComparisonChart.render();
+        if (data.series && getAggregationValue() === data.series[0].data[0].aggregationValue) {
+            pageComparisonChart.render();
+        }
+    };
+
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
     };
 
     var handleNewData = function (data, isStateChange) {
         $("#chart-card").removeClass("hidden");
+        data.aggregationValue = getAggregationValue();
         renderChart(data, isStateChange)
     };
 
@@ -55,16 +65,25 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var loadData = function (isStateChange) {
+        pageComparisonChart.resetData();
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+        var queryData = {
+            from: selectedTimeFrame[0].toISOString(),
+            to: selectedTimeFrame[1].toISOString(),
+            measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
+            selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
+        };
+
+        getDataForAggregationValue("median", queryData, isStateChange);
+        getDataForAggregationValue("avg", queryData, isStateChange);
+    };
+
+    function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
+        queryData.selectedAggregationValue = aggregationValue;
         spinner.start();
         $.ajax({
             type: 'POST',
-            data: {
-                from: selectedTimeFrame[0].toISOString(),
-                to: selectedTimeFrame[1].toISOString(),
-                measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
-            },
+            data: queryData,
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
             success: function (data) {
@@ -88,6 +107,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             }
         });
     };
+
     init();
     return {}
 })();

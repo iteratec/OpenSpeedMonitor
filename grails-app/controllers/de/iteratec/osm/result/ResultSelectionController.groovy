@@ -7,7 +7,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
-
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
@@ -374,41 +373,29 @@ class ResultSelectionController extends ExceptionHandlerController {
             and {
                 between("jobResultDate", from.toDate(), to.toDate())
                 if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
+                    'in'('jobGroup.id', command.jobGroupIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
+                    'in'("measuredEvent.id", command.measuredEventIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionType.Pages && command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
+                    'in'("page.id", command.pageIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
+                    'in'("location.id", command.locationIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
+                    'in'("browser.id", command.browserIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
                     or {
                         if (command.connectivityIds) {
-                            connectivityProfile {
-                                'in'("id", command.connectivityIds)
-                            }
+                            'in'("connectivityProfile.id", command.connectivityIds)
                         }
 
                         if (command.nativeConnectivity) {

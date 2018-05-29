@@ -7,6 +7,7 @@ import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.dao.EventResultProjection
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
@@ -120,9 +121,9 @@ class SelectedMeasurandSpec extends Specification {
         '_UTMK_name'                  | 1000       | 1000
     }
 
-    void "test get value from EventResult"() {
+    void "test get value from EventResultProjection"() {
         given: "testee is intiated"
-        EventResult testee = createTestee(1000, 2000, 3000)
+        EventResultProjection testee = createTestee(1000, 2000, 3000)
 
         when: "selected is build"
         SelectedMeasurand selected = new SelectedMeasurand(name, cachedView)
@@ -133,33 +134,19 @@ class SelectedMeasurandSpec extends Specification {
         where:
         name                                                              | expectedResult
         SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "mark"       | 1000
-        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "measure"    | null
-        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "mark"    | null
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "queasure"   | null
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "quark"   | null
         SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "measure" | 2000
         Measurand.DOC_COMPLETE_TIME.toString()                            | 3000
     }
 
-    private EventResult createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime) {
-        List<UserTiming> userTimings = []
-        userTimings.add(
-                UserTiming.build(
-                        name: "mark",
-                        startTime: valueMark,
-                        type: UserTimingType.MARK,
-                )
-        )
-        userTimings.add(
-                UserTiming.build(
-                        name: "measure",
-                        duration: valueMeasure,
-                        type: UserTimingType.MEASURE,
-                )
-        )
-
-        return EventResult.build(
+    private EventResultProjection createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime) {
+        Map projectedProperties = [
+                mark: valueMark,
+                measure: valueMeasure,
                 cachedView: cachedView,
-                docCompleteTimeInMillisecs: docCompleteTime,
-                userTimings: userTimings
-        )
+                docCompleteTimeInMillisecs: docCompleteTime
+        ]
+        return new EventResultProjection(id: 1, projectedProperties:projectedProperties)
     }
 }

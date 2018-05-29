@@ -65,18 +65,21 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var inFrontButton = $("#inFrontButton");
     var besideButton = $("#besideButton");
 
-    var init = function() {
-        drawGraphButton.click(function() {
+    var init = function () {
+        drawGraphButton.click(function () {
             loadData(true);
         });
-        $(window).on('historyStateLoaded', function() {
+        $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
-        $(window).on('resize', function() {
+        $(window).on('resize', function () {
             renderChart({}, false);
         });
-        $("input[name='stackBars']").on("change", function() {
+        $("input[name='stackBars']").on("change", function () {
             renderChart({stackBars: getStackBars()}, true);
+        });
+        $("input[name='aggregationValue']").on("change", function () {
+            renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -89,7 +92,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         return $("#inFrontButton input").prop("checked");
     };
 
-    var onFilterClick = function(event) {
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
+    };
+
+    var onFilterClick = function (event) {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
@@ -104,7 +111,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $filterDropdownGroup.find('.filterRule').remove();
         $filterDropdownGroup.toggleClass("hidden", false);
 
-        Object.keys(filterRules).forEach(function(filterRuleKey) {
+        Object.keys(filterRules).forEach(function (filterRuleKey) {
             var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             var link = $("a", listItem);
             link.data('filter', filterRuleKey);
@@ -112,7 +119,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             listItem.insertAfter($customerJourneyHeader);
         });
 
-        var selectedFilterElement = $(".chart-filter").filter(function() { return $(this).data("filter") === selectedFilter; });
+        var selectedFilterElement = $(".chart-filter").filter(function () {
+            return $(this).data("filter") === selectedFilter;
+        });
         if (selectedFilterElement.length) {
             selectedFilterElement.toggleClass("selected", true);
         } else {
@@ -169,9 +178,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         data.width = -1;
         data.selectedFilter = updateFilters(data.filterRules);
         data.stackBars = updateStackBars(data);
+        data.aggregationValue = getAggregationValue();
 
         renderChart(data, isStateChange);
-        $('html, body').animate({scrollTop:0},'500');
+        $('html, body').animate({scrollTop: 0}, '500');
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
@@ -182,10 +192,14 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        pageAggregationChart.render();
+        if (!data.series) pageAggregationChart.render();
+        if (data.series && getAggregationValue() === data.series[0].aggregationValue) {
+            pageAggregationChart.render();
+        }
     };
 
-    var loadData = function(isStateChange) {
+    var loadData = function (isStateChange) {
+        pageAggregationChart.resetData();
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
@@ -207,6 +221,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             queryData.toComparative = comparativeTimeFrame[1].toISOString();
         }
 
+        getDataForAggregationValue("median", queryData, isStateChange);
+        getDataForAggregationValue("avg", queryData, isStateChange);
+    };
+
+    function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
+        queryData.selectedAggregationValue = aggregationValue;
         spinner.start();
         $.ajax({
             type: 'POST',
@@ -218,7 +238,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             },
             error: function (e) {
                 spinner.stop();
-                $("#chart-card").removeClass("hidden")
+                $("#chart-card").removeClass("hidden");
                 if (e.responseText === "no data") {
                     $("#error-div").addClass("hidden");
                     $('#warning-no-data').show();
@@ -229,9 +249,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
                 }
             }
         });
-    };
+    }
 
     init();
-    return {
-    };
+    return {};
 })();

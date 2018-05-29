@@ -36,6 +36,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
         });
     };
 
+    var resetData = function () {
+        data.resetData()
+    };
+
     var render = function () {
         if (data.isDataAvailable()) {
             var shouldShowScore = data.hasLoadTimes();
@@ -123,7 +127,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
 
     return {
         render: render,
-        setData: setData
+        setData: setData,
+        resetData: resetData
     };
 
 });

@@ -115,11 +115,13 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      *         if called on an invalid instance.
      */
     ErQueryParams createErQueryParams() throws IllegalStateException {
+
         ErQueryParams queryParams = new ErQueryParams()
         fillMvQueryParams(queryParams)
 
         queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
+
         if (this.trimBelowLoadTimes) {
             queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes * MeasurandGroup.LOAD_TIMES.unit.divisor
         }

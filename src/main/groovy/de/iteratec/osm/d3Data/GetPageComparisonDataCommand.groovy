@@ -16,4 +16,5 @@ class GetPageComparisonDataCommand implements Validateable {
         return JSON.parse(source['measurand']).measurands[0][0].replace("Uncached", "")
     })
     String measurand
+    String selectedAggregationValue
 }

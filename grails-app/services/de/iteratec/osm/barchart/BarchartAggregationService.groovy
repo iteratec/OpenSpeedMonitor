@@ -5,9 +5,8 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 
@@ -16,6 +15,7 @@ class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
+    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -38,35 +38,35 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages)
+        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.selectedAggregationValue)
     }
 
-    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages) {
-        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages)
+    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
-    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages) {
+    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages, String selectedAggregationValue) {
         if (!selectedMeasurands) {
             return []
         }
-        selectedMeasurands.unique({a, b -> a.name <=> b.name})
-        List<EventResultProjection> projections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobResultDateBetween(from, to)
-                .withPageIn(pages, true)
-                .withJobGroupIn(jobGroups, true)
-                .withSelectedMeasurandsAverageProjection(selectedMeasurands)
-                .getResults()
+        selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
-        return createListForEventResultProjection(selectedMeasurands, projections)
+        switch(selectedAggregationValue) {
+            case 'avg':
+                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands)
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+            case 'median':
+                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands)
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+        }
     }
 
-
-    List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd){
+    List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
         List<PageComparisonAggregation> comparisons = []
         List<Page> pages = []
         List<JobGroup> jobGroups = []
@@ -77,7 +77,7 @@ class BarchartAggregationService {
             jobGroups << JobGroup.get(it.jobGroupId2)
         }
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages)
+        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue)
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
             pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId1 as long) && aggr.page.id == (comparison.pageId1 as long) }
@@ -98,7 +98,7 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
@@ -106,7 +106,8 @@ class BarchartAggregationService {
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
                         jobGroup: aggregation.jobGroup,
-                        page: aggregation.page
+                        page: aggregation.page,
+                        aggregationValue: selectedAggregationValue,
                 )
             }
         }

@@ -1,10 +1,13 @@
 package de.iteratec.osm.result
+
+import de.iteratec.osm.report.chart.RepresentableWptResult
+
 /**
  * Created by mwg on 02.08.2017.
  */
 enum SelectedMeasurandType {
     MEASURAND{
-        Double getValue(EventResult eventResult, String name) {
+        Double getValue(RepresentableWptResult eventResult, String name) {
             Measurand measurand = name as Measurand
             return eventResult."$measurand.eventResultField" != null ? Double.valueOf(eventResult."$measurand.eventResultField") : null
         }
@@ -26,9 +29,9 @@ enum SelectedMeasurandType {
         }
     },
     USERTIMING_MARK{
-        Double getValue(EventResult eventResult, String name) {
-            UserTiming userTiming = eventResult.userTimings.find { it.name == name && it.type == UserTimingType.MARK }
-            return userTiming?.getValue()
+        Double getValue(RepresentableWptResult eventResult, String name) {
+            //return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            return  getUsertimingValue(eventResult,name,UserTimingType.MARK)
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
@@ -48,11 +51,9 @@ enum SelectedMeasurandType {
         }
     },
     USERTIMING_MEASURE{
-        Double getValue(EventResult eventResult, String name) {
-            UserTiming userTiming = eventResult.userTimings.find {
-                it.name == name && it.type == UserTimingType.MEASURE
-            }
-            return userTiming?.getValue()
+        Double getValue(RepresentableWptResult eventResult, String name) {
+            //return eventResult."$name" != null ? Double.valueOf(eventResult."$name") : null
+            return  getUsertimingValue(eventResult,name,UserTimingType.MEASURE)
         }
 
         MeasurandGroup getMeasurandGroup(String name) {
@@ -74,11 +75,26 @@ enum SelectedMeasurandType {
 
     abstract boolean isUserTiming()
 
-    abstract Double getValue(EventResult eventResult, String name)
+    abstract Double getValue(RepresentableWptResult eventResult, String name)
 
     abstract MeasurandGroup getMeasurandGroup(String name)
 
     abstract String getOptionPrefix()
 
     abstract String getDatabaseName(String name)
+
+    private static getUsertimingValue(RepresentableWptResult representableWptResult, String name, UserTimingType type){
+        if(representableWptResult.hasProperty("userTimings")){
+            Set<UserTiming> userTimings = representableWptResult.userTimings
+            UserTiming relevantTiming = userTimings.find({it.name == name})
+            if(relevantTiming){
+                def value = type == UserTimingType.MARK? relevantTiming.startTime : relevantTiming.duration
+                return Double.valueOf(value)
+            }
+        }
+        if(representableWptResult."$name" != null){
+            return Double.valueOf(representableWptResult."$name")
+        }
+        return null
+    }
 }

@@ -27,7 +27,6 @@ import groovy.transform.EqualsAndHashCode
 * */
 @EqualsAndHashCode
 class WptEventResultInfo {
-
     String serverBaseUrl
     String testId
     Integer numberOfWptRun

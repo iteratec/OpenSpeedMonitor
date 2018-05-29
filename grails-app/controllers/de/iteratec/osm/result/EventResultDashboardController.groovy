@@ -38,6 +38,7 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 import org.springframework.dao.DataIntegrityViolationException
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -506,14 +507,14 @@ class EventResultDashboardController {
         Map<String, Object> modelToRender = new HashMap<String, Object>();
 
         if (request.queryString && cmd.validate()) {
-            fillWithEventResultData(modelToRender, cmd);
             cmd.copyRequestDataToViewModelMap(modelToRender)
+            fillWithEventResultData(modelToRender, cmd)
         } else {
             redirectWith303('showAll', params)
             return
         }
         String filename = ""
-        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(modelToRender['selectedFolder'])
+        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(cmd.selectedFolder)
 
         selectedJobGroups.each { jobGroup ->
             filename += jobGroup.name + '_'
@@ -521,8 +522,8 @@ class EventResultDashboardController {
         if (modelToRender['selectedInterval'] != -1) {
             filename += modelToRender['selectedInterval'] + 'm_'
         }
-        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss")
-        filename += dateFormatter.print(modelToRender["from"]) + '_to_' + dateFormatter.print(modelToRender["to"]) + '.csv'
+        DateTimeFormatter dateFormatter = ISODateTimeFormat.date()
+        filename += dateFormatter.print(cmd.from) + '_to_' + dateFormatter.print(cmd.to) + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename);
         response.setContentType("text/csv;header=present;charset=UTF-8");

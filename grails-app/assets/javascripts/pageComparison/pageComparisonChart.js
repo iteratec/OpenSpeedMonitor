@@ -50,6 +50,10 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         registerBarEvents();
     };
 
+    var resetData = function () {
+        data.resetData()
+    };
+
     var setBarChartData = function () {
         var componentsToRender = [];
         var firstPage = OpenSpeedMonitor.ChartComponents.ChartBars();
@@ -58,8 +62,8 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
         var secondPage = OpenSpeedMonitor.ChartComponents.ChartBars();
         secondPage.setData(data.getDataForBars(1));
         secondPage.setOpacitiyFunction(determineBarOpacity);
-        componentsToRender.push(secondPage);
         componentsToRender.push(firstPage);
+        componentsToRender.push(secondPage);
         chartBarsComponents = componentsToRender;
     };
 
@@ -183,6 +187,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
 
     return {
         setData: setData,
+        resetData: resetData,
         render: render
     };
 
