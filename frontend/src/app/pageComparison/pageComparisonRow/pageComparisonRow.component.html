@@ -1,0 +1,51 @@
+<div id="measurandSeries-clone" class="row form-group addPageComparisonRow">
+  <label class="col-sm-2 control-label">
+    <!--<g:message code="de.iteratec.osm.pageComparison.firstPageTitle"-->
+    <!--default="First Page:"/>-->
+    First Page
+  </label>
+  <div class="col-sm-3">
+    <select name="firstJobGroupSelect"
+            class="form-control jobgroupselect" (change)="setFirstSelectedJobGroup($event.target.value)">
+      <option disabled value="-1">- choose a job group -</option>
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id">
+        {{ jobGroup.name }}
+      </option>
+    </select>
+    <select name="firstPageSelect" class="form-control pageSelect">
+      <option disabled value="-1">- choose a page -</option>
+      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id"
+              (change)="setFirstSelectedPage($event.target.value)">
+        {{page.name}}
+      </option>
+    </select>
+  </div>
+  <label class="col-sm-2 control-label">
+    <!--<g:message code="de.iteratec.osm.pageComparison.secondPageTitle"-->
+    <!--default="Second Page:"/>-->
+    Second Page
+  </label>
+
+  <div class="col-sm-3">
+    <select name="secondJobGroupSelect"
+            class="form-control jobgroupselect" (change)="setSecondSelectedJobGroup($event.target.value)">
+      <option disabled value="-1">- choose a job group -</option>
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id">
+        {{ jobGroup.name }}
+      </option>
+    </select>
+    <select name="secondPageSelect" class="form-control pageSelect">
+      <option disabled value="-1">- choose a page -</option>
+      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id"
+              (change)="setSecondSelectedPage($event.target.value)">
+        {{page.name}}
+      </option>
+    </select>
+  </div>
+  <!--<div v-bind:class="[isOnlyRow()? 'hidden':'', 'col-sm-2']">-->
+  <!--<a href="#" role="button" v-bind:id="'removeComparisonRow'+index">-->
+  <!--<i class="fa fa-times" aria-hidden="true"></i>-->
+  <!--</a>-->
+  <!--</div>-->
+
+</div>
