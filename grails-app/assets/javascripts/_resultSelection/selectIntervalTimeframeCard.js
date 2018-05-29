@@ -166,7 +166,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
 
   var setComparativeTimeFrame = function (comparativeTimeFrame) {
     if (comparativeTimeFrame) {
-        comparativeTimeFramePicker.setRange(comparativeTimeFrame);
+        comparativeTimeFramePicker.setRange(comparativeTimeFrame[0], comparativeTimeFrame[1]);
     }
     if ((comparativeTimeFrame && comparativeEnabled() && comparativeTimeFramePickerContainer.hasClass("hidden")) ||
         ((!comparativeTimeFrame || !comparativeEnabled()) && !comparativeTimeFramePickerContainer.hasClass("hidden"))) {
