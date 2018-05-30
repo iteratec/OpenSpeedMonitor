@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {JobGroup} from "../../setup-dashboard/service/rest/job-group.model";
+import {JobGroup} from "../../setup-dashboard/model/job-group.model";
 import {JobGroupToPagesMapping} from "../service/JobGroupToPagesMapping";
 import {PageId} from "../service/PageId";
 import {isNullOrUndefined} from "util";
