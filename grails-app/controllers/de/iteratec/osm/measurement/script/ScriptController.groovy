@@ -192,7 +192,7 @@ class ScriptController {
 	def getMeasuredEventsForScript(String scriptId) {
 		Long id = Long.parseLong(scriptId)
 
-g        def output = scriptService.getMeasuredEventsForScript(id)
+        def output = scriptService.getMeasuredEventsForScript(id)
 
 		render output as JSON
 	}

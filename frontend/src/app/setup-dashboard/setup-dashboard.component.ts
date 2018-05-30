@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {JobGroupRestService} from "./service/rest/job-group-rest.service";
-import {JobGroup, JobGroupFromJson} from "./service/rest/job-group.model";
+import {JobGroup, JobGroupFromJson} from "./model/job-group.model";
 
 @Component({
   selector: 'app-setup-dashboard',
@@ -22,4 +22,6 @@ export class SetupDashboardComponent implements OnInit {
       this.activeJobGroups = activeJobs.map(jobJson => new JobGroupFromJson(jobJson));
     })
   }
+
+
 }
