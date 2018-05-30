@@ -20,6 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.measurement.script.ScriptService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletResponse
  */
 class PageController {
     PageService pageService
+    ScriptService scriptService
 
     I18nService i18nService
 
@@ -142,20 +144,30 @@ class PageController {
     }
 
     def getPagesForJobGroup(){
-        println(params)
-        if(params['jobGroupId']){
+        if(params['jobGroupId']) {
             Long jobGroupId = Long.parseLong(params['jobGroupId'].toString())
+
             def jobGroup = JobGroup.findById(jobGroupId)
             def jobList = Job.findAllByJobGroup(jobGroup)
-            def scriptList = jobList.findAll{it.script}.collect{it.script}
-            def result = scriptList.collect{
-                new ScriptParser(pageService, it.navigationScript).getAllMeasuredEvents(it.navigationScript).collect()
+
+            jobList.collect{ it.active }
+
+            def scriptList = jobList.findAll { it.script }.collect { it.script }
+
+            def measuredEventList = scriptList.collect {
+                scriptService.getMeasuredEventsForScript(it.id)
             }
-            println(result)
+
+            measuredEventList = measuredEventList.flatten()
+
+            def result = measuredEventList.collect{
+                it.testedPage
+            }
+
+            result = result.unique()
+
             return ControllerUtils.sendObjectAsJSON(response, result)
         }
-
-
     }
 }
 
