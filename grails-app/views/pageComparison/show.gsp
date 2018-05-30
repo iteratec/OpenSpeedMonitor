@@ -13,7 +13,7 @@
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageComparison']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
-               default="The displayed chart shows the differnces between two pages. Usually used to compare pages as 'entry page' and as 'follow page'."/>
+               default="The displayed chart shows the differences between two pages. Usually used to compare pages as 'entry page' and as 'follow page'."/>
 </p>
 
 <div class="card hidden" id="chart-card">
