@@ -1,4 +1,13 @@
 <div id="chart-container">
+    <div id="filter-dropdown-group" class="btn-group">
+        <div class="btn-group pull-left" data-toggle="buttons" id="aggregationValueSwitch">
+            <label class="btn btn-sm btn-default active" id="averageButton"><input type="radio" name="aggregationValue"
+                                                                                   value="avg"
+                                                                                   checked>Average</label>
+        <label class="btn btn-sm btn-default" id="medianButton"><input type="radio" name="aggregationValue"
+                                                                       value="median">Median</label>
+        </div>
+    </div>
     <div class="in-chart-buttons">
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="initPngDownloadModal()"
