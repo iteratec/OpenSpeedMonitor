@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Page} from "../../model/page.model";
+import {IPage} from "../../model/page.model";
 
 @Component({
   selector: 'app-page',
@@ -7,7 +7,7 @@ import {Page} from "../../model/page.model";
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements OnInit {
-  @Input() page:Page;
+  @Input() page:IPage;
   constructor() { }
 
   ngOnInit() {
