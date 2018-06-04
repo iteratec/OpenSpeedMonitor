@@ -26,6 +26,7 @@ import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import groovy.transform.EqualsAndHashCode
 import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -45,7 +46,7 @@ class PageController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index() {
-       
+
     }
 
     def list() {
@@ -119,7 +120,8 @@ class PageController {
         flash.message = message(code: 'default.updated.message', args: [message(code: 'page.label', default: 'Page'), pageInstance.id])
         redirect(action: "show", id: pageInstance.id)
     }
-    def updateTable(){
+
+    def updateTable() {
         params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
         params.max = params.max as Integer
@@ -127,7 +129,7 @@ class PageController {
         List<Page> result
         int count
         result = Page.createCriteria().list(params) {
-            if(params.filter)ilike("name","%"+params.filter+"%")
+            if (params.filter) ilike("name", "%" + params.filter + "%")
         }
         String templateAsPlainText = g.render(
                 template: 'pageTable',
@@ -139,36 +141,53 @@ class PageController {
         ])
     }
 
-    def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command){
+    def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command) {
         render command.measuredEventList*.testedPageId as Set
     }
 
-    def getPagesForJobGroup(){
-        if(params['jobGroupId']) {
-            Long jobGroupId = Long.parseLong(params['jobGroupId'].toString())
+    def getPagesForActiveJobGroups() {
 
-            def jobGroup = JobGroup.findById(jobGroupId)
-            def jobList = Job.findAllByJobGroup(jobGroup)
-
-            jobList.collect{ it.active }
-
-            def scriptList = jobList.findAll { it.script }.collect { it.script }
-
-            def measuredEventList = scriptList.collect {
-                scriptService.getMeasuredEventsForScript(it.id)
+        def scriptsWithJobGroup = Job.createCriteria().list {
+            eq('active', true)
+            isNotNull('script')
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            createAlias('script', 'script')
+            projections {
+                distinct('jobGroup.id', 'script.id')
+                property('jobGroup.id', 'jobGroupId')
+                property('script.id', 'scriptId')
+                property('script.navigationScript', 'navigationScript')
             }
-
-            measuredEventList = measuredEventList.flatten()
-
-            def result = measuredEventList.collect{
-                it.testedPage
-            }
-
-            result = result.unique()
-
-            return ControllerUtils.sendObjectAsJSON(response, result)
         }
+
+        def pagesByScriptId = scriptsWithJobGroup.unique { script -> script.scriptId }.collectEntries { script ->
+            [(script.scriptId): scriptService.getMeasuredEventsForScript((String) script.navigationScript).collect { it.testedPage }]
+        }
+
+        println pagesByScriptId
+
+        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
+            println pagesByScriptId[scriptWithJobGroup.scriptId]
+            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
+                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
+            }
+        }
+
+        result = result.flatten()
+        result = result.unique()
+
+        return ControllerUtils.sendObjectAsJSON(response, result)
+
     }
+}
+
+
+@EqualsAndHashCode(includeFields = true)
+class PageWithJobGroupId {
+    Long id
+    String name
+    Boolean undefinedPage
+    Long jobGroupId
 }
 
 class GetPagesForMeasuredEventsCommand {

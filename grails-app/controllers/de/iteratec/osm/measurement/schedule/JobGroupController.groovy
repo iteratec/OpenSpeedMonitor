@@ -243,11 +243,13 @@ class JobGroupController {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
                 jobGroup {
-                    property('id','id')
-                    property('name','name')
+                    distinct('id')
+                    property('id', 'id')
+                    property('name', 'name')
                 }
             }
         }
+
         return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
     }
 }
