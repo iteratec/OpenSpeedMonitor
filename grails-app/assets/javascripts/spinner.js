@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-//= require node_modules/spin/dist/spin.min.js
+//= require node_modules/spin.js/spin.min.js
 //= require_self
 
 "use strict";

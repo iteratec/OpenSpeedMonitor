@@ -188,7 +188,7 @@ task nodeSyncJavascript(type: Sync) {
     include 'later/later.min.js'
     include 'moment/min/moment.min.js'
     include 'prettycron/prettycron.js'
-    include 'spin/dist/spin.min.js'
+    include 'spin.js/spin.min.js'
     include 'tag-it/js/tag-it.min.js'
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
