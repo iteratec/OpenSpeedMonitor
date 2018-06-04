@@ -20,8 +20,3 @@
         <svg id="page-comparison-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
-<asset:script type="text/javascript">
-    $(window).load(function() {
-      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pageComparison/pageComparisonChart.js" />', 'pageComparisonChart');
-    });
-</asset:script>
