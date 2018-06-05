@@ -1,6 +1,8 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.d3Data.BarChartData
@@ -11,12 +13,19 @@ import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.result.ResultSelectionCommand
+import de.iteratec.osm.result.ResultSelectionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
+import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
+
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+import java.util.concurrent.ConcurrentHashMap
 
 import static org.springframework.http.HttpStatus.*
 
@@ -30,6 +39,8 @@ class JobGroupController {
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
+    PerformanceLoggingService performanceLoggingService
+    ResultSelectionService resultSelectionService
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
@@ -251,5 +262,42 @@ class JobGroupController {
         }
 
         return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
+    }
+    @RestAction()
+    def getJobGroupsWithPages(JobGroupWithPagesCommand command) {
+        if (command.hasErrors()) {
+            println 'send error'
+            sendError(command)
+            return
+        }
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+            def jobGroupAndPages = resultSelectionService.query(command.toResultSelectionCommand(), null, { existing ->
+                projections {
+                    distinct(['jobGroup','page'])
+                }
+            })
+            Map<Long, Map> map = [:].withDefault {[name:"", pages:[] as Set]}
+            jobGroupAndPages.each {
+                JobGroup jobGroup = it[0] as JobGroup
+                Page page = it[1] as Page
+                Map jobGroupMap = map[jobGroup.id]
+                jobGroupMap.name = jobGroup.name
+                jobGroupMap.id = jobGroup.id
+                jobGroupMap.pages << page
+            }
+            return map.collect{k, v ->
+                [name:v.name, id: v.id, pages: v.pages.collect {[name: it.name, id: it.id]}.sort{it.name}                ]
+            }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+}
+
+class JobGroupWithPagesCommand{
+    DateTime from
+    DateTime to
+
+    ResultSelectionCommand toResultSelectionCommand(){
+        return new ResultSelectionCommand(from: from, to: to)
     }
 }
