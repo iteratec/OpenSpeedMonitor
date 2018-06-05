@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {JobGroup} from "../../model/job-group.model";
-import {IPage} from "../../model/page.model";
+import {IPage} from "../../../common/model/page.model";
 import {PageService} from "../../service/rest/page.service";
 import {filter, map} from "rxjs/internal/operators";
 import {Observable} from "rxjs/index";

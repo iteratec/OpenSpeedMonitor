@@ -10,7 +10,7 @@
 </head>
 
 <body>
-%{--<page-comparison data-module-path="src/app/pageComparison/pageComparison.module#PageComparisonModule"></page-comparison>--}%
+%{--<page-comparison data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></page-comparison>--}%
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageComparison']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
