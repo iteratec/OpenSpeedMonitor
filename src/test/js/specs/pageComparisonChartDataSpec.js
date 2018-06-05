@@ -77,16 +77,16 @@ describe("PageComparisonChartData data transformation", function () {
                     .groupingPage2("Group1 | Page2").valuePage2(600) .build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1 - Average");
     });
-    it("getDataForHeader should return an empty label if nothing is equal for all series", function () {
+    it("getDataForHeader should return only aggregationtype as label if nothing is equal for all series", function () {
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group1 | Page1")
                     .valuePage1(300).groupingPage2("Group2 | Page2").valuePage2(600) .build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("Average");
     });
     it("getDataForBarScore should return the right maximum ", function () {
         var expectedMaximum = 9999;

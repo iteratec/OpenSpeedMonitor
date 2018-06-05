@@ -236,7 +236,7 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend contains deterioration and improvement if defined", function () {
-        pageAggregationData.setData({ series: [
+        pageAggregationData.setData({ hasComparativeData : true, series: [
             new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2000).build(),
             new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
         ], i18nMap: {
@@ -258,7 +258,7 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend contains only deterioration if values are only higher", function () {
-        pageAggregationData.setData({ series: [
+        pageAggregationData.setData({ hasComparativeData : true, series: [
             new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
         ], i18nMap: {
             "comparativeDeterioration": "deteriorationLabel"
@@ -354,11 +354,12 @@ describe("PageAggregationChartData data transformation", function () {
 
         expect(ttfbData.max).toBe(5000);
         expect(ttfbData.min).toBe(0);
+
         expect(ttfbData.values).toEqual([page1TTFB, { page: 'page2', jobGroup: 'TestJobGroup', id: 'page2;TestJobGroup', value: null }]);
     });
 
     it("getDataForBars contains data for improvement and deterioration if defined", function () {
-        pageAggregationData.setData({ series: [
+        pageAggregationData.setData({ hasComparativeData : true, series: [
             new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2500).build(),
             new SeriesBuilder().makeTTFB().page("page2").value(1200).valueComparative(500).build()
         ]});
