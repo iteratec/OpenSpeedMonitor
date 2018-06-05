@@ -4,7 +4,9 @@ describe("PageAggregationChartData data transformation", function () {
 
     class SeriesBuilder {
         constructor() {
+            this._hasComparativeData = false;
             this._series = {
+                aggregationValue: "avg",
                 measurandGroup: "UNKNOWN",
                 unit: "?",
                 measurand: "DOC_COMPLETE_TIME",
@@ -91,7 +93,7 @@ describe("PageAggregationChartData data transformation", function () {
                 new SeriesBuilder().makeSpeedIndex().jobGroup("TestGroup").page("TestPage").build()
             ]
         });
-        expect(pageAggregationData.getDataForHeader().text).toEqual("TestGroup, TestPage");
+        expect(pageAggregationData.getDataForHeader().text).toEqual("TestGroup, TestPage - Average");
     });
 
     it("getDataForHeader should return a label with job group if jobGroup is equal for all series", function () {
@@ -102,7 +104,7 @@ describe("PageAggregationChartData data transformation", function () {
                 new SeriesBuilder().makeDocComplete().jobGroup("TestGroup").page("TestPage2").build()
             ]
         });
-        expect(pageAggregationData.getDataForHeader().text).toEqual("TestGroup");
+        expect(pageAggregationData.getDataForHeader().text).toEqual("TestGroup - Average");
     });
 
     it("getDataForHeader should return a label with page if page is equal for all series", function () {
@@ -112,7 +114,7 @@ describe("PageAggregationChartData data transformation", function () {
                 new SeriesBuilder().makeDocComplete().jobGroup("TestGroup2").page("TestPage").build()
             ]
         });
-        expect(pageAggregationData.getDataForHeader().text).toEqual("TestPage");
+        expect(pageAggregationData.getDataForHeader().text).toEqual("TestPage - Average");
     });
 
     it("hasStackedBars simply returns the internal boolean value", function () {
@@ -155,9 +157,10 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getAllMeasurands contains deterioration and improvement if comparative values are given", function () {
-        pageAggregationData.setData({ series: [
+        pageAggregationData.setData(
+            { hasComparativeData : true, series: [
             new SeriesBuilder().makeSpeedIndex().page("page1").value(800).valueComparative(2000).build(),
-            new SeriesBuilder().makeSpeedIndex().page("page2").value(900).valueComparative(500).build(),
+            new SeriesBuilder().makeSpeedIndex().page("page2").value(900).valueComparative(500).build()
         ]});
         var expectedMeasurands = [ 'SPEED_INDEX', 'SPEED_INDEX_improvement', 'SPEED_INDEX_deterioration'];
         expect(pageAggregationData.getAllMeasurands().sort()).toEqual(expectedMeasurands.sort());
