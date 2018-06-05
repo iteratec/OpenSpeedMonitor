@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {JobGroup} from "../../model/job-group.model";
 import {Observable, ReplaySubject} from "rxjs/index";
-import {IPage} from "../../model/page.model";
+import {IPage} from "../../../common/model/page.model";
 
 @Injectable({
   providedIn: 'root'

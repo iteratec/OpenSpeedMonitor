@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {IPage} from "../../model/page.model";
+import {IPage} from "../../../common/model/page.model";
 
 @Component({
   selector: 'app-page',

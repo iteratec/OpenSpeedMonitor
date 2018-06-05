@@ -155,29 +155,31 @@ class PageController {
             projections {
                 distinct('jobGroup.id', 'script.id')
                 property('jobGroup.id', 'jobGroupId')
-                property('script.id', 'scriptId')
-                property('script.navigationScript', 'navigationScript')
+                property('script', 'script')
             }
         }
 
-        def pagesByScriptId = scriptsWithJobGroup.unique { script -> script.scriptId }.collectEntries { script ->
-            [(script.scriptId): scriptService.getMeasuredEventsForScript((String) script.navigationScript).collect { it.testedPage }]
-        }
+//        def pagesByScriptId = scriptsWithJobGroup.unique { script -> script.scriptId }.collectEntries { script ->
+//            [(script.scriptId): scriptService.getMeasuredEventsForScript((String) script.navigationScript).collect { it.testedPage }]
+//        }
+//
+//        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
+//            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
+//                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
+//            }g
+//        }
 
-        println pagesByScriptId
-
-        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
-            println pagesByScriptId[scriptWithJobGroup.scriptId]
-            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
-                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
+        def result = scriptsWithJobGroup.collect { scriptsAndJobGroup ->
+            scriptsAndJobGroup.script.testedPages.collect{
+                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptsAndJobGroup.jobGroupId)
             }
         }
 
         result = result.flatten()
         result = result.unique()
+        result = result.unique()
 
         return ControllerUtils.sendObjectAsJSON(response, result)
-
     }
 }
 

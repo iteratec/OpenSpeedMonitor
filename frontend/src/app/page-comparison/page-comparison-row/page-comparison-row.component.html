@@ -42,10 +42,5 @@
       </option>
     </select>
   </div>
-  <!--<div v-bind:class="[isOnlyRow()? 'hidden':'', 'col-sm-2']">-->
-  <!--<a href="#" role="button" v-bind:id="'removeComparisonRow'+index">-->
-  <!--<i class="fa fa-times" aria-hidden="true"></i>-->
-  <!--</a>-->
-  <!--</div>-->
-
+  <div class="col-sm-2" *ngIf="removable"><a href="#" role="button" id="removeComparisonRow0"><i aria-hidden="true" class="fa fa-times" (click)="onDelete()"></i></a></div>
 </div>

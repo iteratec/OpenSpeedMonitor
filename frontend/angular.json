@@ -28,7 +28,7 @@
             ],
             "scripts": [],
             "lazyModules": [ "src/app/setup-dashboard/setup-dashboard.module",
-                              "src/app/pageComparison/pageComparison.module"]
+                              "src/app/page-comparison/page-comparison.module"]
           },
           "configurations": {
             "production": {
