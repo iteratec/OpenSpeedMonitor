@@ -24,6 +24,7 @@ import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.DataIntegrityViolationExpectionUtil
 import grails.converters.JSON
+import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -232,5 +233,22 @@ class ScriptController {
         archivedScript.versionDescription = newVersionDescription
         archivedScript.save(failOnError: true, flush: true)
         ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, newVersionDescription)
+    }
+
+    def getScriptsForActiveJobGroups() {
+        def activeScripts = Job.createCriteria().list {
+            eq('active', true)
+            isNotNull('script')
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            createAlias('script', 'script')
+            projections {
+                distinct(['script.id', 'jobGroup.id'])
+                property('jobGroup.id', 'jobGroupId')
+                property('script.id', 'id')
+                property('script.label', 'label')
+                property('script.measuredEventsCount', 'numberOfMeasuredEvents')
+            }
+        }
+        return ControllerUtils.sendObjectAsJSON(response, activeScripts)
     }
 }
