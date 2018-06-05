@@ -57,7 +57,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
             try {
                 return EventResult.createCriteria().list {
-                    applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
+                    resultSelectionService.applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
                     maxResults MAX_RESULT_COUNT
                     timeout RESULT_COUNT_MAX_SECONDS
                     projections {
