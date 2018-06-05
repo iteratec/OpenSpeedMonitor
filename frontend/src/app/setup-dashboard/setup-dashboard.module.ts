@@ -7,14 +7,17 @@ import { UrlStore } from "../common/app.url-store";
 import {PageService} from "./service/rest/page.service";
 import { PageComponent } from './component/page/page.component';
 import { PageListComponent } from './component/page-list/page-list.component';
+import { ScriptListComponent } from './component/script-list/script-list.component';
+import {ScriptService} from "./service/rest/script.service";
+import {ScriptComponent} from "./component/script/script.component";
 
 @NgModule({
   imports: [
     CommonModule, HttpClientModule
   ],
-  declarations: [SetupDashboardComponent, PageComponent, PageListComponent],
+  declarations: [SetupDashboardComponent, PageComponent, PageListComponent, ScriptComponent, ScriptListComponent],
   providers: [
-    { provide: 'components', useValue: [SetupDashboardComponent], multi: true}, JobGroupRestService, PageService
+    { provide: 'components', useValue: [SetupDashboardComponent], multi: true}, JobGroupRestService, PageService, ScriptService
   ],
   entryComponents: [SetupDashboardComponent]
 })
