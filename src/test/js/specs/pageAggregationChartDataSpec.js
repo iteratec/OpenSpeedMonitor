@@ -17,72 +17,97 @@ describe("PageAggregationChartData data transformation", function () {
                 valueComparative: null
             };
         }
+
         makeDocComplete() {
             return this.makeLoadTime().measurand("DOC_COMPLETE_TIME");
         };
+
         makeSpeedIndex() {
             return this.makeLoadTime().measurand("SPEED_INDEX");
         };
+
         makeTTFB() {
             return this.makeLoadTime().measurand("FIRST_BYTE");
         }
+
         makeIncomingBytesFullyLoaded() {
             return this.makeRequestSize().measurand("FULLY_LOADED_INCOMING_BYTES");
         };
+
         makeRequestsDocComplete() {
             return this.makeRequestCounts().measurand("DOC_COMPLETE_REQUESTS");
         }
+
         makeCustomerSatisfaction() {
             return this.makePercentages().measurand("CS_BY_WPT_DOC_COMPLETE");
         }
+
         makeRequestSize() {
             this._series.measurandGroup = "REQUEST_SIZES";
             this._series.unit = "MB";
             return this;
         };
+
         makeRequestCounts() {
             this._series.measurandGroup = "REQUEST_COUNTS";
             this._series.unit = "#";
             return this;
         };
+
         makePercentages() {
             this._series.measurandGroup = "PERCENTAGES";
             this._series.unit = "%";
             return this;
         };
+
         makeLoadTime() {
             this._series.measurandGroup = "LOAD_TIMES";
             this._series.unit = "ms";
             return this;
         };
+
         measurand(measurand) {
             this._series.measurand = measurand;
             this._series.measurandLabel = measurand + "_label";
             return this;
         };
+
         jobGroup(jobGroup) {
             this._series.jobGroup = jobGroup;
             return this;
         };
+
         page(page) {
             this._series.page = page;
             return this;
         };
+
         value(value) {
             this._series.value = value;
             return this;
         };
+
         valueComparative(valueComparative) {
             this._series.valueComparative = valueComparative;
             return this;
         };
+
         build() {
             return Object.assign({}, this._series);
+        };
+
+        transformBarDataToRawData(listWithValues) {
+            listWithValues.forEach(function (it) {
+                it['avg'] = it.value;
+                it['aggregationValue'] = 'avg';
+                it['valueComparative'] = null;
+                delete it.value;
+            })
         };
     }
 
     beforeEach(function () {
-        $(document.body).append($("<svg width='" + width +"' />"));
+        $(document.body).append($("<svg width='" + width + "' />"));
         pageAggregationData = OpenSpeedMonitor.ChartModules.PageAggregationData(d3.select("svg"));
     });
 
@@ -119,11 +144,11 @@ describe("PageAggregationChartData data transformation", function () {
 
     it("hasStackedBars simply returns the internal boolean value", function () {
         expect(pageAggregationData.hasStackedBars()).toBe(true);
-        pageAggregationData.setData({ stackBars: false });
+        pageAggregationData.setData({stackBars: false});
         expect(pageAggregationData.hasStackedBars()).toBe(false);
         pageAggregationData.setData({});
         expect(pageAggregationData.hasStackedBars()).toBe(false);
-        pageAggregationData.setData({ stackBars: true });
+        pageAggregationData.setData({stackBars: true});
         expect(pageAggregationData.hasStackedBars()).toBe(true);
     });
 
@@ -145,57 +170,67 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("can return all measurands", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeIncomingBytesFullyLoaded().build(),
-            new SeriesBuilder().makeCustomerSatisfaction().build(),
-            new SeriesBuilder().makeRequestsDocComplete().build(),
-            new SeriesBuilder().makeSpeedIndex().build(),
-            new SeriesBuilder().makeSpeedIndex().jobGroup("group2").build() // twice to check for deduplication
-        ]});
-        var expectedMeasurands = [ 'CS_BY_WPT_DOC_COMPLETE', 'DOC_COMPLETE_REQUESTS', 'FULLY_LOADED_INCOMING_BYTES', 'SPEED_INDEX' ];
+        pageAggregationData.setData({
+            series: [
+                new SeriesBuilder().makeIncomingBytesFullyLoaded().build(),
+                new SeriesBuilder().makeCustomerSatisfaction().build(),
+                new SeriesBuilder().makeRequestsDocComplete().build(),
+                new SeriesBuilder().makeSpeedIndex().build(),
+                new SeriesBuilder().makeSpeedIndex().jobGroup("group2").build() // twice to check for deduplication
+            ]
+        });
+        var expectedMeasurands = ['CS_BY_WPT_DOC_COMPLETE', 'DOC_COMPLETE_REQUESTS', 'FULLY_LOADED_INCOMING_BYTES', 'SPEED_INDEX'];
         expect(pageAggregationData.getAllMeasurands().sort()).toEqual(expectedMeasurands.sort());
     });
 
     it("getAllMeasurands contains deterioration and improvement if comparative values are given", function () {
         pageAggregationData.setData(
-            { hasComparativeData : true, series: [
-            new SeriesBuilder().makeSpeedIndex().page("page1").value(800).valueComparative(2000).build(),
-            new SeriesBuilder().makeSpeedIndex().page("page2").value(900).valueComparative(500).build()
-        ]});
-        var expectedMeasurands = [ 'SPEED_INDEX', 'SPEED_INDEX_improvement', 'SPEED_INDEX_deterioration'];
+            {
+                hasComparativeData: true, series: [
+                    new SeriesBuilder().makeSpeedIndex().page("page1").value(800).valueComparative(2000).build(),
+                    new SeriesBuilder().makeSpeedIndex().page("page2").value(900).valueComparative(500).build()
+                ]
+            });
+        var expectedMeasurands = ['SPEED_INDEX', 'SPEED_INDEX_improvement', 'SPEED_INDEX_deterioration'];
         expect(pageAggregationData.getAllMeasurands().sort()).toEqual(expectedMeasurands.sort());
     });
 
     it("getDataForBarScore determines correct min and max load_time values, starting from 0", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeIncomingBytesFullyLoaded().value(5000).build(),
-            new SeriesBuilder().makeTTFB().value(2000).build(),
-            new SeriesBuilder().makeSpeedIndex().value(1500).build()
-        ]});
+        pageAggregationData.setData({
+            series: [
+                new SeriesBuilder().makeIncomingBytesFullyLoaded().value(5000).build(),
+                new SeriesBuilder().makeTTFB().value(2000).build(),
+                new SeriesBuilder().makeSpeedIndex().value(1500).build()
+            ]
+        });
         expect(pageAggregationData.getDataForBarScore().min).toBe(0);
         expect(pageAggregationData.getDataForBarScore().max).toBe(2000);
     });
 
     it("getDataForBarScore determines correct min and max load_time values, starting from negative min", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeTTFB().value(2000).build(),
-            new SeriesBuilder().makeSpeedIndex().value(-10).build()
-        ]});
+        pageAggregationData.setData({
+            series: [
+                new SeriesBuilder().makeTTFB().value(2000).build(),
+                new SeriesBuilder().makeSpeedIndex().value(-10).build()
+            ]
+        });
         expect(pageAggregationData.getDataForBarScore().min).toBe(-10);
         expect(pageAggregationData.getDataForBarScore().max).toBe(2000);
     });
 
     it("getDataForBarScore determines correct min and max load_time values, ending at 0", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeIncomingBytesFullyLoaded().value(-5000).build(),
-            new SeriesBuilder().makeTTFB().value(-2000).build(),
-            new SeriesBuilder().makeSpeedIndex().value(-10).build()
-        ]});
+        pageAggregationData.setData({
+            series: [
+                new SeriesBuilder().makeIncomingBytesFullyLoaded().value(-5000).build(),
+                new SeriesBuilder().makeTTFB().value(-2000).build(),
+                new SeriesBuilder().makeSpeedIndex().value(-10).build()
+            ]
+        });
         expect(pageAggregationData.getDataForBarScore().min).toBe(-2000);
         expect(pageAggregationData.getDataForBarScore().max).toBe(0);
     });
 
-    it("sortByMeasurandOrder sorts a list of measurands by a fixed order, unknowns being last", function() {
+    it("sortByMeasurandOrder sorts a list of measurands by a fixed order, unknowns being last", function () {
         var sorted = pageAggregationData.sortByMeasurandOrder([
             'CS_BY_WPT_DOC_COMPLETE',
             'DOC_COMPLETE_REQUESTS',
@@ -215,13 +250,15 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend returns an object containing the sorted entries with measurand labels", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeIncomingBytesFullyLoaded().page("page1").build(),
-            new SeriesBuilder().makeTTFB().page("page1").build(),
-            new SeriesBuilder().makeTTFB().page("page2").build(),
-            new SeriesBuilder().makeSpeedIndex().page("page1").build(),
-            new SeriesBuilder().makeSpeedIndex().page("page2").build()
-        ]});
+        pageAggregationData.setData({
+            series: [
+                new SeriesBuilder().makeIncomingBytesFullyLoaded().page("page1").build(),
+                new SeriesBuilder().makeTTFB().page("page1").build(),
+                new SeriesBuilder().makeTTFB().page("page2").build(),
+                new SeriesBuilder().makeSpeedIndex().page("page1").build(),
+                new SeriesBuilder().makeSpeedIndex().page("page2").build()
+            ]
+        });
         var legendData = pageAggregationData.getDataForLegend();
         expect(legendData.entries.length).toBe(3);
         expect(legendData.entries[0].id).toBe("SPEED_INDEX");
@@ -236,13 +273,15 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend contains deterioration and improvement if defined", function () {
-        pageAggregationData.setData({ hasComparativeData : true, series: [
-            new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2000).build(),
-            new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
-        ], i18nMap: {
-            "comparativeImprovement": "improvementLabel",
-            "comparativeDeterioration": "deteriorationLabel"
-        }});
+        pageAggregationData.setData({
+            hasComparativeData: true, series: [
+                new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2000).build(),
+                new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
+            ], i18nMap: {
+                "comparativeImprovement": "improvementLabel",
+                "comparativeDeterioration": "deteriorationLabel"
+            }
+        });
         var colorScale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
         var legendData = pageAggregationData.getDataForLegend();
         expect(legendData.entries.length).toBe(3);
@@ -258,11 +297,13 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend contains only deterioration if values are only higher", function () {
-        pageAggregationData.setData({ hasComparativeData : true, series: [
-            new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
-        ], i18nMap: {
-            "comparativeDeterioration": "deteriorationLabel"
-        }});
+        pageAggregationData.setData({
+            hasComparativeData: true, series: [
+                new SeriesBuilder().makeTTFB().page("page2").value(1000).valueComparative(500).build()
+            ], i18nMap: {
+                "comparativeDeterioration": "deteriorationLabel"
+            }
+        });
         var colorScale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
         var legendData = pageAggregationData.getDataForLegend();
         expect(legendData.entries.length).toBe(2);
@@ -275,11 +316,13 @@ describe("PageAggregationChartData data transformation", function () {
     });
 
     it("getDataForLegend higher value in cs is improvement", function () {
-        pageAggregationData.setData({ series: [
-            new SeriesBuilder().makeCustomerSatisfaction().page("page1").value(50).valueComparative(10).build()
-        ], i18nMap: {
-            "comparativeImprovement": "improvementLabel"
-        }});
+        pageAggregationData.setData({
+            hasComparativeData: true, series: [
+                new SeriesBuilder().makeCustomerSatisfaction().page("page1").value(50).valueComparative(10).build()
+            ], i18nMap: {
+                "comparativeImprovement": "improvementLabel"
+            }
+        });
         var colorScale = OpenSpeedMonitor.ChartColorProvider().getColorscaleForTrafficlight();
         var legendData = pageAggregationData.getDataForLegend();
         expect(legendData.entries.length).toBe(2);
@@ -291,7 +334,7 @@ describe("PageAggregationChartData data transformation", function () {
         expect(legendData.entries[1].color).toEqual(colorScale("good"));
     });
 
-    it("getDataForSideLabels has empty texts for same pages and same job groups", function() {
+    it("getDataForSideLabels has empty texts for same pages and same job groups", function () {
         pageAggregationData.setData({
             series: [
                 new SeriesBuilder().makeDocComplete().jobGroup("TestGroup").page("TestPage").build(),
@@ -301,7 +344,7 @@ describe("PageAggregationChartData data transformation", function () {
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual([""]);
     });
 
-    it("getDataForSideLabels contains pages names for same job groups", function() {
+    it("getDataForSideLabels contains pages names for same job groups", function () {
         pageAggregationData.setData({
             series: [
                 new SeriesBuilder().makeDocComplete().jobGroup("TestGroup").page("page1").build(),
@@ -311,7 +354,7 @@ describe("PageAggregationChartData data transformation", function () {
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual(["page1", "page2"]);
     });
 
-    it("getDataForSideLabels contains job group names for same pages", function() {
+    it("getDataForSideLabels contains job group names for same pages", function () {
         pageAggregationData.setData({
             series: [
                 new SeriesBuilder().makeDocComplete().jobGroup("group1").page("page").build(),
@@ -321,7 +364,7 @@ describe("PageAggregationChartData data transformation", function () {
         expect(pageAggregationData.getDataForSideLabels().labels).toEqual(["group1", "group2"]);
     });
 
-    it("getDataForSideLabels contains job group and page names for different values", function() {
+    it("getDataForSideLabels contains job group and page names for different values", function () {
         pageAggregationData.setData({
             series: [
                 new SeriesBuilder().makeDocComplete().jobGroup("group1").page("page1").build(),
@@ -338,7 +381,7 @@ describe("PageAggregationChartData data transformation", function () {
         var page2DocComplete = new SeriesBuilder().makeDocComplete().page("page2").value(1000).build();
         var page2Requests = new SeriesBuilder().makeRequestsDocComplete().page("page2").value(9).build();
         pageAggregationData.setData({
-            series: [ page1DocComplete, page2DocComplete, page1TTFB, page1Requests, page2Requests]
+            series: [page1DocComplete, page2DocComplete, page1TTFB, page1Requests, page2Requests]
         });
         var docCompleteData = pageAggregationData.getDataForBars("DOC_COMPLETE_TIME");
         var ttfbData = pageAggregationData.getDataForBars("FIRST_BYTE");
@@ -346,23 +389,35 @@ describe("PageAggregationChartData data transformation", function () {
 
         expect(docCompleteData.max).toBe(5000);
         expect(docCompleteData.min).toBe(0);
+        new SeriesBuilder().transformBarDataToRawData(docCompleteData.values);
         expect(docCompleteData.values).toEqual([page1DocComplete, page2DocComplete]);
 
         expect(requestsData.max).toBe(10);
         expect(requestsData.min).toBe(0);
+        new SeriesBuilder().transformBarDataToRawData(requestsData.values);
         expect(requestsData.values).toEqual([page1Requests, page2Requests]);
 
         expect(ttfbData.max).toBe(5000);
         expect(ttfbData.min).toBe(0);
-
-        expect(ttfbData.values).toEqual([page1TTFB, { page: 'page2', jobGroup: 'TestJobGroup', id: 'page2;TestJobGroup', value: null }]);
+        new SeriesBuilder().transformBarDataToRawData(ttfbData.values);
+        expect(ttfbData.values).toEqual([page1TTFB,
+            {
+                page: 'page2',
+                jobGroup: 'TestJobGroup',
+                id: 'page2;TestJobGroup',
+                avg: null,
+                valueComparative: null,
+                aggregationValue: 'avg'
+            }]);
     });
 
     it("getDataForBars contains data for improvement and deterioration if defined", function () {
-        pageAggregationData.setData({ hasComparativeData : true, series: [
-            new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2500).build(),
-            new SeriesBuilder().makeTTFB().page("page2").value(1200).valueComparative(500).build()
-        ]});
+        pageAggregationData.setData({
+            hasComparativeData: true, series: [
+                new SeriesBuilder().makeTTFB().page("page1").value(1000).valueComparative(2500).build(),
+                new SeriesBuilder().makeTTFB().page("page2").value(1200).valueComparative(500).build()
+            ]
+        });
         var ttfbData = pageAggregationData.getDataForBars("FIRST_BYTE");
         var ttfbImprovementData = pageAggregationData.getDataForBars("FIRST_BYTE_improvement");
         var ttfbDeteriorationData = pageAggregationData.getDataForBars("FIRST_BYTE_deterioration");
