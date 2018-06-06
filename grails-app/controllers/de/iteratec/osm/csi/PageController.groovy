@@ -152,31 +152,34 @@ class PageController {
             isNotNull('script')
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('script', 'script')
+            createAlias('jobGroup', 'jobGroup')
             projections {
                 distinct('jobGroup.id', 'script.id')
                 property('jobGroup.id', 'jobGroupId')
+                property('jobGroup.name', 'jobGroupName')
                 property('script', 'script')
+                property('script.id', 'scriptId')
+                property('id', 'jobId')
             }
         }
 
-//        def pagesByScriptId = scriptsWithJobGroup.unique { script -> script.scriptId }.collectEntries { script ->
-//            [(script.scriptId): scriptService.getMeasuredEventsForScript((String) script.navigationScript).collect { it.testedPage }]
-//        }
-//
-//        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
-//            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
-//                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
-//            }g
-//        }
+        def scriptList = scriptsWithJobGroup.clone()
 
-        def result = scriptsWithJobGroup.collect { scriptsAndJobGroup ->
-            scriptsAndJobGroup.script.testedPages.collect{
-                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptsAndJobGroup.jobGroupId)
+        def pagesByScriptId = scriptList.unique { script -> script.scriptId }.collectEntries { script ->
+            Job job = Job.findById(script.jobId)
+            [(script.scriptId): job.variables.isEmpty() ?
+                    script.script.testedPages :
+                    scriptService.getMeasuredEventsForScript((String) script.script.getParsedNavigationScript(job)).collect { it.testedPage }]
+
+        }
+
+        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
+            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
+                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
             }
         }
 
         result = result.flatten()
-        result = result.unique()
         result = result.unique()
 
         return ControllerUtils.sendObjectAsJSON(response, result)
