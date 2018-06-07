@@ -12,10 +12,9 @@
         {{ jobGroup.name }}
       </option>
     </select>
-    <select name="firstPageSelect" class="form-control pageSelect">
+    <select name="firstPageSelect" class="form-control pageSelect" (change)="setFirstSelectedPage($event.target.value)">
       <option disabled value="-1">- choose a page -</option>
-      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id"
-              (change)="setFirstSelectedPage($event.target.value)">
+      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id">
         {{page.name}}
       </option>
     </select>
@@ -34,10 +33,9 @@
         {{ jobGroup.name }}
       </option>
     </select>
-    <select name="secondPageSelect" class="form-control pageSelect">
+    <select name="secondPageSelect" class="form-control pageSelect" (change)="setSecondSelectedPage($event.target.value)">
       <option disabled value="-1">- choose a page -</option>
-      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id"
-              (change)="setSecondSelectedPage($event.target.value)">
+      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id">
         {{page.name}}
       </option>
     </select>

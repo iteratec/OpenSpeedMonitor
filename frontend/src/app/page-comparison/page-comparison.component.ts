@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import {IJobGroupToPagesMapping} from "../common/model/job-group-to-page-mapping.model";
 import {PageComparisonSelection} from "./page-comparison-selection.model";
 import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
@@ -12,7 +12,20 @@ export class PageComparisonComponent implements OnInit {
   pageComparisonSelections: PageComparisonSelection[] = [];
   canRemoveRow: boolean = false;
 
-  constructor(private jobGroupService:JobGroupRestService) {
+  constructor(private jobGroupService:JobGroupRestService, private zone: NgZone) {
+    this.exposeComponent();
+  }
+
+  exposeComponent(){
+    window['pageComparisonComponent'] = {
+      zone: this.zone,
+      getSelectedPages: (value) => this.getSelectedPages(),
+      component: this,
+    };
+  }
+
+  getSelectedPages(){
+    return this.pageComparisonSelections;
   }
 
   ngOnInit() {

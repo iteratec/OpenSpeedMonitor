@@ -10,7 +10,6 @@
 </head>
 
 <body>
-%{--<page-comparison data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></page-comparison>--}%
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageComparison']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
@@ -42,7 +41,7 @@
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
-                        <g:render template="pageComparisonVue"/>
+                        <page-comparison data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></page-comparison>
                     </div>
                     <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
