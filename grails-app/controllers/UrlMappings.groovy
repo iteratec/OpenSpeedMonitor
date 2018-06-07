@@ -85,7 +85,7 @@ class UrlMappings {
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
         "/rest/man/$action?/$id?" {
-            controller = "apiDoc"
+            controller = "ApiDoc"
             action = "getDocuments"
         }
 
