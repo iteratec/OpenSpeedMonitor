@@ -148,9 +148,9 @@ assets {
 
 node {
     //node version to use
-    version = '6.2.2'
+    version = '8.11.1'
     //npm version to use
-    npmVersion = '3.10.3'
+    npmVersion = '5.6.0'
     // If true, it will download node using above parameters.
     // If false, it will try to use globally installed node.
     download = true
