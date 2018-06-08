@@ -3,6 +3,7 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
@@ -14,6 +15,8 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
+    private List<String> groupsForMedian = []
+    private List<SelectedMeasurand> selectedMeasurands = [];
 
     private List<Closure> filters = []
     private List<ProjectionProperty> baseProjections
@@ -135,6 +138,7 @@ class EventResultQueryBuilder {
             filters.add({
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
             })
+            groupsForMedian.add(associatedDomainFieldName + 'Id')
         }
         if (project) {
             baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
@@ -143,6 +147,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
+        this.selectedMeasurands = selectedMeasurands
         List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
         List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
 
@@ -160,6 +165,13 @@ class EventResultQueryBuilder {
 
     List<EventResultProjection> getRawData() {
         return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
+    }
+
+    List<EventResultProjection> getMedianData(){
+        MedianCalculator medianCalculator = new MedianCalculator()
+        List<EventResultProjection> rawData = getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
+        List<String> measurandNames = selectedMeasurands.collect{it.databaseRelevantName}
+        return  medianCalculator.calculateFor(rawData,groupsForMedian,measurandNames)
     }
 
     private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
