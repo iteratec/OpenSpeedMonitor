@@ -52,7 +52,7 @@ ext {
     karmaConfig = 'src/test/js/karma.conf.js'
 
     seleniumVersion = "3.4.0"
-    swaggerVersion = '1.5.20'
+    swaggerVersion = '1.5.19'
     swaggerUIVersion = '3.17.0'
 }
 
