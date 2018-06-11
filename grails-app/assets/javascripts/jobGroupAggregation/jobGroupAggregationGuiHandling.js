@@ -90,13 +90,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             selectedSeries: JSON.stringify(selectedSeries)
         };
 
+        spinner.start();
         getDataForAggregationValue("median", queryData, isStateChange);
         getDataForAggregationValue("avg", queryData, isStateChange);
     };
 
     function getDataForAggregationValue(aggregationValue, queryData, isStateChanged) {
         queryData.selectedAggregationValue = aggregationValue;
-        spinner.start();
         $.ajax({
             type: 'POST',
             data: queryData,

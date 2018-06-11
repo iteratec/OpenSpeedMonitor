@@ -220,14 +220,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             queryData.fromComparative = comparativeTimeFrame[0].toISOString();
             queryData.toComparative = comparativeTimeFrame[1].toISOString();
         }
-
+        spinner.start();
         getDataForAggregationValue("median", queryData, isStateChange);
         getDataForAggregationValue("avg", queryData, isStateChange);
     };
 
     function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
         queryData.selectedAggregationValue = aggregationValue;
-        spinner.start();
         $.ajax({
             type: 'POST',
             data: queryData,
