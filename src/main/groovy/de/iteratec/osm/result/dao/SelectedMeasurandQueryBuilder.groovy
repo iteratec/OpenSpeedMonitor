@@ -13,6 +13,6 @@ interface SelectedMeasurandQueryBuilder {
 
     void configureForSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands)
 
-    List<EventResultProjection> getResultsForFilter(List<Closure> filters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService)
+    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> filters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService)
 }
 

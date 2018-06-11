@@ -18,12 +18,12 @@ class EventResultQueryBuilder {
     private List<String> groupsForMedian = []
     private List<SelectedMeasurand> selectedMeasurands = [];
 
-    private List<Closure> filters = []
+    private List<EventResultFilter> filters = []
     private List<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, userTimingRawQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
@@ -31,14 +31,15 @@ class EventResultQueryBuilder {
         baseProjections = initBaseProjections()
     }
 
-    private Closure initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        return {
+    private EventResultFilter initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        Closure closure = {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
+        return new EventResultFilter(filterClosure: closure)
     }
 
     private List<ProjectionProperty> initBaseProjections() {
@@ -65,9 +66,9 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            filters.add({
+            filters.add(new EventResultFilter( filterClosure:{
                 'between' 'jobResultDate', from, to
-            })
+            }))
         }
         return this
     }
@@ -101,9 +102,9 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
-        filters.add({
+        filters.add(new EventResultFilter( filterClosure:{
             'eq' 'cachedView', cachedView
-        })
+        }))
         return this
     }
 
@@ -117,7 +118,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
-        filters.add({
+        filters.add(new EventResultFilter( filterClosure:{
             or {
                 if (connectivityProfileIds) {
                     'in'('connectivityProfile.id', connectivityProfileIds)
@@ -129,16 +130,17 @@ class EventResultQueryBuilder {
                     eq('noTrafficShapingAtAll', true)
                 }
             }
-        })
+        }))
         return this
     }
 
     private EventResultQueryBuilder withAssociatedDomainIdsIn(List<Long> associatedDomainIds, String associatedDomainFieldName, boolean project = true) {
         if (associatedDomainIds) {
-            filters.add({
+            Closure filterClosure = {
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
-            })
-            groupsForMedian.add(associatedDomainFieldName + 'Id')
+            }
+            EventResultFilter filter = new EventResultFilter(filterClosure: filterClosure, filteredFieldName: associatedDomainFieldName + 'Id')
+            filters.add(filter)
         }
         if (project) {
             baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
@@ -154,6 +156,7 @@ class EventResultQueryBuilder {
         if (measurands) {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
+            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
@@ -168,10 +171,7 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getMedianData(){
-        MedianCalculator medianCalculator = new MedianCalculator()
-        List<EventResultProjection> rawData = getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
-        List<String> measurandNames = selectedMeasurands.collect{it.databaseRelevantName}
-        return  medianCalculator.calculateFor(rawData,groupsForMedian,measurandNames)
+        return measurandMedianQueryBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
     }
 
     private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
@@ -221,6 +221,9 @@ class EventResultQueryBuilder {
     private initMeasurandsQueryBuilder() {
         if (!measurandRawQueryBuilder) {
             measurandRawQueryBuilder = new MeasurandRawDataQueryBuilder()
+        }
+        if(!measurandMedianQueryBuilder) {
+            measurandMedianQueryBuilder = new MeasurandMedianDataQueryBuilder()
         }
     }
 }
