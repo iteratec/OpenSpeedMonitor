@@ -12,40 +12,62 @@ export class PageComparisonComponent implements OnInit {
   pageComparisonSelections: PageComparisonSelection[] = [];
   canRemoveRow: boolean = false;
 
-  constructor(private jobGroupService:JobGroupRestService, private zone: NgZone) {
+  constructor(private jobGroupService: JobGroupRestService, private zone: NgZone) {
     this.exposeComponent();
   }
 
-  exposeComponent(){
+  exposeComponent() {
     window['pageComparisonComponent'] = {
       zone: this.zone,
-      getSelectedPages: (value) => this.getSelectedPages(),
+      getSelectedPages: () => this.getSelectedPages(),
       component: this,
     };
   }
 
-  getSelectedPages(){
+  getSelectedPages() {
     return this.pageComparisonSelections;
   }
 
   ngOnInit() {
     this.addComparison();
+    this.disableShowButton();
     this.registerTimeFrameChangeEvent();
   }
 
-  checkIfDelete(){
-    this.canRemoveRow = this.pageComparisonSelections.length>1;
+  checkIfDelete() {
+    this.canRemoveRow = this.pageComparisonSelections.length > 1;
   }
 
-  onDelete(event:PageComparisonSelection){
-    let index:number = this.pageComparisonSelections.indexOf(event);
-    if(index>=0){
-      this.pageComparisonSelections.splice(index,1)
+  onDelete(event: PageComparisonSelection) {
+    let index: number = this.pageComparisonSelections.indexOf(event);
+    if (index >= 0) {
+      this.pageComparisonSelections.splice(index, 1)
     }
     this.checkIfDelete();
   }
 
+  onChange(selection: PageComparisonSelection) {
+    if (selection.isValid()) {
+      this.enableShowButton();
+    } else {
+      this.disableShowButton();
+    }
+  }
+
+  disableShowButton() {
+    const button = document.getElementById("graphButtonHtmlId");
+    button.setAttribute("disabled", "disabled");
+    document.getElementById('warning-no-page').style.display = 'block'
+  }
+
+  enableShowButton() {
+    const button = document.getElementById("graphButtonHtmlId");
+    button.removeAttribute("disabled");
+    document.getElementById('warning-no-page').style.display = 'none'
+  }
+
   registerTimeFrameChangeEvent() {
+    //TimeFrame is currently not a angular component, so we have to do it "manually"
     document.getElementById("select-interval-timeframe-card").addEventListener("timeFrameChanged", (event: any) => {
       this.getJobGroups(event.detail[0].toISOString(), event.detail[1].toISOString());
     })

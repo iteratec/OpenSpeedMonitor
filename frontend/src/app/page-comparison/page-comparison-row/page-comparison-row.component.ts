@@ -14,12 +14,17 @@ export class PageComparisonRowComponent implements OnInit {
   @Input() selection: PageComparisonSelection;
   @Input() removable: boolean;
   @Output() deleteEmitter: EventEmitter<PageComparisonSelection> = new EventEmitter();
+  @Output() changeEmitter: EventEmitter<PageComparisonSelection> = new EventEmitter();
 
   constructor() {
   }
 
   onDelete(){
     this.deleteEmitter.emit(this.selection);
+  }
+
+  onChange(){
+    this.changeEmitter.emit(this.selection);
   }
 
   getPagesForJobGroup(id: string): IPageId[] {
@@ -33,18 +38,22 @@ export class PageComparisonRowComponent implements OnInit {
 
   setFirstSelectedJobGroup(id: string) {
     this.selection.firstJobGroupId = id;
+    this.onChange();
   }
 
   setSecondSelectedJobGroup(id: string) {
     this.selection.secondJobGroupId = id;
+    this.onChange();
   }
 
   setFirstSelectedPage(id: string) {
     this.selection.firstPageId = id;
+    this.onChange();
   }
 
   setSecondSelectedPage(id: string) {
     this.selection.secondPageId = id;
+    this.onChange();
   }
 
   ngOnInit() {

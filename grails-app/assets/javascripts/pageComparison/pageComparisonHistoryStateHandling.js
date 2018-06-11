@@ -31,26 +31,27 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
     };
 
     var saveState = function () {
-        var state = {};
-        state["from"] = $("#fromDatepicker").val();
-        state["to"] = $("#toDatepicker").val();
-        state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
-        state['measurand'] = $("#selectedAggrGroupValuesUnCached").val();
-        state['jobGroupId1'] = [];
-        state['pageId1'] = [];
-        state['jobGroupId2'] = [];
-        state['pageId2'] = [];
-        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons().forEach(function (comparison) {
-            state['jobGroupId1'].push(comparison['jobGroupId1']);
-            state['pageId1'].push(comparison['pageId1']);
-            state['jobGroupId2'].push(comparison['jobGroupId2']);
-            state['pageId2'].push(comparison['pageId2']);
-        });
-        var encodedState = urlEncodeState(state);
-        if (encodedState !== loadedState) {
-            loadedState = encodedState;
-            window.history.pushState(state, "", "show?" + encodedState);
-        }
+        //TODO adapt to angular component
+        // var state = {};
+        // state["from"] = $("#fromDatepicker").val();
+        // state["to"] = $("#toDatepicker").val();
+        // state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
+        // state['measurand'] = $("#selectedAggrGroupValuesUnCached").val();
+        // state['jobGroupId1'] = [];
+        // state['pageId1'] = [];
+        // state['jobGroupId2'] = [];
+        // state['pageId2'] = [];
+        // OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons().forEach(function (comparison) {
+        //     state['jobGroupId1'].push(comparison['jobGroupId1']);
+        //     state['pageId1'].push(comparison['pageId1']);
+        //     state['jobGroupId2'].push(comparison['jobGroupId2']);
+        //     state['pageId2'].push(comparison['pageId2']);
+        // });
+        // var encodedState = urlEncodeState(state);
+        // if (encodedState !== loadedState) {
+        //     loadedState = encodedState;
+        //     window.history.pushState(state, "", "show?" + encodedState);
+        // }
     };
 
     var loadState = function (state) {

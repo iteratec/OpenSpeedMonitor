@@ -6,7 +6,7 @@
          class="row form-group addPageComparisonRow">
       <div *ngFor="let selection of pageComparisonSelections">
         <page-comparison-row [jobGroupMappings]="jobGroupMappings"
-                             [selection]="selection" (deleteEmitter)="onDelete($event)" [removable]="canRemoveRow" ></page-comparison-row>
+                             [selection]="selection" (changeEmitter)="onChange($event)" (deleteEmitter)="onDelete($event)" [removable]="canRemoveRow" ></page-comparison-row>
       </div>
     </div>
     <div class="col-md-2"></div>
