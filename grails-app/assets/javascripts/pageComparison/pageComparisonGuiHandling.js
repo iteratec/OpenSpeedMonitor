@@ -51,7 +51,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 from: selectedTimeFrame[0].toISOString(),
                 to: selectedTimeFrame[1].toISOString(),
                 measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(window.pageComparisonComponent.getSelectedPages())
+                selectedPageComparisons: JSON.stringify(window.pageComparisonComponent.getComparisons())
             },
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
