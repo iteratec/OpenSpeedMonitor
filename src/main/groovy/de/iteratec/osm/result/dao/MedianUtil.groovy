@@ -17,4 +17,28 @@ class MedianUtil {
             }
         }
     }
+
+    static List<String> getAggegatorNames(List<EventResultFilter> baseFilters){
+        List<String> aggregators = baseFilters.collect{it.filteredFieldName}
+        aggregators.removeAll([null])
+        return aggregators
+    }
+
+    static String generateGroupKeyForMedianAggregators(Map eventResultProjection, List<String> aggregators){
+        String key = ""
+        aggregators.each {
+            key += "_" + eventResultProjection."$it"
+        }
+        return key
+    }
+
+    private static List<String> getNonMeasurandNames(List<String> measurandNames, Map eventResultProjection){
+        List<String> allPropertyNames = eventResultProjection.keySet() as List
+        return allPropertyNames.findAll{!measurandNames.contains(it)}
+    }
+
+    static Map getMetaDataSample(List<String> measurandNames, Map eventResultProjection){
+        List<String> metaDataKeys = getNonMeasurandNames(measurandNames, eventResultProjection)
+        return eventResultProjection.subMap(metaDataKeys)
+    }
 }

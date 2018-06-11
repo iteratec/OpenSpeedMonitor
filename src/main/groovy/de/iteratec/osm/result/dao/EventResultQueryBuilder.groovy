@@ -23,7 +23,7 @@ class EventResultQueryBuilder {
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
@@ -161,6 +161,7 @@ class EventResultQueryBuilder {
         if (userTimings) {
             initUserTimingsQueryBuilder()
             userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
+            userTimingsMedianDataQueryBuilder.configureForSelectedMeasurands(userTimings)
         }
 
         return this
@@ -171,7 +172,7 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getMedianData(){
-        return measurandMedianQueryBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
+        return getResultFor(userTimingsMedianDataQueryBuilder, measurandMedianQueryBuilder)
     }
 
     private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
@@ -215,6 +216,9 @@ class EventResultQueryBuilder {
     private initUserTimingsQueryBuilder() {
         if (!userTimingRawQueryBuilder) {
             userTimingRawQueryBuilder = new UserTimingRawDataQueryBuilder()
+        }
+        if(!userTimingsMedianDataQueryBuilder){
+            userTimingsMedianDataQueryBuilder = new UserTimingMedianDataQueryBuilder()
         }
     }
 

@@ -8,7 +8,7 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode(excludes = ["projectedProperties"])
 class EventResultProjection implements RepresentableWptResult{
 
-    Long id
+    def id
 
     Map projectedProperties = [:]
 
