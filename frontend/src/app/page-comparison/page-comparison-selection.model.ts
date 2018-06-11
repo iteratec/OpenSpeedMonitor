@@ -1,4 +1,4 @@
-export interface PageComparisonSelection {
+export interface IPageComparisonSelection {
   firstJobGroupId: number;
   firstPageId: number;
   secondJobGroupId: number;

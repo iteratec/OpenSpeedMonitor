@@ -2,28 +2,28 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {IJobGroupToPagesMapping} from "../../common/model/job-group-to-page-mapping.model";
 import {IPageId} from "../../common/model/page.model";
 import {isNullOrUndefined} from "util";
-import {PageComparisonSelection} from "../page-comparison-selection.model";
+import {IPageComparisonSelection} from "../page-comparison-selection.model";
 
 @Component({
   selector: 'page-comparison-row',
   templateUrl: './page-comparison-row.component.html'
   // styleUrls: ['./.component.css']
 })
-export class PageComparisonRowComponent implements OnInit {
+export class PageComparisonRowComponent{
   @Input() jobGroupMappings: IJobGroupToPagesMapping[];
-  @Input() selection: PageComparisonSelection;
+  @Input() selection: IPageComparisonSelection;
   @Input() removable: boolean;
-  @Output() deleteEmitter: EventEmitter<PageComparisonSelection> = new EventEmitter();
-  @Output() changeEmitter: EventEmitter<PageComparisonSelection> = new EventEmitter();
+  @Output() deleteEmitter: EventEmitter<IPageComparisonSelection> = new EventEmitter();
+  @Output() changeEmitter: EventEmitter<IPageComparisonSelection> = new EventEmitter();
 
   constructor() {
   }
 
-  onDelete(){
+  removeComparison(){
     this.deleteEmitter.emit(this.selection);
   }
 
-  onChange(){
+  triggerComparisonChange(){
     this.changeEmitter.emit(this.selection);
   }
 
@@ -38,25 +38,21 @@ export class PageComparisonRowComponent implements OnInit {
 
   setFirstSelectedJobGroup(id: number) {
     this.selection.firstJobGroupId = id;
-    this.onChange();
+    this.triggerComparisonChange();
   }
 
   setSecondSelectedJobGroup(id: number) {
     this.selection.secondJobGroupId = id;
-    this.onChange();
+    this.triggerComparisonChange();
   }
 
   setFirstSelectedPage(id: number) {
     this.selection.firstPageId = id;
-    this.onChange();
+    this.triggerComparisonChange();
   }
 
   setSecondSelectedPage(id: number) {
     this.selection.secondPageId = id;
-    this.onChange();
+    this.triggerComparisonChange();
   }
-
-  ngOnInit() {
-  }
-
 }
