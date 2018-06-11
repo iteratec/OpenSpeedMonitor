@@ -27,7 +27,7 @@ export class PageComparisonRowComponent implements OnInit {
     this.changeEmitter.emit(this.selection);
   }
 
-  getPagesForJobGroup(id: string): IPageId[] {
+  getPagesForJobGroup(id: number): IPageId[] {
     let jobGroupMapping: IJobGroupToPagesMapping = this.jobGroupMappings.find(jobGroup => jobGroup.id == id);
     if (isNullOrUndefined(jobGroupMapping)) {
       return []
@@ -36,22 +36,22 @@ export class PageComparisonRowComponent implements OnInit {
     }
   }
 
-  setFirstSelectedJobGroup(id: string) {
+  setFirstSelectedJobGroup(id: number) {
     this.selection.firstJobGroupId = id;
     this.onChange();
   }
 
-  setSecondSelectedJobGroup(id: string) {
+  setSecondSelectedJobGroup(id: number) {
     this.selection.secondJobGroupId = id;
     this.onChange();
   }
 
-  setFirstSelectedPage(id: string) {
+  setFirstSelectedPage(id: number) {
     this.selection.firstPageId = id;
     this.onChange();
   }
 
-  setSecondSelectedPage(id: string) {
+  setSecondSelectedPage(id: number) {
     this.selection.secondPageId = id;
     this.onChange();
   }

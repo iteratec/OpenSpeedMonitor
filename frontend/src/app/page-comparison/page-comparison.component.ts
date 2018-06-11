@@ -2,6 +2,7 @@ import {Component, NgZone, OnInit} from '@angular/core';
 import {IJobGroupToPagesMapping} from "../common/model/job-group-to-page-mapping.model";
 import {PageComparisonSelection} from "./page-comparison-selection.model";
 import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
+import {log} from "util";
 
 @Component({
   selector: 'page-comparison',
@@ -20,12 +21,21 @@ export class PageComparisonComponent implements OnInit {
     window['pageComparisonComponent'] = {
       zone: this.zone,
       getSelectedPages: () => this.getSelectedPages(),
+      getComparisons: () => this.getSelectedPages(),
+      setComparisons: (comparisons) => this.setComparisons(comparisons),
       component: this,
     };
   }
 
   getSelectedPages() {
     return this.pageComparisonSelections;
+  }
+
+  setComparisons(comparisons: PageComparisonSelection[]) {
+    this.zone.run(() => {
+      this.pageComparisonSelections = comparisons;
+      this.pageComparisonSelections.forEach((comparison) => this.onChange(comparison));
+    });
   }
 
   ngOnInit() {
@@ -46,12 +56,17 @@ export class PageComparisonComponent implements OnInit {
     this.checkIfDelete();
   }
 
-  onChange(selection: PageComparisonSelection) {
-    if (selection.isValid()) {
+  onChange(comparison: PageComparisonSelection) {
+    window.dispatchEvent(new Event("historyStateChanged"));
+    if (this.isComparisonValid(comparison)) {
       this.enableShowButton();
     } else {
       this.disableShowButton();
     }
+  }
+
+  isComparisonValid(comparison: PageComparisonSelection) {
+    return comparison.firstJobGroupId !== -1 && comparison.secondJobGroupId !== -1 && comparison.firstPageId !== -1 && comparison.secondPageId !== -1;
   }
 
   disableShowButton() {
@@ -74,7 +89,12 @@ export class PageComparisonComponent implements OnInit {
   }
 
   addComparison() {
-    this.pageComparisonSelections.push(new PageComparisonSelection());
+    this.pageComparisonSelections.push(<PageComparisonSelection>{
+      firstJobGroupId: -1,
+      firstPageId: -1,
+      secondPageId: -1,
+      secondJobGroupId: -1
+    });
     this.checkIfDelete();
   }
 

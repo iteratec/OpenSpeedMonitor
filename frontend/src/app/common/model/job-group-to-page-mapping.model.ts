@@ -1,7 +1,7 @@
 import {IPageId} from "./page.model";
 
 export interface IJobGroupToPagesMapping {
-  id: string;
+  id: number;
   name: string;
   pages: IPageId[];
 }

@@ -8,13 +8,13 @@
     <select name="firstJobGroupSelect"
             class="form-control jobgroupselect" (change)="setFirstSelectedJobGroup($event.target.value)">
       <option disabled value="-1">- choose a job group -</option>
-      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id">
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id" [selected]="jobGroup.id == selection.firstJobGroupId">
         {{ jobGroup.name }}
       </option>
     </select>
     <select name="firstPageSelect" class="form-control pageSelect" (change)="setFirstSelectedPage($event.target.value)">
       <option disabled value="-1">- choose a page -</option>
-      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id">
+      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id" [selected]="page.id == selection.firstPageId">
         {{page.name}}
       </option>
     </select>
@@ -29,13 +29,13 @@
     <select name="secondJobGroupSelect"
             class="form-control jobgroupselect" (change)="setSecondSelectedJobGroup($event.target.value)">
       <option disabled value="-1">- choose a job group -</option>
-      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id">
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id" [selected]="jobGroup.id == selection.secondJobGroupId">
         {{ jobGroup.name }}
       </option>
     </select>
     <select name="secondPageSelect" class="form-control pageSelect" (change)="setSecondSelectedPage($event.target.value)">
       <option disabled value="-1">- choose a page -</option>
-      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id">
+      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id" [selected]="page.id == selection.secondPageId">
         {{page.name}}
       </option>
     </select>
