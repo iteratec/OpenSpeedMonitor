@@ -35,13 +35,6 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
 
     void "Test service for measurand and usertimings"() {
         when: "BarchartQueryAndCalculationService is called with query parameters"
-        def medians = barchartQueryAndCalculationService.getMediansFor(
-                [jobGroup_one, jobGroup_two],
-                [page_one, page_two],
-                yesterday(),
-                tomorrow(),
-                [measurand, userTimingMeasurand]
-        )
         def avgs = barchartQueryAndCalculationService.getAveragesFor(
                 [jobGroup_one, jobGroup_two],
                 [page_one, page_two],
@@ -49,13 +42,7 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
                 tomorrow(),
                 [measurand, userTimingMeasurand]
         )
-        then: "Get averages and calculated medians in EventResultProjections"
-
-
-        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_one, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
-        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_one, page_one).projectedProperties.get(userTimingMeasurand.getDatabaseRelevantName()) == 2000
-        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_two, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 3000
-        findEventResultProjectionByJobGroupAndPage(medians, jobGroup_two, page_two).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1750
+        then: "Get averages in EventResultProjections"
 
         findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_one, page_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
         findEventResultProjectionByJobGroupAndPage(avgs, jobGroup_one, page_one).projectedProperties.get(userTimingMeasurand.getDatabaseRelevantName()) == 2000
@@ -65,13 +52,6 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
 
     void "Test service for jobGroups only"() {
         when: "BarchartQueryAndCalculationService is called with query parameters"
-        def medians = barchartQueryAndCalculationService.getMediansFor(
-                [jobGroup_one, jobGroup_two],
-                [],
-                yesterday(),
-                tomorrow(),
-                [measurand]
-        )
         def avgs = barchartQueryAndCalculationService.getAveragesFor(
                 [jobGroup_one, jobGroup_two],
                 [],
@@ -79,24 +59,13 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
                 tomorrow(),
                 [measurand]
         )
-        then: "Get averages and calculated medians for jobGroupAggregation"
-
-        findEventResultProjectionByJobGroup(medians, jobGroup_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
-        findEventResultProjectionByJobGroup(medians, jobGroup_two).projectedProperties.get(measurand.getDatabaseRelevantName()) == 2000
-
+        then: "Get averages for jobGroupAggregation"
         findEventResultProjectionByJobGroup(avgs, jobGroup_one).projectedProperties.get(measurand.getDatabaseRelevantName()) == 1500
         Math.round(findEventResultProjectionByJobGroup(avgs, jobGroup_two).projectedProperties.get(measurand.getDatabaseRelevantName())) == 144429
     }
 
     void "Test service for jobGroup with no results"() {
         when: "BarchartQueryAndCalculationService is called with query parameters"
-        def medians = barchartQueryAndCalculationService.getMediansFor(
-                [jobGroup_three],
-                [],
-                yesterday(),
-                tomorrow(),
-                [measurand]
-        )
         def avgs = barchartQueryAndCalculationService.getAveragesFor(
                 [jobGroup_three],
                 [],
@@ -105,7 +74,6 @@ class BarchartQueryAndCalculationServiceSpec extends NonTransactionalIntegration
                 [measurand]
         )
         then: "Get no EventResultProjections since jobGroup is empty"
-        medians.size() == 0
         avgs.size() == 0
     }
 
