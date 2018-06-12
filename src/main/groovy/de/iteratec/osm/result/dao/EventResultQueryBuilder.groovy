@@ -3,6 +3,7 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
@@ -14,13 +15,14 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
+    private List<SelectedMeasurand> selectedMeasurands = []
 
-    private List<Closure> filters = []
+    private List<EventResultFilter> filters = []
     private List<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, userTimingRawQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
@@ -28,14 +30,15 @@ class EventResultQueryBuilder {
         baseProjections = initBaseProjections()
     }
 
-    private Closure initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        return {
+    private EventResultFilter initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        Closure closure = {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
+        return new EventResultFilter(filterClosure: closure)
     }
 
     private List<ProjectionProperty> initBaseProjections() {
@@ -62,9 +65,9 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            filters.add({
+            filters.add(new EventResultFilter( filterClosure:{
                 'between' 'jobResultDate', from, to
-            })
+            }))
         }
         return this
     }
@@ -98,9 +101,9 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
-        filters.add({
+        filters.add(new EventResultFilter( filterClosure:{
             'eq' 'cachedView', cachedView
-        })
+        }))
         return this
     }
 
@@ -114,7 +117,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
-        filters.add({
+        filters.add(new EventResultFilter( filterClosure:{
             or {
                 if (connectivityProfileIds) {
                     'in'('connectivityProfile.id', connectivityProfileIds)
@@ -126,15 +129,17 @@ class EventResultQueryBuilder {
                     eq('noTrafficShapingAtAll', true)
                 }
             }
-        })
+        }))
         return this
     }
 
     private EventResultQueryBuilder withAssociatedDomainIdsIn(List<Long> associatedDomainIds, String associatedDomainFieldName, boolean project = true) {
         if (associatedDomainIds) {
-            filters.add({
+            Closure filterClosure = {
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
-            })
+            }
+            EventResultFilter filter = new EventResultFilter(filterClosure: filterClosure, filteredFieldName: associatedDomainFieldName + 'Id')
+            filters.add(filter)
         }
         if (project) {
             baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
@@ -143,16 +148,19 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
+        this.selectedMeasurands = selectedMeasurands
         List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
         List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
 
         if (measurands) {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
+            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
             userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
+            userTimingsMedianDataQueryBuilder.configureForSelectedMeasurands(userTimings)
         }
 
         return this
@@ -160,6 +168,10 @@ class EventResultQueryBuilder {
 
     List<EventResultProjection> getRawData() {
         return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
+    }
+
+    List<EventResultProjection> getMedianData(){
+        return getResultFor(userTimingsMedianDataQueryBuilder, measurandMedianQueryBuilder)
     }
 
     private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
@@ -204,11 +216,17 @@ class EventResultQueryBuilder {
         if (!userTimingRawQueryBuilder) {
             userTimingRawQueryBuilder = new UserTimingRawDataQueryBuilder()
         }
+        if(!userTimingsMedianDataQueryBuilder){
+            userTimingsMedianDataQueryBuilder = new UserTimingMedianDataQueryBuilder()
+        }
     }
 
     private initMeasurandsQueryBuilder() {
         if (!measurandRawQueryBuilder) {
             measurandRawQueryBuilder = new MeasurandRawDataQueryBuilder()
+        }
+        if(!measurandMedianQueryBuilder) {
+            measurandMedianQueryBuilder = new MeasurandMedianDataQueryBuilder()
         }
     }
 }

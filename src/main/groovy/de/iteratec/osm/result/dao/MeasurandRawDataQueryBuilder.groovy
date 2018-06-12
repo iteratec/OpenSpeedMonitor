@@ -36,12 +36,16 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+        return createEventResultProjections(getRawQueryResults(baseFilters, baseProjections, trims))
+    }
+
+    protected List<Map> getRawQueryResults(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims){
         List<Closure> filters = []
-        filters.addAll(baseFilters)
+        filters.addAll(baseFilters.collect{it.filterClosure})
         filters.addAll(buildTrim(trims))
         filters.add(buildProjection(baseProjections))
-        return createEventResultProjections(executeQuery(filters))
+        return executeQuery(filters)
     }
 
     private List<Closure> buildTrim(List<MeasurandTrim> trims){

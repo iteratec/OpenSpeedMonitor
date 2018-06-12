@@ -4,7 +4,6 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
-import de.iteratec.osm.barchart.BarchartQueryAndCalculationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -35,7 +34,6 @@ class PageAggregationController extends ExceptionHandlerController {
     OsmConfigCacheService osmConfigCacheService
     BarchartAggregationService barchartAggregationService
     PerformanceLoggingService performanceLoggingService
-    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     def index() {
         redirect(action: 'show')

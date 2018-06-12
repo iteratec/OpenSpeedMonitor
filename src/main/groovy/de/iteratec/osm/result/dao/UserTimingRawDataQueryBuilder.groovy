@@ -38,10 +38,19 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+        List<Map> dbResult = getRawQueryResults(baseFilters,baseProjections,trims,performanceLoggingService)
+        List<EventResultProjection> projections
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create EventResultProjections from db maps', 4) {
+            projections = createEventResultProjections(dbResult)
+        }
+        return projections
+    }
+
+    protected List<Map> getRawQueryResults(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService){
         List<Closure> filters = []
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - add base filters', 4) {
-            filters.addAll(baseFilters)
+            filters.addAll(baseFilters.collect{it.filterClosure})
         }
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - build and add ut filters', 4) {
             filters.add(buildUserTimingFilter(trims))
@@ -53,11 +62,7 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - execute ut query', 4) {
             dbResult = executeQuery(filters)
         }
-        List<EventResultProjection> projections
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create EventResultProjections from db maps', 4) {
-            projections = createEventResultProjections(dbResult)
-        }
-        return projections
+        return  dbResult
     }
 
     private Closure buildUserTimingFilter(List<MeasurandTrim> trims) {

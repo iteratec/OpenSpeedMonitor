@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
 
@@ -59,10 +60,15 @@ class BarchartAggregationService {
         switch(selectedAggregationValue) {
             case 'avg':
                 List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands)
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
             case 'median':
-                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands)
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+                List<EventResultProjection> eventResultProjections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                        .withJobResultDateBetween(from, to)
+                        .withSelectedMeasurands(selectedMeasurands)
+                        .withJobGroupIn(jobGroups)
+                        .withPageIn(pages)
+                        .getMedianData()
+                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
         }
     }
 
@@ -98,15 +104,17 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
+                JobGroup jobGroup = aggregation.jobGroup? aggregation.jobGroup : jobGroups.find{it.id == aggregation.jobGroupId}
+                Page page = aggregation.page ? aggregation.page : pages.find{it.id == aggregation.pageId}
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
-                        jobGroup: aggregation.jobGroup,
-                        page: aggregation.page,
+                        jobGroup: jobGroup,
+                        page: page,
                         aggregationValue: selectedAggregationValue,
                 )
             }
