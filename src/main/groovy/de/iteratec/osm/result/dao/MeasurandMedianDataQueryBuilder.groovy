@@ -14,7 +14,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
 
         Map<String,List<Map>> groupedRawData = groupRawDataByAggregators(rawData, aggregators)
         Set<EventResultProjection> groupedAndSummarized = summarizeGroupedRawData(groupedRawData,measurandNames)
-        return getMediansFromSummarizedData(groupedAndSummarized, measurandNames)
+        return getMediansFromSummarizedData(groupedAndSummarized, measurandNames) as List
     }
 
     private Map<String,List<Map>> groupRawDataByAggregators(List<Map> rawData, List<String> aggregators ){
@@ -47,7 +47,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
     }
 
 
-    private List<EventResultProjection> getMediansFromSummarizedData(List<EventResultProjection> eventResultProjections, List<String> measurandNames) {
+    private Set<EventResultProjection> getMediansFromSummarizedData(Set<EventResultProjection> eventResultProjections, List<String> measurandNames) {
         return eventResultProjections.each { eventResultProjection ->
             measurandNames.each { measurandName ->
                 List rawDataForMeasurand = eventResultProjection."$measurandName"
