@@ -72,7 +72,7 @@
                     <g:message code="landing.measurement.text"
                                default="Set up and control {0}. Configure what, how and when you want to measure your web application."
                                encodeAs="raw" args="[
-                            link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
+                            link(uri: '/setup-dashboard') { message(code:'landing.measurement.linkText', default:'your measurements')}
                     ]"/>
                 </p>
                     <a <g:if test="${isSetupFinished}">href="/measurementSetup/create"</g:if> <g:if test="${isSetupFinished}">title="<g:message code="de.iteratec.osm.ui.setupwizards.infra.continueInfo" default="continueButton" />"</g:if> class="btn btn-primary <g:if test="${!isSetupFinished}">submit disabled</g:if>">
@@ -81,4 +81,5 @@
         </div>
     </div>
 </div>
+
 </body>

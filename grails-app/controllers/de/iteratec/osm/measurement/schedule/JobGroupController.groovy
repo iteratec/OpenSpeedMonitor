@@ -14,6 +14,7 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.springframework.http.HttpStatus
 
@@ -234,5 +235,19 @@ class JobGroupController {
             jobGroup.save(flush: true)
             ControllerUtils.sendObjectAsJSON(response, ['jobGroupName': jobGroup.name, 'jobGroupId': jobGroup.id])
         }
+    }
+
+    def getAllActive() {
+        def activeJobGroups = Job.createCriteria().list {
+            eq('active', true)
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                jobGroup {
+                    property('id','id')
+                    property('name','name')
+                }
+            }
+        }
+        return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
     }
 }

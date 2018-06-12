@@ -29,7 +29,7 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
         classpath "org.grails.plugins:hibernate5:6.1.9"
-        classpath 'com.moowork.gradle:gradle-node-plugin:1.0.1'
+        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
     }
 }
 
@@ -160,6 +160,8 @@ node {
     download = true
     // Set the work directory for unpacking node
     workDir = file("${project.buildDir}/nodejs")
+    // Set npm work directory, so it's affected by gradle clean as well and not built in the .gradle folder
+    npmWorkDir = file("${project.buildDir}/npm")
     // Set the work directory where node_modules should be located
 //    nodeModulesDir = file("${project.projectDir}/node_modules")
     nodeModulesDir = file("${project.projectDir}")
@@ -167,6 +169,34 @@ node {
 
 npmInstall {
     outputs.files file('node_modules')
+}
+
+task installFrontendDependencies(type: NpmTask) {
+    description = "Installs frontend package dependencies"
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['install']
+}
+
+task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
+    description = "Compiles frontend"
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['run', 'build:prod']
+}
+
+task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
+    description = "Syncs frontend javascript files"
+    from 'frontend/dist/frontend'
+    include '*.js'
+    into 'grails-app/assets/javascripts/frontend'
+    rename('(main|polyfills|runtime)\\..*\\.js', '$1.js')
+}
+
+task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
+    description = "Syncs frontend stylesheet files"
+    from 'frontend/dist/frontend'
+    include '*.css'
+    into 'grails-app/assets/stylesheets/frontend'
+    rename('(styles)\\..*\\.css', '$1.css')
 }
 
 task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
@@ -238,7 +268,7 @@ task nodeSyncStylesheets(type: Sync) {
 
 
 task nodePackages() {
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets
+    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
 }
 
 processResources.dependsOn nodePackages
@@ -249,6 +279,8 @@ clean.delete << file('grails-app/assets/stylesheets/node_modules')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
+// Cleans old npm directory inside .gradle as these are not needed anymore because the build directory is used
+clean.delete << file('.gradle/npm')
 
 
 
