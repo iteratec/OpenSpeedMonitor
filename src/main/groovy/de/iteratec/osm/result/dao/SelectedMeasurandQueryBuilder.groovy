@@ -1,6 +1,5 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.PerformanceLoggingService
 
@@ -9,10 +8,10 @@ import de.iteratec.osm.util.PerformanceLoggingService
  */
 interface SelectedMeasurandQueryBuilder {
 
-    Closure buildProjection(List<ProjectionProperty> additionalProjections)
+    Closure buildProjection(Set<ProjectionProperty> additionalProjections)
 
     void configureForSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands)
 
-    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> filters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService)
+    List<EventResultProjection> getResultsForFilter(List<Closure> filters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService)
 }
 

@@ -1,6 +1,5 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
@@ -15,7 +14,7 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     List<SelectedMeasurand> selectedMeasurands
 
     @Override
-    Closure buildProjection(List<ProjectionProperty> baseProjections) {
+    Closure buildProjection(Set<ProjectionProperty> baseProjections) {
 
         return {
             projections {
@@ -38,7 +37,7 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
         List<Map> dbResult = getRawQueryResults(baseFilters,baseProjections,trims,performanceLoggingService)
         List<EventResultProjection> projections
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create EventResultProjections from db maps', 4) {
@@ -47,10 +46,10 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         return projections
     }
 
-    protected List<Map> getRawQueryResults(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService){
+    protected List<Map> getRawQueryResults(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService){
         List<Closure> filters = []
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - add base filters', 4) {
-            filters.addAll(baseFilters.collect{it.filterClosure})
+            filters.addAll(baseFilters)
         }
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - build and add ut filters', 4) {
             filters.add(buildUserTimingFilter(trims))

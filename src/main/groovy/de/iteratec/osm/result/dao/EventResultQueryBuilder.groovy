@@ -1,9 +1,7 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
@@ -17,8 +15,8 @@ import org.hibernate.sql.JoinType
 class EventResultQueryBuilder {
     private List<SelectedMeasurand> selectedMeasurands = []
 
-    private List<EventResultFilter> filters = []
-    private List<ProjectionProperty> baseProjections
+    private List<Closure> filters = []
+    private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
@@ -27,21 +25,20 @@ class EventResultQueryBuilder {
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
         filters.add(initBaseClosure(minValidLoadtime, maxValidLoadtime))
-        baseProjections = initBaseProjections()
+        baseProjections = []
     }
 
-    private EventResultFilter initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        Closure closure = {
+    private Closure initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
+        return {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
             'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
-        return new EventResultFilter(filterClosure: closure)
     }
 
-    private List<ProjectionProperty> initBaseProjections() {
+    private List<ProjectionProperty> getRichMetaDataProjections() {
         return [
                 new ProjectionProperty(dbName: 'id', alias: 'id'),
                 new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
@@ -65,45 +62,45 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            filters.add(new EventResultFilter( filterClosure:{
+            filters.add({
                 'between' 'jobResultDate', from, to
-            }))
+            })
         }
         return this
     }
 
-    EventResultQueryBuilder withJobGroupIdsIn(List<Long> jobGroupIds, boolean project = false) {
+    EventResultQueryBuilder withJobGroupIdsIn(List<Long> jobGroupIds, boolean project = true) {
         return withAssociatedDomainIdsIn(jobGroupIds, 'jobGroup', project)
     }
 
-    EventResultQueryBuilder withPageIdsIn(List<Long> pageIds, boolean project = false) {
+    EventResultQueryBuilder withPageIdsIn(List<Long> pageIds, boolean project = true) {
         return withAssociatedDomainIdsIn(pageIds, 'page', project)
     }
 
-    EventResultQueryBuilder withLocationIdsIn(List<Long> locationIds, boolean project = false) {
+    EventResultQueryBuilder withLocationIdsIn(List<Long> locationIds, boolean project = true) {
         return withAssociatedDomainIdsIn(locationIds, 'location', project)
     }
 
-    EventResultQueryBuilder withBrowserIdsIn(List<Long> browserIds, boolean project = false) {
+    EventResultQueryBuilder withBrowserIdsIn(List<Long> browserIds, boolean project = true) {
         return withAssociatedDomainIdsIn(browserIds, 'browser', project)
     }
 
-    EventResultQueryBuilder withMeasuredEventIdsIn(List<Long> measuredEventIds, boolean project = false) {
+    EventResultQueryBuilder withMeasuredEventIdsIn(List<Long> measuredEventIds, boolean project = true) {
         return withAssociatedDomainIdsIn(measuredEventIds, 'measuredEvent', project)
     }
 
-    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = false) {
+    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
         return withAssociatedDomainIdsIn(jobGroups.collect { it.ident() }, 'jobGroup', project)
     }
 
-    EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = false) {
+    EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = true) {
         return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
-        filters.add(new EventResultFilter( filterClosure:{
+        filters.add({
             'eq' 'cachedView', cachedView
-        }))
+        })
         return this
     }
 
@@ -117,7 +114,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
-        filters.add(new EventResultFilter( filterClosure:{
+        filters.add({
             or {
                 if (connectivityProfileIds) {
                     'in'('connectivityProfile.id', connectivityProfileIds)
@@ -129,7 +126,7 @@ class EventResultQueryBuilder {
                     eq('noTrafficShapingAtAll', true)
                 }
             }
-        }))
+        })
         return this
     }
 
@@ -138,11 +135,10 @@ class EventResultQueryBuilder {
             Closure filterClosure = {
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
             }
-            EventResultFilter filter = new EventResultFilter(filterClosure: filterClosure, filteredFieldName: associatedDomainFieldName + 'Id')
-            filters.add(filter)
+            filters.add(filterClosure)
         }
         if (project) {
-            baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
+            baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName+'.id', alias: associatedDomainFieldName+ 'Id'))
         }
         return this
     }
@@ -166,7 +162,10 @@ class EventResultQueryBuilder {
         return this
     }
 
-    List<EventResultProjection> getRawData() {
+    List<EventResultProjection> getRawData(boolean withRichMetaData= true) {
+        if(withRichMetaData){
+            baseProjections.addAll(getRichMetaDataProjections())
+        }
         return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
     }
 

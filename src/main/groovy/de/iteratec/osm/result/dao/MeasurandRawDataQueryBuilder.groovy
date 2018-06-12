@@ -1,6 +1,5 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -13,7 +12,7 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     List<SelectedMeasurand> selectedMeasurands
 
     @Override
-    Closure buildProjection(List<ProjectionProperty> baseProjections) {
+    Closure buildProjection(Set<ProjectionProperty> baseProjections) {
         List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
         if (!measurands) {
             return null
@@ -36,13 +35,13 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
+    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
         return createEventResultProjections(getRawQueryResults(baseFilters, baseProjections, trims))
     }
 
-    protected List<Map> getRawQueryResults(List<EventResultFilter> baseFilters, List<ProjectionProperty> baseProjections, List<MeasurandTrim> trims){
+    protected List<Map> getRawQueryResults(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims){
         List<Closure> filters = []
-        filters.addAll(baseFilters.collect{it.filterClosure})
+        filters.addAll(baseFilters)
         filters.addAll(buildTrim(trims))
         filters.add(buildProjection(baseProjections))
         return executeQuery(filters)

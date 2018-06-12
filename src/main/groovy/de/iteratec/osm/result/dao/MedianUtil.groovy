@@ -18,13 +18,12 @@ class MedianUtil {
         }
     }
 
-    static List<String> getAggegatorNames(List<EventResultFilter> baseFilters){
-        List<String> aggregators = baseFilters.collect{it.filteredFieldName}
-        aggregators.removeAll([null])
-        return aggregators
+    private static Set<String> getAggregatorAliases(Set<ProjectionProperty> projectionPropertySet){
+        return projectionPropertySet.collect{it.alias}
     }
 
-    static String generateGroupKeyForMedianAggregators(Map eventResultProjection, List<String> aggregators){
+    static String generateGroupKeyForMedianAggregators(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet){
+        Set aggregators = getAggregatorAliases(projectionPropertySet)
         String key = ""
         aggregators.each {
             key += "_" + eventResultProjection."$it"
@@ -32,13 +31,7 @@ class MedianUtil {
         return key
     }
 
-    private static Set<String> getNonMeasurandNames(List<String> measurandNames, Map eventResultProjection){
-        Set<String> allPropertyNames = eventResultProjection.keySet()
-        return allPropertyNames.findAll{!measurandNames.contains(it)}
-    }
-
-    static Map getMetaDataSample(List<String> measurandNames, Map eventResultProjection){
-        Set<String> metaDataKeys = getNonMeasurandNames(measurandNames, eventResultProjection)
-        return eventResultProjection.subMap(metaDataKeys)
+    static Map getMetaDataSample(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet){
+        return eventResultProjection.subMap(getAggregatorAliases(projectionPropertySet))
     }
 }
