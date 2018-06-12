@@ -150,26 +150,25 @@ class PageController {
                 property('jobGroup.id', 'jobGroupId')
                 property('jobGroup.name', 'jobGroupName')
                 property('script', 'script')
-                property('id', 'jobId')
             }
         }
 
-        def scriptJobGroupList = scriptsWithJobGroup.clone()
+        def jobGroupsWithPages = scriptsWithJobGroup.collect{ scriptWithJobGroup ->
+            [
+                    'id': scriptWithJobGroup.jobGroupId,
+                    'name': scriptWithJobGroup.jobGroupName,
+                    'pages': []
+            ]
+        }.unique()
 
-        def pagesByScriptId = scriptJobGroupList.unique { scriptWithJobGroup -> scriptWithJobGroup.script.id }.collectEntries { scriptWithJobGroup ->
-            [(scriptWithJobGroup.script.id): scriptWithJobGroup.script.testedPages]
+        scriptsWithJobGroup.each { scriptWithJobGroup ->
+            def jobGroupWithPages = jobGroupsWithPages.find {test -> test.id == scriptWithJobGroup.jobGroupId}
+            jobGroupWithPages.pages.add(scriptWithJobGroup.script.testedPages)
+            jobGroupWithPages.pages = jobGroupWithPages.pages.flatten()
+            jobGroupWithPages.pages = jobGroupWithPages.pages.unique()
         }
 
-        def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
-            pagesByScriptId[scriptWithJobGroup.script.id].collect {
-                new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
-            }
-        }
-
-        result = result.flatten()
-        result = result.unique().unique()
-
-        return ControllerUtils.sendObjectAsJSON(response, result)
+        return ControllerUtils.sendObjectAsJSON(response, jobGroupsWithPages)
     }
 }
 
