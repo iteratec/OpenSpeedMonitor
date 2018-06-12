@@ -74,13 +74,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
         };
 
+        spinner.start();
         getDataForAggregationValue("median", queryData, isStateChange);
         getDataForAggregationValue("avg", queryData, isStateChange);
     };
 
     function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
         queryData.selectedAggregationValue = aggregationValue;
-        spinner.start();
         $.ajax({
             type: 'POST',
             data: queryData,
