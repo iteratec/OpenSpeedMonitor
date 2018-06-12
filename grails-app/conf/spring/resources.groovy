@@ -15,6 +15,8 @@
 * limitations under the License.
 */
 
+package spring
+
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import io.swagger.models.Contact

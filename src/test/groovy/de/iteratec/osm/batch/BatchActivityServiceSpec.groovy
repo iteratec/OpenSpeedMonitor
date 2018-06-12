@@ -17,13 +17,12 @@
 
 package de.iteratec.osm.batch
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DomainUnitTest
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(BatchActivityService)
-@Mock(BatchActivity)
-class BatchActivityServiceSpec extends Specification {
+class BatchActivityServiceSpec extends Specification implements ServiceUnitTest<BatchActivityService>,
+        DomainUnitTest<BatchActivity> {
 
     void "get batch activity returns a real BatchActivityUpdater when observe is true"() {
         given:

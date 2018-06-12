@@ -17,13 +17,11 @@
 
 package de.iteratec.osm.d3Data
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
-class ScheduleChartDataSpec extends Specification{
+class ScheduleChartDataSpec extends Specification implements GrailsUnitTest {
 
     def "initialisation test" () {
         when: "ScheduleChartData is created"

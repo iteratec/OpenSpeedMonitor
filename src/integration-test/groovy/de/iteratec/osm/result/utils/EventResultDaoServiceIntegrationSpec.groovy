@@ -28,8 +28,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.apache.commons.lang.time.DateUtils
 
 @Integration

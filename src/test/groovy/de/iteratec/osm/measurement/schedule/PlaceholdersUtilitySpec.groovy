@@ -19,8 +19,8 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
 /**
@@ -28,9 +28,8 @@ import spock.lang.Specification
  * @see pts.js Contains regex pattern used for syntax highlighting  
  * @author dri
  */
-@Mock([Script])
 @Build(Script)
-class PlaceholdersUtilitySpec extends Specification{
+class PlaceholdersUtilitySpec extends Specification implements BuildDomainTest<Script> {
 
     public static final String NAV_SCRIPT_USING_VARS = 'setEventName ${eventName}\nnavigate ${targeturl}'
 
@@ -40,7 +39,7 @@ class PlaceholdersUtilitySpec extends Specification{
             targeturl: 'http://example.com',
             eventName: 'HOMEPAGE'
         ]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with a variable map containing all variables"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, fullScriptVariableMap)
@@ -54,7 +53,7 @@ class PlaceholdersUtilitySpec extends Specification{
         Map incompleteScriptVariableMap = [
                 targeturl: 'http://example.com',
         ]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with a variable map containing just one of two variables"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, incompleteScriptVariableMap)
@@ -67,7 +66,7 @@ class PlaceholdersUtilitySpec extends Specification{
     void "parametrized navigationScript parsing given no variables"() {
         given: "a script using multiple variables"
         Map emptyScriptVariableMap = [:]
-        Script script = Script.buildWithoutSave(navigationScript: NAV_SCRIPT_USING_VARS)
+        Script script = Script.build(save: false, navigationScript: NAV_SCRIPT_USING_VARS)
 
         when: "this script get parsed with an empty variable map"
         String parsedWithVariables = PlaceholdersUtility.getParsedNavigationScript(script.navigationScript, emptyScriptVariableMap)

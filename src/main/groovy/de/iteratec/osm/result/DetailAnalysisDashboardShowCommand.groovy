@@ -1,8 +1,8 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.util.ParameterBindingUtility
+import grails.databinding.BindUsing
 import grails.validation.Validateable
-import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 

@@ -20,11 +20,11 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
+import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
 import grails.plugins.taggable.Taggable
 import grails.util.Environment
 
-import org.grails.databinding.BindUsing
 import org.quartz.CronExpression
 
 /**
@@ -318,6 +318,7 @@ class Job implements Taggable {
         customConnectivityProfile defaultValue: false
         persistNonMedianResults defaultValue: '1'
         label(index: 'label_idx')
+        autowire true
     }
 
     def beforeValidate() {

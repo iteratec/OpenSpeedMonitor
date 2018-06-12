@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.script
 
+import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
-import org.grails.databinding.BindUsing
 
 @Entity
 class ArchivedScript {

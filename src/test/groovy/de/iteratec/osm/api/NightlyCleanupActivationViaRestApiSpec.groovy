@@ -2,23 +2,26 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.de.iteratec.osm.api.NightlyDatabaseCleanupActivationCommand
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DomainUnitTest
+import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.*
 
-@TestFor(GeneralMeasurementApiController)
-@Mock([ApiKey])
-class NightlyCleanupActivationViaRestApiSpec extends Specification {
+class NightlyCleanupActivationViaRestApiSpec extends Specification implements
+        ControllerUnitTest<GeneralMeasurementApiController>, DomainUnitTest<ApiKey> {
 
     InMemoryConfigService inMemoryConfigService
 
     static String apiKeyAllowed = 'allowed'
     static String apiKeyNotAllowed = 'not-allowed'
-    def doWithSpring = {
-        inMemoryConfigService(InMemoryConfigService)
+
+    Closure doWithSpring() {
+        return {
+            inMemoryConfigService(InMemoryConfigService)
+        }
     }
+
     void setup(){
         //test data common to all tests
         ApiKey.withTransaction {

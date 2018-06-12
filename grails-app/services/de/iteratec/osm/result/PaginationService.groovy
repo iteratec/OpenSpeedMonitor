@@ -20,7 +20,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
 import de.iteratec.osm.util.ParameterBindingUtility
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 
 /**

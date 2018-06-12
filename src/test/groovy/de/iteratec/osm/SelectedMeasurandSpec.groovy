@@ -1,5 +1,7 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
@@ -8,20 +10,17 @@ import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.result.dao.EventResultProjection
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, UserTiming])
 @Build([EventResult, UserTiming])
-class SelectedMeasurandSpec extends Specification {
+class SelectedMeasurandSpec extends Specification implements BuildDataTest {
     CachedView cachedView = CachedView.UNCACHED
+
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming, ConnectivityProfile, Script)
+    }
 
     void "test if constructor works as intended"() {
         when: "selected is constructed for optionValue"

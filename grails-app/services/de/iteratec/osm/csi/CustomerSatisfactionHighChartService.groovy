@@ -162,7 +162,7 @@ class CustomerSatisfactionHighChartService {
         List<OsmChartGraph> graphs = new ArrayList<OsmChartGraph>();
 
         // start a new session for better performance
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
 
             for (CsiAggregation currentCsiAggregation : csiValues) {
                 if (getValue(currentCsiAggregation) != null && getValue(currentCsiAggregation) >= 0) {

@@ -22,7 +22,7 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.MultiLineChartLineData
 import de.iteratec.osm.util.I18nService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class TimeToCsMappingService {
 

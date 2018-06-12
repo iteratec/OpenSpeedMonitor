@@ -16,7 +16,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone

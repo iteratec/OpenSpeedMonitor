@@ -3,24 +3,19 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(ResultPersisterService)
 @Unroll
-@Mock([Page, EventResult, MeasuredEvent])
 @Build([Page, EventResult, MeasuredEvent])
-class FilterResultsToReportSpec extends Specification {
+class FilterResultsToReportSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
     static final PAGE_NAME_HOMEPAGE = 'Homepage'
 
@@ -28,6 +23,10 @@ class FilterResultsToReportSpec extends Specification {
         Page.build(name: PAGE_NAME_HOMEPAGE)
         Page.build(name: Page.UNDEFINED)
         service.csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
+    }
+
+    void setupSpec() {
+        mockDomains(Page, EventResult, MeasuredEvent, ConnectivityProfile, Script)
     }
 
     void "Report Results for Page #pageName"() {

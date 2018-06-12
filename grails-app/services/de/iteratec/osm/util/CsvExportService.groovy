@@ -1,6 +1,6 @@
 package de.iteratec.osm.util
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.supercsv.encoder.DefaultCsvEncoder

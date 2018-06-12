@@ -1,20 +1,18 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.MeasurementResultDto
-import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
-import spock.lang.Unroll
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
-@TestFor(ThresholdService)
-@Mock([EventResult, Threshold])
 @Build([EventResult, Threshold])
-class ThresholdServiceSpec extends Specification {
+class ThresholdServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<ThresholdService> {
+    void setupSpec() {
+        mockDomains(EventResult, Threshold, ConnectivityProfile, Script)
+    }
 
     void "test measured event result"() {
         given: "a event result and a threshold"

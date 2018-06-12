@@ -250,7 +250,7 @@ databaseChangeLog = {
      **/
     changeSet(author: "mmi", id: "1465407008000-1") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1459346200213-69'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1459346200213-69'")
         }
         grailsChange{
             change{

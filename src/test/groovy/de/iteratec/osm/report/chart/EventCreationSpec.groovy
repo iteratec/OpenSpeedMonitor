@@ -18,21 +18,16 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(EventDaoService)
-@Mock([Event, JobGroup])
 @Build([JobGroup])
-class EventCreationSpec extends Specification {
+class EventCreationSpec extends Specification implements BuildDataTest, ServiceUnitTest<EventDaoService> {
 
     EventDaoService serviceUnderTest
 
@@ -43,6 +38,10 @@ class EventCreationSpec extends Specification {
         //test data common to all tests
         group1 = JobGroup.build()
         group2 = JobGroup.build()
+    }
+
+    void setupSpec() {
+        mockDomains(Event, JobGroup)
     }
 
     void "successful creation of event"() {
@@ -116,16 +115,15 @@ class EventCreationSpec extends Specification {
         boolean globalVisibility = true
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }
@@ -139,16 +137,15 @@ class EventCreationSpec extends Specification {
         boolean globalVisibility = true
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }
@@ -162,16 +159,15 @@ class EventCreationSpec extends Specification {
         boolean globalVisibility
 
         when:
-        shouldFail(ValidationException) {
-            serviceUnderTest.createEvent(
-                    shortname,
-                    datetime,
-                    description,
-                    globalVisibility,
-                    [group1, group2])
-        }
+        serviceUnderTest.createEvent(
+                shortname,
+                datetime,
+                description,
+                globalVisibility,
+                [group1, group2])
 
         then:
+        ValidationException e = thrown()
         //test written event
         Event.list().size() == 0
     }

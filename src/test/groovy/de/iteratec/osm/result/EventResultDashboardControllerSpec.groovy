@@ -23,11 +23,11 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
+
 /**
  * <p>
  * Test-suite of {@link EventResultDashboardController} and 
@@ -37,16 +37,19 @@ import spock.lang.Specification
  * @author rhe, sburnicki
  * @since IT-98
  */
-@TestFor(EventResultDashboardController)
 @Build([JobGroup, Page, MeasuredEvent, Browser, Location])
-@Mock([ConnectivityProfile, JobGroup, Page, MeasuredEvent, Browser, Location])
-class EventResultDashboardControllerSpec extends Specification {
+class EventResultDashboardControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<EventResultDashboardController> {
 
     public static final String CUSTOM_CONNECTIVITY_NAME = 'Custom (6.000/512 Kbps, 50ms)'
     EventResultDashboardShowAllCommand command
 
     void setup() {
         command = new EventResultDashboardShowAllCommand()
+    }
+
+    void setupSpec() {
+        mockDomains(ConnectivityProfile, JobGroup, Page, MeasuredEvent, Browser, Location)
     }
 
     void "command without bound parameters is invalid"() {

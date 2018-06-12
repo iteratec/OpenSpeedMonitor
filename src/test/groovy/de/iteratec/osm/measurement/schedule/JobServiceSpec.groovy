@@ -25,16 +25,14 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.Measurand
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
 import spock.lang.Specification
 
-@TestFor(JobService)
-@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay])
 @Build([Job, JobGroup, CsiConfiguration])
-class JobServiceSpec extends Specification {
+class JobServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<JobService> {
 
     JobService serviceUnderTest
 
@@ -45,6 +43,11 @@ class JobServiceSpec extends Specification {
         serviceUnderTest = service
         service.jobDaoService = new JobDaoService()
         createTestDataCommonForAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay,
+                ConnectivityProfile)
     }
 
     void "get csi JobGroup of Job associated to a non csi JobGroup"() {

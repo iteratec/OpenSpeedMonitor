@@ -19,17 +19,17 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(CsiValueService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent])
 @Build([EventResult, CsiAggregation])
-class CsiValueServiceSpec extends Specification {
+class CsiValueServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<CsiValueService> {
 
     CsiValueService serviceUnderTest
 
@@ -39,8 +39,10 @@ class CsiValueServiceSpec extends Specification {
     EventResult eventResult
     CsiAggregation csiAggregation
 
-    def doWithSpring = {
-        osmConfigCacheService(OsmConfigCacheService)
+    Closure doWithSpring() {
+        return {
+            osmConfigCacheService(OsmConfigCacheService)
+        }
     }
 
     void setup() {
@@ -53,6 +55,10 @@ class CsiValueServiceSpec extends Specification {
         csiAggregation = CsiAggregation.build(csByWptDocCompleteInPercent: 50.0)
     }
 
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, ConnectivityProfile, Script)
+    }
+
     void "Different functionality is applied respective polymorphism of CsiValue implementations"() {
         setup:
         serviceUnderTest.metaClass.isCsiRelevant = { EventResult eventResult ->
@@ -63,8 +69,8 @@ class CsiValueServiceSpec extends Specification {
         }
 
         when:
-        CsiValue csiAgg = CsiAggregation.buildWithoutSave()
-        CsiValue eventResult = EventResult.buildWithoutSave()
+        CsiValue csiAgg = CsiAggregation.build(save: false)
+        CsiValue eventResult = EventResult.build(save: false)
 
         then:
         !serviceUnderTest.isCsiRelevant(csiAgg)

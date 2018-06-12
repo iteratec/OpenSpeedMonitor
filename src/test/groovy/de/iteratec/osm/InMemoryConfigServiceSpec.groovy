@@ -1,11 +1,9 @@
 package de.iteratec.osm
 
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-
-@TestFor(InMemoryConfigService)
-class InMemoryConfigServiceSpec extends Specification{
+class InMemoryConfigServiceSpec extends Specification implements ServiceUnitTest<InMemoryConfigService> {
 
     void "check default values"(){
         when: "In Memory Confing service is not null"

@@ -12,7 +12,7 @@ import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmRickshawChart
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime

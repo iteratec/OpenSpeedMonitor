@@ -17,10 +17,9 @@ class CsTargetGraphCreatePage extends I18nGebPage{
         descriptionTextField { $("#description") }
 
         errorMessageBox { $("div", class: "alert alert-danger") }
-        errorMessageBoxText { errorMessageBox.attr("innerHTML") }
     }
 
     def selectPointTwo () {
-        $("#pointTwo").find("option")[1].click()
+        $("#pointTwo\\.id").find("option")[1].click()
     }
 }

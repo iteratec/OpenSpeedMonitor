@@ -17,9 +17,10 @@
 
 package de.iteratec.osm.result
 
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
+import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
+import grails.testing.services.ServiceUnitTest
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -32,10 +33,9 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 
-@TestFor(EventResultDashboardService)
-@Mock([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
 @Build([EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile, CsiAggregation])
-class EventResultDashboardServiceSpec extends Specification {
+class EventResultDashboardServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<EventResultDashboardService> {
 
     Browser browser
     Location location
@@ -46,12 +46,14 @@ class EventResultDashboardServiceSpec extends Specification {
 
     DateTime runDate
 
-    def doWithSpring = {
-        osmChartProcessingService(OsmChartProcessingService)
-        performanceLoggingService(PerformanceLoggingService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        i18nService(I18nService)
-        browserSerivce(BrowserService)
+    Closure doWithSpring() {
+        return {
+            osmChartProcessingService(OsmChartProcessingService)
+            performanceLoggingService(PerformanceLoggingService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            i18nService(I18nService)
+            browserSerivce(BrowserService)
+        }
     }
 
     void setup() {
@@ -59,6 +61,11 @@ class EventResultDashboardServiceSpec extends Specification {
 
         mockI18NServices()
         mockGrailsLinkGenerator()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming, Browser, JobGroup, Location, MeasuredEvent, Page, ConnectivityProfile,
+                CsiAggregation, Script)
     }
 
     void "build url list underlaying event results of a data point"() {

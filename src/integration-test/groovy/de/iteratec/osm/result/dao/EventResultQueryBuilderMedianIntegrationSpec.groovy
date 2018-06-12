@@ -8,7 +8,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
 @Integration

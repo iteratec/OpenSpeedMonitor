@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -31,21 +32,27 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@TestFor(ResultPersisterService)
 @Build([WebPageTestServer, Location, Job])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
-class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification {
+class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        pageService(PageService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            pageService(PageService)
+            jobDaoService(JobDaoService)
+        }
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script, ConnectivityProfile)
     }
 
     @Unroll

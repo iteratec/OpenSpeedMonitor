@@ -39,11 +39,9 @@ import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Test
@@ -51,12 +49,9 @@ import spock.lang.Specification
 
 import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
 
-
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(MetricReportingService)
-@Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity, ConnectivityProfile])
 @Build([JobGroup, CsiAggregation, GraphiteServer, Page, JobGroup, MeasuredEvent, Location, Browser])
-class QuartzControlledGrailsReportsSpec extends Specification{
+class QuartzControlledGrailsReportsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<MetricReportingService> {
 
     static final String jobGroupWithServersName = 'csiGroupWithServers'
     static final String jobGroupWithoutServersName = 'csiGroupWithoutServers'
@@ -79,13 +74,15 @@ class QuartzControlledGrailsReportsSpec extends Specification{
     MetricReportingService serviceUnderTest
     public MockedGraphiteSocket graphiteSocketUsedInTests
 
-    def doWithSpring = {
-        inMemoryConfigService(InMemoryConfigService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        configService(ConfigService)
-        eventCsiAggregationService(EventCsiAggregationService)
-        pageCsiAggregationService(PageCsiAggregationService)
-        shopCsiAggregationService(JobGroupCsiAggregationService)
+    Closure doWithSpring() {
+        return {
+            inMemoryConfigService(InMemoryConfigService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            configService(ConfigService)
+            eventCsiAggregationService(EventCsiAggregationService)
+            pageCsiAggregationService(PageCsiAggregationService)
+            shopCsiAggregationService(JobGroupCsiAggregationService)
+        }
     }
 
     void setup() {
@@ -98,6 +95,10 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockBatchActivityService()
+    }
+
+    void setupSpec() {
+        mockDomains(CsiAggregationInterval, OsmConfiguration, BatchActivity, ConnectivityProfile)
     }
 
     void "writing hourly CsiAggregations to Graphite"() {
@@ -362,24 +363,25 @@ class QuartzControlledGrailsReportsSpec extends Specification{
         GraphitePathCsiData pathPage = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.PAGE)
         GraphitePathCsiData pathShop = new GraphitePathCsiData(prefix: pathPrefix, aggregationType: AggregationType.JOB_GROUP)
 
-        GraphiteServer serverWithPaths = GraphiteServer.buildWithoutSave(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
-                reportCsiAggregationsToGraphiteServer: true)
+        GraphiteServer serverWithPaths = GraphiteServer.build(graphitePathsCsiData: [pathEvent,pathPage,pathShop],
+                reportCsiAggregationsToGraphiteServer: true, save: false)
 
         return [serverWithPaths]
     }
 
     static getCsiAggregation(CsiAggregationInterval interval, AggregationType aggregationType, Double value, DateTime valueForStated, String resultIds) {
-        return CsiAggregation.buildWithoutSave(
+        return CsiAggregation.build(
+            save: false,
             started: valueForStated.toDate(),
             interval: interval,
             aggregationType: aggregationType,
             csByWptDocCompleteInPercent: value,
             underlyingEventResultsByWptDocComplete: resultIds,
-            page: Page.buildWithoutSave(name: pageName),
-            jobGroup: JobGroup.buildWithoutSave(name: jobGroupWithoutServersName),
-            measuredEvent: MeasuredEvent.buildWithoutSave(name: eventName),
-            browser: Browser.buildWithoutSave(name: browserName),
-            location: Location.buildWithoutSave(location: locationLocation)
+            page: Page.build(save: false, name: pageName),
+            jobGroup: JobGroup.build(save: false, name: jobGroupWithoutServersName),
+            measuredEvent: MeasuredEvent.build(save: false, name: eventName),
+            browser: Browser.build(save: false, name: browserName),
+            location: Location.build(save: false, location: locationLocation)
         )
     }
 

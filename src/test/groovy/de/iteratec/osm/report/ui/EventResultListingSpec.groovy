@@ -17,15 +17,19 @@
 
 package de.iteratec.osm.report.ui
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @Build([EventResult, JobResult])
-@Mock([EventResult, JobResult])
-class EventResultListingSpec extends Specification {
+class EventResultListingSpec extends Specification implements BuildDataTest {
+    void setupSpec() {
+        mockDomains(EventResult, JobResult, ConnectivityProfile, Script)
+    }
 
     void "add rows to event result listing"(int count) {
         setup:

@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import de.iteratec.osm.util.I18nService
 
 

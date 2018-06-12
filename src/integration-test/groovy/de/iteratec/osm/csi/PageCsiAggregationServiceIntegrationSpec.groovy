@@ -31,8 +31,8 @@ import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.util.mop.ConfineMetaClassChanges

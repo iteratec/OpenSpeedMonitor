@@ -16,7 +16,7 @@
 */
 
 package de.iteratec.osm.measurement.environment
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class BrowserService {

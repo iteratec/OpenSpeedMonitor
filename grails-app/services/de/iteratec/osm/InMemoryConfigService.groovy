@@ -17,7 +17,7 @@
 
 package de.iteratec.osm
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 /**
  * InMemoryConfigService

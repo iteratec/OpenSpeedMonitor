@@ -10,7 +10,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.OsmRickshawChart
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime

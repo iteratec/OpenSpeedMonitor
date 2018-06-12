@@ -32,8 +32,8 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.WptStatus
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -116,10 +116,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
         }
 
         when: "It get calculated."
-        CsiAggregation.withNewSession { session ->
-            jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
-            session.flush()
-        }
+        jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
         CsiAggregation csiAggWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         then: "It is marked as calculated and has a valid csByWptDocCompleteInPercent."

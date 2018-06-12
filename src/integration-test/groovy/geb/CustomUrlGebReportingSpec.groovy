@@ -3,13 +3,14 @@ package geb
 import de.iteratec.osm.util.OsmTestLogin
 import geb.pages.de.iteratec.osm.LoginPage
 import geb.spock.GebReportingSpec
+import grails.buildtestdata.TestDataBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Holders
 
 /**
  * Sets the baseUrl for the test browser configured in the OpenSpeedMonitor-config.yml
  */
-class CustomUrlGebReportingSpec extends GebReportingSpec implements OsmTestLogin{
+class CustomUrlGebReportingSpec extends GebReportingSpec implements OsmTestLogin, TestDataBuilder {
 
     SpringSecurityService springSecurityService
 

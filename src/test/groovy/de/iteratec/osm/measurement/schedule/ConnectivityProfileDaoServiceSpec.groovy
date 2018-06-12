@@ -17,17 +17,17 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(ConnectivityProfileDaoService)
-@Mock([ConnectivityProfile])
+
 @Build(ConnectivityProfile)
-class ConnectivityProfileDaoServiceSpec extends Specification{
+class ConnectivityProfileDaoServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ConnectivityProfileDaoService> {
+    void setupSpec() {
+        mockDomain(ConnectivityProfile)
+    }
 
     void "findAll delivers all profiles"() {
         when: "4 ConnectivityProfiles exit in db."

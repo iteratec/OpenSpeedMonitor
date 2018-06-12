@@ -2,8 +2,8 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.de.iteratec.osm.api.MeasurementActivationCommand
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DomainUnitTest
+import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.*
@@ -11,17 +11,18 @@ import static de.iteratec.osm.util.Constants.*
 /**
  * Created by nkuhn on 12.05.15.
  */
-@TestFor(GeneralMeasurementApiController)
-@Mock([ApiKey])
-class MeasurementActivationViaRestApiSpec extends Specification {
+class MeasurementActivationViaRestApiSpec extends Specification implements
+        ControllerUnitTest<GeneralMeasurementApiController>, DomainUnitTest<ApiKey> {
 
     InMemoryConfigService inMemoryConfigService
 
     static String apiKeyAllowed = 'allowed'
     static String apiKeyNotAllowed = 'not-allowed'
 
-    def doWithSpring = {
-        inMemoryConfigService(InMemoryConfigService)
+    Closure doWithSpring() {
+        return {
+            inMemoryConfigService(InMemoryConfigService)
+        }
     }
 
     void setup(){

@@ -30,7 +30,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.I18nService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.quartz.CronExpression

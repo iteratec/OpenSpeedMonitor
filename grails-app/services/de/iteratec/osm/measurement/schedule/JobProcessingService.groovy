@@ -28,8 +28,8 @@ import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandle
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.NotTransactional
+import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild

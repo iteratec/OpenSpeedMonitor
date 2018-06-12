@@ -6,7 +6,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultProjection
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Unroll
 /**

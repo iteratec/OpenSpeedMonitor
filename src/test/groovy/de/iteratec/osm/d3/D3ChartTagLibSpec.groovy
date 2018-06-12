@@ -18,23 +18,18 @@
 package de.iteratec.osm.d3
 
 import de.iteratec.osm.util.I18nService
-import grails.test.mixin.*
+import grails.testing.web.taglib.TagLibUnitTest
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.web.GroovyPageUnitTestMixin} for usage instructions
- */
-@TestFor(D3ChartTagLib)
-class D3ChartTagLibSpec extends Specification {
+class D3ChartTagLibSpec extends Specification implements TagLibUnitTest<D3ChartTagLib> {
 
     static def HTML_FRAGMENT_PARSER
 
     void setup(){
         HTML_FRAGMENT_PARSER = new org.cyberneko.html.parsers.SAXParser()
         HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true)
-        def d3ChartTagLib = mockTagLib(D3ChartTagLib)
-        d3ChartTagLib.i18nService = Mock(I18nService)
+        tagLib.i18nService = Mock(I18nService)
     }
 
     def "HTML provided by taglib iteratec:multiLineChart returns container with correct identifier"() {

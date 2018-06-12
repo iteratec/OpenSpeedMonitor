@@ -15,7 +15,6 @@
 * limitations under the License.
 */
 
-
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity

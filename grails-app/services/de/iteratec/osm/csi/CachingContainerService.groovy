@@ -20,7 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
 /**

@@ -44,6 +44,7 @@ class ConnectivityProfile {
 
     static mapping = {
         active defaultValue: true
+        autowire true
     }
 
     static constraints = {

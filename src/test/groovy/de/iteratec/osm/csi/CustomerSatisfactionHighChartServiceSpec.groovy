@@ -21,6 +21,7 @@ import asset.pipeline.grails.LinkGenerator
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -30,9 +31,9 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.apache.commons.lang.time.DateUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -44,11 +45,9 @@ import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 /**
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
  */
-@TestFor(CustomerSatisfactionHighChartService)
-@Mock([CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
-        Script, WebPageTestServer])
 @Build([Browser, Location, MeasuredEvent, Page, Job, JobGroup, CsiAggregationInterval])
-class CustomerSatisfactionHighChartServiceSpec extends Specification {
+class CustomerSatisfactionHighChartServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CustomerSatisfactionHighChartService> {
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
@@ -110,20 +109,25 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
-    def doWithSpring = {
-        csiAggregationUtilService(CsiAggregationUtilService)
-        osmChartProcessingService(OsmChartProcessingService)
-        eventResultDashboardService(EventResultDashboardService)
+    Closure doWithSpring() {
+        return {
+            csiAggregationUtilService(CsiAggregationUtilService)
+            osmChartProcessingService(OsmChartProcessingService)
+            eventResultDashboardService(EventResultDashboardService)
+        }
     }
 
     void setup() {
-
         serviceUnderTest = service
 
         createDataCommonForAllTests()
 
         mockServicesCommonForAllTests()
+    }
 
+    void setupSpec() {
+        mockDomains(CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup,
+                MeasuredEvent, Browser, Location, Script, WebPageTestServer, ConnectivityProfile, Script)
     }
 
     void "correct graph labels get created for hourly event csiAggregations"() {

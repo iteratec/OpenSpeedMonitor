@@ -17,8 +17,8 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
@@ -172,8 +172,8 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         addAliasButton.click()
 
         when: "User provides graph alias"
-        waitFor { graphNameSelect.displayed }
-        graphNameSelect.click()
+        waitFor { graphNameSelect[0].displayed }
+        graphNameSelect[0].click()
         sleep(200)
         graphNameSelectOptions[1].click()
         aliasInputField << "CustomAlias"
@@ -187,7 +187,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
     void "Change Graph color"() {
         when: "User changes graph color"
         waitFor{ adjustChartButton.click() }
-        waitFor { colorPicker.displayed }
+        waitFor { colorPicker[0].displayed }
         sleep(300)
         setColorPicker("#aaaaaa")
         adjustChartApply.click()
@@ -336,16 +336,16 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             MeasuredEvent.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
-                it.delete()
-            }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -372,9 +372,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 
