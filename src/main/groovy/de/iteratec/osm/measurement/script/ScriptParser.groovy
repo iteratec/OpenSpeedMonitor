@@ -206,6 +206,7 @@ class ScriptParser {
     public List<Integer> steps
 
     public Set<String> newPages
+    public List<Page> testedPages
     public Map<String, String> newMeasuredEvents
     public Set<CorrectPageForMeasuredEvent> correctPageName
     public Set<String> allMeasuredEvents
@@ -297,6 +298,7 @@ class ScriptParser {
     public List<ScriptStatement> interpret(String navigationScript) {
         measuredEventsCount = 0
         eventNames = []
+        testedPages = []
         newMeasuredEvents = [:]
         newPages = []
         allMeasuredEvents = []
@@ -352,6 +354,9 @@ class ScriptParser {
                         }
                         measuredEventName = stmt.parameter.split(":::")[1]
                         page = Page.findByName(pageName)
+                        if(page){
+                            testedPages.add(page)
+                        }
                     } else if (stmt.parameter.split(":::").length > 2) {
                         errors << new ScriptEventNameCmdError(
                                 type: ScriptErrorEnum.TOO_MANY_SEPARATORS,
@@ -371,8 +376,12 @@ class ScriptParser {
                     allMeasuredEvents.add(measuredEventName)
                     measuredEvent = MeasuredEvent.findByName(measuredEventName)
                     if (pageName && !page) {
-                        if (!newPages.contains('${') || !newPages.contains('}'))
+                        if (!newPages.contains('${') || !newPages.contains('}')){
                             newPages.add(pageName)
+                            Page newPage = new Page()
+                            newPage.name = pageName
+                            testedPages.add(newPage)
+                        }
                     }
                     if (measuredEventName && !measuredEvent) {
                         if (!measuredEventName.contains('${') || !measuredEventName.contains('}'))
@@ -466,10 +475,6 @@ class ScriptParser {
     }
 
     public List<Page> getTestedPages() {
-        List<Page> testedPages = []
-        this.eventNames.each { eventName ->
-            testedPages << (MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))?.testedPage ?: Page.findOrCreateByName(Page.UNDEFINED))
-        }
         return testedPages
     }
 
