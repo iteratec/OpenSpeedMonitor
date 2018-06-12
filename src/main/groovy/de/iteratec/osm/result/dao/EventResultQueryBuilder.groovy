@@ -15,8 +15,7 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private List<String> groupsForMedian = []
-    private List<SelectedMeasurand> selectedMeasurands = [];
+    private List<SelectedMeasurand> selectedMeasurands = []
 
     private List<EventResultFilter> filters = []
     private List<ProjectionProperty> baseProjections

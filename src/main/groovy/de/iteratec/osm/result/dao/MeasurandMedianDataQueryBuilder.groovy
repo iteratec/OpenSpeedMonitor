@@ -13,7 +13,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
         List<Map> rawData = super.getRawQueryResults(baseFilters, baseProjections,trims)
 
         Map<String,List<Map>> groupedRawData = groupRawDataByAggregators(rawData, aggregators)
-        List<EventResultProjection> groupedAndSummarized = summarizeGroupedRawData(groupedRawData,measurandNames)
+        Set<EventResultProjection> groupedAndSummarized = summarizeGroupedRawData(groupedRawData,measurandNames)
         return getMediansFromSummarizedData(groupedAndSummarized, measurandNames)
     }
 
@@ -26,7 +26,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
         return groupedRawData
     }
 
-    private List<EventResultProjection> summarizeGroupedRawData(Map<String,List<Map>> groupedRawData, List<String> measurandNames){
+    private Set<EventResultProjection> summarizeGroupedRawData(Map<String,List<Map>> groupedRawData, List<String> measurandNames){
         Map<EventResultProjection, List<Map>> justAHelperMap = [:]
         groupedRawData.each {String key, List<Map> value ->
             EventResultProjection newKey = new EventResultProjection(id:key)
@@ -43,8 +43,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
                 }
             }
         }
-        Set<EventResultProjection> result = justAHelperMap.keySet()
-        return  result as List
+        return justAHelperMap.keySet()
     }
 
 

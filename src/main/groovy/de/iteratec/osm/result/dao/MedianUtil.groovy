@@ -32,13 +32,13 @@ class MedianUtil {
         return key
     }
 
-    private static List<String> getNonMeasurandNames(List<String> measurandNames, Map eventResultProjection){
-        List<String> allPropertyNames = eventResultProjection.keySet() as List
+    private static Set<String> getNonMeasurandNames(List<String> measurandNames, Map eventResultProjection){
+        Set<String> allPropertyNames = eventResultProjection.keySet()
         return allPropertyNames.findAll{!measurandNames.contains(it)}
     }
 
     static Map getMetaDataSample(List<String> measurandNames, Map eventResultProjection){
-        List<String> metaDataKeys = getNonMeasurandNames(measurandNames, eventResultProjection)
+        Set<String> metaDataKeys = getNonMeasurandNames(measurandNames, eventResultProjection)
         return eventResultProjection.subMap(metaDataKeys)
     }
 }
