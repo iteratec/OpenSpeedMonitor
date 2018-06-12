@@ -365,6 +365,7 @@ class ScriptParser {
                                 }.lineNumber)
                     } else {
                         measuredEventName = stmt.parameter
+                        testedPages.add(Page.findByName('undefined'))
                     }
                     if (allMeasuredEvents.contains(measuredEventName)) {
                         errors << new ScriptEventNameCmdError(
