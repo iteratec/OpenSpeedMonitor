@@ -23,12 +23,7 @@ class LoginRedirectBeforeInfrastructureSetupGebSpec extends CustomUrlGebReportin
 
         and: "there is an admin and an osm config in db and infrastructure setup didn't run yet"
         User.withNewTransaction {
-            OsmConfiguration configuration = OsmConfiguration.list()[0]
-            if (!configuration) {
-                configuration = OsmConfiguration.build()
-            }
-            configuration.infrastructureSetupRan=OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED
-            configuration.save(flush: true)
+            OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED)
             createAdminUser()
         }
 

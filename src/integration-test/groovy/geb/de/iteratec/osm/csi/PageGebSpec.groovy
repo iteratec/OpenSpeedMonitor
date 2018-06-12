@@ -30,7 +30,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
     void "test user gets to page list when logged in"() {
         given: "User is logged in"
         User.withNewTransaction {
-            if(OsmConfiguration.count()<1) OsmConfiguration.build()
+            OsmConfiguration.build()
             createAdminUser()
         }
         doLogin()
