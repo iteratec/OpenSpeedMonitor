@@ -18,20 +18,13 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.measurement.script.ScriptService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
 import groovy.transform.EqualsAndHashCode
 import org.hibernate.criterion.CriteriaSpecification
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus
-
-import javax.servlet.http.HttpServletResponse
 
 /**
  * PageController
@@ -146,7 +139,6 @@ class PageController {
     }
 
     def getPagesForActiveJobGroups() {
-
         def scriptsWithJobGroup = Job.createCriteria().list {
             eq('active', true)
             isNotNull('script')
@@ -158,29 +150,24 @@ class PageController {
                 property('jobGroup.id', 'jobGroupId')
                 property('jobGroup.name', 'jobGroupName')
                 property('script', 'script')
-                property('script.id', 'scriptId')
                 property('id', 'jobId')
             }
         }
 
-        def scriptList = scriptsWithJobGroup.clone()
+        def scriptJobGroupList = scriptsWithJobGroup.clone()
 
-        def pagesByScriptId = scriptList.unique { script -> script.scriptId }.collectEntries { script ->
-            Job job = Job.findById(script.jobId)
-            [(script.scriptId): job.variables.isEmpty() ?
-                    script.script.testedPages :
-                    scriptService.getMeasuredEventsForScript((String) script.script.getParsedNavigationScript(job)).collect { it.testedPage }]
-
+        def pagesByScriptId = scriptJobGroupList.unique { scriptWithJobGroup -> scriptWithJobGroup.script.id }.collectEntries { scriptWithJobGroup ->
+            [(scriptWithJobGroup.script.id): scriptWithJobGroup.script.testedPages]
         }
 
         def result = scriptsWithJobGroup.collect { scriptWithJobGroup ->
-            pagesByScriptId[scriptWithJobGroup.scriptId].collect {
+            pagesByScriptId[scriptWithJobGroup.script.id].collect {
                 new PageWithJobGroupId(name: it.name, id: it.id, undefinedPage: it.undefinedPage, jobGroupId: scriptWithJobGroup.jobGroupId)
             }
         }
 
         result = result.flatten()
-        result = result.unique()
+        result = result.unique().unique()
 
         return ControllerUtils.sendObjectAsJSON(response, result)
     }
