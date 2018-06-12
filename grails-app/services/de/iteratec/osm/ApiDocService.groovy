@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 
 class ApiDocService implements ApplicationContextAware {
-    static Logger log = LoggerFactory.getLogger(ApiDocService.class)
+    static Logger logger = LoggerFactory.getLogger(ApiDocService.class)
     Swagger swagger
 
     ApplicationContext applicationContext
@@ -48,7 +48,7 @@ class ApiDocService implements ApplicationContextAware {
             try {
                 swaggerJson = Json.mapper().writeValueAsString(swagger)
             } catch (JsonProcessingException e) {
-                log.error("Failed to write swagger document", e);
+                logger.error("Failed to write swagger document", e);
             }
         }
         return swaggerJson
