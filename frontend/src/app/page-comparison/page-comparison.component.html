@@ -1,21 +1,18 @@
-<div class="card form-horizontal" id="pageComparisonSelectionCard2">
-  <!--<h2><g:message code="de.iteratec.osm.pageComparison.card.title" default="Pages"/></h2>-->
+<div class="card form-horizontal">
   <h2>Pages</h2>
   <div class="col-md-12" id="pageComparisonCard2">
-    <div v-for="(comparison,index) in comparisons" id="measurandSeries-clone2"
-         class="row form-group addPageComparisonRow">
-      <div *ngFor="let selection of pageComparisonSelections">
-        <page-comparison-row [jobGroupMappings]="jobGroupToPagesMapping"
-                             [selection]="selection" (changeEmitter)="handleShowButtonVisibility($event)" (deleteEmitter)="onComparisonRowRemove($event)" [removable]="canRemoveRow" ></page-comparison-row>
-      </div>
+    <div *ngFor="let selection of pageComparisonSelections">
+      <page-comparison-row [jobGroupMappings]="jobGroupToPagesMapping"
+                           [selection]="selection" (changeEmitter)="handleShowButtonVisibility($event)"
+                           (deleteEmitter)="onComparisonRowRemove($event)"
+                           [removable]="canRemoveRow"></page-comparison-row>
     </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-      <button type="button" id="addComparison2" class="btn btn-default btn-block" (click)="addComparison()">
-        <i class="fa fa-plus"></i>
-        Vergleich hinzufügen
-        <!--<g:message code="de.iteratec.osm.pageComparison.card.addRow" default="Pages"/>-->
-      </button>
-    </div>
+  </div>
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <button type="button" class="btn btn-default btn-block" (click)="addComparison()">
+      <i class="fa fa-plus"></i>
+      Add Comparison
+    </button>
   </div>
 </div>
