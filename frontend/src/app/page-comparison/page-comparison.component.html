@@ -3,8 +3,8 @@
   <div class="col-md-12" id="pageComparisonCard2">
     <div *ngFor="let selection of pageComparisonSelections">
       <page-comparison-row [jobGroupMappings]="jobGroupToPagesMapping"
-                           [selection]="selection" (changeEmitter)="handleShowButtonVisibility($event)"
-                           (deleteEmitter)="onComparisonRowRemove($event)"
+                           [selection]="selection" (select)="handleShowButtonVisibility($event)"
+                           (delete)="onComparisonRowRemove($event)"
                            [removable]="canRemoveRow"></page-comparison-row>
     </div>
   </div>
