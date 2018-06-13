@@ -1,7 +1,5 @@
-<div id="measurandSeries-clone" class="row form-group addPageComparisonRow">
+<div class="row form-group addPageComparisonRow">
   <label class="col-sm-2 control-label">
-    <!--<g:message code="de.iteratec.osm.pageComparison.firstPageTitle"-->
-    <!--default="First Page:"/>-->
     First Page
   </label>
   <div class="col-sm-3">
@@ -20,8 +18,6 @@
     </select>
   </div>
   <label class="col-sm-2 control-label">
-    <!--<g:message code="de.iteratec.osm.pageComparison.secondPageTitle"-->
-    <!--default="Second Page:"/>-->
     Second Page
   </label>
 
@@ -40,5 +36,5 @@
       </option>
     </select>
   </div>
-  <div class="col-sm-2" *ngIf="removable"><a href="#" role="button" id="removeComparisonRow0"><i aria-hidden="true" class="fa fa-times" (click)="removeComparison()"></i></a></div>
+  <div class="col-sm-2" *ngIf="removable"><a href="#" role="button"><i aria-hidden="true" class="fa fa-times" (click)="removeComparison()"></i></a></div>
 </div>
