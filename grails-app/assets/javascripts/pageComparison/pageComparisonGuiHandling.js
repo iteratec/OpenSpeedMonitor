@@ -17,6 +17,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var init = function () {
         $(window).on('resize', function () {
+            $("#chart-card").removeClass("hidden");
+            spinner.start();
             renderChart({}, false);
         });
         $(window).on('historyStateLoaded', function () {
