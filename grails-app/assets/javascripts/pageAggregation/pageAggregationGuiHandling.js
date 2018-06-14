@@ -64,6 +64,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var stackBarSwitch = $("#stackBarSwitch");
     var inFrontButton = $("#inFrontButton");
     var besideButton = $("#besideButton");
+    var avgLoaded = false;
+    var medianLoaded = false;
 
     var init = function () {
         drawGraphButton.click(function () {
@@ -79,6 +81,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             renderChart({stackBars: getStackBars()}, true);
         });
         $("input[name='aggregationValue']").on("change", function () {
+            spinner.start();
             renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);
@@ -165,7 +168,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
-        spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
 
@@ -186,6 +188,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var renderChart = function (data, isStateChange) {
+        if(avgLoaded && getAggregationValue() === "avg") {
+            spinner.stop()
+        }
+        if(medianLoaded && getAggregationValue() === "median"){
+            console.log(medianLoaded);
+            spinner.stop()
+        }
         if (data) {
             pageAggregationChart.setData(data);
             if (isStateChange) {
@@ -200,6 +209,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
     var loadData = function (isStateChange) {
         pageAggregationChart.resetData();
+        avgLoaded = false;
+        medianLoaded = false;
+
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
@@ -233,6 +245,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             url: OpenSpeedMonitor.urls.pageAggregationGetData,
             dataType: "json",
             success: function (data) {
+                if (aggregationValue === "avg") {
+                    avgLoaded = true;
+                } else {
+                    medianLoaded = true;
+                }
                 handleNewData(data, isStateChange);
             },
             error: function (e) {
