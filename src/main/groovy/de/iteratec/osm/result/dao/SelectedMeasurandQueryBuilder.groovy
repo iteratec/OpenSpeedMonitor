@@ -12,6 +12,6 @@ interface SelectedMeasurandQueryBuilder {
 
     void configureForSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands)
 
-    List<EventResultProjection> getResultsForFilter(List<Closure> filters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService)
+    List<EventResultProjection> getResultsForFilter(List<Closure> filters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, Integer maxValidLoadTime, Integer minValidLoadTime, PerformanceLoggingService performanceLoggingService)
 }
 

@@ -37,8 +37,9 @@ class UserTimingRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     }
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
-        List<Map> dbResult = getRawQueryResults(baseFilters,baseProjections,trims,performanceLoggingService)
+    List<EventResultProjection> getResultsForFilter(List<Closure> filters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, Integer maxValidLoadTime, Integer minValidLoadTime, PerformanceLoggingService performanceLoggingService) {
+        filters.add(AggregationUtil.generateMinMaxConstraint(false,selectedMeasurands,maxValidLoadTime,minValidLoadTime))
+        List<Map> dbResult = getRawQueryResults(filters,baseProjections,trims,performanceLoggingService)
         List<EventResultProjection> projections
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create EventResultProjections from db maps', 4) {
             projections = createEventResultProjections(dbResult)

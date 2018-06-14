@@ -13,6 +13,8 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
+    private Integer minValidLoadTime, maxValidLoadTime
+
     private List<SelectedMeasurand> selectedMeasurands = []
 
     private List<Closure> filters = []
@@ -20,20 +22,21 @@ class EventResultQueryBuilder {
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
+    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, measurandAverageQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
-        filters.add(initBaseClosure(minValidLoadtime, maxValidLoadtime))
+        filters.add(initBaseClosure())
+        minValidLoadTime = minValidLoadtime
+        maxValidLoadTime = maxValidLoadtime
         baseProjections = []
     }
 
-    private Closure initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
+    private Closure initBaseClosure() {
         return {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
-            'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
     }
@@ -152,6 +155,7 @@ class EventResultQueryBuilder {
             initMeasurandsQueryBuilder()
             measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
             measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
+            measurandAverageQueryBuilder.configureForSelectedMeasurands(measurands)
         }
         if (userTimings) {
             initUserTimingsQueryBuilder()
@@ -173,18 +177,22 @@ class EventResultQueryBuilder {
         return getResultFor(userTimingsMedianDataQueryBuilder, measurandMedianQueryBuilder)
     }
 
+    List<EventResultProjection> getAverageData(){
+        return getResultFor(null, measurandAverageQueryBuilder)
+    }
+
     private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
         List<EventResultProjection> userTimingsResult = []
         List<EventResultProjection> measurandResult = []
 
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get usertiming results', 3) {
             if (userTimingsBuilder) {
-                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
+                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims, minValidLoadTime, maxValidLoadTime,  performanceLoggingService)
             }
         }
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get measurand results', 3) {
             if (measurandsBuilder) {
-                measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
+                measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims, minValidLoadTime, maxValidLoadTime, performanceLoggingService)
             }
         }
 
@@ -226,6 +234,9 @@ class EventResultQueryBuilder {
         }
         if(!measurandMedianQueryBuilder) {
             measurandMedianQueryBuilder = new MeasurandMedianDataQueryBuilder()
+        }
+        if(!measurandAverageQueryBuilder) {
+            measurandAverageQueryBuilder = new MeasurandAverageDataQueryBuilder()
         }
     }
 }

@@ -17,7 +17,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
     private Map<String,List<Map>> groupRawDataByAggregators(List<Map> rawData, Set<ProjectionProperty> baseProjections ){
         Map<String, List<Map>> groupedRawData = [:].withDefault { [] }
         rawData.each { ungrouped ->
-            String key = MedianUtil.generateGroupKeyForMedianAggregators(ungrouped,baseProjections)
+            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped,baseProjections)
             groupedRawData.get(key) << ungrouped
         }
         return groupedRawData
@@ -28,7 +28,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
         groupedRawData.each {String key, List<Map> value ->
             EventResultProjection newKey = new EventResultProjection(id:key)
             Map metaDataSample = value[0]
-            Map metaData = MedianUtil.getMetaDataSample(metaDataSample, baseProjections)
+            Map metaData = AggregationUtil.getMetaDataSample(metaDataSample, baseProjections)
             newKey.projectedProperties.putAll(metaData)
             justAHelperMap.put(newKey, value)
         }
@@ -48,7 +48,7 @@ class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
         return eventResultProjections.each { eventResultProjection ->
             measurandNames.each { measurandName ->
                 List rawDataForMeasurand = eventResultProjection."$measurandName"
-                eventResultProjection.projectedProperties.put(measurandName, MedianUtil.getMedianFrom(rawDataForMeasurand))
+                eventResultProjection.projectedProperties.put(measurandName, AggregationUtil.getMedianFrom(rawDataForMeasurand))
             }
         }
     }

@@ -14,15 +14,15 @@ class UserTimingMedianDataQueryBuilder extends UserTimingRawDataQueryBuilder{
         Map<String, Map<String,List>> groupedAggregations = [:].withDefault { [:].withDefault { [] } }
         rawData.each { ungrouped ->
             def value = ungrouped.type == UserTimingType.MEASURE ? ungrouped.duration : ungrouped.startTime
-            String key = MedianUtil.generateGroupKeyForMedianAggregators(ungrouped,baseProjections)
+            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped,baseProjections)
             groupedAggregations.get(key).get(ungrouped.name) << value
-            metaDataForAggregations.get(key) << MedianUtil.getMetaDataSample(ungrouped, baseProjections)
+            metaDataForAggregations.get(key) << AggregationUtil.getMetaDataSample(ungrouped, baseProjections)
         }
         groupedAggregations.each { String key, Map<String, List> valueMap ->
             EventResultProjection erp = new EventResultProjection(id:key)
             erp.projectedProperties.putAll(metaDataForAggregations.get(key))
             valueMap.each { String nameKey, List valueList ->
-                erp.projectedProperties.put(nameKey, MedianUtil.getMedianFrom(valueList))
+                erp.projectedProperties.put(nameKey, AggregationUtil.getMedianFrom(valueList))
             }
             result << erp
         }

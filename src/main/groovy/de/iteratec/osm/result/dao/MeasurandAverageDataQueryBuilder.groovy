@@ -4,26 +4,22 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.util.PerformanceLoggingService
 
-/**
- * Created by mwg on 11.10.2017.
- */
-class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
-
+class MeasurandAverageDataQueryBuilder implements SelectedMeasurandQueryBuilder{
     List<SelectedMeasurand> selectedMeasurands
 
     @Override
     Closure buildProjection(Set<ProjectionProperty> baseProjections) {
-        List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
+        List<String> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }.collect{it.databaseRelevantName}
         if (!measurands) {
             return null
         }
         return {
             projections {
                 measurands.each {
-                    property it.databaseRelevantName, it.databaseRelevantName
+                    avg it, it
                 }
                 baseProjections.each {ProjectionProperty pp ->
-                    property pp.dbName, pp.alias
+                    groupProperty pp.dbName, pp.alias
                 }
             }
         }
@@ -37,8 +33,9 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
     @Override
     List<EventResultProjection> getResultsForFilter(List<Closure> filters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, Integer maxValidLoadTime, Integer minValidLoadTime, PerformanceLoggingService performanceLoggingService) {
         filters.add(AggregationUtil.generateMinMaxConstraint(false,selectedMeasurands,maxValidLoadTime,minValidLoadTime))
-        return createEventResultProjections(getRawQueryResults(baseFilters, baseProjections, trims))
+        return createEventResultProjections(getRawQueryResults(baseFilters, baseProjections, trims), baseProjections)
     }
+
 
     protected List<Map> getRawQueryResults(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims){
         List<Closure> filters = []
@@ -63,13 +60,12 @@ class MeasurandRawDataQueryBuilder implements SelectedMeasurandQueryBuilder {
         return trimClosures
     }
 
-    List<EventResultProjection> createEventResultProjections(List<Map> dataFromDb) {
+    List<EventResultProjection> createEventResultProjections(List<Map> dataFromDb, Set<ProjectionProperty> projectionPropertySet) {
         List<EventResultProjection> eventResultProjections = []
         dataFromDb.each {Map dbResult ->
             EventResultProjection eventResultProjection = new EventResultProjection(
-                    id: dbResult.id
+                    id: AggregationUtil.generateGroupKeyForMedianAggregators(dbResult, projectionPropertySet)
             )
-            dbResult.remove('id')
             eventResultProjection.projectedProperties = dbResult
             eventResultProjections += eventResultProjection
         }

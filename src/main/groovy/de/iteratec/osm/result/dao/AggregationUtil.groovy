@@ -1,6 +1,20 @@
 package de.iteratec.osm.result.dao
 
-class MedianUtil {
+import de.iteratec.osm.result.Measurand
+import de.iteratec.osm.result.SelectedMeasurand
+
+
+class AggregationUtil {
+
+    static Closure generateMinMaxConstraint(Boolean isAverageProjection, List<SelectedMeasurand> selectedMeasurands, Integer minValidLoadTime, Integer maxValidLoadTime){
+        if(isAverageProjection){
+            SelectedMeasurand fullyLoadedTime = selectedMeasurands.findAll{!it.selectedType.isUserTiming()}.find {it.databaseRelevantName == Measurand.FULLY_LOADED_TIME.eventResultField}
+            if(fullyLoadedTime){
+                return {'between'(Measurand.FULLY_LOADED_TIME.eventResultField, Double.valueOf(minValidLoadTime), Double.valueOf(maxValidLoadTime))}
+            }
+        }
+        return {'between'(Measurand.FULLY_LOADED_TIME.eventResultField, minValidLoadTime, maxValidLoadTime)}
+    }
 
     static def getMedianFrom(List data) {
         data.removeAll([null])
