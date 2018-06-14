@@ -35,7 +35,7 @@ import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
 @TestFor(CsiSystemCsiAggregationService)
-@Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration])
+@Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration, CsiSystem])
 @Mock([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
         CsiSystem, JobGroup, CsiAggregationUpdateEvent])
 class CsiSystemCsiAggregationServiceSpec extends Specification {
@@ -63,7 +63,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                     new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d))
             ]
         }
-        CsiSystem csiSystem = TestDataUtil.buildCsiSystem()
+        CsiSystem csiSystem = buildCsiSystem()
 
         when: "the csiAggregations should be retrieved or calculated"
         List<CsiAggregation> calculated = service.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(),
@@ -88,7 +88,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                     new WeightedCsiValue(weightedValue: new WeightedValue(value: 1d, weight: 5d))
             ]
         }
-        CsiSystem csiSystem = TestDataUtil.buildCsiSystem()
+        CsiSystem csiSystem = buildCsiSystem()
 
         when: "the csiAggregations should be retrieved or calculated"
         List<CsiAggregation> calculated = service.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(),
@@ -108,7 +108,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         service.csiValueService = Stub(CsiValueService) {
             getWeightedCsiValues(_, _) >> []
         }
-        CsiSystem csiSystem = TestDataUtil.buildCsiSystem()
+        CsiSystem csiSystem = buildCsiSystem()
 
         when: "the csiAggregations should be retrieved or calculated"
         List<CsiAggregation> calculatedMvs = service.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem])
@@ -126,7 +126,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     void "mark outdated CsiAggregation as outdated"() {
         setup:
         DateTime startDate = new DateTime(2013, 5, 3, 0, 0)
-        CsiSystem csiSystem = TestDataUtil.buildCsiSystem()
+        CsiSystem csiSystem = buildCsiSystem()
         EventResult eventResult = EventResult.build(jobResult: JobResult.build(job: Job.build(jobGroup: csiSystem.jobGroupWeights[1].jobGroup)))
         CsiAggregation csiAggregation = CsiAggregation.build(started: startDate.toDate(), csiSystem: csiSystem)
 
@@ -138,5 +138,11 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         updateEvents.size() == 1
         updateEvents*.updateCause == [CsiAggregationUpdateEvent.UpdateCause.OUTDATED]
         updateEvents*.id == [csiAggregation.id]
+    }
+    static CsiSystem buildCsiSystem() {
+        return CsiSystem.buildWithoutSave()
+                .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
+                .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
+                .save(flush: true, failOnError: true)
     }
 }

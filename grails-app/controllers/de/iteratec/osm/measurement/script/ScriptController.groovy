@@ -183,6 +183,22 @@ class ScriptController {
         render output as JSON
     }
 
+    /**
+     * Collects all measured events for a script.
+     *
+     * @param scriptId The selected script id.
+     * @return All measured events for the script id.
+     */
+	def getMeasuredEventsForScript(String scriptId) {
+		Long id = Long.parseLong(scriptId)
+		Script script = Script.get(id)
+		ScriptParser parser = new ScriptParser(pageService, script.navigationScript)
+
+		def output = parser.getAllMeasuredEvents(script.navigationScript).collect()
+
+		render output as JSON
+	}
+
     def getArchivedNavigationScript(long scriptId) {
         def navigationScript = ArchivedScript.findById(scriptId).navigationScript
         ControllerUtils.sendObjectAsJSON(response, [
@@ -197,7 +213,7 @@ class ScriptController {
         if (job && script) {
             content = script.getParsedNavigationScript(job)
         }
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, content)
     }
 
     def loadArchivedScript(long archivedScriptId) {
@@ -217,6 +233,6 @@ class ScriptController {
         def archivedScript = ArchivedScript.get(archivedScriptId)
         archivedScript.versionDescription = newVersionDescription
         archivedScript.save(failOnError: true, flush: true)
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, newVersionDescription)
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, newVersionDescription)
     }
 }

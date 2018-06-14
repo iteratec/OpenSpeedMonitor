@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm.wizard
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -42,8 +41,8 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     def setupAndLogin(){
         User.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            if(OsmConfiguration.count()<1) OsmConfiguration.build()
+            createAdminUser()
             location = Location.build(label: "location1", location: "local", active: true, wptServer: WebPageTestServer.build(active: true))
             ConnectivityProfile.build(active: true)
         }
@@ -125,9 +124,9 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     void "previously created location and connectivity should appear and should be preselected"(){
         expect: "the location and connectivity to be preselected and all connectivities should appear"
-        msPage.locationSelect.text() == location.location.toString()
+        msPage.locationSelect.value() == location.ident().toString()
         msPage.getConnectivities().size() == ConnectivityProfile.count()
-        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.text())
+        ConnectivityProfile.list()*.name.contains(msPage.connectivitySelect.value())
         msPage.canContinueToJob()
     }
 
@@ -143,7 +142,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
     void "job create defaults"(){
         expect: "the job name to be set and a valid schedule to be selected, so that the setup could be finished"
         msPage.jobNameInput.value() == jobName
-        msPage.executionScheduleSelect.text() == msPage.getI18nMessage("de.iteratec.osm.setupMeasurementWizard.selectExecutionSchedule.hourly")
+        msPage.executionScheduleSelect.value() == "0 * * * ? *"
         msPage.executionScheduleInput.@readonly
         msPage.canClickCreateButton()
     }

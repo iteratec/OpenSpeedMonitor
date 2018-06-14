@@ -1,10 +1,10 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.report.chart.RepresentableWptResult
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.InheritConstructors
 
 import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
-
 /**
  * Created by mwg on 18.07.2017.
  */
@@ -16,16 +16,16 @@ class GraphLabel  implements Comparable<GraphLabel> {
     Long millisStartOfInterval
     String connectivity, tag
 
-    GraphLabel(EventResult eventResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
-        this.connectivity = getConnectivityName(eventResult)
+    GraphLabel(RepresentableWptResult wptResult, Long millisStartOfInterval, SelectedMeasurand selectedMeasurand){
+        this.connectivity = getConnectivityName(wptResult)
         this.millisStartOfInterval = millisStartOfInterval
         this.selectedMeasurand = selectedMeasurand
-        this.jobGroupId = eventResult.jobGroupId
-        this.measuredEventId = eventResult.measuredEventId
-        this.pageId = eventResult.pageId
-        this.browserId = eventResult.browserId
-        this.locationId = eventResult.locationId
-        this.tag = "${eventResult.jobGroupId};${eventResult.measuredEventId};${eventResult.pageId};${eventResult.browserId};${eventResult.locationId}"
+        this.jobGroupId = wptResult.jobGroupId
+        this.measuredEventId = wptResult.measuredEventId
+        this.pageId = wptResult.pageId
+        this.browserId = wptResult.browserId
+        this.locationId = wptResult.locationId
+        this.tag = "${wptResult.jobGroupId};${wptResult.measuredEventId};${wptResult.pageId};${wptResult.browserId};${wptResult.locationId}"
     }
 
     GraphLabel createCopy(boolean  withMilliseconds){
@@ -55,11 +55,11 @@ class GraphLabel  implements Comparable<GraphLabel> {
         }
     }
 
-    private static getConnectivityName(EventResult eventResult) {
-        if (eventResult.connectivityProfile) {
-            return eventResult.connectivityProfile.name
-        } else if (eventResult.customConnectivityName) {
-            return eventResult.customConnectivityName
+    private static getConnectivityName(RepresentableWptResult wptResult) {
+        if (wptResult.connectivityProfile) {
+            return wptResult.connectivityProfile
+        } else if (wptResult.customConnectivityName) {
+            return wptResult.customConnectivityName
         } else {
             return "native"
         }

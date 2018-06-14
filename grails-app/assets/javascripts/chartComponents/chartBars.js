@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require common.js
 //= require_self
 
@@ -15,6 +15,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var width = 1000;
     var barBand = OpenSpeedMonitor.ChartComponents.common.barBand;
     var barColor = "#1660a7";
+    var individualColors = false;
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
     var isRestrained = false;
     var forceSignInLabel = false;
@@ -28,6 +29,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         height = componentData.height || height;
         width = componentData.width || width;
         barColor = componentData.color || barColor;
+        individualColors = componentData.individualColors || individualColors;
         forceSignInLabel = (componentData.forceSignInLabel !== undefined) ? componentData.forceSignInLabel : forceSignInLabel;
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
         highlightId = highlightId!==componentData.highLightId ? componentData.highLightId || highlightId : undefined;
@@ -53,12 +55,14 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         bars.append("rect")
             .attr("class", "bar-rect")
             .attr("x", 0)
-            .attr("width", 0)
+            .attr("y", 0)
             .attr("height", barBand)
-            .attr("fill", barColor);
+            .each(function (d) {
+                var color = individualColors?d.color: barColor;
+                d3.select(this).attr("fill", color);
+            });
         bars.append("text")
             .attr("class", "bar-value")
-            .attr("x", 0)
             .attr("dominant-baseline", "middle")
             .style("fill", "white")
             .style("font-weight", "bold");
@@ -70,18 +74,25 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .on("mouseover", function(data) { callEventHandler("mouseover", data) })
             .on("mouseout", function(data) { callEventHandler("mouseout", data) })
             .on("click", function(data) { callEventHandler("click", data) });
+        updateSelection.select(".bar-rect")
+            .attr("width", function (d) {
+                return barWidth(xScale, d.value);
+            });
         updateSelection.select(".bar-value")
             .text(function (d) {
-                var prefix = d.value > 0 && forceSignInLabel ? "+" : "";
+                var prefix =  d.showLabelOnTop? d.label+": ": "";
+                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
                 return prefix + formatValue(d.value) + " " + d.unit;
+            })
+            .attr("x", function (d) {
+                return (d.value < 0) ? (barStart(xScale, d.value) + valueLabelOffset) : (barEnd(xScale, d.value) - valueLabelOffset);
             });
+
         var transition = updateSelection
             .transition()
             .duration(transitionDuration)
-            .style("opacity", isRestrained ? 0.2 : 1);
-
+            .style("opacity", getOpacity);
         transition.select(".bar-rect")
-            .style("fill", barColor)
             .style("opacity", function (d) {
                 return !(d.id===highlightId || !highlightId) ? 0.2 : 1;
             })
@@ -93,14 +104,14 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             })
             .attr("width", function (d) {
                 return barWidth(xScale, d.value);
+            })
+            .each(function (d) {
+                var color = individualColors?d.color: barColor;
+                d3.select(this).attr("fill", color);
             });
-
         transition.select(".bar-value")
             .attr("y", function (d) {
                 return yScale(d.id) + barBand / 2;
-            })
-            .attr("x", function (d) {
-                return (d.value < 0) ? (barStart(xScale, d.value) + valueLabelOffset) : (barEnd(xScale, d.value) - valueLabelOffset);
             })
             .attr("text-anchor", function (d) {
                 return (d.value < 0) ? "start" : "end";
@@ -129,8 +140,6 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         exitTransition
             .style("opacity", 0)
             .remove();
-        exitTransition.select(".bar-rect")
-            .attr("width", 0);
     };
 
     var formatValue = function (value) {
@@ -148,10 +157,18 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         eventHandlers[eventType] = eventHandler;
     };
 
+    var getOpacity = function () {
+        return isRestrained ? 0.2 : 1
+    };
+
+    var setOpacityFunction = function (func) {
+        getOpacity = func;
+    };
 
     return {
         render: render,
         setData: setData,
-        on: registerEventHandler
+        on: registerEventHandler,
+        setOpacitiyFunction: setOpacityFunction
     };
 });

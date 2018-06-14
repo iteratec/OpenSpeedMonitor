@@ -148,10 +148,9 @@ class EventResultDashboardPage extends I18nGebPage {
         appendedInputAboveRequestSizesTextField << aboveRequestSizeValueToSet
     }
 
-    public clearAboveRequestSizeTextField(){
-        waitFor { appendedInputAboveRequestSizesTextField.displayed }
-        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.DELETE)
+    void clickAdjustChartButton() {
+        scrollTop()
+        adjustChartButton.click()
     }
 
     public void clickSaveAsDashboardButton() {

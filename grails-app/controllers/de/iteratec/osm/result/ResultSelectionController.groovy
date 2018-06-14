@@ -1,11 +1,12 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
-
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
@@ -13,6 +14,8 @@ import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.springframework.http.HttpStatus
+
+import java.util.concurrent.ConcurrentHashMap
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -63,7 +66,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             }
         })
         def result = count < MAX_RESULT_COUNT ? count : -1
-        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, result.toString())
+        ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, result.toString())
     }
 
     @RestAction
@@ -197,7 +200,6 @@ class ResultSelectionController extends ExceptionHandlerController {
             }
             return dtos
         })
-
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 
@@ -223,6 +225,37 @@ class ResultSelectionController extends ExceptionHandlerController {
                         name: it.name
                 ]
             }.sort { it.name }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
+    def getJobGroupToPagesMap(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            println 'send error'
+            sendError(command)
+            return
+        }
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+            def jobGroupAndPages = query(command, null, { existing ->
+                projections {
+                    distinct(['jobGroup','page'])
+                }
+            })
+            Map<Long, Map> map = [:].withDefault {[name:"", pages:[] as Set]}
+            jobGroupAndPages.each {
+                JobGroup jobGroup = it[0] as JobGroup
+                Page page = it[1] as Page
+                Map jobGroupMap = map[jobGroup.id]
+                jobGroupMap.name = jobGroup.name
+                jobGroupMap.pages << page
+            }
+            def nMap = [:].withDefault {[:]}
+            map.each{k,v ->
+                nMap[k].name = v.name
+                nMap[k].pages = v.pages.collect {[name: it.name, id: it.id]}.sort{it.name}
+            }
+            return nMap as ConcurrentHashMap
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
@@ -284,7 +317,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     private def sendError(ResultSelectionCommand command) {
         ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
-                "Invalid parameters: " + command.getErrors().fieldErrors.each { it.field }.join(", "))
+                "Invalid parameters: " + command.getErrors().fieldErrors.collect { it.field }.join(", "))
     }
 
     private def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {
@@ -340,41 +373,29 @@ class ResultSelectionController extends ExceptionHandlerController {
             and {
                 between("jobResultDate", from.toDate(), to.toDate())
                 if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
+                    'in'('jobGroup.id', command.jobGroupIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
+                    'in'("measuredEvent.id", command.measuredEventIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionType.Pages && command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
+                    'in'("page.id", command.pageIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
+                    'in'("location.id", command.locationIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
+                    'in'("browser.id", command.browserIds)
                 }
 
                 if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
                     or {
                         if (command.connectivityIds) {
-                            connectivityProfile {
-                                'in'("id", command.connectivityIds)
-                            }
+                            'in'("connectivityProfile.id", command.connectivityIds)
                         }
 
                         if (command.nativeConnectivity) {

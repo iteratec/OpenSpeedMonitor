@@ -19,6 +19,8 @@ package de.iteratec.osm.report.external
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.report.external.provider.*
+import grails.databinding.BindUsing
+import grails.gorm.annotation.Entity
 
 /**
  * A graphite server to which measured data is to be sent to.
@@ -28,6 +30,7 @@ import de.iteratec.osm.report.external.provider.*
  * @see GraphitePathCsiData
  * @see GraphiteEventSourcePath
  */
+@Entity
 class GraphiteServer {
 
     /**
@@ -70,8 +73,11 @@ class GraphiteServer {
      * {@link GraphiteEventSourcePath}s, to create Events.
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
-
-    static hasMany = [ graphiteEventSourcePaths: GraphiteEventSourcePath, graphitePathsRawData: GraphitePathRawData, graphitePathsCsiData: GraphitePathCsiData]
+    static hasMany = [
+        graphiteEventSourcePaths: GraphiteEventSourcePath,
+        graphitePathsRawData: GraphitePathRawData,
+        graphitePathsCsiData: GraphitePathCsiData
+    ]
     static transients = ['serverInetAddress']
 
     Boolean reportCsiAggregationsToGraphiteServer = false

@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 
 "use strict";
 
@@ -56,7 +56,6 @@ OpenSpeedMonitor.ChartColorProvider = function() {
         var colorscale = d3.scale.ordinal()
                            .domain(createDomain(colors.length))
                            .range(colors);
-
         return colorscale;
     };
 
@@ -66,6 +65,10 @@ OpenSpeedMonitor.ChartColorProvider = function() {
                            .range(trafficColors);
 
         return colorscale;
+    };
+
+    var getColorScaleForComparison = function () {
+        return d3.scale.category20()
     };
 
     var createDomain = function (arrayLength) {
@@ -80,7 +83,8 @@ OpenSpeedMonitor.ChartColorProvider = function() {
 
     return {
         getColorscaleForMeasurandGroup: getColorscaleForMeasurandGroup,
-        getColorscaleForTrafficlight: getColorscaleForTrafficlight
+        getColorscaleForTrafficlight: getColorscaleForTrafficlight,
+        getColorScaleForComparison: getColorScaleForComparison
     }
 };
 

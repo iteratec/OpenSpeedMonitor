@@ -106,7 +106,8 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         }
     };
     var update = function() {
-        if (!editor) {
+        var scriptId = $('#script').val();
+        if (!editor || !scriptId) {
             return;
         }
         $.ajax({
@@ -114,7 +115,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
             url : linkMergeDefinedAndUsedPlaceholders,
             data: {
                 'jobId': $('input#id').val(),
-                'scriptId': $('#script').val()
+                'scriptId': scriptId
             },
             success : function(result) {
                 $("#placeholderCandidates").html(result);
@@ -129,11 +130,11 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
             url : parsedScriptUrl,
             data: {
                 'jobId': $('input#id').val(),
-                'scriptId': $('#script').val()
+                'scriptId': scriptId
             },
             success : function(result) {
                 clipboard = new Clipboard("#copyToClipboard",{
-                    text :function (trigger) {
+                    text: function (trigger) {
                         return result
                     }
                 });

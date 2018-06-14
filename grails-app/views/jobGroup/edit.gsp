@@ -39,7 +39,7 @@
 </section>
 
 <content tag="include.bottom">
-    <asset:javascript src="bower_components/tagit/js/tag-it.min.js"/>
+    <asset:javascript src="node_modules/tag-it/js/tag-it.min.js"/>
     <asset:script type="text/javascript">
         $(document).ready(function() {
 

@@ -1,4 +1,4 @@
 //= require prettycron/cron-expressions.js
-//= require bower_components/later/later.min.js
-//= require bower_components/moment/min/moment.min.js
-//= require bower_components/prettycron/prettycron.js
+//= require node_modules/later/later.min.js
+//= require node_modules/moment/min/moment.min.js
+//= require node_modules/prettycron/prettycron.js

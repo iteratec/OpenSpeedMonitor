@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require /d3/chartLabelUtil
 //= require /d3/chartColorProvider
 
@@ -8,7 +8,7 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.distributionChart = (function () {
-    var svgContainer = null,
+    var svg = null,
         chartData = null,
         width = 600,
         height = 600,
@@ -22,14 +22,24 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         colorProvider = OpenSpeedMonitor.ChartColorProvider();
 
     var init = function () {
-        svgContainer = document.querySelector("#svg-container");
-
         dataTrimValue = document.querySelector("#data-trim-value");
         dataTrimValue.addEventListener('change', function() {
             draw();
         });
 
-        $(window).resize(draw);
+        $(window).resize(drawUpdatedSize);
+    };
+
+    var drawUpdatedSize = function () {
+        var domain = getDomain();
+
+        width = svg.node().getBoundingClientRect().width;
+        violinWidth = calculateViolinWidth();
+
+        drawXAxis();
+        drawViolins(domain);
+        svg.select("#header-text").attr("transform", getHeaderTransform());
+        chartStyling();
     };
 
     var drawChart = function (distributionChartData) {
@@ -51,27 +61,28 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var draw = function () {
-        var svg = initSvg();
+        initSvg();
         violinWidth = calculateViolinWidth();
 
         var domain = getDomain();
 
-        drawXAxis(svg);
-        drawYAxis(svg, domain,chartData.i18nMap['measurand'] + " [" + chartData.dimensionalUnit + "]");
-        drawViolins(svg, domain);
-        drawHeader(svg);
+        drawXAxis();
+        drawYAxis(domain,chartData.i18nMap['measurand'] + " [" + chartData.dimensionalUnit + "]");
+        drawViolins(domain);
+        drawHeader();
 
         postDraw();
     };
 
     var initSvg = function () {
-        d3.select(svgContainer).selectAll("svg").remove();
-        width = svgContainer.clientWidth;
-        return d3.select(svgContainer)
-            .append("svg")
+        if (svg)
+            svg.remove();
+
+        svg = d3.select("#svg-container").append("svg")
             .attr("class", "d3chart")
             .attr("height", height)
-            .attr("width", width)
+            .attr("width", "100%");
+        width = svg.node().getBoundingClientRect().width;
     };
 
     var assignShortLabels = function () {
@@ -88,19 +99,22 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         });
     };
 
-    var drawHeader = function (svg) {
+    var getHeaderTransform = function() {
         var widthOfAllViolins = Object.keys(chartData.series).length * violinWidth;
+        return "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)";
+    };
 
+    var drawHeader = function () {
         svg.append("g").selectAll("text")
             .data([commonLabelParts])
             .enter()
             .append("text")
             .text(commonLabelParts)
             .attr("id", "header-text")
-            .attr("transform", "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)");
+            .attr("transform", getHeaderTransform());
     };
 
-    var drawXAxis = function (svg) {
+    var drawXAxis = function () {
         var x = d3.scale.ordinal()
             .range(xRange())
             .domain(Object.keys(chartData.series).map(function (seriesKey) {
@@ -111,6 +125,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .scale(x)
             .orient("bottom");
 
+        svg.selectAll(".d3chart-xAxis").remove();
         svg.append("g")
             .attr("class", "d3chart-axis d3chart-xAxis")
             .call(xAxis)
@@ -118,7 +133,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             .attr("transform", "translate(" + margin.left + ", " + ( height - margin.bottom ) + ")");
     };
 
-    var drawYAxis = function (svg, domain, text) {
+    var drawYAxis = function (domain, text) {
         var y = d3.scale.linear()
             .range([height - margin.bottom, margin.top])
             .domain(domain);
@@ -139,9 +154,12 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         g.selectAll("path").classed("d3chart-yAxis-line", true);
     };
 
-    var drawViolins = function (svg, domain) {
+    var drawViolins = function (domain) {
+        svg.selectAll("clipPath").remove();
+        svg.select("[clip-path]").remove();
+
         var violinGroup = svg.append("g");
-        createClipPathAroundViolins(svg, violinGroup);
+        createClipPathAroundViolins(violinGroup);
         Object.keys(chartData.series).forEach(function (trace, i) {
             var traceData = chartData.series[trace].data;
 
@@ -153,7 +171,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         });
     };
 
-    var createClipPathAroundViolins = function (svg, violinGroup) {
+    var createClipPathAroundViolins = function (violinGroup) {
         var clipPathId = "violin-clip";
         svg
             .append("clipPath")
@@ -178,7 +196,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var calculateViolinWidth = function () {
-        var svgWidth = svgContainer.clientWidth - margin.left;
+        var svgWidth = width - margin.left;
         var numberOfViolins = Object.keys(chartData.series).length;
 
         if (numberOfViolins * maxViolinWidth > svgWidth) {
@@ -222,7 +240,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         return range;
     };
 
-    var addViolin = function (svg, traceData, height, violinWidth, domain) {
+    var addViolin = function (g, traceData, height, violinWidth, domain) {
         var resolution = histogramResolutionForTraceData(traceData);
 
         var data = d3.layout.histogram()
@@ -252,8 +270,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
                      .x(function (d) { return x(d.x); })
                      .y(function (d) { return y(d.y); });
 
-        var gPlus = svg.append("g");
-        var gMinus = svg.append("g");
+        var gPlus = g.append("g");
+        var gMinus = g.append("g");
 
 
         var colorscale = colorProvider.getColorscaleForMeasurandGroup(chartData.dimensionalUnit);

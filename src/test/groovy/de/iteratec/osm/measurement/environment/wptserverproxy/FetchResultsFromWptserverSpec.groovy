@@ -20,7 +20,6 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
@@ -72,8 +71,6 @@ class FetchResultsFromWptserverTests extends Specification {
         serviceUnderTest = service
         mockHttpBuilderToUseBetamax()
         serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
-
-        createTestDataCommonToAllTests()
     }
 
     private void mockHttpBuilderToUseBetamax() {
@@ -85,20 +82,6 @@ class FetchResultsFromWptserverTests extends Specification {
         int port = properties.'betamax.proxyPort' as int
     }
 
-    void createTestDataCommonToAllTests() {
-        TestDataUtil.createOsmConfig()
-        TestDataUtil.createCsiAggregationIntervals()
-        WebPageTestServer wptserverMultistep = TestDataUtil.createWebPageTestServer(WPTSERVER_MULTISTEP_URL, WPTSERVER_MULTISTEP_URL, true, "http://${WPTSERVER_MULTISTEP_URL}/")
-        WebPageTestServer wptserverSinglestep = TestDataUtil.createWebPageTestServer(WPTSERVER_SINGLESTEP_URL, WPTSERVER_SINGLESTEP_URL, true, "http://${WPTSERVER_SINGLESTEP_URL}/")
-        List<Browser> browsers = TestDataUtil.createBrowsersAndAliases()
-        TestDataUtil.createJobGroups()
-        TestDataUtil.createLocation(wptserverMultistep, LOCATION_IDENTIFIER_MULTISTEP, browsers.find {
-            it.name.equals(Browser.UNDEFINED)
-        }, true)
-        TestDataUtil.createLocation(wptserverSinglestep, LOCATION_IDENTIFIER_SINGLESTEP, browsers.find {
-            it.name.equals(Browser.UNDEFINED)
-        }, true)
-    }
     // TestSkript:
     //	logData	0
     ////um die hostnames vieler gemeinsamer adserver schon aufzulösen (sonst haben wir im IE10 zu viele pre-resolves)

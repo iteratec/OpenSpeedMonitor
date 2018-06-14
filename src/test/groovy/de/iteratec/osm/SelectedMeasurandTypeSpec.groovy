@@ -64,8 +64,8 @@ class SelectedMeasurandTypeSpec extends Specification {
     void "test getValue for UserTiming"() {
         setup: "EventResult is initiated"
         Double startTime = type == UserTimingType.MARK ? expectedValue : 10
-        Double duraction = type == UserTimingType.MEASURE ? expectedValue : null
-        List<UserTiming> userTimings = [UserTiming.build(name: name, type: type, startTime: startTime, duration: duraction),
+        Double duration = type == UserTimingType.MEASURE ? expectedValue : null
+        List<UserTiming> userTimings = [UserTiming.build(name: name, type: type, startTime: startTime, duration: duration),
                                         UserTiming.build(name: 'someMark', type: UserTimingType.MARK, startTime: 2000, duration: null),
                                         UserTiming.build(name: 'someMeasure', type: UserTimingType.MEASURE, startTime: 20, duration: 4000)]
         EventResult eventResult = EventResult.build(userTimings: userTimings)

@@ -97,7 +97,6 @@ class MetricReportingService {
                 log.info("now the graphiteSocket should be retrieved ...")
                 socket = graphiteSocketProvider.getSocket(graphiteServer)
             } catch (Exception e) {
-                //TODO: java.net.UnknownHostException can't be catched explicitly! Maybe groovy wraps the exception? But the stacktrace says java.net.UnknownHostException  ...
                 log.error("GraphiteServer ${graphiteServer} couldn't be reached. The following result couldn't be be sent: ${result}")
                 return
             }

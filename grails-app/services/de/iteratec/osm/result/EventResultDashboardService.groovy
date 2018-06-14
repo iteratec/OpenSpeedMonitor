@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
@@ -27,16 +27,17 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
+import de.iteratec.osm.result.dao.TrimQualifier
 import de.iteratec.osm.util.I18nService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
-
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 /**
  * <p>
  * A utility service for the event result dashboard and related operations.
@@ -52,6 +53,7 @@ public class EventResultDashboardService {
     CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService
     OsmChartProcessingService osmChartProcessingService
+    OsmConfigCacheService osmConfigCacheService
 
     /**
      * The Grails engine to generate links.
@@ -167,45 +169,58 @@ public class EventResultDashboardService {
     public OsmRickshawChart getEventResultDashboardHighchartGraphs(
             Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> selectedMeasurands, ErQueryParams queryParams) {
 
-        Map<String, Number> gtValues = [:]
-        Map<String, Number> ltValues = [:]
-        selectedMeasurands.each {
-            if (it.getMeasurandGroup() == MeasurandGroup.LOAD_TIMES) {
-                if (queryParams.minLoadTimeInMillisecs) {
-                    gtValues[it.name] = queryParams.minLoadTimeInMillisecs
-                }
-                if (queryParams.maxLoadTimeInMillisecs) {
-                    ltValues[it.name] = queryParams.maxLoadTimeInMillisecs
-                }
-            } else if (it.getMeasurandGroup() == MeasurandGroup.REQUEST_COUNTS) {
-                if (queryParams.minRequestCount) {
-                    gtValues[it.name] = queryParams.minRequestCount
-                }
-                if (queryParams.maxRequestCount) {
-                    ltValues[it.name] = queryParams.maxRequestCount
-                }
-            } else if (it.getMeasurandGroup() == MeasurandGroup.REQUEST_SIZES) {
-                if (queryParams.minRequestSizeInBytes) {
-                    gtValues[it.name] = queryParams.minRequestSizeInBytes
-                }
-                if (queryParams.maxRequestSizeInBytes) {
-                    ltValues[it.name] = queryParams.maxRequestSizeInBytes
-                }
-            }
-        }
+        Collection<EventResultProjection> eventResults
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - with builder', 1) {
 
-        Collection<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getEventResultDashboardHighchartGraphs - getLimitedMedianEventResultsBy', 1) {
-            eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    startDate,
-                    endDate,
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
+            EventResultQueryBuilder queryBuilder
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
+                queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                        .withJobResultDateBetween(startDate, endDate)
+                        .withJobGroupIdsIn(queryParams.jobGroupIds as List)
+                        .withPageIdsIn(queryParams.pageIds as List)
+                        .withLocationIdsIn(queryParams.locationIds as List)
+                        .withBrowserIdsIn(queryParams.browserIds as List)
+                        .withMeasuredEventIdsIn(queryParams.measuredEventIds as List)
+                        .withSelectedMeasurands(selectedMeasurands)
+            }
+
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append connectivities', 2) {
+                appendConnectivity(queryBuilder, queryParams)
+            }
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append trims', 2) {
+                appendTrims(queryBuilder, queryParams)
+            }
+
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - actually query the data', 2) {
+                eventResults = queryBuilder.getRawData()
+            }
+
         }
-        return calculateResultMap(eventResults, selectedMeasurands, interval, gtValues, ltValues)
+        log.debug("getting event-results - Got ${eventResults.size()} EventResultProjections")
+
+        OsmRickshawChart osmRickshawChart
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculateResultMap', 1) {
+            osmRickshawChart = calculateResultMap(eventResults, selectedMeasurands, interval)
+        }
+        return osmRickshawChart
+    }
+
+    private void appendConnectivity(EventResultQueryBuilder queryBuilder, ErQueryParams queryParams) {
+        if (!queryParams.includeAllConnectivities) {
+            queryBuilder.withConnectivity(
+                    queryParams.connectivityProfileIds as List,
+                    queryParams.customConnectivityNames as List,
+                    queryParams.includeNativeConnectivity)
+        }
+    }
+
+    private void appendTrims(EventResultQueryBuilder queryBuilder, ErQueryParams queryParams) {
+        if (queryParams.minLoadTimeInMillisecs) queryBuilder.withTrim(queryParams.minLoadTimeInMillisecs, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
+        if (queryParams.maxLoadTimeInMillisecs) queryBuilder.withTrim(queryParams.maxLoadTimeInMillisecs, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
+        if (queryParams.minRequestCount) queryBuilder.withTrim(queryParams.minRequestCount, TrimQualifier.GREATER_THAN, MeasurandGroup.REQUEST_COUNTS)
+        if (queryParams.maxRequestCount) queryBuilder.withTrim(queryParams.maxRequestCount, TrimQualifier.LOWER_THAN, MeasurandGroup.REQUEST_COUNTS)
+        if (queryParams.minRequestSizeInBytes) queryBuilder.withTrim(queryParams.minRequestSizeInBytes, TrimQualifier.GREATER_THAN, MeasurandGroup.REQUEST_SIZES)
+        if (queryParams.maxRequestSizeInBytes) queryBuilder.withTrim(queryParams.maxRequestSizeInBytes, TrimQualifier.LOWER_THAN, MeasurandGroup.REQUEST_SIZES)
     }
 
     /**
@@ -219,13 +234,13 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<SelectedMeasurand> selectedMeasurands, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResultProjection> eventResults, List<SelectedMeasurand> selectedMeasurands, Integer interval) {
         Map<GraphLabel, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
             if (interval == CsiAggregationInterval.RAW) {
-                calculatedResultMap = calculateResultMapForRawData(selectedMeasurands, eventResults, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForRawData(selectedMeasurands, eventResults)
             } else {
-                calculatedResultMap = calculateResultMapForAggregatedData(selectedMeasurands, eventResults, interval, gtBoundary, ltBoundary)
+                calculatedResultMap = calculateResultMapForAggregatedData(selectedMeasurands, eventResults, interval)
             }
         }
         List<OsmChartGraph> graphs = []
@@ -241,49 +256,91 @@ public class EventResultDashboardService {
         return chart
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForRawData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResultProjection> eventResults) {
 
-        Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
+        performanceLoggingService.resetExecutionTimeLoggingSession()
+
+        Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:]
         selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
 
-            eventResults.each { EventResult eventResult ->
-                URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
+            eventResults.each { EventResultProjection eventResult ->
 
-                // Get WPT event result info to build the WPT url dynamically
-                String serverBaseUrl = eventResult.jobResult.wptServerBaseurl
-                String testId = eventResult.jobResult.testId
-                Integer numberOfWptRun = eventResult.numberOfWptRun
-                CachedView cachedView = eventResult.cachedView
-                Integer oneBaseStepIndexInJourney = eventResult.oneBasedStepIndexInJourney
-                WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
-                        serverBaseUrl: serverBaseUrl,
-                        testId: testId,
-                        numberOfWptRun: numberOfWptRun,
-                        cachedView: cachedView,
-                        oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
-                )
+                Double value
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', 2){
+                    value = selectedMeasurand.getNormalizedValueFrom(eventResult)
+                }
 
-                if (selectedMeasurand.cachedView == eventResult.cachedView) {
-                    Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
-                    if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
-                        GraphLabel graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
-                        OsmChartPoint chartPoint = new OsmChartPoint(
-                                time: eventResult.getJobResultDate().getTime(),
-                                csiAggregation: value,
-                                countOfAggregatedResults: 1,
-                                sourceURL: testsDetailsURL,
-                                testingAgent: eventResult.testAgent,
-                                chartPointWptInfo: chartPointWptInfo
-                        )
-                        // customer satisfaction can be 0.
-                        if (chartPoint.isValid() || (selectedMeasurand.getMeasurandGroup() == MeasurandGroup.PERCENTAGES && chartPoint.time >= 0 && chartPoint.csiAggregation != null))
-                            highchartPointsForEachGraph[graphLabel].add(chartPoint)
+                if (selectedMeasurand.cachedView == eventResult.cachedView && value != null) {
+
+                    GraphLabel graphLabel
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', 2){
+                        graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
+                    }
+                    URL testsDetailsURL
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2){
+                        testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
+                    }
+                    WptEventResultInfo chartPointWptInfo
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2){
+                        chartPointWptInfo = getChartPointsWptInfos(eventResult)
+                    }
+
+                    try {
+                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', 2){
+                            long time
+                            String agent
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', 3){
+                                time = eventResult.jobResultDate.time
+                                agent = eventResult.testAgent
+                            }
+                            OsmChartPoint chartPoint
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', 3){
+                                chartPoint = new OsmChartPoint(
+                                        time: time,
+                                        csiAggregation: value,
+                                        countOfAggregatedResults: 1,
+                                        sourceURL: testsDetailsURL,
+                                        testingAgent: agent,
+                                        chartPointWptInfo: chartPointWptInfo
+                                )
+                            }
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3){
+                                if (chartPoint.isValid()){
+                                    // The following is a bit more verbose than using a groovy MapWithDefault, but significantly faster
+                                    if (chartPointsForEachGraph[graphLabel] == null) {
+                                        chartPointsForEachGraph[graphLabel] = []
+                                    }
+                                    chartPointsForEachGraph[graphLabel].add(chartPoint)
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("The following EventResultProjection couldn't be used to create an OsmChartPoint: $eventResult")
                     }
                 }
+
             }
         }
 
-        return highchartPointsForEachGraph
+        log.debug(performanceLoggingService.getExecutionTimeLoggingSessionData(LogLevel.DEBUG))
+
+        return chartPointsForEachGraph
+    }
+
+    private getChartPointsWptInfos(EventResultProjection eventResult) {
+        String serverBaseUrl = eventResult.wptServerBaseurl
+        String testId = eventResult.testId
+        Integer numberOfWptRun = eventResult.numberOfWptRun
+        CachedView cachedView = eventResult.cachedView
+        Integer oneBaseStepIndexInJourney = eventResult.oneBasedStepIndexInJourney
+        WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
+                serverBaseUrl: serverBaseUrl,
+                testId: testId,
+                numberOfWptRun: numberOfWptRun,
+                cachedView: cachedView,
+                oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
+        )
+        return chartPointWptInfo
     }
 
     private boolean isInBounds(
@@ -302,17 +359,17 @@ public class EventResultDashboardService {
         return inBound
     }
 
-    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResult> eventResults, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
+    private Map<GraphLabel, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<SelectedMeasurand> selectedMeasurands, Collection<EventResultProjection> eventResults, Integer interval) {
 
-        Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
+        Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:].withDefault { [] }
         Map<GraphLabel, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
-            eventResults.each { EventResult eventResult ->
+            eventResults.each { EventResultProjection eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
                         Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
-                        if (isInBounds(value, selectedMeasurand, gtBoundary, ltBoundary)) {
+                        if (value != null){
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult, millisStartOfInterval, selectedMeasurand)
                             eventResultsToAggregate[key] << value
@@ -327,6 +384,7 @@ public class EventResultDashboardService {
             Double sum = 0
             Integer countValues = 0
             eventResultsToAggregate.each { key, value ->
+
                 testsDetailsURL = buildTestsDetailsURL(key.jobGroupId, key.measuredEventId, key.pageId, key.browserId, key.locationId, key.selectedMeasurand, key.millisStartOfInterval, interval, value.size())
 
                 performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
@@ -336,17 +394,22 @@ public class EventResultDashboardService {
                     if (countValues > 0) {
                         sum = 0
                         value.each { singleValue -> sum += singleValue }
-                        OsmChartPoint chartPoint = new OsmChartPoint(time: key.millisStartOfInterval, csiAggregation: sum / countValues, countOfAggregatedResults: countValues, sourceURL: testsDetailsURL, testingAgent: null)
+                        OsmChartPoint chartPoint = new OsmChartPoint(
+                                time: key.millisStartOfInterval,
+                                csiAggregation: sum / countValues,
+                                countOfAggregatedResults: countValues,
+                                sourceURL: testsDetailsURL,
+                                testingAgent: null)
                         if (chartPoint.isValid())
-                            highchartPointsForEachGraph[graphLabel] << chartPoint
+                            chartPointsForEachGraph[graphLabel] << chartPoint
                     }
                 }
             }
         }
-        return highchartPointsForEachGraph.sort()
+        return chartPointsForEachGraph.sort()
     }
 
-    private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<GraphLabel, List<OsmChartPoint>> highchartPointsForEachGraphOrigin) {
+    private List<OsmChartGraph> setSpeakingGraphLabelsAndSort(Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraphOrigin) {
 
         String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "Cached", null)
         String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "Uncached", null)
@@ -356,7 +419,7 @@ public class EventResultDashboardService {
         Map<Serializable, JobGroup> jobGroupMap = [:]
         Map<Serializable, MeasuredEvent> measuredEventMap = [:]
         Map<Serializable, Location> locationMap = [:]
-        highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
+        chartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', 1) {
 
                 graphLabel.validate()
@@ -380,22 +443,22 @@ public class EventResultDashboardService {
                     Location location = locationMap[graphLabel.locationId] ?: Location.get(graphLabel.locationId)
 
                     if (group && measuredEvent && location) {
-                        String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
-                                "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
-                                "${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.connectivity}"
+                        String newGraphLabel = "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${group.name}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                                "${measuredEvent.name}${TIMESERIES_CHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
+                                "${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.connectivity}"
                         graphs.add(new OsmChartGraph(
                                 label: newGraphLabel,
                                 measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     } else {
                         graphs.add(new OsmChartGraph(
-                                label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                                label: "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.tag}",
                                 measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                                 points: highChartPoints))
                     }
                 } else {
                     graphs.add(new OsmChartGraph(
-                            label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${graphLabel.tag}",
+                            label: "${measurand}${TIMESERIES_CHART_LEGEND_DELIMITTER}${graphLabel.tag}",
                             measurandGroup: graphLabel.selectedMeasurand.getMeasurandGroup(),
                             points: highChartPoints))
                 }
@@ -450,7 +513,7 @@ public class EventResultDashboardService {
      * @return The created URL or <code>null</code> if not possible to
      *         build up an URL.
      */
-    public URL buildTestsDetailsURL(EventResult result) {
+    public URL buildTestsDetailsURL(EventResultProjection result) {
         URL resultUrl = null
 
         if (result) {

@@ -146,8 +146,8 @@ class EventResultDashboardControllerSpec extends Specification {
         command.validate()
         result.size() == 30
         result["selectedInterval"] == 60
-        result["selectedAggrGroupValuesCached"] == [Measurand.DOC_COMPLETE_TIME]
-        result["selectedAggrGroupValuesUnCached"] == [Measurand.DOC_COMPLETE_INCOMING_BYTES]
+        result["selectedAggrGroupValuesCached"] == [Measurand.DOC_COMPLETE_TIME.toString()]
+        result["selectedAggrGroupValuesUnCached"] == [Measurand.DOC_COMPLETE_INCOMING_BYTES.toString()]
     }
 
     void "command creates correct ErQueryParameters"() {

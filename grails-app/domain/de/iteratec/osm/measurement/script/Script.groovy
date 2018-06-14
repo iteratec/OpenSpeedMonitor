@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.PageService
+import grails.gorm.annotation.Entity
 import org.grails.databinding.BindUsing
 
 import org.grails.databinding.BindUsing
@@ -29,6 +30,7 @@ import org.grails.databinding.BindUsing
  * A script used to perform web page test job.
  * </p>
  */
+@Entity
 class Script {
 
     PageService pageService
@@ -51,11 +53,12 @@ class Script {
 
     Collection<Page> testedPages = []
 
-    static hasMany = [ testedPages: Page ]
+    static hasMany = [ testedPages: Page, archivedScripts: ArchivedScript ]
 
     static mapping = {
         sort 'label'
         navigationScript(type: 'text')
+        archivedScripts cascade: 'all-delete-orphan'
     }
 
     static constraints = {

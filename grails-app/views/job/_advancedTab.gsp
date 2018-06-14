@@ -118,32 +118,41 @@
 
 <g:render template="inputField" model="${['attribute': 'imageQuality','label': "${message(code: 'job.imageQuality.label', default: 'JPEG Compression Level (30-100)')}", 'job': job]}"/>
 
-<div id="userAgent" class="form-group">
-
-    <label class="col-md-4 control-label" for="userAgent">
-        <abbr title="${message(code: "job.userAgent.description", default: 'What to send as the User Agent. Default is append PTST to signify a page test')}"
-              data-placement="bottom" rel="tooltip">
-            <g:message code="job.userAgent.label" default="User Agent" />
-        </abbr>
-    </label>
-
-    <div class="col-md-6">
-        <select  id="inputField-userAgent" name="userAgent" class="form-control chosen">
-            <option value="DEFAULT"
-                    <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.DEFAULT}">selected</g:if>><g:message
-                    code="job.userAgent.default" default="Append PTST" /></option>
-            <option value="ORIGINAL"
-                    <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.ORIGINAL}">selected</g:if>><g:message
-                    code="job.userAgent.original" default="Append Nothing" /></option>
-            <option value="APPEND"
-                    <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.APPEND}">selected</g:if>><g:message
-                    code="job.userAgent.append" default="Append Suffix" /></option>
-            <option value="OVERWRITE"
-                    <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.OVERWRITE}">selected</g:if>><g:message
-                    code="job.userAgent.overwrite" default="Overwrite" /></option>
-        </select>
+<g:if test="${globalUserAgentSuffix}">
+    <div id="globalUserAgent">
+        <g:render template="checkbox" model="${['booleanAttribute': 'useGlobalUASuffix',
+                                                'label': "${message(code: 'job.userAgent.useGlobalSuffix',default: 'Use global User Agent Suffix:')} " + globalUserAgentSuffix,
+                                                'job': job]}"/>
     </div>
-</div>
+</g:if>
 
-<g:render template="inputField" model="${['attribute': 'userAgentString','label': "${message(code: 'job.userAgentString.label', default: 'New User Agent')}", 'job': job]}"/>
-<g:render template="inputField" model="${['attribute': 'appendUserAgent','label': "${message(code: 'job.appendUserAgent.label', default: 'Append UA')}", 'job': job]}"/>
+<div id="userAgent">
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="userAgent">
+            <abbr title="${message(code: "job.userAgent.description", default: 'What to send as the User Agent. Default is append PTST to signify a page test')}"
+                  data-placement="bottom" rel="tooltip">
+                <g:message code="job.userAgent.label" default="User Agent" />
+            </abbr>
+        </label>
+
+        <div class="col-md-6">
+            <select  id="inputField-userAgent" name="userAgent" class="form-control chosen">
+                <option value="DEFAULT"
+                        <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.DEFAULT}">selected</g:if>><g:message
+                        code="job.userAgent.default" default="Append PTST" /></option>
+                <option value="ORIGINAL"
+                        <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.ORIGINAL}">selected</g:if>><g:message
+                        code="job.userAgent.original" default="Append Nothing" /></option>
+                <option value="APPEND"
+                        <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.APPEND}">selected</g:if>><g:message
+                        code="job.userAgent.append" default="Append Suffix" /></option>
+                <option value="OVERWRITE"
+                        <g:if test="${job?.userAgent == de.iteratec.osm.measurement.schedule.Job.UserAgent.OVERWRITE}">selected</g:if>><g:message
+                        code="job.userAgent.overwrite" default="Overwrite" /></option>
+            </select>
+        </div>
+    </div>
+
+    <g:render template="inputField" model="${['attribute': 'userAgentString','label': "${message(code: 'job.userAgentString.label', default: 'New User Agent')}", 'job': job]}"/>
+    <g:render template="inputField" model="${['attribute': 'appendUserAgent','label': "${message(code: 'job.appendUserAgent.label', default: 'Append UA')}", 'job': job]}"/>
+</div>

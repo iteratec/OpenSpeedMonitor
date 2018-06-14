@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -28,7 +29,7 @@ class JobStatisticServiceSpec extends Specification {
     void "job with lot of tests and all successful"() {
         setup:
         Job job = Job.build()
-        160.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
+        160.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -42,7 +43,7 @@ class JobStatisticServiceSpec extends Specification {
     void "job with less than 150 tests and all successful"() {
         setup: "job gets prepared with 80 successful results"
         Job job = Job.build()
-        80.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
+        80.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -56,7 +57,7 @@ class JobStatisticServiceSpec extends Specification {
     void "job with less than 25 tests and all successful"() {
         setup: "job gets prepared with 19 successful results"
         Job job = Job.build()
-        19.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
+        19.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -70,7 +71,7 @@ class JobStatisticServiceSpec extends Specification {
     void "job with less than 5 tests and all successful"() {
         setup: "job gets prepared with 4 successful results"
         Job job = Job.build()
-        4.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
+        4.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -84,9 +85,9 @@ class JobStatisticServiceSpec extends Specification {
     void "job with lot of tests and status 5,25,150: RED,YELLOW,GREEN"() {
         setup: "job gets prepared with results sequence"
         Job job = Job.build()
-        3.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 400) }
-        2.times { JobResult.build(job: job, date: minutesAgo(3 + it), httpStatusCode: 200) }
-        150.times { JobResult.build(job: job, date: minutesAgo(5 + it), httpStatusCode: 200) }
+        3.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
+        2.times { JobResult.build(job: job, date: minutesAgo(3 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
+        150.times { JobResult.build(job: job, date: minutesAgo(5 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -100,10 +101,10 @@ class JobStatisticServiceSpec extends Specification {
     void "job with lot of tests and status 5,25,150: GREEN,YELLOW,GREEN"() {
         setup: "job gets prepared with results sequence"
         Job job = Job.build()
-        5.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
-        16.times { JobResult.build(job: job, date: minutesAgo(5 + it), httpStatusCode: 200) }
-        4.times { JobResult.build(job: job, date: minutesAgo(31 + it), httpStatusCode: 504) }
-        150.times { JobResult.build(job: job, date: minutesAgo(35 + it), httpStatusCode: 200) }
+        5.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
+        16.times { JobResult.build(job: job, date: minutesAgo(5 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
+        4.times { JobResult.build(job: job, date: minutesAgo(31 + it), httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode()) }
+        150.times { JobResult.build(job: job, date: minutesAgo(35 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -117,8 +118,8 @@ class JobStatisticServiceSpec extends Specification {
     void "job with lot of tests and status 5,25,150: RED,RED,YELLOW"() {
         setup: "job gets prepared with results sequence"
         Job job = Job.build()
-        25.times  { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 400) }
-        125.times { JobResult.build(job: job, date: minutesAgo(25 + it), httpStatusCode: 200) }
+        25.times  { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
+        125.times { JobResult.build(job: job, date: minutesAgo(25 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -132,7 +133,7 @@ class JobStatisticServiceSpec extends Specification {
     void "job with lot of tests and no one successful (RED,RED,RED)"() {
         setup: "job gets prepared with results sequence"
         Job job = Job.build()
-        150.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 400) }
+        150.times { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)
@@ -146,9 +147,9 @@ class JobStatisticServiceSpec extends Specification {
     void "job with less than 150 tests and not all successful (YELLOW,RED,null)"() {
         setup: "job gets prepared with 80 results mixed successful and not successful"
         Job job = Job.build()
-        4.times  { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: 200) }
-        12.times { JobResult.build(job: job, date: minutesAgo(4 + it), httpStatusCode: 400) }
-        64.times { JobResult.build(job: job, date: minutesAgo(16 + it), httpStatusCode: 200) }
+        4.times  { JobResult.build(job: job, date: minutesAgo(it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
+        12.times { JobResult.build(job: job, date: minutesAgo(4 + it), httpStatusCode: WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
+        64.times { JobResult.build(job: job, date: minutesAgo(16 + it), httpStatusCode: WptStatus.COMPLETED.getWptStatusCode()) }
 
         when: "stats get calculated"
         service.updateStatsFor(job)

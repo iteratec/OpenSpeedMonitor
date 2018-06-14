@@ -16,6 +16,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -49,23 +50,15 @@ import spock.lang.Stepwise
 @Stepwise
 class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     @Shared
-    String script1Name = "TestScript1-564892#Afef1"
-    @Shared
-    String job1Name = "TestJob1-564892#Afef1"
-    @Shared
     String location1Name = "TestLocation1-564892#Afef1"
     @Shared
     String jobGroup1Name = "TestJobGroup1-564892#Afef1"
     @Shared
     String jobGroup2Name = "TestJobGroup2-564892#Afef1"
     @Shared
-    String page1Name = "TestPage1-564892#Afef1"
-    @Shared
     String connectivityProfileName = "ConnectivityProfile-564892#Afef1"
     @Shared
     String measureEvent1Name = "MeasureEvent1-564892#Afef1"
-    @Shared
-    String csiConfigurationName = "CsiConfiguration1-564892#Afef1"
 
     void cleanupSpec() {
         cleanUpData()
@@ -338,33 +331,30 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             initCsiData()
             createTestSpecificData()
         }
-
     }
 
     private void createTestSpecificData() {
-
-
-        Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
-        Browser browser = TestDataUtil.createBrowser("TestFireFox")
-        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
-        BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
-        Page page1 = TestDataUtil.createPage(page1Name)
-        PageWeight pageWeight = TestDataUtil.createPageWeight(page1, 3)
-        TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
-        CsiDay csiDay = TestDataUtil.createCsiDay([0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 11, 13: 10, 14: 9, 15: 8, 16: 7, 17: 6, 18: 5, 19: 4, 20: 3, 21: 2, 22: 1, 23: 0])
-        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName, "TestDescription", csiDay, [browserConnectivityWeight], [pageWeight], [timeToCsMapping])
-        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(), TestDataUtil.createCsTargetValue())
+        Script script1 = Script.build().save(failOnError: true)
+        Browser browser = Browser.build().save(failOnError: true)
+        ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
+        BrowserConnectivityWeight browserConnectivityWeight = createBrowserConnectivityWeight(browser, connectivityProfile, 2)
+        Page page1 = Page.build().save(failOnError: true)
+        PageWeight pageWeight = createPageWeight(page1, 3)
+        TimeToCsMapping timeToCsMapping = createTimeToCsMapping(page1)
+        CsiDay csiDay = CsiDay.build()
+        CsiConfiguration csiConfiguration = CsiConfiguration.build().save(failOnError: true)
+        createCsTargetGraph()
         JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
         JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
-        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-        Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
-        Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
+        WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
+        Location location1 = Location.build(uniqueIdentifierForServer: location1Name).save(failOnError: true)
+        Job job1 = Job.build().save(failOnError: true)
         CsiSystem csiSystem = new CsiSystem([label: "TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 60))
         csiSystem.save(failOnError: true)
-        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
-        MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
+        JobResult jobResult1 = JobResult.build()
+        MeasuredEvent measuredEvent1 = MeasuredEvent.build(name: measureEvent1Name).save(failOnError: true)
         CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         new CsiAggregation([started: new DateTime(2016, 6, 5, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 14, csByWptVisuallyCompleteInPercent: 55, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started: new DateTime(2016, 6, 6, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 22, csByWptVisuallyCompleteInPercent: 58, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
@@ -380,10 +370,59 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         new CsiAggregation([started: new DateTime(2016, 6, 16, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 99, csByWptVisuallyCompleteInPercent: 78, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started: new DateTime(2016, 6, 17, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started: new DateTime(2016, 6, 18, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregationType: AggregationType.MEASURED_EVENT, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
-        Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
-        TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-        TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
+        Browser notUsedBrowser = Browser.build().save(failOnError: true)
+        createConnectivityProfile("NotUsedConnectivityProfile")
+        Location.build().save(failOnError: true)
+    }
 
+    private ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
+        ConnectivityProfile result = ConnectivityProfile.build(
+                name: profileName,
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        )
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
+    }
+
+    private PageWeight createPageWeight(Page page, double weight) {
+        return PageWeight.build(
+                page: page,
+                weight: weight
+        )
+    }
+
+    private BrowserConnectivityWeight createBrowserConnectivityWeight(Browser browser, ConnectivityProfile connectivityProfile, double weight) {
+        return BrowserConnectivityWeight.build(
+                browser: browser,
+                connectivity: connectivityProfile,
+                weight: weight
+        )
+    }
+
+    private void createTimeToCsMapping(Page page) {
+        TimeToCsMapping.build(
+                page: page,
+                loadTimeInMilliSecs: 1,
+                customerSatisfaction: 0.9,
+                mappingVersion: 1
+        )
+    }
+
+    private void createCsTargetGraph() {
+        CsTargetGraph.build(
+                label: 'TestCsTargetGraph',
+                pointOne: CsTargetValue.build(date: new Date(), csInPercent: 42),
+                pointTwo: CsTargetValue.build(date: new Date(), csInPercent: 42),
+                defaultVisibility: true
+        )
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {

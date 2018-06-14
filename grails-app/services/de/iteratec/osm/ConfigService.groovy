@@ -81,15 +81,6 @@ class ConfigService {
         return getConfig().initialChartHeightInPixels
 	}
 
-	/**
-	 * Gets main url under test within this osm instance from osm-configuration. That url got shown in chart title of csi dashboard.
-	 * @see OsmConfiguration
-	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
-	 */
-	String getMainUrlUnderTest(){
-        return getConfig().mainUrlUnderTest
-	}
-
     /**
      * Gets max result-data storage time in months from osm-configuration.
      * @return Time in months to store results of the application.
@@ -108,6 +99,10 @@ class ConfigService {
 	 */
 	Integer getMaxBatchActivityStorageTimeInDays(){
         return getConfig().maxBatchActivityStorageTimeInDays
+	}
+
+	String getGlobalUserAgentSuffix(){
+		return getConfig().globalUserAgentSuffix
 	}
 
 	/**
@@ -177,7 +172,7 @@ class ConfigService {
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
         int confCount = osmConfigs.size()
         if (confCount != 1) {
-            throw new IllegalStateException("It must exist exact one Configuration in database. Found ${confCount}!")
+            throw new IllegalStateException("It must exist exactly one Configuration in database. Found ${confCount}!")
         }else{
             return osmConfigs[0]
         }

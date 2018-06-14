@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
+import grails.gorm.annotation.Entity
 import grails.plugins.taggable.Taggable
 import groovy.transform.EqualsAndHashCode
 
@@ -28,6 +29,7 @@ import groovy.transform.EqualsAndHashCode
  *
  */
 @EqualsAndHashCode
+@Entity
 class JobGroup implements Taggable{
 
     /**

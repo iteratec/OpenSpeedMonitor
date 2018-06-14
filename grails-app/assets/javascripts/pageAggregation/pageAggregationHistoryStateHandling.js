@@ -38,6 +38,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state["selectedPages"] = $("#pageSelectHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
+        state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -77,6 +78,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setMeasurands(state);
         setSelectedFilter(state);
         setStackBars(state);
+        setAggregationValue(state);
         loadedState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             $(window).trigger("historyStateLoaded");
@@ -117,7 +119,16 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
             currentAddButton.click();
         }
         var selects = $(".measurand-select");
+
         measurands.forEach(function (measurand, i) {
+            if(measurand.startsWith("_UTM")) {
+
+                var optGroupUserTimings = $(selects[i]).find('.measurand-opt-group-USER_TIMINGS');
+                var alreadyThere = optGroupUserTimings.size() > 1;
+                if(!alreadyThere){
+                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{id: measurand, name: measurand}])
+                }
+            }
             $(selects[i]).val(measurand);
         });
     };
@@ -141,6 +152,17 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         $("#inFrontButton").toggleClass("active", isStacked);
         $("#besideButton input").prop("checked", !isStacked);
         $("#besideButton").toggleClass("active", !isStacked);
+    };
+
+    var setAggregationValue = function (state) {
+        if (!state["selectedAggregationValue"]) {
+            return
+        }
+        var isAvg = state["selectedAggregationValue"] === "avg";
+        $("#averageButton input").prop("checked", isAvg);
+        $("#averageButton").toggleClass("active", isAvg);
+        $("#medianButton input").prop("checked", !isAvg);
+        $("#medianButton").toggleClass("active", !isAvg);
     };
 
     var setMultiSelect = function (id, values) {

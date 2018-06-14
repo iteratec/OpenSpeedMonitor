@@ -2,23 +2,15 @@ package geb.de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.ResultSelectionInformation
-import de.iteratec.osm.result.SelectedMeasurandType
-import de.iteratec.osm.result.UserTiming
-import de.iteratec.osm.result.UserTimingSelectionInformation
-import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -32,14 +24,13 @@ import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise
-
 /**
  * Created by mwg on 07.08.2017.
  */
 @Integration
 @Rollback
 @Stepwise
-class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec implements OsmTestLogin {
+class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
     @Shared
@@ -95,7 +86,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         isUserTimingsHidden() == true
     }
 
-    void "matching date matches timings"(){
+    void "matching date matches timings"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
 
@@ -110,7 +101,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
-    void "timings disappear if date does not match" (){
+    void "timings disappear if date does not match"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
 
@@ -124,7 +115,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         isUserTimingsHidden() == true
     }
 
-    void "timings appear for correct timeframe within a day"(){
+    void "timings appear for correct timeframe within a day"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
 
@@ -139,7 +130,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
-    void "timings disappear if wrong jobGroup"(){
+    void "timings disappear if wrong jobGroup"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
 
@@ -154,7 +145,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         isUserTimingsHidden() == true
     }
 
-    void "timings appear for matching job group"(){
+    void "timings appear for matching job group"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
         jobGroupList[1].click()
@@ -171,7 +162,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
-    void "timings disappear if wrong page"(){
+    void "timings disappear if wrong page"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
         jobGroupList[0].click()
@@ -188,7 +179,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         isUserTimingsHidden() == true
     }
 
-    void "timings appear if page matches"(){
+    void "timings appear if page matches"() {
         given: "navigate to job selection"
         clickJobSelectionTab()
         pageList[0].click()
@@ -205,7 +196,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
         firstViewHasOptionFor(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName) == true
     }
 
-    void "show graph for mark"(){
+    void "show graph for mark"() {
         given: "usertimings are additionally selected"
         findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MARK, userTimingMarkName).click()
         findOptionInFirstViewForUserTiming(SelectedMeasurandType.USERTIMING_MEASURE, userTimingMeasureName).click()
@@ -284,58 +275,63 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
 
     private createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
-            TestDataUtil.createAdminUser()
+            if (OsmConfiguration.count == 0) {
+                OsmConfiguration.build().save(failOnError: true)
+            }
+            createAdminUser()
 
-            Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
-            Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
-            JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
-            JobGroup jobGroup2 = TestDataUtil.createJobGroup(jobGroup2Name)
-            WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen")
-            Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
-            Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
-            Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
-            Job job2 = TestDataUtil.createJob(job2Name, script2, location2, jobGroup2, "This is the second test job", 1, false, 12)
-            Page page1 = TestDataUtil.createPage(page1Name)
-            Page page2 = TestDataUtil.createPage(page2Name)
+            Script script1 = Script.build(label: script1Name, description: "This is for test purposes", navigationScript: "stuff")
+            Script script2 = Script.build(label: script2Name, description: "This is also for test purposes", navigationScript: "stuff")
+            JobGroup jobGroup1 = JobGroup.build(name: jobGroup1Name)
+            JobGroup jobGroup2 = JobGroup.build(name: jobGroup2Name)
+            WebPageTestServer wpt = WebPageTestServer.build(label: "TestWPTServer-564892#Afef1", proxyIdentifier: "TestIdentifier", active: true, baseUrl: "http://internet.de")
 
-            JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
-            JobResult jobResultWithUserTimings1 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
-            JobResult jobResult2 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
-            JobResult jobResult3 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job2, location2)
-            JobResult jobResultWithUserTimings2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 19, DateTimeZone.UTC).toDate(), job1, location1)
+            Browser browser = Browser.build(name: "This is the very best browser I've ever seen")
+            Location location1 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location1Name, browser: browser, active: true)
+            Location location2 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location2Name, browser: browser, active: true)
+            Job job1 = Job.build(label: job1Name, script: script1, location: location1, jobGroup: jobGroup1, description: "This is the first test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
+            Job job2 = Job.build(label: job2Name, script: script2, location: location2, jobGroup: jobGroup2, description: "This is the second test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
 
-            ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
-            MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
-            MeasuredEvent measuredEvent2 = TestDataUtil.createMeasuredEvent(measureEvent2Name, page2)
-            MeasuredEvent measuredEvent3 = TestDataUtil.createMeasuredEvent(measureEvent3Name, page2)
+            Page page1 = Page.build(name: page1Name)
+            Page page2 = Page.build(name: page2Name)
 
-            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
-            TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-            TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
+            MeasuredEvent measuredEvent1 = MeasuredEvent.build(name: measureEvent1Name, testedPage: page1)
+            MeasuredEvent measuredEvent2 = MeasuredEvent.build(name: measureEvent2Name, testedPage: page2)
+            MeasuredEvent measuredEvent3 = MeasuredEvent.build(name: measureEvent3Name, testedPage: page2)
+
+            Browser notUsedBrowser = Browser.build(name: "NotUsedBrowser")
+            createConnectivityProfile("NotUsedConnectivityProfile")
+            Location.build(wptServer: wpt, uniqueIdentifierForServer: "NotUsedLocation", browser: notUsedBrowser, active: true)
+
+            JobResult jobResult1 = JobResult.build(testId:"Test1", date: new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
+            JobResult jobResultWithUserTimings1 = JobResult.build(testId:"Test2", date: new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
+            JobResult jobResult2 = JobResult.build(testId:"Test3", date: new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
+            JobResult jobResult3 = JobResult.build(testId:"Test1", date: new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job: job2, locationLocation: location2)
+            JobResult jobResultWithUserTimings2 = JobResult.build(testId:"Test2", date: new DateTime(2016, 06, 22, 3, 19, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
+
+            ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
 
             List<UserTiming> userTimingsForJobResult2 = []
             userTimingsForJobResult2.add(
                     new UserTiming(
-                        name: userTimingMarkName,
-                        type: UserTimingType.MARK,
-                        startTime: 123
-            ))
+                            name: userTimingMarkName,
+                            type: UserTimingType.MARK,
+                            startTime: 123
+                    ))
             userTimingsForJobResult2.add(
                     new UserTiming(
-                        name: userTimingMeasureName,
-                        type: UserTimingType.MEASURE,
-                        startTime: 123,
-                        duration: 456
-            ))
+                            name: userTimingMeasureName,
+                            type: UserTimingType.MEASURE,
+                            startTime: 123,
+                            duration: 456
+                    ))
             userTimingsSize = userTimingsForJobResult2.size()
 
             new EventResult(
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 74476,
                     docCompleteRequests: 4,
                     docCompleteTimeInMillisecs: 838,
@@ -366,7 +362,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 71976,
                     docCompleteRequests: 5,
                     docCompleteTimeInMillisecs: 638,
@@ -399,7 +395,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 71976,
                     docCompleteRequests: 5,
                     docCompleteTimeInMillisecs: 638,
@@ -432,7 +428,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 21976,
                     docCompleteRequests: 3,
                     docCompleteTimeInMillisecs: 238,
@@ -464,7 +460,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 15976,
                     docCompleteRequests: 35,
                     docCompleteTimeInMillisecs: 158,
@@ -495,7 +491,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 25976,
                     docCompleteRequests: 25,
                     docCompleteTimeInMillisecs: 258,
@@ -527,7 +523,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 25976,
                     docCompleteRequests: 25,
                     docCompleteTimeInMillisecs: 258,
@@ -559,7 +555,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 45976,
                     docCompleteRequests: 45,
                     docCompleteTimeInMillisecs: 458,
@@ -590,7 +586,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 55976,
                     docCompleteRequests: 55,
                     docCompleteTimeInMillisecs: 558,
@@ -622,7 +618,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 55976,
                     docCompleteRequests: 55,
                     docCompleteTimeInMillisecs: 558,
@@ -654,7 +650,7 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 55976,
                     docCompleteRequests: 55,
                     docCompleteTimeInMillisecs: 558,
@@ -741,6 +737,23 @@ class EventResultDashboardUserTimingGebSpec  extends CustomUrlGebReportingSpec i
             ).save()
         }
 
+    }
+
+    private ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
+        ConnectivityProfile result = ConnectivityProfile.build(
+                name: profileName,
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        )
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
     }
 
     private void selectDateInDatepicker(def datePicker, String date) {

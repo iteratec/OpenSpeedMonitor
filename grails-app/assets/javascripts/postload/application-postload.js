@@ -24,7 +24,7 @@
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
-//= require bower_components/spin.js/spin.js
+//= require node_modules/spin.js/spin.min.js
 //= require_self
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.postLoaded = (function() {

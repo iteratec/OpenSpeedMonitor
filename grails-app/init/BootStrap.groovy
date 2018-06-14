@@ -398,7 +398,7 @@ class BootStrap {
         BatchActivity.findAllByStatus(Status.ACTIVE).each { BatchActivity batchActivity ->
             BatchActivity.withTransaction {
                 batchActivity.status = Status.CANCELLED
-                batchActivity.save(faildOnError: true)
+                batchActivity.save(failOnError: true)
             }
         }
     }

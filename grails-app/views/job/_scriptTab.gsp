@@ -1,5 +1,5 @@
 <%@ page import="de.iteratec.osm.measurement.script.Script" %>
-<asset:javascript src="bower_components/clipboard/dist/clipboard.min.js"/>
+<asset:javascript src="node_modules/clipboard/dist/clipboard.min.js"/>
 <div class="form-group ${hasErrors(bean: job, field: 'script', 'error')}" id="scriptFormGroup">
     <label class="col-md-2 control-label" for="script"><g:message code="job.selectedScript.label"
                                                                   default="Selected Script"/> <span
@@ -27,7 +27,7 @@
 <g:render template="/script/codemirror"
           model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}"/>
 
-<button class="btn btn-default" id="script_button_copyToClipboard"  type="button" id="copyToClipboard">
+<button class="btn btn-default" type="button" id="copyToClipboard">
     <g:message code="job.script.copyToClipboard" default="Copy To Clipboard"/>
 </button>
 <a href="" target="_blank" id="editScriptLink">

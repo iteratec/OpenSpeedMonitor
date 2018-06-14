@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 //= require prettycron/prettycronManifest.js
-//= require bower_components/tagit/js/tag-it.min.js
+//= require node_modules/tag-it/js/tag-it.min.js
 //= require_self
 function doOnDomReady(newJob,
                       customConnNameForNative,
@@ -152,6 +152,7 @@ function prepareConnectivityProfileControls(newJob, customConnNameForNative, con
 }
 
 var inputUserAgent = $("#inputField-userAgent");
+var inputGlobalUserAgent = $("#globalUserAgent input[type=checkbox]");
 var inputEmulateMobile = $("#chkbox-emulateMobile");
 
 var predefinedCronSelectBox = $("#selectExecutionSchedule");
@@ -159,17 +160,19 @@ var cronStringInputField = $("#executionSchedule");
 var cronInputHelpBlock = $("#cronInputHelpBlock");
 
 function registerEventHandlers() {
-    $("#location").on("change", toggleChromeTab);
     inputEmulateMobile.on("change", toggleMobileOptions);
     $("#chkbox-captureTimeline").on("change", toggleTimelineOptions);
     $("#chkbox-trace").on("change", toggleTraceOptions);
-    toggleChromeTab();
     toggleMobileOptions();
     toggleTimelineOptions();
     toggleTraceOptions();
 
     $("#inputField-takeScreenshots").on("change", toggleScreenshotOptions);
     inputUserAgent.on("change", toggleUserAgentOptions);
+    if (inputGlobalUserAgent.length) {
+        inputGlobalUserAgent.first().on("change", toggleGlobalUserAgentOptions);
+        toggleGlobalUserAgentOptions();
+    }
     toggleScreenshotOptions();
     toggleUserAgentOptions();
 
@@ -241,6 +244,10 @@ function toggleScreenshotOptions() {
     $("#imageQuality").toggleClass("hidden", $("#inputField-takeScreenshots").val() !== "DEFAULT");
 }
 
+function toggleGlobalUserAgentOptions() {
+    $("#userAgent").toggleClass("hidden", inputGlobalUserAgent.first().prop('checked'));
+}
+
 function toggleUserAgentOptions() {
     $("#userAgentString").toggleClass("hidden", inputUserAgent.val() !== "OVERWRITE");
     $("#appendUserAgent").toggleClass("hidden", inputUserAgent.val() !== "APPEND");
@@ -257,10 +264,6 @@ function toggleTimelineOptions() {
 
 function toggleTraceOptions() {
     $("#traceCategories").toggleClass("hidden", !$("#chkbox-trace").prop("checked"));
-}
-
-function toggleChromeTab() {
-    $("#chromeTabLink").toggleClass("hidden", !($("#location option:selected").text()).includes("Chrome"));
 }
 
 function updateJobName() {
@@ -464,6 +467,7 @@ function createJobGroup(createJobGroupUrl) {
         }
     });
 }
+
 
 function selectAllGraphiteServer(select) {
     var obj = $("#graphiteServers")[0];

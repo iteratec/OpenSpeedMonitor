@@ -53,7 +53,7 @@ testDb*
 #ignore  dataSource-Config
 OpenSpeedMonitor-config.groovy
 
-# ignore karma-install
+# ignore npm build files
 node_modules/
 .asscache
 
@@ -67,7 +67,7 @@ version.properties
 # local scripts
 scripts/local/
 
-# bower build files
+# bower build files (deprecated)
 bower_components/
 .bowerrc
 

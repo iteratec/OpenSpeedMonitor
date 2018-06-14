@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
+    <g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
     <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>
 
     <asset:stylesheet src="job/edit.css"/>
@@ -16,7 +17,7 @@
     <g:render template="messages"/>
     <g:form resource="${entity}" method="post" role="form" class="form-horizontal" data-toggle="validator">
 
-        <g:hiddenField name="id" value="${entity?.id}"/>
+        <g:hiddenField name="id" value="${entity?.id}" id="entityId"/>
         <g:hiddenField name="version" value="${entity?.version}"/>
 
         <div class="card">
@@ -119,7 +120,14 @@
                             editor.update();
                         });
                         $('#script').change();
+
+                        if (${job?.id != null}) {
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdVue.js"/>', "thresholdVue");
+                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdComponents/buttonVue.js"/>', "buttonVue");
+                        }
                     });
+
                     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });

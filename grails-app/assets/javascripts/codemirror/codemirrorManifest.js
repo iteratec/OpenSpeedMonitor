@@ -1,5 +1,5 @@
-//= require bower_components/codemirror/lib/codemirror.js
-//= require bower_components/codemirror/addon/hint/show-hint.js
+//= require node_modules/codemirror/lib/codemirror.js
+//= require node_modules/codemirror/addon/hint/show-hint.js
 //= require hint/pts-hint.js
 //= require mode/pts.js
 //= require codemirror-usage.js

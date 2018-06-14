@@ -1,3 +1,3 @@
 //= require list.js
 //= require jobListFilter.js
-//= require bower_components/StickyTableHeaders/js/jquery.stickytableheaders.js
+//= require node_modules/StickyTableHeaders/js/jquery.stickytableheaders.js

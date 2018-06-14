@@ -29,12 +29,11 @@ class OsmConfiguration {
     static final Integer DEFAULT_MIN_VALID_LOADTIME = 10
     static final Integer DEFAULT_MAX_VALID_LOADTIME = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
-    static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
     static final Integer DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS = 30
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
     static final Integer INTERNAL_MONITORING_STORAGETIME_IN_DAYS = 30
-
+    static final String DEFAULT_GLOBAL_USER_AGENT_SUFFIX = null
 
     /* Default (injected) attributes of GORM */
     Long	id
@@ -61,7 +60,6 @@ class OsmConfiguration {
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     /** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
-    String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
     /** Maximum Number of months osm keeps results in database   */
     Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
     /** Maximum Number of days osm keeps BatchActivities in database   */
@@ -72,6 +70,8 @@ class OsmConfiguration {
     Integer internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     /** Did the infrastructure setup run already? */
     InfrastructureSetupStatus infrastructureSetupRan = InfrastructureSetupStatus.NOT_STARTED
+    /** Suffix for user agent that can be set to be applied to every job by default */
+    String globalUserAgentSuffix = DEFAULT_GLOBAL_USER_AGENT_SUFFIX
 
     enum InfrastructureSetupStatus {
         NOT_STARTED, ABORTED, FINISHED
@@ -83,12 +83,12 @@ class OsmConfiguration {
         minValidLoadtime(defaultValue: DEFAULT_MIN_VALID_LOADTIME)
         maxValidLoadtime(defaultValue: DEFAULT_MAX_VALID_LOADTIME)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
-        mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
         infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        globalUserAgentSuffix defaultValue: DEFAULT_GLOBAL_USER_AGENT_SUFFIX
     }
 
     static constraints = {
@@ -97,11 +97,18 @@ class OsmConfiguration {
         minValidLoadtime(defaultValue: DEFAULT_MIN_VALID_LOADTIME, min: -2147483648, max: 2147483647)
         maxValidLoadtime(defaultValue: DEFAULT_MAX_VALID_LOADTIME, min: -2147483648, max: 2147483647)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS, min: -2147483648, max: 2147483647)
-        mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST, maxSize: 255)
         maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS, min: 0, max: 2147483647)
         maxBatchActivityStorageTimeInDays defaultValue: DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
         csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
         internalMonitoringStorageTimeInDays defaultValue: INTERNAL_MONITORING_STORAGETIME_IN_DAYS
         infrastructureSetupRan defaultValue: InfrastructureSetupStatus.NOT_STARTED
+        globalUserAgentSuffix nullable: true, defaultValue: DEFAULT_GLOBAL_USER_AGENT_SUFFIX
+    }
+    def beforeInsert(){
+        if(count() != 0){
+            log.error("Osm Configuration already exists. Won't save again.")
+            return false
+        }
+        return true
     }
 }

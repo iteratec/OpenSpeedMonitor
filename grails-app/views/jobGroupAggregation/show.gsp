@@ -16,7 +16,7 @@
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
-<div class="card" id="chart-card">
+<div class="card hidden" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>
@@ -33,9 +33,9 @@
                 <div class="col-md-12">
 
                     <div class="btn-group pull-right" id="show-button-group">
-                        <a href="#" type="button" id="graphButtonHtmlId"
+                        <button type="button" id="graphButtonHtmlId"
                            class="btn btn-primary show-button">
-                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</a>
+                            ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
@@ -79,7 +79,6 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:javascript src="/jobGroupAggregation/jobGroupAggregation.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {

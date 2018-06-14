@@ -1,4 +1,4 @@
-//= require /bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js
+//= require /node_modules/bootstrap-timepicker/js/bootstrap-timepicker.js
 //= require_self
 
 $(document).ready(function() {

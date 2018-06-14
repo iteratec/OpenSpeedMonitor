@@ -79,8 +79,14 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
         viewModelToCopyTo.put('selectedAggrGroupValues', getAllSelected(this.selectedAggrGroupValuesCached, this.selectedAggrGroupValuesUnCached))
-        viewModelToCopyTo.put('selectedAggrGroupValuesCached', getEnumValuesForString(this.selectedAggrGroupValuesCached))
-        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', getEnumValuesForString(this.selectedAggrGroupValuesUnCached))
+        viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
+        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
+        viewModelToCopyTo.get('aggrGroupValuesCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesCached.findAll {
+            !SelectedMeasurand.isMeasurand(it)
+        })
+        viewModelToCopyTo.get('aggrGroupValuesUnCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
+            !SelectedMeasurand.isMeasurand(it)
+        })
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
@@ -90,13 +96,11 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('trimAboveRequestSizes', this.trimAboveRequestSizes)
     }
 
-    Collection<Measurand> getEnumValuesForString(Collection<String> selectedValues){
-        return selectedValues.findAll {SelectedMeasurand.isNoUserTiming(it)}.collect {Measurand.valueOf(it)}
-    }
-
-    Collection<SelectedMeasurand> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached){
-        Collection<SelectedMeasurand> result = measurandsUncached.collect{new SelectedMeasurand(it, CachedView.UNCACHED)}
-        result.addAll(measurandsCached.collect{new SelectedMeasurand(it, CachedView.CACHED)})
+    Collection<SelectedMeasurand> getAllSelected(Collection<String> measurandsCached, Collection<String> measurandsUncached) {
+        Collection<SelectedMeasurand> result = measurandsUncached.collect {
+            new SelectedMeasurand(it, CachedView.UNCACHED)
+        }
+        result.addAll(measurandsCached.collect { new SelectedMeasurand(it, CachedView.CACHED) })
         return result
     }
 
@@ -111,28 +115,30 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
      *         if called on an invalid instance.
      */
     ErQueryParams createErQueryParams() throws IllegalStateException {
+
         ErQueryParams queryParams = new ErQueryParams()
         fillMvQueryParams(queryParams)
 
         queryParams.includeNativeConnectivity = this.getIncludeNativeConnectivity()
         queryParams.customConnectivityNames.addAll(this.selectedCustomConnectivityNames)
+
         if (this.trimBelowLoadTimes) {
-            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
+            queryParams.minLoadTimeInMillisecs = this.trimBelowLoadTimes * MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimAboveLoadTimes) {
-            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes*MeasurandGroup.LOAD_TIMES.unit.divisor
+            queryParams.maxLoadTimeInMillisecs = this.trimAboveLoadTimes * MeasurandGroup.LOAD_TIMES.unit.divisor
         }
         if (this.trimBelowRequestCounts) {
-            queryParams.minRequestCount = this.trimBelowRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
+            queryParams.minRequestCount = this.trimBelowRequestCounts * MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimAboveRequestCounts) {
-            queryParams.maxRequestCount = this.trimAboveRequestCounts*MeasurandGroup.REQUEST_COUNTS.unit.divisor
+            queryParams.maxRequestCount = this.trimAboveRequestCounts * MeasurandGroup.REQUEST_COUNTS.unit.divisor
         }
         if (this.trimBelowRequestSizes) {
-            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
+            queryParams.minRequestSizeInBytes = this.trimBelowRequestSizes * MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
         if (this.trimAboveRequestSizes) {
-            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes*MeasurandGroup.REQUEST_SIZES.unit.divisor
+            queryParams.maxRequestSizeInBytes = this.trimAboveRequestSizes * MeasurandGroup.REQUEST_SIZES.unit.divisor
         }
 
         return queryParams

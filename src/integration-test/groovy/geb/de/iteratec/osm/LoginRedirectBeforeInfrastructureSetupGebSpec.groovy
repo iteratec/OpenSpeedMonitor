@@ -1,7 +1,6 @@
 package geb.de.iteratec.osm
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
@@ -24,8 +23,13 @@ class LoginRedirectBeforeInfrastructureSetupGebSpec extends CustomUrlGebReportin
 
         and: "there is an admin and an osm config in db and infrastructure setup didn't run yet"
         User.withNewTransaction {
-            TestDataUtil.setInfrastructureSetupStatus(OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED)
-            TestDataUtil.createAdminUser()
+            OsmConfiguration configuration = OsmConfiguration.list()[0]
+            if (!configuration) {
+                configuration = OsmConfiguration.build()
+            }
+            configuration.infrastructureSetupRan=OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED
+            configuration.save(flush: true)
+            createAdminUser()
         }
 
         when: "User inserts correct data in form"

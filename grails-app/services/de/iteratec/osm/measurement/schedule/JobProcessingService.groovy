@@ -26,12 +26,15 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.time.TimeCategory
+import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.http.HttpStatus
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
@@ -103,8 +106,8 @@ class JobProcessingService {
      *
      * @return A map of parameters suitable for POSTing a valid request to runtest.php
      */
-    private def fillRequestParameters(Job job) {
-        def parameters = [
+    private Map fillRequestParameters(Job job) {
+        Map parameters = [
                 url            : '',
                 label          : job.label,
                 location       : job.location.uniqueIdentifierForServer,
@@ -152,15 +155,21 @@ class JobProcessingService {
             parameters.bodies = true
         }
 
-        if(job.userAgent == Job.UserAgent.ORIGINAL) {
-            parameters.keepua = true
+        if (configService.globalUserAgentSuffix && job.useGlobalUASuffix) {
+            parameters.appendua = configService.globalUserAgentSuffix
         }
-        else if(job.userAgent == Job.UserAgent.APPEND) {
-            parameters.appendua = job.appendUserAgent
+        else {
+            if(job.userAgent == Job.UserAgent.ORIGINAL) {
+                parameters.keepua = true
+            }
+            else if(job.userAgent == Job.UserAgent.APPEND) {
+                parameters.appendua = job.appendUserAgent
+            }
+            else if(job.userAgent == Job.UserAgent.OVERWRITE) {
+                parameters.uastring = job.userAgentString
+            }
         }
-        else if(job.userAgent == Job.UserAgent.OVERWRITE) {
-            parameters.uastring = job.userAgentString
-        }
+
 
         if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"
@@ -285,13 +294,13 @@ class JobProcessingService {
         return result.save(failOnError: true, flush: true)
     }
 
-    private void validateRuntestResponse(NodeChild runtestResponseXml, WebPageTestServer wptserver) {
-        Integer statusCode = runtestResponseXml?.statusCode?.toInteger()
-        if (statusCode != 200) {
-            throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode} for wptserver ${wptserver}")
-        }
-        if (!runtestResponseXml?.data?.testId) {
-            throw new JobExecutionException("No testId was provided for wptserver ${wptserver}.")
+    private NodeChild parseResponse(def runtestResponse, WebPageTestServer wptserver){
+        NodeChild runtestResponseXml
+        if(runtestResponse instanceof NodeChild || runtestResponse instanceof GPathResult){
+            runtestResponseXml = runtestResponse
+            return runtestResponseXml
+        } else {
+            throw new JobExecutionException("Response is not XML from wptserver ${wptserver}")
         }
     }
 
@@ -330,23 +339,24 @@ class JobProcessingService {
     /**
      * If measurements are generally enabled: Launches the given Job and creates a Quartz trigger to poll for new results every x seconds.
      * If they are not enabled nothing happens.
-     * @return whether the job was launched successfully
+     * @return the testId of the running job.
      */
-    public boolean launchJobRun(Job job) {
+    String launchJobRun(Job job, priority = 5) {
 
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
-            log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
-            return false
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause measurements are generally disabled.")
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations){
             //TODO: Implement logic for IT-1334 if we have example LocationHealthChecks for a real location under load.
-            return false
+            throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
         int statusCode
         String testId
         try {
-            def parameters = fillRequestParameters(job);
+            def parameters = fillRequestParameters(job)
+            parameters['priority'] = priority
+
 
             WebPageTestServer wptserver = job.location.wptServer
             if (!wptserver) {
@@ -357,13 +367,17 @@ class JobProcessingService {
             performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
                 result = proxyService.runtest(wptserver, parameters);
             }
-            validateRuntestResponse(result, wptserver)
-            testId = result.data.testId
-            if (testId){
-                log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
-            } else {
-                testId = "DID_NOT_RECEIVE"
+
+            NodeChild runtestResponseXml = parseResponse(result, wptserver)
+            statusCode = runtestResponseXml?.statusCode?.toInteger()
+            testId = runtestResponseXml?.data?.testId
+            if(statusCode != 200){
+                throw new JobExecutionException("Got status code ${statusCode} from wptserver ${wptserver}")
+            }
+            if(!testId){
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
+            } else {
+                log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}, got testID: ${testId}")
             }
 
             use(TimeCategory) {
@@ -381,11 +395,11 @@ class JobProcessingService {
                 JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
             }
 
-            return true
+            return testId
         } catch (Exception e) {
-            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
-            persistUnfinishedJobResult(job.id, testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
-            return false
+            statusCode = statusCode? statusCode : 500
+            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
+            throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
 
@@ -432,13 +446,13 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
         if (!result)
             return
-        if (result.httpStatusCode < 200) {
+        if (result.httpStatusCode < WptStatus.COMPLETED.getWptStatusCode()) {
             // poll a last time
             WptResultXml lastResult = pollJobRun(job, testId)
-            if (lastResult.statusCodeOfWholeTest < 200 || (lastResult.statusCodeOfWholeTest >= 200 && !lastResult.hasRuns())) {
+            if (lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() || (lastResult.statusCodeOfWholeTest >= WptStatus.COMPLETED.getWptStatusCode() && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < 200 ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                persistUnfinishedJobResult(job.id, testId, 504, '', description)
+                String description = lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
+                persistUnfinishedJobResult(job.id, testId, WptStatus.TIME_OUT.getWptStatusCode(), '', description)
                 proxyService.cancelTest(job.location.wptServer, [test: testId])
             }
         }
@@ -455,7 +469,7 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, 200)
+        JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, WptStatus.COMPLETED.getWptStatusCode())
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true)
@@ -570,14 +584,14 @@ class JobProcessingService {
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(200)
+        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(WptStatus.COMPLETED.getWptStatusCode())
         jobResults = jobResults.findAll {
             // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
         }
         if (jobResults) {
             jobResults.each {
-                it.httpStatusCode = 900
+                it.httpStatusCode = WptStatus.OUTDATED_JOB.getWptStatusCode()
                 it.description = "closed due to nightly cleanup of job results"
                 it.save(failOnError: true)
             }

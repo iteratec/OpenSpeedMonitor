@@ -1,4 +1,4 @@
-//= require /bower_components/d3/d3.min.js
+//= require /node_modules/d3/d3.min.js
 //= require common.js
 //= require_self
 
@@ -35,11 +35,11 @@ OpenSpeedMonitor.ChartComponents.ChartHeader = (function () {
           })
           .style("opacity", 0);
       text
+          .attr("x", width/2)
+          .attr("y", height)
           .transition()
           .duration(transitionDuration)
-          .style("opacity", 1)
-          .attr("x", width/2)
-          .attr("y", height);
+          .style("opacity", 1);
     };
 
     return {

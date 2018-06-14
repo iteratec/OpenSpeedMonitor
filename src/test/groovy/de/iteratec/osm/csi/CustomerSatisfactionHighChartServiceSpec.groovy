@@ -39,7 +39,7 @@ import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 
 /**
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
@@ -150,17 +150,17 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 browser: browser2,
                 location: location2)
 
-        String expectedLabel1 = "${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
+        String expectedLabel1 = "${expectedCsiTypes[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedMeasuredEventNames[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
                 "${expectedLocationNames[0]}"
-        String expectedLabel2 = "${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedMeasuredEventNames[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
+        String expectedLabel2 = "${expectedCsiTypes[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedMeasuredEventNames[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
                 "${expectedLocationNames[0]}"
-        String expectedLabel3 = "${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
+        String expectedLabel3 = "${expectedCsiTypes[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedMeasuredEventNames[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
                 "${expectedLocationNames[1]}"
 
         when:
@@ -193,12 +193,12 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 jobGroup: jobGroup2,
                 page: page2)
 
-        String expectedLabel1 = "${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[0]}"
-        String expectedLabel2 = "${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
-        String expectedLabel3 = "${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}" +
-                "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
+        String expectedLabel1 = "${expectedCsiTypes[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}${expectedPageNames[0]}"
+        String expectedLabel2 = "${expectedCsiTypes[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
+        String expectedLabel3 = "${expectedCsiTypes[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
+                "${expectedJobGroupNames[1]}${TIMESERIES_CHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
 
         when:
         String mapLabel1 = serviceUnderTest.getMapLabel(mv1, CsiType.VISUALLY_COMPLETE)
@@ -222,9 +222,9 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
                 interval: weekly,
                 jobGroup: jobGroup2)
 
-        String expectedLabel1 = "${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
+        String expectedLabel1 = "${expectedCsiTypes[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
                 "${expectedJobGroupNames[0]}"
-        String expectedLabel2 = "${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}" +
+        String expectedLabel2 = "${expectedCsiTypes[0]}${TIMESERIES_CHART_LEGEND_DELIMITTER}" +
                 "${expectedJobGroupNames[1]}"
 
         when:
@@ -301,7 +301,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
         setup:
         //create test-specific data
-        String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
+        String expectedLabel = expectedCsiTypes[0] + TIMESERIES_CHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
         mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
@@ -331,7 +331,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
         setup:
         //create test-specific data
-        String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
+        String expectedLabel = expectedCsiTypes[0] + TIMESERIES_CHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
         mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyWithNullList)
@@ -361,7 +361,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
         setup:
         //create test-specific data
-        String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
+        String expectedLabel = expectedCsiTypes[0] + TIMESERIES_CHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
         mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
@@ -391,7 +391,7 @@ class CustomerSatisfactionHighChartServiceSpec extends Specification {
 
         setup:
         //create test-specific data
-        String expectedLabel = expectedCsiTypes[0] + HIGHCHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
+        String expectedLabel = expectedCsiTypes[0] + TIMESERIES_CHART_LEGEND_DELIMITTER + expectedJobGroupNames[0]
         CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
         //mock inner service
         mockGenerator.mockJobGroupCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)

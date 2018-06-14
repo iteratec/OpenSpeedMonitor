@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
@@ -31,23 +32,12 @@ import spock.lang.Stepwise
 @Rollback
 @Stepwise
 class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
-
-    @Shared
-    String script1Name = "TestScript1-564892#Afef1"
-    @Shared
-    String script2Name = "TestScript2-564892#Afef1"
-    @Shared
-    String job1Name = "TestJob1-564892#Afef1"
-    @Shared
-    String job2Name = "TestJob2-564892#Afef1"
     @Shared
     String location1Name = "TestLocation1-564892#Afef1"
     @Shared
     String Location2Name = "TestLocation2-564892#Afef1"
     @Shared
     String jobGroup1Name = "TestJobGroup1-564892#Afef1"
-    @Shared
-    String page1Name = "TestPage1-564892#Afef1"
     @Shared
     String connectivityProfileName = "ConnectivityProfile-564892#Afef1"
     @Shared
@@ -372,9 +362,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowLoadTimesTextField.displayed }
-        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.DELETE)
-
+        appendedInputBelowLoadTimesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputBelowLoadTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal time"() {
@@ -397,8 +388,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputAboveLoadTimesTextField.displayed }
-        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
+        appendedInputAboveLoadTimesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputAboveLoadTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim minimal requests"() {
@@ -424,8 +417,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
-        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
+        appendedInputBelowRequestCountsTextField << Keys.chord(Keys.END)
+        3.times {
+            appendedInputBelowRequestCountsTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal requests"() {
@@ -450,8 +445,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
-        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
+        appendedInputAboveRequestCountsTextField << Keys.chord(Keys.END)
+        3.times {
+            appendedInputAboveRequestCountsTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim minimal size"() {
@@ -477,8 +474,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         clickVariableSelectionTab()
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
-        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.CONTROL, "a")
-        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
+        appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.END)
+        4.times {
+            appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Trim maximal size"() {
@@ -503,7 +502,10 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanup:
         scrollBottom()
         clickVariableSelectionTab()
-        clearAboveRequestSizeTextField()
+        appendedInputAboveRequestSizesTextField << Keys.chord(Keys.END)
+        5.times {
+            appendedInputAboveRequestSizesTextField << Keys.chord(Keys.BACK_SPACE)
+        }
     }
 
     void "Load time graph is shown"() {
@@ -848,37 +850,36 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         }
     }
 
-
     private createData() {
         Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
 
-            Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
-            Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
-            JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
-            WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen")
-            Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
-            Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
-            Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
-            Job job2 = TestDataUtil.createJob(job2Name, script2, location2, jobGroup1, "This is the second test job", 1, false, 12)
-            Page page1 = TestDataUtil.createPage(page1Name)
-            JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
-            JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
-            JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
-            ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
-            MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
+            Script script1 = Script.build().save(failOnError: true)
+            Script script2 = Script.build().save(failOnError: true)
+            JobGroup jobGroup1 = JobGroup.build(name: jobGroup1Name)
+            WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
+            Browser browser = Browser.build().save(failOnError: true)
+            Location location1 = Location.build(uniqueIdentifierForServer: location1Name).save(failOnError: true)
+            Location location2 = Location.build(uniqueIdentifierForServer: location2Name).save(failOnError: true)
+            Job job1 = Job.build().save(failOnError: true)
+            Job job2 = Job.build().save(failOnError: true)
+            Page page1 = Page.build().save(failOnError: true)
+            JobResult jobResult1 = createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
+            JobResult jobResult2 = createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
+            JobResult jobResult3 = createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
+            ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
+            MeasuredEvent measuredEvent1 = MeasuredEvent.build(name: measureEvent1Name).save(failOnError: true)
 
-            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
-            TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-            TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
+            Browser notUsedBrowser = Browser.build().save(failOnError: true)
+            createConnectivityProfile("NotUsedConnectivityProfile")
+            Location.build().save(failOnError: true)
 
             new EventResult(
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 74476,
                     docCompleteRequests: 4,
                     docCompleteTimeInMillisecs: 838,
@@ -909,7 +910,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 71976,
                     docCompleteRequests: 5,
                     docCompleteTimeInMillisecs: 638,
@@ -941,7 +942,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 21976,
                     docCompleteRequests: 3,
                     docCompleteTimeInMillisecs: 238,
@@ -973,7 +974,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 15976,
                     docCompleteRequests: 35,
                     docCompleteTimeInMillisecs: 158,
@@ -1004,7 +1005,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 25976,
                     docCompleteRequests: 25,
                     docCompleteTimeInMillisecs: 258,
@@ -1035,7 +1036,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 45976,
                     docCompleteRequests: 45,
                     docCompleteTimeInMillisecs: 458,
@@ -1066,7 +1067,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     numberOfWptRun: 1,
                     cachedView: CachedView.UNCACHED,
                     medianValue: true,
-                    wptStatus: 200,
+                    wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                     docCompleteIncomingBytes: 55976,
                     docCompleteRequests: 55,
                     docCompleteTimeInMillisecs: 558,
@@ -1128,6 +1129,23 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     }
 
+    private ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
+        ConnectivityProfile result = ConnectivityProfile.build(
+                name: profileName,
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 40,
+                packetLoss: 0,
+                active: true
+        )
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
+    }
+
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker << Keys.chord(Keys.ESCAPE)
         Thread.sleep(500l)
@@ -1139,5 +1157,36 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         datePicker << date
         datePicker << Keys.chord(Keys.ESCAPE)
         Thread.sleep(500l)
+    }
+
+    /**
+     * <p>
+     * Creates a job result for the specified data.
+     * </p>
+     *
+     * <p>
+     * None of the arguments may be <code>null</code>.
+     * </p>
+     *
+     * @param testId The ID of the test-result.
+     * @param dateOfJobRun The date of the test run.
+     * @param parentJob The job the result belongs to.
+     * @param agentLocation The location where the agent is working.
+     *
+     * @return A newly created result, not <code>null</code>.
+     */
+    private JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation) {
+        return JobResult.build(
+                date: dateOfJobRun,
+                testId: testId,
+                httpStatusCode: 200,
+                jobConfigLabel: parentJob.label,
+                jobConfigRuns: 1,
+                description: '',
+                locationBrowser: agentLocation.browser.name,
+                locationLocation: agentLocation.location,
+                jobGroupName: parentJob.jobGroup.name,
+                job: parentJob
+        ).save(failOnError: true)
     }
 }
