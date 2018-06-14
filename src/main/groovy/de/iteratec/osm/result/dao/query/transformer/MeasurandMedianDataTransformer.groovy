@@ -1,32 +1,37 @@
-package de.iteratec.osm.result.dao
+package de.iteratec.osm.result.dao.query.transformer
 
-import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.AggregationUtil
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.ProjectionProperty
 
-class MeasurandMedianDataQueryBuilder extends MeasurandRawDataQueryBuilder {
+class MeasurandMedianDataTransformer implements EventResultTransformer {
+    Set<ProjectionProperty> baseProjections
+    List<SelectedMeasurand> selectedMeasurands
 
     @Override
-    List<EventResultProjection> getResultsForFilter(List<Closure> baseFilters, Set<ProjectionProperty> baseProjections, List<MeasurandTrim> trims, PerformanceLoggingService performanceLoggingService) {
-        List<String> measurandNames = super.selectedMeasurands.collect {it.databaseRelevantName}
-        List<Map> rawData = super.getRawQueryResults(baseFilters, baseProjections,trims)
-
-        Map<String,List<Map>> groupedRawData = groupRawDataByAggregators(rawData, baseProjections)
+    List<EventResultProjection> transformRawQueryResult(List<Map> rawQueryData) {
+        List<String> measurandNames = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }.collect {
+            it.databaseRelevantName
+        }
+        Map<String, List<Map>> groupedRawData = groupRawDataByAggregators(rawQueryData, baseProjections)
         Set<EventResultProjection> groupedAndSummarized = summarizeGroupedRawData(groupedRawData, baseProjections, measurandNames)
         return getMediansFromSummarizedData(groupedAndSummarized, measurandNames) as List
     }
 
-    private Map<String,List<Map>> groupRawDataByAggregators(List<Map> rawData, Set<ProjectionProperty> baseProjections ){
+    private Map<String, List<Map>> groupRawDataByAggregators(List<Map> rawData, Set<ProjectionProperty> baseProjections) {
         Map<String, List<Map>> groupedRawData = [:].withDefault { [] }
         rawData.each { ungrouped ->
-            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped,baseProjections)
+            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped, baseProjections)
             groupedRawData.get(key) << ungrouped
         }
         return groupedRawData
     }
 
-    private Set<EventResultProjection> summarizeGroupedRawData(Map<String,List<Map>> groupedRawData, Set<ProjectionProperty> baseProjections, List<String> measurandNames){
+    private Set<EventResultProjection> summarizeGroupedRawData(Map<String, List<Map>> groupedRawData, Set<ProjectionProperty> baseProjections, List<String> measurandNames) {
         Map<EventResultProjection, List<Map>> justAHelperMap = [:]
-        groupedRawData.each {String key, List<Map> value ->
-            EventResultProjection newKey = new EventResultProjection(id:key)
+        groupedRawData.each { String key, List<Map> value ->
+            EventResultProjection newKey = new EventResultProjection(id: key)
             Map metaDataSample = value[0]
             Map metaData = AggregationUtil.getMetaDataSample(metaDataSample, baseProjections)
             newKey.projectedProperties.putAll(metaData)

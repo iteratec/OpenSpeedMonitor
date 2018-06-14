@@ -3,8 +3,14 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
+import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
+import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
+import de.iteratec.osm.result.dao.query.projector.UserTimingRawDataProjector
+import de.iteratec.osm.result.dao.query.transformer.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
@@ -14,15 +20,13 @@ import org.hibernate.sql.JoinType
  */
 class EventResultQueryBuilder {
     private Integer minValidLoadTime, maxValidLoadTime
-
-    private List<SelectedMeasurand> selectedMeasurands = []
-
     private List<Closure> filters = []
     private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, measurandAverageQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
+    private EventResultQueryExecutor measurandQueryExecutor = new EventResultQueryExecutor()
+    private EventResultQueryExecutor userTimingQueryExecutor = new EventResultQueryExecutor()
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
@@ -37,6 +41,7 @@ class EventResultQueryBuilder {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
+            between(Measurand.FULLY_LOADED_TIME.eventResultField, minValidLoadTime, maxValidLoadTime)
             eq('medianValue', true)
         }
     }
@@ -147,21 +152,9 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
-        this.selectedMeasurands = selectedMeasurands
-        List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
-        List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
 
-        if (measurands) {
-            initMeasurandsQueryBuilder()
-            measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
-            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
-            measurandAverageQueryBuilder.configureForSelectedMeasurands(measurands)
-        }
-        if (userTimings) {
-            initUserTimingsQueryBuilder()
-            userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
-            userTimingsMedianDataQueryBuilder.configureForSelectedMeasurands(userTimings)
-        }
+        measurandQueryExecutor.setMeasurands(selectedMeasurands)
+        userTimingQueryExecutor.setUserTimings(selectedMeasurands)
 
         return this
     }
@@ -170,31 +163,25 @@ class EventResultQueryBuilder {
         if(withRichMetaData){
             baseProjections.addAll(getRichMetaDataProjections())
         }
-        return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
+        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandRawDataProjector(), new MeasurandRawDataTransformer())
+        userTimingQueryExecutor.setProjectorAndTransformer(new UserTimingRawDataProjector(), new UserTimingRawDataTransformer())
+        return getResults()
     }
 
     List<EventResultProjection> getMedianData(){
-        return getResultFor(userTimingsMedianDataQueryBuilder, measurandMedianQueryBuilder)
+        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandRawDataProjector(), new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
+        userTimingQueryExecutor.setProjectorAndTransformer(new UserTimingRawDataProjector(), new UserTimingMedianDataTransformer(baseProjections: baseProjections))
+        return getResults()
     }
 
     List<EventResultProjection> getAverageData(){
-        return getResultFor(null, measurandAverageQueryBuilder)
+        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandAverageDataProjector(), new MeasurandAverageDataTransformer(baseProjections: baseProjections))
+        return getResults()
     }
 
-    private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
-        List<EventResultProjection> userTimingsResult = []
-        List<EventResultProjection> measurandResult = []
-
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get usertiming results', 3) {
-            if (userTimingsBuilder) {
-                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims, minValidLoadTime, maxValidLoadTime,  performanceLoggingService)
-            }
-        }
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get measurand results', 3) {
-            if (measurandsBuilder) {
-                measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims, minValidLoadTime, maxValidLoadTime, performanceLoggingService)
-            }
-        }
+    private getResults() {
+        List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
 
         List<EventResultProjection> merged
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
@@ -217,26 +204,5 @@ class EventResultQueryBuilder {
             return measurandResult ? measurandResult : userTimingResult
         }
 
-    }
-
-    private initUserTimingsQueryBuilder() {
-        if (!userTimingRawQueryBuilder) {
-            userTimingRawQueryBuilder = new UserTimingRawDataQueryBuilder()
-        }
-        if(!userTimingsMedianDataQueryBuilder){
-            userTimingsMedianDataQueryBuilder = new UserTimingMedianDataQueryBuilder()
-        }
-    }
-
-    private initMeasurandsQueryBuilder() {
-        if (!measurandRawQueryBuilder) {
-            measurandRawQueryBuilder = new MeasurandRawDataQueryBuilder()
-        }
-        if(!measurandMedianQueryBuilder) {
-            measurandMedianQueryBuilder = new MeasurandMedianDataQueryBuilder()
-        }
-        if(!measurandAverageQueryBuilder) {
-            measurandAverageQueryBuilder = new MeasurandAverageDataQueryBuilder()
-        }
     }
 }
