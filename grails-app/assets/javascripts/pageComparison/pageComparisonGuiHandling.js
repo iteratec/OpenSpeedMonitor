@@ -18,7 +18,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     var init = function () {
         $(window).on('resize', function () {
             $("#chart-card").removeClass("hidden");
-            spinner.start();
             renderChart({}, false);
         });
         $(window).on('historyStateLoaded', function () {
@@ -37,10 +36,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var renderChart = function (data, isStateChange) {
-        if(avgLoaded && getAggregationValue() === "avg") {
+        if (avgLoaded && getAggregationValue() === "avg") {
             spinner.stop()
         }
-        if(medianLoaded && getAggregationValue() === "median"){
+        if (medianLoaded && getAggregationValue() === "median") {
             spinner.stop()
         }
         if (data) {
@@ -51,7 +50,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         }
         if (!data.series)  pageComparisonChart.render();
         if (data.series && getAggregationValue() === data.series[0].data[0].aggregationValue) {
-            // spinner.start();
             pageComparisonChart.render();
         }
     };

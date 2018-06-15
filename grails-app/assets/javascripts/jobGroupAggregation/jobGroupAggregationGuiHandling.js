@@ -17,7 +17,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var init = function () {
         drawGraphButton.click(function () {
             $("#chart-card").removeClass("hidden");
-            spinner.start();
             loadData(true);
         });
         $(window).on('historyStateLoaded', function () {
@@ -28,7 +27,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $("input[name='aggregationValue']").on("change", function () {
-            spinner.start();
+            spinner.start()
             renderChart({aggregationValue: getAggregationValue()}, true);
         });
         $(".chart-filter").click(onFilterClick);

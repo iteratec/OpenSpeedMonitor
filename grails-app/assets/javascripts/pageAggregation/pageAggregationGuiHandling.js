@@ -70,7 +70,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var init = function () {
         drawGraphButton.click(function () {
             $("#chart-card").removeClass("hidden");
-            spinner.start();
             loadData(true);
         });
         $(window).on('historyStateLoaded', function () {
@@ -190,11 +189,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var renderChart = function (data, isStateChange) {
-        if(avgLoaded && getAggregationValue() === "avg") {
+        if (avgLoaded && getAggregationValue() === "avg") {
             spinner.stop()
         }
-        if(medianLoaded && getAggregationValue() === "median"){
-            console.log(medianLoaded);
+        if (medianLoaded && getAggregationValue() === "median") {
             spinner.stop()
         }
         if (data) {
