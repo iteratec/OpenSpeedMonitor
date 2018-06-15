@@ -12,15 +12,19 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     var pageComparisonChart = OpenSpeedMonitor.ChartModules.PageComparisonChart("#page-comparison-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
+    var avgLoaded = false;
+    var medianLoaded = false;
 
     var init = function () {
         $(window).on('resize', function () {
+            $("#chart-card").removeClass("hidden");
             renderChart({}, false);
         });
         $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
         $("input[name='aggregationValue']").on("change", function () {
+            spinner.start();
             renderChart({aggregationValue: getAggregationValue()}, true);
         });
         drawGraphButton.click(function () {
@@ -32,6 +36,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
     };
 
     var renderChart = function (data, isStateChange) {
+        if (avgLoaded && getAggregationValue() === "avg") {
+            spinner.stop()
+        }
+        if (medianLoaded && getAggregationValue() === "median") {
+            spinner.stop()
+        }
         if (data) {
             pageComparisonChart.setData(data);
             if (isStateChange) {
@@ -66,6 +76,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
 
     var loadData = function (isStateChange) {
         pageComparisonChart.resetData();
+        avgLoaded = false;
+        medianLoaded = false;
+
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var queryData = {
             from: selectedTimeFrame[0].toISOString(),
@@ -87,7 +100,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
             success: function (data) {
-                spinner.stop();
+                if (aggregationValue === "avg") {
+                    avgLoaded = true;
+                } else {
+                    medianLoaded = true;
+                }
                 if (!$("#error-div").hasClass("hidden"))
                     $("#error-div").addClass("hidden");
 
