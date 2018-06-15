@@ -316,4 +316,6 @@ integrationTest {
         systemProperty 'geb.env', 'chrome'
     }
 }
-
+bootRun {
+    addResources = true
+}

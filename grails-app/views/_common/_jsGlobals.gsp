@@ -5,6 +5,7 @@
     OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 
     OpenSpeedMonitor.i18n = {
+      lang: '${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}',
         duplicatePrompt: '${message(code: 'de.iteratec.actions.duplicate.prompt')}',
         duplicateSuffix: '${message(code: 'de.iteratec.actions.duplicate.copy')}',
         deletionConfirmMessage: '${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}',

@@ -1,0 +1,4 @@
+{
+  "HELLO": "hallo {{value}}",
+  "de.iteratec.ism.ui.labels.download.csv": "Als CSV exportieren"
+}
