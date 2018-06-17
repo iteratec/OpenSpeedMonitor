@@ -285,7 +285,7 @@ task nodeSyncStylesheets(type: Sync) {
 task nodePackages() {
     group "frontend build"
     description "Prepare grails asset pipeline processing."
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
+    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets, generateFrontendI18nFiles
 }
 
 processResources.dependsOn nodePackages
