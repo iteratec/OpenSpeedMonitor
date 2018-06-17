@@ -5,11 +5,10 @@ import {TranslateLoader, TranslateModule, TranslateService} from "@ngx-translate
 import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {TranslateHttpLoader} from '@ngx-translate/http-loader'
 import {OsmCommonModule} from "../common/osm.common.module";
-import {WindowRefService} from "../common/service/window-ref.service";
 import {OsmLangService} from "./service/osm-lang.service";
 
 // AoT requires an exported function for factories
-export function createTranslateLoader(http: HttpClient, windowRef: WindowRefService) {
+export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './static/i18n/', `.json`);
 }
 
@@ -27,7 +26,6 @@ export function createTranslateLoader(http: HttpClient, windowRef: WindowRefServ
     })
   ],
   declarations: [],
-  providers: [OsmLangService],
   exports: [
     CommonModule,
     TranslateModule

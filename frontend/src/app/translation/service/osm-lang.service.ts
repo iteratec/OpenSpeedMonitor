@@ -10,6 +10,6 @@ export class OsmLangService {
   }
 
   getOsmLang(): string {
-    return this.winRef.getNativeWindow().OpenSpeedMonitor.i18n.lang
+    return this.winRef.getNativeWindow().OpenSpeedMonitor.i18n.lang;
   }
 }
