@@ -18,9 +18,11 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.SetupDashboardService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import groovy.transform.EqualsAndHashCode
@@ -32,8 +34,7 @@ import org.hibernate.criterion.CriteriaSpecification
  */
 class PageController {
     PageService pageService
-    ScriptService scriptService
-
+    SetupDashboardService setupDashboardService
     I18nService i18nService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
@@ -139,46 +140,9 @@ class PageController {
     }
 
     def getPagesForActiveJobGroups() {
-        def scriptsWithJobGroup = Job.createCriteria().list {
-            eq('active', true)
-            isNotNull('script')
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            createAlias('script', 'script')
-            createAlias('jobGroup', 'jobGroup')
-            projections {
-                distinct('jobGroup.id', 'script.id')
-                property('jobGroup.id', 'jobGroupId')
-                property('jobGroup.name', 'jobGroupName')
-                property('script', 'script')
-            }
-        }
 
-        def jobGroupsWithPages = scriptsWithJobGroup.collect{ scriptWithJobGroup ->
-            [
-                    'id': scriptWithJobGroup.jobGroupId,
-                    'name': scriptWithJobGroup.jobGroupName,
-                    'pages': []
-            ]
-        }.unique()
-
-        scriptsWithJobGroup.each { scriptWithJobGroup ->
-            def jobGroupWithPages = jobGroupsWithPages.find {test -> test.id == scriptWithJobGroup.jobGroupId}
-            jobGroupWithPages.pages.add(scriptWithJobGroup.script.testedPages)
-            jobGroupWithPages.pages = jobGroupWithPages.pages.flatten()
-            jobGroupWithPages.pages = jobGroupWithPages.pages.unique()
-        }
-
-        return ControllerUtils.sendObjectAsJSON(response, jobGroupsWithPages)
+        return ControllerUtils.sendObjectAsJSON(response, setupDashboardService.getPagesForActiveJobGroups())
     }
-}
-
-
-@EqualsAndHashCode(includeFields = true)
-class PageWithJobGroupId {
-    Long id
-    String name
-    Boolean undefinedPage
-    Long jobGroupId
 }
 
 class GetPagesForMeasuredEventsCommand {
