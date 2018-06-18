@@ -25,7 +25,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         });
         $("input[name='aggregationValue']").on("change", function () {
             spinner.start();
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
         drawGraphButton.click(function () {
             loadData(true);
@@ -35,7 +35,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         setShowButtonDisabled(true);
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
         if (avgLoaded && getAggregationValue() === "avg") {
             spinner.stop()
         }
@@ -48,9 +48,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.series)  pageComparisonChart.render();
+        if (!data.series) pageComparisonChart.render(isAggregationValueChange);
         if (data.series && getAggregationValue() === data.series[0].data[0].aggregationValue) {
-            pageComparisonChart.render();
+            pageComparisonChart.render(isAggregationValueChange);
         }
     };
 
