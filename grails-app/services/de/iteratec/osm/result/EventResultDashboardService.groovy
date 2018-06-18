@@ -29,7 +29,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
-import de.iteratec.osm.result.dao.query.trimmer.TrimQualifier
+import de.iteratec.osm.result.dao.query.TrimQualifier
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel

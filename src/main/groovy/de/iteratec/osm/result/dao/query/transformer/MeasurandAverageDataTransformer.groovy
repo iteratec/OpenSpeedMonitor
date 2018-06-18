@@ -2,7 +2,7 @@ package de.iteratec.osm.result.dao.query.transformer
 
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.AggregationUtil
-import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
+import de.iteratec.osm.result.dao.query.ProjectionProperty
 
 class MeasurandAverageDataTransformer implements EventResultTransformer {
     Set<ProjectionProperty> baseProjections
@@ -12,7 +12,7 @@ class MeasurandAverageDataTransformer implements EventResultTransformer {
         List<EventResultProjection> eventResultProjections = []
         rawQueryData.each { Map dbResult ->
             EventResultProjection eventResultProjection = new EventResultProjection(
-                    id: AggregationUtil.generateGroupKeyForMedianAggregators(dbResult, baseProjections)
+                    id: AggregationUtil.generateGroupedKeyForAggregations(dbResult, baseProjections)
             )
             eventResultProjection.projectedProperties = dbResult
             eventResultProjections += eventResultProjection

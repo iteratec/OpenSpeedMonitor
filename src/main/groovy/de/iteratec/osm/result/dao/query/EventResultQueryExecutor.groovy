@@ -4,10 +4,8 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.projector.EventResultProjector
-import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
 import de.iteratec.osm.result.dao.query.transformer.EventResultTransformer
 import de.iteratec.osm.result.dao.query.trimmer.EventResultTrimmer
-import de.iteratec.osm.result.dao.query.trimmer.MeasurandTrim
 import de.iteratec.osm.util.PerformanceLoggingService
 
 class EventResultQueryExecutor {

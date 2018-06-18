@@ -1,4 +1,4 @@
-package de.iteratec.osm.result.dao.query.trimmer
+package de.iteratec.osm.result.dao.query
 
 /**
  * @author nkuhn

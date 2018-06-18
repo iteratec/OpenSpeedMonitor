@@ -1,8 +1,6 @@
 package de.iteratec.osm.result.dao.query
 
 import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
-import de.iteratec.osm.result.dao.query.trimmer.MeasurandTrim
 
 class AggregationUtil {
 
@@ -26,7 +24,7 @@ class AggregationUtil {
         return projectionPropertySet.collect { it.alias }
     }
 
-    static String generateGroupKeyForMedianAggregators(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet) {
+    static String generateGroupedKeyForAggregations(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet) {
         Set aggregators = getAggregatorAliases(projectionPropertySet)
         String key = ""
         aggregators.each {

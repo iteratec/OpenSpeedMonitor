@@ -3,7 +3,7 @@ package de.iteratec.osm.result.dao.query.transformer
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.AggregationUtil
-import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
+import de.iteratec.osm.result.dao.query.ProjectionProperty
 
 class UserTimingMedianDataTransformer implements EventResultTransformer {
     Set<ProjectionProperty> baseProjections
@@ -16,7 +16,7 @@ class UserTimingMedianDataTransformer implements EventResultTransformer {
         Map<String, Map<String, List>> groupedAggregations = [:].withDefault { [:].withDefault { [] } }
         rawQueryData.each { ungrouped ->
             def value = ungrouped.type == UserTimingType.MEASURE ? ungrouped.duration : ungrouped.startTime
-            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped, baseProjections)
+            String key = AggregationUtil.generateGroupedKeyForAggregations(ungrouped, baseProjections)
             groupedAggregations.get(key).get(ungrouped.name) << value
             metaDataForAggregations.get(key) << AggregationUtil.getMetaDataSample(ungrouped, baseProjections)
         }

@@ -2,6 +2,7 @@ package de.iteratec.osm.result.dao.query.trimmer
 
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.query.AggregationUtil
+import de.iteratec.osm.result.dao.query.MeasurandTrim
 
 class MeasurandRawDataTrimmer implements EventResultTrimmer {
     @Override

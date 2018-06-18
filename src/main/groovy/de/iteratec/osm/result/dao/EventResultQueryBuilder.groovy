@@ -7,6 +7,9 @@ import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
+import de.iteratec.osm.result.dao.query.MeasurandTrim
+import de.iteratec.osm.result.dao.query.ProjectionProperty
+import de.iteratec.osm.result.dao.query.TrimQualifier
 import de.iteratec.osm.result.dao.query.projector.*
 import de.iteratec.osm.result.dao.query.transformer.*
 import de.iteratec.osm.result.dao.query.trimmer.*

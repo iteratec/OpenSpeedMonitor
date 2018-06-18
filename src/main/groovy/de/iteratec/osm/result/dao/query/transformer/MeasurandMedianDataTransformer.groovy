@@ -3,7 +3,7 @@ package de.iteratec.osm.result.dao.query.transformer
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.AggregationUtil
-import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
+import de.iteratec.osm.result.dao.query.ProjectionProperty
 
 class MeasurandMedianDataTransformer implements EventResultTransformer {
     Set<ProjectionProperty> baseProjections
@@ -22,7 +22,7 @@ class MeasurandMedianDataTransformer implements EventResultTransformer {
     private Map<String, List<Map>> groupRawDataByAggregators(List<Map> rawData, Set<ProjectionProperty> baseProjections) {
         Map<String, List<Map>> groupedRawData = [:].withDefault { [] }
         rawData.each { ungrouped ->
-            String key = AggregationUtil.generateGroupKeyForMedianAggregators(ungrouped, baseProjections)
+            String key = AggregationUtil.generateGroupedKeyForAggregations(ungrouped, baseProjections)
             groupedRawData.get(key) << ungrouped
         }
         return groupedRawData

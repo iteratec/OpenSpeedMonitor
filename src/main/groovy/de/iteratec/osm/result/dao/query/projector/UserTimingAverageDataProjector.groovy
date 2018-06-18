@@ -1,6 +1,7 @@
 package de.iteratec.osm.result.dao.query.projector
 
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.query.ProjectionProperty
 
 class UserTimingAverageDataProjector implements EventResultProjector {
     @Override

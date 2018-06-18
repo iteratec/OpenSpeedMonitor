@@ -1,4 +1,4 @@
-package de.iteratec.osm.result.dao.query.trimmer
+package de.iteratec.osm.result.dao.query
 
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
