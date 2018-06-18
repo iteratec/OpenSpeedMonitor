@@ -45,7 +45,7 @@ export class PageComparisonAdapterComponent {
   setComparisons(comparisons: IPageComparisonSelection[]) {
     this.zone.run(() => {
       this.pageComparisonComponent.pageComparisonSelections = comparisons;
-      this.pageComparisonComponent.pageComparisonSelections.forEach((comparison) => this.pageComparisonComponent.handleShowButtonVisibility(comparison));
+      this.pageComparisonComponent.validateComparisons();
     });
   }
 }

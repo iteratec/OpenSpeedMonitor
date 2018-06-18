@@ -15,7 +15,6 @@ export class PageComparisonComponent {
 
   constructor(private jobGroupService: JobGroupRestService) {
     this.addComparison();
-    this.disableShowButton();
     this.registerTimeFrameChangeEvent();
   }
 
@@ -31,30 +30,16 @@ export class PageComparisonComponent {
     this.checkIfRowsAreRemovable();
   }
 
-  handleShowButtonVisibility(comparison: IPageComparisonSelection) {
+  validateComparisons() {
     window.dispatchEvent(new Event("historyStateChanged"));
-    if (this.isComparisonValid(comparison)) {
-      this.enableShowButton();
-    } else {
-      this.disableShowButton();
-    }
+    let isValid = !this.pageComparisonSelections.find(comparison => !this.isComparisonValid(comparison));
+    window.dispatchEvent(new CustomEvent("pageComparisonValidation", {detail: {isValid: isValid}}))
   }
 
   isComparisonValid(comparison: IPageComparisonSelection) {
     return comparison.firstJobGroupId !== -1 && comparison.secondJobGroupId !== -1 && comparison.firstPageId !== -1 && comparison.secondPageId !== -1;
   }
 
-  disableShowButton() {
-    const button = document.getElementById("graphButtonHtmlId");
-    button.setAttribute("disabled", "disabled");
-    document.getElementById('warning-no-page').style.display = 'block'
-  }
-
-  enableShowButton() {
-    const button = document.getElementById("graphButtonHtmlId");
-    button.removeAttribute("disabled");
-    document.getElementById('warning-no-page').style.display = 'none'
-  }
 
   registerTimeFrameChangeEvent() {
     //TimeFrame is currently not a angular component, so we have to do it "manually"
@@ -71,6 +56,7 @@ export class PageComparisonComponent {
       secondJobGroupId: -1
     });
     this.checkIfRowsAreRemovable();
+    this.validateComparisons();
   }
 
   getJobGroups(from: string, to: string) {

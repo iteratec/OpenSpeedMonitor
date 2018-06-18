@@ -24,8 +24,30 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         drawGraphButton.click(function () {
             loadData(true);
         });
-
+        window.addEventListener("pageComparisonValidation", function (event) {
+            setShowButtonState(event.detail.isValid)
+        });
+        setShowButtonState(false);
     };
+
+    var setShowButtonState = function (enable) {
+        var button = document.getElementById("graphButtonHtmlId");
+        if (enable) {
+            enableButton(button)
+        } else {
+            disableButton(button)
+        }
+    };
+
+    var disableButton = function (button) {
+        button.setAttribute("disabled", "disabled");
+        document.getElementById('warning-no-page').style.display = 'block'
+    }
+
+    var enableButton = function (button) {
+        button.removeAttribute("disabled");
+        document.getElementById('warning-no-page').style.display = 'none'
+    }
 
     var renderChart = function (data, isStateChange) {
         if (data) {
