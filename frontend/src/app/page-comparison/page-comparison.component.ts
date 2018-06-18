@@ -1,7 +1,7 @@
-import {Component, NgZone, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {IJobGroupToPagesMapping} from "../common/model/job-group-to-page-mapping.model";
 import {IPageComparisonSelection} from "./page-comparison-selection.model";
-import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
+import {JobGroupService} from "../setup-dashboard/service/rest/job-group.service";
 import {log} from "util";
 
 @Component({
@@ -13,7 +13,7 @@ export class PageComparisonComponent {
   pageComparisonSelections: IPageComparisonSelection[] = [];
   canRemoveRow: boolean = false;
 
-  constructor(private jobGroupService: JobGroupRestService) {
+  constructor(private jobGroupService: JobGroupService) {
     this.addComparison();
     this.registerTimeFrameChangeEvent();
   }

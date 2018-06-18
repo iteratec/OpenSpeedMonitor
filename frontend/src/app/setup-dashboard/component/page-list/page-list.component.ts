@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {JobGroup} from "../../model/job-group.model";
 import {IPageId} from "../../../common/model/page.model";
 import {PageService} from "../../service/rest/page.service";
@@ -23,6 +23,6 @@ export class PageListComponent {
   }
 
   private filterPagesByJobGroup(jobGroup: JobGroup, jobGroupsWithPages: IJobGroupToPagesMapping[]): IPageId[] {
-    return jobGroupsWithPages.find( a => a.id == jobGroup.getId()).pages;
+    return jobGroupsWithPages.find(a => a.id == jobGroup.id).pages;
   }
 }

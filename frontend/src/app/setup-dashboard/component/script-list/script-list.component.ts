@@ -23,7 +23,7 @@ export class ScriptListComponent {
   }
 
   private filterScriptsByJobGroup(jobGroup: JobGroup, scripts: IScript[]) : IScript[] {
-    return scripts.filter(script => script.jobGroupId == jobGroup.getId())
+    return scripts.filter(script => script.jobGroupId == jobGroup.id)
   }
 
 }
