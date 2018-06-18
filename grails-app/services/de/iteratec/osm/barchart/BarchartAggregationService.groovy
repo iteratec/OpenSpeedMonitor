@@ -110,8 +110,8 @@ class BarchartAggregationService {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
-                JobGroup jobGroup = aggregation.jobGroup? aggregation.jobGroup : jobGroups.find{it.id == aggregation.jobGroupId}
-                Page page = aggregation.page ? aggregation.page : pages.find{it.id == aggregation.pageId}
+                JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
+                Page page = pages.find { it.id == aggregation.pageId }
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
