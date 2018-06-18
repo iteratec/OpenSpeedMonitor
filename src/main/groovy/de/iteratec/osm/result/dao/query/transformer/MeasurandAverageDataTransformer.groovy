@@ -11,11 +11,14 @@ class MeasurandAverageDataTransformer implements EventResultTransformer {
     List<EventResultProjection> transformRawQueryResult(List<Map> rawQueryData) {
         List<EventResultProjection> eventResultProjections = []
         rawQueryData.each { Map dbResult ->
-            EventResultProjection eventResultProjection = new EventResultProjection(
-                    id: AggregationUtil.generateGroupedKeyForAggregations(dbResult, baseProjections)
-            )
-            eventResultProjection.projectedProperties = dbResult
-            eventResultProjections += eventResultProjection
+            String key = AggregationUtil.generateGroupedKeyForAggregations(dbResult, baseProjections)
+            if (key) {
+                EventResultProjection eventResultProjection = new EventResultProjection(
+                        id: key
+                )
+                eventResultProjection.projectedProperties = dbResult
+                eventResultProjections += eventResultProjection
+            }
         }
         return eventResultProjections
     }
