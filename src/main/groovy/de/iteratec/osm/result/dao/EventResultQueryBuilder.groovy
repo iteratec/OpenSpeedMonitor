@@ -10,9 +10,14 @@ import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
 import de.iteratec.osm.result.dao.query.MeasurandTrim
 import de.iteratec.osm.result.dao.query.ProjectionProperty
 import de.iteratec.osm.result.dao.query.TrimQualifier
-import de.iteratec.osm.result.dao.query.projector.*
+import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
+import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
+import de.iteratec.osm.result.dao.query.projector.UserTimingAverageDataProjector
+import de.iteratec.osm.result.dao.query.projector.UserTimingRawDataProjector
 import de.iteratec.osm.result.dao.query.transformer.*
-import de.iteratec.osm.result.dao.query.trimmer.*
+import de.iteratec.osm.result.dao.query.trimmer.MeasurandAverageDataTrimmer
+import de.iteratec.osm.result.dao.query.trimmer.MeasurandRawDataTrimmer
+import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
