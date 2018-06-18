@@ -62,4 +62,5 @@ databaseChangeLog = {
     include file: '2018-01-09-v440-addUseGlobalUASuffixBool.groovy'
     include file: '2018-01-17-v440-addThreshold.groovy'
     include file: '2018-02-20-v450-dropMainUrl.groovy'
+    include file: '2018-06-18-v460-updateScripts.groovy'
 }
