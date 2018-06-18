@@ -1,4 +1,4 @@
-package de.iteratec.osm.result.dao
+package de.iteratec.osm.result.dao.query.projector
 
 import groovy.transform.EqualsAndHashCode
 

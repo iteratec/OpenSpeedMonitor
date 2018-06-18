@@ -1,26 +1,17 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.UserTiming
-import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.query.trimmer.TrimQualifier
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-
 
 @Integration
 @Rollback

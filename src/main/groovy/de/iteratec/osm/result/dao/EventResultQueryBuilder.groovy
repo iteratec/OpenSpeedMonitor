@@ -7,10 +7,9 @@ import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
-import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
-import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
-import de.iteratec.osm.result.dao.query.projector.UserTimingRawDataProjector
+import de.iteratec.osm.result.dao.query.projector.*
 import de.iteratec.osm.result.dao.query.transformer.*
+import de.iteratec.osm.result.dao.query.trimmer.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
@@ -19,7 +18,6 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private Integer minValidLoadTime, maxValidLoadTime
     private List<Closure> filters = []
     private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
@@ -31,9 +29,9 @@ class EventResultQueryBuilder {
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
         filters.add(initBaseClosure())
-        minValidLoadTime = minValidLoadtime
-        maxValidLoadTime = maxValidLoadtime
         baseProjections = []
+        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: minValidLoadtime, qualifier: TrimQualifier.GREATER_THAN))
+        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: maxValidLoadtime, qualifier: TrimQualifier.LOWER_THAN))
     }
 
     private Closure initBaseClosure() {
@@ -41,7 +39,6 @@ class EventResultQueryBuilder {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
-            between(Measurand.FULLY_LOADED_TIME.eventResultField, minValidLoadTime, maxValidLoadTime)
             eq('medianValue', true)
         }
     }
@@ -163,19 +160,36 @@ class EventResultQueryBuilder {
         if(withRichMetaData){
             baseProjections.addAll(getRichMetaDataProjections())
         }
-        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandRawDataProjector(), new MeasurandRawDataTransformer())
-        userTimingQueryExecutor.setProjectorAndTransformer(new UserTimingRawDataProjector(), new UserTimingRawDataTransformer())
+        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
+        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer())
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
         return getResults()
     }
 
     List<EventResultProjection> getMedianData(){
-        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandRawDataProjector(), new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
-        userTimingQueryExecutor.setProjectorAndTransformer(new UserTimingRawDataProjector(), new UserTimingMedianDataTransformer(baseProjections: baseProjections))
+        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
+        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingMedianDataTransformer(baseProjections: baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
         return getResults()
     }
 
     List<EventResultProjection> getAverageData(){
-        measurandQueryExecutor.setProjectorAndTransformer(new MeasurandAverageDataProjector(), new MeasurandAverageDataTransformer(baseProjections: baseProjections))
+        measurandQueryExecutor.setProjector(new MeasurandAverageDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandAverageDataTransformer(baseProjections: baseProjections))
+        measurandQueryExecutor.setTrimmer(new MeasurandAverageDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingAverageDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingAverageDataTransformer(baseProjections: baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+
         return getResults()
     }
 

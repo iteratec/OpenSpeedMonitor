@@ -2,7 +2,7 @@ package de.iteratec.osm.result.dao.query.projector
 
 import de.iteratec.osm.result.SelectedMeasurand
 
-class UserTimingRawDataProjector implements EventResultProjector {
+class UserTimingAverageDataProjector implements EventResultProjector {
     @Override
     Closure generateSelectedMeasurandProjectionFor(List<SelectedMeasurand> measurands, Set<ProjectionProperty> baseProjections) {
         return {
@@ -11,13 +11,13 @@ class UserTimingRawDataProjector implements EventResultProjector {
             }
             'projections' {
                 'userTimings' {
-                    'property' 'name', 'name'
-                    'property' 'type', 'type'
-                    'property' 'startTime', 'startTime'
-                    'property' 'duration', 'duration'
+                    'groupProperty' 'name', 'name'
+                    'groupProperty' 'type', 'type'
+                    'avg' 'startTime', 'startTime'
+                    'avg' 'duration', 'duration'
                 }
                 baseProjections.each { ProjectionProperty pp ->
-                    'property' pp.dbName, pp.alias
+                    'groupProperty' pp.dbName, pp.alias
                 }
             }
         }

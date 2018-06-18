@@ -3,15 +3,17 @@ package de.iteratec.osm.result.dao.query
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.MeasurandTrim
-import de.iteratec.osm.result.dao.ProjectionProperty
 import de.iteratec.osm.result.dao.query.projector.EventResultProjector
+import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
 import de.iteratec.osm.result.dao.query.transformer.EventResultTransformer
+import de.iteratec.osm.result.dao.query.trimmer.EventResultTrimmer
+import de.iteratec.osm.result.dao.query.trimmer.MeasurandTrim
 import de.iteratec.osm.util.PerformanceLoggingService
 
 class EventResultQueryExecutor {
     private EventResultProjector projector
     private EventResultTransformer transformer
+    private EventResultTrimmer trimmer
     List<SelectedMeasurand> selectedMeasurands
 
     void setUserTimings(List<SelectedMeasurand> selectedMeasurands) {
@@ -23,12 +25,19 @@ class EventResultQueryExecutor {
     }
 
     private boolean isNotValid() {
-        return this.selectedMeasurands.isEmpty() || !transformer || !projector
+        return this.selectedMeasurands.isEmpty() || !transformer || !projector || !trimmer
     }
 
-    void setProjectorAndTransformer(EventResultProjector projector, EventResultTransformer transformer) {
+    void setProjector(EventResultProjector projector) {
         this.projector = projector
+    }
+
+    void setTransformer(EventResultTransformer transformer) {
         this.transformer = transformer
+    }
+
+    void setTrimmer(EventResultTrimmer trimmer) {
+        this.trimmer = trimmer
     }
 
     List<EventResultProjection> getResultFor(List<Closure> filters, List<MeasurandTrim> measurandTrims, Set<ProjectionProperty> baseProjections, PerformanceLoggingService performanceLoggingService) {
@@ -38,7 +47,7 @@ class EventResultQueryExecutor {
 
         List<Closure> queryParts = []
         queryParts.addAll(filters)
-        List<Closure> trims = projector.buildTrims(selectedMeasurands, measurandTrims)
+        List<Closure> trims = trimmer.buildTrims(selectedMeasurands, measurandTrims)
         queryParts.addAll(trims)
         Closure projection = projector.generateSelectedMeasurandProjectionFor(selectedMeasurands, baseProjections)
         queryParts.add(projection)

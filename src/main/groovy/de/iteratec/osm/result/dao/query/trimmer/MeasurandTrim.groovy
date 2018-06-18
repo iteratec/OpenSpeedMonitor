@@ -1,5 +1,6 @@
-package de.iteratec.osm.result.dao
+package de.iteratec.osm.result.dao.query.trimmer
 
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 
 /**
@@ -7,6 +8,7 @@ import de.iteratec.osm.result.MeasurandGroup
  */
 class MeasurandTrim {
     MeasurandGroup measurandGroup
+    Measurand onlyForSpecific
     def value
     TrimQualifier qualifier
 }

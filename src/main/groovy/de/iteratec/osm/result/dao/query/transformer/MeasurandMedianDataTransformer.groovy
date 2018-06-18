@@ -1,9 +1,9 @@
 package de.iteratec.osm.result.dao.query.transformer
 
 import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.dao.AggregationUtil
 import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.ProjectionProperty
+import de.iteratec.osm.result.dao.query.AggregationUtil
+import de.iteratec.osm.result.dao.query.projector.ProjectionProperty
 
 class MeasurandMedianDataTransformer implements EventResultTransformer {
     Set<ProjectionProperty> baseProjections
