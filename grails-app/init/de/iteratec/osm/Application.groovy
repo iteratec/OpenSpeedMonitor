@@ -17,7 +17,9 @@ class Application extends GrailsAutoConfiguration implements ExternalConfig {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
 
-        FrontendWatcher.runFrontendWatcher(grails.util.Environment.getCurrentEnvironment())
+        if (GrailsApp.developmentModeActive) {
+            FrontendWatcher.initializeFrontendWatcher()
+        }
     }
 }
 

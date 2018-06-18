@@ -12,15 +12,13 @@ class FrontendWatcher {
 
     private static DirectoryWatcher directoryWatcher
 
-    static void runFrontendWatcher(Environment environment) {
-        if (GrailsApp.developmentModeActive) {
-            FrontendWatcher frontendWatcher = new FrontendWatcher()
-            frontendWatcher.enableFileWatcher(environment)
-        }
+    static void initializeFrontendWatcher() {
+        FrontendWatcher frontendWatcher = new FrontendWatcher()
+        frontendWatcher.startFrontendWatcher(Environment.getCurrentEnvironment())
     }
 
     @CompileDynamic
-    protected void enableFileWatcher(Environment environment) {
+    protected void startFrontendWatcher(Environment environment) {
 
         def location = environment.getReloadLocation()
 
