@@ -31,6 +31,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterSer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.GraphiteServer
@@ -104,6 +105,7 @@ class BootStrap {
         cancelActiveBatchActivity()
         excludePropertiesInJsonRepresentationsofDomainObjects()
         initHealthReporting()
+        updateScripts()
 
         log.info "initApplicationData() OSM ends"
 
@@ -438,6 +440,15 @@ class BootStrap {
         if (initiallyCreatedWptServer) {
             Map retrievsLocationsUsableForPublicApiKeys = [k: "A"]
             proxyService.fetchLocations(initiallyCreatedWptServer, retrievsLocationsUsableForPublicApiKeys)
+        }
+    }
+
+    void updateScripts(){
+        def scripts = Script.findAllByUpdated(false)
+        scripts.each { script ->
+            script.updated = true
+            //forces a new parsing of the script
+            script.save(flush:true)
         }
     }
 
