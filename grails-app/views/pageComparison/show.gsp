@@ -41,7 +41,7 @@
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
-                        <page-comparison data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></page-comparison>
+                        <page-comparison-adapter data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></page-comparison-adapter>
                     </div>
                     <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[

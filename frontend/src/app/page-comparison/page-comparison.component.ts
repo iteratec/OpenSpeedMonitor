@@ -8,56 +8,12 @@ import {log} from "util";
   selector: 'page-comparison',
   templateUrl: './page-comparison.component.html'
 })
-export class PageComparisonComponent implements OnInit {
+export class PageComparisonComponent {
   jobGroupToPagesMapping: IJobGroupToPagesMapping[] = [];
   pageComparisonSelections: IPageComparisonSelection[] = [];
   canRemoveRow: boolean = false;
 
-  constructor(private jobGroupService: JobGroupRestService, private zone: NgZone) {
-    this.exposeComponent();
-  }
-
-  exposeComponent() {
-    window['pageComparisonComponent'] = {
-      zone: this.zone,
-      getSelectedPageIds: () => this.getSelectedPageIds(),
-      getSelectedJobGroups: () => this.getSelectedJobGroupIds(),
-      getComparisons: () => this.getSelectedComparisons(),
-      setComparisons: (comparisons) => this.setComparisons(comparisons),
-      component: this,
-    };
-  }
-
-  getSelectedJobGroupIds(): number[] {
-    const ids: number[] = [];
-    this.pageComparisonSelections.forEach(comparison => {
-      ids.push(comparison.firstPageId);
-      ids.push(comparison.secondPageId);
-    });
-    return ids;
-  }
-
-  getSelectedPageIds(): number[] {
-    const ids: number[] = [];
-    this.pageComparisonSelections.forEach(comparison => {
-      ids.push(comparison.firstJobGroupId);
-      ids.push(comparison.secondJobGroupId);
-    });
-    return ids;
-  }
-
-  getSelectedComparisons() {
-    return this.pageComparisonSelections;
-  }
-
-  setComparisons(comparisons: IPageComparisonSelection[]) {
-    this.zone.run(() => {
-      this.pageComparisonSelections = comparisons;
-      this.pageComparisonSelections.forEach((comparison) => this.handleShowButtonVisibility(comparison));
-    });
-  }
-
-  ngOnInit() {
+  constructor(private jobGroupService: JobGroupRestService) {
     this.addComparison();
     this.disableShowButton();
     this.registerTimeFrameChangeEvent();
