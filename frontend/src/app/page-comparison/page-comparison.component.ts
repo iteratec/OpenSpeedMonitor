@@ -31,8 +31,8 @@ export class PageComparisonComponent {
   }
 
   validateComparisons() {
-    window.dispatchEvent(new Event("historyStateChanged"));
     let isValid = !this.pageComparisonSelections.find(comparison => !this.isComparisonValid(comparison));
+    if (isValid) window.dispatchEvent(new Event("historyStateChanged"));
     window.dispatchEvent(new CustomEvent("pageComparisonValidation", {detail: {isValid: isValid}}))
   }
 
