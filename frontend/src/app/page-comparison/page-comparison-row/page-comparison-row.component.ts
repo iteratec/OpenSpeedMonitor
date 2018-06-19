@@ -26,6 +26,7 @@ export class PageComparisonRowComponent {
   }
 
   getPagesForJobGroup(id: number): IPageId[] {
+    if (!this.jobGroupMappings) return [];
     const jobGroupMapping: IJobGroupToPagesMapping = this.jobGroupMappings.find(jobGroup => jobGroup.id == id);
     return jobGroupMapping ? jobGroupMapping.pages : []
   }

@@ -1,15 +1,15 @@
-import {Component, NgZone, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {IJobGroupToPagesMapping} from "../common/model/job-group-to-page-mapping.model";
 import {IPageComparisonSelection} from "./page-comparison-selection.model";
 import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
-import {log} from "util";
+import {Observable} from "rxjs/internal/Observable";
 
 @Component({
   selector: 'page-comparison',
   templateUrl: './page-comparison.component.html'
 })
 export class PageComparisonComponent {
-  jobGroupToPagesMapping: IJobGroupToPagesMapping[] = [];
+  jobGroupToPagesMapping: Observable<IJobGroupToPagesMapping[]>;
   pageComparisonSelections: IPageComparisonSelection[] = [];
   canRemoveRow: boolean = false;
 
@@ -60,6 +60,6 @@ export class PageComparisonComponent {
   }
 
   getJobGroups(from: string, to: string) {
-    this.jobGroupService.getJobGroupToPagesMap(from, to).subscribe(next => this.jobGroupToPagesMapping = next)
+    this.jobGroupToPagesMapping = this.jobGroupService.getJobGroupToPagesMap(from, to);
   }
 }
