@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {IJobGroupToPagesMapping} from "../common/model/job-group-to-page-mapping.model";
-import {IPageComparisonSelection} from "./page-comparison-selection.model";
+import {JobGroupToPagesMappingDto} from "../common/model/job-group-to-page-mapping.model";
+import {PageComparisonSelectionDto} from "./page-comparison-selection.model";
 import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
 import {Observable} from "rxjs/internal/Observable";
 
@@ -9,8 +9,8 @@ import {Observable} from "rxjs/internal/Observable";
   templateUrl: './page-comparison.component.html'
 })
 export class PageComparisonComponent {
-  jobGroupToPagesMapping: Observable<IJobGroupToPagesMapping[]>;
-  pageComparisonSelections: IPageComparisonSelection[] = [];
+  jobGroupToPagesMapping: Observable<JobGroupToPagesMappingDto[]>;
+  pageComparisonSelections: PageComparisonSelectionDto[] = [];
   canRemoveRow: boolean = false;
 
   constructor(private jobGroupService: JobGroupRestService) {
@@ -22,7 +22,7 @@ export class PageComparisonComponent {
     this.canRemoveRow = this.pageComparisonSelections.length > 1;
   }
 
-  onComparisonRowRemove(event: IPageComparisonSelection) {
+  onComparisonRowRemove(event: PageComparisonSelectionDto) {
     let index: number = this.pageComparisonSelections.indexOf(event);
     if (index >= 0) {
       this.pageComparisonSelections.splice(index, 1)
@@ -36,7 +36,7 @@ export class PageComparisonComponent {
     window.dispatchEvent(new CustomEvent("pageComparisonValidation", {detail: {isValid: isValid}}))
   }
 
-  isComparisonValid(comparison: IPageComparisonSelection) {
+  isComparisonValid(comparison: PageComparisonSelectionDto) {
     return comparison.firstJobGroupId !== -1 && comparison.secondJobGroupId !== -1 && comparison.firstPageId !== -1 && comparison.secondPageId !== -1;
   }
 
@@ -49,7 +49,7 @@ export class PageComparisonComponent {
   }
 
   addComparison() {
-    this.pageComparisonSelections.push(<IPageComparisonSelection>{
+    this.pageComparisonSelections.push(<PageComparisonSelectionDto>{
       firstJobGroupId: -1,
       firstPageId: -1,
       secondPageId: -1,
@@ -60,6 +60,6 @@ export class PageComparisonComponent {
   }
 
   getJobGroups(from: string, to: string) {
-    this.jobGroupToPagesMapping = this.jobGroupService.getJobGroupToPagesMap(from, to);
+    this.jobGroupToPagesMapping = this.jobGroupService.getJobGroupToPagesMapDto(from, to);
   }
 }

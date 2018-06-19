@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {JobGroup} from "../../model/job-group.model";
 import {IPageId} from "../../../common/model/page.model";
 import {PageService} from "../../service/rest/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs/index";
-import {IJobGroupToPagesMapping} from "../../../common/model/job-group-to-page-mapping.model";
+import {JobGroupToPagesMappingDto} from "../../../common/model/job-group-to-page-mapping.model";
 
 @Component({
   selector: 'app-page-list',
@@ -18,11 +18,11 @@ export class PageListComponent {
 
   constructor(private pageService: PageService) {
     this.pageList$ = this.pageService.pages$.pipe(
-      map((jobGroupsWithPages: IJobGroupToPagesMapping[]) => this.filterPagesByJobGroup(this.jobGroup, jobGroupsWithPages))
+      map((jobGroupsWithPages: JobGroupToPagesMappingDto[]) => this.filterPagesByJobGroup(this.jobGroup, jobGroupsWithPages))
     );
   }
 
-  private filterPagesByJobGroup(jobGroup: JobGroup, jobGroupsWithPages: IJobGroupToPagesMapping[]): IPageId[] {
+  private filterPagesByJobGroup(jobGroup: JobGroup, jobGroupsWithPages: JobGroupToPagesMappingDto[]): IPageId[] {
     return jobGroupsWithPages.find( a => a.id == jobGroup.getId()).pages;
   }
 }

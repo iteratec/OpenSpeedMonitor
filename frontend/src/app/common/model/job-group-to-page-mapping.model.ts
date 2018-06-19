@@ -1,6 +1,6 @@
 import {IPageId} from "./page.model";
 
-export interface IJobGroupToPagesMapping {
+export type JobGroupToPagesMappingDto = {
   id: number;
   name: string;
   pages: IPageId[];

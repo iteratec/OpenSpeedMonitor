@@ -1,4 +1,4 @@
-export interface IPageComparisonSelection {
+export type PageComparisonSelectionDto = {
   firstJobGroupId: number;
   firstPageId: number;
   secondJobGroupId: number;

@@ -1,5 +1,5 @@
 import {Component, NgZone, ViewChild} from "@angular/core";
-import {IPageComparisonSelection} from "../page-comparison-selection.model";
+import {PageComparisonSelectionDto} from "../page-comparison-selection.model";
 import {PageComparisonComponent} from "../page-comparison.component";
 
 @Component({
@@ -25,14 +25,14 @@ export class PageComparisonAdapterComponent {
   }
 
   getSelectedJobGroupIds(): number[] {
-    return this.pageComparisonComponent.pageComparisonSelections.reduce((ids: number[], comparison: IPageComparisonSelection) => {
+    return this.pageComparisonComponent.pageComparisonSelections.reduce((ids: number[], comparison: PageComparisonSelectionDto) => {
       ids.push(comparison.firstPageId, comparison.secondPageId);
       return ids;
     }, []);
   }
 
   getSelectedPageIds(): number[] {
-    return this.pageComparisonComponent.pageComparisonSelections.reduce((ids: number[], comparison: IPageComparisonSelection) => {
+    return this.pageComparisonComponent.pageComparisonSelections.reduce((ids: number[], comparison: PageComparisonSelectionDto) => {
       ids.push(comparison.firstJobGroupId, comparison.secondJobGroupId);
       return ids
     }, []);
@@ -42,7 +42,7 @@ export class PageComparisonAdapterComponent {
     return this.pageComparisonComponent.pageComparisonSelections;
   }
 
-  setComparisons(comparisons: IPageComparisonSelection[]) {
+  setComparisons(comparisons: PageComparisonSelectionDto[]) {
     this.zone.run(() => {
       this.pageComparisonComponent.pageComparisonSelections = comparisons;
       this.pageComparisonComponent.validateComparisons();
