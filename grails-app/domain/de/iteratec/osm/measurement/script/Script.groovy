@@ -43,9 +43,6 @@ class Script {
     Date	dateCreated
     Date	lastUpdated
 
-    //update flag after refactoring the script parser
-    boolean updated = true
-
     String label
     @BindUsing({
         obj, source -> source['description']

@@ -444,10 +444,10 @@ class BootStrap {
     }
 
     void updateScripts(){
-        def scripts = Script.findAllByUpdated(false)
+        def scripts = Script.findAllByTestedPagesIsEmpty()
         scripts.each { script ->
-            script.updated = true
             //forces a new parsing of the script
+            script.beforeUpdate()
             script.save(flush:true)
         }
     }
