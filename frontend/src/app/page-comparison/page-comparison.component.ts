@@ -5,7 +5,7 @@ import {JobGroupService} from "../setup-dashboard/service/rest/job-group.service
 import {log} from "util";
 
 @Component({
-  selector: 'page-comparison',
+  selector: 'osm-page-comparison',
   templateUrl: './page-comparison.component.html'
 })
 export class PageComparisonComponent {

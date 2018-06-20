@@ -1,20 +1,20 @@
 import {Component, Input} from '@angular/core';
-import {JobGroup} from "../../model/job-group.model";
 import {IPageId} from "../../../common/model/page.model";
 import {PageService} from "../../service/rest/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs/index";
 import {IJobGroupToPagesMapping} from "../../../common/model/job-group-to-page-mapping.model";
+import {JobGroupDTO} from "../../../common/model/job-group.model";
 
 @Component({
-  selector: 'app-page-list',
+  selector: 'osm-page-list',
   templateUrl: './page-list.component.html',
   styleUrls: ['./page-list.component.css']
 })
 export class PageListComponent {
   pageList$: Observable<IPageId[]>;
 
-  @Input() jobGroup: JobGroup;
+  @Input() jobGroup: JobGroupDTO;
 
   constructor(private pageService: PageService) {
     this.pageList$ = this.pageService.pages$.pipe(
@@ -22,7 +22,7 @@ export class PageListComponent {
     );
   }
 
-  private filterPagesByJobGroup(jobGroup: JobGroup, jobGroupsWithPages: IJobGroupToPagesMapping[]): IPageId[] {
+  private filterPagesByJobGroup(jobGroup: JobGroupDTO, jobGroupsWithPages: IJobGroupToPagesMapping[]): IPageId[] {
     return jobGroupsWithPages.find(a => a.id == jobGroup.id).pages;
   }
 }

@@ -3,17 +3,17 @@ import {Observable} from "rxjs/internal/Observable";
 import {IScript} from "../../model/script.model";
 import {ScriptService} from "../../service/rest/script.service";
 import {filter, map} from "rxjs/operators";
-import {JobGroup} from "../../model/job-group.model";
+import {JobGroupDTO} from "../../../common/model/job-group.model";
 
 @Component({
-  selector: 'app-script-list',
+  selector: 'osm-script-list',
   templateUrl: './script-list.component.html',
   styleUrls: ['./script-list.component.css']
 })
 export class ScriptListComponent {
   scriptList$: Observable<IScript[]>;
 
-  @Input() jobGroup: JobGroup;
+  @Input() jobGroup: JobGroupDTO;
 
   constructor(private scriptService: ScriptService) {
     this.scriptList$ = this.scriptService.scripts$.pipe(
@@ -22,7 +22,7 @@ export class ScriptListComponent {
     )
   }
 
-  private filterScriptsByJobGroup(jobGroup: JobGroup, scripts: IScript[]) : IScript[] {
+  private filterScriptsByJobGroup(jobGroup: JobGroupDTO, scripts: IScript[]): IScript[] {
     return scripts.filter(script => script.jobGroupId == jobGroup.id)
   }
 

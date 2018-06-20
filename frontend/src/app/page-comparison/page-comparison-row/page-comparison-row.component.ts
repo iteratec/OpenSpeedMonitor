@@ -4,7 +4,7 @@ import {IPageId} from "../../common/model/page.model";
 import {IPageComparisonSelection} from "../page-comparison-selection.model";
 
 @Component({
-  selector: 'page-comparison-row',
+  selector: 'osm-page-comparison-row',
   templateUrl: './page-comparison-row.component.html'
 })
 export class PageComparisonRowComponent {

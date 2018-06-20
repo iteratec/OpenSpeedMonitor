@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {IScript} from "../../model/script.model";
 
 @Component({
-  selector: 'app-script',
+  selector: 'osm-script',
   templateUrl: './script.component.html',
   styleUrls: ['./script.component.css']
 })

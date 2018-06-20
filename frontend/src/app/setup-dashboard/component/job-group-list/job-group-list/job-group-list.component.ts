@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {JobGroupService} from "../../../service/rest/job-group.service";
 
 @Component({
-  selector: 'app-job-group-list',
+  selector: 'osm-job-group-list',
   templateUrl: './job-group-list.component.html',
   styleUrls: ['./job-group-list.component.css']
 })
