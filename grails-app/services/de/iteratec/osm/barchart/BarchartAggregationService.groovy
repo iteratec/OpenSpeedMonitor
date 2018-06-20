@@ -109,9 +109,9 @@ class BarchartAggregationService {
     private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
+            JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
+            Page page = pages.find { it.id == aggregation.pageId }
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
-                JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
-                Page page = pages.find { it.id == aggregation.pageId }
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
