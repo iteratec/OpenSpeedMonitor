@@ -1,8 +1,4 @@
 <div class="card">
   <h2>Setup Dashboard</h2>
-  <div *ngFor="let jobGroup of activeJobGroups" class="card">
-    <h2>{{jobGroup.name}}</h2>
-    <app-page-list [jobGroup]="jobGroup"></app-page-list>
-    <app-script-list [jobGroup]="jobGroup"></app-script-list>
-  </div>
+  <osm-job-group-list></osm-job-group-list>
 </div>

@@ -1,19 +1,19 @@
 import {Component} from '@angular/core';
 import {JobGroupToPagesMappingDto} from "../common/model/job-group-to-page-mapping.model";
 import {PageComparisonSelectionDto} from "./page-comparison-selection.model";
-import {JobGroupRestService} from "../setup-dashboard/service/rest/job-group-rest.service";
+import {JobGroupService} from "../setup-dashboard/service/rest/job-group.service";
 import {Observable} from "rxjs/internal/Observable";
 
 @Component({
-  selector: 'page-comparison',
+  selector: 'osm-page-comparison',
   templateUrl: './page-comparison.component.html'
 })
 export class PageComparisonComponent {
-  jobGroupToPagesMapping: Observable<JobGroupToPagesMappingDto[]>;
+  jobGroupToPagesMapping$: Observable<JobGroupToPagesMappingDto[]>;
   pageComparisonSelections: PageComparisonSelectionDto[] = [];
   canRemoveRow: boolean = false;
 
-  constructor(private jobGroupService: JobGroupRestService) {
+  constructor(private jobGroupService: JobGroupService) {
     this.addComparison();
     this.registerTimeFrameChangeEvent();
   }
@@ -60,6 +60,6 @@ export class PageComparisonComponent {
   }
 
   getJobGroups(from: string, to: string) {
-    this.jobGroupToPagesMapping = this.jobGroupService.getJobGroupToPagesMapDto(from, to);
+    this.jobGroupToPagesMapping$ = this.jobGroupService.getJobGroupToPagesMapDto(from, to);
   }
 }

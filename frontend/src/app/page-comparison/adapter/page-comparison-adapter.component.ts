@@ -3,8 +3,8 @@ import {PageComparisonSelectionDto} from "../page-comparison-selection.model";
 import {PageComparisonComponent} from "../page-comparison.component";
 
 @Component({
-  selector: 'page-comparison-adapter',
-  template: ' <page-comparison></page-comparison>'
+  selector: 'osm-page-comparison-adapter',
+  template: ' <osm-page-comparison></osm-page-comparison>'
 })
 export class PageComparisonAdapterComponent {
   @ViewChild(PageComparisonComponent) pageComparisonComponent: PageComparisonComponent;
