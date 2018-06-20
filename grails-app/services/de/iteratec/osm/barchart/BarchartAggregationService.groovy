@@ -16,7 +16,6 @@ class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
-    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -57,19 +56,22 @@ class BarchartAggregationService {
         }
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
+        EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobResultDateBetween(from, to)
+                .withSelectedMeasurands(selectedMeasurands)
+                .withJobGroupIn(jobGroups)
+                .withPageIn(pages)
+
+        List<EventResultProjection> eventResultProjections = []
         switch(selectedAggregationValue) {
             case 'avg':
-                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands)
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
+                eventResultProjections = queryBuilder.getAverageData()
+                break
             case 'median':
-                List<EventResultProjection> eventResultProjections = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                        .withJobResultDateBetween(from, to)
-                        .withSelectedMeasurands(selectedMeasurands)
-                        .withJobGroupIn(jobGroups)
-                        .withPageIn(pages)
-                        .getMedianData()
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
+                eventResultProjections = queryBuilder.getMedianData()
+                break
         }
+        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
     }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
@@ -107,9 +109,9 @@ class BarchartAggregationService {
     private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
+            JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
+            Page page = pages.find { it.id == aggregation.pageId }
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
-                JobGroup jobGroup = aggregation.jobGroup? aggregation.jobGroup : jobGroups.find{it.id == aggregation.jobGroupId}
-                Page page = aggregation.page ? aggregation.page : pages.find{it.id == aggregation.pageId}
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,

@@ -4,17 +4,18 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.query.TrimQualifier
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
 @Integration
 @Rollback
-class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalIntegrationSpec {
+class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page1, page2, page3
 
-    void "check median for measurands with page"() {
+    void "check average for measurands with page"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -37,7 +38,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
             EventResult.build(
                     page: page1,
                     jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedTimeInMillisecs: 600,
                     medianValue: true,
             )
 
@@ -55,17 +56,17 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.fullyLoadedTimeInMillisecs == 200 &&
-            it.pageId == page1.id
+            it.fullyLoadedTimeInMillisecs == 300 &&
+                    it.pageId == page1.id
         }
     }
 
-    void "check median for userTimings with page"() {
+    void "check average for userTimings with page"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -92,7 +93,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
                     jobGroup: jobGroup3,
                     fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
             )
             2.times {
                 EventResult.build(
@@ -109,17 +110,17 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.mark1 == 200 &&
-            it.pageId == page1.id
+            it.mark1 == 300 &&
+                    it.pageId == page1.id
         }
     }
 
-    void "check median for measurands and userTimings with page"() {
+    void "check average for measurands and userTimings with page"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -144,9 +145,9 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
             EventResult.build(
                     page: page1,
                     jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedTimeInMillisecs: 600,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
             )
             2.times {
                 EventResult.build(
@@ -164,18 +165,18 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.mark1 == 200 &&
-                    it.fullyLoadedTimeInMillisecs == 200 &&
-            it.pageId == page1.id
+            it.mark1 == 300 &&
+                    it.fullyLoadedTimeInMillisecs == 300 &&
+                    it.pageId == page1.id
         }
     }
 
-    void "check median for measurands with jobGroup"() {
+    void "check average for measurands with jobGroup"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -198,7 +199,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
             EventResult.build(
                     page: page3,
                     jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedTimeInMillisecs: 600,
                     medianValue: true,
             )
             2.times {
@@ -215,17 +216,17 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.fullyLoadedTimeInMillisecs == 200 &&
-            it.jobGroupId == jobGroup1.id
+            it.fullyLoadedTimeInMillisecs == 300 &&
+                    it.jobGroupId == jobGroup1.id
         }
     }
 
-    void "check median for userTimings with jobGroup"() {
+    void "check average for userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -253,7 +254,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
                     jobGroup: jobGroup1,
                     fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
             )
             2.times {
                 EventResult.build(
@@ -270,17 +271,17 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.mark1 == 200 &&
-            it.jobGroupId == jobGroup1.id
+            it.mark1 == 300 &&
+                    it.jobGroupId == jobGroup1.id
         }
     }
 
-    void "check median for measurands and userTimings with jobGroup"() {
+    void "check average for measurands and userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -305,9 +306,9 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
             EventResult.build(
                     page: page3,
                     jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedTimeInMillisecs: 600,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
             )
             2.times {
                 EventResult.build(
@@ -325,18 +326,18 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.mark1 == 200 &&
-                    it.fullyLoadedTimeInMillisecs == 200 &&
-            it.jobGroupId == jobGroup1.id
+            it.mark1 == 300 &&
+                    it.fullyLoadedTimeInMillisecs == 300 &&
+                    it.jobGroupId == jobGroup1.id
         }
     }
 
-    void "check median for measurand and usertiming with page and jobGroup"() {
+    void "check average for measurand and usertiming with page and jobGroup"() {
         given: "three matching and two other Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -359,9 +360,9 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
             EventResult.build(
                     page: page1,
                     jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedTimeInMillisecs: 600,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
             )
             2.times {
                 EventResult.build(
@@ -380,19 +381,19 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
                 .withPageIdsIn([page1.id])
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .getMedianData()
+                .getAverageData()
 
         then: "only one aggregation is returned"
         result.size() == 1
         result.every {
-            it.mark1 == 200 &&
-                    it.fullyLoadedTimeInMillisecs == 200 &&
+            it.mark1 == 300 &&
+                    it.fullyLoadedTimeInMillisecs == 300 &&
                     it.jobGroupId == jobGroup1.id &&
-            it.pageId == page1.id
+                    it.pageId == page1.id
         }
     }
 
-    void "check median for measurand and usertiming with page and jobGroup without aggregation"() {
+    void "check average for measurand and usertiming with page and jobGroup without aggregation"() {
         given: "nine different but matching Eventresults"
         EventResult.withNewSession { session ->
             page1 = Page.build()
@@ -478,7 +479,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
                 .withPageIdsIn([page1.id, page2.id, page3.id])
                 .withJobGroupIdsIn([jobGroup1.id, jobGroup2.id, jobGroup3.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .getMedianData()
+                .getAverageData()
 
         then: "nine aggregations are returned"
         result.size() == 9
@@ -509,7 +510,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .withTrim(700, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
                 .withTrim(500, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
-                .getMedianData()
+                .getAverageData()
 
         then: "nothing is found"
         result.size() == 0

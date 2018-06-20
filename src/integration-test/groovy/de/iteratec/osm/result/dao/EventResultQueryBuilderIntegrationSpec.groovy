@@ -1,26 +1,16 @@
 package de.iteratec.osm.result.dao
 
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.UserTiming
-import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.*
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-
 
 @Integration
 @Rollback
@@ -368,6 +358,37 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             it.fullyLoadedTimeInMillisecs == 200 &&
                     !it.userTimingMK
         }
+    }
+
+    void "check impossible trims"() {
+        given: "one Eventresult"
+        EventResult.withNewSession { session ->
+
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 600,
+                    firstByteInMillisecs: 600,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
+                    ]
+            )
+
+            session.flush()
+        }
+
+
+        when: "the builder is trimmed with two selectedMeasurands"
+        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
+        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
+        List<EventResultProjection> result = new EventResultQueryBuilder(0, 500)
+                .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
+                .withTrim(700, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
+                .withTrim(500, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
+                .getRawData()
+
+        then: "nothing is found"
+        result.size() == 0
     }
 
     void "check trims for UserTiming Measures"() {

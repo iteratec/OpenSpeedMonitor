@@ -1,4 +1,4 @@
-package de.iteratec.osm.result.dao
+package de.iteratec.osm.result.dao.query
 
 /**
  * @author nkuhn
@@ -10,10 +10,11 @@ enum TrimQualifier {
 
     private String gorm
 
-    private TrimQualifier(String gorm){
+    private TrimQualifier(String gorm) {
         this.gorm = gorm
     }
-    String getGormSyntax(){
+
+    String getGormSyntax() {
         return this.gorm
     }
 }
