@@ -1,3 +1,2 @@
-<p>
-  application-dashboard works!
-</p>
+<osm-application-select (onSelectedApplicationChanged)="updateApplication($event)"></osm-application-select>
+<p *ngIf="application">{{application.name}}</p>

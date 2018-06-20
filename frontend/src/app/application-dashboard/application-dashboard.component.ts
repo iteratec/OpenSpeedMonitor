@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import {Component} from '@angular/core';
+import {JobGroupDTO} from "../common/model/job-group.model";
 
 @Component({
   selector: 'osm-application-dashboard',
   templateUrl: './application-dashboard.component.html',
   styleUrls: ['./application-dashboard.component.css']
 })
-export class ApplicationDashboardComponent implements OnInit {
+export class ApplicationDashboardComponent {
+  application: JobGroupDTO;
 
   constructor() { }
 
-  ngOnInit() {
+  updateApplication(jobGroup: JobGroupDTO) {
+    this.application = jobGroup
   }
-
 }
