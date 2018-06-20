@@ -173,7 +173,7 @@ class EventResultQueryBuilder {
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
 
         userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
-        userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer())
+        userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer(baseProjections: baseProjections))
         userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
         return getResults()
     }

@@ -16,11 +16,7 @@ class UserTimingAverageDataTransformer implements EventResultTransformer {
             String key = AggregationUtil.generateGroupedKeyForAggregations(dbResult, baseProjections)
             EventResultProjection projection = getRelevantProjection(projections, key)
             projection.projectedProperties.put(dbResult.name, userTimingValue)
-            dbResult.remove('name')
-            dbResult.remove('startTime')
-            dbResult.remove('duration')
-            dbResult.remove('type')
-            projection.projectedProperties.putAll(dbResult)
+            projection.projectedProperties.putAll(AggregationUtil.getMetaData(dbResult, baseProjections))
         }
         return projections
     }

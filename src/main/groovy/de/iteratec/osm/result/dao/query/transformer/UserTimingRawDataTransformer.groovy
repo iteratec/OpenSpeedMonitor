@@ -2,8 +2,11 @@ package de.iteratec.osm.result.dao.query.transformer
 
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.query.AggregationUtil
+import de.iteratec.osm.result.dao.query.ProjectionProperty
 
 class UserTimingRawDataTransformer implements EventResultTransformer{
+    Set<ProjectionProperty> baseProjections
 
     @Override
     List<EventResultProjection> transformRawQueryResult(List<Map> rawQueryData) {
@@ -12,12 +15,7 @@ class UserTimingRawDataTransformer implements EventResultTransformer{
             def userTimingValue = dbResult.type == UserTimingType.MEASURE ? dbResult.duration : dbResult.startTime
             EventResultProjection projection = getRelevantProjection(dbResult, projections)
             projection.projectedProperties.put(dbResult.name, userTimingValue)
-            dbResult.remove('id')
-            dbResult.remove('name')
-            dbResult.remove('startTime')
-            dbResult.remove('duration')
-            dbResult.remove('type')
-            projection.projectedProperties.putAll(dbResult)
+            projection.projectedProperties.putAll(AggregationUtil.getMetaData(dbResult, baseProjections))
         }
         return projections
     }

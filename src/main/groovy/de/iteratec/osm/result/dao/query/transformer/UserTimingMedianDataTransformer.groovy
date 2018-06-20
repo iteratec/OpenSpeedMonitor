@@ -18,7 +18,7 @@ class UserTimingMedianDataTransformer implements EventResultTransformer {
             def value = ungrouped.type == UserTimingType.MEASURE ? ungrouped.duration : ungrouped.startTime
             String key = AggregationUtil.generateGroupedKeyForAggregations(ungrouped, baseProjections)
             groupedAggregations.get(key).get(ungrouped.name) << value
-            metaDataForAggregations.get(key) << AggregationUtil.getMetaDataSample(ungrouped, baseProjections)
+            metaDataForAggregations.get(key) << AggregationUtil.getMetaData(ungrouped, baseProjections)
         }
         groupedAggregations.each { String key, Map<String, List> valueMap ->
             EventResultProjection erp = new EventResultProjection(id: key)

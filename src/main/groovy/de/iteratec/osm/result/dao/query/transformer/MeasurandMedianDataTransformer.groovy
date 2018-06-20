@@ -33,7 +33,7 @@ class MeasurandMedianDataTransformer implements EventResultTransformer {
         groupedRawData.each { String key, List<Map> value ->
             EventResultProjection newKey = new EventResultProjection(id: key)
             Map metaDataSample = value[0]
-            Map metaData = AggregationUtil.getMetaDataSample(metaDataSample, baseProjections)
+            Map metaData = AggregationUtil.getMetaData(metaDataSample, baseProjections)
             newKey.projectedProperties.putAll(metaData)
             justAHelperMap.put(newKey, value)
         }

@@ -33,7 +33,7 @@ class AggregationUtil {
         return key
     }
 
-    static Map getMetaDataSample(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet) {
+    static Map getMetaData(Map eventResultProjection, Set<ProjectionProperty> projectionPropertySet) {
         return eventResultProjection.subMap(getAggregatorAliases(projectionPropertySet))
     }
 
