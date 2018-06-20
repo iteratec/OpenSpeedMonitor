@@ -4,6 +4,7 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.query.TrimQualifier
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
