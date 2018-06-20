@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || "${request.forwardURI.equals('/application-dashboard')}"}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -41,6 +41,12 @@
                     <g:message code="de.iteratec.isr.measurementresults" default="Results"/> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
+                    <li class="${request.forwardURI.equals('/application-dashboard') ? 'active' : ''}">
+                        <a href="${createLink(uri: '/application-dashboard')}">
+                            <i class="fa fa-navicon"></i>
+                            <g:message message="Overview"/>
+                        </a>
+                    </li>
                     <li class="${controllerName.equals('eventResultDashboard') ? 'active' : ''}" id="eventResultMainMenu">
                         <g:link controller="eventResultDashboard" action="showAll"
                                 title="${message(code:'eventResultDashboard.label', default:'Time Series')}">
