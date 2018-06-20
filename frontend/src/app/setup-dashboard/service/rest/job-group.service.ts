@@ -10,14 +10,21 @@ import {JobGroupToPagesMappingDto} from '../../../common/model/job-group-to-page
 export class JobGroupService {
 
   public jobGroups$ = new ReplaySubject<JobGroupDTO[]>(1);
+  public activeOrRecentlyMeasured$ = new ReplaySubject<JobGroupDTO[]>(1);
 
   constructor(private http: HttpClient) {
     this.updateActiveJobGroups()
+    this.updateActiveOrRecentlyMeasured()
   }
 
   updateActiveJobGroups() {
     this.http.get<JobGroupDTO[]>("jobGroup/getAllActive")
       .subscribe(next => this.jobGroups$.next(next), error => this.handleError(error));
+  }
+
+  updateActiveOrRecentlyMeasured() {
+    this.http.get<JobGroupDTO[]>("jobGroup/getAllActive")
+      .subscribe(next => this.activeOrRecentlyMeasured$.next(next), error => this.handleError(error));
   }
 
   handleError(error: any) {

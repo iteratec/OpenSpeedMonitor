@@ -1,0 +1,8 @@
+<!--<ul>-->
+<!--<li *ngFor="let jobGroup of jobGroups$ | async" (click)="onSelect(jobGroup)">{{jobGroup.name}}</li>-->
+<!--</ul>-->
+<select [(ngModel)]="application" (change)="onSelect()">
+  <option *ngFor="let jobGroup of jobGroups$ | async" [ngValue]="jobGroup">
+    {{jobGroup.name}}
+  </option>
+</select>
