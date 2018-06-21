@@ -51,12 +51,6 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         data.getAllMeasurands().forEach(function (measurand) {
             if (!chartBarsComponents[measurand]) {
                 var component = OpenSpeedMonitor.ChartComponents.ChartBars();
-                component.on("mouseover", function () {
-                    chartLegendComponent.mouseOverEntry({id: measurand});
-                });
-                component.on("mouseout", function () {
-                    chartLegendComponent.mouseOutEntry({id: measurand});
-                });
                 component.on("click", function () {
                     chartLegendComponent.clickEntry({id: measurand});
                 });

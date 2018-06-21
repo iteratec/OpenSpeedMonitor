@@ -72,12 +72,6 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             barGroup.on("click", function (bar) {
                 chartLegendComponent.clickEntry([bar.id]);
             });
-            barGroup.on("mouseover", function (bar) {
-                chartLegendComponent.mouseOverEntry([bar.id])
-            });
-            barGroup.on("mouseout", function (bar) {
-                chartLegendComponent.mouseOutEntry([bar.id])
-            });
         });
     };
 
