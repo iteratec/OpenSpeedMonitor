@@ -75,6 +75,16 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .on("mouseout", function(data) { callEventHandler("mouseout", data) })
             .on("click", function(data) { callEventHandler("click", data) });
 
+        updateSelection.select(".bar-value").text(function (d) {
+            if (d.value === null) {
+                var prefix = d.showLabelOnTop ? d.label + ": " : "";
+                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
+                return prefix + formatValue(d.value) + " " + d.unit;
+            } else {
+                return ''
+            }
+        });
+
         var transition;
         var xTransition;
         if (isAggregationValueChange) {
@@ -95,11 +105,6 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
                 return barWidth(xScale, d.value);
             });
         xTransition.select(".bar-value")
-            .text(function (d) {
-                var prefix =  d.showLabelOnTop? d.label+": ": "";
-                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
-                return prefix + formatValue(d.value) + " " + d.unit;
-            })
             .attr("x", function (d) {
                 return (d.value < 0) ? (barStart(xScale, d.value) + valueLabelOffset) : (barEnd(xScale, d.value) - valueLabelOffset);
             });
