@@ -1,4 +1,6 @@
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
+    <h1>THRESHOLDTAB GUACAMOLE</h1>     %{--GUACAMOLE--}%
+    <app-job-threshold   data-module-path="src/app/job-threshold/job-threshold.module#ThresholdModule"></app-job-threshold>
     <div v-if="activeMeasuredEvents.length !== 0"
          class="container">
         <div id="thresholdList" class="col-md-offset-1">
@@ -45,7 +47,6 @@
             <g:message code="job.threshold.createScript" default="Create CI-Script"/>
         </button>
     </span>
-
 </div>
 
 <g:render template="threshold/measuredEventVue"/>
