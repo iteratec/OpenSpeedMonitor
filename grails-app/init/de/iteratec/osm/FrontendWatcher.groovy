@@ -6,6 +6,10 @@ import groovy.transform.CompileDynamic
 import org.grails.io.watch.DirectoryWatcher
 import org.grails.io.watch.FileExtensionFileChangeListener
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class FrontendWatcher {
@@ -24,11 +28,16 @@ class FrontendWatcher {
 
         if (location) {
 
+            Thread.start {
+                Process recompileFrontend = new ProcessBuilder(['sh', '-c', './gradlew angularWatcher']).redirectErrorStream(true).start()
+                recompileFrontend.in.eachLine { line -> println line }
+            }
+
             directoryWatcher = new DirectoryWatcher()
 
             Queue<File> changedFiles = new ConcurrentLinkedQueue<>()
 
-            directoryWatcher.addListener(new FileExtensionFileChangeListener(['ts', 'html', 'css', 'js']) {
+            directoryWatcher.addListener(new FileExtensionFileChangeListener(['css', 'js']) {
                 @Override
                 void onChange(File file, List<String> extensions) {
                     changedFiles << file.canonicalFile
@@ -40,7 +49,7 @@ class FrontendWatcher {
                 }
             })
 
-            directoryWatcher.addWatchDirectory(new File(location, "frontend/src"), ['ts', 'css', 'html', 'js'])
+            directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['css', 'js'])
 
             Thread.start {
                 while (GrailsApp.developmentModeActive) {
@@ -52,21 +61,25 @@ class FrontendWatcher {
                         if (uniqueChangedFilesSize >= 1) {
                             changedFiles.clear()
 
-                            println "\n Frontend Files $uniqueChangedFiles changed, recompiling frontend..."
+                            println "\n Updating ${uniqueChangedFilesSize} frontend files:\n${uniqueChangedFiles}...\n"
 
-                            def recompileFrontend = new ProcessBuilder(['sh', '-c', './gradlew syncFrontendStylesheets syncFrontendJavascript'])
-                                    .redirectErrorStream(true).start()
+                            for (File file : uniqueChangedFiles) {
+                                Path src = file.toPath()
+                                Path dst
 
-                            recompileFrontend.in.eachLine { line -> println line }
-                            recompileFrontend.waitFor()
-
-                            println('\n Finished frontend recompiling with exit code ' + recompileFrontend.exitValue())
-                            sleep(1000)
+                                if (src.toString().endsWith('.css')) {
+                                    dst = Paths.get("${location}/grails-app/assets/stylesheets/frontend/${file.getName()}")
+                                } else {
+                                    dst = Paths.get("${location}/grails-app/assets/javascripts/frontend/${file.getName()}")
+                                }
+                                Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
+                            }
+                            sleep(5000)
                         }
                     } catch (Exception e) {
                         log.error("Exception:  $e.message", e)
                     }
-                    sleep(5000)
+                    sleep(1000)
                 }
             }
             directoryWatcher.start()

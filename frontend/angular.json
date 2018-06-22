@@ -27,7 +27,11 @@
               "src/styles.css"
             ],
             "scripts": [],
-            "lazyModules": [ "src/app/setup-dashboard/setup-dashboard.module" ]
+            "lazyModules": [
+              "src/app/setup-dashboard/setup-dashboard.module"
+            ],
+            "vendorChunk": false,
+            "extractCss": true
           },
           "configurations": {
             "production": {

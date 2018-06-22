@@ -171,19 +171,19 @@ npmInstall {
     outputs.files file('node_modules')
 }
 
-task installFrontendDependencies(type: NpmTask) {
+task installFrontendDependencies(type: NpmTask, dependsOn: npmInstall) {
     description = "Installs frontend package dependencies"
     workingDir = file("${project.projectDir}/frontend")
     args = ['install']
 }
 
-task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
+task compileFrontend(type: NpmTask) {
     description = "Compiles frontend"
     workingDir = file("${project.projectDir}/frontend")
-    args = ['run', 'build:prod']
+    args = ['run', 'build']
 }
 
-task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
+task syncFrontendJavascripts(type: Sync) {
     description = "Syncs frontend javascript files"
     from 'frontend/dist/frontend'
     include '*.js'
@@ -191,12 +191,17 @@ task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
     rename('(main|polyfills|runtime)\\..*\\.js', '$1.js')
 }
 
-task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
+task syncFrontendStylesheets(type: Sync) {
     description = "Syncs frontend stylesheet files"
     from 'frontend/dist/frontend'
     include '*.css'
     into 'grails-app/assets/stylesheets/frontend'
     rename('(styles)\\..*\\.css', '$1.css')
+}
+
+task angularWacher(type: NpmTask) {
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['run', 'build:dev']
 }
 
 task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
