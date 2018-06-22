@@ -17,8 +17,8 @@ export class ApplicationSelectComponent {
     this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$
   }
 
-  onSelect() {
-    console.log(this.application);
+  setApplication(jobGroup: JobGroupDTO) {
+    this.application = jobGroup
     this.onSelectedApplicationChanged.emit(this.application)
   }
 }
