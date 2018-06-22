@@ -149,9 +149,9 @@ class EventResultQueryBuilder {
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
             }
             filters.add(filterClosure)
-        }
-        if (project) {
-            baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName+'.id', alias: associatedDomainFieldName+ 'Id'))
+            if (project) {
+                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName + '.id', alias: associatedDomainFieldName + 'Id'))
+            }
         }
         return this
     }

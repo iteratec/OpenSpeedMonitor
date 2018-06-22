@@ -270,6 +270,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
+                .withPageIdsIn([])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getAverageData()
 
