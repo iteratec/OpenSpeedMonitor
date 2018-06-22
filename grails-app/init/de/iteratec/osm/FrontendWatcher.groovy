@@ -11,6 +11,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.stream.Stream
 
 class FrontendWatcher {
 
@@ -25,11 +26,18 @@ class FrontendWatcher {
     protected void startFrontendWatcher(Environment environment) {
 
         def location = environment.getReloadLocation()
+        Stream<Path> fileStream = (Files.walk(Paths.get("${location}/build/nodejs"), 2))
+        List<Path> fileList = fileStream.collect()
+        def nodeLocation = fileList.get(8)
 
-        if (location) {
+        if (location && nodeLocation) {
 
             Thread.start {
-                Process recompileFrontend = new ProcessBuilder(['sh', '-c', './gradlew angularWatcher']).redirectErrorStream(true).start()
+                ProcessBuilder watchBuilder = new ProcessBuilder(['sh', '-c', 'ng build --watch'])
+                        .redirectErrorStream(true).directory(new File(location, "frontend"))
+                watchBuilder.environment().put("PATH", "${location}/frontend/node_modules/.bin:${nodeLocation}")
+
+                Process recompileFrontend = watchBuilder.start()
                 recompileFrontend.in.eachLine { line -> println line }
             }
 
@@ -79,7 +87,7 @@ class FrontendWatcher {
                     } catch (Exception e) {
                         log.error("Exception:  $e.message", e)
                     }
-                    sleep(1000)
+                    sleep(2000)
                 }
             }
             directoryWatcher.start()
