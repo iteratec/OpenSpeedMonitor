@@ -5,12 +5,7 @@ import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.d3Data.BarChartData
-import de.iteratec.osm.d3Data.ChartEntry
-import de.iteratec.osm.d3Data.MatrixViewData
-import de.iteratec.osm.d3Data.MatrixViewEntry
-import de.iteratec.osm.d3Data.MultiLineChart
-import de.iteratec.osm.d3Data.TreemapData
+import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.ResultSelectionCommand
@@ -25,9 +20,7 @@ import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-import java.util.concurrent.ConcurrentHashMap
-
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.NOT_FOUND
 
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 //TODO: save, show, update and tags were NOT generated
@@ -249,7 +242,13 @@ class JobGroupController {
     }
 
     def getAllActive() {
-        def activeJobGroups = Job.createCriteria().list {
+        def activeJobGroups = getAllActiveJobGroups()
+
+        return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
+    }
+
+    private List<JobGroup> getAllActiveJobGroups() {
+        return Job.createCriteria().list {
             eq('active', true)
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
@@ -260,8 +259,23 @@ class JobGroupController {
                 }
             }
         }
+    }
 
-        return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
+    def getAllActiveAndAllRecent() {
+        Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
+
+        DateTime today = new DateTime()
+        DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
+
+        ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
+        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, null, { existing ->
+            projections {
+                distinct 'jobGroup'
+            }
+        })
+        allActiveAndRecent.addAll(recentJobGroups)
+
+        return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
     @RestAction()
     def getJobGroupsWithPages(JobGroupWithPagesCommand command) {

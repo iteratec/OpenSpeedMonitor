@@ -23,7 +23,7 @@ export class JobGroupService {
   }
 
   updateActiveOrRecentlyMeasured() {
-    this.http.get<JobGroupDTO[]>("jobGroup/getAllActive")
+    this.http.get<JobGroupDTO[]>("jobGroup/getAllActiveAndAllRecent")
       .subscribe(next => this.activeOrRecentlyMeasured$.next(next), error => this.handleError(error));
   }
 
