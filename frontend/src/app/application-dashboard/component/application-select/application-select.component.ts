@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Output} from '@angular/core';
-import {JobGroupService} from "../../../setup-dashboard/service/rest/job-group.service";
+import {JobGroupService} from "../../../shared/service/rest/job-group.service";
 import {Observable} from "rxjs/index";
 import {map, take} from "rxjs/internal/operators";
-import {JobGroupDTO} from "../../../common/model/job-group.model";
+import {JobGroupDTO} from "../../../shared/model/job-group.model";
 
 @Component({
   selector: 'osm-application-select',
