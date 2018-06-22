@@ -199,11 +199,6 @@ task syncFrontendStylesheets(type: Sync) {
     rename('(styles)\\..*\\.css', '$1.css')
 }
 
-task angularWacher(type: NpmTask) {
-    workingDir = file("${project.projectDir}/frontend")
-    args = ['run', 'build:dev']
-}
-
 task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
