@@ -1,8 +1,13 @@
-<!--<ul>-->
-<!--<li *ngFor="let jobGroup of jobGroups$ | async" (click)="onSelect(jobGroup)">{{jobGroup.name}}</li>-->
-<!--</ul>-->
-<select [(ngModel)]="application" (change)="onSelect()">
-  <option *ngFor="let jobGroup of jobGroups$ | async" [ngValue]="jobGroup">
-    {{jobGroup.name}}
-  </option>
-</select>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+    {{application? application.name : "select Application"}}
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li>
+      <a class="dropdown-item" *ngFor="let jobGroup of jobGroups$ | async" (click)="setApplication(jobGroup)">
+        {{jobGroup.name}}
+      </a>
+    </li>
+  </ul>
+</div>
