@@ -79,6 +79,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
     compile "org.grails:grails-dependencies"
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
@@ -92,7 +93,6 @@ dependencies {
     compile "org.webjars:swagger-ui:${swaggerUIVersion}"
 
     runtime "com.h2database:h2"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
     console "org.grails:grails-console"
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
