@@ -1062,12 +1062,18 @@ class CsiDashboardController {
         SimpleDateFormat sdfSource = new SimpleDateFormat("yyyy-MM-dd")
         def list = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups)
         def result = list.collect {
-            String date = sdfSource.format(new Date(it.started.getDateString()))
-            [
-                    'date': date,
-                    'csi' : it.csByWptDocCompleteInPercent
-            ]
+            if (it.csByWptVisuallyCompleteInPercent && it.csByWptDocCompleteInPercent) {
+                String date = sdfSource.format(new Date(it.started.getDateString()))
+                [
+                        'date'          : date,
+                        'csiDocComplete': it.csByWptDocCompleteInPercent,
+                        'csiVisComplete': it.csByWptVisuallyCompleteInPercent
+                ]
+            }
         }
+
+        result.removeAll([null])
+
 
         return ControllerUtils.sendObjectAsJSON(response, result)
     }

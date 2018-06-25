@@ -2,3 +2,5 @@
   <osm-application-select (selectApplication)="updateApplication($event)"></osm-application-select>
 </h1>
 
+<osm-application-csi *ngIf="application" [jobGroup]="application"></osm-application-csi>
+
