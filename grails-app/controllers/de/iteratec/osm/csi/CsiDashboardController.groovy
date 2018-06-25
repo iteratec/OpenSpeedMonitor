@@ -360,8 +360,8 @@ class CsiDashboardController {
         }
 
         modelToRender.put("highChartLabels", [
-            new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
-                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
+                new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
+                        MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
         ])
 
         if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
@@ -769,7 +769,6 @@ class CsiDashboardController {
             }
         }
 
-
         // Create command for validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: from, to: to,
                 aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
@@ -1060,9 +1059,16 @@ class CsiDashboardController {
 
         List<JobGroup> csiGroups = [JobGroup.findById(jobGroupId)]
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
-
+        SimpleDateFormat sdfSource = new SimpleDateFormat("yyyy-MM-dd")
         def list = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups)
+        def result = list.collect {
+            String date = sdfSource.format(new Date(it.started.getDateString()))
+            [
+                    'date': date,
+                    'csi' : it.csByWptDocCompleteInPercent
+            ]
+        }
 
-        return ControllerUtils.sendObjectAsJSON(response, list)
+        return ControllerUtils.sendObjectAsJSON(response, result)
     }
 }
