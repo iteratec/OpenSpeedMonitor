@@ -74,6 +74,7 @@ class CsiDashboardController {
     UserspecificDashboardService userspecificDashboardService
     PerformanceLoggingService performanceLoggingService
     EventResultDashboardService eventResultDashboardService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     /**
      * The Grails engine to generate links.
@@ -1046,5 +1047,22 @@ class CsiDashboardController {
         }
 
         render answer as JSON
+    }
+
+    def getCSIForActiveOrRecentlyMeasuredJobGroups() {
+        Long jobGroupId = Long.parseLong(params['jobGroupId'])
+
+
+        DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
+        Date today = todayDateTime.toDate()
+        Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
+
+
+        List<JobGroup> csiGroups = [JobGroup.findById(jobGroupId)]
+        CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+
+        def list = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups)
+
+        return ControllerUtils.sendObjectAsJSON(response, list)
     }
 }
