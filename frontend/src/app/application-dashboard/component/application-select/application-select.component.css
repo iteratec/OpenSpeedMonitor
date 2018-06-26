@@ -1,8 +1,8 @@
-.select-header {
+.select-application-header {
   border: none;
   background-color: transparent;
 }
 
-.margin-left-10 {
+.select-application-header-triangle {
   margin-left: 10px;
 }
