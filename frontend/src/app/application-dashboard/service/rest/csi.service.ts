@@ -15,9 +15,8 @@ export class CsiService {
   }
 
   getCsiForJobGroup(jobGroup: JobGroupDTO) {
-    console.log(job)
     let params = new HttpParams().set('jobGroupId', jobGroup.id.toString());
-    this.http.get<CsiDTO[]>('csiDashboard/getCSIForActiveOrRecentlyMeasuredJobGroups', {params: params})
+    this.http.get<CsiDTO[]>('/csiDashboard/getCSIForActiveOrRecentlyMeasuredJobGroups', {params: params})
       .subscribe(next => this.csiValues$.next(next), error => this.handleError(error));
   }
 

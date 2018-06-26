@@ -11,20 +11,18 @@ import {CsiDTO} from "../../model/csi.model";
 })
 export class ApplicationCsiComponent {
   csiValues$: Observable<CsiDTO[]>;
-  recentCsiValue: CsiDTO;
-  @Input() jobGroup: JobGroupDTO;
+  recentCsiValue$: Observable<CsiDTO>;
 
-  constructor(private csiService: CsiService) {
-    console.log(this.jobGroup);
-
-    this.csiService.getCsiForJobGroup(this.jobGroup);
+  @Input()
+  set jobGroup(jobGroup: JobGroupDTO) {
+    this.csiService.getCsiForJobGroup(jobGroup);
 
     this.csiValues$ = this.csiService.csiValues$.pipe();
+    
+    //TODO: Get recent csi value
+    //this.recentCsiValue$ = this.csiValues$.pipe()
+  }
 
-    this.csiValues$.pipe()
-      .subscribe((csiValues: CsiDTO[]) => {
-        console.log(csiValues);
-        this.recentCsiValue = csiValues[csiValues.length - 1]
-      })
+  constructor(private csiService: CsiService) {
   }
 }
