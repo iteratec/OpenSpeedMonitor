@@ -1063,9 +1063,8 @@ class CsiDashboardController {
         def list = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups)
         def result = list.collect {
             if (it.csByWptVisuallyCompleteInPercent && it.csByWptDocCompleteInPercent) {
-                String date = sdfSource.format(new Date(it.started.getDateString()))
                 [
-                        'date'          : date,
+                        'date'          : it.started.format("yyyy-MM-dd"),
                         'csiDocComplete': it.csByWptDocCompleteInPercent,
                         'csiVisComplete': it.csByWptVisuallyCompleteInPercent
                 ]
