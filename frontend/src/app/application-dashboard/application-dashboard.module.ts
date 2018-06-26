@@ -5,10 +5,11 @@ import {ApplicationSelectComponent} from './component/application-select/applica
 import {JobGroupService} from "../setup-dashboard/service/rest/job-group.service";
 import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
+import {ApplicationDashboardRoutingModule} from "./application-dashboard-routing.module"
 
 @NgModule({
   imports: [
-    CommonModule, HttpClientModule, FormsModule
+    CommonModule, HttpClientModule, FormsModule, ApplicationDashboardRoutingModule
   ],
   declarations: [ApplicationDashboardComponent, ApplicationSelectComponent],
   providers: [

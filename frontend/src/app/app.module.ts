@@ -1,12 +1,19 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {ApplicationRef, Injector, NgModule, NgModuleFactory, SystemJsNgModuleLoader, Type} from '@angular/core';
+import {APP_BASE_HREF} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {AppRoutingModule} from "./app-routing.module";
+
 
 @NgModule({
   declarations: [],
   imports: [
-    BrowserModule
+    BrowserModule, AppRoutingModule
   ],
-  providers: [SystemJsNgModuleLoader]
+  exports: [RouterModule],
+  providers: [SystemJsNgModuleLoader,
+    {provide: APP_BASE_HREF, useValue: '/'}
+  ]
 })
 export class AppModule {
   constructor(private injector: Injector, private moduleLoader: SystemJsNgModuleLoader) {
