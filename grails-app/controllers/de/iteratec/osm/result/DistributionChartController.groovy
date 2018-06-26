@@ -18,7 +18,6 @@ import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
@@ -34,8 +33,8 @@ class DistributionChartController extends ExceptionHandlerController {
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
-    PerformanceLoggingService performanceLoggingService
     OsmConfigCacheService osmConfigCacheService
+    PerformanceLoggingService performanceLoggingService
 
     def index() {
         redirect(action: 'show')
@@ -185,24 +184,24 @@ class DistributionChartController extends ExceptionHandlerController {
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
         List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
-                .withJobGroupIn(allJobGroups)
-                .withJobResultDateBetween(from, to)
-                .withProjectedBaseProperty('jobGroup')
+                .withJobResultDateBetween(from,to)
+                .withSelectedMeasurands([selectedMeasurand])
                 .withPageIn(allPages)
-                .withProjectedBaseProperty('page')
-                .withSelectedMeasurandsPropertyProjection([selectedMeasurand])
-                .getResults()
+                .withJobGroupIn(allJobGroups)
+                .getRawData(false)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
-                aggregations.each {
-                    if(it."${selectedMeasurand.getDatabaseRelevantName()}"){
-                        String identifier = "${it.page} | ${it.jobGroup}"
+                aggregations.each {EventResultProjection eventResultProjection ->
+                    if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
+                        JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
+                        Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
+                        String identifier = "${page} | ${jobGroup}"
                         if (!distributionChartDTO.series.get(identifier)) {
-                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: it.page, jobGroup: it.jobGroup))
+                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: page, jobGroup: jobGroup))
                         }
                         def newTrace = distributionChartDTO.series.get(identifier)
-                        newTrace.data.add(selectedMeasurand.normalizeValue(it."${selectedMeasurand.getDatabaseRelevantName()}"))
+                        newTrace.data.add(selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"))
                     }
                 }
             }

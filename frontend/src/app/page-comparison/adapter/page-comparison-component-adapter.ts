@@ -1,15 +1,10 @@
-import {Component, NgZone, ViewChild} from "@angular/core";
+import {NgZone} from "@angular/core";
 import {PageComparisonSelectionDto} from "../page-comparison-selection.model";
 import {PageComparisonComponent} from "../page-comparison.component";
 
-@Component({
-  selector: 'osm-page-comparison-adapter',
-  template: ' <osm-page-comparison></osm-page-comparison>'
-})
-export class PageComparisonAdapterComponent {
-  @ViewChild(PageComparisonComponent) pageComparisonComponent: PageComparisonComponent;
+export class PageComparisonComponentAdapter {
 
-  constructor(private zone: NgZone) {
+  constructor(private zone: NgZone, private pageComparisonComponent: PageComparisonComponent) {
     this.exposeComponent();
   }
 

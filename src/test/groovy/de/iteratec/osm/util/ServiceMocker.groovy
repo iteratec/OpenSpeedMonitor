@@ -33,10 +33,9 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
 import groovy.mock.interceptor.StubFor
+import org.grails.testing.GrailsUnitTest
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
@@ -51,8 +50,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
  * @author nkuhn
  *
  */
-@TestMixin(GrailsUnitTestMixin)
-class ServiceMocker {
+class ServiceMocker implements GrailsUnitTest {
 
 	private ServiceMocker(){}
 	public static ServiceMocker create(){

@@ -17,15 +17,10 @@
 
 package de.iteratec.osm.d3Data
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-class MultiLineChartSpec extends Specification{
+class MultiLineChartSpec extends Specification implements GrailsUnitTest {
 
     def "MultiLineChart initialisation test" () {
         when: "a new MultiLineChart is created"

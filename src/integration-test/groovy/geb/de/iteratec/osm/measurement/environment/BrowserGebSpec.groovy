@@ -6,8 +6,8 @@ import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
 import geb.pages.de.iteratec.osm.measurement.environment.*
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared
@@ -180,5 +180,8 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

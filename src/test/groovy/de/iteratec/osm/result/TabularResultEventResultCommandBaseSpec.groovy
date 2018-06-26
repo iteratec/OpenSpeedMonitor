@@ -18,20 +18,15 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.buildtestdata.BuildDomainTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
 
-
-@TestFor(TabularResultPresentationController)
-@Mock([ConnectivityProfile])
-class TabularResultEventResultCommandBaseSpec extends Specification {
-
-    TabularResultPresentationController controllerForTest = controller
-
+class TabularResultEventResultCommandBaseSpec extends Specification implements BuildDomainTest<ConnectivityProfile>,
+        ControllerUnitTest<TabularResultPresentationController> {
     void "empty command is invalid"() {
         when: "An empty command is initialized"
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
@@ -50,7 +45,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification {
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
 
         when: "empty parameters are bound"
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then: "the command doesn't validate, but collections are initialized and empty"
         !command.validate()
@@ -67,7 +62,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification {
 
         when: "the parameters are bound"
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then: "the command validates and the correct data is bound"
         command.validate()
@@ -97,7 +92,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification {
 
         when:
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then:
         !command.validate()
@@ -116,7 +111,7 @@ class TabularResultEventResultCommandBaseSpec extends Specification {
 
         when:
         TabularResultListResultsCommand command = new TabularResultListResultsCommand()
-        controllerForTest.bindData(command, params)
+        controller.bindData(command, params)
 
         then:
         int nowInMillis = DateTime.now().millis

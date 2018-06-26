@@ -38,6 +38,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state["selectedPages"] = $("#pageSelectHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
+        state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -77,6 +78,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setMeasurands(state);
         setSelectedFilter(state);
         setStackBars(state);
+        setAggregationValue(state);
         loadedState = encodedState;
         if(state.selectedFolder && state.selectedPages){
             $(window).trigger("historyStateLoaded");
@@ -150,6 +152,17 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         $("#inFrontButton").toggleClass("active", isStacked);
         $("#besideButton input").prop("checked", !isStacked);
         $("#besideButton").toggleClass("active", !isStacked);
+    };
+
+    var setAggregationValue = function (state) {
+        if (!state["selectedAggregationValue"]) {
+            return
+        }
+        var isAvg = state["selectedAggregationValue"] === "avg";
+        $("#averageButton input").prop("checked", isAvg);
+        $("#averageButton").toggleClass("active", isAvg);
+        $("#medianButton input").prop("checked", !isAvg);
+        $("#medianButton").toggleClass("active", !isAvg);
     };
 
     var setMultiSelect = function (id, values) {

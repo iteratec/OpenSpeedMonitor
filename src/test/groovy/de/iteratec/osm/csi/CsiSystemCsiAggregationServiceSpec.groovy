@@ -19,40 +19,47 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsiSystemCsiAggregationService)
 @Build([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration, CsiSystem])
-@Mock([CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job, CsiConfiguration,
-        CsiSystem, JobGroup, CsiAggregationUpdateEvent])
-class CsiSystemCsiAggregationServiceSpec extends Specification {
+class CsiSystemCsiAggregationServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CsiSystemCsiAggregationService> {
 
     CsiAggregationInterval dailyInterval
 
-    def doWithSpring = {
-        csiAggregationUpdateEventDaoService(CsiAggregationUpdateEventDaoService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        meanCalcService(MeanCalcService)
+    Closure doWithSpring() {
+        return {
+            csiAggregationUpdateEventDaoService(CsiAggregationUpdateEventDaoService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            meanCalcService(MeanCalcService)
+        }
     }
 
     void setup() {
         dailyInterval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         service.jobGroupCsiAggregationService = Stub(JobGroupCsiAggregationService) {
-            getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.buildWithoutSave()]
+            getOrCalculateShopCsiAggregations(_, _, _, _) >> [CsiAggregation.build(save: false)]
         }
+    }
+
+    void setupSpec() {
+        mockDomains(CsiAggregation, CsiAggregationInterval, JobGroupWeight, EventResult, JobResult, Job,
+                CsiConfiguration, CsiSystem, JobGroup, CsiAggregationUpdateEvent, ConnectivityProfile, Script)
     }
 
     void "calculate CsiAggregation from single weighted value"() {
@@ -140,7 +147,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         updateEvents*.id == [csiAggregation.id]
     }
     static CsiSystem buildCsiSystem() {
-        return CsiSystem.buildWithoutSave()
+        return CsiSystem.build(save: false)
                 .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
                 .addToJobGroupWeights(jobGroup: JobGroup.build(csiConfiguration: CsiConfiguration.build()), weight: 0.5)
                 .save(flush: true, failOnError: true)

@@ -1,13 +1,12 @@
 package de.iteratec.osm.util
 
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
 
-@TestFor(CronExpressionController)
-class CronExpressionControllerSpec extends Specification {
+class CronExpressionControllerSpec extends Specification implements ControllerUnitTest<CronExpressionController> {
 
     def setup() {
     }

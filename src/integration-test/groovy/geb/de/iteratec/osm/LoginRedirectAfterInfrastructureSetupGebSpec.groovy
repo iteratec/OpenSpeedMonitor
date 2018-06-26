@@ -6,9 +6,10 @@ import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.LoginPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Stepwise
+
 /**
  * See http://www.gebish.org/manual/current/ for more instructions
  */
@@ -57,5 +58,8 @@ class LoginRedirectAfterInfrastructureSetupGebSpec extends CustomUrlGebReporting
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

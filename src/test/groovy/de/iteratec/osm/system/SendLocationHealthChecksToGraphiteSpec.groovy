@@ -7,16 +7,15 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.MockedGraphiteSocket
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(LocationHealthCheckService)
-@Mock([LocationHealthCheck, GraphiteServer])
 @Build([Location, LocationHealthCheck, WebPageTestServer, GraphiteServer])
-class SendLocationHealthChecksToGraphiteSpec extends Specification {
+class SendLocationHealthChecksToGraphiteSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationHealthCheckService> {
 
     public static final String GRAPHITESERVERS_HEALTH_PREFIX = "osm.health"
     public static final String WPTSERVERS_LABEL = "mywptserver.com"
@@ -27,15 +26,23 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
     def setup() {
         mockGraphiteSocketProvider()
     }
-    static doWithSpring = {
-        configService(ConfigService)
-        batchActivityService(BatchActivityService)
+
+    void setupSpec() {
+        mockDomains(LocationHealthCheck, GraphiteServer)
+    }
+
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+            batchActivityService(BatchActivityService)
+        }
     }
 
     void "reportToGraphiteServers sends no LocationHealthChecks to graphite if no graphite server exists"(){
         given: "creating a LocationHealthCheck"
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -46,9 +53,9 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(save: false,
                         uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                        wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                        wptServer: WebPageTestServer.build(save: false,label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -64,7 +71,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = false"
         GraphiteServer.build(reportHealthMetrics: false)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -75,9 +83,10 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -94,7 +103,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = true"
         GraphiteServer.build(healthMetricsReportPrefix: GRAPHITESERVERS_HEALTH_PREFIX, reportHealthMetrics: true)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -105,9 +115,9 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false,label: WPTSERVERS_LABEL)
                     )
                 )
         ]
@@ -130,7 +140,8 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
         given: "creating a LocationHealthCheck and a graphite server with reportHealthMetrics = true"
         GraphiteServer.build(healthMetricsReportPrefix: GRAPHITESERVERS_HEALTH_PREFIX, reportHealthMetrics: true)
         List<LocationHealthCheck> healthChecks = [
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -141,12 +152,14 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 ),
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -157,12 +170,14 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 ),
-                LocationHealthCheck.buildWithoutSave(
+                LocationHealthCheck.build(
+                    save: false,
                     date: new DateTime().toDate(),
                     numberOfAgents: 2,
                     numberOfPendingJobsInWpt: 12,
@@ -173,9 +188,10 @@ class SendLocationHealthChecksToGraphiteSpec extends Specification {
                     numberOfEventResultsNextHour: 140,
                     numberOfCurrentlyPendingJobs: 20,
                     numberOfCurrentlyRunningJobs: 4,
-                    location: Location.buildWithoutSave(
+                    location: Location.build(
+                            save: false,
                             uniqueIdentifierForServer: LOCATIONS_IDENTIFIER,
-                            wptServer: WebPageTestServer.buildWithoutSave(label: WPTSERVERS_LABEL)
+                            wptServer: WebPageTestServer.build(save: false, label: WPTSERVERS_LABEL)
                     )
                 )
         ]

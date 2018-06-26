@@ -6,19 +6,15 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.databinding.SimpleMapDataBindingSource
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
 import javax.persistence.NoResultException
 
-@TestMixin(GrailsUnitTestMixin)
-@Mock([Page, JobGroup, Browser, Location])
 @Build([Page, JobGroup])
-class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
+class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification implements BuildDataTest {
 
     public static final String NAME_PAGE_1 = "homepage"
     public static final String NAME_PAGE_2 = "category"
@@ -27,7 +23,6 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
     SimpleMapDataBindingSource requestMap
 
     def setup() {
-
         // Use Grails data binding
         dataBinder = applicationContext.getBean('grailsWebDataBinder')
 
@@ -36,7 +31,10 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
         cmd = new ResultsRequestCommand()
 
         prepareRequestParameters()
+    }
 
+    void setupSpec() {
+        mockDomains(Page, JobGroup, Browser, Location)
     }
 
     void "requested single page in page parameter"() {

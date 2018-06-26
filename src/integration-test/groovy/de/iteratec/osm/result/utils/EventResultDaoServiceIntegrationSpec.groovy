@@ -28,8 +28,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.apache.commons.lang.time.DateUtils
 
 @Integration
@@ -191,7 +191,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 downloadAttempts: 1,
                 firstStatusUpdate: jobRunDatePlus_Zero.date,
                 lastStatusUpdate: jobRunDatePlus_Zero.date,
-                wptStatus: 0,
+                wptStatus: WptStatus.SUCCESSFUL.getWptStatusCode(),
                 validationState: 'validationState',
                 csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Zero,
@@ -238,7 +238,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 downloadAttempts: 1,
                 firstStatusUpdate: jobRunDatePlus_Ten.date,
                 lastStatusUpdate: jobRunDatePlus_Ten.date,
-                wptStatus: 0,
+                wptStatus: WptStatus.SUCCESSFUL.getWptStatusCode(),
                 validationState: 'validationState',
                 csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Ten,
@@ -285,7 +285,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 downloadAttempts: 1,
                 firstStatusUpdate: jobRunDatePlus_Twenty.date,
                 lastStatusUpdate: jobRunDatePlus_Twenty.date,
-                wptStatus: 0,
+                wptStatus: WptStatus.SUCCESSFUL.getWptStatusCode(),
                 validationState: 'validationState',
                 csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Twenty,
@@ -332,7 +332,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 downloadAttempts: 1,
                 firstStatusUpdate: jobRunDatePlus_Thirty.date,
                 lastStatusUpdate: jobRunDatePlus_Thirty.date,
-                wptStatus: 0,
+                wptStatus: WptStatus.SUCCESSFUL.getWptStatusCode(),
                 validationState: 'validationState',
                 csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Thirty,
@@ -379,7 +379,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 downloadAttempts: 1,
                 firstStatusUpdate: jobRunDatePlus_Day.date,
                 lastStatusUpdate: jobRunDatePlus_Day.date,
-                wptStatus: 0,
+                wptStatus: WptStatus.SUCCESSFUL.getWptStatusCode(),
                 validationState: 'validationState',
                 csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Day,

@@ -1,15 +1,13 @@
 package de.iteratec.osm.result
 
 import grails.databinding.SimpleMapDataBindingSource
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
-class TimeSeriesShowCommandBaseSpec extends Specification {
+class TimeSeriesShowCommandBaseSpec extends Specification implements GrailsUnitTest {
 
     public static final String CUSTOM_CONNECTIVITY_NAME = 'Custom (6.000/512 Kbps, 50ms)'
     TimeSeriesShowCommandBase command

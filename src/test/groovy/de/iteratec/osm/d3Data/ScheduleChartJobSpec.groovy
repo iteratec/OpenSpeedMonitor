@@ -17,17 +17,12 @@
 
 package de.iteratec.osm.d3Data
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import spock.lang.Specification
 
 import static org.junit.Assert.fail
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-class ScheduleChartJobSpec extends Specification{
+class ScheduleChartJobSpec extends Specification implements GrailsUnitTest {
 
     def "initialisation test"() {
         when: "a ScheduleChartJob is created"

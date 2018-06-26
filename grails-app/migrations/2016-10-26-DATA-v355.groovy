@@ -6,7 +6,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664005-1") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from event_result')
+                sqlCheck(expectedResult: '0', 'select count(*) from event_result')
             }
         }
         grailsChange {
@@ -42,7 +42,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-1") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_aggregation')
             }
         }
         grailsChange {
@@ -77,7 +77,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-2") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_aggregation')
             }
         }
         grailsChange {
@@ -109,7 +109,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-3") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_aggregation')
             }
         }
         grailsChange {
@@ -150,7 +150,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-15") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+                sqlCheck(expectedResult: '0', 'select count(*) from csi_aggregation')
             }
         }
         grailsChange {
@@ -182,7 +182,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-16") {
         preConditions(onFail: 'MARK_RAN') {
             not {
-                sqlCheck(expectedResult: 0, 'select count(*) from event_result')
+                sqlCheck(expectedResult: '0', 'select count(*) from event_result')
             }
         }
         grailsChange {

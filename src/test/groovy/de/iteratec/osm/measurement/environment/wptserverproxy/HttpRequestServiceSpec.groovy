@@ -17,11 +17,10 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(HttpRequestService)
-class HttpRequestServiceSpec extends Specification{
+class HttpRequestServiceSpec extends Specification implements ServiceUnitTest<HttpRequestService> {
 
     void "add trailing slash if missing"(String url, String expectedResult) {
         when: "the services should remove the trailing slash"

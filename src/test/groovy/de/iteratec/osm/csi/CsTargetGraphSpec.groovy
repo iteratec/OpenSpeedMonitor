@@ -17,20 +17,21 @@
 
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import spock.lang.Specification
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsTargetGraph)
 @Build([CsTargetValue, CsTargetGraph])
-@Mock([CsTargetValue, CsTargetGraph])
-class CsTargetGraphSpec extends Specification {
+class CsTargetGraphSpec extends Specification implements BuildDataTest {
     final static double error = 0.01
+
+    void setupSpec() {
+        mockDomains(CsTargetValue, CsTargetGraph)
+    }
 
     def "test percent calculation by date"() {
         setup:
@@ -41,7 +42,7 @@ class CsTargetGraphSpec extends Specification {
                 pointTwo: CsTargetValue.build(date: endDate.toDate(), csInPercent: 90)
         )
 
-        expect: "thhe target graph can calculate the correct value for a given date in range"
+        expect: "the target graph can calculate the correct value for a given date in range"
         that targetGraph.getPercentOfDate(endDate120DaysAgo), closeTo(80d, error)
         that targetGraph.getPercentOfDate(endDate.minusDays(90)), closeTo(82.5d, error)
         that targetGraph.getPercentOfDate(endDate.minusDays(60)), closeTo(85d, error)

@@ -2,8 +2,8 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback
@@ -50,10 +50,6 @@ class CsiConfigurationIntegrationSpec extends NonTransactionalIntegrationSpec {
         ConnectivityProfile profile = ConnectivityProfile.build()
 
         csiConfiguration = CsiConfiguration.build()
-        csiConfiguration.timeToCsMappings = [TimeToCsMapping.build(page: page)]
-        csiConfiguration.pageWeights = [PageWeight.build()]
-        csiConfiguration.browserConnectivityWeights = [BrowserConnectivityWeight.build(browser: browser, connectivity: profile)]
         csiConfiguration.save(failOnError: true)
-
     }
 }

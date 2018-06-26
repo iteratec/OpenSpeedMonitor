@@ -17,7 +17,9 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.gorm.annotation.Entity
 
+@Entity
 class BrowserAlias {
 
     static belongsTo = [browser: Browser]

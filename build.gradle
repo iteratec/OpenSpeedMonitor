@@ -25,15 +25,15 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'org.grails.plugins:database-migration:2.0.0'
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.2"
+        classpath 'org.grails.plugins:database-migration:3.0.3'
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
-        classpath "org.grails.plugins:hibernate4:5.0.4"
+        classpath "org.grails.plugins:hibernate5:6.1.9"
         classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
     }
 }
 
-version "4.5.2"
+version "4.6.0"
 group "OpenSpeedMonitor"
 
 apply plugin: "eclipse"
@@ -51,7 +51,9 @@ ext {
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
 
-    seleniumVersion = "3.4.0"
+    seleniumVersion = "2.53.1"
+    swaggerVersion = '1.5.19'
+    swaggerUIVersion = '3.17.0'
 }
 
 repositories {
@@ -73,29 +75,34 @@ dependencies {
     // Default Grails-Stuff
     runtime 'org.grails.plugins:grails-console:2.0.8'
     compile "org.grails:grails-core"
+    compile 'org.grails:grails-logging'
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
     compile "org.grails:grails-dependencies"
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
     compile "org.grails.plugins:scaffolding"
-    compile "org.grails.plugins:hibernate4"
+    compile "org.grails.plugins:hibernate5:6.1.9"
     compile 'org.grails.plugins:log-hibernate-stats:1.0.20'
     compile "org.hibernate:hibernate-ehcache"
-    compile 'org.grails.plugins:swagger:1.0.0'
-    compile 'io.swagger:swagger-core:1.5.16'
+    compile "io.swagger:swagger-core:${swaggerVersion}"
+    compile "io.swagger:swagger-models:${swaggerVersion}"
+    compile "io.swagger:swagger-servlet:${swaggerVersion}"
+    compile "org.webjars:swagger-ui:${swaggerUIVersion}"
 
     runtime "com.h2database:h2"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
     console "org.grails:grails-console"
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
-    profile "org.grails.profiles:web:3.1.5"
+    profile "org.grails.profiles:web:3.2.0"
 
-    testCompile "org.grails.plugins:hibernate"
+    testCompile "org.grails:grails-gorm-testing-support:1.1.4"
+    testCompile "org.grails:grails-web-testing-support:1.1.4"
+    testCompile "org.grails.plugins:hibernate5:6.1.9"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
@@ -104,27 +111,26 @@ dependencies {
     //Custom OSM-Stuff
     runtime 'mysql:mysql-connector-java:5.1.35'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
-    runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
+    runtime 'org.grails.plugins:database-migration:3.0.3'
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'org.grails.plugins:joda-time:2.0.0'
-    compile 'org.grails.plugins:spring-security-core:3.1.1'
-    compile 'org.grails.plugins:spring-security-ui:3.0.2'
+    compile 'org.grails.plugins:spring-security-core:3.2.1'
+    compile 'org.grails.plugins:spring-security-ui:3.1.2'
     compile 'org.grails.plugins:greenmail:2.0.0.M1'
     compile 'org.grails.plugins:mail:2.0.0.RC6'
     compile 'org.grails.plugins:quartz:2.0.8'
-    compile 'org.grails.plugins:taggable:2.0.1-SNAPSHOT'
+    compile 'org.grails.plugins:taggable:2.1.0-SNAPSHOT'
     compile 'org.grails.plugins:cookie:2.0.4'
     compile 'xml-apis:xml-apis:1.4.01'
     compile 'io.dropwizard.metrics:metrics-core:3.2.3'
     compile 'io.dropwizard.metrics:metrics-graphite:3.2.3'
     compile 'io.dropwizard.metrics:metrics-jvm:3.2.3'
     compile 'p6spy:p6spy:3.0.0'
-    compile 'org.grails.plugins:build-test-data:3.0.1'
+    compile 'org.grails.plugins:build-test-data:3.3.0.RC2'
     compile 'io.github.http-builder-ng:http-builder-ng-core:0.17.0'
     compile 'org.grails.plugins:http-builder-helper:1.0.2'
 
     runtime 'net.sf.supercsv:super-csv:2.4.0'
-    runtime "org.grails.plugins:asset-pipeline"
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
@@ -146,7 +152,7 @@ assets {
 
 node {
     //node version to use
-    version = '8.11.1'
+    version = '8.11.3'
     //npm version to use
     npmVersion = '5.6.0'
     // If true, it will download node using above parameters.
@@ -218,8 +224,8 @@ task nodeSyncJavascript(type: Sync) {
     include 'later/later.min.js'
     include 'moment/min/moment.min.js'
     include 'prettycron/prettycron.js'
-    include 'spin/dist/spin.min.js'
-    include 'tagit/js/tag-it.min.js'
+    include 'spin.js/spin.min.js'
+    include 'tag-it/js/tag-it.min.js'
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
@@ -251,7 +257,7 @@ task nodeSyncStylesheets(type: Sync) {
     include 'bootstrap-chosen/chosen-sprite@2x.png'
     include 'codemirror/lib/codemirror.css'
     include 'codemirror/addon/hint/show-hint.css'
-    include 'tagit/css/jquery.tagit.css'
+    include 'tag-it/css/jquery.tagit.css'
     include 'jquery-ui-dist/jquery-ui.css'
     include 'jquery-ui-dist/images/'
     include 'bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css'

@@ -1,16 +1,15 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DomainUnitTest
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 /**
  * Tests the delete functionality of the DefaultTimToCsMappingService
  */
-@TestFor(DefaultTimeToCsMappingService)
-@Mock([DefaultTimeToCsMapping])
-class DefaultTimeToCsMappingDeleteSpec extends Specification{
+class DefaultTimeToCsMappingDeleteSpec extends Specification implements ServiceUnitTest<DefaultTimeToCsMappingService>,
+        DomainUnitTest<DefaultTimeToCsMapping> {
 
     void "test simple delete"(){
         when: "We create a DefaultTimeToCsMapping with 1000 entries"

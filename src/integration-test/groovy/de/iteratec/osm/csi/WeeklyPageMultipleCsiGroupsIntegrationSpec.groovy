@@ -27,7 +27,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.springframework.test.annotation.Rollback
 

@@ -20,10 +20,8 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.PageService
+import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
-import org.grails.databinding.BindUsing
-
-import org.grails.databinding.BindUsing
 
 /**
  * <p>
@@ -43,9 +41,6 @@ class Script {
     Date	dateCreated
     Date	lastUpdated
 
-    //update flag after refactoring the script parser
-    boolean updated = true
-
     String label
     @BindUsing({
         obj, source -> source['description']
@@ -62,6 +57,7 @@ class Script {
         sort 'label'
         navigationScript(type: 'text')
         archivedScripts cascade: 'all-delete-orphan'
+        autowire true
     }
 
     static constraints = {

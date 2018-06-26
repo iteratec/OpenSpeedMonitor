@@ -62,41 +62,29 @@ class ResultSelectionService {
                     between("jobResultDate", from.toDate(), to.toDate())
                 }
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.JobGroups && command.jobGroupIds) {
-                    jobGroup {
-                        'in'("id", command.jobGroupIds)
-                    }
+                    'in'('jobGroup.id', command.jobGroupIds)
                 }
 
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
-                    measuredEvent {
-                        'in'("id", command.measuredEventIds)
-                    }
+                    'in'("measuredEvent.id", command.measuredEventIds)
                 }
 
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionController.ResultSelectionType.Pages && command.pageIds) {
-                    page {
-                        'in'("id", command.pageIds)
-                    }
+                    'in'("page.id", command.pageIds)
                 }
 
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.Locations && command.locationIds) {
-                    location {
-                        'in'("id", command.locationIds)
-                    }
+                    'in'("location.id", command.locationIds)
                 }
 
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.Locations && command.browserIds) {
-                    browser {
-                        'in'("id", command.browserIds)
-                    }
+                    'in'("browser.id", command.browserIds)
                 }
 
                 if (resultSelectionType != ResultSelectionController.ResultSelectionType.ConnectivityProfiles) {
                     or {
                         if (command.connectivityIds) {
-                            connectivityProfile {
-                                'in'("id", command.connectivityIds)
-                            }
+                            'in'("connectivityProfile.id", command.connectivityIds)
                         }
 
                         if (command.nativeConnectivity) {

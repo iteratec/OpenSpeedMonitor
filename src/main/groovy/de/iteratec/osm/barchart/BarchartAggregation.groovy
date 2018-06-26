@@ -8,11 +8,12 @@ import groovy.transform.EqualsAndHashCode
 /**
  * Created by mwg on 30.08.2017.
  */
-@EqualsAndHashCode(excludes = ["value", "valueComparative"])
+@EqualsAndHashCode(excludes = ["value", "valueComparative", "median", "medianComparative"])
 class BarchartAggregation {
     Double value
     Double valueComparative
     SelectedMeasurand selectedMeasurand
     Page page
     JobGroup jobGroup
+    String aggregationValue
 }

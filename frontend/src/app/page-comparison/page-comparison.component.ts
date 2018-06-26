@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
 import {JobGroupToPagesMappingDto} from "../shared/model/job-group-to-page-mapping.model";
+import {Component, NgZone} from '@angular/core';
 import {PageComparisonSelectionDto} from "./page-comparison-selection.model";
 import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {Observable} from "rxjs/internal/Observable";
+import {PageComparisonComponentAdapter} from "./adapter/page-comparison-component-adapter";
 
 @Component({
   selector: 'osm-page-comparison',
@@ -12,10 +13,12 @@ export class PageComparisonComponent {
   jobGroupToPagesMapping$: Observable<JobGroupToPagesMappingDto[]>;
   pageComparisonSelections: PageComparisonSelectionDto[] = [];
   canRemoveRow: boolean = false;
+  pageComparisonComponentAdapter: PageComparisonComponentAdapter;
 
-  constructor(private jobGroupService: JobGroupService) {
+  constructor(private jobGroupService: JobGroupService, zone: NgZone) {
     this.addComparison();
     this.registerTimeFrameChangeEvent();
+    this.pageComparisonComponentAdapter = new PageComparisonComponentAdapter(zone, this);
   }
 
   checkIfRowsAreRemovable() {

@@ -31,7 +31,7 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 
 /**
  * Provides methods to get {@link CsiAggregation}s from db and transform them into a chart processable format.
@@ -162,7 +162,7 @@ class CustomerSatisfactionHighChartService {
         List<OsmChartGraph> graphs = new ArrayList<OsmChartGraph>();
 
         // start a new session for better performance
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewTransaction {
 
             for (CsiAggregation currentCsiAggregation : csiValues) {
                 if (getValue(currentCsiAggregation) != null && getValue(currentCsiAggregation) >= 0) {
@@ -348,7 +348,7 @@ class CustomerSatisfactionHighChartService {
      */
     private String getMapLabel(CsiAggregation mv, CsiType csiType) {
         String labelForValuesNotAssignable = 'n.a.'
-        String csiTypeString = csiType.toString() + HIGHCHART_LEGEND_DELIMITTER
+        String csiTypeString = csiType.toString() + TIMESERIES_CHART_LEGEND_DELIMITTER
         String tag = getCsiAggregationIdentifierForChart(mv)
         switch (mv.aggregationType) {
             case AggregationType.MEASURED_EVENT:
@@ -359,8 +359,8 @@ class CustomerSatisfactionHighChartService {
                     Location location = mv.location
 
                     //Removed Browser and Page See IT-153
-                    String label = (group ? group.name : labelForValuesNotAssignable) + HIGHCHART_LEGEND_DELIMITTER;
-                    label += (event ? event.name : labelForValuesNotAssignable) + HIGHCHART_LEGEND_DELIMITTER;
+                    String label = (group ? group.name : labelForValuesNotAssignable) + TIMESERIES_CHART_LEGEND_DELIMITTER;
+                    label += (event ? event.name : labelForValuesNotAssignable) + TIMESERIES_CHART_LEGEND_DELIMITTER;
                     label += location ?
                             (location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer) :
                             labelForValuesNotAssignable;
@@ -375,7 +375,7 @@ class CustomerSatisfactionHighChartService {
                     JobGroup group = mv.jobGroup
                     Page page = mv.page
                     group && page ?
-                            weeklyPageTagToGraphLabelMap.put(tag, "${group.name}${HIGHCHART_LEGEND_DELIMITTER}${page.name}") :
+                            weeklyPageTagToGraphLabelMap.put(tag, "${group.name}${TIMESERIES_CHART_LEGEND_DELIMITTER}${page.name}") :
                             weeklyPageTagToGraphLabelMap.put(tag, labelForValuesNotAssignable)
                 }
                 return csiTypeString + weeklyPageTagToGraphLabelMap[tag]

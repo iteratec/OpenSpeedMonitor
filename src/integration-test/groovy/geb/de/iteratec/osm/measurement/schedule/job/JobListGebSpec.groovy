@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -15,8 +16,8 @@ import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
 import geb.pages.de.iteratec.osm.measurement.schedule.job.JobCreatePage
 import geb.pages.de.iteratec.osm.measurement.schedule.job.JobListPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -345,6 +346,9 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     void cleanupSpec() {
         doLogout()
         Job.withNewTransaction {
+            JobResult.list().each {
+                it.delete()
+            }
             Job.list().each {
                 it.delete()
             }
@@ -372,9 +376,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 

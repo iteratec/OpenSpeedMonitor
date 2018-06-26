@@ -30,8 +30,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.result.*
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.util.mop.ConfineMetaClassChanges
@@ -227,7 +227,7 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 page: page,
                 browser: browser,
                 location: location,
-                wptStatus: 200,
+                wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                 medianValue: true,
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,

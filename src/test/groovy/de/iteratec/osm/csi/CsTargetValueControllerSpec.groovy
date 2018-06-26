@@ -1,13 +1,12 @@
 package de.iteratec.osm.csi
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DomainUnitTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(CsTargetValueController)
-@Mock([CsTargetValue])
-class CsTargetValueControllerSpec extends Specification {
+class CsTargetValueControllerSpec extends Specification implements ControllerUnitTest<CsTargetValueController>,
+        DomainUnitTest<CsTargetValue> {
 
     void "test creating a csTargetValue without any params"() {
         when: "nothing is in params"

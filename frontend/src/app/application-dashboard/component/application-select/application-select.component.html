@@ -1,15 +1,16 @@
-
-  <div class="dropdown">
-    <button class="select-header dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-      {{selectedApplication?.name || "select application"}}<i class="fa fa-caret-down margin-left-10"></i>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <li>
-        <a class="dropdown-item" *ngFor="let jobGroup of jobGroups$ | async" (click)="setApplication(jobGroup)">
+<div class="dropdown">
+  <button class="select-application-header dropdown-toggle" type="button" id="selectApplicationHeader"
+          data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+    {{selectedApplication?.name || "select application"}}
+    <i class="fa fa-caret-down select-application-header-triangle"></i>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
+    <li>
+      <a class="dropdown-item" *ngFor="let jobGroup of jobGroups$ | async" (click)="setApplication(jobGroup)">
           {{jobGroup.name}}
-        </a>
-      </li>
-    </ul>
-  </div>
+      </a>
+    </li>
+  </ul>
+</div>
 

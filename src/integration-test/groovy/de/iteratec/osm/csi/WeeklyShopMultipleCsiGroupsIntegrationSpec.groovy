@@ -20,7 +20,7 @@ package de.iteratec.osm.csi
 import static org.junit.Assert.*
 import org.joda.time.DateTime
 import org.springframework.test.annotation.Rollback
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService

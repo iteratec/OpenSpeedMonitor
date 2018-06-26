@@ -2,7 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.MeasurementResultDto
 import de.iteratec.osm.measurement.schedule.Job
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class ThresholdService {

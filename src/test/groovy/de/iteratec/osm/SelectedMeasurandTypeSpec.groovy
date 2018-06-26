@@ -1,23 +1,21 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
 @Build([EventResult, UserTiming])
-@Mock([EventResult, UserTiming])
-class SelectedMeasurandTypeSpec extends Specification {
+class SelectedMeasurandTypeSpec extends Specification implements BuildDataTest {
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming, ConnectivityProfile, Script)
+    }
 
     void "test getValue for Measurand"() {
         setup: "EventResult is initiated"
@@ -64,8 +62,8 @@ class SelectedMeasurandTypeSpec extends Specification {
     void "test getValue for UserTiming"() {
         setup: "EventResult is initiated"
         Double startTime = type == UserTimingType.MARK ? expectedValue : 10
-        Double duraction = type == UserTimingType.MEASURE ? expectedValue : null
-        List<UserTiming> userTimings = [UserTiming.build(name: name, type: type, startTime: startTime, duration: duraction),
+        Double duration = type == UserTimingType.MEASURE ? expectedValue : null
+        List<UserTiming> userTimings = [UserTiming.build(name: name, type: type, startTime: startTime, duration: duration),
                                         UserTiming.build(name: 'someMark', type: UserTimingType.MARK, startTime: 2000, duration: null),
                                         UserTiming.build(name: 'someMeasure', type: UserTimingType.MEASURE, startTime: 20, duration: 4000)]
         EventResult eventResult = EventResult.build(userTimings: userTimings)

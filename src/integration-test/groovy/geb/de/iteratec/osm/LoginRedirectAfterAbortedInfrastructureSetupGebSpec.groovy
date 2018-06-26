@@ -6,8 +6,8 @@ import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.LoginPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import spock.lang.Stepwise
 /**
  * See http://www.gebish.org/manual/current/ for more instructions
@@ -23,12 +23,7 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
         and: "there is an admin and an osm config in db and infrastructure setup was aborted previously"
         User.withNewTransaction {
-            OsmConfiguration configuration = OsmConfiguration.list()[0]
-            if (!configuration) {
-                configuration = OsmConfiguration.build()
-            }
-            configuration.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.ABORTED
-            configuration.save(failOnError: true)
+            OsmConfiguration.build(infrastructureSetupRan: OsmConfiguration.InfrastructureSetupStatus.ABORTED)
             createAdminUser()
         }
 
@@ -43,5 +38,8 @@ class LoginRedirectAfterAbortedInfrastructureSetupGebSpec extends CustomUrlGebRe
 
     void cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }

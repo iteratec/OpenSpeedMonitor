@@ -11,8 +11,8 @@ class CsTargetGraphShowPage extends I18nGebPage{
     }
 
     static content = {
-        labelText { $("#show-csTargetGraph").$("tr")[0].$(".property-value").attr("innerHTML") }
-        descriptionText { $("#show-csTargetGraph").$("tr")[1].$(".property-value").attr("innerHTML") }
+        labelText { $("#show-csTargetGraph").$("tr")[4].$(".property-value").attr("innerHTML") }
+        descriptionText { $("#show-csTargetGraph").$("tr")[5].$(".property-value").attr("innerHTML") }
 
         successDiv { $("div", class: "alert alert-info") }
         successDivText { successDiv[0].attr("innerHTML") }

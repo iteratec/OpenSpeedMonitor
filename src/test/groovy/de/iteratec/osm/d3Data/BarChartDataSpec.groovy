@@ -17,15 +17,10 @@
 
 package de.iteratec.osm.d3Data
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-class BarChartDataSpec extends Specification{
+class BarChartDataSpec extends Specification implements GrailsUnitTest {
 
     def "bar chart data object initialised with labels and an empty list"() {
         when: "new BarChartData is created"

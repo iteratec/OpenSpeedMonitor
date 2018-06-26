@@ -1,49 +1,34 @@
 package de.iteratec.osm.csi
 
-import org.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
-import org.hibernate.cfg.Configuration
+import grails.buildtestdata.TestDataBuilder
+import grails.core.GrailsApplication
+import org.grails.datastore.mapping.core.connections.ConnectionSource
+import org.grails.orm.hibernate.HibernateDatastore
+import org.hibernate.boot.MetadataBuilder
+import org.hibernate.boot.MetadataSources
+import org.hibernate.boot.spi.MetadataImplementor
+import org.hibernate.engine.spi.SessionFactoryImplementor
 import org.hibernate.tool.hbm2ddl.SchemaExport
-import spock.lang.Shared
 import spock.lang.Specification
-
-class NonTransactionalIntegrationSpec extends Specification {
-
-    @Shared
-    private static Configuration _configuration
-
-    @Shared
-    def grailsApplication
-
+/*
+See https://stackoverflow.com/questions/16628929/grails-recreate-database-schema-for-integration-test
+ */
+class NonTransactionalIntegrationSpec extends Specification implements TestDataBuilder {
     static transactional = false
 
-    def setup() {
-        if (!_configuration) {
-            // 1-time creation of the configuration
-            Properties properties = new Properties()
-            properties.setProperty 'hibernate.connection.driver_class', grailsApplication.config.dataSource.driverClassName
-            properties.setProperty 'hibernate.connection.username', grailsApplication.config.dataSource.username
-            properties.setProperty 'hibernate.connection.password', grailsApplication.config.dataSource.password ?:""
-            properties.setProperty 'hibernate.connection.url', grailsApplication.config.dataSource.url
-            properties.setProperty 'hibernate.dialect', 'org.hibernate.dialect.H2Dialect'
-
-            _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
-        }
-        new SchemaExport(_configuration).create(false, true)
-    }
+    GrailsApplication grailsApplication
 
     def cleanup() {
-      if (!_configuration) {
-          // 1-time creation of the configuration
-          Properties properties = new Properties()
-          properties.setProperty 'hibernate.connection.driver_class', grailsApplication.config.dataSource.driverClassName
-          properties.setProperty 'hibernate.connection.username', grailsApplication.config.dataSource.username
-          properties.setProperty 'hibernate.connection.password', grailsApplication.config.dataSource.password ?:""
-          properties.setProperty 'hibernate.connection.url', grailsApplication.config.dataSource.url
-          properties.setProperty 'hibernate.dialect', 'org.hibernate.dialect.H2Dialect'
+        HibernateDatastore hibernateDatastore = grailsApplication.mainContext.getBean("hibernateDatastore", HibernateDatastore)
+        hibernateDatastore = hibernateDatastore.getDatastoreForConnection(ConnectionSource.DEFAULT)
+        def serviceRegistry = ((SessionFactoryImplementor)hibernateDatastore.sessionFactory).getServiceRegistry()
+                .getParentServiceRegistry()
+        final MetadataSources metadataSources = new MetadataSources( serviceRegistry )
+        final MetadataBuilder metadataBuilder = metadataSources.getMetadataBuilder()
+        def metadata = (MetadataImplementor) metadataBuilder.build()
 
-          _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
-      }
-      new SchemaExport(_configuration).create(false, true)
+        def schemaExport = new SchemaExport(serviceRegistry, metadata)
+        schemaExport.create(false, true)
     }
 
 }

@@ -20,7 +20,7 @@ package de.iteratec.osm.csi.transformation
 import de.iteratec.osm.csi.CustomerFrustration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 import org.joda.time.Duration
 

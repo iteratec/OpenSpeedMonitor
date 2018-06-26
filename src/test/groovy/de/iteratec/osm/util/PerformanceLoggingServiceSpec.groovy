@@ -23,22 +23,20 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.AppenderBase
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import static de.iteratec.osm.util.PerformanceLoggingService.INDENTATION_CHAR
 
-
-@TestFor(PerformanceLoggingService)
-class PerformanceLoggingServiceSpec extends Specification {
+class PerformanceLoggingServiceSpec extends Specification implements ServiceUnitTest<PerformanceLoggingService> {
 
     Logger serviceLogger
     PerformanceLoggingService serviceUnderTest
 
     void setup() {
         serviceUnderTest = service
-        serviceLogger = (Logger) LoggerFactory.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService");
+        serviceLogger = (Logger) LoggerFactory.getLogger("de.iteratec.osm.util.PerformanceLoggingService");
     }
 
     /**
@@ -50,9 +48,9 @@ class PerformanceLoggingServiceSpec extends Specification {
         Appender appender = addAppender { String m -> message = m }
         String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
 
-        when: "We set the log level to Info and execute a operation which logs on Fatal"
+        when: "We set the log level to Info and execute a operation which logs on Error"
         serviceLogger.setLevel(Level.INFO)
-        serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, 0) {
+        serviceUnderTest.logExecutionTime(LogLevel.ERROR, descriptionOfClosureToMeasure, 0) {
             Thread.sleep(1100)
         }
 

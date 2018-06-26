@@ -22,13 +22,14 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -37,12 +38,9 @@ import static de.iteratec.osm.csi.weighting.WeightFactor.*
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(WeightingService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
-        JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiDay, ConnectivityProfile])
-class WeightedAverageCalculationSpec extends Specification {
+class WeightedAverageCalculationSpec extends Specification implements BuildDataTest, ServiceUnitTest<WeightingService> {
 
     private static final double DELTA = 1e-15
 
@@ -60,12 +58,19 @@ class WeightedAverageCalculationSpec extends Specification {
 
     static CsiConfiguration CSI_CONFIGURATION
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+        }
     }
 
     void setup() {
         createTestDataCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem, Script)
     }
 
     void "Without WeightFactors weight is always 1 when calculated for EventResults"() {
@@ -93,7 +98,7 @@ class WeightedAverageCalculationSpec extends Specification {
 
         given: "HOUROFDAY WeightFactor and some EventResults in place."
         Set<WeightFactor> weightFactors = [HOUROFDAY] as Set
-        CsiValue eventResult = EventResult.buildWithoutSave(jobResultDate: date, jobGroup: JOB_GROUP)
+        CsiValue eventResult = EventResult.build(save: false, jobResultDate: date, jobGroup: JOB_GROUP)
 
         when: "Weights get calculated."
         double weight = service.getWeight(eventResult, weightFactors, CSI_CONFIGURATION)
@@ -113,7 +118,7 @@ class WeightedAverageCalculationSpec extends Specification {
 
         given: "HOUROFDAY WeightFactor and some CsiAggregations in place."
         Set<WeightFactor> weightFactors = [HOUROFDAY] as Set
-        CsiValue csiAggregation = CsiAggregation.buildWithoutSave(started: date, jobGroup: JOB_GROUP)
+        CsiValue csiAggregation = CsiAggregation.build(save: false, started: date, jobGroup: JOB_GROUP)
 
         when: "Weights get calculated."
         double weight = service.getWeight(csiAggregation, weightFactors, CSI_CONFIGURATION)

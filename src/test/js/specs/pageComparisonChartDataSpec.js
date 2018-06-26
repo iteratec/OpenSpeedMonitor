@@ -7,11 +7,13 @@ describe("PageComparisonChartData data transformation", function () {
                 dimensionalUnit: 'ms',
                 data: [
                     {
+                        aggregationValue: 'avg',
                         grouping: "",
                         measurand: "",
                         value: 1
                     },
                     {
+                        aggregationValue: 'avg',
                         grouping: "",
                         measurand: "",
                         value: 1
@@ -73,31 +75,31 @@ describe("PageComparisonChartData data transformation", function () {
     it("getDataForHeader should return a label with the equal job group", function () {
         pageComparisonData.setData({
             series: [
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group1 | Page1").valuePage1(300)
-                    .groupingPage2("Group1 | Page2").valuePage2(600) .build()
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(300)
+                    .groupingPage2("Group1 | Page2").valuePage2(600).build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1, DOC_COMPLETE_TIME - Average");
     });
-    it("getDataForHeader should return an empty label if nothing is equal for all series", function () {
+    it("getDataForHeader should return only aggregationtype as label if nothing is equal for all series", function () {
         pageComparisonData.setData({
             series: [
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group1 | Page1")
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1")
                     .valuePage1(300).groupingPage2("Group2 | Page2").valuePage2(600) .build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("DOC_COMPLETE_TIME - Average");
     });
     it("getDataForBarScore should return the right maximum ", function () {
         var expectedMaximum = 9999;
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(30)
-                    .groupingPage2("Group1 | Page2").valuePage2(100) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group2 | Page3").valuePage1(expectedMaximum)
-                    .groupingPage2("Group2 | Page4").valuePage2(600) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group3 | Page5").valuePage1(10)
-                    .groupingPage2("Group3 | Page6").valuePage2(50) .build()
+                    .groupingPage2("Group1 | Page2").valuePage2(100).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group2 | Page3").valuePage1(expectedMaximum)
+                    .groupingPage2("Group2 | Page4").valuePage2(600).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group3 | Page5").valuePage1(10)
+                    .groupingPage2("Group3 | Page6").valuePage2(50).build()
             ]
         });
         expect(pageComparisonData.getDataForBarScore().max).toBe(expectedMaximum);
@@ -107,11 +109,11 @@ describe("PageComparisonChartData data transformation", function () {
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(30)
-                    .groupingPage2("Group1 | Page2").valuePage2(100) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group2 | Page3").valuePage1(999)
-                    .groupingPage2("Group2 | Page4").valuePage2(600) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group3 | Page5").valuePage1(10)
-                    .groupingPage2("Group3 | Page6").valuePage2(50) .build()
+                    .groupingPage2("Group1 | Page2").valuePage2(100).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group2 | Page3").valuePage1(999)
+                    .groupingPage2("Group2 | Page4").valuePage2(600).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group3 | Page5").valuePage1(10)
+                    .groupingPage2("Group3 | Page6").valuePage2(50).build()
             ]
         });
         var barsOfFirstPage = pageComparisonData.getDataForBars(0);
@@ -129,11 +131,11 @@ describe("PageComparisonChartData data transformation", function () {
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(firstPage1)
-                    .groupingPage2("Group1 | Page2").valuePage2(secondPage1) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group2 | Page3").valuePage1(firstPage2)
-                    .groupingPage2("Group2 | Page4").valuePage2(secondPage2) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group3 | Page5").valuePage1(firstPage3)
-                    .groupingPage2("Group3 | Page6").valuePage2(secondPage3) .build()
+                    .groupingPage2("Group1 | Page2").valuePage2(secondPage1).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group2 | Page3").valuePage1(firstPage2)
+                    .groupingPage2("Group2 | Page4").valuePage2(secondPage2).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group3 | Page5").valuePage1(firstPage3)
+                    .groupingPage2("Group3 | Page6").valuePage2(secondPage3).build()
             ]
         });
         var firstPageValues = pageComparisonData.getDataForBars(0).values.map(function (page) {
@@ -149,11 +151,11 @@ describe("PageComparisonChartData data transformation", function () {
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(30)
-                    .groupingPage2("Group1 | Page2").valuePage2(100) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group2 | Page3").valuePage1(999)
-                    .groupingPage2("Group2 | Page4").valuePage2(600) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group3 | Page5").valuePage1(10)
-                    .groupingPage2("Group3 | Page6").valuePage2(50) .build()
+                    .groupingPage2("Group1 | Page2").valuePage2(100).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group2 | Page3").valuePage1(999)
+                    .groupingPage2("Group2 | Page4").valuePage2(600).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group3 | Page5").valuePage1(10)
+                    .groupingPage2("Group3 | Page6").valuePage2(50).build()
             ]
         });
         var barsOfFirstPage = pageComparisonData.getDataForBars(0);
@@ -165,11 +167,11 @@ describe("PageComparisonChartData data transformation", function () {
         pageComparisonData.setData({
             series: [
                 new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group1 | Page1").valuePage1(30)
-                    .groupingPage2("Group1 | Page2").valuePage2(100) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group2 | Page3").valuePage1(999)
-                    .groupingPage2("Group2 | Page4").valuePage2(600) .build(),
-                new PageComparisonSeriesBuilder().makeDocComplete() .groupingPage1("Group3 | Page5").valuePage1(10)
-                    .groupingPage2("Group3 | Page6").valuePage2(50) .build()
+                    .groupingPage2("Group1 | Page2").valuePage2(100).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group2 | Page3").valuePage1(999)
+                    .groupingPage2("Group2 | Page4").valuePage2(600).build(),
+                new PageComparisonSeriesBuilder().makeDocComplete().groupingPage1("Group3 | Page5").valuePage1(10)
+                    .groupingPage2("Group3 | Page6").valuePage2(50).build()
             ]
         });
         var barsOfFirstPage = pageComparisonData.getDataForBars(0);

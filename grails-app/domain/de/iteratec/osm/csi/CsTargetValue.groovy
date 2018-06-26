@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import grails.databinding.BindUsing
 import groovy.transform.EqualsAndHashCode
-import org.grails.databinding.BindUsing
 
 import java.text.SimpleDateFormat
 

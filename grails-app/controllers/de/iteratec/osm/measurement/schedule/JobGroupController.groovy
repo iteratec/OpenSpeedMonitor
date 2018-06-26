@@ -9,6 +9,7 @@ import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.ResultSelectionCommand
+import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -268,12 +269,21 @@ class JobGroupController {
         DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
-        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, null, { existing ->
+        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
+            if (existing) {
+                not { 'in'('jobGroup', existing) }
+            }
             projections {
-                distinct 'jobGroup'
+                distinct('jobGroup')
             }
         })
-        allActiveAndRecent.addAll(recentJobGroups)
+        List recentAndFormattedJobGroups = recentJobGroups.collect {
+            [
+                    id  : it.id,
+                    name: it.name
+            ]
+        }
+        allActiveAndRecent.addAll(recentAndFormattedJobGroups)
 
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }

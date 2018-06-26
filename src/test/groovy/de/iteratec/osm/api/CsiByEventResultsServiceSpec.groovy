@@ -24,25 +24,26 @@ import de.iteratec.osm.csi.MeanCalcService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsiByEventResultsService)
-@Mock([JobGroup, CsiConfiguration])
 @Build([EventResult, CsiConfiguration, JobGroup])
-class CsiByEventResultsServiceSpec extends Specification{
+class CsiByEventResultsServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CsiByEventResultsService> {
 
     static final double DELTA = 1e-15
     static final double EXPECTED_TARGET_CSI = 34d
@@ -51,9 +52,11 @@ class CsiByEventResultsServiceSpec extends Specification{
     CsiByEventResultsService serviceUnderTest
     MvQueryParams queryParamsIrrelevantCauseDbQueriesAreMocked
 
-    def doWithSpring = {
-        meanCalcService(MeanCalcService)
-        performanceLoggingService(PerformanceLoggingService)
+    Closure doWithSpring() {
+        return {
+            meanCalcService(MeanCalcService)
+            performanceLoggingService(PerformanceLoggingService)
+        }
     }
 
     void setup() {
@@ -61,6 +64,10 @@ class CsiByEventResultsServiceSpec extends Specification{
         initFullFunctionalSpringBeanServices()
         mocksCommonToAllTests()
         createTestDataCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(JobGroup, CsiConfiguration, ConnectivityProfile, Script)
     }
 
     //tests////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +92,7 @@ class CsiByEventResultsServiceSpec extends Specification{
     void "get system csi with one single EventResult"() {
         given: "one EventResult matches query"
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.build(save: false)]
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
@@ -127,7 +134,7 @@ class CsiByEventResultsServiceSpec extends Specification{
         int numberOfUnderlyingEventResults = 8
 
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.buildWithoutSave()]
+            List<EventResult> nonEmptyEventResultListNotUsedInTest = [EventResult.build(save: false)]
             getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> nonEmptyEventResultListNotUsedInTest
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
@@ -166,7 +173,7 @@ class CsiByEventResultsServiceSpec extends Specification{
         MvQueryParams queryParamsWithoutCsiConfiguration = new MvQueryParams()
         queryParamsWithoutCsiConfiguration.jobGroupIds.add(jobGroupWithoutCsiConfig.getId())
         serviceUnderTest.eventResultDaoService = Stub(EventResultDaoService){
-            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.buildWithoutSave()]
+            getByStartAndEndTimeAndMvQueryParams(_, _, _, _) >> [EventResult.build(save: false)]
         }
         serviceUnderTest.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> [new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
@@ -197,7 +204,7 @@ class CsiByEventResultsServiceSpec extends Specification{
     }
 
     private void createTestDataCommonToAllTests() {
-        CsiConfiguration csiConfiguration = CsiConfiguration.buildWithoutSave()
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(save: false)
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration)
         queryParamsIrrelevantCauseDbQueriesAreMocked = new MvQueryParams()
         queryParamsIrrelevantCauseDbQueriesAreMocked.jobGroupIds.add(jobGroup.getId())

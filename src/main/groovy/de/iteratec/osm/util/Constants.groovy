@@ -20,7 +20,7 @@ package de.iteratec.osm.util
 
 abstract class Constants {
     public static final String UNIQUE_STRING_DELIMITTER = ':::'
-    public static final String HIGHCHART_LEGEND_DELIMITTER = ' | '
+    public static final String TIMESERIES_CHART_LEGEND_DELIMITTER = ' | '
     public static final String COOKIE_KEY_CSI_DASHBOARD_TITLE = 'de-iteratec-osm-p13n-default-csi-dashboard-title'
     public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 }

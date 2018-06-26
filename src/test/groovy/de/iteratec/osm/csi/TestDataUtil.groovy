@@ -28,18 +28,6 @@ import de.iteratec.osm.util.OsmTestLogin
  * @since IT-8
  */
 class TestDataUtil implements OsmTestLogin {
-    /**
-     * <p>
-     * Creates an OsmConfiguration and persists it.
-     * This method uses default values for minValidLoadtime and maxValidLoadtime.
-     * </p>
-     */
-    public static void createOsmConfig() {
-        if (OsmConfiguration.count == 0) {
-            OsmConfiguration.build().save(failOnError: true)
-        }
-    }
-
     public static User createAdminUser() {
         String adminUserName = getConfiguredUsername()
         User user = User.findByUsername(adminUserName)

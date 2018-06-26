@@ -24,7 +24,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat

@@ -18,7 +18,7 @@ import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
 class PageAggregationController extends ExceptionHandlerController {
@@ -33,7 +33,7 @@ class PageAggregationController extends ExceptionHandlerController {
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
     BarchartAggregationService barchartAggregationService
-
+    PerformanceLoggingService performanceLoggingService
 
     def index() {
         redirect(action: 'show')
@@ -67,7 +67,7 @@ class PageAggregationController extends ExceptionHandlerController {
         return modelToRender
     }
 
-    def entryAndFollow(){
+    def entryAndFollow() {
         return [:]
     }
 
@@ -93,16 +93,15 @@ class PageAggregationController extends ExceptionHandlerController {
             allPages = Page.findAllByNameInList(cmd.selectedPages)
         }
 
-        List<BarchartAggregation> barchartAggregations =  barchartAggregationService.getBarchartAggregationsFor(cmd)
+        List<BarchartAggregation> barchartAggregations = barchartAggregationService.getBarchartAggregationsFor(cmd)
 
         // return if no data is available
-        boolean hasComparativeData = barchartAggregations.any{it.valueComparative != null}
-        if (!barchartAggregations.any{it.value != null} && !hasComparativeData) {
+        boolean hasComparativeData = barchartAggregations.any { it.valueComparative != null }
+        if (!barchartAggregations.any { it.value != null } && !hasComparativeData) {
             ControllerUtils.sendObjectAsJSON(response, [:])
             return
         }
 
-        List allSeries = cmd.selectedSeries
         PageAggregationChartDTO chartDto = new PageAggregationChartDTO(hasComparativeData: hasComparativeData)
         chartDto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         chartDto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
@@ -111,16 +110,17 @@ class PageAggregationController extends ExceptionHandlerController {
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
         barchartAggregations.each {
-            if(it.value){
+            if (it.value) {
                 PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
-                        unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
-                        measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
-                        measurand: it.selectedMeasurand.name,
-                        measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
-                        value: it.value,
-                        valueComparative: it.valueComparative,
-                        page: it.page.name,
-                        jobGroup: it.jobGroup.name
+                    unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
+                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
+                    measurand: it.selectedMeasurand.name,
+                    measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
+                    value: it.value,
+                    valueComparative: it.valueComparative,
+                    page: it.page,
+                    jobGroup: it.jobGroup,
+                    aggregationValue: it.aggregationValue
                 )
                 chartDto.series.add(seriesDto)
             }
@@ -136,20 +136,19 @@ class PageAggregationController extends ExceptionHandlerController {
                 HttpStatus.OK,
                 i18nService.msg("de.iteratec.ism.no.data.on.current.selection.heading", "No data")
             )
-        }
-        else {
+        } else {
             ControllerUtils.sendObjectAsJSON(response, chartDto)
         }
     }
 
     @RestAction
-    def getEntryAndFollowBarchartData(){
+    def getEntryAndFollowBarchartData() {
 
         JobGroup jobGroup = JobGroup.findByName('develop_Desktop')
         List<Job> jobs = jobDaoService.getJobs(jobGroup)
         Set<Page> uniqueTestedPages = [] as Set
 
-        jobs*.script*.navigationScript.each {String navigationScript ->
+        jobs*.script*.navigationScript.each { String navigationScript ->
             List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
             uniqueTestedPages.addAll(pagesOfThisScript)
         }
@@ -190,7 +189,7 @@ class PageAggregationController extends ExceptionHandlerController {
             testedPages.each { p ->
                 if (pages.contains(p)) {
                     jobGroups.each {
-                        filterRule << [ page: p.name, jobGroup: it.name]
+                        filterRule << [page: p.name, jobGroup: it.name]
                     }
                 }
             }

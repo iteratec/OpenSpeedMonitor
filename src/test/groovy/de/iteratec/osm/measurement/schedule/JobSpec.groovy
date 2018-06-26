@@ -19,20 +19,19 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
 /**
  * These class contains tests for custom validators or any other logic of class {@link Job}.
  * Default gorm persistance isn't tested.
  */
-@TestMixin(GrailsUnitTestMixin)
-@Mock([Job, Location, Script])
 @Build([Job, ConnectivityProfile])
-class JobSpec extends Specification {
+class JobSpec extends Specification implements BuildDataTest {
+    void setupSpec() {
+        mockDomains(Job, Location, Script)
+    }
 
     void "connectivityProfile: not custom or all set manually"() {
         when:

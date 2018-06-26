@@ -19,7 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.util.I18nService
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 
 /**
  * OsmChartProcessingService
@@ -136,7 +136,7 @@ class OsmChartProcessingService {
     }
 
     private List splitGraphLabels(List<OsmChartGraph> graphs) {
-        List<List<String>> allTokenizedLabels = graphs*.label*.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim())
+        List<List<String>> allTokenizedLabels = graphs*.label*.tokenize(TIMESERIES_CHART_LEGEND_DELIMITTER.trim())
         return allTokenizedLabels
     }
 
