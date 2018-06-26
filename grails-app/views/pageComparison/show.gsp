@@ -41,7 +41,8 @@
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
-                        <osm-page-comparison-adapter data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></osm-page-comparison-adapter>
+                        <osm-page-comparison
+                                data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></osm-page-comparison>
                     </div>
                     <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
