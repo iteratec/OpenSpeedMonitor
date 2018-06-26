@@ -95,7 +95,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             from: selectedTimeFrame[0].toISOString(),
             to: selectedTimeFrame[1].toISOString(),
             measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-            selectedPageComparisons: JSON.stringify(OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getComparisons())
+            selectedPageComparisons: JSON.stringify(window.pageComparisonComponent.getComparisons())
         };
 
         spinner.start();
@@ -107,16 +107,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         queryData.selectedAggregationValue = aggregationValue;
         $.ajax({
             type: 'POST',
-<<<<<<< HEAD
             data: queryData,
-=======
-            data: {
-                from: selectedTimeFrame[0].toISOString(),
-                to: selectedTimeFrame[1].toISOString(),
-                measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
-                selectedPageComparisons: JSON.stringify(window.pageComparisonComponent.getComparisons())
-            },
->>>>>>> feature/bootstrapAngular
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
             success: function (data) {
