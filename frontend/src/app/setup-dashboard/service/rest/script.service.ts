@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/internal/ReplaySubject";
 import {IScript} from "../../model/script.model";
@@ -15,7 +15,7 @@ export class ScriptService {
   }
 
   updateScripts() {
-    this.http.get<IScript[]>('script/getScriptsForActiveJobGroups')
+    this.http.get<IScript[]>('/script/getScriptsForActiveJobGroups')
       .subscribe(next => this.scripts$.next(next), error => this.handleError(error));
   }
 

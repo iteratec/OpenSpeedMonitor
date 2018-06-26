@@ -17,7 +17,7 @@ export class PageService {
 
 
   updatePages() {
-    this.http.get<JobGroupToPagesMappingDto[]>("page/getPagesForActiveJobGroups")
+    this.http.get<JobGroupToPagesMappingDto[]>("/page/getPagesForActiveJobGroups")
       .subscribe(next => this.pages$.next(next), error => this.handleError(error));
   }
 

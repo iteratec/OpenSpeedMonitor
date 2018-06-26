@@ -18,12 +18,12 @@ export class JobGroupService {
   }
 
   updateActiveJobGroups() {
-    this.http.get<JobGroupDTO[]>("jobGroup/getAllActive")
+    this.http.get<JobGroupDTO[]>("/jobGroup/getAllActive")
       .subscribe(next => this.jobGroups$.next(next), error => this.handleError(error));
   }
 
   updateActiveOrRecentlyMeasured() {
-    this.http.get<JobGroupDTO[]>("jobGroup/getAllActiveAndAllRecent")
+    this.http.get<JobGroupDTO[]>("/jobGroup/getAllActiveAndAllRecent")
       .subscribe(next => this.activeOrRecentlyMeasured$.next(next), error => this.handleError(error));
   }
 
