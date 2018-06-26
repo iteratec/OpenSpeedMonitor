@@ -278,6 +278,7 @@ grails:
                             {pattern: '/rest/**',                                       access: ["permitAll"]},
                             {pattern: '/webjars/swagger-ui/**',                         access: ["permitAll"]},
                             {pattern: '/resultSelection/**',                            access: ["permitAll"]},
+                            {pattern: '/jobGroup/getJobGroupsWithPages',                access: ["permitAll"]},
                             {pattern: '/login/**',                                      access: ["permitAll"]},
                             {pattern: '/logout/**',                                     access: ["permitAll"]},
                             {pattern: '/job/index',                                     access: ["permitAll"]},

@@ -30,10 +30,30 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         drawGraphButton.click(function () {
             loadData(true);
         });
-
-        OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.setShowButtonDisabledCallback(setShowButtonDisabled);
-        setShowButtonDisabled(true);
+        window.addEventListener("pageComparisonValidation", function (event) {
+            setShowButtonState(event.detail.isValid)
+        });
+        setShowButtonState(false);
     };
+
+    var setShowButtonState = function (enable) {
+        var button = document.getElementById("graphButtonHtmlId");
+        if (enable) {
+            enableButton(button)
+        } else {
+            disableButton(button)
+        }
+    };
+
+    var disableButton = function (button) {
+        button.setAttribute("disabled", "disabled");
+        document.getElementById('warning-no-page').style.display = 'block'
+    }
+
+    var enableButton = function (button) {
+        button.removeAttribute("disabled");
+        document.getElementById('warning-no-page').style.display = 'none'
+    }
 
     var renderChart = function (data, isStateChange, isAggregationValueChange) {
         if (avgLoaded && getAggregationValue() === "avg") {
@@ -42,6 +62,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         if (medianLoaded && getAggregationValue() === "median") {
             spinner.stop()
         }
+
         if (data) {
             pageComparisonChart.setData(data);
             if (isStateChange) {
@@ -62,16 +83,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         $("#chart-card").removeClass("hidden");
         data.aggregationValue = getAggregationValue();
         renderChart(data, isStateChange)
-    };
-
-    var setShowButtonDisabled = function (state) {
-        if(!state) {
-            $('#graphButtonHtmlId').removeAttr('disabled', 'disabled');
-            $('#warning-no-page').hide();
-        } else {
-            $('#graphButtonHtmlId').attr('disabled', 'disabled');
-            $('#warning-no-page').show();
-        }
     };
 
     var loadData = function (isStateChange) {
@@ -96,7 +107,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
         queryData.selectedAggregationValue = aggregationValue;
         $.ajax({
             type: 'POST',
+<<<<<<< HEAD
             data: queryData,
+=======
+            data: {
+                from: selectedTimeFrame[0].toISOString(),
+                to: selectedTimeFrame[1].toISOString(),
+                measurand: JSON.stringify(OpenSpeedMonitor.BarchartMeasurings.getValues()),
+                selectedPageComparisons: JSON.stringify(window.pageComparisonComponent.getComparisons())
+            },
+>>>>>>> feature/bootstrapAngular
             url: OpenSpeedMonitor.urls.pageComparisonGetData,
             dataType: "json",
             success: function (data) {
