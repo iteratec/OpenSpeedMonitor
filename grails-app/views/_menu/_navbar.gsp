@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || "${request.forwardURI.equals('/application-dashboard')}"}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || request.forwardURI.equals('/application-dashboard')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
