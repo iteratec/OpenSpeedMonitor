@@ -36,6 +36,7 @@ class UrlMappings {
         ////////////////////////////////////////////////////////////////////////////////////////////////
         "/releasenotes"(view: "/siteinfo/releasenotes")
         "/about"(view: "/siteinfo/about")
+        "/documentation"(view: "/documentation/index")
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/setup-dashboard"(view: "/setupDashboard/index")
         "/application-dashboard"(view: "/applicationDashboard/index")

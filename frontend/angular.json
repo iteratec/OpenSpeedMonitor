@@ -29,7 +29,8 @@
             "lazyModules": [
               "src/app/setup-dashboard/setup-dashboard.module",
               "src/app/page-comparison/page-comparison.module",
-              "src/app/application-dashboard/application-dashboard.module"
+              "src/app/application-dashboard/application-dashboard.module",
+              "src/app/documentation/documentation.module"
             ]
           },
           "configurations": {
