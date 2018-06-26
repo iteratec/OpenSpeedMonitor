@@ -91,7 +91,11 @@ class Script {
         try{
 			ScriptParser parser = new ScriptParser(pageService, navigationScript)
             measuredEventsCount = parser.measuredEventsCount
-			testedPages = parser.getTestedPages()
+
+            this.testedPages.clear()
+            parser.testedPages.each {
+                this.addToTestedPages(it)
+            }
 		} catch (Exception e) {
 			log.error("An error occurred while parsing of script: ${this}", e)
 		}
