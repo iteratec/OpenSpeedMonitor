@@ -1,19 +1,18 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {ApplicationRef, Injector, NgModule, NgModuleFactory, SystemJsNgModuleLoader, Type} from '@angular/core';
-import {APP_BASE_HREF} from '@angular/common';
-import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from "./app-routing.module";
+import {APP_BASE_HREF} from '@angular/common';
+import {NotFoundComponent} from "./not-found.component";
 
 
 @NgModule({
-  declarations: [],
+  declarations: [NotFoundComponent],
   imports: [
     BrowserModule, AppRoutingModule
   ],
-  exports: [RouterModule],
   providers: [SystemJsNgModuleLoader,
-    {provide: APP_BASE_HREF, useValue: '/'}
-  ]
+    {provide: APP_BASE_HREF, useValue: '/',}
+  ],
 })
 export class AppModule {
   constructor(private injector: Injector, private moduleLoader: SystemJsNgModuleLoader) {
@@ -22,25 +21,30 @@ export class AppModule {
   ngDoBootstrap(appRef: ApplicationRef) {
     const widgets = document.querySelectorAll('[data-module-path]');
     for (const i in widgets) {
-      if (widgets.hasOwnProperty(i)) {
-        const modulePath = (widgets[i] as HTMLElement).getAttribute('data-module-path');
-        if (modulePath) {
-          this.moduleLoader.load(modulePath)
-            .then((moduleFactory: NgModuleFactory<any>) => {
-              const ngModuleRef = moduleFactory.create(this.injector);
-              ngModuleRef.injector.get('components').forEach((components: Type<{}>[]) => {
-                components.forEach((component: Type<{}>) => {
-                  const compFactory = ngModuleRef.componentFactoryResolver.resolveComponentFactory(component);
-                  if (document.querySelector(compFactory.selector)) {
-                    appRef.bootstrap(compFactory);
-                  }
-                });
-              });
-            }, (error) => {
-              console.error(error);
-            });
-        }
+      if (!widgets.hasOwnProperty(i)) {
+        continue;
       }
+      const modulePath = (widgets[i] as HTMLElement).getAttribute('data-module-path');
+      if (!modulePath) {
+        continue;
+      }
+      this.moduleLoader.load(modulePath).then((moduleFactory: NgModuleFactory<any>) => {
+        this.bootstrapComponentsFromModule(appRef, moduleFactory);
+      }, (error) => {
+        console.error(error);
+      });
     }
+  }
+
+  private bootstrapComponentsFromModule(appRef: ApplicationRef, moduleFactory: NgModuleFactory<any>) {
+    const ngModuleRef = moduleFactory.create(this.injector);
+    ngModuleRef.injector.get('components').forEach((components: Type<{}>[]) => {
+      components.forEach((component: Type<{}>) => {
+        const compFactory = ngModuleRef.componentFactoryResolver.resolveComponentFactory(component);
+        if (document.querySelector(compFactory.selector)) {
+          appRef.bootstrap(compFactory);
+        }
+      });
+    });
   }
 }

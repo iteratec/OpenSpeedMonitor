@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {JobGroupDTO} from "../common/model/job-group.model";
+import {JobGroupDTO} from "../../common/model/job-group.model";
 import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
@@ -11,7 +11,7 @@ export class ApplicationDashboardComponent {
   application: JobGroupDTO;
 
   constructor(private route: ActivatedRoute, private router: Router) {
-    route.params.subscribe(params => console.log("jobgroupname ", params));
+    route.params.subscribe(params => console.log("jobGroupId ", params));
     route.data.subscribe(params => console.log("data ", params));
     route.url.subscribe(params => console.log("url ", params));
     console.log("config ", route.routeConfig);

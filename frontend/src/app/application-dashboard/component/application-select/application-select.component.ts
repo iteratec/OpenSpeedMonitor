@@ -18,7 +18,6 @@ export class ApplicationSelectComponent {
   }
 
   onSelect() {
-    console.log(this.application);
     this.onSelectedApplicationChanged.emit(this.application)
   }
 }
