@@ -24,7 +24,7 @@ new Vue({
         scriptId: "",
         copiedMeasuredEvents: []
     },
-    computed: {
+    computed: {                                                 /*TODO ?*/
         availableMeasuredEvents: function () {
             var self = this;
             self.activeMeasuredEvents.forEach(function (threshold) {
@@ -38,11 +38,11 @@ new Vue({
             return this.copiedMeasuredEvents;
         }
     },
-    beforeMount: function () {
+    beforeMount: function () {                                      /*TODO ?*/
         this.jobId = this.$el.attributes['jobId'].value;
         this.scriptId = this.$el.attributes['scriptId'].value;
     },
-    mounted: function () {
+    mounted: function () {                                          /*GUACAMOLE*/
         this.fetchData();
     },
     methods: {
@@ -69,7 +69,7 @@ new Vue({
                 });
             }
         },
-        getMeasurands: function () {
+        getMeasurands: function () {                                        /*GUACAMOLE*/
             var self = this;
             $.ajax({
                 type: 'GET',
@@ -79,7 +79,7 @@ new Vue({
                     result.forEach(function (measurand) {
                         measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];    //TODO
                     });
-                    console.log("VUE Measurands result: " + JSON.stringify(result));
+                    /*console.log("VUE Measurands result: " + JSON.stringify(result));*/
                     self.measurands = result;
                 },
                 error: function () {
@@ -107,7 +107,7 @@ new Vue({
                         thresholdList: thresholdsForEvent
                     })
                 });
-                console.log("VUE activeMeasuredEvents : " + JSON.stringify(self.activeMeasuredEvents));
+                /*console.log("VUE activeMeasuredEvents : " + JSON.stringify(self.activeMeasuredEvents));*/
 
 
             }).error(function (e) {

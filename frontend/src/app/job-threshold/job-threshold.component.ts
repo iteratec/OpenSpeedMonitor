@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef} from '@angular/core';
+import { Component, OnInit, ElementRef, OnChanges} from '@angular/core';
 import { ThresholdRestService } from './service/rest/threshold-rest.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { ThresholdRestService } from './service/rest/threshold-rest.service';
 OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};*/
 
-export class JobThresholdComponent implements OnInit {
+export class JobThresholdComponent implements OnInit, OnChanges {
 
 
   private activeMeasuredEvents: any[];
@@ -29,10 +29,14 @@ export class JobThresholdComponent implements OnInit {
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
   }
 
-  ngOnInit() {
-
+  ngOnChanges() {
     /*this.jobId = this.$el.attributes['jobId'].value;*/
     /*this.scriptId = this.$el.attributes['scriptId'].value;*/
+  }
+
+  ngOnInit() {
+
+
     /*console.log("ngOnInit measurands: " + this.measurands);
     console.log("ngOnInit jobId: " + this.jobId);
     console.log("ngOnInit scriptId: " + this.scriptId);*/
@@ -46,7 +50,7 @@ export class JobThresholdComponent implements OnInit {
       /*measurands.forEach(function (measurand) {
         measurand.translatedName = this.OpenSpeedMonitor.i18n.measurands[measurand.name];
       });*/
-      console.log("after measurands: " + JSON.stringify(measurands ));
+      /*console.log("after measurands: " + JSON.stringify(measurands ));*/
 
     });
 
@@ -62,6 +66,7 @@ export class JobThresholdComponent implements OnInit {
       console.log("this.measuredEventCount: " + JSON.stringify(this.measuredEventCount ));*/
 
       this.getThresholds();
+
     });
   }
 
@@ -69,10 +74,7 @@ export class JobThresholdComponent implements OnInit {
     this.activeMeasuredEvents = [];
     var self = this;
     this.thresholdRestService.getThresholdsForJob(this.jobId).subscribe((result: any[]) => {
-/*
-      console.log("getThresholdsForJob result: " + JSON.stringify(result ));
-*/
-
+    /*console.log("getThresholdsForJob result: " + JSON.stringify(result ));*/
       result.forEach(function (resultEvent) {
         var thresholdsForEvent = [];
         resultEvent.thresholds.forEach(function (threshold) {
@@ -89,9 +91,7 @@ export class JobThresholdComponent implements OnInit {
           thresholdList: thresholdsForEvent
         })
       });
-/*
-      console.log(" Angular self.activeMeasuredEvents: " + JSON.stringify(self.activeMeasuredEvents ));
-*/
+      console.log(" self.activeMeasuredEvents: " + JSON.stringify(self.activeMeasuredEvents ));
 
     });
   }
