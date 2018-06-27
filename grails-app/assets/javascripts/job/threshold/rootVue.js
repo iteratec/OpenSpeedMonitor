@@ -46,11 +46,11 @@ new Vue({
         this.fetchData();
     },
     methods: {
-        fetchData: function () {
+        fetchData: function () {                                     /*GUACAMOLE*/
             this.getMeasurands();
             this.getMeasuredEvents(this.scriptId);
         },
-        getMeasuredEvents: function (scriptId) {
+        getMeasuredEvents: function (scriptId) {                    /*GUACAMOLE*/
             var self = this;
             if (scriptId) {
                 $.ajax({
@@ -77,9 +77,9 @@ new Vue({
                 data: {},
                 success: function (result) {
                     result.forEach(function (measurand) {
-                        measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];
+                        measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];    //TODO
                     });
-
+                    console.log("VUE Measurands result: " + JSON.stringify(result));
                     self.measurands = result;
                 },
                 error: function () {
@@ -87,7 +87,7 @@ new Vue({
                 }
             });
         },
-        getThresholds: function () {
+        getThresholds: function () {                        /*GUACAMOLE*/
             this.activeMeasuredEvents = [];
             var self = this;
             this.getThresholdsForJob(this.jobId).success(function (result) {
@@ -106,7 +106,10 @@ new Vue({
                         }),
                         thresholdList: thresholdsForEvent
                     })
-                })
+                });
+                console.log("VUE activeMeasuredEvents : " + JSON.stringify(self.activeMeasuredEvents));
+
+
             }).error(function (e) {
                 console.log(e);
             });
@@ -193,7 +196,7 @@ new Vue({
                 }
             });
         },
-        getThresholdsForJob: function (jobId) {
+        getThresholdsForJob: function (jobId) {             /*GUACAMOLE*/
             var targetUrl = "/job/getThresholdsForJob";
             return $.ajax({
                 type: 'GET',
