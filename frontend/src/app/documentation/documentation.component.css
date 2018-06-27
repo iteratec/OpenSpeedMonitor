@@ -1,0 +1,6 @@
+.documentation-entries {
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  justify-content: flex-start;
+}

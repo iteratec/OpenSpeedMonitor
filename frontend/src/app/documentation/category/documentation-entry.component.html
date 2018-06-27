@@ -1,0 +1,12 @@
+<div class="card">
+  <h2>{{entry.title}}</h2>
+  <div class="documentation-image-container">
+    <img [src]="entry.imgUrl" class="documentation-image"/>
+  </div>
+  <div>
+    {{entry.text}}
+  </div>
+  <div class="documentation-links">
+    <a *ngFor="let url of entry.links" class="btn btn-primary documentation-link" role="button" [href]="url.url">{{url.text}}</a>
+  </div>
+</div>

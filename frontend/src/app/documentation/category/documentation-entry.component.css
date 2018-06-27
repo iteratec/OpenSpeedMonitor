@@ -1,0 +1,36 @@
+.documentation-card {
+}
+
+:host {
+  max-width: 450px;
+}
+
+.card {
+  height: 90%;
+  margin: 15px;
+}
+
+.documentation-image-container {
+  margin: 10px auto;
+  height: 140px;
+}
+
+.documentation-image {
+  max-width: 100%;
+  max-height: 140px;
+  display: block;
+  margin: auto;
+}
+
+.documentation-links {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.documentation-link {
+  margin-right: 10px;
+}
+
