@@ -1,0 +1,6 @@
+<div class="job-group-list">
+  <div *ngFor="let jobGroup of jobGroupList$ | async" class="card">
+    <osm-job-group [jobGroup]="jobGroup"></osm-job-group>
+  </div>
+</div>
+

@@ -1,12 +1,8 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {ApplicationRef, InjectionToken, Injector, NgModule, NgModuleFactory, SystemJsNgModuleLoader, Type} from '@angular/core';
-
-import {AppComponent} from './app.component';
+import {ApplicationRef, Injector, NgModule, NgModuleFactory, SystemJsNgModuleLoader, Type} from '@angular/core';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [],
   imports: [
     BrowserModule
   ],

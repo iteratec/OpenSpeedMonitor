@@ -79,7 +79,7 @@ describe("PageComparisonChartData data transformation", function () {
                     .groupingPage2("Group1 | Page2").valuePage2(600).build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1 - Average");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("Group1, DOC_COMPLETE_TIME - Average");
     });
     it("getDataForHeader should return only aggregationtype as label if nothing is equal for all series", function () {
         pageComparisonData.setData({
@@ -88,7 +88,7 @@ describe("PageComparisonChartData data transformation", function () {
                     .valuePage1(300).groupingPage2("Group2 | Page2").valuePage2(600) .build()
             ]
         });
-        expect(pageComparisonData.getDataForHeader().text).toEqual("Average");
+        expect(pageComparisonData.getDataForHeader().text).toEqual("DOC_COMPLETE_TIME - Average");
     });
     it("getDataForBarScore should return the right maximum ", function () {
         var expectedMaximum = 9999;

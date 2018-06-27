@@ -217,15 +217,17 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var filterSeries = function (series) {
-        if (selectedFilter === "asc" || selectedFilter === "desc") {
-            return series;
-        }
         var filteredSeries = [];
-        filterRules[selectedFilter].forEach(function (filterEntry) {
-            Array.prototype.push.apply(filteredSeries, series.filter(function (datum) {
-                return datum.page === filterEntry.page && datum.jobGroup === filterEntry.jobGroup;
-            }));
-        });
+        if (selectedFilter === "asc" || selectedFilter === "desc") {
+            Array.prototype.push.apply(filteredSeries, series);
+        }
+        else {
+            filterRules[selectedFilter].forEach(function (filterEntry) {
+                Array.prototype.push.apply(filteredSeries, series.filter(function (datum) {
+                    return datum.page === filterEntry.page && datum.jobGroup === filterEntry.jobGroup;
+                }));
+            });
+        }
         return filteredSeries;
     };
 

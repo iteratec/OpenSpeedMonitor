@@ -35,7 +35,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         highlightId = highlightId!==componentData.highLightId ? componentData.highLightId || highlightId : undefined;
     };
 
-    var render = function (selection) {
+    var render = function (selection, isAggregationValueChange) {
         var xScale = d3.scale.linear().range([0, width]);
         var yScale = d3.scale.ordinal().rangeBands([0, height]);
 
@@ -46,7 +46,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         });
         renderExit(bars.exit());
         renderEnter(bars.enter(), yScale);
-        renderUpdate(bars, xScale, yScale);
+        renderUpdate(bars, xScale, yScale, isAggregationValueChange);
     };
 
     var renderEnter = function (enterSelection) {
@@ -68,42 +68,54 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .style("font-weight", "bold");
     };
 
-    var renderUpdate = function (updateSelection, xScale, yScale) {
+    var renderUpdate = function (updateSelection, xScale, yScale, isAggregationValueChange) {
         var valueLabelOffset = 10;
         updateSelection
             .on("mouseover", function(data) { callEventHandler("mouseover", data) })
             .on("mouseout", function(data) { callEventHandler("mouseout", data) })
             .on("click", function(data) { callEventHandler("click", data) });
-        updateSelection.select(".bar-rect")
+
+        updateSelection.select(".bar-value").text(function (d) {
+          if (d.value !== null) {
+                var prefix = d.showLabelOnTop ? d.label + ": " : "";
+                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
+                return prefix + formatValue(d.value) + " " + d.unit;
+            } else {
+                return ''
+            }
+        });
+
+        var transition;
+        var xTransition;
+        if (isAggregationValueChange) {
+            xTransition = updateSelection.transition().duration(transitionDuration);
+            transition = xTransition;
+        } else {
+            xTransition = updateSelection;
+            transition = updateSelection
+                .transition()
+                .duration(transitionDuration);
+        }
+
+        xTransition.select(".bar-rect")
+            .attr("x", function (d) {
+                return barStart(xScale, d.value)
+            })
             .attr("width", function (d) {
                 return barWidth(xScale, d.value);
             });
-        updateSelection.select(".bar-value")
-            .text(function (d) {
-                var prefix =  d.showLabelOnTop? d.label+": ": "";
-                prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
-                return prefix + formatValue(d.value) + " " + d.unit;
-            })
+        xTransition.select(".bar-value")
             .attr("x", function (d) {
                 return (d.value < 0) ? (barStart(xScale, d.value) + valueLabelOffset) : (barEnd(xScale, d.value) - valueLabelOffset);
             });
 
-        var transition = updateSelection
-            .transition()
-            .duration(transitionDuration)
-            .style("opacity", getOpacity);
+        transition.style("opacity", getOpacity);
         transition.select(".bar-rect")
             .style("opacity", function (d) {
                 return !(d.id===highlightId || !highlightId) ? 0.2 : 1;
             })
             .attr("y", function (d) {
                 return yScale(d.id)
-            })
-            .attr("x", function (d) {
-                return barStart(xScale, d.value)
-            })
-            .attr("width", function (d) {
-                return barWidth(xScale, d.value);
             })
             .each(function (d) {
                 var color = individualColors?d.color: barColor;

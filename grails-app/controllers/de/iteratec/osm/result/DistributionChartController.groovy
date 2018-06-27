@@ -18,7 +18,6 @@ import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
@@ -189,7 +188,7 @@ class DistributionChartController extends ExceptionHandlerController {
                 .withSelectedMeasurands([selectedMeasurand])
                 .withPageIn(allPages)
                 .withJobGroupIn(allJobGroups)
-                .getRawData()
+                .getRawData(false)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
