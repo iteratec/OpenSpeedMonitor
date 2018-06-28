@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
-import {ApplicationDashboardComponent} from './application-dashboard-entry/application-dashboard.component';
+import {ApplicationDashboardComponent} from './application-dashboard.component';
 import {ApplicationSelectComponent} from './component/application-select/application-select.component';
 import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {SharedModule} from "../shared/shared.module";
-import {ApplicationDashboardRoutingModule} from "./application-dashboard-routing.module";
-import {ApplicationDashboardEntryComponent} from './application-dashboard-entry.component'
+import {ApplicationDashboardRoutingModule} from "./application-dashboard-routing/application-dashboard-routing.module";
+import {ApplicationDashboardEntryComponent} from './application-dashboard-routing/application-dashboard-entry.component'
 
 @NgModule({
   imports: [
