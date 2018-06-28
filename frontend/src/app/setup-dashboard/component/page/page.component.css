@@ -1,0 +1,12 @@
+ .page {
+   background-color: #ededed;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   text-align: center;
+   padding: 10px;
+}
+
+ .page h3 {
+   text-overflow: ellipsis;
+   overflow: hidden;
+ }

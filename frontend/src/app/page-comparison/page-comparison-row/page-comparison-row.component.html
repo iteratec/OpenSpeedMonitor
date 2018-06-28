@@ -1,0 +1,50 @@
+<div class="row form-group addPageComparisonRow">
+  <label class="col-sm-2 control-label">
+    First Page
+  </label>
+  <div class="col-sm-3">
+    <select name="firstJobGroupSelect" [(ngModel)]="selection.firstJobGroupId"
+            class="form-control jobgroupselect" (change)="triggerComparisonChange()">
+      <option disabled value="-1">- choose a job group -</option>
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id"
+              [selected]="jobGroup.id == selection.firstJobGroupId">
+        {{ jobGroup.name }}
+      </option>
+    </select>
+    <select name="firstPageSelect" [(ngModel)]="selection.firstPageId" class="form-control pageSelect"
+            (change)="triggerComparisonChange()">
+      <option disabled value="-1">- choose a page -</option>
+      <option *ngFor="let page of getPagesForJobGroup(selection.firstJobGroupId)" [value]="page.id"
+              [selected]="page.id == selection.firstPageId">
+        {{page.name}}
+      </option>
+    </select>
+  </div>
+  <label class="col-sm-2 control-label">
+    Second Page
+  </label>
+
+  <div class="col-sm-3">
+    <select name="secondJobGroupSelect" [(ngModel)]="selection.secondJobGroupId"
+            class="form-control jobgroupselect" (change)="triggerComparisonChange()">
+      <option disabled value="-1">- choose a job group -</option>
+      <option *ngFor="let jobGroup of jobGroupMappings" [value]="jobGroup.id"
+              [selected]="jobGroup.id == selection.secondJobGroupId">
+        {{ jobGroup.name }}
+      </option>
+    </select>
+    <select name="secondPageSelect" class="form-control pageSelect" [(ngModel)]="selection.secondPageId"
+            (change)="triggerComparisonChange()">
+      <option disabled value="-1">- choose a page -</option>
+      <option *ngFor="let page of getPagesForJobGroup(selection.secondJobGroupId)" [value]="page.id"
+              [selected]="page.id == selection.secondPageId">
+        {{page.name}}
+      </option>
+    </select>
+  </div>
+  <div class="col-sm-2" *ngIf="removable">
+    <a href="#" role="button">
+      <i aria-hidden="true" class="fa fa-times" (click)="removeComparison()"> </i>
+    </a>
+  </div>
+</div>

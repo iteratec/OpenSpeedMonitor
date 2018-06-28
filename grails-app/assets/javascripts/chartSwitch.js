@@ -13,7 +13,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     var getJobGroup = function (map) {
         var folder = null;
         if ($("#pageComparisonSelectionCard").length) {
-            folder = OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getJobGroupIds();
+            folder = window.pageComparisonComponent.getSelectedJobGroupIds();
         } else {
             folder = $("#folderSelectHtmlId").val();
         }
@@ -51,7 +51,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
     var getPage = function (map) {
         var pages = null;
         if($("#pageComparisonSelectionCard").length) {
-            pages = OpenSpeedMonitor.ChartModules.GuiHandling.PageComparison.Comparisons.getPageIds();
+            pages = window.pageComparisonComponent.getSelectedPageIds();
         }else {
          pages = $("#pageSelectHtmlId").val();
         }

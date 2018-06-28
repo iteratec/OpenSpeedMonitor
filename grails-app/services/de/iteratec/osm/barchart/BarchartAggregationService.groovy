@@ -79,17 +79,17 @@ class BarchartAggregationService {
         List<Page> pages = []
         List<JobGroup> jobGroups = []
         cmd.selectedPageComparisons.each {
-            pages << Page.get(it.pageId1)
-            pages << Page.get(it.pageId2)
-            jobGroups << JobGroup.get(it.jobGroupId1)
-            jobGroups << JobGroup.get(it.jobGroupId2)
+            pages << Page.get(it.firstPageId)
+            pages << Page.get(it.secondPageId)
+            jobGroups << JobGroup.get(it.firstJobGroupId)
+            jobGroups << JobGroup.get(it.secondJobGroupId)
         }
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
         List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue)
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
-            pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId1 as long) && aggr.page.id == (comparison.pageId1 as long) }
-            pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId2 as long) && aggr.page.id == (comparison.pageId2 as long) }
+            pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.firstJobGroupId as long) && aggr.page.id == (comparison.firstPageId as long) }
+            pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.secondJobGroupId as long) && aggr.page.id == (comparison.secondPageId as long) }
             comparisons << pageComparisonAggregation
         }
         return comparisons

@@ -20,4 +20,15 @@ class ScriptService {
             }
         }
     }
+
+    def getMeasuredEventsForScript(Long scriptId) {
+        Script script = Script.get(scriptId)
+        return getMeasuredEventsForScript(script.navigationScript)
+    }
+
+    List<MeasuredEvent> getMeasuredEventsForScript(String navigationScript){
+        ScriptParser parser = new ScriptParser(pageService, navigationScript)
+
+        return parser.getAllMeasuredEvents(navigationScript).collect()
+    }
 }

@@ -6,7 +6,7 @@
 </head>
 
 <body>
-<app-setup-dashboard data-module-path="src/app/setup-dashboard/setup-dashboard.module#SetupDashboardModule"></app-setup-dashboard>
+<osm-setup-dashboard data-module-path="src/app/setup-dashboard/setup-dashboard.module#SetupDashboardModule"></osm-setup-dashboard>
 
 <asset:stylesheet src="frontend/styles.css"/>
 <asset:javascript src="frontend/runtime.js"/>
