@@ -171,19 +171,19 @@ npmInstall {
     outputs.files file('node_modules')
 }
 
-task installFrontendDependencies(type: NpmTask, dependsOn: npmInstall) {
+task installFrontendDependencies(type: NpmTask) {
     description = "Installs frontend package dependencies"
     workingDir = file("${project.projectDir}/frontend")
     args = ['install']
 }
 
-task compileFrontend(type: NpmTask) {
+task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
     description = "Compiles frontend"
     workingDir = file("${project.projectDir}/frontend")
-    args = ['run', 'build']
+    args = ['run', 'build:prod']
 }
 
-task syncFrontendJavascripts(type: Sync) {
+task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
     description = "Syncs frontend javascript files"
     from 'frontend/dist/frontend'
     include '*.js'
@@ -191,7 +191,7 @@ task syncFrontendJavascripts(type: Sync) {
     rename('(main|polyfills|runtime)\\..*\\.js', '$1.js')
 }
 
-task syncFrontendStylesheets(type: Sync) {
+task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
     description = "Syncs frontend stylesheet files"
     from 'frontend/dist/frontend'
     include '*.css'
