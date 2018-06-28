@@ -2,14 +2,16 @@
  * Created by glastra on 27.06.18.
  */
 
-import {MeasuredEventForScript} from "./measured-events-for-script.model"
+import {MeasuredEvent} from "./measured-event.model"
 import {Measurand} from "./measurand.model"
 
-export type ThresholdForJob = {
+export type Threshold = {
   id: number;
   lowerBoundary: number;
   measurand: Measurand;
-  measuredEvent: MeasuredEventForScript;
+  measuredEvent: MeasuredEvent;
   upperBoundary: number;
+  edit: boolean;
+  saved: boolean;
 
 }

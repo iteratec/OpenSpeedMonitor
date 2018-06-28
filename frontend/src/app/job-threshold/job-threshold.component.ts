@@ -1,5 +1,9 @@
 import { Component, OnInit, ElementRef, OnChanges} from '@angular/core';
 import { ThresholdRestService } from './service/rest/threshold-rest.service';
+import {Measurand} from './service/model/measurand.model'
+import {MeasuredEvent} from './service/model/measured-event.model'
+import {ThresholdForJob} from './service/model/threshold-for-job.model'
+import {Threshold} from "./service/model/threshold.model";
 
 @Component({
   selector: 'app-job-threshold',
@@ -14,13 +18,15 @@ OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};*/
 export class JobThresholdComponent implements OnInit, OnChanges {
 
 
-  private activeMeasuredEvents: any[];
+  private activeMeasuredEvents: ThresholdForJob;
   private jobId : number;
   private scriptId : number;
-  private measurands : any[];
-  private measuredEvents : any[];
-  private copiedMeasuredEvents: any[];
+  private measurands : Measurand[];
+  private measuredEvents : MeasuredEvent[];
+  private copiedMeasuredEvents: MeasuredEvent[];
   private measuredEventCount : number;
+  private thresholdsForEvent :  Threshold[];
+  private measured : MeasuredEvent;
 
 
   constructor(private thresholdRestService: ThresholdRestService,
@@ -45,7 +51,7 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   fetchData() {
-    this.thresholdRestService.getMeasurands().subscribe((measurands: any[]) => {
+    this.thresholdRestService.getMeasurands().subscribe((measurands: Measurand[]) => {
       console.log("measurands: " + JSON.stringify(measurands ));
       /*measurands.forEach(function (measurand) {
         measurand.translatedName = this.OpenSpeedMonitor.i18n.measurands[measurand.name];
@@ -54,7 +60,7 @@ export class JobThresholdComponent implements OnInit, OnChanges {
 
     });
 
-    this.thresholdRestService.getMeasuredEvents(this.scriptId).subscribe((measuredEvents: any[]) => {
+    this.thresholdRestService.getMeasuredEvents(this.scriptId).subscribe((measuredEvents: MeasuredEvent[]) => {
 /*
       console.log("after measuredEvents: " + JSON.stringify(measuredEvents ));
 */
@@ -65,35 +71,42 @@ export class JobThresholdComponent implements OnInit, OnChanges {
       console.log("this.copiedMeasuredEvents: " + JSON.stringify(this.copiedMeasuredEvents ));
       console.log("this.measuredEventCount: " + JSON.stringify(this.measuredEventCount ));*/
 
-      this.getThresholds();
+      this.activeMeasuredEvents = this.getThresholds();
 
     });
   }
 
   getThresholds() {
-    this.activeMeasuredEvents = [];
-    var self = this;
-    this.thresholdRestService.getThresholdsForJob(this.jobId).subscribe((result: any[]) => {
-    /*console.log("getThresholdsForJob result: " + JSON.stringify(result ));*/
-      result.forEach(function (resultEvent) {
-        var thresholdsForEvent = [];
-        resultEvent.thresholds.forEach(function (threshold) {
-          thresholdsForEvent.push({
-            threshold: threshold,
-            edit: false,
-            saved: true
-          })
+    //this.activeMeasuredEvents = [];
+    let activeMeasuredEventsTemp = {} as ThresholdForJob;
+    let self = this;
+    this.thresholdRestService.getThresholdsForJob(this.jobId).subscribe((response: ThresholdForJob[]) => {
+      response.forEach(function (responseEvent) {
+        let thresholdsForEvent: Threshold[] = [];
+        let thresholdEdited = {} as Threshold;
+        responseEvent.thresholds.forEach(function (threshold) {
+          thresholdEdited.id = threshold.id ;
+          thresholdEdited.lowerBoundary = threshold.lowerBoundary ;
+          thresholdEdited.measurand = threshold.measurand ;
+          thresholdEdited.measuredEvent = threshold.measuredEvent ;
+          thresholdEdited.upperBoundary = threshold.upperBoundary ;
+          thresholdEdited.edit = false;
+          thresholdEdited.saved = true;
+          console.log("getThresholds forEach forEach thresholdEdited: " + JSON.stringify(thresholdEdited ));
+          thresholdsForEvent.push(thresholdEdited)
         });
-        self.activeMeasuredEvents.push({
-          measuredEvent: self.measuredEvents.find(function (element) {
-            return element.id === resultEvent.measuredEvent.id;
-          }),
-          thresholdList: thresholdsForEvent
-        })
+         let measured : MeasuredEvent = self.measuredEvents.find(function (element) {
+          return element.id === responseEvent.measuredEvent.id;
+        });
+
+        console.log(" measured: " + JSON.stringify(measured ));
+        activeMeasuredEventsTemp.measuredEvent = measured;
+        activeMeasuredEventsTemp.thresholds = thresholdsForEvent;
       });
-      console.log(" self.activeMeasuredEvents: " + JSON.stringify(self.activeMeasuredEvents ));
+      console.log(" self.activeMeasuredEvents: " + JSON.stringify(activeMeasuredEventsTemp ));
 
     });
+    return activeMeasuredEventsTemp;
   }
 
 }
