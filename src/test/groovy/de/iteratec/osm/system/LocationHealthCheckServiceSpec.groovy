@@ -5,22 +5,22 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(LocationHealthCheckService)
-@Mock([Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
-        OsmConfiguration, BatchActivity])
 @Build([Location, JobResult, OsmConfiguration, LocationHealthCheck])
-class LocationHealthCheckServiceSpec extends Specification {
+class LocationHealthCheckServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationHealthCheckService> {
 
     private List<JobResult> jobResults
     private int expectedNumberOfAgents = 2
@@ -37,12 +37,21 @@ class LocationHealthCheckServiceSpec extends Specification {
         createTestDataCommonForAllTests()
         prepareMocksCommonForAllTests()
     }
+
+    void setupSpec() {
+        mockDomains(Location, WebPageTestServer, LocationHealthCheck, Browser, JobResult, Script, Job, JobGroup,
+                OsmConfiguration, BatchActivity, ConnectivityProfile)
+    }
+
     static doWithConfig(c) {
         c.internalMonitoringStorageTimeInDays = INTERNAL_MONITORING_STORAGETIME_IN_DAYS
     }
-    static doWithSpring = {
-        configService(ConfigService)
-        batchActivityService(BatchActivityService)
+
+    Closure doWithSpring() {
+        return {
+            configService(ConfigService)
+            batchActivityService(BatchActivityService)
+        }
     }
 
 
@@ -70,8 +79,8 @@ class LocationHealthCheckServiceSpec extends Specification {
         locationHealthChecks[0].numberOfErrorsLastHour == expectedNumberOfErrorsLastHour
         locationHealthChecks[0].numberOfJobResultsNextHour == expectedNumberOfJobResultsNextHour
         locationHealthChecks[0].numberOfEventResultsNextHour == expectedNumberOfEventResultsNextHour
-        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll { it.httpStatusCode == 100 }.size()
-        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll { it.httpStatusCode == 101 }.size()
+        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size()
+        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
     }
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
@@ -97,11 +106,11 @@ class LocationHealthCheckServiceSpec extends Specification {
         location = Location.build()
         jobResults = []
         2.times {
-            jobResults << JobResult.build(httpStatusCode: 100)
+            jobResults << JobResult.build(httpStatusCode: WptStatus.PENDING.getWptStatusCode())
         }
-        jobResults << JobResult.build(httpStatusCode: 101)
+        jobResults << JobResult.build(httpStatusCode: WptStatus.RUNNING.getWptStatusCode())
         2.times {
-            jobResults << JobResult.build(httpStatusCode: 200)
+            jobResults << JobResult.build(httpStatusCode: WptStatus.COMPLETED.getWptStatusCode())
         }
         OsmConfiguration.build()
     }

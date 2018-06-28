@@ -21,10 +21,13 @@ import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
 /**
@@ -34,7 +37,7 @@ import spock.lang.Specification
  * @since IT-81
  */
 @Build([Page, MeasuredEvent, JobResult, EventResult, WebPageTestServer, Location, Job])
-class ResultTestsSpec extends Specification{
+class ResultTestsSpec extends Specification implements BuildDataTest {
 
     private static final String WPT_SERVER_BASE_URL = 'http://my-wpt-server.com/'
     private static final String TEST_ID = 'my-test-id'
@@ -42,6 +45,10 @@ class ResultTestsSpec extends Specification{
     public static final String EVENT_NAME = 'ADS for article 5'
     public static final String LOCATION_IDENTIFIER = 'agent01:IE'
     public static final String BROWSER_IN_LOCATION = 'Firefox7'
+
+    void setupSpec() {
+        mockDomains(ConnectivityProfile, Script)
+    }
 
     def "EventResultDto get constructed correctly for an EventResult with customer satisfaction"() {
         given: "an EventResult with customer satisfaction"
@@ -78,18 +85,18 @@ class ResultTestsSpec extends Specification{
     private EventResult getEventResult(boolean hasCustomerSatisfaction) {
         Map eventResultsAttributes = [
                 id: 1,
-                measuredEvent: MeasuredEvent.buildWithoutSave(
-                        testedPage: Page.buildWithoutSave(name: PAGE_NAME),
+                measuredEvent: MeasuredEvent.build(save: false,
+                        testedPage: Page.build(save: false, name: PAGE_NAME),
                         name: EVENT_NAME
                 ),
-                jobResult: JobResult.buildWithoutSave(
+                jobResult: JobResult.build(save: false,
                         locationLocation: 'agent01',
                         locationUniqueIdentifierForServer: LOCATION_IDENTIFIER,
                         locationBrowser: BROWSER_IN_LOCATION,
                         testId: TEST_ID,
-                        job: Job.buildWithoutSave(
-                                location: Location.buildWithoutSave(
-                                        wptServer: WebPageTestServer.buildWithoutSave(baseUrl: WPT_SERVER_BASE_URL)
+                        job: Job.build(save: false,
+                                location: Location.build(save: false,
+                                        wptServer: WebPageTestServer.build(save: false, baseUrl: WPT_SERVER_BASE_URL)
                                 )
                         )
                 )
@@ -97,7 +104,7 @@ class ResultTestsSpec extends Specification{
         if (hasCustomerSatisfaction){
             eventResultsAttributes.csByWptDocCompleteInPercent = 1.5112d
         }
-        return EventResult.buildWithoutSave(eventResultsAttributes)
+        return EventResult.build(save: false,eventResultsAttributes)
     }
 
 }

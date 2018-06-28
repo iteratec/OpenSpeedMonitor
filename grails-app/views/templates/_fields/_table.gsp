@@ -2,8 +2,8 @@
     <thead>
     <tr>
         <g:each in="${domainProperties}" var="p" status="i">
-            <g:set var="propTitle">${domainClass.propertyName}.${p.name}.label</g:set>
-            <g:sortableColumn property="${p.name}" title="${message(code: propTitle, default: p.naturalName)}" />
+            <g:set var="propTitle">${domainClass.decapitalizedName}.${p.name}.label</g:set>
+            <g:sortableColumn property="${p.name}" title="${message(code: propTitle, default: grails.util.GrailsNameUtils.getNaturalName(p.name))}" />
         </g:each>
     </tr>
     </thead>

@@ -30,28 +30,29 @@ import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.TimeSeriesShowCommandBaseSpec
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.plugins.taggable.TagLink
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import spock.lang.Specification
 
-@TestFor(CsiDashboardController)
 @Build([Location, JobGroup, Page, Browser, CsiConfiguration, MeasuredEvent])
-@Mock([Location, JobGroup, Page, Browser, ConnectivityProfile, CsiSystem, TagLink, CsiConfiguration])
-class CsiDashboardControllerSpec extends Specification {
+class CsiDashboardControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<CsiDashboardController> {
 
     DateTimeFormatter ISO_FORMAT = ISODateTimeFormat.dateTime()
     CsiDashboardController controllerUnderTest
     CsiDashboardShowAllCommand command
 
-    def doWithSpring = {
-        eventResultDashboardService(EventResultDashboardService)
-        browserService(BrowserService)
+    Closure doWithSpring() {
+        return {
+            eventResultDashboardService(EventResultDashboardService)
+            browserService(BrowserService)
+        }
     }
 
     void setup() {
@@ -67,6 +68,10 @@ class CsiDashboardControllerSpec extends Specification {
             findCSIGroups() >> { JobGroup.findAllByCsiConfigurationIsNotNull() }
         }
         command.csiAggregationUtilService = Spy(CsiAggregationUtilService)
+    }
+
+    void setupSpec() {
+        mockDomains(Location, JobGroup, Page, Browser, ConnectivityProfile, CsiSystem, TagLink, CsiConfiguration)
     }
 
     void "command without bound parameters is invalid"() {

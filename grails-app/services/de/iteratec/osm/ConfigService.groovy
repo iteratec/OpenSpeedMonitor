@@ -172,7 +172,7 @@ class ConfigService {
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
         int confCount = osmConfigs.size()
         if (confCount != 1) {
-            throw new IllegalStateException("It must exist exact one Configuration in database. Found ${confCount}!")
+            throw new IllegalStateException("It must exist exactly one Configuration in database. Found ${confCount}!")
         }else{
             return osmConfigs[0]
         }

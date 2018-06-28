@@ -26,8 +26,8 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 
 
 @Integration

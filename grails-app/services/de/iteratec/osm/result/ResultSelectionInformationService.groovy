@@ -5,7 +5,7 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
 import org.joda.time.Days

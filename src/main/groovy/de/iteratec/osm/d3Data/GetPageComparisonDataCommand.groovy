@@ -1,8 +1,8 @@
 package de.iteratec.osm.d3Data
 
 import grails.converters.JSON
+import grails.databinding.BindUsing
 import grails.validation.Validateable
-import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 
 class GetPageComparisonDataCommand implements Validateable {
@@ -16,4 +16,5 @@ class GetPageComparisonDataCommand implements Validateable {
         return JSON.parse(source['measurand']).measurands[0][0].replace("Uncached", "")
     })
     String measurand
+    String selectedAggregationValue
 }

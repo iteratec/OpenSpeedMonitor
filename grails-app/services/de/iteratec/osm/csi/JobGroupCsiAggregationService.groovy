@@ -103,26 +103,18 @@ class JobGroupCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
 
+        while (!currentDateTime.isAfter(toDateTime)) {
+            List<Long> shopCsiAggregationIds
+            List<Long> shopCsiAggregationIdsToCalculate
 
-        CsiAggregation.withNewSession { session ->
+            shopCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups)
+            shopCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(shopCsiAggregationIds)
+            if (shopCsiAggregationIdsToCalculate)
+                calcCsiAggregations(shopCsiAggregationIdsToCalculate)
 
-            while (!currentDateTime.isAfter(toDateTime)) {
-                List<Long> shopCsiAggregationIds
-                List<Long> shopCsiAggregationIdsToCalculate
+            allCsiAggregationIds.addAll(shopCsiAggregationIds)
 
-                shopCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups)
-                shopCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(shopCsiAggregationIds)
-                if (shopCsiAggregationIdsToCalculate)
-                    calcCsiAggregations(shopCsiAggregationIdsToCalculate)
-
-                allCsiAggregationIds.addAll(shopCsiAggregationIds)
-
-                currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
-
-                session.flush()
-                session.clear()
-            }
-
+            currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
         }
 
         return CsiAggregation.getAll(allCsiAggregationIds)

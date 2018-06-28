@@ -26,4 +26,6 @@ class GetBarchartCommand implements Validateable {
         return new JsonSlurper().parseText(source['selectedSeries'])
     })
     List selectedSeries
+
+    String selectedAggregationValue
 }

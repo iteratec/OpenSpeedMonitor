@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -33,9 +34,9 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.result.CachedView.CACHED
@@ -48,20 +49,26 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  * @see {@link ProxyService}
  *
  */
-@TestFor(ResultPersisterService)
 @Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
-class PersistingNewEventResultsSpec extends Specification {
+class PersistingNewEventResultsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultPersisterService> {
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        pageService(PageService)
-        jobDaoService(JobDaoService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            pageService(PageService)
+            jobDaoService(JobDaoService)
+        }
     }
 
     void "setup"() {
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
+    }
+
+    void setupSpec() {
+        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
+                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay, ConnectivityProfile)
     }
 
     void "result persistance with old (single step) WPT server"(String fileName, String jobLabel, String pageName) {
@@ -87,14 +94,14 @@ class PersistingNewEventResultsSpec extends Specification {
         medianUncachedResults.size() == 1
         medianUncachedResults[0].docCompleteTimeInMillisecs == 5873
         medianUncachedResults[0].docCompleteRequests == 157
-        medianUncachedResults[0].wptStatus == 0
+        medianUncachedResults[0].wptStatus == WptStatus.SUCCESSFUL.getWptStatusCode()
         medianUncachedResults[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         List<EventResult> cachedRun3Results = EventResult.findAllByCachedViewAndNumberOfWptRun(CACHED, 3)
         cachedRun3Results.size() == 1
         cachedRun3Results[0].docCompleteTimeInMillisecs == 3977
         cachedRun3Results[0].docCompleteRequests == 36
-        cachedRun3Results[0].wptStatus == 0
+        cachedRun3Results[0].wptStatus == WptStatus.SUCCESSFUL.getWptStatusCode()
         cachedRun3Results[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         where:
@@ -131,7 +138,7 @@ class PersistingNewEventResultsSpec extends Specification {
         productResults[0].page.name == productPageName
         productResults[0].docCompleteTimeInMillisecs == 2218
         productResults[0].docCompleteRequests == 29
-        productResults[0].wptStatus == 99999
+        productResults[0].wptStatus == WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.getWptStatusCode()
         productResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen"
 
 
@@ -142,7 +149,7 @@ class PersistingNewEventResultsSpec extends Specification {
         searchResults[0].page.name == searchPageName
         searchResults[0].docCompleteTimeInMillisecs == 931
         searchResults[0].docCompleteRequests == 6
-        searchResults[0].wptStatus == 99999
+        searchResults[0].wptStatus == WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.getWptStatusCode()
         searchResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen"
 
         where:
@@ -268,16 +275,16 @@ class PersistingNewEventResultsSpec extends Specification {
     void "check CSI value creation"() {
         setup: "mock service and create testee"
         service.timeToCsMappingService = Mock(TimeToCsMappingService)
-        JobGroup jobGroup = JobGroup.buildWithoutSave()
-        EventResult testee = EventResult.buildWithoutSave(inputVariables)
+        JobGroup jobGroup = JobGroup.build(save: false)
+        EventResult testee = EventResult.build(save: false, inputVariables)
         testee.jobGroup = jobGroup
 
         when: "customer satisfaction is set with testee"
         service.setCustomerSatisfaction(testee)
 
         then: "interactions with mocked service are as expected"
-        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
-        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.page, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionDocComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(1, testee.measuredEvent.testedPage, testee.jobGroup.csiConfiguration) >> 1.0
+        expectedInteractionVisuallyComplete * service.timeToCsMappingService.getCustomerSatisfactionInPercent(2, testee.measuredEvent.testedPage, testee.jobGroup.csiConfiguration) >> 1.0
 
         where:
         inputVariables                                                            | expectedInteractionDocComplete | expectedInteractionVisuallyComplete

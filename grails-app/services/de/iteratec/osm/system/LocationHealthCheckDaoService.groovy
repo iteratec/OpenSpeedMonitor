@@ -1,7 +1,7 @@
 package de.iteratec.osm.system
 
 import de.iteratec.osm.measurement.environment.Location
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class LocationHealthCheckDaoService {

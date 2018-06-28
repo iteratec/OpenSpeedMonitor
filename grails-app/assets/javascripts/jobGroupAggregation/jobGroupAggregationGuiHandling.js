@@ -11,17 +11,24 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var jobGroupAggregationChart = OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal("#job-group-aggregation-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
+    var avgLoaded = false;
+    var medianLoaded = false;
 
-    var init = function() {
-        drawGraphButton.click(function() {
+    var init = function () {
+        drawGraphButton.click(function () {
+            $("#chart-card").removeClass("hidden");
             loadData(true);
         });
-        $(window).on('historyStateLoaded', function() {
+        $(window).on('historyStateLoaded', function () {
             loadData(false);
         });
-        $(window).on('resize', function() {
+        $(window).on('resize', function () {
             jobGroupAggregationChart.setData({});
             jobGroupAggregationChart.render();
+        });
+        $("input[name='aggregationValue']").on("change", function () {
+            spinner.start();
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -30,7 +37,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         return $(".chart-filter.selected").data("filter");
     };
 
-    var onFilterClick = function() {
+    var getAggregationValue = function () {
+        return $('input[name=aggregationValue]:checked').val()
+    };
+
+    var onFilterClick = function () {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
@@ -38,7 +49,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
-        spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
 
@@ -50,22 +60,36 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         $('#warning-no-data').hide();
         data.width = -1;
         data.activeFilter = getSelectedFilter();
+        data.aggregationValue = getAggregationValue();
 
         renderChart(data, isStateChange);
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
+        if(avgLoaded && getAggregationValue() === "avg") {
+            spinner.stop()
+        }
+        if(medianLoaded && getAggregationValue() === "median"){
+            spinner.stop()
+        }
         if (data) {
             jobGroupAggregationChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
             }
         }
-        jobGroupAggregationChart.render();
+        if (!data.groupData) jobGroupAggregationChart.render(isAggregationValueChange);
+        if (data.groupData && getAggregationValue() === data.groupData[0].aggregationValue) {
+            jobGroupAggregationChart.render(isAggregationValueChange);
+        }
     };
 
-    var loadData = function(isStateChanged) {
+    var loadData = function (isStateChange) {
+        jobGroupAggregationChart.resetData();
+        avgLoaded = false;
+        medianLoaded = false;
+
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
@@ -76,21 +100,31 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
                 return $(e).text()
             })),
             selectedSeries: JSON.stringify(selectedSeries)
-
         };
 
         spinner.start();
+        getDataForAggregationValue("median", queryData, isStateChange);
+        getDataForAggregationValue("avg", queryData, isStateChange);
+    };
+
+    function getDataForAggregationValue(aggregationValue, queryData, isStateChanged) {
+        queryData.selectedAggregationValue = aggregationValue;
         $.ajax({
             type: 'POST',
             data: queryData,
             url: OpenSpeedMonitor.urls.jobGroupAggregationGetData,
             dataType: "json",
             success: function (data) {
+                if (aggregationValue === "avg") {
+                    avgLoaded = true;
+                } else {
+                    medianLoaded = true;
+                }
                 handleNewData(data, isStateChanged);
             },
             error: function (e) {
                 spinner.stop();
-                $("#chart-card").removeClass("hidden")
+                $("#chart-card").removeClass("hidden");
                 if (e.responseText === "no data") {
                     $("#error-div").addClass("hidden");
                     $('#warning-no-data').show();
@@ -101,9 +135,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
                 }
             }
         });
-    };
+    }
 
     init();
-    return {
-    };
+    return {};
 })();

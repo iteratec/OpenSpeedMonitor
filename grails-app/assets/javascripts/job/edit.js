@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 //= require prettycron/prettycronManifest.js
-//= require node_modules/tagit/js/tag-it.min.js
+//= require node_modules/tag-it/js/tag-it.min.js
 //= require_self
 function doOnDomReady(newJob,
                       customConnNameForNative,

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {JobGroupDTO} from "../../../../common/model/job-group.model";
+import {JobGroupDTO} from "../../../../shared/model/job-group.model";
 
 @Component({
   selector: 'osm-job-group',

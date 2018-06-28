@@ -15,11 +15,45 @@
 * limitations under the License.
 */
 
+package spring
+
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import io.swagger.models.Contact
+import io.swagger.models.Info
+import io.swagger.models.License
+import io.swagger.models.Scheme
+import io.swagger.models.Swagger
+import org.apache.commons.lang.StringUtils
+
 // Place your Spring DSL code here
 
 beans = {
     jobGroupDaoService(DefaultJobGroupDaoService)
-	graphiteSocketProvider(DefaultGraphiteSocketProvider)
+    graphiteSocketProvider(DefaultGraphiteSocketProvider)
+
+    swagger(Swagger) {
+        Map swaggerConfig = (application.config.swagger as Map) ?: [:]
+        Map infoConfig = swaggerConfig.info ?: [:]
+        Info swaggerInfo = new Info(
+                description: infoConfig.description ?: StringUtils.EMPTY,
+                version: infoConfig.version ?: StringUtils.EMPTY,
+                title: infoConfig.title ?: StringUtils.EMPTY,
+                termsOfService: infoConfig.termsOfServices ?: StringUtils.EMPTY
+        )
+        Map contactConfig = infoConfig.contact ?: [:]
+        swaggerInfo.setContact(new Contact(
+                name: contactConfig.name ?: StringUtils.EMPTY,
+                url: contactConfig.url ?: StringUtils.EMPTY,
+                email: contactConfig.email ?: StringUtils.EMPTY)
+        )
+        Map licenseConfig = infoConfig.license ?: [:]
+        swaggerInfo.license(new License(
+                name: licenseConfig.name ?: StringUtils.EMPTY,
+                url: licenseConfig.url ?: StringUtils.EMPTY)
+        )
+        info = swaggerInfo
+        schemes = swaggerConfig.schemes ?: [Scheme.HTTP]
+        consumes = swaggerConfig.consumes ?: ["application/json"]
+    }
 }

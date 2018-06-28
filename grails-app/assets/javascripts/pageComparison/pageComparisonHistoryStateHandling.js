@@ -5,7 +5,6 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
-OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
 OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
     var loadedState = "";
@@ -47,6 +46,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
             state['secondJobGroups'].push(comparison['secondJobGroupId']);
             state['secondPages'].push(comparison['secondPageId']);
         });
+        state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         var encodedState = urlEncodeState(state);
         if (encodedState !== loadedState) {
             loadedState = encodedState;
@@ -65,6 +65,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         setTimeFrame(state);
         setComparisons(state);
         setMeasurand(state);
+        setAggregationValue(state);
         loadedState = encodedState;
         if (state['firstJobGroups'] && state['firstPages'] && state['secondJobGroups'] && state['secondPages']) {
             $(window).trigger("historyStateLoaded");
@@ -106,6 +107,17 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
             comparisons.push(comparison);
         }
         window.pageComparisonComponent.setComparisons(comparisons);
+    };
+
+    var setAggregationValue = function (state) {
+        if (!state["selectedAggregationValue"]) {
+            return
+        }
+        var isAvg = state["selectedAggregationValue"] === "avg";
+        $("#averageButton input").prop("checked", isAvg);
+        $("#averageButton").toggleClass("active", isAvg);
+        $("#medianButton input").prop("checked", !isAvg);
+        $("#medianButton").toggleClass("active", !isAvg);
     };
 
     var setMeasurand = function (params) {

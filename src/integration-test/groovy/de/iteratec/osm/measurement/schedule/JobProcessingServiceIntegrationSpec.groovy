@@ -26,8 +26,9 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import de.iteratec.osm.result.WptStatus
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
@@ -196,25 +197,25 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         Job jobWithMaxDownloadTime = createJob(false)
         jobWithMaxDownloadTime.maxDownloadTimeInMinutes = 60
 
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, 101)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, 100)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, 101)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, 200)
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, 504)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, WptStatus.RUNNING.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, WptStatus.PENDING.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, WptStatus.RUNNING.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, WptStatus.PENDING.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, WptStatus.PENDING.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, WptStatus.COMPLETED.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, WptStatus.TIME_OUT.getWptStatusCode())
 
         when: "closing running and pending job results"
         jobProcessingService.closeRunningAndPengingJobResults()
 
         then: "find jobResults and check their httpStatusCode"
-        JobResult.findByTestId("running test").httpStatusCode == 100
-        JobResult.findByTestId("pending test").httpStatusCode == 101
-        JobResult.findByTestId("barely running test").httpStatusCode == 100
-        JobResult.findByTestId("outdated running test").httpStatusCode == 900
-        JobResult.findByTestId("outdated pending test").httpStatusCode == 900
-        JobResult.findByTestId("finished test").httpStatusCode == 200
-        JobResult.findByTestId("failed test").httpStatusCode == 504
+        JobResult.findByTestId("running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
+        JobResult.findByTestId("pending test").httpStatusCode == WptStatus.PENDING.getWptStatusCode()
+        JobResult.findByTestId("barely running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
+        JobResult.findByTestId("outdated running test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
+        JobResult.findByTestId("outdated pending test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
+        JobResult.findByTestId("finished test").httpStatusCode == WptStatus.COMPLETED.getWptStatusCode()
+        JobResult.findByTestId("failed test").httpStatusCode == WptStatus.TIME_OUT.getWptStatusCode()
     }
 
     void "statusOfRepeatedJobExecution test"() {

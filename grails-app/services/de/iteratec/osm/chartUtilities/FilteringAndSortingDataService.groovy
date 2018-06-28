@@ -8,7 +8,7 @@ import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.PageService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class FilteringAndSortingDataService {

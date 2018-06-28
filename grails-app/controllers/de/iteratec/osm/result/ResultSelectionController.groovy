@@ -8,7 +8,6 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
-
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException

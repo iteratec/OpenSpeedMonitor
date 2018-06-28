@@ -1,17 +1,15 @@
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
-@Mock([UserTiming])
 @Build([UserTiming])
-class UserTimingSpec extends Specification {
-
+class UserTimingSpec extends Specification implements BuildDomainTest<UserTiming> {
 
     void "test constraints for duration"(duration, userTimingType, expectedResult) {
         when:"userTiming is created"
-        UserTiming testee = UserTiming.buildWithoutSave(duration: duration, type: userTimingType)
+        UserTiming testee = UserTiming.build(save: false, duration: duration, type: userTimingType)
 
         then:"validation is as expected"
         testee.validate() == expectedResult

@@ -1,5 +1,7 @@
 package de.iteratec.osm
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.Measurand
@@ -7,20 +9,18 @@ import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.SelectedMeasurandType
 import de.iteratec.osm.result.UserTiming
 import de.iteratec.osm.result.UserTimingType
+import de.iteratec.osm.result.dao.EventResultProjection
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, UserTiming])
 @Build([EventResult, UserTiming])
-class SelectedMeasurandSpec extends Specification {
+class SelectedMeasurandSpec extends Specification implements BuildDataTest {
     CachedView cachedView = CachedView.UNCACHED
+
+    void setupSpec() {
+        mockDomains(EventResult, UserTiming, ConnectivityProfile, Script)
+    }
 
     void "test if constructor works as intended"() {
         when: "selected is constructed for optionValue"
@@ -120,9 +120,9 @@ class SelectedMeasurandSpec extends Specification {
         '_UTMK_name'                  | 1000       | 1000
     }
 
-    void "test get value from EventResult"() {
+    void "test get value from EventResultProjection"() {
         given: "testee is intiated"
-        EventResult testee = createTestee(1000, 2000, 3000)
+        EventResultProjection testee = createTestee(1000, 2000, 3000)
 
         when: "selected is build"
         SelectedMeasurand selected = new SelectedMeasurand(name, cachedView)
@@ -133,33 +133,19 @@ class SelectedMeasurandSpec extends Specification {
         where:
         name                                                              | expectedResult
         SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "mark"       | 1000
-        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "measure"    | null
-        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "mark"    | null
+        SelectedMeasurandType.USERTIMING_MARK.optionPrefix + "queasure"   | null
+        SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "quark"   | null
         SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix + "measure" | 2000
         Measurand.DOC_COMPLETE_TIME.toString()                            | 3000
     }
 
-    private EventResult createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime) {
-        List<UserTiming> userTimings = []
-        userTimings.add(
-                UserTiming.build(
-                        name: "mark",
-                        startTime: valueMark,
-                        type: UserTimingType.MARK,
-                )
-        )
-        userTimings.add(
-                UserTiming.build(
-                        name: "measure",
-                        duration: valueMeasure,
-                        type: UserTimingType.MEASURE,
-                )
-        )
-
-        return EventResult.build(
+    private EventResultProjection createTestee(Double valueMark, Double valueMeasure, Integer docCompleteTime) {
+        Map projectedProperties = [
+                mark: valueMark,
+                measure: valueMeasure,
                 cachedView: cachedView,
-                docCompleteTimeInMillisecs: docCompleteTime,
-                userTimings: userTimings
-        )
+                docCompleteTimeInMillisecs: docCompleteTime
+        ]
+        return new EventResultProjection(id: 1, projectedProperties:projectedProperties)
     }
 }

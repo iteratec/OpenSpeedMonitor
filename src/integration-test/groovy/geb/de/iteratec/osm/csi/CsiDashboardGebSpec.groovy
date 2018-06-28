@@ -1,17 +1,7 @@
 package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.CsiSystem
-import de.iteratec.osm.csi.JobGroupWeight
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageWeight
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -23,7 +13,6 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -32,8 +21,8 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.csi.CsiDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
@@ -326,7 +315,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     private void createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
+            OsmConfiguration.build()
             TestDataUtil.createAdminUser()
             initCsiData()
             createTestSpecificData()
@@ -519,10 +508,13 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             BrowserConnectivityWeight.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
+            JobResult.list().each {
                 it.delete()
             }
-            JobResult.list().each {
+            Job.list().each {
+                it.delete()
+            }
+            ConnectivityProfile.list().each {
                 it.delete()
             }
             TimeToCsMapping.list().each {
@@ -532,9 +524,6 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
                 it.delete()
             }
             Page.list().each {
-                it.delete()
-            }
-            Job.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -570,9 +559,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
             CsiSystem.list().each {
                 it.delete()
             }

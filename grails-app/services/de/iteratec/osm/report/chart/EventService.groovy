@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.springframework.dao.DataIntegrityViolationException

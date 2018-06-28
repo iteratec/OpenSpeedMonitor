@@ -1,10 +1,9 @@
 package de.iteratec.osm.batch
 
-import grails.test.mixin.Mock
+import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 
-@Mock([BatchActivity])
-class BatchActivityUpdaterSpec extends Specification{
+class BatchActivityUpdaterSpec extends Specification implements DomainUnitTest<BatchActivity> {
 
 
     def "test creation"(){

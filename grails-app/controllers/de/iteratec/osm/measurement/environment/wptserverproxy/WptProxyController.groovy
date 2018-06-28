@@ -44,13 +44,13 @@ class WptProxyController {
 		def wptserver = WebPageTestServer.findByProxyIdentifier(params.wptserver)
 
 		if (wptserver) {
-			if (log.infoEnabled) log.info("redirect to ${wptserver.baseUrl}getLocations.php")
+			log.info("redirect to ${wptserver.baseUrl}getLocations.php")
 			
 			proxyService.fetchLocations(wptserver)
 
 			redirect(url: "${wptserver.baseUrl}getLocations.php", params: params)
 		} else {
-			if (log.infoEnabled) log.info('Fail on getLocations')
+			log.info('Fail on getLocations')
 
 			response.sendError(404)
 		}
@@ -65,12 +65,12 @@ class WptProxyController {
 		def wptserver = WebPageTestServer.findByProxyIdentifier(params.wptserver)
 
 		if (wptserver) {
-			if (log.infoEnabled) log.info('Test run...')
-			if (log.infoEnabled) log.info("params=$params")
+			log.info('Test run...')
+			log.info("params=$params")
 			
 			response.outputStream << proxyService.runtest(wptserver, params).data
 		} else {
-			if (log.infoEnabled) log.info('Fail on runtest')
+			log.info('Fail on runtest')
 
 			response.sendError(404)
 		}
@@ -88,7 +88,7 @@ class WptProxyController {
 			log.info("routing to filedownload ${wptserver.baseUrl}results/${params.resultYear}/${params.resultMonth}/${params.resultDay}/${params.resultFolder}/${params.resultId}/${params.fileToDownload}")
 			redirect(url: "${wptserver.baseUrl}results/${params.resultYear}/${params.resultMonth}/${params.resultDay}/${params.resultFolder}/${params.resultId}/${params.fileToDownload}")
 		} else {
-			if (log.infoEnabled) log.info('Fail on resultFileDownload')
+			log.info('Fail on resultFileDownload')
 
 			response.sendError(404)
 		}
@@ -104,10 +104,10 @@ class WptProxyController {
 
 
 		if (wptserver) {
-			if (log.infoEnabled) log.info("Routing to result ${wptserver.baseUrl}result/${params.resultId}")
+			log.info("Routing to result ${wptserver.baseUrl}result/${params.resultId}")
 			redirect(url: "${wptserver.baseUrl}result/${params.resultId}")
 		} else {
-			if (log.infoEnabled) log.info('Fail on result')
+			log.info('Fail on result')
 
 			response.sendError(404)
 		}
@@ -132,7 +132,7 @@ class WptProxyController {
 
 			redirect(url: "${wptserver.baseUrl}xmlResult.php?f=xml&test=${params.resultId}")
 		} else {
-			if (log.infoEnabled) log.info('Fail on xmlResult')
+			log.info('Fail on xmlResult')
 
 			response.sendError(404)
 		}

@@ -13,7 +13,7 @@
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageComparison']"/>
 <p>
     <g:message code="de.iteratec.isocsi.pageComparison.description"
-               default="The displayed chart shows the differnces between two pages. Usually used to compare pages as 'entry page' and as 'follow page'."/>
+               default="The displayed chart shows the differences between two pages. Usually used to compare pages as 'entry page' and as 'follow page'."/>
 </p>
 
 <div class="card hidden" id="chart-card">
@@ -38,11 +38,14 @@
                     <g:render template="/_resultSelection/hiddenWarnings"/>
                 </div>
             </div>
+
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
-                        <osm-page-comparison-adapter data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></osm-page-comparison-adapter>
+                        <osm-page-comparison
+                                data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></osm-page-comparison>
                     </div>
+
                     <div class="col-md-5">
                         <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
                                 aggrGroupValuesUnCached          : aggrGroupValuesUnCached,
@@ -76,8 +79,8 @@
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
-        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
+             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageComparison/pageComparison.js"/>', "pageComparison");
+             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
     </asset:script>
 </content>

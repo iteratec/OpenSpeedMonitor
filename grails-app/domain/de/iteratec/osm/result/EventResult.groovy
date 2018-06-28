@@ -17,13 +17,13 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.RepresentableWptResult
 import grails.gorm.annotation.Entity
 
 
@@ -46,11 +46,9 @@ import grails.gorm.annotation.Entity
  * @see JobResult
  */
 @Entity
-class EventResult implements CsiValue {
+class EventResult implements CsiValue, RepresentableWptResult {
 
     public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-
-    OsmConfigCacheService osmConfigCacheService
 
     Long id
     Date dateCreated
@@ -219,16 +217,19 @@ class EventResult implements CsiValue {
 
     static mapping = {
 
-        jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx,GetLimitedMedianEventResultsBy')
+        jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx,GetLimitedMedianEventResultsBy,forEventResultDashboard')
         jobResultJobConfigId(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
         medianValue(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
         cachedView(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
+        jobGroup(index: 'forEventResultDashboard')
+        page(index: 'forEventResultDashboard')
+        connectivityProfile(index: 'forEventResultDashboard')
+        fullyLoadedTimeInMillisecs(index: 'forEventResultDashboard')
 
         noTrafficShapingAtAll(defaultValue: false)
-
     }
 
-    static transients = ['csiRelevant', 'osmConfigCacheService']
+    static transients = ['csiRelevant']
 
     @Override
     public Double retrieveCsByWptDocCompleteInPercent() {

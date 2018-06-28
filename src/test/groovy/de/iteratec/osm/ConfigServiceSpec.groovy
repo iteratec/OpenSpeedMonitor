@@ -17,9 +17,9 @@
 
 package de.iteratec.osm
 
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
@@ -27,10 +27,8 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 
-@TestFor(ConfigService)
 @Build([OsmConfiguration])
-@Mock([OsmConfiguration])
-class ConfigServiceSpec extends Specification {
+class ConfigServiceSpec extends Specification implements BuildDomainTest<OsmConfiguration>, ServiceUnitTest<ConfigService> {
 
     void "one config is fine"() {
         when: "only one config has been saved with a value"
@@ -44,15 +42,12 @@ class ConfigServiceSpec extends Specification {
         service.getInitialChartHeightInPixels() == DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     }
 
-    void "more than one config is bad"() {
+    void "only one config can be persisted"() {
         given: "two configs have been saved"
         2.times { OsmConfiguration.build() }
 
-        when: "trying to access any value from config service"
-        service.getDetailDataStorageTimeInWeeks()
-
-        then: "an illegalStateExpection should be thrown"
-        thrown(IllegalStateException)
+        expect: "only one configuration"
+        OsmConfiguration.count() == 1
     }
 
     void "values in config can be changed"(int from, int to) {

@@ -5,8 +5,8 @@ import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptCreatePage
 import geb.pages.de.iteratec.osm.measurement.environment.script.ScriptListPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import spock.lang.Shared
 import spock.lang.Stepwise
 /**
@@ -75,6 +75,9 @@ class ScriptGebSpec extends CustomUrlGebReportingSpec{
 
     def cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 
 }

@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 
 /**

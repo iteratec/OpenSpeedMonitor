@@ -18,7 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
 /**

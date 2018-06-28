@@ -19,14 +19,10 @@ package de.iteratec.osm.measurement.script
 
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-
-@TestMixin(GrailsUnitTestMixin)
-@Mock([MeasuredEvent])
-class ScriptParserTestSpec extends Specification {
+class ScriptParserTestSpec extends Specification implements DomainUnitTest<MeasuredEvent> {
 
     PageService pageService
 

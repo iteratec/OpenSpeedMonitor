@@ -31,8 +31,9 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import de.iteratec.osm.result.WptStatus
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import spock.lang.Unroll
 
@@ -76,24 +77,19 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
         createResultDataFromCsv()
         Date startDate = START_OF_WEEK.toDate()
         long csiAggregationId
-        CsiAggregation.withNewTransaction {
-            CsiAggregation aggregation = CsiAggregation.build(
-                    started: startDate,
-                    interval: weekly,
-                    aggregationType: AggregationType.PAGE,
-                    jobGroup: JobGroup.get(jobGroupId),
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: '',
-                    page: Page.findByName(pageName)
-            )
-            csiAggregationId = aggregation.id
-        }
+        CsiAggregation aggregation = CsiAggregation.build(
+                started: startDate,
+                interval: weekly,
+                aggregationType: AggregationType.PAGE,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: '',
+                page: Page.findByName(pageName)
+        )
+        csiAggregationId = aggregation.id
 
         when: "We calculate the CsiAgg."
-        CsiAggregation.withNewSession { session ->
-            pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
-            session.flush()
-        }
+        pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
         CsiAggregation csiAggWeeklyPage = CsiAggregation.get(csiAggregationId)
 
         then: "There should be the correct value for csByWptDocCompleteInPercent."
@@ -178,7 +174,7 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
                     EventResult.build(
                             cachedView: CachedView.UNCACHED,
                             numberOfWptRun: 1,
-                            wptStatus: 200,
+                            wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                             medianValue: true,
                             docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
                             csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,

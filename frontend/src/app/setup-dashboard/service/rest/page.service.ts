@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/index";
-import {JobGroupToPagesMappingDto} from "../../../common/model/job-group-to-page-mapping.model";
+import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class PageService {
 
 
   updatePages() {
-    this.http.get<JobGroupToPagesMappingDto[]>("page/getPagesForActiveJobGroups")
+    this.http.get<JobGroupToPagesMappingDto[]>("/page/getPagesForActiveJobGroups")
       .subscribe(next => this.pages$.next(next), error => this.handleError(error));
   }
 

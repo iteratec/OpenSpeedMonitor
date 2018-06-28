@@ -19,25 +19,27 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 /**
  * Tests low level-functionality of {@link EventCsiAggregationService}.
  */
-
-@TestFor(EventCsiAggregationService)
 @Build([JobGroup, Page])
-@Mock([JobGroup, Page])
-class EventCsiAggregationServiceSpec extends Specification{
+class EventCsiAggregationServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<EventCsiAggregationService> {
     Date from
     Date to
 
     def setup(){
         from = new Date(2017, 2,1)
         to = new Date(2016,2,1)
+    }
+
+    void setupSpec() {
+        mockDomains(JobGroup, Page)
     }
 
     void "Hourly aggregation with mv Query: assert failure in case of from > to"(){

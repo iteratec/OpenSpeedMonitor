@@ -5,23 +5,17 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.*
 
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(ResultSelectionInformationService)
-@Mock([UserTiming, UserTimingSelectionInformation, EventResult, ResultSelectionInformation, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
 @Build([UserTiming, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, ConnectivityProfile])
-class ResultSelectionInformationServiceSpec extends Specification {
+class ResultSelectionInformationServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<ResultSelectionInformationService> {
     Page page
     JobGroup jobGroup
     Browser browser
@@ -29,7 +23,10 @@ class ResultSelectionInformationServiceSpec extends Specification {
     MeasuredEvent measuredEvent
     ConnectivityProfile connectivityProfile
 
-
+    void setupSpec() {
+        mockDomains(UserTiming, UserTimingSelectionInformation, EventResult, ResultSelectionInformation, Page, JobGroup,
+                Browser, Location, MeasuredEvent, ConnectivityProfile, Script)
+    }
 
     void "test userTimingInformation are relevant and unique"(relevantEventResults, relevantUserTimingsPerType, expectedResultSize, irrelevantEventResults, irrelevantUserTimings) {
         setup: "dates are set"

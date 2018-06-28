@@ -17,7 +17,7 @@ import de.iteratec.osm.util.I18nService
 
 class PageComparisonController extends ExceptionHandlerController {
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
 
     I18nService i18nService
@@ -73,6 +73,7 @@ class PageComparisonController extends ExceptionHandlerController {
         return new BarchartDatum(
                 measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.selectedMeasurand.name}", aggregation.selectedMeasurand.name),
                 value: aggregation.value,
+                aggregationValue: aggregation.aggregationValue,
                 grouping: "${aggregation.jobGroup.name} | ${aggregation.page.name}")
     }
 }

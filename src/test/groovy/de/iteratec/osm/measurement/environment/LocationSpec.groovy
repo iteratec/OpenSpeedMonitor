@@ -17,25 +17,25 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
  * Test-suite for {@link Location}
  */
-@TestFor(Location)
 @Build([Location, WebPageTestServer, Browser])
-@Mock([Location, WebPageTestServer,Browser])
-class LocationSpec extends Specification {
+class LocationSpec extends Specification implements BuildDataTest {
+    void setupSpec() {
+        mockDomains(Location, WebPageTestServer,Browser)
+    }
 
     @Unroll
     void "A location with a label of a length of #labelLength characters validates to #valid"() {
 
         when: "a location with a label of a length of #labelLength characters is created"
-        Location location = Location.buildWithoutSave(label: "*".padLeft(labelLength,"*"))
+        Location location = Location.build(save: false, label: "*".padLeft(labelLength,"*"))
 
         then: "the location validates to #valid"
         location.validate() == valid

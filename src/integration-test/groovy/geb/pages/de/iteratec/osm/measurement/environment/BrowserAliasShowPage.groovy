@@ -15,7 +15,7 @@ class BrowserAliasShowPage extends I18nGebPage {
         successDivText { successDiv[0].attr("innerHTML") }
 
         alias { $("#show-browserAlias").$("tr")[0].$("td")[2].attr("innerHTML") }
-        browserName { $("#show-browserAlias").$("tr")[1].$("td")[2].attr("innerHTML") }
+        browserName { $("#show-browserAlias").$("tr")[2].$("td")[2].attr("innerHTML") }
 
         deleteButton (to: BrowserAliasShowPage) { $("li").$("a", href: "#DeleteModal") }
 

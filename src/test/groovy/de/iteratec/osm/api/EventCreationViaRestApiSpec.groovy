@@ -5,9 +5,9 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Duration
@@ -15,22 +15,27 @@ import spock.lang.Specification
 
 import static de.iteratec.osm.util.Constants.*
 
-@TestFor(GeneralMeasurementApiController)
-@Mock([Job, ApiKey, JobGroup, Event])
 @Build([ApiKey, JobGroup])
-class EventCreationViaRestApiSpec extends Specification {
+class EventCreationViaRestApiSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<GeneralMeasurementApiController> {
 
     static String APIKEY_ALLOWED = 'allowed'
     static String APIKEY_NOT_ALLOWED = 'not-allowed'
     static JobGroup group1, group2
 
-    def doWithSpring = {
-        eventDaoService(EventDaoService)
+    Closure doWithSpring() {
+        return {
+            eventDaoService(EventDaoService)
+        }
     }
 
     void setup(){
         createTestDataCommonToAllTests()
         controller.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
+    }
+
+    void setupSpec() {
+        mockDomains(Job, ApiKey, JobGroup, Event)
     }
 
     //apiKey constraint violation ////////////////////////////////////
@@ -202,11 +207,10 @@ class EventCreationViaRestApiSpec extends Specification {
                 description: description,
                 globallyVisible: globalVisibility
         )
+        cmd.validate()
 
         then:
-        shouldFail(IllegalArgumentException){
-            cmd.validate()
-        }
+        IllegalArgumentException e = thrown()
     }
 
     // successful event creation //////////////////////////////////////////////////////////////

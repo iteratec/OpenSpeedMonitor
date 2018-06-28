@@ -1,15 +1,14 @@
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
 import de.iteratec.osm.csi.Page
 
-@TestFor(PageAggregationController)
-@Mock([Page])
 @Build([Page])
-class PageAggregationControllerSpec extends Specification {
+class PageAggregationControllerSpec extends Specification implements BuildDomainTest<Page>,
+        ControllerUnitTest<PageAggregationController> {
 
     private PageAggregationController controllerUnderTest
 

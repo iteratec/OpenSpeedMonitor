@@ -19,19 +19,17 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.CsiType
 import de.iteratec.osm.util.I18nService
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 
 /**
  * These tests test processing osm chart data.
  *
  * <b>Note: </b>Method {@link de.iteratec.osm.report.chart.OsmChartProcessingService#summarizeEventResultGraphs(java.util.List)}
- *      isn't tested here cause it is tested in class {@link de.iteratec.osm.result.SummarizedChartLegendEntriesSpec} already.
  */
-@TestFor(OsmChartProcessingService)
-class OsmChartProcessingServiceSpec extends Specification {
+class OsmChartProcessingServiceSpec extends Specification implements ServiceUnitTest<OsmChartProcessingService> {
 
     OsmChartProcessingService serviceUnderTest
 
@@ -81,10 +79,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event csiAggregations, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_3_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_3_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
 
         when:
@@ -95,10 +93,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_3_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_3_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -106,10 +104,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event csiAggregations, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel =
                 "<b>${I18N_LABEL_CSI_TYPE}</b>: ${CsiType.DOC_COMPLETE.toString()} | " +
@@ -135,10 +133,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event csiAggregations, single legend parts in some but not all graphs the same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_3_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_3_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
 
         when:
@@ -149,10 +147,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_1_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_1_NAME, EVENT_3_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, EVENT_3_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_4_NAME, EVENT_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -162,10 +160,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "page csiAggregations, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_2_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_3_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_4_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_2_NAME, PAGE_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_3_NAME, PAGE_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_4_NAME, PAGE_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
         ]
 
         when:
@@ -176,10 +174,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_2_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_3_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_4_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, PAGE_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_2_NAME, PAGE_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_3_NAME, PAGE_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_4_NAME, PAGE_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -187,10 +185,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "page csiAggregations, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel = "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME}"
 
@@ -202,10 +200,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                CsiType.DOC_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_1_NAME,
-                CsiType.DOC_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_2_NAME,
-                CsiType.VISUALLY_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_3_NAME,
-                CsiType.VISUALLY_COMPLETE.toString() + HIGHCHART_LEGEND_DELIMITTER + PAGE_4_NAME
+                CsiType.DOC_COMPLETE.toString() + TIMESERIES_CHART_LEGEND_DELIMITTER + PAGE_1_NAME,
+                CsiType.DOC_COMPLETE.toString() + TIMESERIES_CHART_LEGEND_DELIMITTER + PAGE_2_NAME,
+                CsiType.VISUALLY_COMPLETE.toString() + TIMESERIES_CHART_LEGEND_DELIMITTER + PAGE_3_NAME,
+                CsiType.VISUALLY_COMPLETE.toString() + TIMESERIES_CHART_LEGEND_DELIMITTER + PAGE_4_NAME
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
@@ -213,10 +211,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "page csiAggregations, single legend parts in some but not all graphs the same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_4_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [JOB_GROUP_4_NAME, PAGE_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
 
         when:
@@ -227,10 +225,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_4_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, PAGE_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, PAGE_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, PAGE_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_4_NAME, PAGE_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -238,10 +236,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "page csiAggregations, single legend parts begin with same chars but end different -> no summarization"() {
         given:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: ["jobGroup_Name", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["jobGroup_Name", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["jobGroup_NameDifferent", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["JobGroup_NameDifferent", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: ["jobGroup_Name", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["jobGroup_Name", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["jobGroup_NameDifferent", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["JobGroup_NameDifferent", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
 
         when:
@@ -252,10 +250,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                ["jobGroup_Name", "HP"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["jobGroup_Name", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["jobGroup_NameDifferent", "HP"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["JobGroup_NameDifferent", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER),
+                ["jobGroup_Name", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["jobGroup_Name", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["jobGroup_NameDifferent", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["JobGroup_NameDifferent", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -263,10 +261,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "page csiAggregations, page name and jobGroup name are equal -> no summarization"() {
         given:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: ["HP", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["HP", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["jobGroup_NameDifferent", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: ["JobGroup_NameDifferent", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: ["HP", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["HP", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["jobGroup_NameDifferent", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: ["JobGroup_NameDifferent", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER))
         ]
 
         when:
@@ -277,10 +275,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                ["HP", "HP"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["HP", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["jobGroup_NameDifferent", "HP"].join(HIGHCHART_LEGEND_DELIMITTER),
-                ["JobGroup_NameDifferent", "HP_entry"].join(HIGHCHART_LEGEND_DELIMITTER),
+                ["HP", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["HP", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["jobGroup_NameDifferent", "HP"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                ["JobGroup_NameDifferent", "HP_entry"].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -290,10 +288,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event result, every legend part in every graph different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_3_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_3_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
         ]
 
         when:
@@ -304,10 +302,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_3_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_3_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_4_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -315,10 +313,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event result, single legend part in some but not in all graphs same -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_2_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
         ]
 
         when:
@@ -329,10 +327,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_2_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_2_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_2_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_4_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
@@ -340,10 +338,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event result, some legend parts in every graph the same, some different -> summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
         ]
 
         when:
@@ -354,10 +352,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_1_NAME, MEASURED_STEP_1_NAME, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_2_NAME, MEASURED_STEP_2_NAME, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_3_NAME, MEASURED_STEP_3_NAME, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [JOB_GROUP_4_NAME, MEASURED_STEP_3_NAME, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == "<b>${I18N_LABEL_MEASURAND}</b>: ${MEASURAND_1_NAME} | " +
                 "<b>${I18N_LABEL_LOCATION}</b>: ${LOCATION_4_UNIQUE_IDENTIFIER}"
@@ -367,10 +365,10 @@ class OsmChartProcessingServiceSpec extends Specification {
     void "event result, single legend parts begin with same chars but end different -> no summarization"() {
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [MEASURAND_1_NAME, "JobGroup_1_Name", MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_2_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_2_NAME, "JobGroup_1_Name", MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [MEASURAND_4_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_1_NAME, "JobGroup_1_Name", MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_2_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_2_NAME, "JobGroup_1_Name", MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [MEASURAND_4_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER)),
         ]
 
         when:
@@ -381,10 +379,10 @@ class OsmChartProcessingServiceSpec extends Specification {
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                [MEASURAND_1_NAME, "JobGroup_1_Name", MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_2_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_2_NAME, "JobGroup_1_Name", MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
-                [MEASURAND_4_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
+                [MEASURAND_1_NAME, "JobGroup_1_Name", MEASURED_STEP_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER, CONNECTIVITY_1_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_2_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, CONNECTIVITY_2_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_2_NAME, "JobGroup_1_Name", MEASURED_STEP_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, CONNECTIVITY_3_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
+                [MEASURAND_4_NAME, "JobGroup_1_NameDifferent", MEASURED_STEP_3_NAME, LOCATION_4_UNIQUE_IDENTIFIER, CONNECTIVITY_4_NAME].join(TIMESERIES_CHART_LEGEND_DELIMITTER),
         ])
         chart.osmChartGraphsCommonLabel == ''
     }

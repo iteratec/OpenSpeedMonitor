@@ -1,7 +1,8 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
-import grails.transaction.Transactional
+import de.iteratec.osm.result.WptStatus
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class JobStatisticService {
@@ -17,13 +18,13 @@ class JobStatisticService {
 
         JobStatistic stat = getStatOf(job)
         stat.percentageSuccessfulTestsOfLast150 = results.size() == 150 ?
-            (results.count{it.httpStatusCode==200}/150)*100 :
+            (results.count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/150)*100 :
             null
         stat.percentageSuccessfulTestsOfLast25 = results.size() >= 25 ?
-            (results.take(25).count{it.httpStatusCode==200}/25)*100 :
+            (results.take(25).count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/25)*100 :
             null
         stat.percentageSuccessfulTestsOfLast5 = results.size() >= 5 ?
-            (results.take(5).count{it.httpStatusCode==200}/5)*100 :
+            (results.take(5).count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/5)*100 :
             null
 
         stat.save(failOnError: true)

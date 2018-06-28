@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ApplicationDashboardComponent } from './application-dashboard.component';
+import {ApplicationDashboardComponent} from './application-dashboard.component';
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -10,7 +10,7 @@ describe('ApplicationDashboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ ApplicationDashboardComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

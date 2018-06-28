@@ -9,8 +9,8 @@ import geb.pages.de.iteratec.osm.csi.PageCreatePage
 import geb.pages.de.iteratec.osm.csi.PageEditPage
 import geb.pages.de.iteratec.osm.csi.PageIndexPage
 import geb.pages.de.iteratec.osm.csi.PageShowPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 import spock.lang.Shared
@@ -169,5 +169,8 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
 
     def cleanupSpec() {
         doLogout()
+        User.withNewTransaction {
+            OsmConfiguration.first().delete()
+        }
     }
 }
