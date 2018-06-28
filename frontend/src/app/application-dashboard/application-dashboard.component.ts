@@ -9,16 +9,16 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class ApplicationDashboardComponent {
   application: JobGroupDTO;
+  jobGroupId: number;
 
   constructor(private route: ActivatedRoute, private router: Router) {
-    route.params.subscribe(params => console.log("jobGroupId ", params));
-    route.data.subscribe(params => console.log("data ", params));
-    route.url.subscribe(params => console.log("url ", params));
-    console.log("config ", route.routeConfig);
-    console.log("rootPath ", route.pathFromRoot);
+    this.route.paramMap.subscribe(params => {
+      this.jobGroupId = +params.get('jobGroupId');
+    });
   }
 
   updateApplication(jobGroup: JobGroupDTO) {
+    this.router.navigate(['/application-dashboard', jobGroup.id]);
     this.application = jobGroup
   }
 }

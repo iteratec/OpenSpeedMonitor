@@ -180,7 +180,7 @@ task installFrontendDependencies(type: NpmTask) {
 task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
     description = "Compiles frontend"
     workingDir = file("${project.projectDir}/frontend")
-    args = ['run', 'build']
+    args = ['run', 'build:prod']
 }
 
 task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
