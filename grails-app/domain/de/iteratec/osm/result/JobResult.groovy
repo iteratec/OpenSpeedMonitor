@@ -16,11 +16,10 @@
 */
 
 package de.iteratec.osm.result
+
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobStatisticService
 import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
-import grails.util.Environment
 
 /**
  * <p>
@@ -41,9 +40,6 @@ import grails.util.Environment
  */
 @Entity
 class JobResult {
-
-    JobStatisticService jobStatisticService
-
     Long id
 
     Job job
@@ -157,7 +153,7 @@ class JobResult {
         autowire true
     }
 
-    static transients = ['eventResults', 'jobStatisticService']
+    static transients = ['eventResults']
 
     String toString() {
         return (testId ?: id) ?: super.toString()
@@ -249,29 +245,4 @@ class JobResult {
         def str = state[httpStatusCode]
         return str ?: 'Unknown'
     }
-
-    /**
-     * If {@link httpStatusCode} will change {@link JobStatistic}s of {@link Job} has to be updated.
-     */
-    def beforeUpdate() {
-        try {
-            boolean noTest = Environment.getCurrent() != Environment.TEST
-            if (noTest && isDirty('httpStatusCode')) {
-                jobStatisticService.updateStatsFor(job)
-            }
-        } catch (Exception e) {
-            log.info("An exception occurred trying to update statistics of job '${job.label}': ${e.message}")
-        }
-        return true
-    }
-    /**
-     * {@link JobStatistic}s of {@link Job} has to be updated.
-     */
-    def afterInsert() {
-        boolean noTest = Environment.getCurrent() != Environment.TEST
-        if (noTest) {
-            jobStatisticService.updateStatsFor(job)
-        }
-    }
-
 }
