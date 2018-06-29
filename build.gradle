@@ -154,7 +154,7 @@ assets {
 
 node {
     //node version to use
-    version = '8.11.1'
+    version = '8.11.3'
     //npm version to use
     npmVersion = '5.6.0'
     // If true, it will download node using above parameters.
