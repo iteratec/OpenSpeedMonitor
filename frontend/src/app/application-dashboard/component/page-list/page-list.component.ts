@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges} from '@angular/core';
 import {ApplicationDashboardService} from "../../service/application-dashboard.service";
 import {Observable} from "rxjs/index";
+import {IPage} from "../../model/page.model";
 
 @Component({
   selector: 'osm-page-list',
@@ -9,7 +10,7 @@ import {Observable} from "rxjs/index";
 })
 export class PageListComponent implements OnChanges {
   @Input() jobGroupId: number;
-  pages$: Observable<any>;
+  pages$: Observable<IPage[]>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
   }
