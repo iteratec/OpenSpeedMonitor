@@ -1,6 +1,21 @@
-.csi-circle-value {
+.csi-circle-container {
+  position: relative;
+  display: inline-block;
 }
 
-.csi-circle-background {
-  opacity: 0.5;
+.csi-circle-text-container {
+  position: absolute;
+  display: inline-block;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
+
+.csi-value-text {
+  font-weight: bold;
+}
+
+.csi-value-description {
+}
+

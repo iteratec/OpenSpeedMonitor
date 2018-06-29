@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {arc} from "d3-shape";
 import {select} from "d3-selection";
 import {transition} from "d3-transition";
@@ -10,18 +10,23 @@ import {interpolate} from "d3-interpolate";
   styleUrls: ['./csi-value.component.css']
 })
 export class CsiValueComponent implements OnInit {
-  color: string = "green";
-  size: number = 150;
-  csiValue: number = 0.75;
+  @Input() color: string;
+  @Input() isSmall: boolean;
+  @Input() description: string;
+  @Input() csiValue: number;
+
+  size: number;
+  valueFontSize: string;
+  descriptionFontSize: string;
+
   arcGenerator: any;
-  backgroundGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
 
   ngOnInit(): void {
+    this.initByInput();
     let outerRadius = this.size / 2;
     let innerRadius = outerRadius - outerRadius * 0.15;
     this.arcGenerator = this.getArcGenerator(innerRadius, outerRadius);
-    this.backgroundGenerator = this.getArcGenerator(innerRadius, outerRadius);
 
     let selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue])
     this.enter(selection.enter());
@@ -44,8 +49,7 @@ export class CsiValueComponent implements OnInit {
   }
 
   enter(selection: any) {
-
-    const baseCircle = this.backgroundGenerator(3 * Math.PI);
+    const baseCircle = this.arcGenerator(3 * Math.PI);
 
     const circleGroup = selection
       .append("g")
@@ -57,11 +61,11 @@ export class CsiValueComponent implements OnInit {
       .attr("class", "csi-circle-background")
       .attr("d", baseCircle)
       .attr("fill", this.color)
-      .style("opacity", 0.1)
+      .style("opacity", 0.1);
     circleGroup
       .append("path")
       .attr("class", "csi-circle-value")
-      .attr("fill", this.color)
+      .attr("fill", this.color);
   }
 
   update(selection: any) {
@@ -83,11 +87,27 @@ export class CsiValueComponent implements OnInit {
 
 
   private calculateCsiArcTarget(csiValue: number) {
-    return 2 * csiValue * Math.PI + Math.PI;
+    return 2 * csiValue / 100 * Math.PI + Math.PI;
   }
 
   exit(selection: any) {
     selection.remove()
+  }
+
+  private initByInput() {
+    if (!this.description) {
+      this.description = "CSI";
+    }
+
+    if (this.isSmall) {
+      this.size = 75;
+      this.valueFontSize = '18';
+      this.descriptionFontSize = '12';
+    } else {
+      this.size = 150;
+      this.valueFontSize = '34';
+      this.descriptionFontSize = '14';
+    }
   }
 }
 
