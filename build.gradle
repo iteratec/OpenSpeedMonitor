@@ -199,8 +199,6 @@ task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
     rename('(styles)\\..*\\.css', '$1.css')
 }
 
-tasks.war.dependsOn("syncFrontendJavascripts", "syncFrontendStylesheets")
-
 task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
@@ -268,16 +266,21 @@ task nodeSyncStylesheets(type: Sync) {
     dependsOn npmInstall
 }
 
-
 task nodePackages() {
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies
+    if (!(System.getenv('GRADLE_CUSTOM_ENV') == 'hotreload')) {
+        dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
+    } else {
+        dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies
+    }
 }
 
 processResources.dependsOn nodePackages
 assetCompile.dependsOn nodePackages
 
 clean.delete << file('grails-app/assets/javascripts/node_modules')
+clean.delete << file('grails-app/assets/javascripts/frontend')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
+clean.delete << file('grails-app/assets/stylesheets/frontend')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
