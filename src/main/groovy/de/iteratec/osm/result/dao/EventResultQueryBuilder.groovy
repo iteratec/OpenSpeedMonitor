@@ -1,12 +1,23 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.dao.ProjectionProperty
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
+import de.iteratec.osm.result.dao.query.MeasurandTrim
+import de.iteratec.osm.result.dao.query.ProjectionProperty
+import de.iteratec.osm.result.dao.query.TrimQualifier
+import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
+import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
+import de.iteratec.osm.result.dao.query.projector.UserTimingAverageDataProjector
+import de.iteratec.osm.result.dao.query.projector.UserTimingRawDataProjector
+import de.iteratec.osm.result.dao.query.transformer.*
+import de.iteratec.osm.result.dao.query.trimmer.MeasurandAverageDataTrimmer
+import de.iteratec.osm.result.dao.query.trimmer.MeasurandRawDataTrimmer
+import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
@@ -15,33 +26,32 @@ import org.hibernate.sql.JoinType
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
-    private List<SelectedMeasurand> selectedMeasurands = []
-
-    private List<EventResultFilter> filters = []
-    private List<ProjectionProperty> baseProjections
+    private List<Closure> filters = []
+    private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
 
-    private SelectedMeasurandQueryBuilder measurandRawQueryBuilder, measurandMedianQueryBuilder, userTimingRawQueryBuilder, userTimingsMedianDataQueryBuilder
+    private EventResultQueryExecutor measurandQueryExecutor = new EventResultQueryExecutor()
+    private EventResultQueryExecutor userTimingQueryExecutor = new EventResultQueryExecutor()
 
     EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
         performanceLoggingService = new PerformanceLoggingService()
-        filters.add(initBaseClosure(minValidLoadtime, maxValidLoadtime))
-        baseProjections = initBaseProjections()
+        filters.add(initBaseClosure())
+        baseProjections = []
+        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: minValidLoadtime, qualifier: TrimQualifier.GREATER_THAN))
+        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: maxValidLoadtime, qualifier: TrimQualifier.LOWER_THAN))
     }
 
-    private EventResultFilter initBaseClosure(Integer minValidLoadtime, Integer maxValidLoadtime) {
-        Closure closure = {
+    private Closure initBaseClosure() {
+        return {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             createAlias('jobResult', 'jobResult')
             createAlias('connectivityProfile', 'connectivityProfile', JoinType.LEFT_OUTER_JOIN)
-            'between'('fullyLoadedTimeInMillisecs', minValidLoadtime, maxValidLoadtime)
             eq('medianValue', true)
         }
-        return new EventResultFilter(filterClosure: closure)
     }
 
-    private List<ProjectionProperty> initBaseProjections() {
+    private List<ProjectionProperty> getRichMetaDataProjections() {
         return [
                 new ProjectionProperty(dbName: 'id', alias: 'id'),
                 new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
@@ -65,45 +75,45 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
         if (from && to) {
-            filters.add(new EventResultFilter( filterClosure:{
+            filters.add({
                 'between' 'jobResultDate', from, to
-            }))
+            })
         }
         return this
     }
 
-    EventResultQueryBuilder withJobGroupIdsIn(List<Long> jobGroupIds, boolean project = false) {
+    EventResultQueryBuilder withJobGroupIdsIn(List<Long> jobGroupIds, boolean project = true) {
         return withAssociatedDomainIdsIn(jobGroupIds, 'jobGroup', project)
     }
 
-    EventResultQueryBuilder withPageIdsIn(List<Long> pageIds, boolean project = false) {
+    EventResultQueryBuilder withPageIdsIn(List<Long> pageIds, boolean project = true) {
         return withAssociatedDomainIdsIn(pageIds, 'page', project)
     }
 
-    EventResultQueryBuilder withLocationIdsIn(List<Long> locationIds, boolean project = false) {
+    EventResultQueryBuilder withLocationIdsIn(List<Long> locationIds, boolean project = true) {
         return withAssociatedDomainIdsIn(locationIds, 'location', project)
     }
 
-    EventResultQueryBuilder withBrowserIdsIn(List<Long> browserIds, boolean project = false) {
+    EventResultQueryBuilder withBrowserIdsIn(List<Long> browserIds, boolean project = true) {
         return withAssociatedDomainIdsIn(browserIds, 'browser', project)
     }
 
-    EventResultQueryBuilder withMeasuredEventIdsIn(List<Long> measuredEventIds, boolean project = false) {
+    EventResultQueryBuilder withMeasuredEventIdsIn(List<Long> measuredEventIds, boolean project = true) {
         return withAssociatedDomainIdsIn(measuredEventIds, 'measuredEvent', project)
     }
 
-    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = false) {
+    EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
         return withAssociatedDomainIdsIn(jobGroups.collect { it.ident() }, 'jobGroup', project)
     }
 
-    EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = false) {
+    EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = true) {
         return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
-        filters.add(new EventResultFilter( filterClosure:{
+        filters.add({
             'eq' 'cachedView', cachedView
-        }))
+        })
         return this
     }
 
@@ -117,7 +127,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withConnectivity(List<Long> connectivityProfileIds, List<String> customConnNames, Boolean includeNativeConnectivity) {
-        filters.add(new EventResultFilter( filterClosure:{
+        filters.add({
             or {
                 if (connectivityProfileIds) {
                     'in'('connectivityProfile.id', connectivityProfileIds)
@@ -129,7 +139,7 @@ class EventResultQueryBuilder {
                     eq('noTrafficShapingAtAll', true)
                 }
             }
-        }))
+        })
         return this
     }
 
@@ -138,56 +148,62 @@ class EventResultQueryBuilder {
             Closure filterClosure = {
                 'in' "${associatedDomainFieldName}.id", associatedDomainIds
             }
-            EventResultFilter filter = new EventResultFilter(filterClosure: filterClosure, filteredFieldName: associatedDomainFieldName + 'Id')
-            filters.add(filter)
-        }
-        if (project) {
-            baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
+            filters.add(filterClosure)
+            if (project) {
+                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName + '.id', alias: associatedDomainFieldName + 'Id'))
+            }
         }
         return this
     }
 
     EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
-        this.selectedMeasurands = selectedMeasurands
-        List<SelectedMeasurand> measurands = selectedMeasurands.findAll { !it.selectedType.isUserTiming() }
-        List<SelectedMeasurand> userTimings = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
 
-        if (measurands) {
-            initMeasurandsQueryBuilder()
-            measurandRawQueryBuilder.configureForSelectedMeasurands(measurands)
-            measurandMedianQueryBuilder.configureForSelectedMeasurands(measurands)
-        }
-        if (userTimings) {
-            initUserTimingsQueryBuilder()
-            userTimingRawQueryBuilder.configureForSelectedMeasurands(userTimings)
-            userTimingsMedianDataQueryBuilder.configureForSelectedMeasurands(userTimings)
-        }
+        measurandQueryExecutor.setMeasurands(selectedMeasurands)
+        userTimingQueryExecutor.setUserTimings(selectedMeasurands)
 
         return this
     }
 
-    List<EventResultProjection> getRawData() {
-        return getResultFor(userTimingRawQueryBuilder, measurandRawQueryBuilder)
+    List<EventResultProjection> getRawData(boolean withRichMetaData= true) {
+        if(withRichMetaData){
+            baseProjections.addAll(getRichMetaDataProjections())
+        }
+        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
+        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer(baseProjections: baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+        return getResults()
     }
 
     List<EventResultProjection> getMedianData(){
-        return getResultFor(userTimingsMedianDataQueryBuilder, measurandMedianQueryBuilder)
+        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
+        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingMedianDataTransformer(baseProjections: baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+        return getResults()
     }
 
-    private getResultFor(SelectedMeasurandQueryBuilder userTimingsBuilder, SelectedMeasurandQueryBuilder measurandsBuilder) {
-        List<EventResultProjection> userTimingsResult = []
-        List<EventResultProjection> measurandResult = []
+    List<EventResultProjection> getAverageData(){
+        measurandQueryExecutor.setProjector(new MeasurandAverageDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandAverageDataTransformer(baseProjections: baseProjections))
+        measurandQueryExecutor.setTrimmer(new MeasurandAverageDataTrimmer())
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get usertiming results', 3) {
-            if (userTimingsBuilder) {
-                userTimingsResult += userTimingsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
-            }
-        }
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - get measurand results', 3) {
-            if (measurandsBuilder) {
-                measurandResult += measurandsBuilder.getResultsForFilter(filters, baseProjections, trims, performanceLoggingService)
-            }
-        }
+        userTimingQueryExecutor.setProjector(new UserTimingAverageDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingAverageDataTransformer(baseProjections: baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+
+        return getResults()
+    }
+
+    private getResults() {
+        List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
 
         List<EventResultProjection> merged
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
@@ -210,23 +226,5 @@ class EventResultQueryBuilder {
             return measurandResult ? measurandResult : userTimingResult
         }
 
-    }
-
-    private initUserTimingsQueryBuilder() {
-        if (!userTimingRawQueryBuilder) {
-            userTimingRawQueryBuilder = new UserTimingRawDataQueryBuilder()
-        }
-        if(!userTimingsMedianDataQueryBuilder){
-            userTimingsMedianDataQueryBuilder = new UserTimingMedianDataQueryBuilder()
-        }
-    }
-
-    private initMeasurandsQueryBuilder() {
-        if (!measurandRawQueryBuilder) {
-            measurandRawQueryBuilder = new MeasurandRawDataQueryBuilder()
-        }
-        if(!measurandMedianQueryBuilder) {
-            measurandMedianQueryBuilder = new MeasurandMedianDataQueryBuilder()
-        }
     }
 }

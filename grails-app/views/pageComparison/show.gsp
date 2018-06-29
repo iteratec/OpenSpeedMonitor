@@ -42,7 +42,8 @@
             <div class="card-well">
                 <div class="row">
                     <div class="col-md-7">
-                        <g:render template="pageComparisonVue"/>
+                        <osm-page-comparison
+                                data-module-path="src/app/page-comparison/page-comparison.module#PageComparisonModule"></osm-page-comparison>
                     </div>
 
                     <div class="col-md-5">
@@ -71,6 +72,10 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
+    <asset:stylesheet src="frontend/styles.css"/>
+    <asset:javascript src="frontend/runtime.js"/>
+    <asset:javascript src="frontend/polyfills.js"/>
+    <asset:javascript src="frontend/main.js"/>
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).load(function() {

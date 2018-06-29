@@ -22,13 +22,16 @@
 
 <div class="row">
     <div class="col-md-12">
-        <g:if test="${errors}">
+        <g:if test="${errors || customError}">
             <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
+                <strong><g:message code="de.iteratec.osm.measurement.setup.errorsTitle"/></strong>
                 <ul>
                     <g:each var="currentError" in="${errors}">
                         <li><g:message error="${currentError}"/></li>
                     </g:each>
+                <g:if test="${customError}">
+                    <li><g:message code="${customError}"/></li>
+                </g:if>
                 </ul>
             </div>
         </g:if>

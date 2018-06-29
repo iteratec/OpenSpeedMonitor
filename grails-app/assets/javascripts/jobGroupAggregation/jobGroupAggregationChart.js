@@ -40,7 +40,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
         data.resetData()
     };
 
-    var render = function () {
+    var render = function (isAggregationValueChange) {
         if (data.isDataAvailable()) {
             var shouldShowScore = data.hasLoadTimes();
             var componentMargin = OpenSpeedMonitor.ChartComponents.common.ComponentMargin;
@@ -60,8 +60,8 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
                 .classed("bars-content-group", true);
             contentGroup.attr("transform",
                 "translate(" + (data.getChartSideLabelsWidth() + componentMargin) + ", " + headerHeight + ")");
-            renderBars(contentGroup);
-            renderBarScore(contentGroup, shouldShowScore, barScorePosY);
+            renderBars(contentGroup, isAggregationValueChange);
+            renderBarScore(contentGroup, shouldShowScore, barScorePosY, isAggregationValueChange);
         }
     };
 
@@ -87,7 +87,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             .call(chartSideLabelsComponent.render)
     };
 
-    var renderBarScore = function (svg, shouldShowScore, posY) {
+    var renderBarScore = function (svg, shouldShowScore, posY, isAggregationValueChange) {
         var barScore = svg.selectAll(".chart-score-group").data([chartBarScoreComponent]);
         barScore.exit()
             .remove();
@@ -96,25 +96,24 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal = (function (selecto
             .attr("class", "chart-score-group")
             .attr("transform", "translate(0, " + posY + ")");
         barScore
-            .call(chartBarScoreComponent.render)
+            .call(chartBarScoreComponent.render, isAggregationValueChange)
             .transition()
             .style("opacity", shouldShowScore ? 1 : 0)
             .duration(transitionDuration)
             .attr("transform", "translate(0, " + posY + ")");
     };
 
-    var renderBars = function (svg) {
+    var renderBars = function (svg, isAggregationValueChange) {
         var bars = svg.selectAll(".chart-bars").data([chartBars]);
         bars.exit()
             .remove();
         bars.enter()
             .append("g")
-            .attr("class", "chart-bars")
+            .attr("class", "chart-bars");
         bars
-            .call(chartBars.render)
+            .call(chartBars.render, isAggregationValueChange)
             .transition()
-            .style("opacity", 1)
-            .duration(transitionDuration)
+            .style("opacity", 1);
     };
 
     var toggleBarHighlight = function (highlightGroupId) {

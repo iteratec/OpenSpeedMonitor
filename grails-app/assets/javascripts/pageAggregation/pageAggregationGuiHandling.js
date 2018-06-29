@@ -83,7 +83,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         });
         $("input[name='aggregationValue']").on("change", function () {
             spinner.start();
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -188,7 +188,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
         if (avgLoaded && getAggregationValue() === "avg") {
             spinner.stop()
         }
@@ -201,9 +201,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.series) pageAggregationChart.render();
+        if (!data.series) pageAggregationChart.render(isAggregationValueChange);
         if (data.series && getAggregationValue() === data.series[0].aggregationValue) {
-            pageAggregationChart.render();
+            pageAggregationChart.render(isAggregationValueChange);
         }
     };
 

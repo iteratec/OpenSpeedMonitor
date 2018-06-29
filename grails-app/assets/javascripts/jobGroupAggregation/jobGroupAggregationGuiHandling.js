@@ -27,8 +27,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $("input[name='aggregationValue']").on("change", function () {
-            spinner.start()
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            spinner.start();
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
         $(".chart-filter").click(onFilterClick);
     };
@@ -66,7 +66,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
         if(avgLoaded && getAggregationValue() === "avg") {
             spinner.stop()
         }
@@ -79,9 +79,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.groupData) jobGroupAggregationChart.render();
+        if (!data.groupData) jobGroupAggregationChart.render(isAggregationValueChange);
         if (data.groupData && getAggregationValue() === data.groupData[0].aggregationValue) {
-            jobGroupAggregationChart.render();
+            jobGroupAggregationChart.render(isAggregationValueChange);
         }
     };
 
@@ -124,7 +124,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             },
             error: function (e) {
                 spinner.stop();
-                $("#chart-card").removeClass("hidden")
+                $("#chart-card").removeClass("hidden");
                 if (e.responseText === "no data") {
                     $("#error-div").addClass("hidden");
                     $('#warning-no-data').show();
