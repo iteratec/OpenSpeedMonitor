@@ -19,7 +19,7 @@ class FrontendWatcher {
 
     static void initializeFrontendWatcher() {
         FrontendWatcher frontendWatcher = new FrontendWatcher()
-        frontendWatcher.startFrontendWatcher(Environment.getCurrentEnvironment())
+        frontendWatcher.startFrontendWatcher(Environment.getCurrent())
     }
 
     @CompileDynamic
