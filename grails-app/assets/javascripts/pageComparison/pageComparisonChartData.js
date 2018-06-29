@@ -27,7 +27,7 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
         if (data.series || data.aggregationValue) {
             filterData();
             var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(createLabelFilterData(), data.i18nMap);
-            headerText = chartLabelUtils.getCommonLabelParts(true);
+            headerText = chartLabelUtils.getCommonLabelParts(false);
             headerText += headerText ? " - " + getAggregationValueLabel() : getAggregationValueLabel();
             sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
                 return s.label;
@@ -49,7 +49,8 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
                 return {
                     page: filterPageName(page.id),
                     jobGroup: filterJobGroup(page.id),
-                    id: page.id
+                    id: page.id,
+                    measurand: page.measurand
                 }
             })
         }))
@@ -106,7 +107,8 @@ OpenSpeedMonitor.ChartModules.PageComparisonData = (function (svgSelection) {
                     label: dataElement.grouping,
                     value: dataElement[aggregationValue],
                     unit: series.dimensionalUnit,
-                    color: colors(id)
+                    color: colors(id),
+                    measurand: dataElement.measurand
                 };
                 if (series.dimensionalUnit === "ms") hasLoadTime = true;
                 allPageData[pageIndex].push(add);

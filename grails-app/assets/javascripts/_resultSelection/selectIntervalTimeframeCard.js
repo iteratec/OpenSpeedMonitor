@@ -140,7 +140,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
     }
 
     if (!suppressEvent) {
-      cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
+      triggerTimeFrameChanged();
     }
 
   };
@@ -175,7 +175,8 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function () {
   };
 
   var triggerTimeFrameChanged = function () {
-    cardElement.trigger("timeFrameChanged", [getTimeFrame()]);
+      var event = new CustomEvent('timeFrameChanged',{detail: getTimeFrame()});
+      document.getElementById('select-interval-timeframe-card').dispatchEvent(event);
   };
 
   var comparativeEnabled = function () {

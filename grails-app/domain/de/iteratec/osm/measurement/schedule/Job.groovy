@@ -24,7 +24,6 @@ import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
 import grails.plugins.taggable.Taggable
 import grails.util.Environment
-
 import org.quartz.CronExpression
 
 /**
@@ -142,6 +141,7 @@ class Job implements Taggable {
     Integer packetLoss
 
     boolean isPrivate = true
+    boolean captureTimeline = true
     String  urlsToBlock
     Integer imageQuality
     boolean emulateMobile
@@ -150,7 +150,6 @@ class Job implements Taggable {
     String  cmdlineOptions
     String  customMetrics
     String  tester
-    boolean captureTimeline
     Integer javascriptCallstack
     String  mobileDevice
     String  appendUserAgent

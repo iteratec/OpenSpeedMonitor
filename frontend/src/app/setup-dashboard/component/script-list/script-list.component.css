@@ -1,0 +1,11 @@
+.script-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.script-list app-script {
+  margin: 10px;
+  width: 420px;
+  display: block;
+}

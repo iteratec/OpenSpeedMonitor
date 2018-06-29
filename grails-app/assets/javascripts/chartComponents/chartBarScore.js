@@ -56,12 +56,12 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
         barsToRender.reverse();
     };
 
-    var render = function (svg) {
+    var render = function (svg, isAggregationValueChange) {
         var scale = d3.scale.linear().rangeRound([0, width]).domain([min, max]);
         var scoreBars = svg.selectAll(".scoreBar").data(barsToRender, function (d) { return d.id });
         renderExit(scoreBars.exit());
         renderEnter(scoreBars.enter());
-        renderUpdate(scoreBars, scale);
+        renderUpdate(scoreBars, scale, isAggregationValueChange);
     };
 
     var renderEnter = function(enterSelection) {
@@ -80,22 +80,23 @@ OpenSpeedMonitor.ChartComponents.ChartBarScore = (function () {
             .attr("text-anchor", "middle");
     };
 
-    var renderUpdate = function (updateSelection, scale) {
-        updateSelection.select('rect')
+    var renderUpdate = function (updateSelection, scale, isAggregationValueChange) {
+        var xTransition = updateSelection;
+        if (isAggregationValueChange) {
+            xTransition = updateSelection.transition().duration(transitionDuration)
+        }
+
+        xTransition.select('rect')
             .attr("width", function (d) {
                 return scale(d.end) - scale(d.start);
-            });
-        updateSelection.select('text')
+            })
             .attr("x", function (d) {
-                return (scale(d.end) - scale(d.start)) / 2;
+                return scale(d.start);
             });
-        updateSelection.attr("transform", function (d) {
-            return "translate(" + scale(d.start) + ", 0)";
-        });
-        var transition = updateSelection
-            .transition()
-            .duration(transitionDuration);
-        transition.select('text')
+        xTransition.select('text')
+            .attr("x", function (d) {
+                return (scale(d.end) + scale(d.start)) / 2;
+            })
             .style("opacity", function(d) {
                 return ((this.getComputedTextLength() + 20) > ((scale(d.end) - scale(d.start)) / 2)) ? 0 : 1;
             });
