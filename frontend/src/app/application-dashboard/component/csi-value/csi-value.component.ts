@@ -11,7 +11,7 @@ import {interpolate} from "d3-interpolate";
 })
 export class CsiValueComponent implements OnInit {
   @Input() color: string;
-  @Input() isSmall: boolean;
+  @Input() isBig: boolean;
   @Input() description: string;
   @Input() csiValue: number;
 
@@ -99,14 +99,14 @@ export class CsiValueComponent implements OnInit {
       this.description = "CSI";
     }
 
-    if (this.isSmall) {
-      this.size = 75;
-      this.valueFontSize = '18';
-      this.descriptionFontSize = '12';
-    } else {
+    if (this.isBig) {
       this.size = 150;
       this.valueFontSize = '34';
       this.descriptionFontSize = '14';
+    } else {
+      this.size = 75;
+      this.valueFontSize = '18';
+      this.descriptionFontSize = '12';
     }
   }
 }
