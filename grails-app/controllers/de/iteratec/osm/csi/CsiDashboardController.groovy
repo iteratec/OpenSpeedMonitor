@@ -18,6 +18,8 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.api.dto.JobGroupCsiDto
+import de.iteratec.osm.api.dto.JobGroupCsiListDto
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
@@ -1050,30 +1052,42 @@ class CsiDashboardController {
 
     def getCSIForActiveOrRecentlyMeasuredJobGroups() {
         Long jobGroupId = Long.parseLong(params['jobGroupId'])
+        JobGroupCsiListDto jobGroupCsiListDto = new JobGroupCsiListDto()
 
+        if (JobGroup.findById(jobGroupId).hasCsiConfiguration()) {
+            jobGroupCsiListDto.hasCsiConfiguration = true
 
-        DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
-        Date today = todayDateTime.toDate()
-        Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
+            DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
+            Date today = todayDateTime.toDate()
+            Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
 
+            List<JobGroup> csiGroups = [JobGroup.findById(jobGroupId)]
+            CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-        List<JobGroup> csiGroups = [JobGroup.findById(jobGroupId)]
-        CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
-        SimpleDateFormat sdfSource = new SimpleDateFormat("yyyy-MM-dd")
-        def list = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups)
-        def result = list.collect {
-            if (it.csByWptVisuallyCompleteInPercent && it.csByWptDocCompleteInPercent) {
-                [
-                        'date'          : it.started.format("yyyy-MM-dd"),
-                        'csiDocComplete': it.csByWptDocCompleteInPercent,
-                        'csiVisComplete': it.csByWptVisuallyCompleteInPercent
-                ]
+            List<JobGroupCsiDto> csiDtoList = []
+
+            jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups).each {
+                JobGroupCsiDto jobGroupCsiDto = new JobGroupCsiDto()
+                if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
+                    jobGroupCsiDto.date = it.started.format("yyyy-MM-dd")
+                    jobGroupCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                    jobGroupCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                    jobGroupCsiDto.isCsiCalculated = true
+                    csiDtoList << jobGroupCsiDto
+                } else if (it.jobGroup.hasCsiConfiguration() && (!it.csByWptDocCompleteInPercent)) {
+                    jobGroupCsiDto.date = it.started.format("yyyy-MM-dd")
+                    jobGroupCsiDto.isCsiCalculated = false
+                    csiDtoList << jobGroupCsiDto
+                }
             }
+
+            jobGroupCsiListDto.jobGroupCsiDtos = csiDtoList
+            return ControllerUtils.sendObjectAsJSON(response, jobGroupCsiListDto)
+
+        } else {
+            jobGroupCsiListDto.hasCsiConfiguration = false
+            jobGroupCsiListDto.jobGroupCsiDtos = []
+            return ControllerUtils.sendObjectAsJSON(response, jobGroupCsiListDto)
         }
-
-        result.removeAll([null])
-
-
-        return ControllerUtils.sendObjectAsJSON(response, result)
     }
 }
