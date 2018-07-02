@@ -4,12 +4,13 @@ import {JobThresholdComponent} from './job-threshold.component';
 import {HttpClientModule} from "@angular/common/http";
 import {ThresholdRestService} from "../job-threshold/service/rest/threshold-rest.service";
 import {FormsModule} from '@angular/forms';
+import { MeasuredEventComponent } from './component/measured-event/measured-event.component';
 
 @NgModule({
   imports: [
     CommonModule, HttpClientModule, FormsModule
   ],
-  declarations: [JobThresholdComponent],
+  declarations: [JobThresholdComponent, MeasuredEventComponent],
   providers: [
     { provide: 'components', useValue: [JobThresholdComponent], multi: true}, ThresholdRestService
   ],

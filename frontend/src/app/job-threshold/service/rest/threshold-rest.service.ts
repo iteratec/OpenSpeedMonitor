@@ -4,6 +4,13 @@ import { catchError, map, tap } from 'rxjs/operators';
 import {Observable} from "rxjs/internal/Observable";
 import { mergeMap } from 'rxjs/operators';
 
+import {Measurand} from '../model/measurand.model'
+import {MeasuredEvent} from '../model/measured-event.model'
+import {ThresholdForJob} from '../model/threshold-for-job.model'
+import {Threshold} from "../model/threshold.model";
+import {Subject} from "rxjs/internal/Subject";
+
+
 
 
 const httpOptions = {
@@ -18,36 +25,26 @@ export class ThresholdRestService {
 
   private baseUrl = '/job';  // URL
 
-  constructor(private http: HttpClient) {
-  }
-
-/*  fetchData() {
-  return this.getMeasurands();
-  //this.getMeasuredEvents(this.scriptId);
-  }*/
-
+  constructor(private http: HttpClient) {}
 
   /** GET Measurands */
-  getMeasurands (): Observable<any> {
+  getMeasurands ()/*: Observable< Measurand[] >*/ {
     const url = `${this.baseUrl}/getAllMeasurands`;
-    return this.http.get<any>(url);
-
+    return this.http.get< Measurand[]>(url);
   }
 
   /** GET MeasuredEvents */
-  getMeasuredEvents (scriptId: number): Observable<any> {
-    console.log("getMeasuredEvents scriptId: " + scriptId);
+  getMeasuredEvents (scriptId: number)/*: Observable<MeasuredEvent[]> */{
+    /*console.log("getMeasuredEvents scriptId: " + scriptId);*/
     const url = `/script/getMeasuredEventsForScript?scriptId=${scriptId}`;
-    return this.http.get<any>(url) ;
-
+    return this.http.get<MeasuredEvent[]>(url) ;
   }
 
-
   /** GET Thresholds For a Job */
-  getThresholdsForJob (jobId: number): Observable<any> {
-    console.log("getThresholds jobId: " + jobId);
+  getThresholdsForJob (jobId: number)/*: Observable<ThresholdForJob[]> */{
+    /*console.log("getThresholds jobId: " + jobId);*/
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
-    return this.http.get<any>(url) ;
+    return this.http.get<ThresholdForJob[]>(url) ;
   }
 
     /*getThresholds: function () {

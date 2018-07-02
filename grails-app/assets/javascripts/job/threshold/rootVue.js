@@ -38,7 +38,7 @@ new Vue({
             return this.copiedMeasuredEvents;
         }
     },
-    beforeMount: function () {                                      /*TODO ?*/
+    beforeMount: function () {                                      /*GUACAMOLE*/
         this.jobId = this.$el.attributes['jobId'].value;
         this.scriptId = this.$el.attributes['scriptId'].value;
     },
