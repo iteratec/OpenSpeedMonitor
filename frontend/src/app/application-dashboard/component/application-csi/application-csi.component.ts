@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 import {CsiService} from "../../service/rest/csi.service";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
-import {Observable} from "rxjs/internal/Observable";
 import {CsiDTO} from "../../model/csi.model";
+import {CsiListDTO} from "../../model/csi-list.model";
 
 @Component({
   selector: 'osm-application-csi',
@@ -10,15 +10,17 @@ import {CsiDTO} from "../../model/csi.model";
   styleUrls: ['./application-csi.component.css']
 })
 export class ApplicationCsiComponent {
-  csiValues$: Observable<CsiDTO[]>;
-  recentCsiValue$: Observable<CsiDTO>;
+  csiValues: CsiListDTO;
+  recentCsiValue: CsiDTO;
 
   @Input()
   set jobGroup(jobGroup: JobGroupDTO) {
     this.csiService.getCsiForJobGroup(jobGroup);
 
-    this.csiValues$ = this.csiService.csiValues$.pipe();
-    
+    this.csiService.csiValues$.subscribe((res: CsiListDTO) => {
+      this.csiValues = res;
+    });
+
     //TODO: Get recent csi value
     //this.recentCsiValue$ = this.csiValues$.pipe()
   }

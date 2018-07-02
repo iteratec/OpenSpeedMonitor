@@ -1,3 +1,12 @@
-<div>
-  <p *ngFor="let csiValue of csiValues$ | async">{{ csiValue.csiDocComplete }} / {{ csiValue.csiVisComplete }}</p>
+<div *ngIf="csiValues">
+  <div *ngIf="csiValues.hasCsiConfiguration; then returnCsi else returnError"></div>
+  <ng-template #returnCsi>
+    <div *ngFor="let csiValue of csiValues.jobGroupCsiDtos">
+      CSI: <span style="color: cornflowerblue;">{{csiValue.csiDocComplete}}</span> / CSI Calculated:
+      {{csiValue.isCsiCalculated}}
+    </div>
+  </ng-template>
+  <ng-template #returnError>
+    <p style="color: red">CSI is not configured for this Job Group!</p>
+  </ng-template>
 </div>
