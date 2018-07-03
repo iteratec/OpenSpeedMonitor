@@ -265,6 +265,8 @@ task nodeSyncStylesheets(type: Sync) {
     include 'bootstrap/less/mixins/*.less'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
+    include '@fortawesome/fontawesome-free/less/*'
+    include '@fortawesome/fontawesome-free/webfonts/*'
     include 'jquery-contextmenu/dist/jquery.contextMenu.min.css'
     include 'bootstrap-chosen/bootstrap-chosen.less'
     include 'bootstrap-chosen/bootstrap-chosen-variables.less'
