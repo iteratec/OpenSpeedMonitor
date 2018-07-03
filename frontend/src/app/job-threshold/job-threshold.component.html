@@ -1,8 +1,10 @@
-<div>
+<div class="container">
   <osm-measured-event *ngFor="let activeMeasuredEvent of activeMeasuredEvents"
                       [measuredEvent]="activeMeasuredEvent.measuredEvent"
                       [thresholds]="activeMeasuredEvent.thresholds">
   </osm-measured-event>
+  <button>Measured Event hinzufügen</button>
+  <button>CI-Script Erstellen</button>
 </div>
 
 

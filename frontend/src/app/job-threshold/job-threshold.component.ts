@@ -30,10 +30,11 @@ export class JobThresholdComponent implements OnInit {
               elm: ElementRef) {
     this.jobId = elm.nativeElement.getAttribute('data-job-id');
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
+    this.fetchData();
   }
 
   ngOnInit() {
-    this.fetchData();
+
   }
 
   fetchData() {
