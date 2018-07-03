@@ -15,14 +15,15 @@ export class ApplicationCsiComponent {
 
   @Input()
   set jobGroup(jobGroup: JobGroupDTO) {
+    this.csiValues = null;
+    this.recentCsiValue = null;
     this.csiService.getCsiForJobGroup(jobGroup);
 
     this.csiService.csiValues$.subscribe((res: CsiListDTO) => {
       this.csiValues = res;
+      //get last Value
+      this.recentCsiValue = this.csiValues.jobGroupCsiDtos.slice(-1)[0];
     });
-
-    //TODO: Get recent csi value
-    //this.recentCsiValue$ = this.csiValues$.pipe()
   }
 
   constructor(private csiService: CsiService) {
