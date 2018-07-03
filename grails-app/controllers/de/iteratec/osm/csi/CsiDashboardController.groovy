@@ -1074,11 +1074,11 @@ class CsiDashboardController {
                     jobGroupCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
                     jobGroupCsiDto.isCsiCalculated = true
                     csiDtoList << jobGroupCsiDto
-                } else if (it.jobGroup.hasCsiConfiguration() && (!it.csByWptDocCompleteInPercent)) {
+                }/* else if ((!it.csByWptDocCompleteInPercent)) {
                     jobGroupCsiDto.date = it.started.format("yyyy-MM-dd")
                     jobGroupCsiDto.isCsiCalculated = false
                     csiDtoList << jobGroupCsiDto
-                }
+                }*/
             }
 
             jobGroupCsiListDto.jobGroupCsiDtos = csiDtoList
