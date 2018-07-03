@@ -1,4 +1,5 @@
 <h1>
-  <osm-application-select [jobGroupId]="jobGroupId"
-                          (selectApplication)="updateApplication($event)"></osm-application-select>
+  <osm-application-select [selectedApplication]="selectedApplication$ | async"
+                          [applications]="jobGroups$ | async"
+                          (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>

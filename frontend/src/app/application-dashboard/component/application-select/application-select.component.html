@@ -5,9 +5,9 @@
     {{selectedApplication?.name || "select application"}}
     <i class="fa fa-caret-down select-application-header-triangle"></i>
   </button>
-  <ul class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
+  <ul *ngIf="applications" class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
     <li>
-      <a class="dropdown-item" *ngFor="let jobGroup of jobGroups$ | async" (click)="setApplication(jobGroup)">
+      <a class="dropdown-item" *ngFor="let jobGroup of applications" (click)="setApplication(jobGroup)">
         {{jobGroup.name}}
       </a>
     </li>
