@@ -1,6 +1,5 @@
 <script type="text/x-template" id="threshold-vue">
 <div>
-    <h1>THRESHOLDVUE GUACAMOLE</h1>     %{--GUACAMOLE--}%
     <div v-if="thresholdItem.saved">
         <label class="thresholdMeasurand">{{ translatedMeasurand }}</label>
     </div>

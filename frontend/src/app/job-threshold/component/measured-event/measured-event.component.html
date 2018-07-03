@@ -1,2 +1,3 @@
-<h3>Name: {{measuredEvent.name}} </h3>
-
+<h4>Name: {{measuredEvent.name}} </h4>
+<osm-threshold *ngFor="let threshold of thresholds"
+                [threshold]="threshold"></osm-threshold>

@@ -1,7 +1,7 @@
 <div>
   <osm-measured-event *ngFor="let activeMeasuredEvent of activeMeasuredEvents"
-                      [measuredEvent]="activeMeasuredEvent.measuredEvent">
-
+                      [measuredEvent]="activeMeasuredEvent.measuredEvent"
+                      [thresholds]="activeMeasuredEvent.thresholds">
   </osm-measured-event>
 </div>
 

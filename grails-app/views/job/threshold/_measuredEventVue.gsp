@@ -1,6 +1,5 @@
 <script type="text/x-template" id="threshold-measured-event-vue">
 <div>
-    <h1>MEASUREDEVENTVUE GUACAMOLE</h1>     %{--GUACAMOLE--}%
     <div v-if="Object.keys(measuredEventItem.measuredEvent).length">
         <label class="measuredEventLabel">{{ measuredEventItem.measuredEvent.name }}</label>
         <a @click="addMetric()" title="Add measurand">
