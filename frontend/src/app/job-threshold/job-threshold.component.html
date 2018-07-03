@@ -1,8 +1,8 @@
 <div>
-  <ul *ngFor="let activeMeasuredEvent of activeMeasuredEvents">
-    <li> ID: {{activeMeasuredEvent.measuredEvent.id}} </li>
-    <li> Name: {{activeMeasuredEvent.measuredEvent.name}} </li>
-    <li>TestpageID: {{activeMeasuredEvent.measuredEvent.testedPageId}} </li>
-  </ul>
+  <osm-measured-event *ngFor="let activeMeasuredEvent of activeMeasuredEvents"
+                      [measuredEvent]="activeMeasuredEvent.measuredEvent">
+
+  </osm-measured-event>
 </div>
+
 
