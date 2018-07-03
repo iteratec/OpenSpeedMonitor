@@ -41,6 +41,7 @@ export class PageComparisonComponentAdapter {
     this.zone.run(() => {
       this.pageComparisonComponent.pageComparisonSelections = comparisons;
       this.pageComparisonComponent.validateComparisons();
+      this.pageComparisonComponent.checkIfRowsAreRemovable();
     });
   }
 }

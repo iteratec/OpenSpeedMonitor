@@ -6,9 +6,9 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.measurement.script.ScriptService
@@ -49,27 +49,39 @@ class MeasurementSetupController extends ExceptionHandlerController {
         job.maxDownloadTimeInMinutes = 60
 
         def errors = []
+        def customError
 
         if (!jobGroup.validate()) errors.addAll(jobGroup.getErrors()*.fieldError)
         if (!script.validate()) errors.addAll(script.getErrors()*.fieldError)
         if (!job.validate()) errors.addAll(job.getErrors()*.fieldError)
 
-        if (errors.size() == 0) {
-            job.active = true
-            job.save(failOnError: true)
-            scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
-            try {
-                jobProcessingService.launchJobRun(job)
-            } catch(Exception exception) {
-                log.error(exception.getMessage(), exception)
+        if (errors.empty) {
+            if (!PlaceholdersUtility.getPlaceholdersUsedInScript(script).empty) {
+                customError = "de.iteratec.osm.measurement.setup.variablesUsed"
             }
-            redirect(controller: 'job', action: 'index')
-            return
+            if (customError == null) {
+                job.active = true
+                if (!job.save()) {
+                    customError = "de.iteratec.osm.measurement.setup.jobPersistenceError"
+                }
+            }
+            if (customError == null) {
+                scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
+                try {
+                    jobProcessingService.launchJobRun(job)
+                } catch (Exception exception) {
+                    log.error(exception.getMessage(), exception)
+                }
+
+                redirect(controller: 'job', action: 'index')
+                return
+            }
         }
 
         // on error
         Map modelToRender = createStaticViewData()
         modelToRender['errors'] = errors
+        modelToRender['customError'] = customError
         modelToRender['script'] = params.script
         modelToRender['jobGroup'] = params.jobGroup
         modelToRender['location'] = params.location
