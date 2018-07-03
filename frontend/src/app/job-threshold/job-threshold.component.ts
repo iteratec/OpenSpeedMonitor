@@ -56,6 +56,12 @@ export class JobThresholdComponent implements OnInit {
       console.log(" activeMeasuredEvents 2: " + JSON.stringify(this.activeMeasuredEvents));
 
     });
+
+  }
+
+  deleteThresh(thresholdId) {
+    console.log("job.thresholdthresholdId: " + thresholdId);
+    this.thresholdRestService.deleteThreshold(5).subscribe();
   }
 
   /*getThresholds() {

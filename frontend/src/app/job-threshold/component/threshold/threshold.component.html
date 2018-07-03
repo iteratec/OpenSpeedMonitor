@@ -1,8 +1,47 @@
-<h5>Threshold Name: {{threshold.measurand.name}} </h5>
-<p>Good< Lower: {{threshold.lowerBoundary}}</p>
-<p> Upper: {{threshold.upperBoundary}} >Bad</p>
-<p>
-  <button>Editieren</button>
-  <button>Löschen</button>
-</p>
+<div>
+  <label class="thresholdMeasurand">{{threshold.measurand.name}} </label>
+  <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
+    <span class="form-inline">
+      <span class="thresholdLabel labelGood">Good</span>
+      <span class="thresholdLabel"><</span>
+    </span>
+    <span class="form-inline">
+      <div class="input-group thresholdInput">
+        <input type="number" min="1" size="40" maxlength="12" readonly="readonly" class="form-control">
+        <span class="input-group-addon">ms</span>
+      </div>
+    </span>
+
+
+
+    <span class="form-inline">
+      <span class="thresholdLabel"> > </span>
+      <span class="thresholdLabel labelOk">Ok</span>
+      <span class="thresholdLabel"><</span>
+    </span>
+    <span class="form-inline">
+      <div class="input-group thresholdInput">
+        <input type="number" min="1" size="40" maxlength="12" readonly="readonly" class="form-control">
+        <span class="input-group-addon">ms</span>
+      </div>
+    </span>
+    <span class="form-inline">
+      <span class="thresholdLabel"><</span>
+      <span class="thresholdLabel labelBad">Bad</span>
+    </span>
+    <span class="form-inline">
+      <button type="button"
+              class="btn btn-primary btn-sm">Editieren</button>
+      <button type="button"
+              class="btn btn-danger btn-sm"
+              (click)="deleteThreshold(threshold.id)">Löschen</button> <!--(click)="deleteThreshold(threshold.id)"-->
+    </span>
+
+
+
+
+  </div>
+</div>
+
+
 

@@ -46,6 +46,12 @@ export class ThresholdRestService {
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
     return this.http.get<ThresholdForJob[]>(url) ;
   }
+  /** DELETE Threshold */
+  deleteThreshold (thresholdId: number)/*: Observable<ThresholdForJob[]> */{
+    console.log("deleteThreshold thresholdId " + thresholdId);
+    const url = "/threshold/deleteThreshold" ;
+    return this.http.post(url, thresholdId) ;
+  }
 
     /*getThresholds: function () {
   this.activeMeasuredEvents = [];

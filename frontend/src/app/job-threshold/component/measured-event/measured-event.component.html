@@ -1,4 +1,9 @@
-<h4>Name: {{measuredEvent.name}} </h4>
-<button>Threshold hinzufügen</button>
-<osm-threshold *ngFor="let threshold of thresholds"
-                [threshold]="threshold"></osm-threshold>
+<div class="col-md-offset-1">
+  <label class="measuredEventLabel">{{measuredEvent.name}}</label>
+  <button type="button"
+          class="btn btn-success">+</button>
+
+  <osm-threshold *ngFor="let threshold of thresholds"
+                 [threshold]="threshold"></osm-threshold>
+</div>
+
