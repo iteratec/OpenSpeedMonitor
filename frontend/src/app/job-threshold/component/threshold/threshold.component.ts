@@ -18,9 +18,9 @@ export class ThresholdComponent implements OnInit {
     console.log("this.threshold: " + JSON.stringify(this.threshold));
   }
 
-  delete() {
+  delete(thresholdID) {
     console.log("DELETE");
-    //this.thresholdRestService.deleteThreshold(5);
+    this.thresholdRestService.deleteThreshold(thresholdID);
     //this.deleteThresh.emit(thresholdId); //emmiting the event.
   }
 

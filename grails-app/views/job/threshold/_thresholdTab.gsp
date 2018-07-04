@@ -2,7 +2,7 @@
                    data-job-scriptId="${job?.script?.id}"
                    data-module-path="src/app/job-threshold/job-threshold.module#ThresholdModule"></app-job-threshold>
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
-   
+
     <div v-if="activeMeasuredEvents.length !== 0"
          class="container">
 

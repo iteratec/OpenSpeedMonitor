@@ -50,10 +50,15 @@ export class ThresholdRestService {
   }
 
   /** DELETE Threshold */
-  deleteThreshold (thresholdId: number)/*: Observable<ThresholdForJob[]> */{
+  deleteThreshold (thresholdId: string)/*: Observable<ThresholdForJob[]> */{
     console.log("deleteThreshold thresholdId " + thresholdId);
     const url = "/threshold/deleteThreshold" ;
-    this.http.post(url, thresholdId).subscribe();
+    let formData = new FormData()
+    formData.append("thresholdId", thresholdId)
+    let data = {
+      thresholdId: thresholdId
+    }
+    this.http.post(url, formData).subscribe();
   }
 
   handleError(error: any){
