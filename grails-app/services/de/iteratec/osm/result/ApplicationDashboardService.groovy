@@ -9,6 +9,22 @@ class ApplicationDashboardService {
 
     ResultSelectionService resultSelectionService
 
+    def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
+        def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
+        def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
+
+
+        def pages = (pagesWithResults + pagesOfActiveJobs).collect {
+            [
+                    'id'  : it.id,
+                    'name': it.name
+            ]
+        } as Set
+        pages.unique()
+
+        return pages
+    }
+
     def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
 
         ResultSelectionCommand pagesForGivenJobGroup = new ResultSelectionCommand(

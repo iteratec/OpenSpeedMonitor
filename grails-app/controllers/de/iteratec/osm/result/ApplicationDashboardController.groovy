@@ -6,33 +6,24 @@ import org.joda.time.DateTime
 
 class ApplicationDashboardController {
 
+    final static FOUR_WEEKS = 4
+
     ApplicationDashboardService applicationDashboardService
 
-    def getPagesForJobGroup(PagesForJobGroupCommand command) {
+    def getPagesForApplication(PagesForApplicationCommand command) {
 
-        DateTime today = new DateTime()
-        DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
-
-        def pagesWithResults = applicationDashboardService.getPagesWithExistingEventResults(fourWeeksAgo, today, command.jobGroupId)
-        def pagesOfActiveJobs = applicationDashboardService.getPagesOfActiveJobs(command.jobGroupId)
-
-
-        def pages = (pagesWithResults + pagesOfActiveJobs).collect {
-            [
-                    'id'  : it.id,
-                    'name': it.name
-            ]
-        } as Set
-        pages.unique()
+        DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
+        DateTime to = new DateTime()
+        def pages = applicationDashboardService.getPagesWithResultsOrActiveJobsForJobGroup(from, to, command.applicationId)
 
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }
 }
 
-class PagesForJobGroupCommand implements Validateable {
-    Long jobGroupId
+class PagesForApplicationCommand implements Validateable {
+    Long applicationId
 
     static constraints = {
-        jobGroupId(nullable: false)
+        applicationId(nullable: false)
     }
 }
