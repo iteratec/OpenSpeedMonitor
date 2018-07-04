@@ -1,12 +1,15 @@
 <div class="container">
-  <osm-measured-event *ngFor="let activeMeasuredEvent of activeMeasuredEvents"
-                      [measuredEvent]="activeMeasuredEvent.measuredEvent"
-                      [thresholds]="activeMeasuredEvent.thresholds">
+  <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList$ | async"
+                      [measuredEvent]="measuredEvent.measuredEvent"
+                      [thresholds]="measuredEvent.thresholds">
   </osm-measured-event>
-  <button type="button"
-          class="btn btn-primary">Measured Event hinzufügen</button>
-  <button type="button"
-          class="btn btn-default ">CI-Script Erstellen</button>
+  <span class="col-sm-offset-1">
+    <button type="button"
+            class="btn btn-primary">Measured Event hinzufügen</button>
+    <button type="button"
+            class="btn btn-default ">CI-Script Erstellen</button>
+  </span>
+
 </div>
 
 

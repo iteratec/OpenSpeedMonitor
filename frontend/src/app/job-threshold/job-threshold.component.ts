@@ -14,6 +14,7 @@ import {Observable} from "rxjs";
 })
 
 export class JobThresholdComponent implements OnInit {
+  thresholdsForJobList$: Observable<ThresholdForJob[]>;
 
   public activeMeasuredEvents: ThresholdForJob [];
   private jobId : number;
@@ -31,6 +32,8 @@ export class JobThresholdComponent implements OnInit {
     this.jobId = elm.nativeElement.getAttribute('data-job-id');
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
     this.fetchData();
+    this.thresholdRestService.getThresholdsForJob(this.jobId);
+    this.thresholdsForJobList$ = this.thresholdRestService.thresholdsForJob$;
   }
 
   ngOnInit() {
@@ -49,20 +52,20 @@ export class JobThresholdComponent implements OnInit {
       this.measuredEventCount = this.measuredEvents.length;
       /*let self = this;
       this.activeMeasuredEvents = this.getThresholds();*/
-      this.thresholdRestService.getThresholdsForJob(this.jobId).subscribe((response: ThresholdForJob[]) => {
+      /*this.thresholdRestService.getThresholdsForJob(this.jobId).subscribe((response: ThresholdForJob[]) => {
         this.activeMeasuredEvents = response;
         console.log(" activeMeasuredEvents 1: " + JSON.stringify(this.activeMeasuredEvents));
       })
       console.log(" activeMeasuredEvents 2: " + JSON.stringify(this.activeMeasuredEvents));
-
+*/
     });
 
   }
 
-  deleteThresh(thresholdId) {
+  /*deleteThresh(thresholdId) {
     console.log("job.thresholdthresholdId: " + thresholdId);
     this.thresholdRestService.deleteThreshold(5).subscribe();
-  }
+  }*/
 
   /*getThresholds() {
     /!*let activeMeasuredEventTemp = {} as ThresholdForJob;*!/

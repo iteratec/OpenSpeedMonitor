@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {ReplaySubject} from "rxjs/index";
 import { catchError, map, tap } from 'rxjs/operators';
 import {Observable} from "rxjs/internal/Observable";
 import { mergeMap } from 'rxjs/operators';
@@ -12,20 +13,20 @@ import {Subject} from "rxjs/internal/Subject";
 
 
 
-
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
-
 @Injectable({
   providedIn: 'root'
 })
 
 export class ThresholdRestService {
 
+  public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
+
+
   private baseUrl = '/job';  // URL
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+
+  }
 
   /** GET Measurands */
   getMeasurands ()/*: Observable< Measurand[] >*/ {
@@ -44,14 +45,21 @@ export class ThresholdRestService {
   getThresholdsForJob (jobId: number)/*: Observable<ThresholdForJob[]> */{
     /*console.log("getThresholds jobId: " + jobId);*/
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
-    return this.http.get<ThresholdForJob[]>(url) ;
+    this.http.get<ThresholdForJob[]>(url)
+      .subscribe(next => this.thresholdsForJob$.next(next), error => this.handleError(error)) ;
   }
+
   /** DELETE Threshold */
   deleteThreshold (thresholdId: number)/*: Observable<ThresholdForJob[]> */{
     console.log("deleteThreshold thresholdId " + thresholdId);
     const url = "/threshold/deleteThreshold" ;
-    return this.http.post(url, thresholdId) ;
+    this.http.post(url, thresholdId).subscribe();
   }
+
+  handleError(error: any){
+    console.log(error);
+  }
+
 
     /*getThresholds: function () {
   this.activeMeasuredEvents = [];
