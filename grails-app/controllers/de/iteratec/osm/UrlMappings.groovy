@@ -38,7 +38,7 @@ class UrlMappings {
         "/about"(view: "/siteinfo/about")
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/setup-dashboard"(view: "/setupDashboard/index")
-        "/application-dashboard"(view: "/applicationDashboard/index")
+        "/applicationDashboard"(view: "/applicationDashboard/index")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
