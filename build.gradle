@@ -1,4 +1,4 @@
-import de.iteratec.osm.build.frontend.Grails2FrontendI18nTask
+import de.iteratec.osm.frontendBuild.Grails2FrontendI18nTask
 
 /*
 * OpenSpeedMonitor (OSM)
