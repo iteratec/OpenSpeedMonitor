@@ -1,5 +1,5 @@
 <div class="csi-circle-container">
-  <svg [style.width]="size" [style.height]="size" #svg>
+  <svg [style.width]="size" [style.height]="size" #svg [ngClass]="csiValueClass">
   </svg>
   <div class="csi-circle-text-container">
     <div class="csi-value-text" [style.font-size.px]="valueFontSize">{{csiValue}}%</div>
