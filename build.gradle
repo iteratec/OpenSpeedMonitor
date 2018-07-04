@@ -266,16 +266,8 @@ task nodeSyncStylesheets(type: Sync) {
     dependsOn npmInstall
 }
 
-task nodePackages() {
-    if (!(System.getenv('GRADLE_CUSTOM_ENV') == 'hotreload')) {
-        dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
-    } else {
-        dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies
-    }
-}
-
-processResources.dependsOn nodePackages
-assetCompile.dependsOn nodePackages
+processResources.dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies
+assetCompile.dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
 
 clean.delete << file('grails-app/assets/javascripts/node_modules')
 clean.delete << file('grails-app/assets/javascripts/frontend')
