@@ -212,7 +212,7 @@ task generateFrontendI18nFiles(type: Grails2FrontendI18nTask) {
     frontendKeyPrefix = "frontend."
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
+task jasmineRun(type: NodeTask, dependsOn: ['nodeSyncJavascript', 'nodeSyncStylesheets']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
