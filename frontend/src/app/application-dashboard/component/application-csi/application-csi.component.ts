@@ -3,6 +3,8 @@ import {CsiService} from "../../service/rest/csi.service";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
 import {CsiDTO} from "../../model/csi.model";
 import {CsiListDTO} from "../../model/csi-list.model";
+import {Observable} from "rxjs/index";
+import {map} from "rxjs/internal/operators";
 
 @Component({
   selector: 'osm-application-csi',
@@ -10,22 +12,19 @@ import {CsiListDTO} from "../../model/csi-list.model";
   styleUrls: ['./application-csi.component.css']
 })
 export class ApplicationCsiComponent {
-  csiValues: CsiListDTO;
-  recentCsiValue: CsiDTO;
+  recentCsiValue$: Observable<CsiDTO>;
+  hasConfiguration$: Observable<boolean>;
 
   @Input()
   set jobGroup(jobGroup: JobGroupDTO) {
-    this.csiValues = null;
-    this.recentCsiValue = null;
     this.csiService.getCsiForJobGroup(jobGroup);
-
-    this.csiService.csiValues$.subscribe((res: CsiListDTO) => {
-      this.csiValues = res;
-      //get last Value
-      this.recentCsiValue = this.csiValues.jobGroupCsiDtos.slice(-1)[0];
-    });
   }
 
   constructor(private csiService: CsiService) {
+    this.recentCsiValue$ = this.csiService.csiValues$.pipe(
+      map((res: CsiListDTO) => res.jobGroupCsiDtos.slice(-1)[0]));
+
+    this.hasConfiguration$ = this.csiService.csiValues$.pipe(
+      map((res: CsiListDTO) => res.hasCsiConfiguration));
   }
 }

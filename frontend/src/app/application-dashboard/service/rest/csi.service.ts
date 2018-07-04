@@ -4,9 +4,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
 import {CsiListDTO} from "../../model/csi-list.model";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CsiService {
 
   public csiValues$ = new ReplaySubject<CsiListDTO>(1);
