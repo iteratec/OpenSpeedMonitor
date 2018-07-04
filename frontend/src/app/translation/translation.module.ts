@@ -29,7 +29,6 @@ export function createTranslateLoader(http: HttpClient) {
     OsmLangService
   ],
   exports: [
-    CommonModule,
     TranslateModule
   ]
 })

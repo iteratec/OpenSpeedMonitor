@@ -16,7 +16,7 @@ import {GrailsBridgeService} from "./service/grails-bridge.service";
     GrailsBridgeService
   ],
   exports: [
-    CommonModule, HttpClientModule, FormsModule
+    CommonModule, HttpClientModule, FormsModule, TranslationModule
   ]
 })
 export class SharedModule {
