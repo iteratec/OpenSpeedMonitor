@@ -10,6 +10,7 @@ import {MeasuredEvent} from '../model/measured-event.model'
 import {ThresholdForJob} from '../model/threshold-for-job.model'
 import {Threshold} from "../model/threshold.model";
 import {Subject} from "rxjs/internal/Subject";
+import {log} from "util";
 
 
 
@@ -20,6 +21,7 @@ import {Subject} from "rxjs/internal/Subject";
 export class ThresholdRestService {
 
   public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
+  public actualJobId : number;
 
 
   private baseUrl = '/job';  // URL
@@ -53,12 +55,17 @@ export class ThresholdRestService {
   deleteThreshold (thresholdId: string)/*: Observable<ThresholdForJob[]> */{
     console.log("deleteThreshold thresholdId " + thresholdId);
     const url = "/threshold/deleteThreshold" ;
+    let self= this;
     let formData = new FormData()
     formData.append("thresholdId", thresholdId)
     let data = {
       thresholdId: thresholdId
     }
-    this.http.post(url, formData).subscribe();
+    this.http.post(url, formData).subscribe(() => {
+      console.log("delete server Response: " + self.actualJobId);
+      self.getThresholdsForJob(self.actualJobId);
+      }
+    );
   }
 
   handleError(error: any){

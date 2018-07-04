@@ -31,6 +31,8 @@ export class JobThresholdComponent implements OnInit {
               elm: ElementRef) {
     this.jobId = elm.nativeElement.getAttribute('data-job-id');
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
+    this.thresholdRestService.actualJobId = this.jobId;
+    console.log("jobId: " + this.jobId);
     this.fetchData();
     this.thresholdRestService.getThresholdsForJob(this.jobId);
     this.thresholdsForJobList$ = this.thresholdRestService.thresholdsForJob$;
