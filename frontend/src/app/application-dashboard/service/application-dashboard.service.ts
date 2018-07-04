@@ -12,7 +12,7 @@ export class ApplicationDashboardService {
   getPagesForJobGroup(applicationId: number): Observable<IPage[]> {
     return this.http.get<IPage[]>("/applicationDashboard/getPagesForApplication", {
       params: {
-        applicationId: applicationId.toString()
+        applicationId: applicationId ? applicationId.toString() : ""
       }
     });
   }
