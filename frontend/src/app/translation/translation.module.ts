@@ -4,8 +4,8 @@ import {CommonModule} from '@angular/common';
 import {TranslateLoader, TranslateModule, TranslateService} from "@ngx-translate/core";
 import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {TranslateHttpLoader} from '@ngx-translate/http-loader'
-import {OsmCommonModule} from "../common/osm.common.module";
 import {OsmLangService} from "./service/osm-lang.service";
+import {SharedModule} from "../shared/shared.module";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -15,7 +15,6 @@ export function createTranslateLoader(http: HttpClient) {
 @NgModule({
   imports: [
     CommonModule,
-    OsmCommonModule,
     HttpClientModule,
     TranslateModule.forRoot({
       loader: {
@@ -26,6 +25,9 @@ export function createTranslateLoader(http: HttpClient) {
     })
   ],
   declarations: [],
+  providers: [
+    OsmLangService
+  ],
   exports: [
     CommonModule,
     TranslateModule
@@ -33,11 +35,12 @@ export function createTranslateLoader(http: HttpClient) {
 })
 export class TranslationModule {
 
-  constructor(private translate: TranslateService, private osmLangService: OsmLangService) {
-    let supportedLangs: string[] = ['en', 'de'];
-    translate.addLangs(supportedLangs);
-    translate.setDefaultLang('en');
+  supportedLangs: string[] = ['en', 'de'];
 
-    translate.use(supportedLangs.includes(this.osmLangService.getOsmLang()) ? this.osmLangService.getOsmLang() : translate.getDefaultLang());
+  constructor(private translateService: TranslateService, private osmLangService: OsmLangService) {
+    translateService.addLangs(this.supportedLangs);
+    translateService.setDefaultLang('en');
+
+    translateService.use(this.supportedLangs.includes(this.osmLangService.getOsmLang()) ? this.osmLangService.getOsmLang() : translateService.getDefaultLang());
   }
 }

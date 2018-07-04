@@ -1,15 +1,13 @@
 import {Injectable} from '@angular/core';
-import {WindowRefService} from "../../common/service/window-ref.service";
+import {GrailsBridgeService} from "../../shared/service/grails-bridge.service";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class OsmLangService {
 
-  constructor(private winRef: WindowRefService) {
+  constructor(private grailsBridgeService: GrailsBridgeService) {
   }
 
   getOsmLang(): string {
-    return this.winRef.getNativeWindow().OpenSpeedMonitor.i18n.lang;
+    return this.grailsBridgeService.globalOsmNamespace.i18n.lang;
   }
 }

@@ -9,10 +9,12 @@ import {ScriptComponent} from "./component/script/script.component";
 import {JobGroupComponent} from "./component/job-group/job-group/job-group.component";
 import {JobGroupListComponent} from "./component/job-group-list/job-group-list/job-group-list.component";
 import {SharedModule} from "../shared/shared.module";
+import {TranslationModule} from "../translation/translation.module";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   imports: [
-    SharedModule
+    SharedModule,
     HttpClientModule,
     TranslationModule
   ],
