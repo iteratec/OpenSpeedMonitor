@@ -303,7 +303,6 @@ grails:
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
                             {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
                             {pattern: '/landing/**',                                    access: ["permitAll"]},
-                            {pattern: '/application-dashboard',                         access: ["permitAll"]},
                             {pattern: '/applicationDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/jobGroup/getAllActiveAndAllRecent',             access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
