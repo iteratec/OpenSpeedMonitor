@@ -12,7 +12,6 @@ export class ApplicationDashboardComponent {
   constructor() { }
 
   updateApplication(jobGroup: JobGroupDTO) {
-    console.log(jobGroup);
     this.application = jobGroup
   }
 }
