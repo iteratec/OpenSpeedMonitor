@@ -266,16 +266,13 @@ task nodeSyncStylesheets(type: Sync) {
     dependsOn npmInstall
 }
 
-
-task nodePackages() {
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
-}
-
-processResources.dependsOn nodePackages
-assetCompile.dependsOn nodePackages
+processResources.dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies
+assetCompile.dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
 
 clean.delete << file('grails-app/assets/javascripts/node_modules')
+clean.delete << file('grails-app/assets/javascripts/frontend')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
+clean.delete << file('grails-app/assets/stylesheets/frontend')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
