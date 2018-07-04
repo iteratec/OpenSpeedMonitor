@@ -1,6 +1,6 @@
 package de.iteratec.osm.api.dto
 
-class ApplicationCsiListDto {
+class ApplicationCsiDto {
     CsiDto[] csiDtoList
     boolean hasCsiConfiguration
 }

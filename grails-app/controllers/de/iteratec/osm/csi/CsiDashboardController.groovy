@@ -18,8 +18,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.api.dto.ApplicationCsiListDto
-import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
@@ -1048,41 +1046,5 @@ class CsiDashboardController {
         }
 
         render answer as JSON
-    }
-
-    def getCSIForActiveOrRecentlyMeasuredJobGroups() {
-        Long jobGroupId = Long.parseLong(params['jobGroupId'])
-        ApplicationCsiListDto applicationCsiListDto = new ApplicationCsiListDto()
-
-        if (JobGroup.findById(jobGroupId).hasCsiConfiguration()) {
-            applicationCsiListDto.hasCsiConfiguration = true
-
-            DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
-            Date today = todayDateTime.toDate()
-            Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
-
-            List<JobGroup> csiGroups = [JobGroup.findById(jobGroupId)]
-            CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
-
-            List<CsiDto> csiDtoList = []
-
-            jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups).each {
-                CsiDto applicationCsiDto = new CsiDto()
-                if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                    applicationCsiDto.date = it.started.format("yyyy-MM-dd")
-                    applicationCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                    applicationCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                    csiDtoList << applicationCsiDto
-                }
-            }
-
-            applicationCsiListDto.csiDtoList = csiDtoList
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-
-        } else {
-            applicationCsiListDto.hasCsiConfiguration = false
-            applicationCsiListDto.csiDtoList = []
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-        }
     }
 }
