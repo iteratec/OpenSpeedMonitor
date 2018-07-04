@@ -14,7 +14,8 @@ class ApplicationDashboardController {
 
         DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
         DateTime to = new DateTime()
-        def pages = applicationDashboardService.getPagesWithResultsOrActiveJobsForJobGroup(from, to, command.applicationId)
+        Long jobGroupId = command.applicationId
+        def pages = applicationDashboardService.getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }
