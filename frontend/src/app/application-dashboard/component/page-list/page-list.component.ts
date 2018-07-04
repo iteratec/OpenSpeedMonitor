@@ -9,14 +9,14 @@ import {IPage} from "../../model/page.model";
   styleUrls: ['./page-list.component.css']
 })
 export class PageListComponent implements OnChanges {
-  @Input() jobGroupId: number;
+  @Input() applicationId: number;
   pages$: Observable<IPage[]>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
   }
 
   ngOnChanges() {
-      this.pages$ = this.applicationDashboardService.getPagesForJobGroup(this.jobGroupId);
+    this.pages$ = this.applicationDashboardService.getPagesForJobGroup(this.applicationId);
   }
 
 }

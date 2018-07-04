@@ -3,18 +3,16 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs/index";
 import {IPage} from "../model/page.model";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ApplicationDashboardService {
 
   constructor(private http: HttpClient) {
   }
 
-  getPagesForJobGroup(jobGroupId: number): Observable<IPage[]> {
-    return this.http.get<IPage[]>("/applicationDashboard/getPagesForJobGroup", {
+  getPagesForJobGroup(applicationId: number): Observable<IPage[]> {
+    return this.http.get<IPage[]>("/applicationDashboard/getPagesForApplication", {
       params: {
-        jobGroupId: jobGroupId.toString()
+        applicationId: applicationId.toString()
       }
     });
   }

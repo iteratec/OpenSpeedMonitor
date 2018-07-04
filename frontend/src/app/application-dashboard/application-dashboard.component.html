@@ -1,5 +1,5 @@
 <h1>
   <osm-application-select (selectApplication)="updateApplication($event)"></osm-application-select>
 </h1>
-<osm-page-list *ngIf="application" [jobGroupId]="application.id"></osm-page-list>
+<osm-page-list *ngIf="application" [applicationId]="application.id"></osm-page-list>
 
