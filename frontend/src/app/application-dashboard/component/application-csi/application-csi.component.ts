@@ -23,9 +23,7 @@ export class ApplicationCsiComponent {
   constructor(private csiService: CsiService) {
     this.recentCsiValue$ = this.csiService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => {
-        console.log(res);
         return res.csiDtoList.slice(-1)[0]
-
       }));
 
     this.hasConfiguration$ = this.csiService.csiValues$.pipe(
