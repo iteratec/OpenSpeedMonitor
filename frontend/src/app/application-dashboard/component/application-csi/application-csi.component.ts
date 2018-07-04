@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {CsiService} from "../../service/rest/csi.service";
+import {CsiService} from "../../service/csi.service";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
 import {CsiDTO} from "../../model/csi.model";
 import {Observable} from "rxjs/index";
@@ -17,7 +17,7 @@ export class ApplicationCsiComponent {
 
   @Input()
   set application(application: JobGroupDTO) {
-    this.csiService.getCsiForJobGroup(application);
+    this.csiService.getCsiForApplication(application);
   }
 
   constructor(private csiService: CsiService) {

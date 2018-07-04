@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {ReplaySubject} from "rxjs/internal/ReplaySubject";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
-import {ApplicationCsiListDTO} from "../../model/csi-list.model";
+import {JobGroupDTO} from "../../shared/model/job-group.model";
+import {ApplicationCsiListDTO} from "../model/csi-list.model";
 
 @Injectable()
 export class CsiService {
@@ -12,9 +12,9 @@ export class CsiService {
   constructor(private http: HttpClient) {
   }
 
-  getCsiForJobGroup(application: JobGroupDTO) {
-    let params = new HttpParams().set('jobGroupId', application.id.toString());
-    this.http.get<ApplicationCsiListDTO>('/csiDashboard/getCSIForActiveOrRecentlyMeasuredJobGroups', {params: params})
+  getCsiForApplication(application: JobGroupDTO) {
+    const params = new HttpParams().set('applicationId', application.id.toString());
+    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/getCsiValuesForApplication', {params: params})
       .subscribe(response => this.csiValues$.next(response), error => this.handleError(error));
   }
 

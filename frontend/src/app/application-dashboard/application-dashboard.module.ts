@@ -4,7 +4,7 @@ import {ApplicationSelectComponent} from './component/application-select/applica
 import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {SharedModule} from "../shared/shared.module";
 import {ApplicationCsiComponent} from './component/application-csi/application-csi.component';
-import {CsiService} from "./service/rest/csi.service";
+import {CsiService} from "./service/csi.service";
 
 @NgModule({
   imports: [
