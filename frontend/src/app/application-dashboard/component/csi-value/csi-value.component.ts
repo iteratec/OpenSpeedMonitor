@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild, ɵisDefaultChangeDetectionStrategy} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Arc, arc, DefaultArcObject} from "d3-shape";
 import {select} from "d3-selection";
 import {transition} from "d3-transition";
@@ -115,10 +115,10 @@ export class CsiValueComponent implements OnInit {
   }
 
   private determineClass(csiValue: number):string{
-    if(csiValue >= 85) {
+    if (csiValue >= 90) {
       return "good";
     }
-    if(csiValue >= 40){
+    if (csiValue >= 70) {
       return "okay";
     }
     return "bad";

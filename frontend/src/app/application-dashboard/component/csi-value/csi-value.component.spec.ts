@@ -1,9 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CsiValueComponent } from './csi-value.component';
+import {CsiValueComponent} from './csi-value.component';
 import {DebugElement} from "@angular/core";
 import {By} from "@angular/platform-browser";
-import {log} from "util";
 
 fdescribe('CsiValueComponent', () => {
   let component: CsiValueComponent;
@@ -45,7 +44,7 @@ fdescribe('CsiValueComponent', () => {
   });
 
   it('should be bad if csi value is bad', () => {
-    const badValue: number = 39.4;
+    const badValue: number = 69.4;
     component.csiValue =  badValue;
     component.ngOnInit();
     expect(component.csiValueClass).toEqual('bad');
@@ -58,7 +57,7 @@ fdescribe('CsiValueComponent', () => {
     expect(svgDe.classes.good).toBeFalsy();
   });
   it('should be okay if csi value is okay', () => {
-    const okayValue: number = 50;
+    const okayValue: number = 70;
     component.csiValue =  okayValue;
     component.ngOnInit();
     expect(component.csiValueClass).toEqual('okay');
@@ -71,7 +70,7 @@ fdescribe('CsiValueComponent', () => {
     expect(svgDe.classes.good).toBeFalsy();
   });
   it('should be good if csi value is good', () => {
-    const goodValue: number = 95;
+    const goodValue: number = 90;
     component.csiValue =  goodValue;
     component.ngOnInit();
     expect(component.csiValueClass).toEqual('good');
