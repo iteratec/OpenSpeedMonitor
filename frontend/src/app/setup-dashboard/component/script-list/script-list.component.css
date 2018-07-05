@@ -4,7 +4,7 @@
   justify-content: flex-start;
 }
 
-.script-list app-script {
+.script-list osm-script {
   margin: 10px;
   width: 420px;
   display: block;

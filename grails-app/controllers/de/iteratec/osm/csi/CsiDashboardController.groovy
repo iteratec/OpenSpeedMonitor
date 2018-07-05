@@ -74,6 +74,7 @@ class CsiDashboardController {
     UserspecificDashboardService userspecificDashboardService
     PerformanceLoggingService performanceLoggingService
     EventResultDashboardService eventResultDashboardService
+    JobGroupCsiAggregationService jobGroupCsiAggregationService
 
     /**
      * The Grails engine to generate links.
@@ -359,8 +360,8 @@ class CsiDashboardController {
         }
 
         modelToRender.put("highChartLabels", [
-            new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
-                MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
+                new OsmChartAxis(i18nService.msg("de.iteratec.isr.measurand.group.PERCENTAGES.CSI",
+                        MeasurandGroup.PERCENTAGES.toString()), MeasurandGroup.PERCENTAGES, "%", 0.01, OsmChartAxis.LEFT_CHART_SIDE)
         ])
 
         if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
@@ -767,7 +768,6 @@ class CsiDashboardController {
                 valuesConnectivities.each { l -> selectedConnectivities.add(l) }
             }
         }
-
 
         // Create command for validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: from, to: to,

@@ -3,3 +3,8 @@
                           [applications]="jobGroups$ | async"
                           (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>
+<osm-application-csi *ngIf="selectedApplication$ | async"
+                     [application]="selectedApplication$ | async"></osm-application-csi>
+<osm-page-list *ngIf="selectedApplication$ | async, let selectedApplication"
+               [applicationId]="selectedApplication.id"></osm-page-list>
+
