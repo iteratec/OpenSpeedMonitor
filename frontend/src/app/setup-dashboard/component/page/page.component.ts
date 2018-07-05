@@ -4,7 +4,7 @@ import {IPage} from "../../../shared/model/page.model";
 @Component({
   selector: 'osm-page',
   templateUrl: './page.component.html',
-  styleUrls: ['./page.component.css']
+  styleUrls: ['./page.component.scss']
 })
 export class PageComponent implements OnInit {
   @Input() page:IPage;

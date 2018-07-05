@@ -6,7 +6,7 @@ import {IPage} from "../../model/page.model";
 @Component({
   selector: 'osm-page-list',
   templateUrl: './page-list.component.html',
-  styleUrls: ['./page-list.component.css']
+  styleUrls: ['./page-list.component.scss']
 })
 export class PageListComponent implements OnChanges {
   @Input() applicationId: number;
