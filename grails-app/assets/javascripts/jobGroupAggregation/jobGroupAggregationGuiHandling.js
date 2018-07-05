@@ -41,7 +41,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         return $('input[name=aggregationValue]:checked').val()
     };
 
-    var onFilterClick = function () {
+    var onFilterClick = function (event) {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);

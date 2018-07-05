@@ -30,7 +30,9 @@
               "src/app/setup-dashboard/setup-dashboard.module",
               "src/app/page-comparison/page-comparison.module",
               "src/app/application-dashboard/application-dashboard.module"
-            ]
+            ],
+            "vendorChunk": false,
+            "extractCss": true
           },
           "configurations": {
             "production": {
