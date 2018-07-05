@@ -5,12 +5,19 @@ import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {SharedModule} from "../shared/shared.module";
 import {PageListComponent} from './component/page-list/page-list.component';
 import {ApplicationDashboardService} from "./service/application-dashboard.service";
+import {ApplicationCsiComponent} from './component/application-csi/application-csi.component';
+import {CsiService} from "./service/csi.service";
 
 @NgModule({
   imports: [
     SharedModule
   ],
-  declarations: [ApplicationDashboardComponent, ApplicationSelectComponent, PageListComponent],
+  declarations: [
+    ApplicationDashboardComponent,
+    ApplicationSelectComponent,
+    ApplicationCsiComponent,
+    PageListComponent
+  ],
   providers: [
     {
       provide: 'components',
@@ -18,7 +25,8 @@ import {ApplicationDashboardService} from "./service/application-dashboard.servi
       multi: true
     },
     JobGroupService,
-    ApplicationDashboardService
+    ApplicationDashboardService,
+    CsiService
   ],
   entryComponents: [ApplicationDashboardComponent]
 })
