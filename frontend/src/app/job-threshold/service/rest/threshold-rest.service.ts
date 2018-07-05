@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {ReplaySubject} from "rxjs/index";
 import { catchError, map, tap } from 'rxjs/operators';
 import {Observable} from "rxjs/internal/Observable";
@@ -52,18 +52,41 @@ export class ThresholdRestService {
   }
 
   /** DELETE Threshold */
-  deleteThreshold (thresholdId: string)/*: Observable<ThresholdForJob[]> */{
+  deleteThreshold (thresholdId: string){
     console.log("deleteThreshold thresholdId " + thresholdId);
     const url = "/threshold/deleteThreshold" ;
     let self= this;
     let formData = new FormData()
     formData.append("thresholdId", thresholdId)
-    let data = {
-      thresholdId: thresholdId
-    }
     this.http.post(url, formData).subscribe(() => {
       console.log("delete server Response: " + self.actualJobId);
       self.getThresholdsForJob(self.actualJobId);
+      }
+    );
+  }
+
+  /** DELETE Threshold */
+  editThreshold (threshold: Threshold){
+    console.log("edit threshold " + JSON.stringify(threshold));
+    const url = "/threshold/updateThreshold" ;
+    let self= this;
+    let formData = new FormData();
+
+    let params = new HttpParams().set('thresholdId', threshold.id.toString());
+    params = params.set('measurand', threshold.measurand.name.toString());
+    params = params.set('measuredEvent', threshold.measuredEvent.id.toString());
+    params = params.set('lowerBoundary', threshold.lowerBoundary.toString());
+    params = params.set('upperBoundary', threshold.upperBoundary.toString());
+
+
+    formData.append("thresholdId", JSON.stringify(threshold.id) );
+    formData.append("measurand", JSON.stringify(threshold.measurand.name));
+    formData.append("measuredEvent", JSON.stringify(threshold.measuredEvent));
+    formData.append("lowerBoundary", JSON.stringify(threshold.lowerBoundary));
+    formData.append("upperBoundary", JSON.stringify(threshold.upperBoundary));
+    this.http.post(url, params).subscribe(() => {
+        console.log("delete server Response: " + self.actualJobId);
+        self.getThresholdsForJob(self.actualJobId);
       }
     );
   }

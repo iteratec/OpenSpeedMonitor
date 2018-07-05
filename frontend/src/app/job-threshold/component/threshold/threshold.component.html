@@ -7,7 +7,7 @@
     </span>
     <span class="form-inline">
       <div class="input-group thresholdInput">
-        <input type="number" min="1" size="40" maxlength="12" readonly="readonly" class="form-control">
+        <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput"  class="form-control">
         <span class="input-group-addon">ms</span>
       </div>
     </span>
@@ -15,13 +15,13 @@
 
 
     <span class="form-inline">
-      <span class="thresholdLabel"> > </span>
+      <span class="thresholdLabel"> < </span>
       <span class="thresholdLabel labelOk">Ok</span>
       <span class="thresholdLabel"><</span>
     </span>
     <span class="form-inline">
       <div class="input-group thresholdInput">
-        <input type="number" min="1" size="40" maxlength="12" readonly="readonly" class="form-control">
+        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput" class="form-control">
         <span class="input-group-addon">ms</span>
       </div>
     </span>
@@ -31,7 +31,8 @@
     </span>
     <span class="form-inline">
       <button type="button"
-              class="btn btn-primary btn-sm">Editieren</button>
+              class="btn btn-primary btn-sm"
+              (click)="edit()">{{editButtonLabel}}</button>
       <button type="button"
               class="btn btn-danger btn-sm"
               (click)="delete(threshold.id)">Löschen</button> <!--(click)="deleteThreshold(threshold.id)"-->
