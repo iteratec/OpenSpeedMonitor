@@ -54,7 +54,7 @@
     <div class="col-sm-offset-1 col-sm-4">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
 
@@ -72,16 +72,16 @@
     <div class="form-group">
         <div class="col-sm-6 text-right">
             <a class="btn btn-default pull-left" data-toggle="modal" data-target="#cancelJobCreationDialog">
-                <i class="fa fa-times" aria-hidden="true"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
             </a>
             <button data-toggle="tab" href="#selectLocationAndConnectivity"
                class="btn btn-default" id="createJobTabPreviousButton">
-                <i class="fa fa-caret-left" aria-hidden="true"></i>
+                <i class="fas fa-caret-left" aria-hidden="true"></i>
                 <g:message code="default.paginate.prev" default="Previous"/>
             </button>
             <button type="submit" name="_action_save" class="btn btn-primary" id="createJobTabCreationButton" disabled>
-                <i class='fa fa-plus' aria-hidden='true'></i>
+                <i class='fas fa-plus' aria-hidden='true'></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createJobStartMeasurement"
                            default="Create Job and Start Measurement"/>
             </button>

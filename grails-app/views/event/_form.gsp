@@ -20,7 +20,7 @@
                    value="<g:if test="${(eventInstance?.eventDate?.getHours() as String)}">${
                        (eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")
                    }</g:if><g:else>00:00</g:else>">
-            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+            <span class="input-group-addon"><i class="fas fa-clock"></i></span>
         </div>
     </div>
 </div>

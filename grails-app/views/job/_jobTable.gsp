@@ -13,9 +13,9 @@
             <div class="show-chart-buttons">
                 <g:if test="${job.lastRun}">
                     <a href="${createLink(action: 'showLastResultForJob', id: job.id)}" class="show-chart"><i
-                            class="fa fa-line-chart"></i></a>
+                            class="fas fa-chart-line"></i></a>
                     <a href="${createLink(action: 'showLastPageAggregationForJob', id: job.id)}" class="show-chart"><i
-                            class="fa fa-bar-chart"></i></a>
+                            class="fas fa-chart-bar"></i></a>
                 </g:if>
             </div>
 

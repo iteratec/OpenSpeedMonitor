@@ -2,7 +2,7 @@
 	<li class="dropdown">
 		
 		<a class="dropdown-toggle" href="#">
-    		<i class="fa fa-info-circle"></i>
+            <i class="fas fa-info-circle"></i>
             <g:message code="default.info.label" locale="${lang}"/>
             <span class="caret"></span>
 		</a>
@@ -11,25 +11,25 @@
 
             <li>
                 <a href="https://github.com/IteraSpeed/OpenSpeedMonitor/releases" target="_blank">
-                    <i class="fa fa-github"></i>
+                    <i class="fab fa-github"></i>
                     <g:message code="de.iteratec.osm.releasenotes.manual.label" default="Release notes"/>
                 </a>
             </li>
             <li>
                 <a href="${createLink(uri: '/rest/man')}" target="_blank">
-                    <i class="fa fa-code"></i>
+                    <i class="fas fa-code"></i>
                     <g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
                 </a>
             </li>
             <li>
                 <a href="${createLink(uri: '/about')}" target="_blank">
-                    <i class="fa fa-info-circle"></i>
+                    <i class="fas fa-info-circle"></i>
                     <g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
                 </a>
             </li>
             <li>
                 <a href="mailto:osm@iteratec.de">
-                    <i class="fa fa-envelope-o"></i>
+                    <i class="fas fa-envelope"></i>
                     <g:message code="de.iteratec.osm.contact.label" locale="${lang}"/>
                 </a>
             </li>

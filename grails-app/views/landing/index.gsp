@@ -30,7 +30,7 @@
 <div class="row card-well">
     <div class="col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="de.iteratec.isr.measurementresults" default="Results"/> <i class="fa fa-tachometer"></i></h2>
+            <h2><g:message code="de.iteratec.isr.measurementresults" default="Results"/> <i class="fas fa-tachometer-alt"></i></h2>
             <img src="${resource(dir: 'images', file: 'results.png')}"
                  alt="Page Aggregation Chart" class="intro-img img-rounded"/>
             <p class="intro-text">
@@ -48,7 +48,8 @@
     </div>
     <div class="col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="customerSatisfation.label" default="Customer Satisfaction"/> <i class="fa fa-users"></i></h2>
+            <h2><g:message code="customerSatisfation.label" default="Customer Satisfaction"/> <i
+                    class="fas fa-users"></i></h2>
             <img src="${resource(dir: 'images', file: 'csi.png')}"
                  alt="CSI Graph" class="intro-img img-rounded"/>
             <div class="intro-text">
@@ -64,7 +65,8 @@
     </div>
     <div class="col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="de.iteratec.isr.managementDashboard" default="Measurement"/> <i class="fa fa-tasks"></i></h2>
+            <h2><g:message code="de.iteratec.isr.managementDashboard" default="Measurement"/> <i
+                    class="fas fa-tasks"></i></h2>
             <img src="${resource(dir: 'images', file: 'jobs.png')}"
                  alt="Job List" class="intro-img img-rounded"/>
             <div class="intro-text">

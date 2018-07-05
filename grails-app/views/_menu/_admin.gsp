@@ -1,7 +1,7 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
     <li class="dropdown">
         <a class="dropdown-toggle" href="#">
-            <i class="fa fa-wrench"></i>
+            <i class="fas fa-wrench"></i>
             <g:message code="default.admin.label" locale="${lang}"/>
             <span class="caret"></span>
         </a>
@@ -9,26 +9,26 @@
             <li>
                 %{--All modal dialogs are located in /grails-app/views/_modals/--}%
                 <a href="#modal-p13n" data-toggle="modal">
-                    <i class="fa fa-star-o"></i>
+                    <i class="fas fa-star"></i>
                     <g:message code="de.iteratec.osm.p13n.cookiebased.label" locale="${lang}"/>
                 </a>
             </li>
             <sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
                 <li>
                     <a href="<g:createLink controller="osmConfiguration" action="show" id="1" />">
-                        <i class="fa fa-cogs"></i>
+                        <i class="fas fa-cogs"></i>
                         <g:message code="de.iteratec.osm.configuration.show.label" locale="${lang}"/>
                     </a>
                 </li>
                 <li>
                     <a href="<g:createLink controller="batchActivity" action="list"/>">
-                        <i class="fa fa-database"></i>
+                        <i class="fas fa-database"></i>
                         <g:message code="de.iteratec.osm.batch.batchactivity.list.heading" locale="${lang}"/>
                     </a>
                 </li>
                 <li>
                     <a href="${createLink(uri: '/systeminfo')}">
-                        <i class="fa fa-info-circle	"></i>
+                        <i class="fas fa-info-circle	"></i>
                         <g:message code="default.systeminfo.label" locale="${lang}"/>
                     </a>
                 </li>
@@ -36,7 +36,7 @@
             <g:if env="development">
                 <li>
                     <a href="${createLink(uri: '/admin/dbconsole')}" target="_blank">
-                        <i class="fa fa-terminal"></i>
+                        <i class="fas fa-terminal"></i>
                         <g:message code="de.iteratec.osm.persistence.dbconsole.label" locale="${lang}"/>
                     </a>
                 </li>
@@ -46,7 +46,7 @@
 <sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
     <li class="dropdown">
         <a class="dropdown-toggle" href="#">
-            <i class="fa fa-sitemap"></i>
+            <i class="fas fa-sitemap"></i>
             All Controller
             <span class="caret"></span>
         </a>

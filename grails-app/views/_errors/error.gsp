@@ -35,11 +35,11 @@
 
                   <div class="actions">
                       <a href="${createLink(uri: '/')}" class="btn btn-lg btn-primary">
-                          <i class="fa fa-chevron-left"></i>
+                          <i class="fas fa-chevron-left"></i>
                           <g:message code="error.button.backToHome"/>
                       </a>
                       <a href="mailto:osm@iteratec.de" class="btn btn-lg btn-success">
-                          <i class="fa fa-envelope-o"></i>
+                          <i class="fas fa-envelope"></i>
                           <g:message code="error.button.contactSupport"/>
                       </a>
                   </div>

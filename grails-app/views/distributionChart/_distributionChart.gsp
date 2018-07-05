@@ -2,7 +2,7 @@
     %{-- TODO: Toggled out because the functionality has a bug right now (see Ticket [IT-1612]) --}%
     %{--<div class="in-chart-buttons" id="toggle-logarithmic-y-axis-container">--}%
         %{--<a href="#toggleLogarithmicYAxis" id="toggle-logarithmic-y-axis">--}%
-            %{--<i class="fa fa-arrows-v" aria-hidden="true"></i>--}%
+            %{--<i class="fas fa-arrows-alt-v" aria-hidden="true"></i>--}%
         %{--</a>--}%
     %{--</div>--}%
     <div id="filter-dropdown-group" class="btn-group">
@@ -17,14 +17,14 @@
             </li>
             <li>
                 <a id="all-violins-desc" href="#">
-                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                    <i class="fas fa-check filterActive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.distributionChart.filter.noFilterDesc"
                                default="Descending Median"/>
                 </a>
             </li>
             <li>
                 <a id="all-violins-asc" href="#">
-                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                    <i class="fas fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.distributionChart.filter.noFilterAsc"
                                default="Ascending Median"/>
                 </a>
@@ -40,7 +40,7 @@
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="initPngDownloadModal()"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
-            <i class="fa fa-download"></i>
+            <i class="fas fa-download"></i>
         </a>
         <input type="number" name="quantity" min="1" id="data-trim-value" class="form-control" step="50" />
     </div>
