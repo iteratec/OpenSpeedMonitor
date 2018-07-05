@@ -1,0 +1,8 @@
+<div>
+  <h3>{{page.name}}</h3>
+  <div *ngIf="metricsForPage$ |async, let metricsDto">
+    <div>SpeedIndex: {{transform(metricsDto.speedIndex)}}</div>
+    <div>DocComplete: {{transform(metricsDto.docCompleteTimeInMillisecs)}}</div>
+    <div>Size: {{transform(convertByteToMiB(metricsDto.fullyLoadedIncomingBytes))}}</div>
+  </div>
+</div>

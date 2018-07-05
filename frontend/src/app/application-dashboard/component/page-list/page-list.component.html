@@ -1,5 +1,1 @@
-<ul>
-  <li *ngFor="let page of pages$ | async">
-    {{ page.name }}
-  </li>
-</ul>
+<osm-page *ngFor="let page of pages$| async" [page]="page"></osm-page>

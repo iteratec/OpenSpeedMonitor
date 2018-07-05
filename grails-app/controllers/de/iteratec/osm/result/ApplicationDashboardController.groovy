@@ -1,6 +1,5 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
 import org.joda.time.DateTime
@@ -23,7 +22,9 @@ class ApplicationDashboardController {
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        List<EventResultProjection> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId)
+        List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
+            it.projectedProperties
+        }
 
         return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
     }
