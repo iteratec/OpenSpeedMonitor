@@ -3,6 +3,6 @@
   <div *ngIf="metricsForPage$ |async, let metricsDto">
     <div>SpeedIndex: {{transform(metricsDto.speedIndex)}}</div>
     <div>DocComplete: {{transform(metricsDto.docCompleteTimeInMillisecs)}}</div>
-    <div>Size: {{transform(convertByteToMiB(metricsDto.fullyLoadedIncomingBytes))}}</div>
+    <div>Size: {{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
   </div>
 </div>

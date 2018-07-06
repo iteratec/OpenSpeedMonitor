@@ -4,6 +4,7 @@ import {Observable} from "rxjs/internal/Observable";
 import {MetricsDto} from "../../model/metrics.model";
 import {ApplicationDashboardService} from "../../service/application-dashboard.service";
 import {map} from "rxjs/operators";
+import {CalculationUtil} from "../../../shared/utils/calculation.util";
 
 @Component({
   selector: 'osm-page',
@@ -19,16 +20,11 @@ export class PageComponent {
       map((next: MetricsDto[]) => next.find((metricsDto: MetricsDto) => metricsDto.pageId == this.page.id)));
   }
 
-  private round(value: number): number {
-    const multiplier = Math.pow(10, 1);
-    return Math.round(value * multiplier) / multiplier;
-  }
-
-  convertByteToMiB(bytes: number): number {
-    return bytes / 1048576;
-  }
-
   transform(value: number): string {
-    return this.round(value).toFixed(2);
+    return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
+  }
+
+  convertToMib(value: number): number {
+    return CalculationUtil.convertBytesToMiB(value);
   }
 }
