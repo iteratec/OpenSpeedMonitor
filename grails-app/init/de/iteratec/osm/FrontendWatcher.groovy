@@ -11,7 +11,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.stream.Stream
 
 class FrontendWatcher {
 
@@ -25,17 +24,16 @@ class FrontendWatcher {
     @CompileDynamic
     protected void startFrontendWatcher(Environment environment) {
 
-        def location = environment.getReloadLocation()
-        Stream<Path> fileStream = (Files.walk(Paths.get("${location}/build/nodejs"), 2))
-        List<Path> fileList = fileStream.collect()
-        def nodeLocation = fileList.get(8)
+        String location = environment.getReloadLocation()
+        def nodeLocation = new File(new FileNameByRegexFinder().getFileNames(location, "/build/nodejs/([^\\\\/]*)/bin/node")[0]).getParent()
 
         if (location && nodeLocation) {
 
             Thread.start {
+                def nodeModulesBin = "${location}/frontend/node_modules/.bin"
                 ProcessBuilder watchBuilder = new ProcessBuilder(['sh', '-c', 'ng build --watch'])
                         .redirectErrorStream(true).directory(new File(location, "frontend"))
-                watchBuilder.environment().put("PATH", "${location}/frontend/node_modules/.bin:${nodeLocation}")
+                watchBuilder.environment().put("PATH", "${nodeModulesBin}:${nodeLocation}")
 
                 Process recompileFrontend = watchBuilder.start()
                 recompileFrontend.in.eachLine { line -> println line }
@@ -82,7 +80,7 @@ class FrontendWatcher {
                                 }
                                 Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
                             }
-                            sleep(5000)
+                            sleep(2000)
                         }
                     } catch (Exception e) {
                         log.error("Exception:  $e.message", e)

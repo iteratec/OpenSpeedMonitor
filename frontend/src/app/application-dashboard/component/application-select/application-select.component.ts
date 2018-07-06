@@ -1,7 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import {JobGroupService} from "../../../shared/service/rest/job-group.service";
-import {Observable} from "rxjs/index";
-import {map, take} from "rxjs/internal/operators";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
 
 @Component({
@@ -10,25 +7,14 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
   styleUrls: ['./application-select.component.css']
 })
 export class ApplicationSelectComponent {
-  @Output() selectApplication: EventEmitter<JobGroupDTO> = new EventEmitter();
-  jobGroups$: Observable<JobGroupDTO[]>;
-  selectedApplication: JobGroupDTO;
+  @Output() selectedApplicationChange: EventEmitter<JobGroupDTO> = new EventEmitter();
+  @Input() applications: JobGroupDTO[];
+  @Input() selectedApplication: JobGroupDTO;
 
-  constructor(private jobGroupService: JobGroupService) {
-    this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
-      map((jobGroups: JobGroupDTO[]) =>
-        jobGroups.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: "base"})
-        ))
-    );
-    this.jobGroups$
-      .pipe(take(1))
-      .subscribe((jobGroups: JobGroupDTO[]) => {
-        this.selectedApplication = jobGroups[0];
-      });
+  constructor() {
   }
 
   setApplication(jobGroup: JobGroupDTO) {
-    this.selectedApplication = jobGroup;
-    this.selectApplication.emit(jobGroup)
+    this.selectedApplicationChange.emit(jobGroup)
   }
 }

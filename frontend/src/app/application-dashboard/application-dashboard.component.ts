@@ -1,5 +1,9 @@
 import {Component} from '@angular/core';
 import {JobGroupDTO} from "../shared/model/job-group.model";
+import {ActivatedRoute, Router} from '@angular/router';
+import {JobGroupService} from "../shared/service/rest/job-group.service";
+import {combineLatest, Observable} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 import {ApplicationDashboardService} from "./service/application-dashboard.service";
 
 @Component({
@@ -8,13 +12,43 @@ import {ApplicationDashboardService} from "./service/application-dashboard.servi
   styleUrls: ['./application-dashboard.component.css']
 })
 export class ApplicationDashboardComponent {
-  application: JobGroupDTO;
+  jobGroups$: Observable<JobGroupDTO[]>;
+  selectedApplication$: Observable<JobGroupDTO>;
 
-  constructor(private dashboardService: ApplicationDashboardService) {
+  constructor(private jobGroupService: JobGroupService, private route: ActivatedRoute, private router: Router, private dashboardService: ApplicationDashboardService) {
+    this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
+      map((jobGroups: JobGroupDTO[]) => this.sortJobGroupsByName(jobGroups))
+    );
+
+    this.selectedApplication$ = combineLatest(this.jobGroups$, this.route.paramMap).pipe(
+      map(([jobGroups, params]) => this.lookForJobGroupWithId(jobGroups, params.get('jobGroupId'))),
+      filter(jobGroup => !!jobGroup)
+    );
+
+    this.handleInvalidNavigation();
+  }
+
+  private handleInvalidNavigation() {
+    combineLatest(this.jobGroups$, this.route.paramMap).subscribe(([jobGroups, params]) => {
+      if (this.lookForJobGroupWithId(jobGroups, params.get('jobGroupId'))) {
+        return;
+      }
+      if (!params.get('jobGroupId')) {
+        this.updateApplication(jobGroups[0])
+      }
+    });
   }
 
   updateApplication(jobGroup: JobGroupDTO) {
-    this.application = jobGroup;
+    this.router.navigate(['/application-dashboard', jobGroup.id]);
     this.dashboardService.updateMetricsForApplication(jobGroup.id);
+  }
+
+  private lookForJobGroupWithId(jobGroups: JobGroupDTO[], jobGroupId: string) {
+    return jobGroups.find(jobGroup => jobGroup.id == Number(jobGroupId));
+  }
+
+  private sortJobGroupsByName(jobGroups: JobGroupDTO[]) {
+    return jobGroups.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: "base"}))
   }
 }
