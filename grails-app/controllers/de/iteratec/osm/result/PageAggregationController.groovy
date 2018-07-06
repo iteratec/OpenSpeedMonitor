@@ -109,22 +109,7 @@ class PageAggregationController extends ExceptionHandlerController {
         chartDto.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        barchartAggregations.each {
-            if (it.value) {
-                PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
-                    unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
-                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
-                    measurand: it.selectedMeasurand.name,
-                    measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
-                    value: it.value,
-                    valueComparative: it.valueComparative,
-                    page: it.page,
-                    jobGroup: it.jobGroup,
-                    aggregationValue: it.aggregationValue
-                )
-                chartDto.series.add(seriesDto)
-            }
-        }
+        chartDto.series.addAll(convertToPageAggregationChartSeriesDTOs(barchartAggregations))
 
 //      TODO: see ticket [IT-1614]
         chartDto.filterRules = createFilterRules(allPages, allJobGroups)
@@ -154,6 +139,26 @@ class PageAggregationController extends ExceptionHandlerController {
         }
         uniqueTestedPages.each {
 
+        }
+    }
+
+    private List<PageAggregationChartSeriesDTO> convertToPageAggregationChartSeriesDTOs(List<BarchartAggregation> barchartAggregations) {
+        return barchartAggregations.collectMany {
+            if (!it.value) {
+                return []
+            } else {
+                return [new PageAggregationChartSeriesDTO(
+                    unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
+                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
+                    measurand: it.selectedMeasurand.name,
+                    measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
+                    value: it.value,
+                    valueComparative: it.valueComparative,
+                    page: it.page.name,
+                    jobGroup: it.jobGroup.name,
+                    aggregationValue: it.aggregationValue
+                )]
+            }
         }
     }
 
