@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import {MeasuredEvent} from '../../service/model/measured-event.model';
 import {Threshold} from '../../service/model/threshold.model';
 import {Measurand} from "../../service/model/measurand.model";
@@ -12,7 +12,7 @@ import {AbstractJsEmitterVisitor} from "@angular/compiler/src/output/abstract_js
   templateUrl: './measured-event.component.html',
   styleUrls: ['./measured-event.component.css']
 })
-export class MeasuredEventComponent implements OnInit, OnDestroy {
+export class MeasuredEventComponent implements OnInit {
   measurandList: Measurand[];
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[];
@@ -33,9 +33,9 @@ export class MeasuredEventComponent implements OnInit, OnDestroy {
     console.log("ngOninit this.thresholds: " + JSON.stringify(this.thresholds));
   }
 
-  ngOnDestroy() {
+  /*ngOnDestroy() {
     this.thresholdRestService.measurands$.unsubscribe();
-  }
+  }*/
 
   add() {
     console.log("ADD");
@@ -43,38 +43,24 @@ export class MeasuredEventComponent implements OnInit, OnDestroy {
     console.log("this.thresholds: " + JSON.stringify(this.thresholds));
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
+    let newMeasuredEvent = {} as MeasuredEvent;
     let newThresholdName: string;
 
     if (this.thresholds.length < this.measurandList.length) {
       newThresholdName = this.measurandList[this.thresholds.length].name;
     }
+    newMeasuredEvent.id = this.measuredEvent.id;
     //newThreshold.id = 5;
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
     this.newThreshold.lowerBoundary = 0;
     this.newThreshold.upperBoundary = 0;
     this.newThreshold.state = "new";
+    this.newThreshold.measuredEvent = newMeasuredEvent;
     console.log("this.newThreshold: " + JSON.stringify(this.newThreshold));
 
     this.thresholds.push(this.newThreshold);
     this.allowthresholdAdd = !this.allowthresholdAdd;
-
-
-    //Which is the next measurand to be used?
-    /*thresholds.forEach(function (threshold) {
-
-    } )*/
-
-    /*//newThreshold.measurand = ;
-    newThreshold.measuredEvent = measuredEvent.id;
-    newThreshold.lowerBoundary = 0;
-    newThreshold.upperBoundary = 0;
-    this.allowthreshold = !this.allowthreshold;
-    threshold.id =
-    this.allowthreshold
-      ? console.log("this.allowthreshold true: " + this.allowthreshold)
-      : console.log("this.allowthreshold false: " + this.allowthreshold)
-    ;*/
   }
 
 }

@@ -76,7 +76,24 @@ export class ThresholdRestService {
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
     this.http.post(url, params).subscribe(() => {
-        console.log("delete server Response: " + self.actualJobId);
+        console.log("self.actualJobId : " + self.actualJobId);
+        self.getThresholdsForJob(self.actualJobId);
+      }
+    );
+  }
+
+  /** Add Threshold */
+  addThreshold (threshold: Threshold){
+    const url = "/threshold/createThreshold" ;
+    let self= this;
+    let params = new HttpParams().set('job', self.actualJobId.toString());
+    params = params.set('measurand', threshold.measurand.name.toString());
+    params = params.set('measuredEvent', threshold.measuredEvent.id.toString());
+    params = params.set('lowerBoundary', threshold.lowerBoundary.toString());
+    params = params.set('upperBoundary', threshold.upperBoundary.toString());
+
+    this.http.post(url, params).subscribe(() => {
+        console.log("self.actualJobId : " + self.actualJobId);
         self.getThresholdsForJob(self.actualJobId);
       }
     );

@@ -14,7 +14,7 @@ export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() allowthresholdAdd: boolean;
   allowInput = false;
-  editButtonLabel= "Editieren";
+  leftButtonLabel= "Editieren";
 
   constructor(private thresholdRestService: ThresholdRestService) {
 
@@ -23,6 +23,9 @@ export class ThresholdComponent implements OnInit {
   ngOnInit() {
     console.log("this.allowthresholdAdd: " + this.allowthresholdAdd);
     console.log("Threshold.component ngOninit this.threshold: " + JSON.stringify(this.threshold));
+    /*if (this.threshold.state == "new") {
+      this.leftButtonLabel = "Speichern";
+    }*/
   }
 
   delete(thresholdID) {
@@ -34,13 +37,21 @@ export class ThresholdComponent implements OnInit {
     console.log("EDIT");
     this.allowInput = !this.allowInput;
     this.allowInput
-      ? this.editButtonLabel = "Übernehmen"
+      ? this.leftButtonLabel = "Übernehmen"
       : (
-      this.editButtonLabel = "Editieren",
+      this.leftButtonLabel = "Editieren",
         this.thresholdRestService.editThreshold(this.threshold)
     ) ;
   }
 
+  save() {
+    console.log("SAVE");
+    this.thresholdRestService.addThreshold(this.threshold)
+  }
+
+  remove() {
+    console.log("REMOVE");
+  }
 
 
 }
