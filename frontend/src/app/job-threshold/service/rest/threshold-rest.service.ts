@@ -21,9 +21,9 @@ import {log} from "util";
 export class ThresholdRestService {
 
   public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
+  public measurands$ = new ReplaySubject<Measurand[]>(1);
+
   public actualJobId : number;
-
-
   private baseUrl = '/job';  // URL
 
   constructor(private http: HttpClient) {
@@ -32,8 +32,8 @@ export class ThresholdRestService {
 
   /** GET Measurands */
   getMeasurands ()/*: Observable< Measurand[] >*/ {
-    const url = `${this.baseUrl}/getAllMeasurands`;
-    return this.http.get< Measurand[]>(url);
+    const url = `/job/getAllMeasurands`;
+    this.http.get< Measurand[]>(url).subscribe( next => this.measurands$.next(next), error => this.handleError(error));
   }
 
   /** GET MeasuredEvents */
@@ -65,25 +65,16 @@ export class ThresholdRestService {
     );
   }
 
-  /** DELETE Threshold */
+  /** Edit Threshold */
   editThreshold (threshold: Threshold){
-    console.log("edit threshold " + JSON.stringify(threshold));
     const url = "/threshold/updateThreshold" ;
     let self= this;
-    let formData = new FormData();
-
     let params = new HttpParams().set('thresholdId', threshold.id.toString());
     params = params.set('measurand', threshold.measurand.name.toString());
     params = params.set('measuredEvent', threshold.measuredEvent.id.toString());
     params = params.set('lowerBoundary', threshold.lowerBoundary.toString());
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
-
-    formData.append("thresholdId", JSON.stringify(threshold.id) );
-    formData.append("measurand", JSON.stringify(threshold.measurand.name));
-    formData.append("measuredEvent", JSON.stringify(threshold.measuredEvent));
-    formData.append("lowerBoundary", JSON.stringify(threshold.lowerBoundary));
-    formData.append("upperBoundary", JSON.stringify(threshold.upperBoundary));
     this.http.post(url, params).subscribe(() => {
         console.log("delete server Response: " + self.actualJobId);
         self.getThresholdsForJob(self.actualJobId);

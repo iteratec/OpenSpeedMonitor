@@ -1,5 +1,10 @@
 <div>
-  <label class="thresholdMeasurand">{{threshold.measurand.name}} </label>
+  <div *ngIf="threshold.state=='normal'">
+    <label class="thresholdMeasurand">{{threshold.measurand.name}} </label>
+  </div>
+  <div *ngIf="threshold.state=='new'">
+    <input [(ngModel)]= "threshold.measurand.name" >
+  </div>
   <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
     <span class="form-inline">
       <span class="thresholdLabel labelGood">Good</span>
@@ -11,9 +16,6 @@
         <span class="input-group-addon">ms</span>
       </div>
     </span>
-
-
-
     <span class="form-inline">
       <span class="thresholdLabel"> < </span>
       <span class="thresholdLabel labelOk">Ok</span>
@@ -37,10 +39,6 @@
               class="btn btn-danger btn-sm"
               (click)="delete(threshold.id)">Löschen</button> <!--(click)="deleteThreshold(threshold.id)"-->
     </span>
-
-
-
-
   </div>
 </div>
 

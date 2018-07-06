@@ -11,7 +11,5 @@ export type Threshold = {
   measurand: Measurand;
   measuredEvent: MeasuredEvent;
   upperBoundary: number;
-  edit: boolean;
-  saved: boolean;
-
+  state: string;
 }

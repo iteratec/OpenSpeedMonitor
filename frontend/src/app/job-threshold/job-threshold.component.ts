@@ -6,6 +6,7 @@ import {ThresholdForJob} from './service/model/threshold-for-job.model'
 import {Threshold} from "./service/model/threshold.model";
 import {ObservableInput} from "rxjs/index";
 import {Observable} from "rxjs";
+import {map} from "rxjs/internal/operators";
 
 @Component({
   selector: 'app-job-threshold',
@@ -33,9 +34,10 @@ export class JobThresholdComponent implements OnInit {
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
     this.thresholdRestService.actualJobId = this.jobId;
     console.log("jobId: " + this.jobId);
+    this.thresholdRestService.getMeasurands();
     this.fetchData();
     this.thresholdRestService.getThresholdsForJob(this.jobId);
-    this.thresholdsForJobList$ = this.thresholdRestService.thresholdsForJob$;
+    this.thresholdsForJobList$ = this.thresholdRestService.thresholdsForJob$
   }
 
   ngOnInit() {
@@ -43,10 +45,10 @@ export class JobThresholdComponent implements OnInit {
   }
 
   fetchData() {
-    this.thresholdRestService.getMeasurands().subscribe((measurands: Measurand[]) => {
+    /*this.thresholdRestService.getMeasurands().subscribe((measurands: Measurand[]) => {
       this.measurands = measurands;
       console.log("measurands: " + JSON.stringify(this.measurands ));
-    });
+    });*/
 
     this.thresholdRestService.getMeasuredEvents(this.scriptId).subscribe((measuredEvents: MeasuredEvent[]) => {
       this.measuredEvents = measuredEvents;

@@ -1,9 +1,13 @@
 <div class="col-md-offset-1">
   <label class="measuredEventLabel">{{measuredEvent.name}}</label>
   <button type="button"
-          class="btn btn-success">+</button>
+          class="btn btn-success"
+          (click)="add()">+</button>
 
   <osm-threshold *ngFor="let threshold of thresholds"
-                 [threshold]="threshold"></osm-threshold>
+                 [threshold]="threshold"
+                 [allowthresholdAdd]="allowthresholdAdd"></osm-threshold>
+<!--  <osm-threshold *ngIf="allowthreshold"
+    [threshold]="newThreshold"></osm-threshold>-->
 </div>
 
