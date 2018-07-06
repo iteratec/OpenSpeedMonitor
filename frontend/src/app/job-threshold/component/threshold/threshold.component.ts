@@ -1,9 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import {Threshold} from '../../service/model/threshold.model';
 import { ThresholdRestService } from '../../service/rest/threshold-rest.service';
-
-
-
+import {Measurand} from "../../service/model/measurand.model";
 
 @Component({
   selector: 'osm-threshold',
@@ -13,11 +11,16 @@ import { ThresholdRestService } from '../../service/rest/threshold-rest.service'
 export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() allowthresholdAdd: boolean;
+  measurandList: Measurand[];
+  selectedOption: string;
+
   allowInput = false;
   leftButtonLabel= "Editieren";
 
   constructor(private thresholdRestService: ThresholdRestService) {
-
+    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
+      this.measurandList = next;
+    } );
   }
 
   ngOnInit() {
@@ -46,6 +49,7 @@ export class ThresholdComponent implements OnInit {
 
   save() {
     console.log("SAVE");
+    this.threshold.measurand.name = this.selectedOption;
     this.thresholdRestService.addThreshold(this.threshold)
   }
 

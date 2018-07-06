@@ -38,7 +38,11 @@
     </div>
   </div>
   <div *ngIf="threshold.state=='new'">
-    <input [(ngModel)]= "threshold.measurand.name" >
+    <select class="form-inline"
+            [(ngModel)]="selectedOption"
+            required>
+      <option *ngFor="let measurand of measurandList" [value]="measurand.name">{{measurand.name}}</option>
+    </select>
     <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
       <span class="form-inline">
       <span class="thresholdLabel labelGood">Good</span>
