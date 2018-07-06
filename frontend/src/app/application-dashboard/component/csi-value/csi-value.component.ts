@@ -1,5 +1,5 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {Arc, arc, DefaultArcObject} from "d3-shape";
+import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {arc} from "d3-shape";
 import {select} from "d3-selection";
 import {transition} from "d3-transition";
 import {interpolate} from "d3-interpolate";
@@ -9,7 +9,7 @@ import {interpolate} from "d3-interpolate";
   templateUrl: './csi-value.component.html',
   styleUrls: ['./csi-value.component.css']
 })
-export class CsiValueComponent implements OnInit {
+export class CsiValueComponent implements OnInit, OnChanges {
   @Input() isBig: boolean;
   @Input() description: string;
   @Input() csiValue: number;
@@ -29,8 +29,14 @@ export class CsiValueComponent implements OnInit {
 
   ngOnInit(): void {
     this.initByInputs();
+    this.drawCircle();
+  }
 
-    let selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue])
+  private drawCircle() {
+    this.csiValue = this.roundCsiValue(this.csiValue);
+    this.csiValueClass = this.determineClass(this.csiValue);
+
+    const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
     this.exit(selection.exit());
@@ -54,9 +60,6 @@ export class CsiValueComponent implements OnInit {
     this.outerRadius = this.size / 2;
     let innerRadius = this.outerRadius - this.outerRadius * 0.15;
     this.arcGenerator = this.getArcGenerator(innerRadius, this.outerRadius);
-
-    this.csiValue = this.roundCsiValue(this.csiValue);
-    this.csiValueClass = this.determineClass(this.csiValue);
   }
 
   private getArcGenerator(innerRadius: number, outerRadius: number){
@@ -89,21 +92,21 @@ export class CsiValueComponent implements OnInit {
       .attr("fill", "currentColor")
   }
 
-  private update(selection: any) {
+  private update(selection: any, start: number = Math.PI) {
     selection
       .select("path.csi-circle-value")
       .transition()
       .duration(1000)
-      .attrTween("d", this.tweenArc(this.calculateCsiArcTarget(this.csiValue)))
+      .attrTween("d", this.tweenArc(this.calculateCsiArcTarget(this.csiValue), start))
   }
 
   private exit(selection: any) {
     selection.remove()
   }
 
-  private tweenArc(target: any) {
+  private tweenArc(target: any, start: number) {
     return (d: any) => {
-      const interpolator = interpolate(Math.PI, target);
+      const interpolator = interpolate(start, target);
       return (t) => {
         return this.arcGenerator(interpolator(t));
       }
@@ -127,6 +130,17 @@ export class CsiValueComponent implements OnInit {
   private roundCsiValue(csiValue: number):number{
     const multiplier = Math.pow(10, 1);
     return Math.round(csiValue * multiplier) / multiplier;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.csiValue) {
+      this.csiValue = this.roundCsiValue(changes.csiValue.currentValue);
+      this.csiValueClass = this.determineClass(this.csiValue);
+
+      const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
+      this.update(selection, this.calculateCsiArcTarget(this.roundCsiValue(changes.csiValue.previousValue)));
+    }
+
   }
 }
 
