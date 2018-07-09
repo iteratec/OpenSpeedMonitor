@@ -2,7 +2,8 @@
   <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList "
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
-                      (removeEvent)="removeMeasuredEvent()">
+                      (removeEvent)="removeMeasuredEvent()"
+                      [measuredEventList]="measuredEventList">
   </osm-measured-event>
   <span class="col-sm-offset-1">
     <button type="button"

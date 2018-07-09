@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef} from '@angular/core';
+import { Component, OnInit, ElementRef, OnChanges} from '@angular/core';
 import { ThresholdRestService } from './service/rest/threshold-rest.service';
 import {Measurand} from './service/model/measurand.model'
 import {MeasuredEvent} from './service/model/measured-event.model'
@@ -12,10 +12,12 @@ import {Observable} from "rxjs";
   styleUrls: ['./job-threshold.component.css']
 })
 
-export class JobThresholdComponent implements OnInit {
+export class JobThresholdComponent implements OnInit, OnChanges {
   //thresholdsForJobList$: Observable<ThresholdForJob[]>;
   thresholdsForJobList: ThresholdForJob[];
   measurandList: Measurand[];
+  measuredEventList: any[];
+
 
   jobId : number;
   scriptId : number;
@@ -28,12 +30,40 @@ export class JobThresholdComponent implements OnInit {
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
     this.thresholdRestService.actualJobId = this.jobId;
     this.fetchData();
+    this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
+      this.measuredEventList = next;
+    } );
 
   }
 
   ngOnInit() {
     //this.thresholdsForJobList.map(m => m.measuredEvent.state = "normal");
+
+
   }
+
+  ngOnChanges() {
+    console.log("BEFORE measuredEventList " + JSON.stringify(this.measuredEventList));
+    console.log("BEFORE thresholdsForJobList " + JSON.stringify(this.thresholdsForJobList));
+    this.thresholdsForJobList.map(job => {
+      job.thresholds.map(threshold => {
+        let name: string = threshold.measuredEvent.name;
+        console.log("INSIDE name: " + JSON.stringify(name));
+        console.log("INSIDE indexOf: " + JSON.stringify(this.measuredEventList.map(element => element.name).indexOf(name)));
+
+        if(this.measuredEventList.map(element => element.name).indexOf(name) !== -1 ) {
+          this.measuredEventList.splice(this.measuredEventList.map(element => element.name).indexOf(name) , 1);
+          console.log("INSIDE measuredEventList: " + JSON.stringify(this.measuredEventList));
+        }
+
+      })
+
+    })
+    console.log(JSON.stringify("AFTER: " + this.measuredEventList));
+
+  }
+
+
 
   fetchData() {
     //this.thresholdRestService.getMeasurands();
@@ -57,6 +87,30 @@ export class JobThresholdComponent implements OnInit {
 
   addMeasuredEvent() {
     console.log("ADD MEASUREDEVENT");
+    console.log("BEFORE measuredEventList " + JSON.stringify(this.measuredEventList));
+    console.log("BEFORE thresholdsForJobList " + JSON.stringify(this.thresholdsForJobList));
+    this.thresholdsForJobList.map(job => {
+      job.thresholds.map(threshold => {
+        let name: string = threshold.measuredEvent.name;
+        console.log("INSIDE name: " + JSON.stringify(name));
+        console.log("INSIDE indexOf: " + JSON.stringify(this.measuredEventList.map(element => element.name).indexOf(name)));
+
+        if(this.measuredEventList.map(element => element.name).indexOf(name) !== -1 ) {
+          this.measuredEventList.splice(this.measuredEventList.map(element => element.name).indexOf(name) , 1);
+          console.log("INSIDE measuredEventList: " + JSON.stringify(this.measuredEventList));
+        }
+
+      })
+
+    })
+    console.log(JSON.stringify("AFTER: " + this.measuredEventList));
+
+
+
+
+
+
+
     this.newThresholdForJob = {} as ThresholdForJob;
     let newThreshold = {} as Threshold;
     //let newMeasurand = {} as Measurand;

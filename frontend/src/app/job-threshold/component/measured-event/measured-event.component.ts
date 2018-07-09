@@ -14,8 +14,10 @@ import {AbstractJsEmitterVisitor} from "@angular/compiler/src/output/abstract_js
 })
 export class MeasuredEventComponent implements OnInit {
   measurandList: Measurand[];
+
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[];
+  @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
   allowthresholdAdd = false;
   newThreshold: Threshold;
@@ -26,7 +28,6 @@ export class MeasuredEventComponent implements OnInit {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
     } );
-
 
   }
 

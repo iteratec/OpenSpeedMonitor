@@ -13,9 +13,9 @@ import {MeasuredEvent} from '../../service/model/measured-event.model';
 export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() allowthresholdAdd: boolean;
+  @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
   measurandList: Measurand[];
-  measuredEventList: MeasuredEvent[];
   selectedMeasuredEvent: MeasuredEvent;
   selectedThreshold: string;
   allowInput = false;
@@ -29,9 +29,7 @@ export class ThresholdComponent implements OnInit {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
     } );
-    this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
-      this.measuredEventList = next;
-    } );
+
   }
 
   ngOnInit() {
