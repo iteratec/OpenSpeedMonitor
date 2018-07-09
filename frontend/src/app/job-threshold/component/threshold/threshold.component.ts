@@ -17,7 +17,7 @@ export class ThresholdComponent implements OnInit {
   @Output() removeEvent = new EventEmitter();
   measurandList: Measurand[];
   selectedMeasuredEvent: MeasuredEvent;
-  selectedThreshold: string;
+  selectedMeasurand: string;
   allowInput = false;
   deleteConfirmation = false;
   leftButtonLabel= "Editieren";
@@ -35,6 +35,8 @@ export class ThresholdComponent implements OnInit {
   ngOnInit() {
     this.firstUpperBoundary = this.threshold.upperBoundary;
     this.firstLowerBoundary = this.threshold.lowerBoundary;
+    this.selectedMeasuredEvent = this.measuredEventList[0];
+    this.selectedMeasurand = this.measurandList[0].name;
   }
 
   delete(thresholdID) {
@@ -84,7 +86,7 @@ export class ThresholdComponent implements OnInit {
 
   save() {
     console.log("SAVE");
-    this.threshold.measurand.name = this.selectedThreshold;
+    this.threshold.measurand.name = this.selectedMeasurand;
     this.selectedMeasuredEvent
       ? (
         this.threshold.measuredEvent = this.selectedMeasuredEvent,
@@ -98,10 +100,4 @@ export class ThresholdComponent implements OnInit {
     console.log("REMOVE");
     this.removeEvent.emit();
   }
-
-
-
-
-
-
 }

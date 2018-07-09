@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output  } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, OnChanges  } from '@angular/core';
 import {MeasuredEvent} from '../../service/model/measured-event.model';
 import {Threshold} from '../../service/model/threshold.model';
 import {Measurand} from "../../service/model/measurand.model";
@@ -12,7 +12,7 @@ import {AbstractJsEmitterVisitor} from "@angular/compiler/src/output/abstract_js
   templateUrl: './measured-event.component.html',
   styleUrls: ['./measured-event.component.css']
 })
-export class MeasuredEventComponent implements OnInit {
+export class MeasuredEventComponent implements OnInit, OnChanges {
   measurandList: Measurand[];
 
   @Input() measuredEvent: MeasuredEvent;
@@ -27,6 +27,9 @@ export class MeasuredEventComponent implements OnInit {
   constructor(private thresholdRestService: ThresholdRestService) {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
+
+
+
     } );
 
   }
@@ -37,12 +40,46 @@ export class MeasuredEventComponent implements OnInit {
     console.log("measured-event-component ngOninit this.thresholds: " + JSON.stringify(this.thresholds));
   }
 
+  ngOnChanges() {
+    console.log("BEFORE measuredEventList " + JSON.stringify(this.measuredEventList));
+
+    this.thresholds.map(threshold => {
+      let name: string = threshold.measurand.name;
+      console.log("INSIDE name: " + JSON.stringify(name));
+      console.log("INSIDE indexOf: " + JSON.stringify(this.measurandList.map(element => element.name).indexOf(name)));
+
+      if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
+        this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
+        console.log("INSIDE measuredEventList: " + JSON.stringify(this.measurandList));
+      }
+
+    })
+    console.log(JSON.stringify("AFTER: " + this.measurandList));
+  }
   /*ngOnDestroy() {
     this.thresholdRestService.measurands$.unsubscribe();
   }*/
 
   add() {
     console.log("ADD THRESHOLD");
+
+    console.log("BEFORE measuredEventList " + JSON.stringify(this.measuredEventList));
+
+    this.thresholds.map(threshold => {
+      let name: string = threshold.measurand.name;
+      console.log("INSIDE name: " + JSON.stringify(name));
+      console.log("INSIDE indexOf: " + JSON.stringify(this.measurandList.map(element => element.name).indexOf(name)));
+
+      if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
+        this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
+        console.log("INSIDE measuredEventList: " + JSON.stringify(this.measurandList));
+      }
+
+    })
+    console.log(JSON.stringify("AFTER: " + this.measurandList));
+
+
+
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
     let newMeasuredEvent = {} as MeasuredEvent;

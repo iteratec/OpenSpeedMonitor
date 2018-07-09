@@ -56,7 +56,7 @@
   </div>
   <div *ngIf="threshold.state=='new'">
     <select class="form-inline"
-            [(ngModel)]="selectedThreshold"
+            [(ngModel)]="selectedMeasurand"
             required>
       <option *ngFor="let measurand of measurandList" [value]="measurand.name">{{measurand.name}}</option>
     </select>
