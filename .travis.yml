@@ -1,11 +1,17 @@
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - node_modules
+    - frontend/node_modules
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - oraclejdk8
-branches:
-  only:
-    - feature/travisCiUnitTests
-script: .grailsw clean
-	&& ./grailsw clean-all
-	&& ./grailsw refresh-dependencies
-  && ./grailsw "test-app unit:"
-  && ./grailsw "war"
+jobs:
+  include:
+    - stage: unit tests
+      script:
+        - ./gradlew -x jasmineRun test
+      install: true
