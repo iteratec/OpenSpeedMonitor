@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output  } from '@angular/core';
 import {MeasuredEvent} from '../../service/model/measured-event.model';
 import {Threshold} from '../../service/model/threshold.model';
 import {Measurand} from "../../service/model/measurand.model";
@@ -16,6 +16,7 @@ export class MeasuredEventComponent implements OnInit {
   measurandList: Measurand[];
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[];
+  @Output() removeEvent = new EventEmitter();
   allowthresholdAdd = false;
   newThreshold: Threshold;
 
@@ -64,8 +65,15 @@ export class MeasuredEventComponent implements OnInit {
   }
 
   removeThreshold() {
-    this.thresholds.pop();
+    console.log(" remove Threshold ");
+      this.thresholds.pop();
   }
+  removeMeasuredEvent() {
+    console.log(" remove MeasuredEvents ");
+    this.removeEvent.emit();
+  }
+
+
 
 
 

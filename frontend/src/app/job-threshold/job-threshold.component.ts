@@ -89,4 +89,9 @@ export class JobThresholdComponent implements OnInit {
     console.log("createScript");
   }
 
+  removeMeasuredEvent() {
+    console.log("jobThreshold removeMeasuredEvent");
+    this.thresholdsForJobList.pop();
+  }
+
 }
