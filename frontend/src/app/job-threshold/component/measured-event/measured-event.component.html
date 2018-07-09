@@ -7,7 +7,8 @@
 
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
-                   [allowthresholdAdd]="allowthresholdAdd"></osm-threshold>
+                   [allowthresholdAdd]="allowthresholdAdd"
+                   (removeEvent)="removeThreshold()"></osm-threshold>
   </div>
   <div *ngIf="measuredEvent.state=='new'">
     <osm-threshold *ngFor="let threshold of thresholds"

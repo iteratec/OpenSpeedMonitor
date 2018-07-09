@@ -20,6 +20,7 @@ export class MeasuredEventComponent implements OnInit {
   newThreshold: Threshold;
 
 
+
   constructor(private thresholdRestService: ThresholdRestService) {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
@@ -61,5 +62,11 @@ export class MeasuredEventComponent implements OnInit {
     this.thresholds.push(this.newThreshold);
     this.allowthresholdAdd = !this.allowthresholdAdd;
   }
+
+  removeThreshold() {
+    this.thresholds.pop();
+  }
+
+
 
 }
