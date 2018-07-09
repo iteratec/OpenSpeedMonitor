@@ -16,12 +16,12 @@ export class ThresholdComponent implements OnInit {
   measurandList: Measurand[];
   measuredEventList: MeasuredEvent[];
   selectedMeasuredEvent: MeasuredEvent;
-
-
   selectedOption: string;
-
   allowInput = false;
   leftButtonLabel= "Editieren";
+  rightButtonLabel= "Löschen";
+  firstUpperBoundary: number;
+  firstLowerBoundary: number;
 
   constructor(private thresholdRestService: ThresholdRestService) {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
@@ -35,6 +35,9 @@ export class ThresholdComponent implements OnInit {
   ngOnInit() {
     console.log("this.allowthresholdAdd: " + this.allowthresholdAdd);
     console.log("Threshold.component ngOninit this.threshold: " + JSON.stringify(this.threshold));
+    this.firstUpperBoundary = this.threshold.upperBoundary;
+    this.firstLowerBoundary = this.threshold.lowerBoundary;
+
     /*if (this.threshold.state == "new") {
       this.leftButtonLabel = "Speichern";
     }*/
@@ -42,26 +45,40 @@ export class ThresholdComponent implements OnInit {
 
   delete(thresholdID) {
     console.log("DELETE");
-    this.thresholdRestService.deleteThreshold(thresholdID);
+
+    this.rightButtonLabel == "Löschen"
+      ? this.thresholdRestService.deleteThreshold(thresholdID)
+      : (
+        this.allowInput = !this.allowInput,
+          this.threshold.upperBoundary = this.firstUpperBoundary,
+          this.threshold.lowerBoundary = this.firstLowerBoundary,
+          this.rightButtonLabel = "Löschen",
+          this.leftButtonLabel = "Editieren"
+      )
+
+
+
+
   }
 
   edit() {
     console.log("EDIT");
     this.allowInput = !this.allowInput;
     this.allowInput
-      ? this.leftButtonLabel = "Übernehmen"
+      ? (
+      this.rightButtonLabel = "Zurücksetzen",
+        this.leftButtonLabel = "Übernehmen"
+      )
       : (
-      this.leftButtonLabel = "Editieren",
-        this.thresholdRestService.editThreshold(this.threshold)
-    ) ;
+      this.rightButtonLabel = "Löschen",
+        this.leftButtonLabel = "Editieren",
+          this.thresholdRestService.editThreshold(this.threshold)
+      ) ;
   }
 
   save() {
     console.log("SAVE");
     this.threshold.measurand.name = this.selectedOption;
-
-    console.log(JSON.stringify(this.selectedMeasuredEvent));
-
     this.selectedMeasuredEvent
       ? (
         this.threshold.measuredEvent = this.selectedMeasuredEvent,
@@ -69,9 +86,6 @@ export class ThresholdComponent implements OnInit {
       ):(
         this.thresholdRestService.addThreshold(this.threshold)
       );
-
-    //this.selectedMeasuredEvent.map(element =>console.log("element: " +element) );
-    //this.thresholdRestService.addThreshold(this.threshold)
   }
 
   remove() {
