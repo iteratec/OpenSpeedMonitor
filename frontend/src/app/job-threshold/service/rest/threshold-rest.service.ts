@@ -28,17 +28,17 @@ export class ThresholdRestService {
   private baseUrl = '/job';  // URL
 
   constructor(private http: HttpClient) {
-    this.getMeasurands();
+    //this.getMeasurands();
   }
 
   /** GET Measurands */
-  getMeasurands ()/*: Observable< Measurand[] >*/ {
+  getMeasurands () {
     const url = `/job/getAllMeasurands`;
     this.http.get< Measurand[]>(url).subscribe( next => this.measurands$.next(next), error => this.handleError(error));
   }
 
   /** GET MeasuredEvents */
-  getMeasuredEvents (scriptId: number)/*: Observable<MeasuredEvent[]> */{
+  getMeasuredEvents (scriptId: number){
     /*console.log("getMeasuredEvents scriptId: " + scriptId);*/
     const url = `/script/getMeasuredEventsForScript?scriptId=${scriptId}`;
     this.http.get<MeasuredEvent[]>(url)
@@ -63,6 +63,7 @@ export class ThresholdRestService {
     this.http.post(url, formData).subscribe(() => {
       console.log("delete server Response: " + self.actualJobId);
       self.getThresholdsForJob(self.actualJobId);
+      self.getMeasurands();
       }
     );
   }
@@ -97,6 +98,7 @@ export class ThresholdRestService {
     this.http.post(url, params).subscribe(() => {
         console.log("self.actualJobId : " + self.actualJobId);
         self.getThresholdsForJob(self.actualJobId);
+        self.getMeasurands();
       }
     );
   }

@@ -4,15 +4,14 @@ import { ThresholdRestService } from '../../service/rest/threshold-rest.service'
 import {Measurand} from "../../service/model/measurand.model";
 import {MeasuredEvent} from '../../service/model/measured-event.model';
 
-
 @Component({
   selector: 'osm-threshold',
   templateUrl: './threshold.component.html',
   styleUrls: ['./threshold.component.css']
 })
-export class ThresholdComponent implements OnInit {
+
+export class ThresholdComponent implements OnInit{
   @Input() threshold: Threshold;
-  @Input() allowthresholdAdd: boolean;
   @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
   measurandList: Measurand[];
@@ -24,6 +23,8 @@ export class ThresholdComponent implements OnInit {
   rightButtonLabel= "Löschen";
   firstUpperBoundary: number;
   firstLowerBoundary: number;
+  leftButtonLabelDisable: boolean = false;
+  value: number = 0;
 
   constructor(private thresholdRestService: ThresholdRestService) {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
@@ -37,12 +38,12 @@ export class ThresholdComponent implements OnInit {
     this.firstLowerBoundary = this.threshold.lowerBoundary;
     this.selectedMeasuredEvent = this.measuredEventList[0];
     this.selectedMeasurand = this.measurandList[0].name;
+    if (this.threshold.state == "new") {
+      this.leftButtonLabelDisable = true;
+    }
   }
 
   delete(thresholdID) {
-    console.log("DELETE");
-    //this.thresholdRestService.deleteThreshold(thresholdID)
-
     if (this.deleteConfirmation) {
       this.deleteConfirmation = !this.deleteConfirmation;
       this.thresholdRestService.deleteThreshold(thresholdID);
@@ -85,19 +86,25 @@ export class ThresholdComponent implements OnInit {
   }
 
   save() {
-    console.log("SAVE");
     this.threshold.measurand.name = this.selectedMeasurand;
-    this.selectedMeasuredEvent
-      ? (
-        this.threshold.measuredEvent = this.selectedMeasuredEvent,
-          this.thresholdRestService.addThreshold(this.threshold)
-      ):(
-        this.thresholdRestService.addThreshold(this.threshold)
-      );
+    if (this.threshold.measuredEvent.state == "new") {
+      this.threshold.measuredEvent = this.selectedMeasuredEvent;
+      this.thresholdRestService.addThreshold(this.threshold);
+    }
+    else {
+      this.thresholdRestService.addThreshold(this.threshold);
+    }
+  }
+
+  onKey(event: any) { // without type info
+    this.value = event.target.value ;
+    console.log(this.value);
+    if (this.value > 0) {
+      this.leftButtonLabelDisable = false;
+    }
   }
 
   remove() {
-    console.log("REMOVE");
-    this.removeEvent.emit();
+    this.removeEvent.emit(this.threshold);
   }
 }

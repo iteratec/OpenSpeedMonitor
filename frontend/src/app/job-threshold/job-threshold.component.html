@@ -1,9 +1,11 @@
 <div class="container">
+  <h4>Angular Component</h4>
+  <hr>
   <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList "
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
-                      (removeEvent)="removeMeasuredEvent()"
-                      [measuredEventList]="measuredEventList">
+                      [measuredEventList]="measuredEventList"
+                      (removeEvent)="removeMeasuredEvent($event)"><!--[measurandList]="measurandList"-->
   </osm-measured-event>
   <span class="col-sm-offset-1">
     <button type="button"
@@ -13,7 +15,6 @@
             class="btn btn-default"
             (click)="createScript()">CI-Script Erstellen</button>
   </span>
-
 </div>
 
 

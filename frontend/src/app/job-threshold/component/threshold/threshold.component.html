@@ -31,7 +31,7 @@
 
         <button type="button"
                 class="btn btn-primary btn-sm"
-                (click)="edit()">{{leftButtonLabel}}</button>
+                (click)="edit()" >{{leftButtonLabel}}</button>
         <button type="button"
                 class="btn btn-danger btn-sm"
                 (click)="delete(threshold.id)">{{rightButtonLabel}}</button>
@@ -78,7 +78,7 @@
     </span>
       <span class="form-inline">
       <div class="input-group thresholdInput">
-        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" class="form-control">
+        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onKey($event)" class="form-control">
         <span class="input-group-addon">ms</span>
       </div>
     </span>
@@ -89,6 +89,7 @@
     <span class="form-inline">
       <button type="button"
               class="btn btn-success btn-sm"
+              [disabled]="leftButtonLabelDisable"
               (click)="save()">Speichern</button>
       <button type="button"
               class="btn btn-danger btn-sm"
@@ -96,12 +97,6 @@
     </span>
     </div>
   </div>
-
-
-
-
-
-
 </div>
 
 
