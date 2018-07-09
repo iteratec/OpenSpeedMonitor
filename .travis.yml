@@ -1,9 +1,9 @@
 language: groovy
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 branches:
   only:
-    - master
+    - feature/travisCiUnitTests
 script: .grailsw clean
 	&& ./grailsw clean-all
 	&& ./grailsw refresh-dependencies
