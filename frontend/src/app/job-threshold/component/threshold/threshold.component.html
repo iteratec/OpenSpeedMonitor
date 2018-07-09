@@ -27,14 +27,24 @@
       <span class="thresholdLabel"><</span>
       <span class="thresholdLabel labelBad">Bad</span>
     </span>
-      <span class="form-inline">
-      <button type="button"
-              class="btn btn-primary btn-sm"
-              (click)="edit()">{{leftButtonLabel}}</button>
-      <button type="button"
-              class="btn btn-danger btn-sm"
-              (click)="delete(threshold.id)">{{rightButtonLabel}}</button>
-    </span>
+      <span *ngIf="!deleteConfirmation" class="form-inline">
+
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                (click)="edit()">{{leftButtonLabel}}</button>
+        <button type="button"
+                class="btn btn-danger btn-sm"
+                (click)="delete(threshold.id)">{{rightButtonLabel}}</button>
+      </span>
+      <span *ngIf="deleteConfirmation" class="form-inline">
+
+        <button type="button"
+                class="btn btn-success btn-sm"
+                (click)="delete(threshold.id)">{{leftButtonLabel}}</button>
+        <button type="button"
+                class="btn btn-danger btn-sm"
+                (click)="cancel()">{{rightButtonLabel}}</button>
+      </span>
     </div>
   </div>
   <div *ngIf="threshold.measuredEvent.state=='new'">
@@ -46,7 +56,7 @@
   </div>
   <div *ngIf="threshold.state=='new'">
     <select class="form-inline"
-            [(ngModel)]="selectedOption"
+            [(ngModel)]="selectedThreshold"
             required>
       <option *ngFor="let measurand of measurandList" [value]="measurand.name">{{measurand.name}}</option>
     </select>

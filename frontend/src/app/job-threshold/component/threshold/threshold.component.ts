@@ -16,8 +16,9 @@ export class ThresholdComponent implements OnInit {
   measurandList: Measurand[];
   measuredEventList: MeasuredEvent[];
   selectedMeasuredEvent: MeasuredEvent;
-  selectedOption: string;
+  selectedThreshold: string;
   allowInput = false;
+  deleteConfirmation = false;
   leftButtonLabel= "Editieren";
   rightButtonLabel= "Löschen";
   firstUpperBoundary: number;
@@ -33,32 +34,38 @@ export class ThresholdComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("this.allowthresholdAdd: " + this.allowthresholdAdd);
-    console.log("Threshold.component ngOninit this.threshold: " + JSON.stringify(this.threshold));
     this.firstUpperBoundary = this.threshold.upperBoundary;
     this.firstLowerBoundary = this.threshold.lowerBoundary;
-
-    /*if (this.threshold.state == "new") {
-      this.leftButtonLabel = "Speichern";
-    }*/
   }
 
   delete(thresholdID) {
     console.log("DELETE");
+    //this.thresholdRestService.deleteThreshold(thresholdID)
 
-    this.rightButtonLabel == "Löschen"
-      ? this.thresholdRestService.deleteThreshold(thresholdID)
-      : (
+    if (this.deleteConfirmation) {
+      this.deleteConfirmation = !this.deleteConfirmation;
+      this.thresholdRestService.deleteThreshold(thresholdID);
+    } else {
+      this.rightButtonLabel == "Löschen"
+        ? (
+        this.deleteConfirmation = !this.deleteConfirmation,
+          this.rightButtonLabel = "Nein",
+          this.leftButtonLabel = "Ja"
+      )
+        : (
         this.allowInput = !this.allowInput,
           this.threshold.upperBoundary = this.firstUpperBoundary,
           this.threshold.lowerBoundary = this.firstLowerBoundary,
           this.rightButtonLabel = "Löschen",
           this.leftButtonLabel = "Editieren"
       )
+    }
+  }
 
-
-
-
+  cancel() {
+    this.deleteConfirmation = !this.deleteConfirmation;
+    this.rightButtonLabel = "Löschen";
+    this.leftButtonLabel = "Editieren";
   }
 
   edit() {
@@ -78,7 +85,7 @@ export class ThresholdComponent implements OnInit {
 
   save() {
     console.log("SAVE");
-    this.threshold.measurand.name = this.selectedOption;
+    this.threshold.measurand.name = this.selectedThreshold;
     this.selectedMeasuredEvent
       ? (
         this.threshold.measuredEvent = this.selectedMeasuredEvent,
