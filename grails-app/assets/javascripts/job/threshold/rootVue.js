@@ -114,7 +114,7 @@ new Vue({
                 console.log(e);
             });
         },
-        createThreshold: function (newThreshold) {
+        createThreshold: function (newThreshold) {                       /*GUACAMOLE*/
             var self = this;
             $.ajax({
                 type: 'POST',
@@ -170,7 +170,7 @@ new Vue({
                 }
             });
         },
-        updateThreshold: function (threshold) {
+        updateThreshold: function (threshold) {                  /*GUACAMOLE*/
             var self = this;
             var updatedThreshold = threshold;
             $.ajax({

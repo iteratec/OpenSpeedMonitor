@@ -25,12 +25,13 @@ export class MeasuredEventComponent implements OnInit {
       this.measurandList = next;
     } );
 
+
   }
 
   ngOnInit() {
-    this.thresholds.map(t => t.state = "normal");
-    console.log("this.measuredEvent: " + JSON.stringify(this.measuredEvent))
-    console.log("ngOninit this.thresholds: " + JSON.stringify(this.thresholds));
+    //this.thresholds.map(t => t.state = "normal");
+    console.log("measured-event-component ngOninit this.measuredEvent: " + JSON.stringify(this.measuredEvent))
+    console.log("measured-event-component ngOninit this.thresholds: " + JSON.stringify(this.thresholds));
   }
 
   /*ngOnDestroy() {
@@ -38,9 +39,7 @@ export class MeasuredEventComponent implements OnInit {
   }*/
 
   add() {
-    console.log("ADD");
-    console.log("this.measurandList$: " + JSON.stringify(this.measurandList));
-    console.log("this.thresholds: " + JSON.stringify(this.thresholds));
+    console.log("ADD THRESHOLD");
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
     let newMeasuredEvent = {} as MeasuredEvent;

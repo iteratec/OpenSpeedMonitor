@@ -22,12 +22,13 @@ export class ThresholdRestService {
 
   public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
   public measurands$ = new ReplaySubject<Measurand[]>(1);
+  public measuredEvents$ = new ReplaySubject<MeasuredEvent[]>(1);
 
   public actualJobId : number;
   private baseUrl = '/job';  // URL
 
   constructor(private http: HttpClient) {
-
+    this.getMeasurands();
   }
 
   /** GET Measurands */
@@ -40,7 +41,8 @@ export class ThresholdRestService {
   getMeasuredEvents (scriptId: number)/*: Observable<MeasuredEvent[]> */{
     /*console.log("getMeasuredEvents scriptId: " + scriptId);*/
     const url = `/script/getMeasuredEventsForScript?scriptId=${scriptId}`;
-    return this.http.get<MeasuredEvent[]>(url) ;
+    this.http.get<MeasuredEvent[]>(url)
+      .subscribe(next => this.measuredEvents$.next(next), error => this.handleError(error)) ;
   }
 
   /** GET Thresholds For a Job */

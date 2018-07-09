@@ -37,6 +37,13 @@
     </span>
     </div>
   </div>
+  <div *ngIf="threshold.measuredEvent.state=='new'">
+    <select class="form-inline"
+            [(ngModel)]="selectedMeasuredEvent"
+            required>
+      <option *ngFor="let measuredEvent of measuredEventList" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
+    </select>
+  </div>
   <div *ngIf="threshold.state=='new'">
     <select class="form-inline"
             [(ngModel)]="selectedOption"
@@ -50,7 +57,7 @@
     </span>
       <span class="form-inline">
       <div class="input-group thresholdInput">
-        <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]=""  class="form-control">
+        <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"  class="form-control">
         <span class="input-group-addon">ms</span>
       </div>
     </span>
@@ -61,7 +68,7 @@
     </span>
       <span class="form-inline">
       <div class="input-group thresholdInput">
-        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="" class="form-control">
+        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" class="form-control">
         <span class="input-group-addon">ms</span>
       </div>
     </span>

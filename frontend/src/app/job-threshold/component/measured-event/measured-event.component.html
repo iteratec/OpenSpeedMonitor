@@ -1,12 +1,26 @@
 <div class="col-md-offset-1">
-  <label class="measuredEventLabel">{{measuredEvent.name}}</label>
-  <button type="button"
-          class="btn btn-success"
-          (click)="add()">+</button>
+  <div>
+    <label class="measuredEventLabel">{{measuredEvent.name}}</label>
+    <button type="button"
+            class="btn btn-success"
+            (click)="add()">+</button>
 
-  <osm-threshold *ngFor="let threshold of thresholds"
-                 [threshold]="threshold"
-                 [allowthresholdAdd]="allowthresholdAdd"></osm-threshold>
+    <osm-threshold *ngFor="let threshold of thresholds"
+                   [threshold]="threshold"
+                   [allowthresholdAdd]="allowthresholdAdd"></osm-threshold>
+  </div>
+<!--  <div *ngIf="measuredEvent.state=='new'">
+    <select class="form-inline"
+            [(ngModel)]="selectedOption"
+            required>
+      <option *ngFor="let measuredEvent of measuredEventList" [value]="measuredEvent.name">{{measuredEvent.name}}</option>
+    </select>
+
+    <osm-threshold *ngFor="let threshold of thresholds"
+                   [threshold]="threshold"
+                   [allowthresholdAdd]="allowthresholdAdd"></osm-threshold>
+  </div>-->
+
 <!--  <osm-threshold *ngIf="allowthreshold"
     [threshold]="newThreshold"></osm-threshold>-->
 </div>

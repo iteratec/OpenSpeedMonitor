@@ -7,4 +7,5 @@ export type MeasuredEvent = {
   name: string;
   testedPage: TestedPage;
   testedPageId: number;
+  state: string;
 }

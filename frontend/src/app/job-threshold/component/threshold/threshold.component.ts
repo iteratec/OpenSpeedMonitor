@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import {Threshold} from '../../service/model/threshold.model';
 import { ThresholdRestService } from '../../service/rest/threshold-rest.service';
 import {Measurand} from "../../service/model/measurand.model";
+import {MeasuredEvent} from '../../service/model/measured-event.model';
+
 
 @Component({
   selector: 'osm-threshold',
@@ -12,6 +14,10 @@ export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() allowthresholdAdd: boolean;
   measurandList: Measurand[];
+  measuredEventList: MeasuredEvent[];
+  selectedMeasuredEvent: MeasuredEvent;
+
+
   selectedOption: string;
 
   allowInput = false;
@@ -20,6 +26,9 @@ export class ThresholdComponent implements OnInit {
   constructor(private thresholdRestService: ThresholdRestService) {
     this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
+    } );
+    this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
+      this.measuredEventList = next;
     } );
   }
 
@@ -50,7 +59,19 @@ export class ThresholdComponent implements OnInit {
   save() {
     console.log("SAVE");
     this.threshold.measurand.name = this.selectedOption;
-    this.thresholdRestService.addThreshold(this.threshold)
+
+    console.log(JSON.stringify(this.selectedMeasuredEvent));
+
+    this.selectedMeasuredEvent
+      ? (
+        this.threshold.measuredEvent = this.selectedMeasuredEvent,
+          this.thresholdRestService.addThreshold(this.threshold)
+      ):(
+        this.thresholdRestService.addThreshold(this.threshold)
+      );
+
+    //this.selectedMeasuredEvent.map(element =>console.log("element: " +element) );
+    //this.thresholdRestService.addThreshold(this.threshold)
   }
 
   remove() {
