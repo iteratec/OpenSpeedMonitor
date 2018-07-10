@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
-import {IScript} from "../../model/script.model";
+import {ScriptDto} from "../../model/script.model";
 import {ScriptService} from "../../service/rest/script.service";
 import {filter, map} from "rxjs/operators";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
@@ -11,18 +11,18 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
   styleUrls: ['./script-list.component.css']
 })
 export class ScriptListComponent {
-  scriptList$: Observable<IScript[]>;
+  scriptList$: Observable<ScriptDto[]>;
 
   @Input() jobGroup: JobGroupDTO;
 
   constructor(private scriptService: ScriptService) {
     this.scriptList$ = this.scriptService.scripts$.pipe(
       filter(() => !!this.jobGroup),
-      map((scripts: IScript[]) => this.filterScriptsByJobGroup(this.jobGroup, scripts))
+      map((scripts: ScriptDto[]) => this.filterScriptsByJobGroup(this.jobGroup, scripts))
     )
   }
 
-  private filterScriptsByJobGroup(jobGroup: JobGroupDTO, scripts: IScript[]): IScript[] {
+  private filterScriptsByJobGroup(jobGroup: JobGroupDTO, scripts: ScriptDto[]): ScriptDto[] {
     return scripts.filter(script => script.jobGroupId == jobGroup.id)
   }
 

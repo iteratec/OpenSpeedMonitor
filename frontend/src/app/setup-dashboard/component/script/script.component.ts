@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {IScript} from "../../model/script.model";
+import {ScriptDto} from "../../model/script.model";
 
 @Component({
   selector: 'osm-script',
@@ -8,7 +8,7 @@ import {IScript} from "../../model/script.model";
 })
 export class ScriptComponent {
 
-  @Input() script: IScript;
+  @Input() script: ScriptDto;
 
   constructor() { }
 

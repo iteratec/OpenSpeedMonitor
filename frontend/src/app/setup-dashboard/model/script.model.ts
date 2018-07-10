@@ -1,4 +1,4 @@
-export interface IScript {
+export interface ScriptDto {
   id: number
   jobGroupId: number
   label: string
