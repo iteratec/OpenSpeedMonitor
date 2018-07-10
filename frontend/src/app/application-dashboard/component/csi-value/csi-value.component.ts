@@ -3,6 +3,7 @@ import {arc} from "d3-shape";
 import {select} from "d3-selection";
 import {transition} from "d3-transition";
 import {interpolate} from "d3-interpolate";
+import {CalculationUtil} from "../../../shared/utils/calculation.util";
 
 @Component({
   selector: 'osm-csi-value',
@@ -129,8 +130,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private roundCsiValue(csiValue: number):number{
-    const multiplier = Math.pow(10, 1);
-    return Math.round(csiValue * multiplier) / multiplier;
+    return CalculationUtil.round(csiValue)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
