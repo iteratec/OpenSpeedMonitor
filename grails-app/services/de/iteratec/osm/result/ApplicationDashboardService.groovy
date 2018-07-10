@@ -1,7 +1,11 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
+import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import grails.gorm.transactions.Transactional
@@ -12,6 +16,7 @@ class ApplicationDashboardService {
 
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
+    PageCsiAggregationService pageCsiAggregationService
 
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
@@ -80,4 +85,28 @@ class ApplicationDashboardService {
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
     }
+
+    List<PageCsiDto> getCsiForPagesOfJobGroup(JobGroup jobGroup) {
+        List<PageCsiDto> pageCsiDtos = []
+        if (jobGroup.hasCsiConfiguration()) {
+
+            List<JobGroup> csiGroup = [jobGroup]
+            DateTime to = new DateTime().withTimeAtStartOfDay()
+            DateTime from = to.minusWeeks(4)
+            CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+
+            pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval, csiGroup).each {
+                PageCsiDto pageCsiDto = new PageCsiDto()
+                if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
+                    pageCsiDto.id = it.page.id
+                    pageCsiDto.date = it.started.format("yyy-MM-dd")
+                    pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                    pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                    pageCsiDtos << pageCsiDto
+                }
+            }
+        }
+        return pageCsiDtos
+    }
+
 }

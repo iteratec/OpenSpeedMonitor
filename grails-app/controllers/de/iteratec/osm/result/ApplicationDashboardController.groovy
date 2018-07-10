@@ -2,7 +2,9 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
+import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
+import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ControllerUtils
@@ -15,6 +17,7 @@ class ApplicationDashboardController {
 
     ApplicationDashboardService applicationDashboardService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
+    PageCsiAggregationService pageCsiAggregationService
 
     def getPagesForApplication(PagesForApplicationCommand command) {
 
@@ -60,6 +63,13 @@ class ApplicationDashboardController {
             applicationCsiListDto.csiDtoList = []
             return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
         }
+    }
+
+    def getCsiValuesForPages(PagesForApplicationCommand command) {
+        JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
+
+        List<PageCsiDto> test = applicationDashboardService.getCsiForPagesOfJobGroup(selectedJobGroup)
+        return ControllerUtils.sendObjectAsJSON(response, test)
     }
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
