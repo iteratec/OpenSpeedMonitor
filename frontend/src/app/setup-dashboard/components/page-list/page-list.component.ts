@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {IPageId} from "../../../shared/model/page.model";
-import {PageService} from "../../service/rest/page.service";
+import {PageService} from "../../services/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs";
 import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";

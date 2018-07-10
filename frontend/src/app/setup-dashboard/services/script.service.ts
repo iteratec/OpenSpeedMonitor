@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/internal/ReplaySubject";
-import {IScript} from "../../model/script.model";
+import {IScript} from "../models/script.model";
 
 @Injectable({
   providedIn: 'root'

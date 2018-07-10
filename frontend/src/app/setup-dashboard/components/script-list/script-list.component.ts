@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
-import {IScript} from "../../model/script.model";
-import {ScriptService} from "../../service/rest/script.service";
+import {IScript} from "../../models/script.model";
+import {ScriptService} from "../../services/script.service";
 import {filter, map} from "rxjs/operators";
 import {JobGroupDTO} from "../../../shared/model/job-group.model";
 

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {IScript} from "../../model/script.model";
+import {IScript} from "../../models/script.model";
 
 @Component({
   selector: 'osm-script',
