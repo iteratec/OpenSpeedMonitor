@@ -66,8 +66,8 @@ class ApplicationDashboardController {
     def getCsiValuesForPages(PagesForApplicationCommand command) {
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
 
-        List<PageCsiDto> test = applicationDashboardService.getCsiForPagesOfJobGroup(selectedJobGroup)
-        return ControllerUtils.sendObjectAsJSON(response, test)
+        List<PageCsiDto> pageCsiDtos = applicationDashboardService.getCsiForPagesOfJobGroup(selectedJobGroup)
+        return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
