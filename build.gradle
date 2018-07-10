@@ -318,6 +318,7 @@ sourceSets {
 }
 
 integrationTest {
+ beforeTest { descriptor -> logger.lifecycle("Running test: " + descriptor) }
     if (System.getProperty('webdriver.chrome.driver')) {
         systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     }

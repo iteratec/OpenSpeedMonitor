@@ -17,19 +17,18 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.result.MeasuredEvent
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import grails.testing.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
-import spock.util.mop.ConfineMetaClassChanges
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.ServiceMocker
-
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import spock.util.mop.ConfineMetaClassChanges
 
 @Integration
 @Rollback
