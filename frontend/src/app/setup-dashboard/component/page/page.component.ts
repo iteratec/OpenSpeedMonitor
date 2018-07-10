@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {IPage} from "../../../shared/model/page.model";
+import {PageDto} from "../../../shared/model/page.model";
 
 @Component({
   selector: 'osm-page',
@@ -7,7 +7,7 @@ import {IPage} from "../../../shared/model/page.model";
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements OnInit {
-  @Input() page:IPage;
+  @Input() page: PageDto;
   constructor() { }
 
   ngOnInit() {

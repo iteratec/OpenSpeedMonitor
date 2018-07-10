@@ -1,9 +1,9 @@
-
-export interface IPageId {
+export interface PageIdDto {
   name: string;
   id: number;
 }
-export interface IPage extends IPageId{
+
+export interface PageDto extends PageIdDto {
   undefinedPage: boolean
   jobGroupId: number
 }
