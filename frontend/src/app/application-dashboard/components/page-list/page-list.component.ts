@@ -1,7 +1,7 @@
 import {Component, Input, OnChanges} from '@angular/core';
-import {ApplicationDashboardService} from "../../service/application-dashboard.service";
+import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {Observable} from "rxjs/index";
-import {IPage} from "../../model/page.model";
+import {IPage} from "../../models/page.model";
 
 @Component({
   selector: 'osm-page-list',

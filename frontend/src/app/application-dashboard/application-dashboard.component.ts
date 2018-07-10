@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {combineLatest, Observable} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
-import {ApplicationDashboardService} from "./service/application-dashboard.service";
+import {ApplicationDashboardService} from "./services/application-dashboard.service";
 
 @Component({
   selector: 'osm-application-dashboard',

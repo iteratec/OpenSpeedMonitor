@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
-import {IPage} from "../../model/page.model";
+import {IPage} from "../../models/page.model";
 import {Observable} from "rxjs/internal/Observable";
-import {MetricsDto} from "../../model/metrics.model";
-import {ApplicationDashboardService} from "../../service/application-dashboard.service";
+import {MetricsDto} from "../../models/metrics.model";
+import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../shared/utils/calculation.util";
 

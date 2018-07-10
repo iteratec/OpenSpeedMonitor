@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, ReplaySubject} from "rxjs/index";
-import {IPage} from "../model/page.model";
-import {MetricsDto} from "../model/metrics.model";
+import {IPage} from "../models/page.model";
+import {MetricsDto} from "../models/metrics.model";
 
 @Injectable()
 export class ApplicationDashboardService {
