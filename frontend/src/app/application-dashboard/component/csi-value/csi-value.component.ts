@@ -32,13 +32,14 @@ export class CsiValueComponent implements OnInit, OnChanges {
     this.drawCircle();
   }
 
-  private drawCircle() {
+  private drawCircle(previousCsiValue: number = 0) {
+    const calculatedPreviousCsi = this.calculateCsiArcTarget(this.roundCsiValue(previousCsiValue));
     this.csiValue = this.roundCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
-    this.update(selection.merge(selection.enter()));
+    this.update(selection.merge(selection.enter()), calculatedPreviousCsi);
     this.exit(selection.exit());
   }
 
@@ -92,7 +93,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
       .attr("fill", "currentColor")
   }
 
-  private update(selection: any, start: number = Math.PI) {
+  private update(selection: any, start: number) {
     selection
       .select("path.csi-circle-value")
       .transition()
@@ -134,13 +135,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.csiValue) {
-      this.csiValue = this.roundCsiValue(changes.csiValue.currentValue);
-      this.csiValueClass = this.determineClass(this.csiValue);
-
-      const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
-      this.update(selection, this.calculateCsiArcTarget(this.roundCsiValue(changes.csiValue.previousValue)));
+      this.drawCircle(changes.csiValue.previousValue);
     }
-
   }
 }
 
