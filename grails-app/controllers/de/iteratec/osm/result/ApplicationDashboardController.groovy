@@ -16,7 +16,7 @@ class ApplicationDashboardController {
     ApplicationDashboardService applicationDashboardService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
 
-    def getPagesForApplication(ApplicationCommand command) {
+    def getPagesForApplication(PagesForApplicationCommand command) {
 
         DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
         DateTime to = new DateTime()
@@ -26,7 +26,7 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }
 
-    def getCsiValuesForApplication(ApplicationCommand command) {
+    def getCsiValuesForApplication(PagesForApplicationCommand command) {
         ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
 
@@ -61,9 +61,18 @@ class ApplicationDashboardController {
             return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
         }
     }
+
+    def getMetricsForApplication(PagesForApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
+            it.projectedProperties
+        }
+
+        return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
+    }
 }
 
-class ApplicationCommand implements Validateable {
+class PagesForApplicationCommand implements Validateable {
     Long applicationId
 
     static constraints = {

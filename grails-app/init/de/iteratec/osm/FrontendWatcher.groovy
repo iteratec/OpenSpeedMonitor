@@ -24,8 +24,8 @@ class FrontendWatcher {
     @CompileDynamic
     protected void startFrontendWatcher(Environment environment) {
 
-        def location = environment.getReloadLocation()
-        def nodeLocation = new File(new FileNameByRegexFinder().getFileNames("${location}/build/nodejs", ".*/bin/node")[0]).getParent()
+        String location = environment.getReloadLocation()
+        def nodeLocation = new File(new FileNameByRegexFinder().getFileNames(location, "/build/nodejs/([^\\\\/]*)/bin/node")[0]).getParent()
 
         if (location && nodeLocation) {
 

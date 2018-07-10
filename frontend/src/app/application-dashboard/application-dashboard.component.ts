@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {JobGroupService} from "../shared/service/rest/job-group.service";
 import {combineLatest, Observable} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
+import {ApplicationDashboardService} from "./service/application-dashboard.service";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -14,7 +15,7 @@ export class ApplicationDashboardComponent {
   jobGroups$: Observable<JobGroupDTO[]>;
   selectedApplication$: Observable<JobGroupDTO>;
 
-  constructor(private jobGroupService: JobGroupService, private route: ActivatedRoute, private router: Router) {
+  constructor(private jobGroupService: JobGroupService, private route: ActivatedRoute, private router: Router, private dashboardService: ApplicationDashboardService) {
     this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
       map((jobGroups: JobGroupDTO[]) => this.sortJobGroupsByName(jobGroups))
     );
@@ -40,6 +41,7 @@ export class ApplicationDashboardComponent {
 
   updateApplication(jobGroup: JobGroupDTO) {
     this.router.navigate(['/application-dashboard', jobGroup.id]);
+    this.dashboardService.updateMetricsForApplication(jobGroup.id);
   }
 
   private lookForJobGroupWithId(jobGroups: JobGroupDTO[], jobGroupId: string) {

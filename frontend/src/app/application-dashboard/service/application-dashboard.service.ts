@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs/index";
+import {Observable, ReplaySubject} from "rxjs/index";
 import {IPage} from "../model/page.model";
+import {MetricsDto} from "../model/metrics.model";
 
 @Injectable()
 export class ApplicationDashboardService {
+  metrics$: ReplaySubject<MetricsDto[]> = new ReplaySubject<MetricsDto[]>(1);
 
   constructor(private http: HttpClient) {
   }
@@ -14,6 +16,16 @@ export class ApplicationDashboardService {
       params: {
         applicationId: applicationId ? applicationId.toString() : ""
       }
+    });
+  }
+
+  updateMetricsForApplication(applicationId: number) {
+    this.http.get<MetricsDto[]>('/applicationDashboard/getMetricsForApplication', {
+      params: {
+        applicationId: applicationId ? applicationId.toString() : ""
+      }
+    }).subscribe((response: MetricsDto[]) => {
+      this.metrics$.next(response)
     });
   }
 
