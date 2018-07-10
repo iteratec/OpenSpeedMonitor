@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {JobGroupToPagesMappingDto} from "../../shared/model/job-group-to-page-mapping.model";
-import {IPageId} from "../../shared/model/page.model";
-import {PageComparisonSelectionDto} from "../page-comparison-selection.model";
+import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
+import {IPageId} from "../../../shared/model/page.model";
+import {PageComparisonSelectionDto} from "../../models/page-comparison-selection.model";
 
 @Component({
   selector: 'osm-page-comparison-row',
