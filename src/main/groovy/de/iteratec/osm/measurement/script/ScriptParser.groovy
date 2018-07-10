@@ -456,7 +456,7 @@ class ScriptParser {
                 }
             }
 
-            log.info("$stmt : logData $logData, inMV $inMeasuredEvent (${eventNames.size() > 0 ? eventNames.last() : ''}), num $measuredEventsCount")
+
         }
 
         if (setEventNameStmtFound && logData)
@@ -491,7 +491,8 @@ class ScriptParser {
     /**
      * Initialize parser and interpret the given script.
      */
-    public ScriptParser(PageService pageService, String navigationScript) {
+    public ScriptParser(PageService pageService, String navigationScript, String navigationScriptName) {
+        log.info("Parsing Script: $navigationScriptName")
         this.pageService = pageService
         def statements = interpret(navigationScript)
         allPageLoadEvents = statements.findAll { (it.keyword == navigateCmd) || (it.keyword == execAndWaitCmd) }.size()

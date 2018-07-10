@@ -89,7 +89,7 @@ class Script {
 
     private void parseScript() {
         try{
-			ScriptParser parser = new ScriptParser(pageService, navigationScript)
+            ScriptParser parser = new ScriptParser(pageService, navigationScript, label)
             measuredEventsCount = parser.measuredEventsCount
 
             this.testedPages.clear()

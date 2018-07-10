@@ -147,7 +147,7 @@ class JobService {
 
     Map<String, Object> createTimeSeriesParamsFor(Job job) {
         Map<String, Object> params = createCommonParams(job)
-        params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript).measuredEvents*.id
+        params["selectedMeasuredEventIds"] = new ScriptParser(pageService, job.script.navigationScript, job.script.label).measuredEvents*.id
         params["_action_showAll"] = "Anzeigen"
         params["selectedBrowsers"] = "$job.location.browserId"
         params["selectedLocations"] = "$job.location.id"
@@ -159,7 +159,7 @@ class JobService {
     Map createPageAggregationParamsFor(Job job) {
         Map params = createCommonParams(job)
         Set<Long> pageIds = []
-        new ScriptParser(pageService, job.script.navigationScript).eventNames.each {
+        new ScriptParser(pageService, job.script.navigationScript, job.script.label).eventNames.each {
             pageIds << pageService.getPageByStepName(it).id
         }
         params["selectedPages"] = pageIds

@@ -71,7 +71,7 @@ class ScriptController {
             render(view: 'create', model: [script: script, pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
             return
         }
-        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
+        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
         def flashMessageArgs = [getScriptI18n(), script.label]
         flash.message = message(code: 'default.created.message', args: flashMessageArgs)
         redirect(action: "list")
@@ -127,7 +127,7 @@ class ScriptController {
             render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(s)])
             return
         }
-        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, s.navigationScript))
+        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, s.navigationScript, s.label))
         archivedScript.save(failOnError: true, flush: true)
 
         flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
@@ -166,7 +166,7 @@ class ScriptController {
     }
 
     def parseScript(String navigationScript) {
-        ScriptParser parser = new ScriptParser(pageService, navigationScript)
+        ScriptParser parser = new ScriptParser(pageService, navigationScript, "Script from Measurement Setup")
         Map output = [:]
         if (parser.warnings)
             output.warnings = parser.warnings.groupBy { it.lineNumber }
