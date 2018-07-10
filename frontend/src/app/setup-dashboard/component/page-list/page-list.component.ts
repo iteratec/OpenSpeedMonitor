@@ -9,7 +9,7 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
 @Component({
   selector: 'osm-page-list',
   templateUrl: './page-list.component.html',
-  styleUrls: ['./page-list.component.css']
+  styleUrls: ['./page-list.component.scss']
 })
 export class PageListComponent {
   pageList$: Observable<IPageId[]>;

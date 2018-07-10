@@ -4,7 +4,7 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
 @Component({
   selector: 'osm-application-select',
   templateUrl: './application-select.component.html',
-  styleUrls: ['./application-select.component.css']
+  styleUrls: ['./application-select.component.scss']
 })
 export class ApplicationSelectComponent {
   @Output() selectedApplicationChange: EventEmitter<JobGroupDTO> = new EventEmitter();

@@ -6,7 +6,7 @@ import {JobGroupService} from "../../../../shared/service/rest/job-group.service
 @Component({
   selector: 'osm-job-group-list',
   templateUrl: './job-group-list.component.html',
-  styleUrls: ['./job-group-list.component.css']
+  styleUrls: ['./job-group-list.component.scss']
 })
 export class JobGroupListComponent {
   jobGroupList$: Observable<JobGroupDTO[]>;

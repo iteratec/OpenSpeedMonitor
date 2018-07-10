@@ -8,7 +8,7 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
 @Component({
   selector: 'osm-script-list',
   templateUrl: './script-list.component.html',
-  styleUrls: ['./script-list.component.css']
+  styleUrls: ['./script-list.component.scss']
 })
 export class ScriptListComponent {
   scriptList$: Observable<IScript[]>;

@@ -4,7 +4,7 @@ import {IScript} from "../../model/script.model";
 @Component({
   selector: 'osm-script',
   templateUrl: './script.component.html',
-  styleUrls: ['./script.component.css']
+  styleUrls: ['./script.component.scss']
 })
 export class ScriptComponent {
 

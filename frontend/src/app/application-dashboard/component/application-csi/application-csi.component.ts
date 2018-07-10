@@ -9,7 +9,7 @@ import {ApplicationCsiListDTO} from "../../model/csi-list.model";
 @Component({
   selector: 'osm-application-csi',
   templateUrl: './application-csi.component.html',
-  styleUrls: ['./application-csi.component.css']
+  styleUrls: ['./application-csi.component.scss']
 })
 export class ApplicationCsiComponent {
   recentCsiValue$: Observable<CsiDTO>;

@@ -4,7 +4,7 @@ import {JobGroupDTO} from "../../../../shared/model/job-group.model";
 @Component({
   selector: 'osm-job-group',
   templateUrl: './job-group.component.html',
-  styleUrls: ['./job-group.component.css']
+  styleUrls: ['./job-group.component.scss']
 })
 export class JobGroupComponent {
   @Input() jobGroup: JobGroupDTO;

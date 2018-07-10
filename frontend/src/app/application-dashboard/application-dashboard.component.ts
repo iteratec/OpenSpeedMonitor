@@ -9,7 +9,7 @@ import {ApplicationDashboardService} from "./service/application-dashboard.servi
 @Component({
   selector: 'osm-application-dashboard',
   templateUrl: './application-dashboard.component.html',
-  styleUrls: ['./application-dashboard.component.css']
+  styleUrls: ['./application-dashboard.component.scss']
 })
 export class ApplicationDashboardComponent {
   jobGroups$: Observable<JobGroupDTO[]>;
