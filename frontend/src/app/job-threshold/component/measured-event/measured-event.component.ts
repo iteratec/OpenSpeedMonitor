@@ -73,6 +73,7 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   }
 
   removeThreshold(threshold) {
+    console.log("MEASUREDEVENT removeThreshold");
     console.log(" removeThreshold this.thresholds.length: " + this.thresholds.length);
     if (this.thresholds.length === 1) {
       this.removeEvent.emit(threshold.measuredEvent);
@@ -82,6 +83,7 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
 
   }
   removeMeasuredEvent(threshold) {
+    console.log("MEASUREDEVENT removeMeasuredEvent");
     console.log(" removeMeasuredEvent this.thresholds.length: " + this.thresholds.length);
     this.removeEvent.emit(threshold.measuredEvent);
   }

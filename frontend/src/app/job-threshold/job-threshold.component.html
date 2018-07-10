@@ -4,7 +4,7 @@
   <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList "
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
-                      [measuredEventList]="measuredEventList"
+                      [measuredEventList]="actualMeasuredEventList"
                       (removeEvent)="removeMeasuredEvent($event)"><!--[measurandList]="measurandList"-->
   </osm-measured-event>
   <span class="col-sm-offset-1">

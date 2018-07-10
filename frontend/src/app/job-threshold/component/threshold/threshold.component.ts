@@ -113,6 +113,7 @@ export class ThresholdComponent implements OnInit{
   }
 
   remove() {
+    console.log("THRESHOLD REMOVE");
     this.removeEvent.emit(this.threshold);
   }
 }
