@@ -2,6 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -95,7 +96,9 @@ class ApplicationDashboardService {
             DateTime from = to.minusWeeks(4)
             CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-            pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval, csiGroup).each {
+            List<Page> pages = getPagesWithExistingEventResults(from, to, jobGroup.id)
+
+            pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval, csiGroup, pages).each {
                 PageCsiDto pageCsiDto = new PageCsiDto()
                 if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
                     pageCsiDto.id = it.page.id
