@@ -29,7 +29,9 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-
+    /*if(this.thresholdsForJobList.length === this.measuredEventList.length) {
+     this.addMeasuredEventDisabled= true;
+    }*/
   }
 
   ngOnChanges() {
@@ -50,10 +52,10 @@ export class JobThresholdComponent implements OnInit, OnChanges {
 /*    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
     } );*/
-    this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
-      this.measuredEventList = next;
-    } );
     this.thresholdRestService.getMeasuredEvents(this.scriptId);
+
+    let self = this;
+
     this.thresholdRestService.getThresholdsForJob(this.jobId);
     this.thresholdRestService.thresholdsForJob$.subscribe((next:ThresholdForJob[]) => {
       this.thresholdsForJobList = next;
@@ -63,11 +65,17 @@ export class JobThresholdComponent implements OnInit, OnChanges {
           threshold.state = "normal";
         })
       });
-      console.log("this.thresholdsForJobList.length: "+this.thresholdsForJobList.length);
-      console.log("this.measuredEventList.length: " + this.measuredEventList.length);
-      if(this.thresholdsForJobList.length === this.measuredEventList.length) {
+      self.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
+        self.measuredEventList = next;
+        if(self.thresholdsForJobList.length === self.measuredEventList.length) {
+          self.addMeasuredEventDisabled= true;
+        }
+      });
+      /*console.log("this.thresholdsForJobList.length: "+this.thresholdsForJobList.length);
+      console.log("this.measuredEventList.length: " + this.measuredEventList.length);*/
+      /*if(this.thresholdsForJobList.length === this.measuredEventList.length) {
         this.addMeasuredEventDisabled= true;
-      }
+      }*/
 
     })
   }
@@ -94,14 +102,18 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     newThreshold.measuredEvent = newMeasuredEvent;
     newThreshold.measuredEvent.state = "new";
 
+
+
     this.newThresholdForJob.measuredEvent = newMeasuredEvent;
     this.newThresholdForJob.thresholds = [];
     this.newThresholdForJob.thresholds.push(newThreshold);
     this.thresholdsForJobList.push(this.newThresholdForJob);
-
-    if(this.thresholdsForJobList.length === this.measuredEventList.length) {
+    if(this.thresholdsForJobList.length > this.measuredEventList.length) {
       this.addMeasuredEventDisabled= true;
     }
+
+
+
   }
 
   createScript() {
