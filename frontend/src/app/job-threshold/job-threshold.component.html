@@ -10,7 +10,8 @@
   <span class="col-sm-offset-1">
     <button type="button"
             class="btn btn-primary"
-            (click)="addMeasuredEvent()">Measured Event hinzufügen</button>
+            [disabled] = "addMeasuredEventDisabled"
+            (click)="addMeasuredEvent() ">Measured Event hinzufügen</button>
     <button type="button"
             class="btn btn-default"
             (click)="createScript()">CI-Script Erstellen</button>

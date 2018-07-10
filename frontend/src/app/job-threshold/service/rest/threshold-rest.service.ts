@@ -9,6 +9,7 @@ import {Measurand} from '../model/measurand.model'
 import {MeasuredEvent} from '../model/measured-event.model'
 import {ThresholdForJob} from '../model/threshold-for-job.model'
 import {Threshold} from "../model/threshold.model";
+import {ActualMeasurandsService} from  "../actual-measurands.service"
 import {Subject} from "rxjs/internal/Subject";
 import {log} from "util";
 
@@ -21,20 +22,20 @@ import {log} from "util";
 export class ThresholdRestService {
 
   public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
-  public measurands$ = new ReplaySubject<Measurand[]>(1);
+  //public measurands$ = new ReplaySubject<Measurand[]>(1);
   public measuredEvents$ = new ReplaySubject<MeasuredEvent[]>(1);
 
   public actualJobId : number;
   private baseUrl = '/job';  // URL
 
-  constructor(private http: HttpClient) {
-    //this.getMeasurands();
+  constructor(private http: HttpClient, private actualMeasurandService: ActualMeasurandsService) {
+    this.getMeasurands();
   }
 
   /** GET Measurands */
   getMeasurands () {
     const url = `/job/getAllMeasurands`;
-    this.http.get< Measurand[]>(url).subscribe( next => this.measurands$.next(next), error => this.handleError(error));
+    this.http.get< Measurand[]>(url).subscribe((measurands:Measurand[]) => this.actualMeasurandService.setActualMeasurands(measurands));
   }
 
   /** GET MeasuredEvents */
@@ -63,7 +64,6 @@ export class ThresholdRestService {
     this.http.post(url, formData).subscribe(() => {
       console.log("delete server Response: " + self.actualJobId);
       self.getThresholdsForJob(self.actualJobId);
-      self.getMeasurands();
       }
     );
   }
@@ -98,7 +98,6 @@ export class ThresholdRestService {
     this.http.post(url, params).subscribe(() => {
         console.log("self.actualJobId : " + self.actualJobId);
         self.getThresholdsForJob(self.actualJobId);
-        self.getMeasurands();
       }
     );
   }

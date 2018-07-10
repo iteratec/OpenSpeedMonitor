@@ -13,11 +13,12 @@ import {Threshold} from "./service/model/threshold.model";
 
 export class JobThresholdComponent implements OnInit, OnChanges {
   thresholdsForJobList: ThresholdForJob[];
-  measurandList: Measurand[];
+  //measurandList: Measurand[];
   measuredEventList: MeasuredEvent[];
   jobId : number;
   scriptId : number;
   newThresholdForJob: ThresholdForJob;
+  addMeasuredEventDisabled: boolean = false;
 
   constructor(private thresholdRestService: ThresholdRestService,
               elm: ElementRef) {
@@ -28,9 +29,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+
   }
 
   ngOnChanges() {
+
     this.thresholdsForJobList.map(job => {
       job.thresholds.map(threshold => {
         let name: string = threshold.measuredEvent.name;
@@ -42,10 +45,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   fetchData() {
-    this.thresholdRestService.getMeasurands();
-    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
+
+    //this.thresholdRestService.getMeasurands();
+/*    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
-    } );
+    } );*/
     this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
       this.measuredEventList = next;
     } );
@@ -59,6 +63,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
           threshold.state = "normal";
         })
       });
+      console.log("this.thresholdsForJobList.length: "+this.thresholdsForJobList.length);
+      console.log("this.measuredEventList.length: " + this.measuredEventList.length);
+      if(this.thresholdsForJobList.length === this.measuredEventList.length) {
+        this.addMeasuredEventDisabled= true;
+      }
 
     })
   }
@@ -76,8 +85,9 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.newThresholdForJob = {} as ThresholdForJob;
     let newThreshold = {} as Threshold;
     let newMeasuredEvent = {} as MeasuredEvent;
+    let newMeasurand = {} as Measurand;
     newMeasuredEvent.state = "new";
-    newThreshold.measurand = this.measurandList[0];
+    newThreshold.measurand = newMeasurand;
     newThreshold.lowerBoundary = 0;
     newThreshold.upperBoundary = 0;
     newThreshold.state = "new";
@@ -88,6 +98,10 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.newThresholdForJob.thresholds = [];
     this.newThresholdForJob.thresholds.push(newThreshold);
     this.thresholdsForJobList.push(this.newThresholdForJob);
+
+    if(this.thresholdsForJobList.length === this.measuredEventList.length) {
+      this.addMeasuredEventDisabled= true;
+    }
   }
 
   createScript() {

@@ -58,7 +58,7 @@
     <select class="form-inline"
             [(ngModel)]="selectedMeasurand"
             required>
-      <option *ngFor="let measurand of measurandList" [value]="measurand.name">{{measurand.name}}</option>
+      <option *ngFor="let measurand of actualMeasurands" [value]="measurand.name">{{measurand.name}}</option>
     </select>
     <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
       <span class="form-inline">

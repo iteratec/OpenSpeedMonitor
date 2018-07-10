@@ -13,8 +13,9 @@ import {MeasuredEvent} from '../../service/model/measured-event.model';
 export class ThresholdComponent implements OnInit{
   @Input() threshold: Threshold;
   @Input() measuredEventList: MeasuredEvent[];
+  @Input()  actualMeasurands: Measurand [];
   @Output() removeEvent = new EventEmitter();
-  measurandList: Measurand[];
+  //measurandList: Measurand[];
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
   allowInput = false;
@@ -27,18 +28,25 @@ export class ThresholdComponent implements OnInit{
   value: number = 0;
 
   constructor(private thresholdRestService: ThresholdRestService) {
-    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
+    /*this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
       this.measurandList = next;
-    } );
+    } );*/
 
   }
 
   ngOnInit() {
     this.firstUpperBoundary = this.threshold.upperBoundary;
     this.firstLowerBoundary = this.threshold.lowerBoundary;
-    this.selectedMeasuredEvent = this.measuredEventList[0];
-    this.selectedMeasurand = this.measurandList[0].name;
+    if (this.threshold.measuredEvent.state == "new") {
+      this.selectedMeasuredEvent = this.measuredEventList[0];
+     /* this.selectedMeasurand = this.actualMeasurands[0].name;
+      console.log("THRESHOLD newMeasuredEvent this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
+      console.log("THRESHOLD newMeasuredEvent this.actualMeasurands[0].name: " + JSON.stringify(this.actualMeasurands[0].name));*/
+    }
     if (this.threshold.state == "new") {
+      console.log("THRESHOLD newThreshold this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
+
+      this.selectedMeasurand = this.actualMeasurands[0].name;
       this.leftButtonLabelDisable = true;
     }
   }

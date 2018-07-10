@@ -3,6 +3,7 @@ import {MeasuredEvent} from '../../service/model/measured-event.model';
 import {Threshold} from '../../service/model/threshold.model';
 import {Measurand} from "../../service/model/measurand.model";
 import { ThresholdRestService } from '../../service/rest/threshold-rest.service';
+import { ActualMeasurandsService } from '../../service/actual-measurands.service';
 
 @Component({
   selector: 'osm-measured-event',
@@ -16,43 +17,51 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
   newThreshold: Threshold;
-  measurandList: Measurand[];
+  //measurandList: Measurand[];
+  actualMeasurands: Measurand[];
 
 
-  constructor(private thresholdRestService: ThresholdRestService) {
-    this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
-      this.measurandList = next;
-    } );
+  constructor(private thresholdRestService: ThresholdRestService,
+              private actualMeasurandsService: ActualMeasurandsService) {
+    /*this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
+     this.measurandList = next;
+     } );*/
+
   }
 
   ngOnInit() {
+    if (this.measuredEvent.state == "new") {
+      this.actualMeasurands = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+    }
   }
 
   ngOnChanges() {
-    this.thresholds.map(threshold => {
+/*    this.thresholds.map(threshold => {
       let name: string = threshold.measurand.name;
       if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
         this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
       }
-    })
+    })*/
   }
 
   addThreshold() {
-    this.thresholds.map(threshold => {
+    this.actualMeasurands = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+    console.log("MEASUREDEVENT this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
+   /* this.thresholds.map(threshold => {
       let name: string = threshold.measurand.name;
       if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
         this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
       }
-    })
+    })*/
 
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
     let newMeasuredEvent = {} as MeasuredEvent;
     let newThresholdName: string;
 
-    if (this.thresholds.length < this.measurandList.length) {
-      newThresholdName = this.measurandList[this.thresholds.length].name;
-    }
+    //if (this.thresholds.length < this.actualMeasurands.length) {
+      newThresholdName = this.actualMeasurands[this.thresholds.length].name;
+    //}
     newMeasuredEvent.id = this.measuredEvent.id;
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
