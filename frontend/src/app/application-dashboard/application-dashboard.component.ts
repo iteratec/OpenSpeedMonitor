@@ -20,12 +20,19 @@ export class ApplicationDashboardComponent {
       map((jobGroups: JobGroupDTO[]) => this.sortJobGroupsByName(jobGroups))
     );
 
-    this.selectedApplication$ = combineLatest(this.jobGroups$, this.route.paramMap).pipe(
-      map(([jobGroups, params]) => this.lookForJobGroupWithId(jobGroups, params.get('jobGroupId'))),
-      filter(jobGroup => !!jobGroup)
-    );
-
+    this.handleValidNavigation();
     this.handleInvalidNavigation();
+  }
+
+  private handleValidNavigation() {
+    this.selectedApplication$ = combineLatest(this.route.paramMap, this.jobGroups$).pipe(
+      map(([params, jobGroups]) => this.lookForJobGroupWithId(jobGroups, params.get('jobGroupId'))),
+      filter(jobGroup => !!jobGroup)
+    ).pipe(map(jobGroup => {
+      this.dashboardService.updateMetricsForApplication(jobGroup.id);
+      return jobGroup
+    }))
+
   }
 
   private handleInvalidNavigation() {
@@ -40,12 +47,13 @@ export class ApplicationDashboardComponent {
   }
 
   updateApplication(jobGroup: JobGroupDTO) {
-    this.router.navigate(['/application-dashboard', jobGroup.id]);
     this.dashboardService.updateMetricsForApplication(jobGroup.id);
+    this.router.navigate(['/application-dashboard', jobGroup.id]);
   }
 
   private lookForJobGroupWithId(jobGroups: JobGroupDTO[], jobGroupId: string) {
-    return jobGroups.find(jobGroup => jobGroup.id == Number(jobGroupId));
+    let selectedApplication = jobGroups.find(jobGroup => jobGroup.id == Number(jobGroupId));
+    return selectedApplication
   }
 
   private sortJobGroupsByName(jobGroups: JobGroupDTO[]) {
