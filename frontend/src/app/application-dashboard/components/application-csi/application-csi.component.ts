@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {CsiService} from "../../services/csi.service";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
+import {JobGroupDTO} from "../../../shared/models/job-group.model";
 import {CsiDTO} from "../../models/csi.model";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";

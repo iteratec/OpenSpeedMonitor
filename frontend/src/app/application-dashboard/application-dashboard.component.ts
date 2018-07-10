@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
-import {JobGroupDTO} from "../shared/model/job-group.model";
+import {JobGroupDTO} from "../shared/models/job-group.model";
 import {ActivatedRoute, Router} from '@angular/router';
-import {JobGroupService} from "../shared/service/rest/job-group.service";
+import {JobGroupService} from "../shared/services/rest/job-group.service";
 import {combineLatest, Observable} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {ApplicationDashboardService} from "./services/application-dashboard.service";

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {GlobalOsmNamespace} from "../model/global-osm-namespace.model";
+import {GlobalOsmNamespace} from "../models/global-osm-namespace.model";
 
 @Injectable()
 export class GrailsBridgeService {

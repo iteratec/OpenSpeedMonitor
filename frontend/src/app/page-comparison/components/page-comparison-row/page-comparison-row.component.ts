@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
-import {IPageId} from "../../../shared/model/page.model";
+import {JobGroupToPagesMappingDto} from "../../../shared/models/job-group-to-page-mapping.model";
+import {IPageId} from "../../../shared/models/page.model";
 import {PageComparisonSelectionDto} from "../../models/page-comparison-selection.model";
 
 @Component({

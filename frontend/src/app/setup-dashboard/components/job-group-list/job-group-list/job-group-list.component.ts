@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
-import {JobGroupDTO} from "../../../../shared/model/job-group.model";
+import {JobGroupDTO} from "../../../../shared/models/job-group.model";
 import {Observable} from 'rxjs';
-import {JobGroupService} from "../../../../shared/service/rest/job-group.service";
+import {JobGroupService} from "../../../../shared/services/rest/job-group.service";
 
 @Component({
   selector: 'osm-job-group-list',

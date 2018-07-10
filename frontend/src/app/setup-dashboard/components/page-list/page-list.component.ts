@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
-import {IPageId} from "../../../shared/model/page.model";
+import {IPageId} from "../../../shared/models/page.model";
 import {PageService} from "../../services/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs";
-import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
+import {JobGroupToPagesMappingDto} from "../../../shared/models/job-group-to-page-mapping.model";
+import {JobGroupDTO} from "../../../shared/models/job-group.model";
 
 @Component({
   selector: 'osm-page-list',

@@ -1,8 +1,7 @@
-import {inject, TestBed} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
 import {OsmLangService} from './osm-lang.service';
-import {GrailsBridgeService} from "../../shared/service/grails-bridge.service";
-import {GlobalOsmNamespace} from "../../shared/model/global-osm-namespace.model";
+import {GrailsBridgeService} from "../../shared/services/grails-bridge.service";
 
 describe('OsmLangService', () => {
 

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ReplaySubject} from "rxjs/internal/ReplaySubject";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {JobGroupDTO} from "../../shared/model/job-group.model";
+import {JobGroupDTO} from "../../shared/models/job-group.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 
 @Injectable()
