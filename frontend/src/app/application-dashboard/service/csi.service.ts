@@ -14,7 +14,7 @@ export class CsiService {
 
   getCsiForApplication(application: JobGroupDTO) {
     const params = new HttpParams().set('applicationId', application.id.toString());
-    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/getCsiValuesForApplication', {params: params})
+    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params: params})
       .subscribe(response => this.csiValues$.next(response), error => this.handleError(error));
   }
 

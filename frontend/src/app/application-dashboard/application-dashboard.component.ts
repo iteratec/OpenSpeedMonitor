@@ -48,7 +48,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
   }
 
   updateApplication(application: ApplicationDTO) {
-    this.router.navigate(['/application-dashboard', application.id]);
+    this.router.navigate(['/applicationDashboard', application.id]);
   }
 
   private findApplicationById(applications: ApplicationDTO[], applicationId: string) {

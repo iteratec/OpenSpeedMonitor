@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {NotFoundComponent} from "./not-found.component";
+import {NotFoundComponent} from './not-found.component';
 
 
 const appRoutes: Routes = [{
-  path: 'application-dashboard',
+  path: 'applicationDashboard',
   loadChildren: './application-dashboard/application-dashboard.module#ApplicationDashboardModule'
 },
   {path: '**', component: NotFoundComponent}];
