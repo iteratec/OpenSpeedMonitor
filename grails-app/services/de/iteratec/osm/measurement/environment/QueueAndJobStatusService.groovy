@@ -262,7 +262,7 @@ class QueueAndJobStatusService {
                 // iterate over jobs
                 jobs.each { job ->
                     if (job.active) {
-                        ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
+                        ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript, job.script.label);
                         int seconds = parser.calculateDurationInSeconds()
 
                         // Add jobs which are going to run in given interval to the list

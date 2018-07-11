@@ -133,8 +133,8 @@ class PageAggregationController extends ExceptionHandlerController {
         List<Job> jobs = jobDaoService.getJobs(jobGroup)
         Set<Page> uniqueTestedPages = [] as Set
 
-        jobs*.script*.navigationScript.each { String navigationScript ->
-            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+        jobs*.script.each { Script script ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, script.navigationScript, script.label).getTestedPages()
             uniqueTestedPages.addAll(pagesOfThisScript)
         }
         uniqueTestedPages.each {
@@ -180,7 +180,7 @@ class PageAggregationController extends ExceptionHandlerController {
             List<List<Page>> testedPagesPerJob = []
 
             jobList.findAll { it.script == currentScript }.each { j ->
-                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables)).getTestedPages().unique()
+                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript).getTestedPages().unique()
             }
 
             // if all lists are equal take any
