@@ -7,4 +7,3 @@ export interface PageDto extends PageIdDto {
   undefinedPage: boolean
   jobGroupId: number
 }
-

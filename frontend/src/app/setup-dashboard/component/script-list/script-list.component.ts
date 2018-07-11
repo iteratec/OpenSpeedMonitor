@@ -3,7 +3,7 @@ import {Observable} from "rxjs/internal/Observable";
 import {ScriptDto} from "../../model/script.model";
 import {ScriptService} from "../../service/rest/script.service";
 import {filter, map} from "rxjs/operators";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
+import {JobGroupDTO} from "../../model/job-group.model";
 
 @Component({
   selector: 'osm-script-list',

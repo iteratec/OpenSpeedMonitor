@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {JobGroupToPagesMappingDto} from "../../shared/model/job-group-to-page-mapping.model";
-import {PageIdDto} from "../../shared/model/page.model";
 import {PageComparisonSelectionDto} from "../page-comparison-selection.model";
+import {JobGroupToPagesMappingDto} from "../model/job-group-to-page-mapping.model";
+import {PageDto} from "../model/page.model";
 
 @Component({
   selector: 'osm-page-comparison-row',
@@ -25,7 +25,7 @@ export class PageComparisonRowComponent {
     this.select.emit(this.selection);
   }
 
-  getPagesForJobGroup(id: number): PageIdDto[] {
+  getPagesForJobGroup(id: number): PageDto[] {
     if (!this.jobGroupMappings) return [];
     const jobGroupMapping: JobGroupToPagesMappingDto = this.jobGroupMappings.find(jobGroup => jobGroup.id == id);
     return jobGroupMapping ? jobGroupMapping.pages : []

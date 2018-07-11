@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/index";
-import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
+import {JobGroupToPagesMappingDto} from "../../model/job-group-to-pages-mapping.model";
+
 
 @Injectable({
   providedIn: 'root'

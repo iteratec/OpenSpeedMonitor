@@ -11,6 +11,7 @@ import {JobGroupListComponent} from "./component/job-group-list/job-group-list/j
 import {SharedModule} from "../shared/shared.module";
 import {TranslationModule} from "../translation/translation.module";
 import {HttpClientModule} from "@angular/common/http";
+import {JobGroupService} from "./service/job-group.service";
 
 @NgModule({
   imports: [
@@ -25,7 +26,7 @@ import {HttpClientModule} from "@angular/common/http";
       provide: 'components',
       useValue: [SetupDashboardComponent],
       multi: true
-    }, PageService, ScriptService
+    }, PageService, ScriptService, JobGroupService
   ],
   entryComponents: [SetupDashboardComponent]
 })

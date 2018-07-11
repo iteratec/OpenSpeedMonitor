@@ -1,10 +1,11 @@
 import {Component, Input} from '@angular/core';
-import {PageIdDto} from "../../../shared/model/page.model";
 import {PageService} from "../../service/rest/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs";
-import {JobGroupToPagesMappingDto} from "../../../shared/model/job-group-to-page-mapping.model";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
+import {PageIdDto} from "../../model/page.model";
+import {JobGroupDTO} from "../../model/job-group.model";
+import {JobGroupToPagesMappingDto} from "../../../page-comparison/model/job-group-to-page-mapping.model";
+
 
 @Component({
   selector: 'osm-page-list',
