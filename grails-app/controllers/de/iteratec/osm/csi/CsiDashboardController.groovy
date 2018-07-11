@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -61,7 +61,7 @@ import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
  */
 class CsiDashboardController {
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     BrowserService browserService
     I18nService i18nService
 
@@ -941,7 +941,7 @@ class CsiDashboardController {
         result.put('aggrGroupValues', AGGREGATOR_GROUP_VALUES)
 
         // CSI-JobGroups
-        result.put('folders', jobGroupDaoService.findCSIGroups().sort(false, { it.name }))
+        result.put('folders', jobGroupService.findCSIGroups().sort(false, { it.name }))
 
         // Pages
         List<Page> pages = Page.list().sort(false, { it.name })
@@ -1003,7 +1003,7 @@ class CsiDashboardController {
             locationsOfBrowsers.put(eachBrowser.getId(), locationIds)
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers)
-        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        result.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result

@@ -23,7 +23,7 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -63,7 +63,7 @@ class CsiDashboardControllerSpec extends Specification implements BuildDataTest,
         controller.configService = Stub(ConfigService) {
             getInitialChartHeightInPixels() >> 400
         }
-        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
+        controller.jobGroupService = Stub(JobGroupService) {
             findAll() >> { JobGroup.findAll() }
             findCSIGroups() >> { JobGroup.findAllByCsiConfigurationIsNotNull() }
         }

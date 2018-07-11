@@ -9,9 +9,9 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
@@ -46,7 +46,7 @@ class GeneralMeasurementApiControllerSpec extends Specification implements Build
 
     Closure doWithSpring() {
         return {
-            defaultJobGroupDaoService(DefaultJobGroupDaoService)
+            jobGroupService(JobGroupService)
             browserService(BrowserService)
         }
     }
@@ -182,6 +182,6 @@ class GeneralMeasurementApiControllerSpec extends Specification implements Build
     }
 
     private void initInnerServices() {
-        controller.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
+        controller.jobGroupService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
     }
 }

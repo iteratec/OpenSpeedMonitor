@@ -25,15 +25,19 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
+
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.measurement.schedule.JobGroupService
+import de.iteratec.osm.report.chart.AggregationType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.MeasuredEvent
@@ -290,18 +294,15 @@ class QuartzControlledGrailsReportsSpec extends Specification implements BuildDa
 
     //mocks of inner services///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Mocks {@linkplain de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService#findCSIGroups}
-     */
     private void mockJobGroupDaoService() {
-        def jobGroupDaoService = Stub(DefaultJobGroupDaoService) {
+        def jobGroupService = Stub(JobGroupService) {
             findCSIGroups() >> {
                 JobGroup jobGroupWithGraphiteServers = JobGroup.build(name: jobGroupWithServersName, graphiteServers: getGraphiteServers())
                 JobGroup jobGroupWithoutGraphiteServers = JobGroup.build(name: jobGroupWithoutServersName, graphiteServers: [])
                 return [jobGroupWithGraphiteServers,jobGroupWithoutGraphiteServers ] as Set
             }
         }
-        serviceUnderTest.jobGroupDaoService = jobGroupDaoService
+        serviceUnderTest.jobGroupService = jobGroupService
     }
     /**
      * Mocks {@linkplain GraphiteSocketProvider#getSocket}.

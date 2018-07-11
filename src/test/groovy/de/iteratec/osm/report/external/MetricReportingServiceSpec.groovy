@@ -23,16 +23,18 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.measurement.schedule.JobGroupService
+import de.iteratec.osm.report.chart.AggregationType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
@@ -188,7 +190,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockJobGroupDaoService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
+        mockJobGroupService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
 
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
@@ -209,7 +211,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockJobGroupDaoService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_WHITESPACES)
+        mockJobGroupService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_WHITESPACES)
 
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
@@ -230,7 +232,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockJobGroupDaoService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
+        mockJobGroupService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS)
 
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
@@ -251,7 +253,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockEventCsiAggregationService(emvs)
-        mockJobGroupDaoService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+        mockJobGroupService(AggregationType.MEASURED_EVENT, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
 
         when:
         serviceUnderTest.reportEventCSIValuesOfLastHour(REPORTING_TIMESTAMP)
@@ -274,7 +276,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE)
+        mockJobGroupService(AggregationType.PAGE)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -295,7 +297,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS)
+        mockJobGroupService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -316,7 +318,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE, SYSTEM_NAME_WITH_WHITESPACES)
+        mockJobGroupService(AggregationType.PAGE, SYSTEM_NAME_WITH_WHITESPACES)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -337,7 +339,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+        mockJobGroupService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -357,7 +359,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockPageCsiAggregationService(pmvsWithoutData)
-        mockJobGroupDaoService(AggregationType.PAGE)
+        mockJobGroupService(AggregationType.PAGE)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -375,7 +377,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE)
+        mockJobGroupService(AggregationType.PAGE)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -396,7 +398,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+        mockJobGroupService(AggregationType.PAGE, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -416,7 +418,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockPageCsiAggregationService(pmvs)
-        mockJobGroupDaoService(AggregationType.PAGE)
+        mockJobGroupService(AggregationType.PAGE)
 
         when:
         serviceUnderTest.reportPageCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -436,7 +438,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP)
+        mockJobGroupService(AggregationType.JOB_GROUP)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -457,7 +459,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+        mockJobGroupService(AggregationType.JOB_GROUP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -477,7 +479,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_DAY)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP)
+        mockJobGroupService(AggregationType.JOB_GROUP)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastDay(REPORTING_TIMESTAMP)
@@ -495,7 +497,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP)
+        mockJobGroupService(AggregationType.JOB_GROUP)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -516,7 +518,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
+        mockJobGroupService(AggregationType.JOB_GROUP, SYSTEM_NAME_WITH_DOTS_AND_WHITESPACES)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -536,7 +538,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         //test-specific mocks
         mockCsiAggregationUtilService(REPORTING_TIMESTAMP_START_OF_WEEK)
         mockShopCsiAggregationService(smvs)
-        mockJobGroupDaoService(AggregationType.JOB_GROUP)
+        mockJobGroupService(AggregationType.JOB_GROUP)
 
         when:
         serviceUnderTest.reportShopCSIValuesOfLastWeek(REPORTING_TIMESTAMP)
@@ -576,13 +578,13 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
     //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Mocks methods of {@linkplain JobGroupDaoService}.
+     * Mocks methods of {@linkplain JobGroupService}.
      * @param csiGroups
      * @param pages
      */
-    private void mockJobGroupDaoService(AggregationType measurandForGraphitePath, String jobGroupName = SYSTEM_NAME) {
-        def jobGroupDaoService = Stub(DefaultJobGroupDaoService)
-        jobGroupDaoService.findCSIGroups() >> {
+    private void mockJobGroupService(AggregationType measurandForGraphitePath, String jobGroupName = SYSTEM_NAME) {
+        def jobGroupService = Stub(JobGroupService)
+        jobGroupService.findCSIGroups() >> {
 
             JobGroup group = JobGroup.build(name: jobGroupName)
 
@@ -599,7 +601,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
 
             return groupSet
         }
-        serviceUnderTest.jobGroupDaoService = jobGroupDaoService
+        serviceUnderTest.jobGroupService = jobGroupService
     }
     /**
      * Mocks methods of {@linkplain CsiAggregationUtilService}.

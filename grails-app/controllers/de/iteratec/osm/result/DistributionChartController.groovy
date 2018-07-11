@@ -9,7 +9,7 @@ import de.iteratec.osm.distributionData.GetDistributionCommand
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
@@ -28,7 +28,7 @@ class DistributionChartController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -58,7 +58,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put("weekStart", MONDAY_WEEKSTART)
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         return modelToRender
     }
