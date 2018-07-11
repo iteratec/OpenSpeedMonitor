@@ -12,7 +12,7 @@ export class ApplicationDashboardService {
   }
 
   getPagesForJobGroup(applicationId: number): Observable<PageDto[]> {
-    return this.http.get<PageDto[]>("/applicationDashboard/getPagesForApplication", {
+    return this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', {
       params: {
         applicationId: applicationId ? applicationId.toString() : ""
       }
@@ -20,7 +20,7 @@ export class ApplicationDashboardService {
   }
 
   updateMetricsForApplication(applicationId: number) {
-    this.http.get<MetricsDto[]>('/applicationDashboard/getMetricsForApplication', {
+    this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {
       params: {
         applicationId: applicationId ? applicationId.toString() : ""
       }
