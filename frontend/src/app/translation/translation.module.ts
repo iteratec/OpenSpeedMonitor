@@ -5,7 +5,6 @@ import {TranslateLoader, TranslateModule, TranslateService} from "@ngx-translate
 import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {TranslateHttpLoader} from '@ngx-translate/http-loader'
 import {OsmLangService} from "./services/osm-lang.service";
-import {SharedModule} from "../shared/shared.module";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {

@@ -1,4 +1,4 @@
-import { TranslationModule } from './translation.module';
+import {TranslationModule} from './translation.module';
 import {TestBed} from "@angular/core/testing";
 import {TranslateService} from "@ngx-translate/core";
 import {OsmLangService} from "./services/osm-lang.service";
