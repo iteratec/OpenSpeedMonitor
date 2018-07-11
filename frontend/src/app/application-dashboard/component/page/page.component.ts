@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {IPage} from "../../model/page.model";
+import {PageDto} from "../../model/page.model";
 import {Observable} from "rxjs/internal/Observable";
 import {MetricsDto} from "../../model/metrics.model";
 import {ApplicationDashboardService} from "../../service/application-dashboard.service";
@@ -12,7 +12,7 @@ import {CalculationUtil} from "../../../shared/utils/calculation.util";
   styleUrls: ['./page.component.css']
 })
 export class PageComponent {
-  @Input() page: IPage;
+  @Input() page: PageDto;
   metricsForPage$: Observable<MetricsDto>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {

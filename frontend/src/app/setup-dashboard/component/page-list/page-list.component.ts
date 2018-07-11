@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {IPageId} from "../../../shared/model/page.model";
+import {PageIdDto} from "../../../shared/model/page.model";
 import {PageService} from "../../service/rest/page.service";
 import {map} from "rxjs/internal/operators";
 import {Observable} from "rxjs";
@@ -12,7 +12,7 @@ import {JobGroupDTO} from "../../../shared/model/job-group.model";
   styleUrls: ['./page-list.component.scss']
 })
 export class PageListComponent {
-  pageList$: Observable<IPageId[]>;
+  pageList$: Observable<PageIdDto[]>;
 
   @Input() jobGroup: JobGroupDTO;
 
@@ -22,7 +22,7 @@ export class PageListComponent {
     );
   }
 
-  private filterPagesByJobGroup(jobGroup: JobGroupDTO, jobGroupsWithPages: JobGroupToPagesMappingDto[]): IPageId[] {
+  private filterPagesByJobGroup(jobGroup: JobGroupDTO, jobGroupsWithPages: JobGroupToPagesMappingDto[]): PageIdDto[] {
     return jobGroupsWithPages.find(a => a.id == jobGroup.id).pages;
   }
 }

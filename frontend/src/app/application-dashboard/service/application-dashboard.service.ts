@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, ReplaySubject} from "rxjs/index";
-import {IPage} from "../model/page.model";
+import {PageDto} from "../model/page.model";
 import {MetricsDto} from "../model/metrics.model";
 
 @Injectable()
@@ -11,8 +11,8 @@ export class ApplicationDashboardService {
   constructor(private http: HttpClient) {
   }
 
-  getPagesForJobGroup(applicationId: number): Observable<IPage[]> {
-    return this.http.get<IPage[]>("/applicationDashboard/getPagesForApplication", {
+  getPagesForJobGroup(applicationId: number): Observable<PageDto[]> {
+    return this.http.get<PageDto[]>("/applicationDashboard/getPagesForApplication", {
       params: {
         applicationId: applicationId ? applicationId.toString() : ""
       }
