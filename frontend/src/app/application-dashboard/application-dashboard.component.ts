@@ -1,10 +1,10 @@
 import {Component, OnDestroy} from '@angular/core';
-import {JobGroupDTO} from '../shared/model/job-group.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {JobGroupService} from '../shared/service/rest/job-group.service';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {ApplicationDashboardService} from './service/application-dashboard.service';
+import {ApplicationDTO} from './model/application.model';
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -12,26 +12,31 @@ import {ApplicationDashboardService} from './service/application-dashboard.servi
   styleUrls: ['./application-dashboard.component.scss']
 })
 export class ApplicationDashboardComponent implements OnDestroy {
-  jobGroups$: Observable<JobGroupDTO[]>;
-  selectedApplication: JobGroupDTO;
+  applications$: Observable<ApplicationDTO[]>;
+  selectedApplication: ApplicationDTO;
   destroyed$ = new Subject<void>();
 
-  constructor(private jobGroupService: JobGroupService, private route: ActivatedRoute, private router: Router, private dashboardService: ApplicationDashboardService) {
-    this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
-      map((jobGroups: JobGroupDTO[]) => this.sortJobGroupsByName(jobGroups))
+  constructor(
+    private jobGroupService: JobGroupService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private dashboardService: ApplicationDashboardService
+  ) {
+    this.applications$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
+      map((applications: ApplicationDTO[]) => this.sortApplicationsByName(applications))
     );
 
-    combineLatest(this.route.paramMap, this.jobGroups$)
+    combineLatest(this.route.paramMap, this.applications$)
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(([params, jobGroups]) => this.handleNavigation(params.get('jobGroupId'), jobGroups));
+      .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
   }
 
-  private handleNavigation(jobGroupId: string, jobGroups: JobGroupDTO[]) {
-    if (!jobGroupId) {
-      this.updateApplication(jobGroups[0]);
+  private handleNavigation(applicationId: string, applications: ApplicationDTO[]) {
+    if (!applicationId) {
+      this.updateApplication(applications[0]);
       return;
     }
-    this.selectedApplication = this.findJobGroupById(jobGroups, jobGroupId);
+    this.selectedApplication = this.findApplicationById(applications, applicationId);
     if (this.selectedApplication) {
       this.dashboardService.updateMetricsForApplication(this.selectedApplication.id);
     }
@@ -42,15 +47,15 @@ export class ApplicationDashboardComponent implements OnDestroy {
     this.destroyed$.complete();
   }
 
-  updateApplication(jobGroup: JobGroupDTO) {
-    this.router.navigate(['/application-dashboard', jobGroup.id]);
+  updateApplication(application: ApplicationDTO) {
+    this.router.navigate(['/application-dashboard', application.id]);
   }
 
-  private findJobGroupById(jobGroups: JobGroupDTO[], jobGroupId: string) {
-    return jobGroups.find(jobGroup => jobGroup.id == Number(jobGroupId));
+  private findApplicationById(applications: ApplicationDTO[], applicationId: string) {
+    return applications.find(application => application.id == Number(applicationId));
   }
 
-  private sortJobGroupsByName(jobGroups: JobGroupDTO[]) {
-    return jobGroups.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: "base"}))
+  private sortApplicationsByName(applications: ApplicationDTO[]) {
+    return applications.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: 'base'}));
   }
 }

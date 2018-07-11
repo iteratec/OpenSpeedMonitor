@@ -1,6 +1,6 @@
 <h1>
   <osm-application-select [selectedApplication]="selectedApplication"
-                          [applications]="jobGroups$ | async"
+                          [applications]="applications$ | async"
                           (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>
 <ng-container *ngIf="selectedApplication">

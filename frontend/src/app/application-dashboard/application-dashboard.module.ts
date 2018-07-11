@@ -13,7 +13,7 @@ import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
-  {path: ':jobGroupId', component: ApplicationDashboardComponent}
+  {path: ':applicationId', component: ApplicationDashboardComponent}
 ];
 
 @NgModule({
