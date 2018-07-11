@@ -44,9 +44,6 @@
                     <li class="${request.forwardURI.equals('/application-dashboard') ? 'active' : ''}">
                         <a href="${createLink(uri: '/application-dashboard')}">
                             <i class="fas fa-bars"></i>
-                    <li class="${request.forwardURI.equals('/applicationDashboard') ? 'active' : ''}">
-                        <a href="${createLink(uri: '/applicationDashboard')}">
-                            <i class="fas fa-bars"></i>
                             <g:message message="Overview"/>
                         </a>
                     </li>
