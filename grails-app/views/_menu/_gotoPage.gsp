@@ -5,23 +5,23 @@
         %{--measurement --------------------------------------------------------}%
 
         <li class="controller">
-            <g:link controller="job" action="index"><i class="fa fa-calendar"></i> <g:message
+            <g:link controller="job" action="index"><i class="fas fa-calendar-alt"></i> <g:message
                     code="de.iteratec.isj.jobs" default="Jobs"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="script" action="list"><i class="fa fa-align-left"></i> <g:message
+            <g:link controller="script" action="list"><i class="fas fa-align-left"></i> <g:message
                     code="de.iteratec.iss.scripts" default="Skripte"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="queueStatus" action="list"><i class="fa fa-inbox"></i> <g:message
+            <g:link controller="queueStatus" action="list"><i class="fas fa-inbox"></i> <g:message
                     code="queue.status.label"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="jobSchedule" action="schedules"><i class="fa fa-clock-o"></i> <g:message
+            <g:link controller="jobSchedule" action="schedules"><i class="fas fa-clock"></i> <g:message
                     code="job.Schedule.label"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="connectivityProfile" action="list"><i class="fa fa-globe"></i> <g:message
+            <g:link controller="connectivityProfile" action="list"><i class="fas fa-globe"></i> <g:message
                     code="connectivityProfile.label.plural"/></g:link>
         </li>
         <li class="divider"></li>
@@ -29,28 +29,28 @@
         %{--results --------------------------------------------------------}%
 
         <li class="controller">
-            <g:link controller="eventResultDashboard" action="showAll"><i class="fa fa-line-chart"></i>
+            <g:link controller="eventResultDashboard" action="showAll"><i class="fas fa-chart-line"></i>
                 <g:message code="eventResultDashboard.label" default="Time Series"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="pageAggregation" action="showAll"><i class="fa fa-bar-chart"></i>
+            <g:link controller="pageAggregation" action="showAll"><i class="fas fa-chart-bar"></i>
                 <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/></g:link>
         </li>
         <li class="controller">
             <g:link controller="tabularResultPresentation" action="listResults"><i
-                    class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
-                                                          default="Result List"/></g:link>
+                    class="fas fa-th-list"></i> <g:message code="de.iteratec.result.title"
+                                                           default="Result List"/></g:link>
         </li>
         <li class="divider"></li>
 
         %{--csi --------------------------------------------------------}%
 
         <li class="controller">
-            <g:link controller="csiDashboard" action="showAll"><i class="fa fa-signal"></i> <g:message
+            <g:link controller="csiDashboard" action="showAll"><i class="fas fa-signal"></i> <g:message
                     code="csiDashboard.label" default="CSI Dashboard"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
+            <g:link controller="csiConfiguration" action="configurations"><i class="fab fa-empirears"></i> <g:message
                     code="de.iteratec.osm.csi.configuration.label" default="CSI Configuration"/></g:link>
         </li>
 

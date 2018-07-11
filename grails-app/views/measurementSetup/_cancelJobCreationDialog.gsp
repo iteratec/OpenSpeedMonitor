@@ -8,7 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                     Caution
                 </h4>
             </div>

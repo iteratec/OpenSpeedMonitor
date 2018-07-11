@@ -318,7 +318,7 @@ function RickshawGraphBuilder(args) {
                 }
                 // insert values in the table
                 pointData += optionalHighlighting + "<td>" + name + ": " + "</td>" +
-                    "<td>" + "<i class=\"fa fa-circle\" style=\"color:" + point.series.color + "\"></i> " +
+                    "<td>" + "<i class=\"fas fa-circle\" style=\"color:" + point.series.color + "\"></i> " +
                     scale.scale.invert(point.value.y).toFixed(2) + "</td>" + "</tr>";
             });
 

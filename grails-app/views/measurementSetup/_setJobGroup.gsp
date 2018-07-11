@@ -41,7 +41,7 @@
     <div class="col-sm-offset-1 col-sm-4">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
 
@@ -59,12 +59,12 @@
     <div class="form-group">
         <div class="col-sm-6 text-right">
             <a class="btn btn-default pull-left" data-toggle="modal" data-target="#cancelJobCreationDialog">
-                <i class="fa fa-times" aria-hidden="true"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
                 <g:message code="script.versionControl.cancel.button" default="Cancel"/>
             </a>
             <button data-toggle="tab" href="#createScript" class="btn btn-primary" id="setJobGroubTabNextButton" disabled>
                 <g:message code="default.paginate.next" default="Next"/>
-                <i class="fa fa-caret-right" aria-hidden="true"></i>
+                <i class="fas fa-caret-right" aria-hidden="true"></i>
             </button>
         </div>
     </div>

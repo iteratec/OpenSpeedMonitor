@@ -241,7 +241,7 @@
     <div id="header">
         <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-            <a href="#updateCsiConfModal" class="fa fa-edit" data-toggle="modal"></a>
+            <a href="#updateCsiConfModal" class="fas fa-edit" data-toggle="modal"></a>
         </sec:ifAnyGranted>
     </div>
     <div>

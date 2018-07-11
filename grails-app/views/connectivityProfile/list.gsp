@@ -12,7 +12,7 @@
         <div class="card">
             <div class="table-filter">
                 <a href="<g:createLink action="create" />" class="btn btn-primary pull-right">
-                    <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                 </a>
             </div>
             <section id="list-connectivityProfile" class="first">
