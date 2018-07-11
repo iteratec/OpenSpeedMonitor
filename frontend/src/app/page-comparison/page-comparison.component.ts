@@ -1,9 +1,9 @@
-import {JobGroupToPagesMappingDto} from "../shared/model/job-group-to-page-mapping.model";
 import {Component, NgZone} from '@angular/core';
 import {PageComparisonSelectionDto} from "./page-comparison-selection.model";
-import {JobGroupService} from "../shared/service/rest/job-group.service";
+import {JobGroupService} from "./service/job-group.service";
 import {Observable} from "rxjs/internal/Observable";
 import {PageComparisonComponentAdapter} from "./adapter/page-comparison-component-adapter";
+import {JobGroupToPagesMappingDto} from "./model/job-group-to-page-mapping.model";
 
 @Component({
   selector: 'osm-page-comparison',
