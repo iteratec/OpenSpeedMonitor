@@ -8,8 +8,7 @@ import {PageComponent} from './component/page/page.component';
 import {ApplicationCsiComponent} from './component/application-csi/application-csi.component';
 import {CsiService} from "./service/csi.service";
 import {ApplicationDashboardRoutingModule} from "./application-dashboard-routing/application-dashboard-routing.module";
-import {ApplicationDashboardEntryComponent} from './application-dashboard-routing/application-dashboard-entry.component'
-import {JobGroupService} from "./service/job-group.service";
+import {ApplicationDashboardEntryComponent} from './application-dashboard-routing/application-dashboard-entry.component';
 
 @NgModule({
   imports: [
@@ -22,7 +21,6 @@ import {JobGroupService} from "./service/job-group.service";
       useValue: [ApplicationDashboardEntryComponent],
       multi: true
     },
-    JobGroupService,
     ApplicationDashboardService,
     CsiService
   ],

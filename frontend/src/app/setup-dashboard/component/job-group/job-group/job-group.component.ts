@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {JobGroupDTO} from "../../../../application-dashboard/model/job-group.model";
+import {ApplicationDTO} from "../../../../application-dashboard/model/application.model";
 
 
 @Component({
@@ -8,7 +8,7 @@ import {JobGroupDTO} from "../../../../application-dashboard/model/job-group.mod
   styleUrls: ['./job-group.component.scss']
 })
 export class JobGroupComponent {
-  @Input() jobGroup: JobGroupDTO;
+  @Input() jobGroup: ApplicationDTO;
 
   constructor() {
   }

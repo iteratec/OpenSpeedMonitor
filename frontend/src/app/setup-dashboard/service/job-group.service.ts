@@ -1,20 +1,20 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/index";
-import {JobGroupDTO} from "../../application-dashboard/model/job-group.model";
+import {ApplicationDTO} from "../../application-dashboard/model/application.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class JobGroupService {
-  public jobGroups$ = new ReplaySubject<JobGroupDTO[]>(1);
+  public jobGroups$ = new ReplaySubject<ApplicationDTO[]>(1);
 
   constructor(private http: HttpClient) {
     this.updateActiveJobGroups()
   }
 
   updateActiveJobGroups() {
-    this.http.get<JobGroupDTO[]>("/jobGroup/getAllActive")
+    this.http.get<ApplicationDTO[]>("/jobGroup/getAllActive")
       .subscribe(next => this.jobGroups$.next(next), error => this.handleError(error));
   }
 

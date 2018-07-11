@@ -4,17 +4,18 @@ import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
 import org.joda.time.DateTime
 
 class ApplicationDashboardController {
-
     final static FOUR_WEEKS = 4
 
     ApplicationDashboardService applicationDashboardService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
+    JobGroupService jobGroupService
 
     def getPagesForApplication(PagesForApplicationCommand command) {
 
@@ -69,6 +70,12 @@ class ApplicationDashboardController {
         }
 
         return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
+    }
+
+    def getAllActiveAndAllRecent() {
+        def allActiveAndRecent = jobGroupService.getAllActiveAndAllRecent()
+
+        return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
 }
 

@@ -4,7 +4,7 @@ import {CsiDTO} from "../../model/csi.model";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";
 import {ApplicationCsiListDTO} from "../../model/csi-list.model";
-import {JobGroupDTO} from "../../model/job-group.model";
+import {ApplicationDTO} from "../../model/application.model";
 
 @Component({
   selector: 'osm-application-csi',
@@ -16,7 +16,7 @@ export class ApplicationCsiComponent {
   hasConfiguration$: Observable<boolean>;
 
   @Input()
-  set application(application: JobGroupDTO) {
+  set application(application: ApplicationDTO) {
     this.csiService.getCsiForApplication(application);
   }
 

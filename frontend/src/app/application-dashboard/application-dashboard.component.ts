@@ -3,8 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {filter, map, takeUntil} from 'rxjs/operators';
 import {ApplicationDashboardService} from './service/application-dashboard.service';
-import {JobGroupService} from "./service/job-group.service";
-import {JobGroupDTO} from "./model/job-group.model";
+import {ApplicationDTO} from "./model/application.model";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -12,13 +11,13 @@ import {JobGroupDTO} from "./model/job-group.model";
   styleUrls: ['./application-dashboard.component.scss']
 })
 export class ApplicationDashboardComponent implements OnDestroy {
-  jobGroups$: Observable<JobGroupDTO[]>;
-  selectedApplication$: Observable<JobGroupDTO>;
+  jobGroups$: Observable<ApplicationDTO[]>;
+  selectedApplication$: Observable<ApplicationDTO>;
   destroyed$ = new Subject<void>();
 
-  constructor(private jobGroupService: JobGroupService, private route: ActivatedRoute, private router: Router, private dashboardService: ApplicationDashboardService) {
-    this.jobGroups$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
-      map((jobGroups: JobGroupDTO[]) => this.sortJobGroupsByName(jobGroups))
+  constructor(private route: ActivatedRoute, private router: Router, private dashboardService: ApplicationDashboardService) {
+    this.jobGroups$ = dashboardService.activeOrRecentlyMeasured$.pipe(
+      map((jobGroups: ApplicationDTO[]) => this.sortJobGroupsByName(jobGroups))
     );
 
     this.handleValidNavigation();
@@ -53,16 +52,16 @@ export class ApplicationDashboardComponent implements OnDestroy {
     });
   }
 
-  updateApplication(jobGroup: JobGroupDTO) {
+  updateApplication(jobGroup: ApplicationDTO) {
     this.router.navigate(['/application-dashboard', jobGroup.id]);
   }
 
-  private lookForJobGroupWithId(jobGroups: JobGroupDTO[], jobGroupId: string) {
+  private lookForJobGroupWithId(jobGroups: ApplicationDTO[], jobGroupId: string) {
     let selectedApplication = jobGroups.find(jobGroup => jobGroup.id == Number(jobGroupId));
     return selectedApplication
   }
 
-  private sortJobGroupsByName(jobGroups: JobGroupDTO[]) {
+  private sortJobGroupsByName(jobGroups: ApplicationDTO[]) {
     return jobGroups.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: "base"}))
   }
 }

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ReplaySubject} from "rxjs/internal/ReplaySubject";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {ApplicationCsiListDTO} from "../model/csi-list.model";
-import {JobGroupDTO} from "../model/job-group.model";
+import {ApplicationDTO} from "../model/application.model";
 
 @Injectable()
 export class CsiService {
@@ -12,7 +12,7 @@ export class CsiService {
   constructor(private http: HttpClient) {
   }
 
-  getCsiForApplication(application: JobGroupDTO) {
+  getCsiForApplication(application: ApplicationDTO) {
     const params = new HttpParams().set('applicationId', application.id.toString());
     this.http.get<ApplicationCsiListDTO>('/applicationDashboard/getCsiValuesForApplication', {params: params})
       .subscribe(response => this.csiValues$.next(response), error => this.handleError(error));

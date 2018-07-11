@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {Observable} from 'rxjs';
-import {JobGroupDTO} from "../../../../application-dashboard/model/job-group.model";
+import {ApplicationDTO} from "../../../../application-dashboard/model/application.model";
 import {JobGroupService} from "../../../service/job-group.service";
 
 @Component({
@@ -9,7 +9,7 @@ import {JobGroupService} from "../../../service/job-group.service";
   styleUrls: ['./job-group-list.component.scss']
 })
 export class JobGroupListComponent {
-  jobGroupList$: Observable<JobGroupDTO[]>;
+  jobGroupList$: Observable<ApplicationDTO[]>;
 
   constructor(private jobGroupService: JobGroupService) {
     this.jobGroupList$ = this.jobGroupService.jobGroups$

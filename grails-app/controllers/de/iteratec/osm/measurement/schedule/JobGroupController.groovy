@@ -9,13 +9,11 @@ import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.ResultSelectionCommand
-import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
@@ -35,6 +33,7 @@ class JobGroupController {
     TimeToCsMappingService timeToCsMappingService
     PerformanceLoggingService performanceLoggingService
     ResultSelectionService resultSelectionService
+    JobGroupService jobGroupService
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
@@ -243,50 +242,11 @@ class JobGroupController {
     }
 
     def getAllActive() {
-        def activeJobGroups = getAllActiveJobGroups()
+        def activeJobGroups = jobGroupService.getAllActiveJobGroups()
 
         return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
     }
 
-    private List<JobGroup> getAllActiveJobGroups() {
-        return Job.createCriteria().list {
-            eq('active', true)
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            projections {
-                jobGroup {
-                    distinct('id')
-                    property('id', 'id')
-                    property('name', 'name')
-                }
-            }
-        }
-    }
-
-    def getAllActiveAndAllRecent() {
-        Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
-
-        DateTime today = new DateTime()
-        DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
-
-        ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
-        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
-            if (existing) {
-                not { 'in'('jobGroup', existing) }
-            }
-            projections {
-                distinct('jobGroup')
-            }
-        })
-        List recentAndFormattedJobGroups = recentJobGroups.collect {
-            [
-                    id  : it.id,
-                    name: it.name
-            ]
-        }
-        allActiveAndRecent.addAll(recentAndFormattedJobGroups)
-
-        return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
-    }
     @RestAction()
     def getJobGroupsWithPages(JobGroupWithPagesCommand command) {
         if (command.hasErrors()) {
