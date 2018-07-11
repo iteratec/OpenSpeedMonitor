@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {CsiService} from "../../service/csi.service";
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
 import {CsiDTO} from "../../model/csi.model";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";
 import {ApplicationCsiListDTO} from "../../model/csi-list.model";
+import {JobGroupDTO} from "../../model/job-group.model";
 
 @Component({
   selector: 'osm-application-csi',

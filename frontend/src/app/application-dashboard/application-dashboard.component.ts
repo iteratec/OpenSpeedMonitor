@@ -1,10 +1,10 @@
 import {Component, OnDestroy} from '@angular/core';
-import {JobGroupDTO} from '../shared/model/job-group.model';
 import {ActivatedRoute, Router} from '@angular/router';
-import {JobGroupService} from '../shared/service/rest/job-group.service';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {filter, map, takeUntil} from 'rxjs/operators';
 import {ApplicationDashboardService} from './service/application-dashboard.service';
+import {JobGroupService} from "./service/job-group.service";
+import {JobGroupDTO} from "./model/job-group.model";
 
 @Component({
   selector: 'osm-application-dashboard',

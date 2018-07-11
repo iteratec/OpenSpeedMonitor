@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {JobGroupDTO} from "../../../shared/model/job-group.model";
+import {JobGroupDTO} from "../../model/job-group.model";
 
 @Component({
   selector: 'osm-application-select',
