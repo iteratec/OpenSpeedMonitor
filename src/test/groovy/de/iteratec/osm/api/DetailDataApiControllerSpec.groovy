@@ -190,7 +190,7 @@ class DetailDataApiControllerSpec extends Specification implements BuildDataTest
     }
 
     private void initInnerServices() {
-        controller.jobGroupService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
+        controller.jobGroupService = new JobGroupService()
         controller.jobDaoService = new JobDaoService()
     }
 }

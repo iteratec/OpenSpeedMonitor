@@ -182,6 +182,6 @@ class GeneralMeasurementApiControllerSpec extends Specification implements Build
     }
 
     private void initInnerServices() {
-        controller.jobGroupService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
+        controller.jobGroupService = new JobGroupService()
     }
 }
