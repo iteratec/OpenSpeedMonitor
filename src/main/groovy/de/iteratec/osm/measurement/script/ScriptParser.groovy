@@ -491,8 +491,8 @@ class ScriptParser {
     /**
      * Initialize parser and interpret the given script.
      */
-    public ScriptParser(PageService pageService, String navigationScript, String navigationScriptName) {
-        log.info("Parsing Script: $navigationScriptName")
+    public ScriptParser(PageService pageService, String navigationScript, String navigationScriptLabel) {
+        log.info("Parsing Script: $navigationScriptLabel")
         this.pageService = pageService
         def statements = interpret(navigationScript)
         allPageLoadEvents = statements.findAll { (it.keyword == navigateCmd) || (it.keyword == execAndWaitCmd) }.size()
