@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {GrailsBridgeService} from "../../shared/service/grails-bridge.service";
+import {GrailsBridgeService} from "./grails-bridge.service";
 
 @Injectable()
 export class OsmLangService {
