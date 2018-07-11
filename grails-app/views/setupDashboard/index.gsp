@@ -8,7 +8,6 @@
 <body>
 <osm-setup-dashboard data-module-path="src/app/setup-dashboard/setup-dashboard.module#SetupDashboardModule"></osm-setup-dashboard>
 
-<asset:stylesheet src="frontend/styles.css"/>
 <asset:javascript src="frontend/runtime.js"/>
 <asset:javascript src="frontend/polyfills.js"/>
 <asset:javascript src="frontend/main.js"/>

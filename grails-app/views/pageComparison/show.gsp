@@ -72,7 +72,6 @@
 <g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']"/>
 
 <content tag="include.bottom">
-    <asset:stylesheet src="frontend/styles.css"/>
     <asset:javascript src="frontend/runtime.js"/>
     <asset:javascript src="frontend/polyfills.js"/>
     <asset:javascript src="frontend/main.js"/>
