@@ -1,9 +1,9 @@
 <h1>
-  <osm-application-select [selectedApplication]="selectedApplication$ | async"
+  <osm-application-select [selectedApplication]="selectedApplication"
                           [applications]="jobGroups$ | async"
                           (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>
-<ng-container *ngIf="selectedApplication$ | async; let selectedApplication">
+<ng-container *ngIf="selectedApplication">
   <osm-application-csi [application]="selectedApplication"></osm-application-csi>
   <osm-page-list [applicationId]="selectedApplication.id"></osm-page-list>
 </ng-container>
