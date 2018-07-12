@@ -1,11 +1,13 @@
-<div *ngIf="hasConfiguration$ | async; else returnError">
-  <div *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
-    CSI ({{recentCsiValue.date}}): <span style="color: cornflowerblue;">{{recentCsiValue.csiDocComplete}}</span>
+<div class="card">
+  <div *ngIf="hasConfiguration$ | async; else returnError">
+    <div *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
+      CSI ({{recentCsiValue.date}}): <span style="color: cornflowerblue;">{{recentCsiValue.csiDocComplete}}</span>
+    </div>
+    <ng-template #noRecentCsi>
+      No CSI available
+    </ng-template>
   </div>
-  <ng-template #noRecentCsi>
-    No CSI available
+  <ng-template #returnError>
+    <p style="color: red">CSI is not configured for this Job Group!</p>
   </ng-template>
 </div>
-<ng-template #returnError>
-  <p style="color: red">CSI is not configured for this Job Group!</p>
-</ng-template>
