@@ -7,3 +7,12 @@ h1 {
   color: $color-text-normal;
   margin: 0 0 20px 10px;
 }
+
+h2 {
+  font: {
+    size: 18px;
+    weight: bold;
+  }
+  color: $color-text-normal;
+  margin: 0 0 20px 0;
+}
