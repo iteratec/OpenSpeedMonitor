@@ -10,12 +10,22 @@ import {ApplicationCsiComponent} from './components/application-csi/application-
 import {CsiService} from "./services/csi.service";
 import {ApplicationDashboardRoutingModule} from "./routing/application-dashboard-routing.module";
 import {ApplicationDashboardEntryComponent} from './routing/application-dashboard-entry.component'
+import {TranslationModule} from "../translation/translation.module";
 
 @NgModule({
   imports: [
-    SharedModule, ApplicationDashboardRoutingModule
+    SharedModule,
+    ApplicationDashboardRoutingModule,
+    TranslationModule
   ],
-  declarations: [ApplicationDashboardComponent, ApplicationSelectComponent, PageListComponent, PageComponent, ApplicationCsiComponent, ApplicationDashboardEntryComponent],
+  declarations: [
+    ApplicationDashboardComponent,
+    ApplicationSelectComponent,
+    PageListComponent,
+    PageComponent,
+    ApplicationCsiComponent,
+    ApplicationDashboardEntryComponent
+  ],
   providers: [
     {
       provide: 'components',
