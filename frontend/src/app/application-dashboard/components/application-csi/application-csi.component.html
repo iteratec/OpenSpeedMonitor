@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card application-csi">
   <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.kpi.title' | translate }}</h2>
   <div *ngIf="hasConfiguration$ | async; else returnError">
     <div *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">

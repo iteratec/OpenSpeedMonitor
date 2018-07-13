@@ -1,0 +1,15 @@
+$items-per-row: 4;
+$grid-gap: 20px;
+
+.page-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-left: -$grid-gap;
+}
+
+.page-grid-child {
+  margin-bottom: $grid-gap;
+  padding-left: $grid-gap;
+  width: calc(100% / #{$items-per-row});
+}

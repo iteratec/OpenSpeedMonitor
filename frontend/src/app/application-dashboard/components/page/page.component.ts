@@ -9,7 +9,7 @@ import {CalculationUtil} from "../../../shared/utils/calculation.util";
 @Component({
   selector: 'osm-page',
   templateUrl: './page.component.html',
-  styleUrls: ['./page.component.css']
+  styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
   @Input() page: PageDto;
