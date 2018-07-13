@@ -12,7 +12,7 @@
     <g:set var="entityName"
            value="${message(code: params.controller + '.label', default: params.controller.substring(0, 1).toUpperCase() + params.controller.substring(1).toLowerCase())}"/>
     <li class="${params.action == "edit" ? 'active' : ''}">
-        <g:link action="edit" id="${params.id}"><i class="fa fa-pencil"></i> <g:message code="default.edit.label"
+        <g:link action="edit" id="${params.id}"><i class="fas fa-pencil-alt"></i> <g:message code="default.edit.label"
                                                                                         args="[entityName]"/></g:link>
     </li>
 </ul>

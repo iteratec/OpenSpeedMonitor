@@ -150,7 +150,7 @@
                                                 <span class="input-group-btn">
                                                     <a class="btn btn-default"
                                                        onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
-                                                        <i class="fa fa-folder-open-o"
+                                                        <i class="fas fa-folderpen-o"
                                                            aria-hidden="true"></i>
                                                     </a>
                                                 </span>
@@ -242,7 +242,7 @@
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
                                        onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
-                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text" readonly>
@@ -294,7 +294,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
-                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="thePageCsvFileTwitter" class="form-control" type="text" readonly>
@@ -346,7 +346,7 @@
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
                                        onclick="$('input[id=theHourOfDayCsvFile]').click();">
-                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text" readonly>

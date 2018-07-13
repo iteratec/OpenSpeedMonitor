@@ -350,7 +350,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+                var link = $("<li class='filterRule'><a href='#'><i class='fas fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
                 link.click(function (e) {
                     filterCustomerJourney(e.target.innerText);
                     toogleFilterCheckmarks(e.target);

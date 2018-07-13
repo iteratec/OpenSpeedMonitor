@@ -3,7 +3,7 @@
     <div v-if="Object.keys(measuredEventItem.measuredEvent).length">
         <label class="measuredEventLabel">{{ measuredEventItem.measuredEvent.name }}</label>
         <a @click="addMetric()" title="Add measurand">
-            <span class="addMetricButton fa text-success fa-lg fa-plus"></span>
+            <span class="addMetricButton fas text-success fa-lg fa-plus"></span>
         </a>
     </div>
 

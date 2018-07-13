@@ -5,7 +5,7 @@
     <g:if test="${showWptInfoPanel == true}">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <g:message code="default.info.title" default="Information"/>
             </div>
 

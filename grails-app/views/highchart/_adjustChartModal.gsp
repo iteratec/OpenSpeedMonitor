@@ -102,7 +102,7 @@
                 <div class="form-group">
                     <div class="col-md-offset-3 col-md-8">
                         <a href="#" id="addAliasButton" onclick="addAlias();">
-                            <i class="fa fa-lg fa-plus-circle" aria-hidden="true"></i>
+                            <i class="fas fa-lg fa-plus-circle" aria-hidden="true"></i>
                             <g:message code="de.iteratec.chart.adjustment.aliases" default="Add Graph Alias"/>
                         </a>
                     </div>

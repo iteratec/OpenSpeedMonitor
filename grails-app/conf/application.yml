@@ -243,7 +243,7 @@ grails:
             securityConfigType: 'InterceptUrlMap'
             interceptUrlMap: [
                             {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
-                            {pattern: "/setup-dashboard",                               access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
+                            {pattern: "/setupDashboard/**",                             access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
                             {pattern: '/assets/**',                                     access: ["permitAll"]},
@@ -303,7 +303,6 @@ grails:
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
                             {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
                             {pattern: '/landing/**',                                    access: ["permitAll"]},
-                            {pattern: '/application-dashboard/**',                      access: ["permitAll"]},
                             {pattern: '/applicationDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/jobGroup/getAllActiveAndAllRecent',             access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
