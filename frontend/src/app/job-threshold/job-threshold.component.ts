@@ -104,19 +104,24 @@ export class JobThresholdComponent implements OnInit {
     this.newThresholdForJob.thresholds = [];
     this.newThresholdForJob.thresholds.push(newThreshold);
     this.thresholdsForJobList.push(this.newThresholdForJob);
-    if(this.thresholdsForJobList.length > this.actualMeasuredEventList.length) {
+    if(this.thresholdsForJobList.length == this.actualMeasuredEventList.length ) {
       this.addMeasuredEventDisabled= true;
     }
   }
+
+
 
   createScript() {
     console.log("createScript");
   }
 
-  removeMeasuredEvent(measuredEvent) {
+  cancelNewMeasuredEvent() {
     console.log("JOB removeMeasuredEvent");
-    this.measuredEventList.push(measuredEvent)
     this.thresholdsForJobList.pop();
+    this.addMeasuredEventDisabled= false;
+  }
+
+  removeOldMeasuredEvent() {
     this.addMeasuredEventDisabled= false;
   }
 

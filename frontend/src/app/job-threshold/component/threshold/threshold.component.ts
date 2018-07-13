@@ -14,7 +14,8 @@ export class ThresholdComponent implements OnInit{
   @Input() threshold: Threshold;
   @Input() measuredEventList: MeasuredEvent[];
   @Input()  actualMeasurands: Measurand [];
-  @Output() removeEvent = new EventEmitter();
+  @Output() cancelEvent = new EventEmitter();
+  @Output() removeOldThreshold = new EventEmitter();
   //measurandList: Measurand[];
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
@@ -55,6 +56,7 @@ export class ThresholdComponent implements OnInit{
     if (this.deleteConfirmation) {
       this.deleteConfirmation = !this.deleteConfirmation;
       this.thresholdRestService.deleteThreshold(thresholdID);
+      this.removeOldThreshold.emit();
     } else {
       this.rightButtonLabel == "Löschen"
         ? (
@@ -114,6 +116,6 @@ export class ThresholdComponent implements OnInit{
 
   remove() {
     console.log("THRESHOLD REMOVE");
-    this.removeEvent.emit(this.threshold);
+    this.cancelEvent.emit();
   }
 }

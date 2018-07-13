@@ -5,7 +5,8 @@
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
                       [measuredEventList]="actualMeasuredEventList"
-                      (removeEvent)="removeMeasuredEvent($event)"><!--[measurandList]="measurandList"-->
+                      (removeOldMeasuredEvent) = "removeOldMeasuredEvent()"
+                      (removeEvent)="cancelNewMeasuredEvent()"><!--[measurandList]="measurandList"-->
   </osm-measured-event>
   <span class="col-sm-offset-1">
     <button type="button"

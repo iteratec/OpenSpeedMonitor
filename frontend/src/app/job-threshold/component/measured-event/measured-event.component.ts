@@ -16,6 +16,7 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   @Input() thresholds: Threshold[];
   @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
+  @Output() removeOldMeasuredEvent = new EventEmitter();
   newThreshold: Threshold;
   //measurandList: Measurand[];
   actualMeasurands: Measurand[];
@@ -72,19 +73,35 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
     this.thresholds.push(this.newThreshold);
   }
 
-  removeThreshold(threshold) {
+  /*removeThreshold() {
     console.log("MEASUREDEVENT removeThreshold");
-    console.log(" removeThreshold this.thresholds.length: " + this.thresholds.length);
-    if (this.thresholds.length === 1) {
-      this.removeEvent.emit(threshold.measuredEvent);
+    if (this.thresholds.length == 1) {
+      console.log("this.thresholds.length == 1");
+      this.removeOldMeasuredEvent.emit();
     } else {
       this.thresholds.pop();
     }
 
   }
-  removeMeasuredEvent(threshold) {
+  cancelNewEvent() {
     console.log("MEASUREDEVENT removeMeasuredEvent");
-    console.log(" removeMeasuredEvent this.thresholds.length: " + this.thresholds.length);
-    this.removeEvent.emit(threshold.measuredEvent);
+    this.removeEvent.emit();
+    this.thresholds.pop();
+  }*/
+
+  removeThreshold() {
+    if (this.thresholds.length == 1) {
+      this.removeOldMeasuredEvent.emit();
+    }
+  }
+
+  cancelNewThreshold(){
+    console.log("MEASUREDEVENT cancelNewThreshold");
+    this.thresholds.pop();
+  }
+
+  cancelNewMeasuredEvent() {
+    console.log("MEASUREDEVENT cancelNewMeasuredEvent");
+    this.removeEvent.emit();
   }
 }
