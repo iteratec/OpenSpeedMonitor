@@ -56,8 +56,17 @@ class FrontendWatcher {
             })
 
             directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['css', 'js'])
+            String frontendJavascriptsFolder = Paths.get("${location}/grails-app/assets/javascripts/frontend")
+            String frontendStylesheetsFolder = Paths.get("${location}/grails-app/assets/stylesheets/frontend")
 
             Thread.start {
+
+                if (!Files.exists(Paths.get(frontendJavascriptsFolder))
+                        || !Files.exists(Paths.get(frontendStylesheetsFolder))) {
+                    Files.createDirectories(Paths.get(frontendStylesheetsFolder))
+                    Files.createDirectories(Paths.get(frontendJavascriptsFolder))
+                }
+
                 while (GrailsApp.developmentModeActive) {
 
                     def uniqueChangedFiles = changedFiles as Set
@@ -74,9 +83,9 @@ class FrontendWatcher {
                                 Path dst
 
                                 if (src.toString().endsWith('.css')) {
-                                    dst = Paths.get("${location}/grails-app/assets/stylesheets/frontend/${file.getName()}")
+                                    dst = Paths.get("${frontendStylesheetsFolder}/${file.getName()}")
                                 } else {
-                                    dst = Paths.get("${location}/grails-app/assets/javascripts/frontend/${file.getName()}")
+                                    dst = Paths.get("${frontendJavascriptsFolder}/${file.getName()}")
                                 }
                                 Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
                             }
