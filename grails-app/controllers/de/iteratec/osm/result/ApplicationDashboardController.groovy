@@ -67,7 +67,7 @@ class ApplicationDashboardController {
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
         List<PageCsiDto> pageCsiDtos = []
         if (selectedJobGroup.hasCsiConfiguration()) {
-            pageCsiDtos = applicationDashboardService.getMostRecentCsiForPage(selectedJobGroup)
+            pageCsiDtos = applicationDashboardService.getMostRecentCsiForPagesOfJobGroup(selectedJobGroup)
         }
         return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }

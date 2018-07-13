@@ -1,5 +1,5 @@
 export interface PageCsiDto {
-  id: number,
+  pageId: number,
   date: string,
   csiDocComplete: number,
   csiVisComplete: number

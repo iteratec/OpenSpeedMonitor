@@ -81,7 +81,7 @@ class ApplicationDashboardService {
                 .getAverageData()
     }
 
-    List<PageCsiDto> getCsiForPagesOfJobGroup(JobGroup jobGroup) {
+    private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
 
         List<PageCsiDto> pageCsiDtos = []
         List<JobGroup> csiGroup = [jobGroup]
@@ -95,7 +95,7 @@ class ApplicationDashboardService {
                 csiGroup, pages).each {
             PageCsiDto pageCsiDto = new PageCsiDto()
             if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                pageCsiDto.id = it.page.id
+                pageCsiDto.pageId = it.page.id
                 pageCsiDto.date = it.started.format("yyy-MM-dd")
                 pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
                 pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
@@ -105,8 +105,8 @@ class ApplicationDashboardService {
         return pageCsiDtos
     }
 
-    List<PageCsiDto> getMostRecentCsiForPage(JobGroup jobGroup) {
-        List<PageCsiDto> recentCsi = getCsiForPagesOfJobGroup(jobGroup)
+    List<PageCsiDto> getMostRecentCsiForPagesOfJobGroup(JobGroup jobGroup) {
+        List<PageCsiDto> recentCsi = getAllCsiForPagesOfJobGroup(jobGroup)
         recentCsi.sort {
             a, b -> b.date <=> a.date
         }

@@ -22,7 +22,7 @@ export class PageComponent {
       map((next: MetricsDto[]) => next.find((metricsDto: MetricsDto) => metricsDto.pageId == this.page.id)));
 
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
-      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.id == this.page.id)));
+      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)));
   }
 
   transform(value: number): string {

@@ -2,9 +2,9 @@ package de.iteratec.osm.api.dto
 
 import groovy.transform.EqualsAndHashCode
 
-@EqualsAndHashCode(includes = "id")
+@EqualsAndHashCode(includes = "pageId")
 class PageCsiDto {
-    Long id
+    Long pageId
     String date
     double csiDocComplete
     double csiVisComplete
