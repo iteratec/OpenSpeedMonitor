@@ -23,16 +23,10 @@ class ApplicationDashboardService {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
 
-
-        def pages = (pagesWithResults + pagesOfActiveJobs).collect {
-            [
-                    'id'  : it.id,
-                    'name': it.name
-            ]
-        } as Set
+        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
         pages.unique()
-
         return pages
+        
     }
 
     def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
@@ -89,24 +83,23 @@ class ApplicationDashboardService {
 
     List<PageCsiDto> getCsiForPagesOfJobGroup(JobGroup jobGroup) {
         List<PageCsiDto> pageCsiDtos = []
-        if (jobGroup.hasCsiConfiguration()) {
+        List<JobGroup> csiGroup = [jobGroup]
+        DateTime to = new DateTime().withTimeAtStartOfDay()
+        DateTime from = to.minusWeeks(4)
+        CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-            List<JobGroup> csiGroup = [jobGroup]
-            DateTime to = new DateTime().withTimeAtStartOfDay()
-            DateTime from = to.minusWeeks(4)
-            CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroup.id)
+        println pages
 
-            List<Page> pages = getPagesWithExistingEventResults(from, to, jobGroup.id)
-
-            pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval, csiGroup, pages).each {
-                PageCsiDto pageCsiDto = new PageCsiDto()
-                if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                    pageCsiDto.id = it.page.id
-                    pageCsiDto.date = it.started.format("yyy-MM-dd")
-                    pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                    pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                    pageCsiDtos << pageCsiDto
-                }
+        pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
+                csiGroup, pages).each {
+            PageCsiDto pageCsiDto = new PageCsiDto()
+            if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
+                pageCsiDto.id = it.page.id
+                pageCsiDto.date = it.started.format("yyy-MM-dd")
+                pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                pageCsiDtos << pageCsiDto
             }
         }
         return pageCsiDtos
