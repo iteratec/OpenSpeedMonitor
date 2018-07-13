@@ -7,7 +7,6 @@ import {PageListComponent} from './components/page-list/page-list.component';
 import {ApplicationDashboardService} from "./services/application-dashboard.service";
 import {PageComponent} from './components/page/page.component';
 import {ApplicationCsiComponent} from './components/application-csi/application-csi.component';
-import {CsiService} from "./services/csi.service";
 import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-component'
 import {RouterModule, Routes} from "@angular/router";
 
@@ -39,8 +38,7 @@ const DashboardRoutes: Routes = [
       multi: true
     },
     JobGroupService,
-    ApplicationDashboardService,
-    CsiService
+    ApplicationDashboardService
   ],
   entryComponents: [ApplicationDashboardEntryComponent]
 })
