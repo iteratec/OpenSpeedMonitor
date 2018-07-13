@@ -1,0 +1,57 @@
+.flex-group {
+  margin: auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+  align-content: center;
+}
+
+.flex-container {
+  display: flex;
+  /*align-items: space-around;*/
+  justify-content: flex-start;
+  align-content: center;
+}
+
+.small-item {
+  flex-grow: 1;
+  margin: auto;
+ }
+
+.medium-item {
+  flex-grow: 2;
+  margin: auto;
+  padding-right: 1%;
+}
+
+.large-item {
+  flex-grow: 3;
+  margin: auto;
+}
+
+.good {
+  color: #2ECC71;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.bad {
+  color: #EB5E55;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: left;
+}
+
+.ok {
+  color: #FFC762;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.symbol {
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: center;
+}

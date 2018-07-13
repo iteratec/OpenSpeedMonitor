@@ -1,0 +1,21 @@
+
+.measuredEvent {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.flex-container {
+  width: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-item {
+  flex-grow: 1;
+  margin: auto;
+  align-self: center;
+  font-weight: bold;
+}

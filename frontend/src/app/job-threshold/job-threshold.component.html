@@ -1,22 +1,19 @@
-<div class="container">
-  <h4>Angular Component</h4>
-  <hr>
+<div>
   <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList "
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
                       [measuredEventList]="actualMeasuredEventList"
                       (removeOldMeasuredEvent) = "removeOldMeasuredEvent()"
-                      (removeEvent)="cancelNewMeasuredEvent()"><!--[measurandList]="measurandList"-->
+                      (removeEvent)="cancelNewMeasuredEvent()">
   </osm-measured-event>
-  <span class="col-sm-offset-1">
-    <button type="button"
-            class="btn btn-primary"
-            [disabled] = "addMeasuredEventDisabled"
-            (click)="addMeasuredEvent() ">Measured Event hinzufügen</button>
-    <button type="button"
-            class="btn btn-default"
-            (click)="createScript()">CI-Script Erstellen</button>
-  </span>
+
+  <button type="button"
+          class="btn btn-primary"
+          [disabled] = "addMeasuredEventDisabled"
+          (click)="addMeasuredEvent() ">Measured Event hinzufügen</button>
+  <button type="button"
+          class="btn btn-default"
+          (click)="createScript()">CI-Script Erstellen</button>
 </div>
 
 

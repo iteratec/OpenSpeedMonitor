@@ -1,54 +1,67 @@
 <div>
   <div *ngIf="threshold.state=='normal'">
-    <label class="thresholdMeasurand">{{threshold.measurand.name}} </label>
-    <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
-      <span class="form-inline">
-      <span class="thresholdLabel labelGood">Good</span>
-      <span class="thresholdLabel"><</span>
-    </span>
-      <span class="form-inline">
-      <div class="input-group thresholdInput">
-        <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput"  class="form-control">
-        <span class="input-group-addon">ms</span>
-      </div>
-    </span>
-      <span class="form-inline">
-      <span class="thresholdLabel"> < </span>
-      <span class="thresholdLabel labelOk">Ok</span>
-      <span class="thresholdLabel"><</span>
-    </span>
-      <span class="form-inline">
-      <div class="input-group thresholdInput">
-        <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput" class="form-control">
-        <span class="input-group-addon">ms</span>
-      </div>
-    </span>
-      <span class="form-inline">
-      <span class="thresholdLabel"><</span>
-      <span class="thresholdLabel labelBad">Bad</span>
-    </span>
-      <span *ngIf="!deleteConfirmation" class="form-inline">
+    <label class="">{{threshold.measurand.name}} </label>
 
-        <button type="button"
-                class="btn btn-primary btn-sm"
-                (click)="edit()" >{{leftButtonLabel}}</button>
-        <button type="button"
-                class="btn btn-danger btn-sm"
-                (click)="delete(threshold.id)">{{rightButtonLabel}}</button>
-      </span>
-      <span *ngIf="deleteConfirmation" class="form-inline"> Sicher?
+    <div class="flex-group">
+      <div class="flex-container"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
 
-        <button type="button"
-                class="btn btn-success btn-sm"
-                (click)="delete(threshold.id)">{{leftButtonLabel}}</button>
-        <button type="button"
-                class="btn btn-danger btn-sm"
-                (click)="cancel()">{{rightButtonLabel}}</button>
-      </span>
+        <!--GOOD INPUT-->
+        <div class="medium-item good">Good</div>
+        <div class="medium-item symbol"><</div>
+        <div class="input-group thresholdInput medium-item">
+          <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput"  class="form-control">
+          <div class="input-group-addon">ms</div>
+        </div>
+
+        <!--OK INPUT BAD-->
+        <div class="medium-item symbol"><</div>
+        <div class="medium-item ok">Ok</div>
+        <div class="medium-item symbol"><</div>
+        <div class="input-group thresholdInput medium-item">
+          <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput" class="form-control">
+          <div class="input-group-addon">ms</div>
+        </div>
+        <div class="medium-item symbol"><</div>
+        <div class="medium-item bad">Bad</div>
+
+
+      </div>
+      <!--BUTTONS WITHOUT delete Confirmation-->
+      <div *ngIf="!deleteConfirmation" class="flex-container">
+        <div class="medium-item">
+          <button type="button"
+                  class="btn btn-primary btn-sm"
+                  (click)="edit()" >{{leftButtonLabel}}</button>
+        </div>
+        <div class="medium-item">
+          <button type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="delete(threshold.id)">{{rightButtonLabel}}</button>
+        </div>
+
+
+      </div>
+      <!--BUTTONS WITH delete Confirmation-->
+      <div *ngIf="deleteConfirmation" class="flex-container"> Sicher?
+        <div class="medium-item">
+          <button type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="delete(threshold.id)">{{leftButtonLabel}}</button>
+        </div>
+        <div class="medium-item">
+          <button type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="cancel()">{{rightButtonLabel}}</button>
+        </div>
+      </div>
     </div>
+
   </div>
+
+  <!--Aqui-->
+
   <div *ngIf="threshold.measuredEvent.state=='new'">
-    <select class="form-inline"
+    <select class=""
             [(ngModel)]="selectedMeasuredEvent"
             required>
       <option *ngFor="let measuredEvent of measuredEventList" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
@@ -63,7 +76,7 @@
     <div class="thresholdBoundaries form-inlinessss"><!--Good< Lower: {{threshold.lowerBoundary}} Upper: {{threshold.upperBoundary}} >Bad-->
       <span class="form-inline">
       <span class="thresholdLabel labelGood">Good</span>
-      <span class="thresholdLabel"><</span>
+      <span class="thresholdLabel"> < </span>
     </span>
       <span class="form-inline">
       <div class="input-group thresholdInput">
@@ -72,9 +85,9 @@
       </div>
     </span>
       <span class="form-inline">
+      <span class="symbol"> < </span>
+      <span class="ok">Ok</span>
       <span class="thresholdLabel"> < </span>
-      <span class="thresholdLabel labelOk">Ok</span>
-      <span class="thresholdLabel"><</span>
     </span>
       <span class="form-inline">
       <div class="input-group thresholdInput">
@@ -83,8 +96,8 @@
       </div>
     </span>
       <span class="form-inline">
-      <span class="thresholdLabel"><</span>
-      <span class="thresholdLabel labelBad">Bad</span>
+      <span class="symbol"><</span>
+      <span class="bad">Bad</span>
     </span>
     <span class="form-inline">
       <button type="button"

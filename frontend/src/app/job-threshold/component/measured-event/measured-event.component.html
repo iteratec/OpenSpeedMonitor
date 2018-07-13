@@ -1,25 +1,38 @@
-<div class="col-md-offset-1">
-  <div *ngIf="measuredEvent.state=='normal'">
-    <label class="measuredEventLabel">{{measuredEvent.name}}</label>
-    <button type="button"
-            class="btn btn-success"
-            [disabled] = "addThresholdDisabled"
-            (click)="addThreshold()">+</button>
+<div class="">
+  <div class="" *ngIf="measuredEvent.state=='normal'">
+    <div class="flex-container">
+      <div class="flex-item">
 
-    <osm-threshold *ngFor="let threshold of thresholds"
-                   [threshold]="threshold"
-                   [measuredEventList]="measuredEventList"
-                   [actualMeasurandList]="actualMeasurandList"
-                   (savedThreshold)="savedThreshold()"
-                   (removeOldThreshold)="removeThreshold()"
-                   (cancelEvent)="cancelNewThreshold()"></osm-threshold><!-- (removeOldThresholdEvent)="removeThreshold()"-->
+        <label class="measuredEvent">{{measuredEvent.name}}</label>
+      </div>
+      <div class="flex-item">
+        <button type="button"
+                class="btn btn-primary"
+                [disabled] = "addThresholdDisabled"
+                (click)="addThreshold()">+</button>
+      </div>
+
+    </div>
+
+
+    <div class="">
+      <osm-threshold *ngFor="let threshold of thresholds"
+                     [threshold]="threshold"
+                     [measuredEventList]="measuredEventList"
+                     [actualMeasurandList]="actualMeasurandList"
+                     (savedThreshold)="savedThreshold()"
+                     (removeOldThreshold)="removeThreshold()"
+                     (cancelEvent)="cancelNewThreshold()"></osm-threshold><!-- (removeOldThresholdEvent)="removeThreshold()"-->
+    </div>
+    <hr>
   </div>
-  <div *ngIf="measuredEvent.state=='new'">
+  <div class="" *ngIf="measuredEvent.state=='new'">
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"
                    [actualMeasurandList]="actualMeasurandList"
                    (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold><!--[measurandList]="measurandList"-->
+
   </div>
 </div>
 
