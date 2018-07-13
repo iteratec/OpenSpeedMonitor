@@ -3,12 +3,14 @@
     <label class="measuredEventLabel">{{measuredEvent.name}}</label>
     <button type="button"
             class="btn btn-success"
+            [disabled] = "addThresholdDisabled"
             (click)="addThreshold()">+</button>
 
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"
-                   [actualMeasurands]="actualMeasurands"
+                   [actualMeasurandList]="actualMeasurandList"
+                   (savedThreshold)="savedThreshold()"
                    (removeOldThreshold)="removeThreshold()"
                    (cancelEvent)="cancelNewThreshold()"></osm-threshold><!-- (removeOldThresholdEvent)="removeThreshold()"-->
   </div>
@@ -16,7 +18,7 @@
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"
-                   [actualMeasurands]="actualMeasurands"
+                   [actualMeasurandList]="actualMeasurandList"
                    (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold><!--[measurandList]="measurandList"-->
   </div>
 </div>

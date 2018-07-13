@@ -13,9 +13,10 @@ import {MeasuredEvent} from '../../service/model/measured-event.model';
 export class ThresholdComponent implements OnInit{
   @Input() threshold: Threshold;
   @Input() measuredEventList: MeasuredEvent[];
-  @Input()  actualMeasurands: Measurand [];
+  @Input()  actualMeasurandList: Measurand [];
   @Output() cancelEvent = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
+  @Output() savedThreshold = new EventEmitter();
   //measurandList: Measurand[];
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
@@ -45,9 +46,9 @@ export class ThresholdComponent implements OnInit{
       console.log("THRESHOLD newMeasuredEvent this.actualMeasurands[0].name: " + JSON.stringify(this.actualMeasurands[0].name));*/
     }
     if (this.threshold.state == "new") {
-      console.log("THRESHOLD newThreshold this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
-
-      this.selectedMeasurand = this.actualMeasurands[0].name;
+      console.log("THRESHOLD newThreshold this.actualMeasurands: " + JSON.stringify(this.actualMeasurandList));
+      console.log("this.actualMeasurandList[0].name: " + this.actualMeasurandList[0].name);
+      this.selectedMeasurand = this.actualMeasurandList[0].name;
       this.leftButtonLabelDisable = true;
     }
   }
@@ -96,6 +97,7 @@ export class ThresholdComponent implements OnInit{
   }
 
   save() {
+    this.savedThreshold.emit();
     this.threshold.measurand.name = this.selectedMeasurand;
     if (this.threshold.measuredEvent.state == "new") {
       this.threshold.measuredEvent = this.selectedMeasuredEvent;

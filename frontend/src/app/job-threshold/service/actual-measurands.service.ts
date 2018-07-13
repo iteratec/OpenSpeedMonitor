@@ -11,6 +11,7 @@ export class ActualMeasurandsService {
 
   measurandList: Measurand[];
   actualMeasurandList: Measurand[];
+
   constructor() {}
 
   setActualMeasurands(measurands: Measurand[]) {
@@ -24,6 +25,8 @@ export class ActualMeasurandsService {
           this.actualMeasurandList.push(measurand);
         }
       });
+    //this.actualMeasurandList.length < 1 ? this.shouldDisabled = false : this.shouldDisabled = true;
+
     return this.actualMeasurandList
   }
 }

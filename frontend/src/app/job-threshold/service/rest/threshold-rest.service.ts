@@ -13,8 +13,6 @@ import {ActualMeasurandsService} from  "../actual-measurands.service"
 import {Subject} from "rxjs/internal/Subject";
 import {log} from "util";
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -102,85 +100,33 @@ export class ThresholdRestService {
     );
   }
 
+  /** GET Script */
+  getScritpt () {
+    var self = this;
+    let params = new HttpParams().set('jobId', this.actualJobId.toString());
+    const url =`/job/getCiScript`;
+    this.http.get(url, { params: params, responseType: 'text' })
+      .subscribe(result =>  self.download(result), error => this.handleError(error)) ;
+  }
+
+  download(data) {
+    var fileName = "CI_Script_" + this.actualJobId + ".groovy";
+    var blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    this.saveData(blob, fileName);
+  }
+
+  saveData(blob, fileName) {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    //a.style = "display: none";
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
   handleError(error: any){
     console.log(error);
   }
-
-
-    /*getThresholds: function () {
-  this.activeMeasuredEvents = [];
-  var self = this;
-  this.getThresholdsForJob(this.jobId).success(function (result) {
-    result.forEach(function (resultEvent) {
-      var thresholdsForEvent = [];
-      resultEvent.thresholds.forEach(function (threshold) {
-        thresholdsForEvent.push({
-          threshold: threshold,
-          edit: false,
-          saved: true
-        })
-      });
-      self.activeMeasuredEvents.push({
-        measuredEvent: self.measuredEvents.find(function (element) {
-          return element.id === resultEvent.measuredEvent.id;
-        }),
-        thresholdList: thresholdsForEvent
-      })
-    })
-  }).error(function (e) {
-    console.log(e);
-  });
-}*/
-
-  /*getHero(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
-      tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
-    );
-  }*/
-
- /* getMeasurands() {
-  var self = this;
-  $.ajax({
-    type: 'GET',
-    url: "/job/getAllMeasurands",
-    data: {},
-    success: function (result) {
-      result.forEach(function (measurand) {
-        measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];
-      });
-
-      self.measurands = result;
-    },
-    error: function () {
-      return ""
-    }
-  });
-
-
-}*/
-  /*getMeasuredEvents: function (scriptId) {
-  var self = this;
-  if (scriptId) {
-    $.ajax({
-      type: 'GET',
-      url: "/script/getMeasuredEventsForScript",
-      data: {scriptId: scriptId},
-      success: function (result) {
-        self.measuredEvents = result;
-        self.copiedMeasuredEvents = self.measuredEvents.slice();
-        self.measuredEventCount = self.measuredEvents.length;
-        self.getThresholds();
-      },
-      error: function () {
-        return ""
-      }
-    });
-  }
-},*/
-
-
-
-
 }

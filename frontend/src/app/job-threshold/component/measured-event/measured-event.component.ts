@@ -11,15 +11,15 @@ import { ActualMeasurandsService } from '../../service/actual-measurands.service
   styleUrls: ['./measured-event.component.css']
 })
 
-export class MeasuredEventComponent implements OnInit, OnChanges {
+export class MeasuredEventComponent implements OnInit {
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[];
   @Input() measuredEventList: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
   @Output() removeOldMeasuredEvent = new EventEmitter();
   newThreshold: Threshold;
-  //measurandList: Measurand[];
-  actualMeasurands: Measurand[];
+  addThresholdDisabled: boolean = false;
+  actualMeasurandList: Measurand[];
 
 
   constructor(private thresholdRestService: ThresholdRestService,
@@ -31,38 +31,25 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (this.measuredEvent.state == "new") {
-      this.actualMeasurands = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    }
-  }
 
-  ngOnChanges() {
-/*    this.thresholds.map(threshold => {
-      let name: string = threshold.measurand.name;
-      if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
-        this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
-      }
-    })*/
+    //if (this.measuredEvent.state == "new") {
+    this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+    //}
+    this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
+    console.log("this.actualMeasurandList.length: " + this.actualMeasurandList.length);
+
+
   }
 
   addThreshold() {
-    this.actualMeasurands = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    console.log("MEASUREDEVENT this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
-   /* this.thresholds.map(threshold => {
-      let name: string = threshold.measurand.name;
-      if(this.measurandList.map(element => element.name).indexOf(name) !== -1 ) {
-        this.measurandList.splice(this.measurandList.map(element => element.name).indexOf(name) , 1);
-      }
-    })*/
-
+    this.addThresholdDisabled = true;
+    this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+    console.log("MEASUREDEVENT this.actualMeasurandList: " + JSON.stringify(this.actualMeasurandList));
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
     let newMeasuredEvent = {} as MeasuredEvent;
     let newThresholdName: string;
-
-    //if (this.thresholds.length < this.actualMeasurands.length) {
-      newThresholdName = this.actualMeasurands[this.thresholds.length].name;
-    //}
+    newThresholdName = this.actualMeasurandList[0].name;
     newMeasuredEvent.id = this.measuredEvent.id;
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
@@ -73,31 +60,22 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
     this.thresholds.push(this.newThreshold);
   }
 
-  /*removeThreshold() {
-    console.log("MEASUREDEVENT removeThreshold");
-    if (this.thresholds.length == 1) {
-      console.log("this.thresholds.length == 1");
-      this.removeOldMeasuredEvent.emit();
-    } else {
-      this.thresholds.pop();
-    }
-
+  savedThreshold() {
+    this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
   }
-  cancelNewEvent() {
-    console.log("MEASUREDEVENT removeMeasuredEvent");
-    this.removeEvent.emit();
-    this.thresholds.pop();
-  }*/
 
   removeThreshold() {
     if (this.thresholds.length == 1) {
       this.removeOldMeasuredEvent.emit();
     }
+    this.addThresholdDisabled = false;
   }
 
   cancelNewThreshold(){
     console.log("MEASUREDEVENT cancelNewThreshold");
     this.thresholds.pop();
+    this.addThresholdDisabled = false;
+
   }
 
   cancelNewMeasuredEvent() {
