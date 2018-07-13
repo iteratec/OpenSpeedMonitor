@@ -26,7 +26,7 @@ class ApplicationDashboardService {
         List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
         pages.unique()
         return pages
-        
+
     }
 
     def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
@@ -82,6 +82,7 @@ class ApplicationDashboardService {
     }
 
     List<PageCsiDto> getCsiForPagesOfJobGroup(JobGroup jobGroup) {
+
         List<PageCsiDto> pageCsiDtos = []
         List<JobGroup> csiGroup = [jobGroup]
         DateTime to = new DateTime().withTimeAtStartOfDay()
@@ -89,7 +90,6 @@ class ApplicationDashboardService {
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
         List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroup.id)
-        println pages
 
         pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
                 csiGroup, pages).each {
@@ -103,6 +103,16 @@ class ApplicationDashboardService {
             }
         }
         return pageCsiDtos
+    }
+
+    List<PageCsiDto> getMostRecentCsiForPage(JobGroup jobGroup) {
+        List<PageCsiDto> recentCsi = getCsiForPagesOfJobGroup(jobGroup)
+        recentCsi.sort {
+            a, b -> b.date <=> a.date
+        }
+        recentCsi.unique()
+        return recentCsi
+
     }
 
 }
