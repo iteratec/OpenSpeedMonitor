@@ -1,8 +1,25 @@
 <div class="card">
   <h2>{{page.name}}</h2>
   <div *ngIf="metricsForPage$ | async, let metricsDto">
-    <div>SpeedIndex: {{transform(metricsDto.speedIndex)}}</div>
-    <div>DocComplete: {{transform(metricsDto.docCompleteTimeInMillisecs)}}</div>
-    <div>Size: {{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
+    <div class="metrics">
+      <div class="metric">
+        <i class="far fa-eye metric-icon"></i>
+        <div class="metric-value">{{transform(metricsDto.speedIndex / 1000)}}</div>
+        <div class="metric-unit">s</div>
+        <div class="metric-description">SpeedIndex</div>
+      </div>
+      <div class="metric">
+        <i class="fas fa-stopwatch metric-icon"></i>
+        <div class="metric-value">{{transform(metricsDto.docCompleteTimeInMillisecs / 1000)}}</div>
+        <div class="metric-unit">s</div>
+        <div class="metric-description">Document Complete</div>
+      </div>
+      <div class="metric">
+        <i class="fas fa-weight-hanging metric-icon"></i>
+        <div class="metric-value">{{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
+        <div class="metric-unit">MB</div>
+        <div class="metric-description">Bytes Fully Loaded</div>
+      </div>
+    </div>
   </div>
 </div>
