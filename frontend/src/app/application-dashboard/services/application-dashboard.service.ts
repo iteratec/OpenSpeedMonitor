@@ -4,29 +4,37 @@ import {ReplaySubject} from "rxjs/index";
 import {PageDto} from "../models/page.model";
 import {MetricsDto} from "../models/metrics.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
+import {JobGroupDTO} from "../../shared/models/job-group.model";
 
 @Injectable()
 export class ApplicationDashboardService {
   metrics$: ReplaySubject<MetricsDto[]> = new ReplaySubject<MetricsDto[]>(1);
   pages$: ReplaySubject<PageDto[]> = new ReplaySubject<PageDto[]>(1);
-  csiValues$ = new ReplaySubject<ApplicationCsiListDTO>(1);
+  csiValues$: ReplaySubject<ApplicationCsiListDTO> = new ReplaySubject<ApplicationCsiListDTO>(1);
 
   constructor(private http: HttpClient) {
   }
 
-  updateMetricsForApplication(applicationId: number) {
-    this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', this.createParams(applicationId))
+  private updateMetricsForApplication(params) {
+    this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params: params})
       .subscribe((response: MetricsDto[]) => this.metrics$.next(response), error => this.handleError(error));
   }
 
-  updatePagesForApplication(applicationId: number) {
-    this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', this.createParams(applicationId))
+  private updatePagesForApplication(params) {
+    this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', {params: params})
       .subscribe((response: PageDto[]) => this.pages$.next(response), error => this.handleError(error))
   }
 
-  updateCsiForApplication(applicationId: number) {
-    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', this.createParams(applicationId))
+  private updateCsiForApplication(params) {
+    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params: params})
       .subscribe((response: ApplicationCsiListDTO) => this.csiValues$.next(response), error => this.handleError(error));
+  }
+
+  updateApplicationData(application: JobGroupDTO) {
+    const params = this.createParams(application.id);
+    this.updateMetricsForApplication(params);
+    this.updatePagesForApplication(params);
+    this.updateCsiForApplication(params);
   }
 
   private handleError(error: any) {
@@ -35,10 +43,8 @@ export class ApplicationDashboardService {
 
   private createParams(applicationId: number) {
     return {
-      params: {
         applicationId: applicationId ? applicationId.toString() : ""
       }
-    }
   }
 
 }
