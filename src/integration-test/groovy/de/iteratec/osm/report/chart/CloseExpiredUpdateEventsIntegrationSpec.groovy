@@ -18,21 +18,20 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.util.ServiceMocker
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import spock.util.mop.ConfineMetaClassChanges
 
 @Integration
 @Rollback
-@ConfineMetaClassChanges([CsiAggregationUtilService, BatchActivityService])
 class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
@@ -65,6 +64,12 @@ class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegratio
             mocksCommonToAllTests()
             createTestDataCommonToAllTests()
     }
+
+    def cleanup() {
+        csiAggregationUpdateEventCleanupService.csiAggregationDaoService.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        csiAggregationUpdateEventCleanupService.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService')
+    }
+
 
     void "Outdated daily page CSI aggregations get closed and calculated correctly"() {
         setup: "Create two outdated CSI aggregations and no event results"
@@ -324,8 +329,14 @@ class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegratio
     }
 
     private void mocksCommonToAllTests() {
-        csiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecutionTimeOfCleanup }
-        ServiceMocker.create().mockBatchActivityService(csiAggregationUpdateEventCleanupService)
+        csiAggregationUpdateEventCleanupService.csiAggregationDaoService.csiAggregationUtilService = Spy(CsiAggregationUtilService) {
+            getNowInUtc() >> mockedExecutionTimeOfCleanup
+        }
+        csiAggregationUpdateEventCleanupService.batchActivityService = Spy(BatchActivityService) {
+            getActiveBatchActivity(_, _, _, _, _) >> {
+                return new BatchActivityUpdaterDummy("test", "test", Activity.UPDATE, 50, 5000)
+            }
+        }
     }
 
     private void createTestDataCommonToAllTests() {

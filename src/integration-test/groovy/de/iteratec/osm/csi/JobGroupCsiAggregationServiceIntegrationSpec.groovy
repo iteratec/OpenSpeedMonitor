@@ -27,11 +27,10 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import spock.lang.Shared
-import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
@@ -41,7 +40,6 @@ import static org.junit.Assert.assertTrue
  */
 @Integration
 @Rollback
-@ConfineMetaClassChanges([WeightingService])
 class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     @Shared JobGroup jobGroup1, jobGroup2, jobGroup3

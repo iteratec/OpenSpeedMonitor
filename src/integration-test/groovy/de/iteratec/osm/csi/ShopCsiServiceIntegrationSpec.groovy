@@ -30,14 +30,14 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.result.*
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.util.mop.ConfineMetaClassChanges
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 @Integration
 @Rollback
@@ -74,7 +74,13 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
             createJobGroup()
             createEventResults()
         }
-        csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
+        csiByEventResultsService.csTargetGraphDaoService = Spy(CsTargetGraphDaoService) {
+            getActualCsTargetGraph() >> null
+        }
+    }
+
+    def cleanup() {
+        csiByEventResultsService.csTargetGraphDaoService = grailsApplication.mainContext.getBean("csTargetGraphDaoService")
     }
 
     void "test retrieveCsi with system and page"() {
