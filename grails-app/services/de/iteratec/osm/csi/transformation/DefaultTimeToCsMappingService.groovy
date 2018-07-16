@@ -23,9 +23,8 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.MultiLineChartLineData
-import de.iteratec.osm.report.chart.RickshawHtmlCreater
 import de.iteratec.osm.util.I18nService
-
+import de.iteratec.osm.util.PerformanceLoggingService
 /**
  * DefaultTimeToCsMappingService
  * A service class encapsulates the core business logic of a Grails application
@@ -35,6 +34,7 @@ class DefaultTimeToCsMappingService {
 
     TimeToCsMappingCacheService timeToCsMappingCacheService
     I18nService i18nService
+    PerformanceLoggingService performanceLoggingService
 
     List<DefaultTimeToCsMapping> getAll() {
         return DefaultTimeToCsMapping.list()
@@ -69,7 +69,9 @@ class DefaultTimeToCsMappingService {
                         customerSatisfaction: defaultMapping.customerSatisfactionInPercent,
                         mappingVersion: actualMappingVersion
                 ).save(failOnError: true))
-                csiConfiguration.save(failOnError: true)
+                performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, 'save csiconf', 1){
+                    csiConfiguration.save(failOnError: true)
+                }
             }
         }
     }
