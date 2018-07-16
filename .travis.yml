@@ -1,13 +1,13 @@
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
-#  directories:
-#    - node_modules
-#    - frontend/node_modules
-#    - build/npm
-#    - $HOME/.npm
-#    - $HOME/.gradle/caches/
-#    - $HOME/.gradle/wrapper/
+  directories:
+    - node_modules
+    - frontend/node_modules
+    - build/npm
+    - $HOME/.npm
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - openjdk8
@@ -22,14 +22,9 @@ notifications:
 
 jobs:
   include:
-    - stage: Tests
-      script: ./gradlew clean integrationTest --tests de.**.* --full-stacktrace
-    - stage: Tests
+    - stage: tests
       script: ./gradlew -x jasmineRun test
-    - stage: Tests
-      install: skip
-      script: date
-after_failure:
-  # dump the last 2000 lines of our build, and hope the error is in that!
-  - cat  ~/iteratec/OpenSpeedMonitor/build/spock-reports/de.iteratec.osm.report.chart.CloseExpiredUpdateEventsIntegrationSpec.html
+#    - script: ./gradlew integrationTest --tests "de.iteratec.osm.report.**"  --tests "de.iteratec.osm.result.**"  --tests "de.iteratec.osm.measurement.**"
+#    - script: ./gradlew integrationTest --tests "de.iteratec.osm.csi.**"
+    - script: ./gradlew jasmineRun
 
