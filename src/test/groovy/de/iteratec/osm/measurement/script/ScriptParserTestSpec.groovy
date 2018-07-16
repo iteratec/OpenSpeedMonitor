@@ -80,7 +80,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
 
     void "PageViewCommandOnlyScript results in warning"() {
         when: "a script with only a navigate command is parsed"
-        ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com')
+        ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com', "test")
 
         then: "a MISSING_SETEVENTNAME_STATEMENT warning occurs"
         parser.errors.size() == 1
