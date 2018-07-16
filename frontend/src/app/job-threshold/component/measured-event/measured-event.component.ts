@@ -51,6 +51,9 @@ export class MeasuredEventComponent implements OnInit {
     let newThresholdName: string;
     newThresholdName = this.actualMeasurandList[0].name;
     newMeasuredEvent.id = this.measuredEvent.id;
+    if (this.measuredEvent.state!= "new"){
+      newMeasuredEvent.state='normal';
+    }
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
     this.newThreshold.lowerBoundary = 0;

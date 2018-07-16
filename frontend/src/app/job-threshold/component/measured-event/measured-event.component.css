@@ -1,21 +1,45 @@
+.thresholdContainer {
+  width:150% ;
+}
+
+.flex-row-group {
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+  line-height: 2;
+}
+
+.flex-column-left {
+  flex: 0 1 230px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  line-height: 2;
+}
+
+.flex-column-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content:flex-end;
+  /*
+  align-items: flex-start;
+  */
+  line-height: 2;
+  flex-basis: 800px;
+}
+
+.flex-up {
+  font-weight: bold;
+}
+
+.flex-down {
+  margin-top: 2%;
+  font-weight: bold;
+}
 
 .measuredEvent {
-  font-size: 1.25em;
-  font-weight: bold;
-  margin-top: auto;
-}
-
-.flex-container {
-  width: 100%;
-  margin: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.flex-item {
-  flex-grow: 1;
-  margin: auto;
-  align-self: center;
+  font-size: 1em;
   font-weight: bold;
 }
+
+
