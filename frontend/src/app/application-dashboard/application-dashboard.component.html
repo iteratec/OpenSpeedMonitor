@@ -4,7 +4,7 @@
                           (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>
 <ng-container *ngIf="selectedApplication">
-  <osm-application-csi [application]="selectedApplication"></osm-application-csi>
-  <osm-page-list [applicationId]="selectedApplication.id"></osm-page-list>
+  <osm-application-csi></osm-application-csi>
+  <osm-page-list></osm-page-list>
 </ng-container>
 

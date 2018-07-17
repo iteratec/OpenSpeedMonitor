@@ -1,10 +1,9 @@
-import {Component, Input} from '@angular/core';
-import {CsiService} from "../../services/csi.service";
-import {JobGroupDTO} from "../../../shared/models/job-group.model";
+import {Component} from '@angular/core';
 import {CsiDTO} from "../../models/csi.model";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
+import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 
 @Component({
   selector: 'osm-application-csi',
@@ -15,16 +14,11 @@ export class ApplicationCsiComponent {
   recentCsiValue$: Observable<CsiDTO>;
   hasConfiguration$: Observable<boolean>;
 
-  @Input()
-  set application(application: JobGroupDTO) {
-    this.csiService.getCsiForApplication(application);
-  }
-
-  constructor(private csiService: CsiService) {
-    this.recentCsiValue$ = this.csiService.csiValues$.pipe(
+  constructor(private dashboardService: ApplicationDashboardService) {
+    this.recentCsiValue$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.csiDtoList.slice(-1)[0]));
 
-    this.hasConfiguration$ = this.csiService.csiValues$.pipe(
+    this.hasConfiguration$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.hasCsiConfiguration));
   }
 }
