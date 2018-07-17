@@ -71,7 +71,7 @@ class ScriptController {
             render(view: 'create', model: [script: script, pages: Page.list(), measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: ""])
             return
         }
-        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
+        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
         def flashMessageArgs = [getScriptI18n(), script.label]
         flash.message = message(code: 'default.created.message', args: flashMessageArgs)
         redirect(action: "list")
@@ -107,39 +107,39 @@ class ScriptController {
     }
 
     def update() {
-        Script s = Script.get(params.id)
-        def flashMessageArgs = [getScriptI18n(), s.label]
-        redirectIfNotFound(s, params.id)
-        ArchivedScript archivedScript = createArchiveScript(s)
+        Script script = Script.get(params.id)
+        def flashMessageArgs = [getScriptI18n(), script.label]
+        redirectIfNotFound(script, params.id)
+        ArchivedScript archivedScript = createArchiveScript(script)
         if (params.version) {
             def version = params.version.toLong()
-            if (s.version > version) {
-                s.errors.rejectValue("version", "default.optimistic.locking.failure",
+            if (script.version > version) {
+                script.errors.rejectValue("version", "default.optimistic.locking.failure",
                         [getScriptI18n()] as Object[],
                         "Another user has updated this script while you were editing")
-                render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(s)])
+                render(view: 'edit', model: [script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(script)])
                 return
             }
         }
 
-        s.properties = params;
-        if (!s.save(flush: true)) {
-            render(view: 'edit', model: [script: s, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(s)])
+        script.properties = params;
+        if (!script.save(flush: true)) {
+            render(view: 'edit', model: [script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(script)])
             return
         }
-        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, s.navigationScript))
+        scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
         archivedScript.save(failOnError: true, flush: true)
 
         flash.message = message(code: 'default.updated.message', args: flashMessageArgs)
-        redirect(action: 'edit', id: s.id)
+        redirect(action: 'edit', id: script.id)
     }
 
-    private ArchivedScript createArchiveScript(Script s) {
-        return new ArchivedScript(versionDescription: s.description,
-                description: s.description,
-                label: s.label,
-                navigationScript: s.navigationScript,
-                script: s)
+    private ArchivedScript createArchiveScript(Script script) {
+        return new ArchivedScript(versionDescription: script.description,
+                description: script.description,
+                label: script.label,
+                navigationScript: script.navigationScript,
+                script: script)
 
     }
 
@@ -166,7 +166,7 @@ class ScriptController {
     }
 
     def parseScript(String navigationScript) {
-        ScriptParser parser = new ScriptParser(pageService, navigationScript)
+        ScriptParser parser = new ScriptParser(pageService, navigationScript, "Script from Measurement Setup")
         Map output = [:]
         if (parser.warnings)
             output.warnings = parser.warnings.groupBy { it.lineNumber }
@@ -216,16 +216,16 @@ class ScriptController {
     }
 
     def loadArchivedScript(long archivedScriptId) {
-        Script s = Script.get(params.id)
-        def flashMessageArgs = [getScriptI18n(), s.label]
-        createArchiveScript(s).save(failOnError: true, flush: true)
+        Script script = Script.get(params.id)
+        def flashMessageArgs = [getScriptI18n(), script.label]
+        createArchiveScript(script).save(failOnError: true, flush: true)
         ArchivedScript archivedScript = ArchivedScript.get(archivedScriptId)
-        s.label = archivedScript.label
-        s.description = archivedScript.description
-        s.navigationScript = archivedScript.navigationScript
-        s.save(failOnError: true, flush: true)
+        script.label = archivedScript.label
+        script.description = archivedScript.description
+        script.navigationScript = archivedScript.navigationScript
+        script.save(failOnError: true, flush: true)
         flash.message = message(code: 'script.versionControl.load.success', args: flashMessageArgs)
-        redirect(action: "edit", id: s.id)
+        redirect(action: "edit", id: script.id)
     }
 
     def updateVersionDescriptionUrl(long archivedScriptId, String newVersionDescription) {

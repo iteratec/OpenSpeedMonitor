@@ -1,0 +1,32 @@
+.csi-circle-container {
+  position: relative;
+  display: inline-block;
+}
+
+.csi-circle-text-container {
+  position: absolute;
+  display: inline-block;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.csi-value-text {
+  font-weight: bold;
+  color: #000000;
+}
+
+.csi-value-description {
+  color: #333333;
+}
+
+.good{
+  color: #00bd58;
+}
+.okay{
+  color: #ffa605;
+}
+.bad{
+  color: #fe1d1d;
+}

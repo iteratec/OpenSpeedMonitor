@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || request.forwardURI.equals('/application-dashboard')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || request.forwardURI.equals('/applicationDashboard')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -11,7 +11,7 @@
 <g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
-<g:elseif test="${request.forwardURI.equals('/setup-dashboard')}"><g:set var="mainTab" value="management"/></g:elseif>
+<g:elseif test="${request.forwardURI.equals('/setupDashboard')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unknown"/></g:else>
 
 <nav class="navbar navbar-inverse sidebar-fixed">
@@ -41,8 +41,8 @@
                     <g:message code="de.iteratec.isr.measurementresults" default="Results"/> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li class="${request.forwardURI.equals('/application-dashboard') ? 'active' : ''}">
-                        <a href="${createLink(uri: '/application-dashboard')}">
+                    <li class="${request.forwardURI.equals('/applicationDashboard') ? 'active' : ''}">
+                        <a href="${createLink(uri: '/applicationDashboard')}">
                             <i class="fas fa-bars"></i>
                             <g:message message="Overview"/>
                         </a>
@@ -133,8 +133,8 @@
                 </a>
                 <ul class="dropdown-menu">
                     <sec:ifLoggedIn>
-                        <li class="${request.forwardURI.equals('/setup-dashboard') ? 'active' : ''}">
-                            <a href="${createLink(uri: '/setup-dashboard')}">
+                        <li class="${request.forwardURI.equals('/setupDashboard') ? 'active' : ''}">
+                            <a href="${createLink(uri: '/setupDashboard')}">
                                 <i class="fas fa-bars"></i>
                                 <g:message message="Overview"/>
                             </a>

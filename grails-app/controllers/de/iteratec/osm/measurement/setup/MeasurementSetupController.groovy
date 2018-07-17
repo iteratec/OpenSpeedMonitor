@@ -66,7 +66,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
                 }
             }
             if (customError == null) {
-                scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript))
+                scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
                 try {
                     jobProcessingService.launchJobRun(job)
                 } catch (Exception exception) {

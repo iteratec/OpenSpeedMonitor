@@ -1,5 +1,8 @@
 <div class="card">
   <h2>{{page.name}}</h2>
+  <div *ngIf="pageCsi$ | async, let pageCsiDto">
+    <div>PageCsi ({{pageCsiDto.date}}): {{pageCsiDto.csiDocComplete}}</div>
+  </div>
   <div *ngIf="metricsForPage$ | async, let metricsDto">
     <div class="metrics">
       <div class="metric">

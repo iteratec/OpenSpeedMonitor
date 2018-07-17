@@ -1,7 +1,12 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
+import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import grails.gorm.transactions.Transactional
@@ -12,21 +17,16 @@ class ApplicationDashboardService {
 
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
+    PageCsiAggregationService pageCsiAggregationService
 
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
 
-
-        def pages = (pagesWithResults + pagesOfActiveJobs).collect {
-            [
-                    'id'  : it.id,
-                    'name': it.name
-            ]
-        } as Set
+        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
         pages.unique()
-
         return pages
+
     }
 
     def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
@@ -80,4 +80,39 @@ class ApplicationDashboardService {
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
     }
+
+    private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
+
+        List<PageCsiDto> pageCsiDtos = []
+        List<JobGroup> csiGroup = [jobGroup]
+        DateTime to = new DateTime().withTimeAtStartOfDay()
+        DateTime from = to.minusWeeks(4)
+        CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+
+        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroup.id)
+
+        pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
+                csiGroup, pages).each {
+            PageCsiDto pageCsiDto = new PageCsiDto()
+            if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
+                pageCsiDto.pageId = it.page.id
+                pageCsiDto.date = it.started.format("yyy-MM-dd")
+                pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                pageCsiDtos << pageCsiDto
+            }
+        }
+        return pageCsiDtos
+    }
+
+    List<PageCsiDto> getMostRecentCsiForPagesOfJobGroup(JobGroup jobGroup) {
+        List<PageCsiDto> recentCsi = getAllCsiForPagesOfJobGroup(jobGroup)
+        recentCsi.sort {
+            a, b -> b.date <=> a.date
+        }
+        recentCsi.unique()
+        return recentCsi
+
+    }
+
 }

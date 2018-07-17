@@ -34,7 +34,7 @@ class FilteringAndSortingDataService {
             List<List<Page>> testedPagesPerJob = [].withDefault { [] }
 
             jobList.findAll { it.script == currentScript }.each { j ->
-                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables)).getTestedPages().unique()
+                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript.label).getTestedPages().unique()
             }
 
             // if all lists are equal take any

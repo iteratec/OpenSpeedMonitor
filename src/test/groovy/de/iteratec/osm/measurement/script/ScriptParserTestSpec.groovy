@@ -48,7 +48,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
                 execAndWait	document.querySelector('cssSelector').click();
                 ///logData	1
                 execAndWait	document.getElementById('idOfLogoutButton').click();
-                        """)
+                        """, "test")
 
         then: "a MISSING_SETEVENTNAME_STATEMENT error occurs"
         parser.errors.size() == 8
@@ -59,7 +59,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
 
     void "Empty script is handled correctly"() {
         when: "script is empty"
-        ScriptParser parser = new ScriptParser(pageService, '')
+        ScriptParser parser = new ScriptParser(pageService, '', "test")
 
         then: "the parsers does nothing"
         parser.measuredEventsCount == 0
@@ -70,7 +70,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
 
     void "Missing PageCommand after setEventName command results in error"() {
         when: "a script without PageCommand after setEventName is parsed"
-        ScriptParser parser = new ScriptParser(pageService, 'setEventName 456')
+        ScriptParser parser = new ScriptParser(pageService, 'setEventName 456', "test")
 
         then: "a DANGLING_SETEVENTNAME_STATEMENT and a NO_STEPS_FOUND error occurs"
         parser.errors.size() == 2
@@ -80,7 +80,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
 
     void "PageViewCommandOnlyScript results in warning"() {
         when: "a script with only a navigate command is parsed"
-        ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com')
+        ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com', "test")
 
         then: "a MISSING_SETEVENTNAME_STATEMENT warning occurs"
         parser.errors.size() == 1
@@ -104,7 +104,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
                 setEventName	eventC
                 exec dsasda
                 navigate http://testsite.de
-                            """)
+                            """, "test")
 
         then: "a NO_STEPS_FOUND error occurs"
         parser.measuredEventsCount == 0
@@ -137,7 +137,7 @@ class ScriptParserTestSpec extends Specification implements DomainUnitTest<Measu
                 logData 1
                 setEventName	eventA
                 navigate http://testsite.de
-                            """)
+                            """, "test")
 
         then: "allPageLoadEvents includes those events"
         parser.allPageLoadEvents == 6
