@@ -1,6 +1,6 @@
 <div *ngIf="hasConfiguration$ | async; else returnError">
-  <div *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
-    CSI ({{recentCsiValue.date}}): <span style="color: cornflowerblue;">{{recentCsiValue.csiDocComplete}}</span>
+  <div class="card" *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
+    <osm-csi-value [csiValue]="recentCsiValue.csiDocComplete" [isBig]="true" [description]="'today'"></osm-csi-value>
   </div>
   <ng-template #noRecentCsi>
     No CSI available

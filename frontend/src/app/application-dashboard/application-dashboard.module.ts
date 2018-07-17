@@ -10,6 +10,7 @@ import {ApplicationCsiComponent} from './components/application-csi/application-
 import {CsiService} from "./services/csi.service";
 import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-component'
 import {RouterModule, Routes} from "@angular/router";
+import {CsiValueComponent} from "./components/csi-value/csi-value.component";
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -25,12 +26,13 @@ const DashboardRoutes: Routes = [
     RouterModule
   ],
   declarations: [
+    ApplicationDashboardEntryComponent,
     ApplicationDashboardComponent,
     ApplicationSelectComponent,
+    ApplicationCsiComponent,
     PageListComponent,
     PageComponent,
-    ApplicationCsiComponent,
-    ApplicationDashboardEntryComponent
+    CsiValueComponent
   ],
   providers: [
     {
