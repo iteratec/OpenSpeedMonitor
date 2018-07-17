@@ -1,5 +1,5 @@
 <div>
-  <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList "
+  <osm-measured-event *ngFor="let measuredEvent of thresholdsForJobList$ | async"
                       [measuredEvent]="measuredEvent.measuredEvent"
                       [thresholds]="measuredEvent.thresholds"
                       [measuredEventList]="actualMeasuredEventList"

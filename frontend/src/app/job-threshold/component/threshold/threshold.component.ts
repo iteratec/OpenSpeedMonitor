@@ -17,7 +17,6 @@ export class ThresholdComponent implements OnInit{
   @Output() cancelEvent = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
   @Output() savedThreshold = new EventEmitter();
-  //measurandList: Measurand[];
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
   allowInput = false;
@@ -29,34 +28,25 @@ export class ThresholdComponent implements OnInit{
   leftButtonLabelDisable: boolean = false;
   value: number = 0;
 
-  constructor(private thresholdRestService: ThresholdRestService) {
-    /*this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
-      this.measurandList = next;
-    } );*/
-
-  }
+  constructor(private thresholdRestService: ThresholdRestService) {}
 
   ngOnInit() {
+    console.log("THRESHOLD");
     this.firstUpperBoundary = this.threshold.upperBoundary;
     this.firstLowerBoundary = this.threshold.lowerBoundary;
     if (this.threshold.measuredEvent.state == "new") {
       this.selectedMeasuredEvent = this.measuredEventList[0];
-     /* this.selectedMeasurand = this.actualMeasurands[0].name;
-      console.log("THRESHOLD newMeasuredEvent this.actualMeasurands: " + JSON.stringify(this.actualMeasurands));
-      console.log("THRESHOLD newMeasuredEvent this.actualMeasurands[0].name: " + JSON.stringify(this.actualMeasurands[0].name));*/
     }
     if (this.threshold.state == "new") {
-      console.log("THRESHOLD newThreshold this.actualMeasurands: " + JSON.stringify(this.actualMeasurandList));
-      console.log("this.actualMeasurandList[0].name: " + this.actualMeasurandList[0].name);
       this.selectedMeasurand = this.actualMeasurandList[0].name;
       this.leftButtonLabelDisable = true;
     }
   }
 
-  delete(thresholdID) {
+  delete(threshold) {
     if (this.deleteConfirmation) {
       this.deleteConfirmation = !this.deleteConfirmation;
-      this.thresholdRestService.deleteThreshold(thresholdID);
+      this.thresholdRestService.deleteThreshold(threshold);
       this.removeOldThreshold.emit();
     } else {
       this.rightButtonLabel == "Löschen"
@@ -82,7 +72,6 @@ export class ThresholdComponent implements OnInit{
   }
 
   edit() {
-    console.log("EDIT");
     this.allowInput = !this.allowInput;
     this.allowInput
       ? (
@@ -108,16 +97,14 @@ export class ThresholdComponent implements OnInit{
     }
   }
 
-  onKey(event: any) { // without type info
+  onKey(event: any) {
     this.value = event.target.value ;
-    console.log(this.value);
     if (this.value > 0) {
       this.leftButtonLabelDisable = false;
     }
   }
 
   remove() {
-    console.log("THRESHOLD REMOVE");
     this.cancelEvent.emit();
   }
 }

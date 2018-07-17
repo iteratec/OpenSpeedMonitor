@@ -9,7 +9,8 @@ import {Measurand} from '../model/measurand.model'
 import {MeasuredEvent} from '../model/measured-event.model'
 import {ThresholdForJob} from '../model/threshold-for-job.model'
 import {Threshold} from "../model/threshold.model";
-import {ActualMeasurandsService} from  "../actual-measurands.service"
+import {ActualMeasurandsService} from  "../actual-measurands.service";
+import {ActualThresholdsForJobService} from  "../actual-thresholds-for-job.service"
 import {Subject} from "rxjs/internal/Subject";
 import {log} from "util";
 
@@ -19,14 +20,17 @@ import {log} from "util";
 
 export class ThresholdRestService {
 
-  public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
-  //public measurands$ = new ReplaySubject<Measurand[]>(1);
+  //public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
   public measuredEvents$ = new ReplaySubject<MeasuredEvent[]>(1);
-
   public actualJobId : number;
-  private baseUrl = '/job';  // URL
+  public actualThresholdId: number;
+  public actualMeasuredEventId: number;
+  public actualThreshold: Threshold;
 
-  constructor(private http: HttpClient, private actualMeasurandService: ActualMeasurandsService) {
+
+  constructor(private http: HttpClient,
+              private actualMeasurandService: ActualMeasurandsService,
+              private actualThresholdsforJobList: ActualThresholdsForJobService) {
     this.getMeasurands();
   }
 
@@ -37,37 +41,41 @@ export class ThresholdRestService {
   }
 
   /** GET MeasuredEvents */
-  getMeasuredEvents (scriptId: number){
-    /*console.log("getMeasuredEvents scriptId: " + scriptId);*/
+  getMeasuredEvents (scriptId: number, jobId: number){
+    this.actualJobId = jobId;
     const url = `/script/getMeasuredEventsForScript?scriptId=${scriptId}`;
     this.http.get<MeasuredEvent[]>(url)
-      .subscribe(next => this.measuredEvents$.next(next), error => this.handleError(error)) ;
+      .subscribe(next => {
+        this.measuredEvents$.next(next);
+        this.getThresholdsForJob(this.actualJobId)
+      }, error => this.handleError(error)) ;
   }
 
   /** GET Thresholds For a Job */
-  getThresholdsForJob (jobId: number)/*: Observable<ThresholdForJob[]> */{
-    /*console.log("getThresholds jobId: " + jobId);*/
+  getThresholdsForJob (jobId: number){
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
     this.http.get<ThresholdForJob[]>(url)
-      .subscribe(next => this.thresholdsForJob$.next(next), error => this.handleError(error)) ;
+      //.subscribe(next => this.thresholdsForJob$.next(next), error => this.handleError(error)) ;
+      .subscribe(next => this.actualThresholdsforJobList.setActualThresholdsforJobList(next), error => this.handleError(error)) ;
   }
 
   /** DELETE Threshold */
-  deleteThreshold (thresholdId: string){
-    console.log("deleteThreshold thresholdId " + thresholdId);
+  deleteThreshold (threshold: Threshold){
+    this.actualThreshold = threshold;
     const url = "/threshold/deleteThreshold" ;
     let self= this;
     let formData = new FormData()
-    formData.append("thresholdId", thresholdId)
+    formData.append("thresholdId", threshold.id.toString())
     this.http.post(url, formData).subscribe(() => {
-      console.log("delete server Response: " + self.actualJobId);
-      self.getThresholdsForJob(self.actualJobId);
-      }
-    );
+      console.log("state: " + threshold.measuredEvent.state);
+      self.actualThresholdsforJobList.deleteFromActualThresholdsforJob(this.actualThreshold);
+    });
   }
 
   /** Edit Threshold */
   editThreshold (threshold: Threshold){
+    this.actualThresholdId = threshold.id;
+    this.actualThreshold = threshold;
     const url = "/threshold/updateThreshold" ;
     let self= this;
     let params = new HttpParams().set('thresholdId', threshold.id.toString());
@@ -77,25 +85,31 @@ export class ThresholdRestService {
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
     this.http.post(url, params).subscribe(() => {
-        console.log("self.actualJobId : " + self.actualJobId);
-        self.getThresholdsForJob(self.actualJobId);
+        //self.getThresholdsForJob(self.actualJobId);
+      self.actualThresholdsforJobList.editThresholdOfActualThresholdsforJob(this.actualThresholdId, this.actualThreshold );
       }
     );
   }
 
   /** Add Threshold */
   addThreshold (threshold: Threshold){
-    const url = "/threshold/createThreshold" ;
+    this.actualThreshold = threshold;
+    this.actualMeasuredEventId = threshold.measuredEvent.id;
     let self= this;
-    let params = new HttpParams().set('job', self.actualJobId.toString());
+    const url = "/threshold/createThreshold" ;
+    let params = new HttpParams().set('job', this.actualJobId.toString());
     params = params.set('measurand', threshold.measurand.name.toString());
     params = params.set('measuredEvent', threshold.measuredEvent.id.toString());
     params = params.set('lowerBoundary', threshold.lowerBoundary.toString());
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
     this.http.post(url, params).subscribe(() => {
-        console.log("self.actualJobId : " + self.actualJobId);
-        self.getThresholdsForJob(self.actualJobId);
+        //self.getThresholdsForJob(self.actualJobId);
+        if (threshold.measuredEvent.state=="new") {
+          self.actualThresholdsforJobList.addThresholdForJobToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
+        } else {
+          self.actualThresholdsforJobList.addThresholdToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
+        }
       }
     );
   }

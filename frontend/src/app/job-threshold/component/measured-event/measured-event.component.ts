@@ -23,28 +23,17 @@ export class MeasuredEventComponent implements OnInit {
 
 
   constructor(private thresholdRestService: ThresholdRestService,
-              private actualMeasurandsService: ActualMeasurandsService) {
-    /*this.thresholdRestService.measurands$.subscribe((next: Measurand[]) => {
-     this.measurandList = next;
-     } );*/
-
-  }
+              private actualMeasurandsService: ActualMeasurandsService) {}
 
   ngOnInit() {
-
-    //if (this.measuredEvent.state == "new") {
+    console.log("MEASUREDEVENT");
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    //}
     this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
-    console.log("this.actualMeasurandList.length: " + this.actualMeasurandList.length);
-
-
   }
 
   addThreshold() {
     this.addThresholdDisabled = true;
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    console.log("MEASUREDEVENT this.actualMeasurandList: " + JSON.stringify(this.actualMeasurandList));
     this.newThreshold = {} as Threshold;
     let newMeasurand = {} as Measurand;
     let newMeasuredEvent = {} as MeasuredEvent;
@@ -75,14 +64,12 @@ export class MeasuredEventComponent implements OnInit {
   }
 
   cancelNewThreshold(){
-    console.log("MEASUREDEVENT cancelNewThreshold");
     this.thresholds.pop();
     this.addThresholdDisabled = false;
 
   }
 
   cancelNewMeasuredEvent() {
-    console.log("MEASUREDEVENT cancelNewMeasuredEvent");
     this.removeEvent.emit();
   }
 }
