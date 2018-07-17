@@ -9,14 +9,11 @@ import {ScriptComponent} from "./components/script/script.component";
 import {JobGroupComponent} from "./components/job-group/job-group/job-group.component";
 import {JobGroupListComponent} from "./components/job-group-list/job-group-list/job-group-list.component";
 import {SharedModule} from "../shared/shared.module";
-import {TranslationModule} from "../translation/translation.module";
-import {HttpClientModule} from "@angular/common/http";
+import {JobGroupService} from "./services/job-group.service";
 
 @NgModule({
   imports: [
-    SharedModule,
-    HttpClientModule,
-    TranslationModule
+    SharedModule
   ],
   declarations:
     [SetupDashboardComponent, JobGroupComponent, JobGroupListComponent, PageComponent, PageListComponent, ScriptComponent, ScriptListComponent],
@@ -25,7 +22,7 @@ import {HttpClientModule} from "@angular/common/http";
       provide: 'components',
       useValue: [SetupDashboardComponent],
       multi: true
-    }, PageService, ScriptService
+    }, PageService, ScriptService, JobGroupService
   ],
   entryComponents: [SetupDashboardComponent]
 })

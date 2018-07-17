@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {PageDto} from "../../../shared/models/page.model";
+import {PageDto} from "../../models/page.model";
 
 @Component({
   selector: 'osm-page',

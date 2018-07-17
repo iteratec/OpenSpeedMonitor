@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {JobGroupDTO} from "../../../shared/models/job-group.model";
+import {ApplicationDTO} from "../../models/application.model";
 
 @Component({
   selector: 'osm-application-select',
@@ -7,14 +7,14 @@ import {JobGroupDTO} from "../../../shared/models/job-group.model";
   styleUrls: ['./application-select.component.scss']
 })
 export class ApplicationSelectComponent {
-  @Output() selectedApplicationChange: EventEmitter<JobGroupDTO> = new EventEmitter();
-  @Input() applications: JobGroupDTO[];
-  @Input() selectedApplication: JobGroupDTO;
+  @Output() selectedApplicationChange: EventEmitter<ApplicationDTO> = new EventEmitter();
+  @Input() applications: ApplicationDTO[];
+  @Input() selectedApplication: ApplicationDTO;
 
   constructor() {
   }
 
-  setApplication(jobGroup: JobGroupDTO) {
-    this.selectedApplicationChange.emit(jobGroup)
+  setApplication(application: ApplicationDTO) {
+    this.selectedApplicationChange.emit(application)
   }
 }

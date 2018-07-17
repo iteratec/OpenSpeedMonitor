@@ -5,7 +5,7 @@ import {PageDto} from "../models/page.model";
 import {MetricsDto} from "../models/metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
-import {JobGroupDTO} from "../../shared/models/job-group.model";
+import {ApplicationDTO} from "../models/application.model";
 
 @Injectable()
 export class ApplicationDashboardService {
@@ -13,11 +13,18 @@ export class ApplicationDashboardService {
   pages$: ReplaySubject<PageDto[]> = new ReplaySubject<PageDto[]>(1);
   csiValues$: ReplaySubject<ApplicationCsiListDTO> = new ReplaySubject<ApplicationCsiListDTO>(1);
   pageCsis$: ReplaySubject<PageCsiDto[]> = new ReplaySubject<PageCsiDto[]>(1);
+  activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
 
   constructor(private http: HttpClient) {
+    this.updateActiveOrRecentlyMeasured()
   }
 
-  updateApplicationData(application: JobGroupDTO) {
+  updateActiveOrRecentlyMeasured() {
+    this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getAllActiveAndAllRecent")
+      .subscribe(next => this.activeOrRecentlyMeasured$.next(next), error => this.handleError(error));
+  }
+
+  updateApplicationData(application: ApplicationDTO) {
     const params = this.createParams(application.id);
     this.updateMetricsForApplication(params);
     this.updatePagesForApplication(params);

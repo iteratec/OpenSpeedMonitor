@@ -304,7 +304,6 @@ grails:
                             {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
                             {pattern: '/landing/**',                                    access: ["permitAll"]},
                             {pattern: '/applicationDashboard/**',                       access: ["permitAll"]},
-                            {pattern: '/jobGroup/getAllActiveAndAllRecent',             access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
                             {pattern: '/securityInfo/mappings',                         access: ["denyAll"]},
                             {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},

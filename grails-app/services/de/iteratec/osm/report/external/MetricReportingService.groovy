@@ -23,14 +23,14 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -52,7 +52,7 @@ class MetricReportingService {
 
     GraphiteSocketProvider graphiteSocketProvider
     EventCsiAggregationService eventCsiAggregationService
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     ConfigService configService
@@ -165,7 +165,7 @@ class MetricReportingService {
 
         log.debug('reporting csi-values of last hour')
         activity.beginNewStage("Collecting JobGroups", 1)
-        Collection<JobGroup> csiGroupsWithGraphiteServers = jobGroupDaoService.findCSIGroups().findAll {
+        Collection<JobGroup> csiGroupsWithGraphiteServers = jobGroupService.findCSIGroups().findAll {
             it.graphiteServers.size() > 0 && it.graphiteServers.any { server -> server.reportCsiAggregationsToGraphiteServer }
         }
         activity.addProgressToStage()
@@ -245,7 +245,7 @@ class MetricReportingService {
     private void reportPageCSIValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivityUpdater activity) {
         log.debug("reporting page csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
 
-        def groups = jobGroupDaoService.findCSIGroups().findAll {
+        def groups = jobGroupService.findCSIGroups().findAll {
             it.graphiteServers.size() > 0 && it.graphiteServers.any { server -> server.reportCsiAggregationsToGraphiteServer }
         }
         int size = groups.size()
@@ -319,7 +319,7 @@ class MetricReportingService {
 
     private void reportShopCSICsiAggregations(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivityUpdater activity) {
         log.debug("reporting shop csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
-        def groups = jobGroupDaoService.findCSIGroups().findAll {
+        def groups = jobGroupService.findCSIGroups().findAll {
             it.graphiteServers.size() > 0 && it.graphiteServers.any { server -> server.reportCsiAggregationsToGraphiteServer }
         }
         int size = groups.size()

@@ -8,23 +8,18 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
 import grails.databinding.BindUsing
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiImplicitParam
-import io.swagger.annotations.ApiImplicitParams
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.*
 import org.springframework.http.HttpStatus
 
 @Api(value = '/rest', tags = ["Detail Data Service"], description = "Api for Detail Data Service communication.", position = 4)
 class DetailDataApiController {
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     BatchActivityService batchActivityService
 
