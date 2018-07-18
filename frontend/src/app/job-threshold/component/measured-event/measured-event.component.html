@@ -29,6 +29,7 @@
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"
                    [actualMeasurandList]="actualMeasurandList"
+                   (measuredEventListChange)="measuredEventChange()"
                    (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold>
 
     <hr>

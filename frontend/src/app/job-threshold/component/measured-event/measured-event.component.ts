@@ -11,10 +11,11 @@ import { ActualMeasurandsService } from '../../service/actual-measurands.service
   styleUrls: ['./measured-event.component.css']
 })
 
-export class MeasuredEventComponent implements OnInit {
+export class MeasuredEventComponent implements OnInit, OnChanges {
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[];
   @Input() measuredEventList: MeasuredEvent[];
+  @Output() measuredEventListChange = new EventEmitter();
   @Output() removeEvent = new EventEmitter();
   @Output() removeOldMeasuredEvent = new EventEmitter();
   newThreshold: Threshold;
@@ -23,12 +24,18 @@ export class MeasuredEventComponent implements OnInit {
 
 
   constructor(private thresholdRestService: ThresholdRestService,
-              private actualMeasurandsService: ActualMeasurandsService) {}
+              private actualMeasurandsService: ActualMeasurandsService,
+  ) {}
 
   ngOnInit() {
     console.log("MEASUREDEVENT");
+    console.log("MEASUREDEVENT this.measuredEvent.state: " + this.measuredEvent.state);
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
     this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
+  }
+
+  ngOnChanges() {
+    console.log("MEASUREDEVENT ngOnChanges")
   }
 
   addThreshold() {
@@ -39,9 +46,12 @@ export class MeasuredEventComponent implements OnInit {
     let newMeasuredEvent = {} as MeasuredEvent;
     let newThresholdName: string;
     newThresholdName = this.actualMeasurandList[0].name;
-    newMeasuredEvent.id = this.measuredEvent.id;
-    if (this.measuredEvent.state!= "new"){
-      newMeasuredEvent.state='normal';
+    newMeasuredEvent = this.measuredEvent;
+
+    if (this.measuredEvent.state == "new"){
+      newMeasuredEvent.state='new';
+    } else {
+      newMeasuredEvent.state='normal'
     }
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
@@ -67,6 +77,11 @@ export class MeasuredEventComponent implements OnInit {
     this.thresholds.pop();
     this.addThresholdDisabled = false;
 
+  }
+
+  measuredEventChange() {
+    console.log("MEASUREDEVENT measuredEventListChange");
+    this.measuredEventListChange.emit()
   }
 
   cancelNewMeasuredEvent() {

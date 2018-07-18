@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef} from '@angular/core';
+import { Component, OnInit, ElementRef, OnChanges} from '@angular/core';
 import { ThresholdRestService } from './service/rest/threshold-rest.service';
 import { ActualMeasuredEventsService } from './service/actual-measured-events.service';
 import {Measurand} from './service/model/measurand.model'
@@ -7,6 +7,7 @@ import {ThresholdForJob} from './service/model/threshold-for-job.model'
 import {Threshold} from "./service/model/threshold.model";
 import {ActualThresholdsForJobService} from "./service/actual-thresholds-for-job.service";
 import {Observable} from "rxjs/index";
+import {log} from "util";
 
 
 @Component({
@@ -15,7 +16,7 @@ import {Observable} from "rxjs/index";
   styleUrls: ['./job-threshold.component.css']
 })
 
-export class JobThresholdComponent implements OnInit {
+export class JobThresholdComponent implements OnInit, OnChanges {
   thresholdsForJobList$: Observable<ThresholdForJob[]>;
   thresholdsForJobList: ThresholdForJob[];
   actualMeasuredEventList: MeasuredEvent[];
@@ -43,18 +44,19 @@ export class JobThresholdComponent implements OnInit {
          this.addMeasuredEventDisabled= true;
          }
       });
-
-
-
     });
   }
 
   ngOnInit() {
-    this.thresholdsForJobList = this.actualThresholdsForJobService.getActualThresholdsforJob();
-    console.log("JOB" + JSON.stringify(this.thresholdsForJobList));
+    console.log("THRESHOLDFORJOB ngOnInit" );
+  }
+
+  ngOnChanges() {
+    console.log("THRESHOLDFORJOB ngOnChanges")
   }
 
   addMeasuredEvent() {
+    console.log("THRESHOLDFORJOB addMeasuredEvent")
     this.actualMeasuredEventList = this.actualMeasuredEventsService.getActualMeasuredEvents(this.thresholdsForJobList);
     this.newThresholdForJob = {} as ThresholdForJob;
     let newThreshold = {} as Threshold;
@@ -81,6 +83,13 @@ export class JobThresholdComponent implements OnInit {
   cancelNewMeasuredEvent() {
     this.thresholdsForJobList.pop();
     this.addMeasuredEventDisabled= false;
+  }
+
+  measuredEventChange() {
+    console.log("THRESHOLDFORJOB measuredEventListChange");
+    console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
+    this.thresholdsForJobList = this.actualThresholdsForJobService.getActualThresholdsforJob();
+    console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
   }
 
   removeOldMeasuredEvent() {

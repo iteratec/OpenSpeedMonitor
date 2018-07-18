@@ -62,12 +62,13 @@ export class ThresholdRestService {
   /** DELETE Threshold */
   deleteThreshold (threshold: Threshold){
     this.actualThreshold = threshold;
+    console.log("REST SERVICE deleteThreshold:" + JSON.stringify(threshold));
+    console.log("REST SERVICE deleteThreshold id:" + threshold.id);
     const url = "/threshold/deleteThreshold" ;
     let self= this;
     let formData = new FormData()
     formData.append("thresholdId", threshold.id.toString())
     this.http.post(url, formData).subscribe(() => {
-      console.log("state: " + threshold.measuredEvent.state);
       self.actualThresholdsforJobList.deleteFromActualThresholdsforJob(this.actualThreshold);
     });
   }
@@ -103,14 +104,15 @@ export class ThresholdRestService {
     params = params.set('lowerBoundary', threshold.lowerBoundary.toString());
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
-    this.http.post(url, params).subscribe(() => {
-        //self.getThresholdsForJob(self.actualJobId);
-        if (threshold.measuredEvent.state=="new") {
-          self.actualThresholdsforJobList.addThresholdForJobToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
-        } else {
-          self.actualThresholdsforJobList.addThresholdToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
-        }
-      }
+    this.http.post(url,  params ).subscribe(response => {
+      let newId : number=  Number(Object.values(response));
+      //newId = newId.thresholdId;
+      console.log("response newId: " + newId);
+      this.actualThreshold.id= newId;
+      console.log("REST this.actualThreshold.id: "+ this.actualThreshold.id);
+      //self.getThresholdsForJob(self.actualJobId);
+          //self.actualThresholdsforJobList.addThresholdForJobToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
+      self.actualThresholdsforJobList.addToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);}
     );
   }
 
