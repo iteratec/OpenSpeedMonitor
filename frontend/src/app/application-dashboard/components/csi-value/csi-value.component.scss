@@ -16,22 +16,25 @@
 
 .csi-value-text {
   font-weight: bold;
-  color: #000000;
+  color: $color-text-normal;
 }
 
 .csi-value-description {
-  color: #333333;
+  color: $color-text-medium;
 }
 
 .not-available {
   color: $color-text-medium;
 }
+
 .good{
-  color: #00bd58;
+  color: $color-good;
 }
+
 .okay{
-  color: #ffa605;
+  color: $color-warning;
 }
+
 .bad{
-  color: #fe1d1d;
+  color: $color-error;
 }
