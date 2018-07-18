@@ -1,7 +1,23 @@
 @import "../../../../styles/colors";
 
+.page-metrics {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+osm-csi-value {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.metric-list {
+  padding: 0 15px;
+}
+
 .metric {
-  margin: 10px;
+  margin: 10px 0;
 }
 
 .metric-icon {

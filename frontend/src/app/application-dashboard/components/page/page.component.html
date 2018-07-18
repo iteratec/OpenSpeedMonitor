@@ -1,10 +1,8 @@
 <div class="card">
   <h2>{{page.name}}</h2>
-  <div *ngIf="pageCsi$ | async, let pageCsiDto">
-    <div>PageCsi ({{pageCsiDto.date}}): {{pageCsiDto.csiDocComplete}}</div>
-  </div>
-  <div *ngIf="metricsForPage$ | async, let metricsDto">
-    <div class="metrics">
+  <div class="page-metrics">
+    <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"></osm-csi-value>
+    <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
       <div class="metric">
         <i class="far fa-eye metric-icon"></i>
         <div class="metric-value">{{transform(metricsDto.speedIndex / 1000)}}</div>
