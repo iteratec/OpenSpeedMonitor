@@ -147,11 +147,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     return "bad";
   }
 
-  private roundCsiValue(csiValue: number): number {
-    return CalculationUtil.round(csiValue)
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this.arcGenerator) {
+      return;
+    }
     if (changes.csiValue) {
       this.drawCircle(changes.csiValue.previousValue);
     }
