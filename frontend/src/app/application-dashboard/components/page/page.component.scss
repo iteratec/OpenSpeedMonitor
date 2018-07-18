@@ -3,17 +3,19 @@
 .page-metrics {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
 }
 
 osm-csi-value {
   display: flex;
+  justify-content: center;
   align-items: center;
+  flex: 1 1 auto;
   padding: 0 15px;
 }
 
 .metric-list {
-  padding: 0 15px;
+  flex: 0 1 auto;
+  padding: 0 25px;
 }
 
 .metric {
@@ -47,6 +49,7 @@ osm-csi-value {
 }
 
 .metric-description {
+  min-width: 120px;
   font-size: 12px;
   color: $color-text-light;
 }
