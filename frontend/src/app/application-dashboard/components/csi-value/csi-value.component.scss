@@ -1,3 +1,5 @@
+@import "../../../../styles/colors";
+
 .csi-circle-container {
   position: relative;
   display: inline-block;
@@ -21,6 +23,9 @@
   color: #333333;
 }
 
+.not-available {
+  color: $color-text-medium;
+}
 .good{
   color: #00bd58;
 }
