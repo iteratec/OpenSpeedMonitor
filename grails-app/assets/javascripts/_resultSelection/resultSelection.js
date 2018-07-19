@@ -61,10 +61,10 @@ OpenSpeedMonitor.resultSelection = (function () {
         }
 
         // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
-        $(".removeMeasurandSeriesButton").click(function () {
+        $(".removeMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
-        $("#addMeasurandSeriesButton").click(function () {
+        $("#addMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
 
