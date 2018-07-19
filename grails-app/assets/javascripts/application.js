@@ -329,7 +329,7 @@ OpenSpeedMonitor.domUtils = (function () {
      */
     var deselectAllOptions = function (selectElement, avoidEvent) {
         selectElement = $(selectElement);
-        selectElement.find("option:selected").removeAttr("selected");
+        selectElement.find("option:selected").prop('selected', false);
         if (!avoidEvent) {
             selectElement.trigger("change");
         }
