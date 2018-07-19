@@ -16,7 +16,7 @@
 */
 
 "use strict";
-
+// TODO: deprecated methods by modules! check dependencies/alternatives for compatibility with jQuery 3.3.*
 //= require /node_modules/air-datepicker/dist/js/datepicker.min.js
 //= require /node_modules/air-datepicker/dist/js/i18n/datepicker.en.js
 //= require /node_modules/moment/min/moment.min.js

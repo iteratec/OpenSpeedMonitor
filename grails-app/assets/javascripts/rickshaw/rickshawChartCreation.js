@@ -73,7 +73,7 @@ function RickshawGraphBuilder(args) {
         if (($('#to-enable-label').is(':checked')) && (!this.dataLabelsHaveBeenAdded)) {
             if ($(".pointMarker").length < 1) {
                 //activate pointMarker
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             var rememberLastRowColor = "";
             var actualIndex = 0;
@@ -450,7 +450,7 @@ function RickshawGraphBuilder(args) {
     };
 
     this.initializeEventListeners = function () {
-        $(window).resize(function () {
+        $(window).on('resize', function () {
             if (!self.autoResize) {
                 return;
             }
@@ -1109,7 +1109,7 @@ function ChartAdjuster(graphBuilder, args) {
     };
 
     this.registerEventHandlers = function () {
-        $('#adjustChartApply').bind('click', function () {
+        $('#adjustChartApply').on('click', function () {
             self.graphBuilder.updateTitle($('#dia-title').val());
             var success = self.updateAllYAxis();
             if (self.updateSize() && success) {
@@ -1117,8 +1117,8 @@ function ChartAdjuster(graphBuilder, args) {
             }
         });
         var aliasChildList = $("#graphAliasChildlist");
-        aliasChildList.bind("graphAliasChildsChanged", self.graphBuilder.updateAliases);
-        aliasChildList.bind("graphAliasColorChanged", function (event, nameAndColor) {
+        aliasChildList.on("graphAliasChildsChanged", self.graphBuilder.updateAliases);
+        aliasChildList.on("graphAliasColorChanged", function (event, nameAndColor) {
             self.graphBuilder.updateColorsOfSeries(nameAndColor);
         });
     };
@@ -1211,14 +1211,14 @@ function ChartAdjuster(graphBuilder, args) {
     };
 
     this.addFunctionalityShowDataMarker = function () {
-        $('#to-enable-marker').bind('change', function () {
+        $('#to-enable-marker').on('change', function () {
             var toEnableMarkers = $(this).is(':checked');
             self.graphBuilder.updateDrawPointMarkers(toEnableMarkers);
         });
     };
 
     this.addFunctionalityShowDataLabels = function () {
-        $('#to-enable-label').bind('change', function () {
+        $('#to-enable-label').on('change', function () {
             var toEnableLabels = $(this).is(':checked');
             if (toEnableLabels && $(rickshawGraphBuilder.graph.series[0].data).length > 10000) {
                 window.alert("Too many datapoints to show and label them!");
