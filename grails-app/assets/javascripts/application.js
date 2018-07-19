@@ -404,7 +404,7 @@ function fireWindowEvent(eventName) {
     window.dispatchEvent(event);
 }
 
-$("#main-navbar .dropdown-toggle").click(function (event) {
+$("#main-navbar .dropdown-toggle").on('click', function (event) {
     event.preventDefault();
     var parent = $(this).parent();
     var wasOpen = parent.hasClass("open");
