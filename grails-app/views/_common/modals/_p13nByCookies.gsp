@@ -36,7 +36,7 @@
             var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
 
             //defining handlers
-            $('#modal-p13n').bind("shown", function(){
+            $('#modal-p13n').on("shown", function(){
                 //p13n message
                 $('#modal-p13n-message').text('${g.message(code: 'de.iteratec.osm.p13n.cookiebased.description')}');
                 if (!navigator.cookieEnabled){
@@ -45,7 +45,7 @@
                 //csi dashboard default chart title
                 $('#input-default-csi-dashboard-title').val(osmClientSideStorageUtils.getCookie(cookieKeyCsiDashboardTitle));
             });
-            $('#modal-p13n-save-btn').bind("click", function(){
+            $('#modal-p13n-save-btn').on("click", function(){
                 osmClientSideStorageUtils.setCookie(cookieKeyCsiDashboardTitle, $('#input-default-csi-dashboard-title').val(), '/', (365*24*60*60*1000));
             });
 
