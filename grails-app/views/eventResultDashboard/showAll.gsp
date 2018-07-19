@@ -282,7 +282,7 @@
             setAdjustments();
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             if (!$("#graph_container").data("isAggregatedData")) {
                 OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>', 'chartContextUtilities');
             }
