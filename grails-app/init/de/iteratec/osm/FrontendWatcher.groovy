@@ -61,11 +61,8 @@ class FrontendWatcher {
 
             Thread.start {
 
-                if (!Files.exists(Paths.get(frontendJavascriptsFolder))
-                        || !Files.exists(Paths.get(frontendStylesheetsFolder))) {
-                    Files.createDirectories(Paths.get(frontendStylesheetsFolder))
-                    Files.createDirectories(Paths.get(frontendJavascriptsFolder))
-                }
+                new File(frontendJavascriptsFolder).mkdirs()
+                new File(frontendStylesheetsFolder).mkdirs()
 
                 while (GrailsApp.developmentModeActive) {
 
