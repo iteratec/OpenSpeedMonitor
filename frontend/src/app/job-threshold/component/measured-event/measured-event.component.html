@@ -10,9 +10,10 @@
                          [threshold]="threshold"
                          [measuredEventList]="measuredEventList"
                          [actualMeasurandList]="actualMeasurandList"
-                         (savedThreshold)="savedThreshold()"
+
                          (removeOldThreshold)="removeThreshold()"
-                         (cancelEvent)="cancelNewThreshold()"></osm-threshold>
+                         (addedThreshold)="addedThreshold()"
+                         (cancelEvent)="cancelNewThreshold()"></osm-threshold> <!--(savedThreshold)="savedThreshold()"-->
         </div>
         <div class="flex-down">
           <button type="button"
@@ -29,7 +30,7 @@
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"
                    [actualMeasurandList]="actualMeasurandList"
-                   (measuredEventListChange)="measuredEventChange()"
+                   (addedMeasuredEvent)="addedMeasuredEvent()"
                    (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold>
 
     <hr>

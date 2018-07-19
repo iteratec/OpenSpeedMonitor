@@ -73,7 +73,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.newThresholdForJob.thresholds = [];
     this.newThresholdForJob.thresholds.push(newThreshold);
     this.thresholdsForJobList.push(this.newThresholdForJob);
+    this.addMeasuredEventDisabled = true;
+
+/*
     this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
+*/
   }
 
   createScript() {
@@ -85,15 +89,13 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.addMeasuredEventDisabled= false;
   }
 
-  measuredEventChange() {
-    console.log("THRESHOLDFORJOB measuredEventListChange");
-    console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
-    this.thresholdsForJobList = this.actualThresholdsForJobService.getActualThresholdsforJob();
-    console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
-  }
-
   removeOldMeasuredEvent() {
     this.addMeasuredEventDisabled= false;
+  }
+
+  addedMeasure() {
+    console.log("THRESHOLDFORJOB addedMeasure");
+    this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
   }
 
 }

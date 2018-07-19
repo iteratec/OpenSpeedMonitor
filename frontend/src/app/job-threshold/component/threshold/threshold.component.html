@@ -78,14 +78,14 @@
                 <div class="flex-item good">Gut</div>
                 <div class="flex-item symbol"><</div>
                 <div class="input-group thresholdInput flex-item">
-                  <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"  class="form-control">
+                  <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onLowerInput($event)" class="form-control">
                   <div class="input-group-addon">ms</div>
                 </div>
                 <div class="flex-item symbol"><</div>
                 <div class="flex-item ok">Ok</div>
                 <div class="flex-item symbol"><</div>
                 <div class="input-group thresholdInput flex-item">
-                  <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onKey($event)" class="form-control">
+                  <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onUpperInput($event)" class="form-control">
                   <div class="input-group-addon">ms</div>
                 </div>
                 <div class="flex-item symbol"><</div>
@@ -126,14 +126,14 @@
           <div class="flex-item good">Gut</div>
           <div class="flex-item symbol"><</div>
           <div class="input-group thresholdInput flex-item">
-            <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"  class="form-control">
+            <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onLowerInput($event)"  class="form-control">
             <div class="input-group-addon">ms</div>
           </div>
           <div class="flex-item symbol"><</div>
           <div class="flex-item ok">Ok</div>
           <div class="flex-item symbol"><</div>
           <div class="input-group thresholdInput flex-item">
-            <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onKey($event)" class="form-control">
+            <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onUpperInput($event)" class="form-control">
             <div class="input-group-addon">ms</div>
           </div>
           <div class="flex-item symbol"><</div>
