@@ -292,7 +292,7 @@
             });
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="csi/configurationPost.js"/>');
         });
 
