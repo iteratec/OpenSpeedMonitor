@@ -38,9 +38,6 @@ export class ActualThresholdsForJobService {
 
   editThresholdOfActualThresholdsforJob(thresholdId: number, editedThreshold:Threshold) {
     let index: number;
-    /*this.thresholdsforJobList.map(thresholdForJob => {
-      index = thresholdForJob.thresholds.map(threshold => threshold.id).indexOf(threshold.id)
-    })*/
     this.thresholdsforJobList.map(thresholdForJob => {
       thresholdForJob.thresholds[thresholdForJob.thresholds.indexOf(editedThreshold)] = editedThreshold;
     })
@@ -50,8 +47,6 @@ export class ActualThresholdsForJobService {
   deleteFromActualThresholdsforJob(deletedThreshold: Threshold) {
     let thresholdIndex: number;
     let thresholdForJobIndex: number;
-    console.log("SERVICE deleteFromActualThresholdsforJob thresholdId: " + deletedThreshold.id);
-    console.log("SERVICE deleteFromActualThresholdsforJob threshold: "+ JSON.stringify(deletedThreshold));
 
     this.thresholdsforJobList.map(thresholdForJob => {
       if (deletedThreshold.measuredEvent.id==thresholdForJob.measuredEvent.id) {
@@ -60,7 +55,7 @@ export class ActualThresholdsForJobService {
     });
     thresholdForJobIndex = this.thresholdsforJobList.findIndex((thresholdForJob => thresholdForJob.measuredEvent.id == deletedThreshold.measuredEvent.id));
 
-    //If is the last threshold of the measure
+    /*If is the last threshold of the measure*/
     if (this.thresholdsforJobList[thresholdForJobIndex].thresholds.length >1) {
       this.thresholdsforJobList[ thresholdForJobIndex].thresholds.splice( thresholdIndex, 1);
       this.actualThresholdsforJobList$.next(this.thresholdsforJobList);
@@ -70,11 +65,9 @@ export class ActualThresholdsForJobService {
   }
 
   addToActualThresholdsforJob(measuredEventId: number, addedThreshold: Threshold) {
-    console.log("SERVICE addToActualThresholdsforJob addedThreshold.measuredEvent.state: " + addedThreshold.measuredEvent.state);
-    console.log("SERVICE addToActualThresholdsforJob addedThreshold id: "+ addedThreshold.id);
     let index: number;
 
-    //If a new Measure was added
+    /*New Measure was added*/
     if(addedThreshold.measuredEvent.state=="new") {
       let newThresholdForJob = {} as ThresholdForJob;
       addedThreshold.state = "normal";
@@ -84,10 +77,9 @@ export class ActualThresholdsForJobService {
       newThresholdForJob.measuredEvent = newMeasuredEvent;
       newThresholdForJob.thresholds = [];
       newThresholdForJob.thresholds.push(addedThreshold);
-      console.log("SERVICE newThresholdForJob: "+ JSON.stringify(newThresholdForJob));
       this.thresholdsforJobList[this.thresholdsforJobList.length -1] = newThresholdForJob;
 
-      //If a new Threshold was added
+      /*New Threshold was added*/
     } else {
       addedThreshold.state = "normal";
       addedThreshold.measuredEvent.state= "normal";
@@ -98,7 +90,6 @@ export class ActualThresholdsForJobService {
         }
       });
     }
-    console.log("SERVICE addToActualThresholdsforJob: " + JSON.stringify(this.thresholdsforJobList));
     this.actualThresholdsforJobList$.next(this.thresholdsforJobList);
 
   }

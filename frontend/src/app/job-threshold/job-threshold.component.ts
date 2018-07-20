@@ -17,7 +17,6 @@ import {log} from "util";
 })
 
 export class JobThresholdComponent implements OnInit, OnChanges {
-  thresholdsForJobList$: Observable<ThresholdForJob[]>;
   thresholdsForJobList: ThresholdForJob[];
   actualMeasuredEventList: MeasuredEvent[];
   measuredEventList: MeasuredEvent[];
@@ -34,7 +33,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
     this.thresholdRestService.actualJobId = this.jobId;
     this.thresholdRestService.getMeasuredEvents(this.scriptId, this.jobId);
-    this.thresholdsForJobList$ = this.actualThresholdsForJobService.actualThresholdsforJobList$;
     this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
       this.measuredEventList = next;
       this.actualMeasuredEventsService.setActualMeasuredEvents(this.measuredEventList);
@@ -47,16 +45,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnInit() {
-    console.log("THRESHOLDFORJOB ngOnInit" );
-  }
+  ngOnInit() {}
 
-  ngOnChanges() {
-    console.log("THRESHOLDFORJOB ngOnChanges")
-  }
+  ngOnChanges() {}
 
   addMeasuredEvent() {
-    console.log("THRESHOLDFORJOB addMeasuredEvent")
     this.actualMeasuredEventList = this.actualMeasuredEventsService.getActualMeasuredEvents(this.thresholdsForJobList);
     this.newThresholdForJob = {} as ThresholdForJob;
     let newThreshold = {} as Threshold;
@@ -75,9 +68,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.thresholdsForJobList.push(this.newThresholdForJob);
     this.addMeasuredEventDisabled = true;
 
-/*
-    this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
-*/
   }
 
   createScript() {
@@ -94,7 +84,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   addedMeasure() {
-    console.log("THRESHOLDFORJOB addedMeasure");
     this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
   }
 

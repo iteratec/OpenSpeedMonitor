@@ -28,15 +28,11 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    console.log("MEASUREDEVENT");
-    console.log("MEASUREDEVENT this.measuredEvent.state: " + this.measuredEvent.state);
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
     this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
   }
 
-  ngOnChanges() {
-    console.log("MEASUREDEVENT ngOnChanges");
-  }
+  ngOnChanges() {}
 
   addThreshold() {
     this.addThresholdDisabled = true;
@@ -62,28 +58,18 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
     this.thresholds.push(this.newThreshold);
   }
 
-  /*savedThreshold() {
-    console.log("MEASUREDEVENT savedThreshold")
-    this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
-  }*/
+  addedMeasuredEvent() {
+    this.addedMeasure.emit()
+  }
+  addedThreshold(){
+    this.actualMeasurandList.length < 2 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
+  }
 
   removeThreshold() {
     if (this.thresholds.length == 1) {
       this.removeOldMeasuredEvent.emit();
     }
     this.addThresholdDisabled = false;
-  }
-
-  addedMeasuredEvent() {
-    console.log("MEASUREDEVENT addedMeasuredEvent");
-    this.addedMeasure.emit()
-  }
-  addedThreshold(){
-    console.log("MEASUREDEVENT addedThreshold this.ahctualMeasurandList.length: " + this.actualMeasurandList.length);
-    this.actualMeasurandList.length < 2 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
-    //this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
-
-
   }
 
   cancelNewThreshold(){

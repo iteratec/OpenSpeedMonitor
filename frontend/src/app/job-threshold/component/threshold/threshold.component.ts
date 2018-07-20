@@ -18,7 +18,6 @@ export class ThresholdComponent implements OnInit{
   @Output() addedMeasuredEvent = new EventEmitter();
   @Output() addedThreshold = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
-  //@Output() savedThreshold = new EventEmitter();
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
   allowInput = false;
@@ -34,7 +33,6 @@ export class ThresholdComponent implements OnInit{
   constructor(private thresholdRestService: ThresholdRestService) {}
 
   ngOnInit() {
-    console.log("THRESHOLD");
     this.firstUpperBoundary = this.threshold.upperBoundary;
     this.firstLowerBoundary = this.threshold.lowerBoundary;
     if (this.threshold.measuredEvent.state == "new") {
@@ -49,7 +47,6 @@ export class ThresholdComponent implements OnInit{
   delete(threshold: Threshold ) {
 
     if (this.deleteConfirmation) {
-      console.log("THRESHOLD delete id: " + threshold.id);
       this.deleteConfirmation = !this.deleteConfirmation;
       this.thresholdRestService.deleteThreshold(threshold);
       this.removeOldThreshold.emit();
@@ -91,9 +88,7 @@ export class ThresholdComponent implements OnInit{
   }
 
   save() {
-    //this.savedThreshold.emit();
     this.threshold.measurand.name = this.selectedMeasurand;
-    console.log("THRESHOLD save this.threshold.measuredEvent.state: "+ this.threshold.measuredEvent.state);
     if (this.threshold.measuredEvent.state == "new") {
       this.threshold.measuredEvent = this.selectedMeasuredEvent;
       this.threshold.measuredEvent.state = "new";
@@ -105,13 +100,6 @@ export class ThresholdComponent implements OnInit{
       this.addedThreshold.emit();
     }
   }
-
-  /*onKey(event: any) {
-    this.value = event.target.value ;
-    if (this.value > 0) {
-      this.leftButtonLabelDisable = false;
-    }
-  }*/
 
   onLowerInput(event: any) {
     this.lowerInput = event.target.value ;

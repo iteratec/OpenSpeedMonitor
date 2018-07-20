@@ -20,7 +20,6 @@ import {log} from "util";
 
 export class ThresholdRestService {
 
-  //public thresholdsForJob$ = new ReplaySubject<ThresholdForJob[]>(1);
   public measuredEvents$ = new ReplaySubject<MeasuredEvent[]>(1);
   public actualJobId : number;
   public actualThresholdId: number;
@@ -55,15 +54,12 @@ export class ThresholdRestService {
   getThresholdsForJob (jobId: number){
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
     this.http.get<ThresholdForJob[]>(url)
-      //.subscribe(next => this.thresholdsForJob$.next(next), error => this.handleError(error)) ;
       .subscribe(next => this.actualThresholdsforJobList.setActualThresholdsforJobList(next), error => this.handleError(error)) ;
   }
 
   /** DELETE Threshold */
   deleteThreshold (threshold: Threshold){
     this.actualThreshold = threshold;
-    console.log("REST SERVICE deleteThreshold:" + JSON.stringify(threshold));
-    console.log("REST SERVICE deleteThreshold id:" + threshold.id);
     const url = "/threshold/deleteThreshold" ;
     let self= this;
     let formData = new FormData()
@@ -86,7 +82,6 @@ export class ThresholdRestService {
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
     this.http.post(url, params).subscribe(() => {
-        //self.getThresholdsForJob(self.actualJobId);
       self.actualThresholdsforJobList.editThresholdOfActualThresholdsforJob(this.actualThresholdId, this.actualThreshold );
       }
     );
@@ -106,12 +101,7 @@ export class ThresholdRestService {
 
     this.http.post(url,  params ).subscribe(response => {
       let newId : number=  Number(Object.values(response));
-      //newId = newId.thresholdId;
-      console.log("response newId: " + newId);
       this.actualThreshold.id= newId;
-      console.log("REST this.actualThreshold.id: "+ this.actualThreshold.id);
-      //self.getThresholdsForJob(self.actualJobId);
-          //self.actualThresholdsforJobList.addThresholdForJobToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
       self.actualThresholdsforJobList.addToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);}
     );
   }
@@ -134,7 +124,6 @@ export class ThresholdRestService {
   saveData(blob, fileName) {
     var a = document.createElement("a");
     document.body.appendChild(a);
-    //a.style = "display: none";
     let url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = fileName;

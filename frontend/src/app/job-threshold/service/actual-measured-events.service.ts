@@ -25,7 +25,4 @@ export class ActualMeasuredEventsService {
     });
     return this.actualMeasuredEventList
   }
-
-
-
 }

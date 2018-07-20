@@ -1,4 +1,6 @@
 <div class="thresholdContainer">
+
+  <!-- Normal MeasuredEvent-->
   <div class="" *ngIf="measuredEvent.state=='normal'">
     <div class="flex-row-group">
       <div class="flex-column-left">
@@ -10,10 +12,9 @@
                          [threshold]="threshold"
                          [measuredEventList]="measuredEventList"
                          [actualMeasurandList]="actualMeasurandList"
-
                          (removeOldThreshold)="removeThreshold()"
                          (addedThreshold)="addedThreshold()"
-                         (cancelEvent)="cancelNewThreshold()"></osm-threshold> <!--(savedThreshold)="savedThreshold()"-->
+                         (cancelEvent)="cancelNewThreshold()"></osm-threshold>
         </div>
         <div class="flex-down">
           <button type="button"
@@ -25,6 +26,8 @@
     </div>
     <hr>
   </div>
+
+  <!--New MeasuredEvent-->
   <div class="" *ngIf="measuredEvent.state=='new'">
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
@@ -32,7 +35,6 @@
                    [actualMeasurandList]="actualMeasurandList"
                    (addedMeasuredEvent)="addedMeasuredEvent()"
                    (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold>
-
     <hr>
   </div>
 </div>
