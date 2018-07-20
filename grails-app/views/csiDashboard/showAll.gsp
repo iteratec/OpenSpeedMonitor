@@ -373,7 +373,7 @@
             setAdjustments();
 
         });
-        $(window).load(function() {
+        $(window).on('load', function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
         });
 

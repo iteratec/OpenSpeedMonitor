@@ -53,7 +53,7 @@ OpenSpeedMonitor.resultSelection = (function () {
 
         // if caller is CsiDashboard there is a need for a changeListener on aggregation card
         if (currentQueryArgs['caller'] == "CsiAggregation") {
-            $("input[name='aggrGroupAndInterval']").change(function () {
+            $("input[name='aggrGroupAndInterval']").on('change', function () {
                 needsNoPageSelectionDueToCsiAggregation = aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
                 csiSystemSelected = $("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system";
                 validateForm();
