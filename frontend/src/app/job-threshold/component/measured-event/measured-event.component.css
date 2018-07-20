@@ -14,6 +14,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   line-height: 2;
+  margin-right: 2%;
 }
 
 .flex-column-right {
@@ -25,7 +26,7 @@
   align-items: flex-start;
   */
   line-height: 2;
-  flex-basis: 800px;
+  flex-basis: 850px;
 }
 
 .flex-up {
@@ -40,6 +41,8 @@
 .measuredEvent {
   font-size: 1em;
   font-weight: bold;
+  word-break: break-all;
+
 }
 
 
