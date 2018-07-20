@@ -19,7 +19,6 @@ export class ActualThresholdsForJobService {
   constructor() { }
 
   setActualThresholdsforJobList(thresholdsforJob: ThresholdForJob[]) {
-    console.log("SERVICE setActualThresholdsforJobList");
     /*State Initialization*/
     thresholdsforJob.map(element => {
       element.measuredEvent.state = "normal";
