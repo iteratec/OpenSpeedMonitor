@@ -24,6 +24,8 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   scriptId : number;
   newThresholdForJob: ThresholdForJob;
   addMeasuredEventDisabled: boolean = false;
+  isEmpty: boolean = false;
+
 
   constructor(private thresholdRestService: ThresholdRestService,
               private actualMeasuredEventsService: ActualMeasuredEventsService,
@@ -38,6 +40,10 @@ export class JobThresholdComponent implements OnInit, OnChanges {
       this.actualMeasuredEventsService.setActualMeasuredEvents(this.measuredEventList);
       this.actualThresholdsForJobService.actualThresholdsforJobList$.subscribe((next: ThresholdForJob[]) => {
         this.thresholdsForJobList = next;
+        console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
+        if (this.thresholdsForJobList.length == 0) {
+          this.isEmpty = true;
+        }
         if(this.thresholdsForJobList.length === this.measuredEventList.length) {
          this.addMeasuredEventDisabled= true;
          }
@@ -67,6 +73,8 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.newThresholdForJob.thresholds.push(newThreshold);
     this.thresholdsForJobList.push(this.newThresholdForJob);
     this.addMeasuredEventDisabled = true;
+    this.isEmpty = false;
+
 
   }
 
@@ -77,10 +85,13 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   cancelNewMeasuredEvent() {
     this.thresholdsForJobList.pop();
     this.addMeasuredEventDisabled= false;
+    this.thresholdsForJobList.length > 0? this.isEmpty = false :this.isEmpty = true ;
+
   }
 
   removeOldMeasuredEvent() {
     this.addMeasuredEventDisabled= false;
+    this.thresholdsForJobList.length > 1? this.isEmpty = false :this.isEmpty = true ;
   }
 
   addedMeasure() {

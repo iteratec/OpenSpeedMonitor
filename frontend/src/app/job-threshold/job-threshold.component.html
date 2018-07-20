@@ -1,4 +1,5 @@
 <div>
+
   <osm-measured-event *ngFor="let thresholdForJob of thresholdsForJobList"
                       [measuredEvent]="thresholdForJob.measuredEvent"
                       [thresholds]="thresholdForJob.thresholds"
@@ -7,6 +8,10 @@
                       (addedMeasure) = "addedMeasure()"
                       (removeEvent)="cancelNewMeasuredEvent()">
   </osm-measured-event>
+
+  <p class="message" *ngIf="isEmpty == true">
+    Für diesen Job existieren noch keine Thresholds. Thresholds haben einen unteren und einen oberen Schwellenwert für ausgewählte Measured Events und Metriken. Thresholds ermöglichen die Erstellung eines Skriptes, welches in eine CI-Pipeline eingebunden werden kann. Das Skript started diesen Job und überprüft ob die Ergebnisse innerhalb der hier konfigurierten Schwellenwerten liegen.
+  </p>
 
   <button type="button"
           class="btn btn-primary"
