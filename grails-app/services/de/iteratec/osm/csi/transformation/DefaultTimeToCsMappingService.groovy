@@ -25,6 +25,7 @@ import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.MultiLineChartLineData
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+
 /**
  * DefaultTimeToCsMappingService
  * A service class encapsulates the core business logic of a Grails application
@@ -48,7 +49,7 @@ class DefaultTimeToCsMappingService {
      * @param nameOfDefaultMapping the default mapping to use
      * @param csiConfiguration the csi configuration where the mapping will be appplied
      */
-    void copyDefaultMappingToPage(Page page, String nameOfDefaultMapping, CsiConfiguration csiConfiguration){
+    void copyDefaultMappingToPage(Page page, String nameOfDefaultMapping, CsiConfiguration csiConfiguration) {
 
         List<DefaultTimeToCsMapping> defaultMappingsToCopyToPage = DefaultTimeToCsMapping.findAllByName(nameOfDefaultMapping)
         if (defaultMappingsToCopyToPage.size() == 0)
@@ -56,23 +57,23 @@ class DefaultTimeToCsMappingService {
 
         Integer actualMappingVersion = csiConfiguration.timeToCsMappings.isEmpty() ? 1 : csiConfiguration.timeToCsMappings.first().mappingVersion
         TimeToCsMapping.withTransaction {
-            Collection<TimeToCsMapping> csiConfigsToDelete = csiConfiguration.timeToCsMappings.findAll{it.page == page}
+            Collection<TimeToCsMapping> csiConfigsToDelete = csiConfiguration.timeToCsMappings.findAll {
+                it.page == page
+            }
             csiConfiguration.timeToCsMappings.removeAll(csiConfigsToDelete)
             csiConfigsToDelete*.delete()
             csiConfiguration.save(failOnError: true)
         }
         TimeToCsMapping.withTransaction {
-            defaultMappingsToCopyToPage.each {defaultMapping ->
-               csiConfiguration.addToTimeToCsMappings(new TimeToCsMapping(
+            defaultMappingsToCopyToPage.each { defaultMapping ->
+                csiConfiguration.addToTimeToCsMappings(new TimeToCsMapping(
                         page: page,
                         loadTimeInMilliSecs: defaultMapping.loadTimeInMilliSecs,
                         customerSatisfaction: defaultMapping.customerSatisfactionInPercent,
                         mappingVersion: actualMappingVersion
-                ).save(failOnError: true))
-                performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, 'save csiconf', 1){
-                    csiConfiguration.save(failOnError: true)
-                }
+                ))
             }
+            csiConfiguration.save(failOnError: true)
         }
     }
 
@@ -81,7 +82,9 @@ class DefaultTimeToCsMappingService {
         String yLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.yAxisLabel", "Kundenzufriedenheit in %")
         MultiLineChart multiLineChart = new MultiLineChart(xLabel: xLabel, yLabel: yLabel)
 
-        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = getAll().findAll { it.loadTimeInMilliSecs <= maxLoadTime }
+        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = getAll().findAll {
+            it.loadTimeInMilliSecs <= maxLoadTime
+        }
         Map<String, MultiLineChartLineData> map = new HashMap<>()
 
         defaultTimeToCsMappings.each { entry ->
@@ -92,7 +95,7 @@ class DefaultTimeToCsMappingService {
         }
 
         // sort and add
-        map.values().sort{a,b -> a.name.compareTo(b.name)}.each{e -> multiLineChart.addLine(e)}
+        map.values().sort { a, b -> a.name.compareTo(b.name) }.each { e -> multiLineChart.addLine(e) }
 
         return multiLineChart
     }
@@ -103,7 +106,7 @@ class DefaultTimeToCsMappingService {
      * @param name
      * @throws IllegalArgumentException
      */
-    void deleteDefaultTimeToCsMapping(String name){
+    void deleteDefaultTimeToCsMapping(String name) {
         List<DefaultTimeToCsMapping> mappings = DefaultTimeToCsMapping.findAllByName(name)
         if (mappings.size() == 0)
             throw new IllegalArgumentException("No default csi mapping with name ${name} exists!")
