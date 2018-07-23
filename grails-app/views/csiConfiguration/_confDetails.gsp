@@ -149,7 +149,7 @@
                                             <div class="input-group">
                                                 <span class="input-group-btn">
                                                     <a class="btn btn-default"
-                                                       onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
+                                                       onclick="$('input[id=defaultTimeToCsMappingCsvFile]').trigger('click');">
                                                         <i class="fas fa-folderpen-o"
                                                            aria-hidden="true"></i>
                                                     </a>
@@ -241,7 +241,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
-                                       onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
+                                       onclick="$('input[id=theBrowserConnectivityCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
@@ -293,7 +293,8 @@
 
                             <div class="input-group">
                                 <span class="input-group-btn">
-                                    <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
+                                    <a class="btn btn-default"
+                                       onclick="$('input[id=thePageCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
@@ -345,7 +346,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
-                                       onclick="$('input[id=theHourOfDayCsvFile]').click();">
+                                       onclick="$('input[id=theHourOfDayCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
