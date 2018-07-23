@@ -58,7 +58,7 @@
         if ('${selectedJobId}') {
             $("#selectedJob").val(${selectedJobId});
             $('#selectedJob').trigger("chosen:updated");
-            $('#selectedJob').change();
+            $('#selectedJob').trigger('change');
         }
     </asset:script>
 </content>
