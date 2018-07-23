@@ -10,15 +10,12 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -31,8 +28,6 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
     Page page
     Browser browser
 
-    DateTime runDate = new DateTime(DateTimeZone.UTC)
-
     def setup() {
         eventResultDashboardService.grailsLinkGenerator = Mock(LinkGenerator)
         eventResultDashboardService.i18nService = Stub(I18nService) {
@@ -41,62 +36,61 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
             }
         }
 
-        JobGroup.withNewSession {
-            OsmConfiguration.build()
+        OsmConfiguration.build()
 
-            jobGroup1 = JobGroup.build(name: "Job Group 1")
-            jobGroup2 = JobGroup.build(name: "Job Group 2")
-            jobGroup3 = JobGroup.build(name: "Job Group 3")
-            jobGroup4 = JobGroup.build(name: "Job Group 4")
+        jobGroup1 = JobGroup.build(name: "Job Group 1")
+        jobGroup2 = JobGroup.build(name: "Job Group 2")
+        jobGroup3 = JobGroup.build(name: "Job Group 3")
+        jobGroup4 = JobGroup.build(name: "Job Group 4")
 
-            location1 = Location.build(location: "Location 1")
-            location2 = Location.build(location: "Location 2")
-            location3 = Location.build(location: "Location 3")
+        location1 = Location.build(location: "Location 1")
+        location2 = Location.build(location: "Location 2")
+        location3 = Location.build(location: "Location 3")
 
-            measuredEvent1 = MeasuredEvent.build(name: "Measured Event 1")
-            measuredEvent2 = MeasuredEvent.build(name: "Measured Event 2")
-            measuredEvent3 = MeasuredEvent.build(name: "Measured Event 3")
+        measuredEvent1 = MeasuredEvent.build(name: "Measured Event 1")
+        measuredEvent2 = MeasuredEvent.build(name: "Measured Event 2")
+        measuredEvent3 = MeasuredEvent.build(name: "Measured Event 3")
 
-            connectivityProfile1 = ConnectivityProfile.build(name: "Connectivity Profile 1")
-            connectivityProfile2 = ConnectivityProfile.build(name: "Connectivity Profile 2")
-            connectivityProfile3 = ConnectivityProfile.build(name: "Connectivity Profile 3")
+        connectivityProfile1 = ConnectivityProfile.build(name: "Connectivity Profile 1")
+        connectivityProfile2 = ConnectivityProfile.build(name: "Connectivity Profile 2")
+        connectivityProfile3 = ConnectivityProfile.build(name: "Connectivity Profile 3")
 
-            page = Page.build()
-            browser = Browser.build()
+        page = Page.build()
+        browser = Browser.build()
 
-            it.flush()
-        }
+    }
+
+    def cleanup() {
+        eventResultDashboardService.i18nService = grailsApplication.mainContext.getBean('i18nService')
     }
 
     def "no summarization possible because every legend part in every event result is different"(int csiAggregationInterval) {
         given: "build two event results with different label attributes"
-        EventResult.withNewSession {
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup1,
-                    measuredEvent: measuredEvent1,
-                    location: location1,
-                    connectivityProfile: connectivityProfile1,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 1,
-                    docCompleteRequests: 1
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+                jobGroup: jobGroup1,
+                measuredEvent: measuredEvent1,
+                location: location1,
+                connectivityProfile: connectivityProfile1,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 1,
+                docCompleteRequests: 1
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup2,
-                    measuredEvent: measuredEvent2,
-                    location: location2,
-                    connectivityProfile: connectivityProfile2,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 1,
-                    docCompleteRequests: 1
-            )
-            it.flush()
-        }
+                jobGroup: jobGroup2,
+                measuredEvent: measuredEvent2,
+                location: location2,
+                connectivityProfile: connectivityProfile2,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 1,
+                docCompleteRequests: 1
+        )
+
         ErQueryParams erQueryParams = new ErQueryParams()
         erQueryParams.jobGroupIds.addAll([jobGroup1.id, jobGroup2.id])
         erQueryParams.measuredEventIds.addAll([measuredEvent1.id, measuredEvent2.id])
@@ -135,26 +129,24 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
 
     def "no summarization necessary because all event results belong to same graph"(int csiAggregationInterval) {
         setup: "build ten event results which belong to the same graph and therefore have the same label attributes"
-        EventResult.withNewSession {
 
-            10.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
+        10.times {
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
 
-                        jobGroup: jobGroup1,
-                        measuredEvent: measuredEvent1,
-                        location: location1,
-                        connectivityProfile: connectivityProfile1,
-                        cachedView: CachedView.UNCACHED,
-                        docCompleteTimeInMillisecs: 0,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    location: location1,
+                    connectivityProfile: connectivityProfile1,
+                    cachedView: CachedView.UNCACHED,
+                    docCompleteTimeInMillisecs: 0,
 
-                        page: page,
-                        browser: browser
-                )
-            }
-            it.flush()
+                    page: page,
+                    browser: browser
+            )
         }
+
         ErQueryParams erQueryParams = new ErQueryParams()
         erQueryParams.jobGroupIds.add(jobGroup1.id)
         erQueryParams.measuredEventIds.add(measuredEvent1.id)
@@ -187,31 +179,29 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
 
     void "some legend parts in every event result the same, some different"(int csiAggregationInterval) {
         setup: "build two event results where same label attributes are the same and some differ"
-        EventResult.withNewSession {
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup1,
-                    measuredEvent: measuredEvent1,
-                    location: location1,
-                    connectivityProfile: connectivityProfile1,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+                jobGroup: jobGroup1,
+                measuredEvent: measuredEvent1,
+                location: location1,
+                connectivityProfile: connectivityProfile1,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup1,
-                    measuredEvent: measuredEvent1,
-                    location: location2,
-                    connectivityProfile: connectivityProfile2,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0
-            )
-            it.flush()
-        }
+                jobGroup: jobGroup1,
+                measuredEvent: measuredEvent1,
+                location: location2,
+                connectivityProfile: connectivityProfile2,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0
+        )
+
         ErQueryParams erQueryParams = new ErQueryParams()
         erQueryParams.jobGroupIds.add(jobGroup1.id)
         erQueryParams.measuredEventIds.add(measuredEvent1.id)
@@ -249,57 +239,55 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
 
     void "single legend parts in some but not all event results the same"(int csiAggregationInterval) {
         setup: "build four event results with the described configuration"
-        EventResult.withNewSession {
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup1,
-                    measuredEvent: measuredEvent1,
-                    location: location1,
-                    connectivityProfile: connectivityProfile1,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0,
-                    docCompleteRequests: 0
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+                jobGroup: jobGroup1,
+                measuredEvent: measuredEvent1,
+                location: location1,
+                connectivityProfile: connectivityProfile1,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0,
+                docCompleteRequests: 0
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup2,
-                    measuredEvent: measuredEvent1,
-                    location: location1,
-                    connectivityProfile: connectivityProfile1,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0,
-                    docCompleteRequests: 0
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+                jobGroup: jobGroup2,
+                measuredEvent: measuredEvent1,
+                location: location1,
+                connectivityProfile: connectivityProfile1,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0,
+                docCompleteRequests: 0
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup3,
-                    measuredEvent: measuredEvent2,
-                    location: location2,
-                    connectivityProfile: connectivityProfile2,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0,
-                    docCompleteRequests: 0
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
+                jobGroup: jobGroup3,
+                measuredEvent: measuredEvent2,
+                location: location2,
+                connectivityProfile: connectivityProfile2,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0,
+                docCompleteRequests: 0
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
 
-                    jobGroup: jobGroup4,
-                    measuredEvent: measuredEvent3,
-                    location: location3,
-                    connectivityProfile: connectivityProfile3,
-                    cachedView: CachedView.UNCACHED,
-                    docCompleteTimeInMillisecs: 0,
-                    docCompleteRequests: 0
-            )
-            it.flush()
-        }
+                jobGroup: jobGroup4,
+                measuredEvent: measuredEvent3,
+                location: location3,
+                connectivityProfile: connectivityProfile3,
+                cachedView: CachedView.UNCACHED,
+                docCompleteTimeInMillisecs: 0,
+                docCompleteRequests: 0
+        )
+
         ErQueryParams erQueryParams = new ErQueryParams()
         erQueryParams.jobGroupIds.addAll([jobGroup1.id, jobGroup2.id, jobGroup3.id, jobGroup4.id])
         erQueryParams.measuredEventIds.addAll([measuredEvent1.id, measuredEvent2.id, measuredEvent3.id])

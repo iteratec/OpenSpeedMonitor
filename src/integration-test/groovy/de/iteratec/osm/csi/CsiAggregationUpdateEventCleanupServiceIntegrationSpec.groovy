@@ -28,6 +28,9 @@ class CsiAggregationUpdateEventCleanupServiceIntegrationSpec extends NonTransact
         addMocksCommonForAllTests()
     }
 
+    def cleanup() {
+        csiAggregationUpdateEventCleanupService.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
+    }
 
     void "already calculated daily page csi aggregations get closed"() {
         setup:

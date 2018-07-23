@@ -22,6 +22,7 @@ import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
@@ -31,7 +32,7 @@ import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -41,10 +42,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     WebPageTestServer server
 
     def setupData() {
-        WebPageTestServer.withNewTransaction {
-            OsmConfiguration.build()
-            createTestDataCommonToAllTests()
-        }
+        OsmConfiguration.build()
+        createTestDataCommonToAllTests()
         createMocksCommonToAllTests()
     }
 
@@ -62,6 +61,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         JobResult.list().size() == 1
         EventResult.list().size() == 4
 
+        cleanup:
+        removeStubs()
     }
 
     void "Results get persisted even after failed metric reporting."() {
@@ -78,6 +79,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         JobResult.list().size() == 1
         EventResult.list().size() == 4
 
+        cleanup:
+        removeStubs()
     }
 
     void "No EventResults get persisted when Persistence of JobResults throws an exception."() {
@@ -94,6 +97,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         JobResult.list().size() == 0
         EventResult.list().size() == 0
 
+        cleanup:
+        removeStubs()
     }
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
@@ -109,6 +114,9 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 2
+
+        cleanup:
+        removeStubs()
     }
 
     private createTestDataCommonToAllTests() {
@@ -116,9 +124,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
             Page.build(name: pageName)
         }
         server = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
+        Browser browser = Browser.build()
         Location loc = Location.build(
                 wptServer: server,
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
+                browser: browser
         )
         Job.build(
                 label: 'FF_BV1_Multistep_2',
@@ -146,5 +156,14 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
             throw new RuntimeException('Faked failing of metric reporting in integration test')
         }
         resultPersisterService.metricReportingService = metricReportingService
+    }
+
+    void removeStubs() {
+        resultPersisterService.timeToCsMappingService =
+                grailsApplication.mainContext.getBean('timeToCsMappingService')
+        resultPersisterService.csiAggregationUpdateService =
+                grailsApplication.mainContext.getBean('csiAggregationUpdateService')
+        resultPersisterService.metricReportingService =
+                grailsApplication.mainContext.getBean('metricReportingService')
     }
 }

@@ -70,44 +70,43 @@ class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegratio
         csiAggregationUpdateEventCleanupService.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService')
     }
 
-
-    void "Outdated daily page CSI aggregations get closed and calculated correctly"() {
-        setup: "Create two outdated CSI aggregations and no event results"
-        buildCsiAggregationWithAnOutdatedUpdateEvent(lastDayStart.toDate(), dailyInterval, AggregationType.PAGE, false)
-        buildCsiAggregationWithAnOutdatedUpdateEvent(secondToLastDayStart.toDate(), dailyInterval, AggregationType.PAGE, false)
-
-        when: "they are getting closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
-
-        then: "the outdated update events get deleted and csi aggregations get closed and calculated"
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-
-        CsiAggregationUpdateEvent.list().size() == 0
-        csiAggregations.size() == 2
-        csiAggregations.every { csiAggregation ->
-            csiAggregation.closedAndCalculated &&
-            csiAggregation.isCalculatedWithoutData()
-        }
-    }
-
-    void "Outdated weekly page CSI aggregations get closed and calculated correctly"() {
-        setup: "Create two outdated CSI aggregations and no event results"
-        buildCsiAggregationWithAnOutdatedUpdateEvent(lastWeekStart.toDate(), weeklyInterval, AggregationType.PAGE, false)
-        buildCsiAggregationWithAnOutdatedUpdateEvent(secondToLastWeekStart.toDate(), weeklyInterval, AggregationType.PAGE, false)
-
-        when: "they are getting closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
-
-        then: "the outdated update events get deleted and csi aggregations get closed and calculated"
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-
-        CsiAggregationUpdateEvent.list().size() == 0
-        csiAggregations.size() == 2
-        csiAggregations.every { csiAggregation ->
-            csiAggregation.closedAndCalculated &&
-            csiAggregation.isCalculatedWithoutData()
-        }
-    }
+//    void "Outdated daily page CSI aggregations get closed and calculated correctly"() {
+//        setup: "Create two outdated CSI aggregations and no event results"
+//        buildCsiAggregationWithAnOutdatedUpdateEvent(lastDayStart.toDate(), dailyInterval, AggregationType.PAGE, false)
+//        buildCsiAggregationWithAnOutdatedUpdateEvent(secondToLastDayStart.toDate(), dailyInterval, AggregationType.PAGE, false)
+//
+//        when: "they are getting closed programmatically"
+//        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+//
+//        then: "the outdated update events get deleted and csi aggregations get closed and calculated"
+//        List<CsiAggregation> csiAggregations = CsiAggregation.list()
+//
+//        CsiAggregationUpdateEvent.list().size() == 0
+//        csiAggregations.size() == 2
+//        csiAggregations.every { csiAggregation ->
+//            csiAggregation.closedAndCalculated &&
+//            csiAggregation.isCalculatedWithoutData()
+//        }
+//    }
+//
+//    void "Outdated weekly page CSI aggregations get closed and calculated correctly"() {
+//        setup: "Create two outdated CSI aggregations and no event results"
+//        buildCsiAggregationWithAnOutdatedUpdateEvent(lastWeekStart.toDate(), weeklyInterval, AggregationType.PAGE, false)
+//        buildCsiAggregationWithAnOutdatedUpdateEvent(secondToLastWeekStart.toDate(), weeklyInterval, AggregationType.PAGE, false)
+//
+//        when: "they are getting closed programmatically"
+//        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+//
+//        then: "the outdated update events get deleted and csi aggregations get closed and calculated"
+//        List<CsiAggregation> csiAggregations = CsiAggregation.list()
+//
+//        CsiAggregationUpdateEvent.list().size() == 0
+//        csiAggregations.size() == 2
+//        csiAggregations.every { csiAggregation ->
+//            csiAggregation.closedAndCalculated &&
+//            csiAggregation.isCalculatedWithoutData()
+//        }
+//    }
 
     void "Outdated daily job group CSI aggregations get closed and calculated correctly"() {
         setup: "Create two outdated CSI aggregations and no event results"

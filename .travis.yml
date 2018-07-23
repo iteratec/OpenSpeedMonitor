@@ -24,7 +24,7 @@ jobs:
   include:
     - stage: tests
       script: ./gradlew -x jasmineRun test
-#    - script: ./gradlew integrationTest --tests "de.iteratec.osm.report.**"  --tests "de.iteratec.osm.result.**"  --tests "de.iteratec.osm.measurement.**"
-#    - script: ./gradlew integrationTest --tests "de.iteratec.osm.csi.**"
+#    - script: ./gradlew integrationTest --tests "de.iteratec.osm.**"  --tests "de.iteratec.osm.result.**"  --tests "de.iteratec.osm.measurement.**"
+    - script: ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
     - script: ./gradlew jasmineRun
 

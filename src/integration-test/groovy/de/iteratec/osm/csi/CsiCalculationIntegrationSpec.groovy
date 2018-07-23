@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
@@ -25,13 +26,13 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     ResultPersisterService resultPersisterService
@@ -51,9 +52,7 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
-        JobGroup.withNewTransaction {
-            Job.build(label: jobLabelFromXML)
-        }
+        Job.build(label: jobLabelFromXML)
 
         when: "larpService listens to result of JobGroup without csi configuration"
         resultPersisterService.listenToResult(xmlResult, server1)
@@ -61,14 +60,15 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         then: "persisted EventResult has no csi value"
         resultsWithCsiCalculated.size() == 0
+
+        cleanup:
+        cleanUpStubs()
     }
 
     void "csi must be calculated with csi-configuration, all values are 100%"() {
         setup: "prepare Job and JobGroup"
-        JobGroup.withNewTransaction {
-            JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
-            Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf)
-        }
+        JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
+        Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
         resultPersisterService.listenToResult(xmlResult, server1)
@@ -77,14 +77,15 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "persisted EventResult has csi value of 100%"
         results.size() > 0
         results*.csByWptDocCompleteInPercent.unique(false) == [100d]
+
+        cleanup:
+        cleanUpStubs()
     }
 
     void "csi must be calculated with csi-configuration, all values are 50%"() {
         setup: "prepare Job and JobGroup"
-        JobGroup.withNewTransaction {
-            JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
-            Job.build(label: jobLabelFromXML, jobGroup: jobGroup)
-        }
+        JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
+        Job.build(label: jobLabelFromXML, jobGroup: jobGroup)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
         resultPersisterService.listenToResult(xmlResult, server1)
@@ -93,20 +94,20 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "persisted EventResult has csi value of 50%"
         results.size() > 0
         results*.csByWptDocCompleteInPercent.unique(false) == [50d]
+
+        cleanup:
+        cleanUpStubs()
     }
 
     private void createTestDataCommonForAllTests() {
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml'
+        File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
-        JobGroup.withNewTransaction {
-            String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml'
-            File file = new File("src/test/resources/WptResultXmls/${nameOfResultXmlFile}")
-            xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-
-            server1 = WebPageTestServer.build(active: true, baseUrl: 'http://wpt.server.de')
-            Location.build(wptServer: server1, uniqueIdentifierForServer: 'otto-prod-hetzner:Firefox')
-            createCsiConfigurations()
-        }
-
+        server1 = WebPageTestServer.build(active: true, baseUrl: 'http://wpt.server.de')
+        Browser browser = Browser.build()
+        Location.build(wptServer: server1, uniqueIdentifierForServer: 'otto-prod-hetzner:Firefox', browser: browser)
+        createCsiConfigurations()
     }
 
     private void createCsiConfigurations() {
@@ -122,5 +123,9 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
         resultPersisterService.timeToCsMappingService = service
+    }
+
+    private void cleanUpStubs() {
+        resultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
     }
 }

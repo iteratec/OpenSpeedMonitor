@@ -47,7 +47,6 @@ class CsiAggregationUpdateService {
 	 */
 	@Transactional
 	void createOrUpdateDependentMvs(long eventResultId) {
-		println("hello we update mvs");
 		EventResult erToUpdateCsiAggregationsFor = EventResult.get(eventResultId)
 		if (erToUpdateCsiAggregationsFor) createOrUpdateDependentMvs(erToUpdateCsiAggregationsFor)
 	}

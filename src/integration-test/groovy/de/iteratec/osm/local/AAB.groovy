@@ -22,6 +22,7 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -29,14 +30,14 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
-import org.springframework.test.annotation.Rollback
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class AAB extends NonTransactionalIntegrationSpec {
 
@@ -53,10 +54,7 @@ class AAB extends NonTransactionalIntegrationSpec {
 
     def "test creation and calculation of weekly job group CSI values"() {
         setup: "event results with document complete values and document complete customer satisfaction values in percent"
-        EventResult.withNewSession { session ->
-            setupData()
-            session.flush()
-        }
+        setupData()
         List<CsiAggregation> weeklyJobGroupCsiAggregations = []
         Map<String, Double> targetValues = [
                 csiGroup1: 0.4d,
@@ -64,22 +62,18 @@ class AAB extends NonTransactionalIntegrationSpec {
         ]
 
         when: "the job group CSI aggregations gets calculated"
-        EventResult.withNewSession {
-            weeklyJobGroupCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
-        }
+        weeklyJobGroupCsiAggregations = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
 
         then: "two job group CSI aggregations were created and the correct CSI values per job group were calculated"
         assertEquals(2, weeklyJobGroupCsiAggregations.size())
-        CsiAggregation.withNewSession {
-            weeklyJobGroupCsiAggregations*.id.each { id ->
-                CsiAggregation csiAggregation = CsiAggregation.get(id)
+        weeklyJobGroupCsiAggregations*.id.each { id ->
+            CsiAggregation csiAggregation = CsiAggregation.get(id)
 
-                assertEquals(AggregationType.JOB_GROUP, csiAggregation.aggregationType)
-                assertEquals(startOfWeek.toDate(), csiAggregation.started)
-                assertEquals(weeklyInterval.intervalInMinutes, csiAggregation.interval.intervalInMinutes)
-                assertTrue(csiAggregation.isCalculated())
-                assertEquals(targetValues["${csiAggregation.jobGroup.name}"], csiAggregation.csByWptDocCompleteInPercent, 0.01d)
-            }
+            assertEquals(AggregationType.JOB_GROUP, csiAggregation.aggregationType)
+            assertEquals(startOfWeek.toDate(), csiAggregation.started)
+            assertEquals(weeklyInterval.intervalInMinutes, csiAggregation.interval.intervalInMinutes)
+            assertTrue(csiAggregation.isCalculated())
+            assertEquals(targetValues["${csiAggregation.jobGroup.name}"], csiAggregation.csByWptDocCompleteInPercent, 0.01d)
         }
     }
 
@@ -115,8 +109,8 @@ class AAB extends NonTransactionalIntegrationSpec {
 
         csiGroups.eachWithIndex { csiGroup, csiGroupIndex ->
             pagesToTest.eachWithIndex { page, pageIndex ->
-                JobResult jobResult1 = JobResult.build(date: dateOfJobResult1.toDate())
-                JobResult jobResult2 = JobResult.build(date: dateOfJobResult2.toDate())
+                JobResult jobResult1 = JobResult.build(date: dateOfJobResult1.toDate(), job: Job.build(jobGroup: csiGroup))
+                JobResult jobResult2 = JobResult.build(date: dateOfJobResult2.toDate(), job: Job.build(jobGroup: csiGroup))
 
                 EventResult.build(
                         docCompleteTimeInMillisecs: 3167,

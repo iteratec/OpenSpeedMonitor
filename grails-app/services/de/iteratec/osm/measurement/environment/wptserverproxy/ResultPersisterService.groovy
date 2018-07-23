@@ -76,7 +76,6 @@ class ResultPersisterService implements iResultListener {
             WebPageTestServer wptserverOfResult) {
 
         try {
-            println("hello i listen");
             checkJobAndLocation(resultXml, wptserverOfResult)
             persistJobResult(resultXml)
             persistResultsForAllTeststeps(resultXml)
@@ -529,7 +528,6 @@ class ResultPersisterService implements iResultListener {
     void informDependentCsiAggregations(EventResult result) {
         try {
             if (csiValueService.isCsiRelevant(result)) {
-                println("hello we inform csi");
                 long resultId = result.ident()
                 csiAggregationUpdateService.createOrUpdateDependentMvs(resultId)
             }
