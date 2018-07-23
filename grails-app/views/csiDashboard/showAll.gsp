@@ -352,10 +352,10 @@
             $(".dia-y-axis-max").val(loadTimeMaximum);
             $(".dia-y-axis-min").val(loadTimeMinimum);
             if (eval(showDataMarkers)) {
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             if (eval(showDataLabels)) {
-                $("#to-enable-label").click();
+                $("#to-enable-label").trigger('click');
             }
             initGraphNameAliases(graphNameAliases);
             initGraphColors(graphColors);
