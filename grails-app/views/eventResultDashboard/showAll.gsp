@@ -270,7 +270,7 @@
             }
         }
 
-        $(document).ready(function () {
+        $(function () {
 
             doOnDomReady(
                 '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'

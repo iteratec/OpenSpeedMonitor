@@ -1,5 +1,5 @@
 if (typeof jQuery !== 'undefined') {
-	$(document).ready(function() {
+    $(function () {
 		/**
 		 * A checkbox using Bootstrap CSS's radio buttons
 		 */

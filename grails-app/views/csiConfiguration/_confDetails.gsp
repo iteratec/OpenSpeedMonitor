@@ -461,7 +461,7 @@
         $(document).scrollTop(scrollposition);
     });
 
-    $(document).ready(function () {
+    $(function () {
         %{-- if passed, show the given nav tab at the start --}%
         var hash = window.location.hash;
         $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {

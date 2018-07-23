@@ -30,7 +30,7 @@
 </div>
 <content tag="include.p13nByCookies.script">
     <asset:script type="text/javascript">
-        $(document).ready(function(){
+        $(function(){
 
             var cookieKeyCsiDashboardTitle = '${de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE}';
             var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()

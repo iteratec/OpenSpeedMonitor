@@ -255,8 +255,7 @@
         <asset:javascript src="timeago/timeagoDe.js"/>
     </g:if>
     <asset:script type="text/javascript">
-        $(document).ready(
-            doOnDomReady(
+        $(doOnDomReady(
                 '${createLink(action: 'getRunningAndRecentlyFinishedJobs')}',
                 '${createLink(action: 'cancelJobRun')}',
                 '${createLink(action: 'getLastRun')}',
@@ -264,7 +263,7 @@
             )
         );
 
-        $(document).ready(function() {
+        $(function() {
           $(window).on('keydown', function(event){
             if(event.keyCode == 13) {
               event.preventDefault();
