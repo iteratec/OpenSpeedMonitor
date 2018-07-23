@@ -23,7 +23,6 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
-import org.springframework.transaction.annotation.Propagation
 
 /**
  * Provides methods for calculating and retrieving {@link CsiAggregation}s.
@@ -46,8 +45,9 @@ class CsiAggregationUpdateService {
 	 *
 	 * @param eventResultId
 	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	void createOrUpdateDependentMvs(long eventResultId) {
+		println("hello we update mvs");
 		EventResult erToUpdateCsiAggregationsFor = EventResult.get(eventResultId)
 		if (erToUpdateCsiAggregationsFor) createOrUpdateDependentMvs(erToUpdateCsiAggregationsFor)
 	}
