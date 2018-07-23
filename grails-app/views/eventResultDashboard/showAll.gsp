@@ -263,10 +263,10 @@
             initGraphColors(graphColors);
 
             if (eval(showDataMarkers)) {
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             if (eval(showDataLabels)) {
-                $("#to-enable-label").click();
+                $("#to-enable-label").trigger('click');
             }
         }
 
