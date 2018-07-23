@@ -265,7 +265,7 @@
         );
 
         $(document).ready(function() {
-          $(window).keydown(function(event){
+          $(window).on('keydown', function(event){
             if(event.keyCode == 13) {
               event.preventDefault();
               return false;
@@ -273,7 +273,7 @@
           });
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             doOnWindowLoad(
                 '${createLink(action: 'list')}',
                 "${createLink(action: 'nextExecution')}"
