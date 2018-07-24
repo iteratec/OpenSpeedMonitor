@@ -9,15 +9,13 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.result.dao.EventResultDaoService
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultDashboardServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 

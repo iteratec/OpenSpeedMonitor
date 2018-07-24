@@ -47,6 +47,15 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         createMocksCommonToAllTests()
     }
 
+    def cleanup() {
+        resultPersisterService.timeToCsMappingService =
+                grailsApplication.mainContext.getBean('timeToCsMappingService')
+        resultPersisterService.csiAggregationUpdateService =
+                grailsApplication.mainContext.getBean('csiAggregationUpdateService')
+        resultPersisterService.metricReportingService =
+                grailsApplication.mainContext.getBean('metricReportingService')
+    }
+
     void "Results get persisted even after failed csi aggregation."() {
 
         given: "a wpt result and a failing CsiAggregationUpdateService"
@@ -60,9 +69,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 4
-
-        cleanup:
-        removeStubs()
     }
 
     void "Results get persisted even after failed metric reporting."() {
@@ -78,9 +84,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 4
-
-        cleanup:
-        removeStubs()
     }
 
     void "No EventResults get persisted when Persistence of JobResults throws an exception."() {
@@ -96,9 +99,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "nothing should be persisted"
         JobResult.list().size() == 0
         EventResult.list().size() == 0
-
-        cleanup:
-        removeStubs()
     }
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
@@ -114,9 +114,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 2
-
-        cleanup:
-        removeStubs()
     }
 
     private createTestDataCommonToAllTests() {
@@ -156,14 +153,5 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
             throw new RuntimeException('Faked failing of metric reporting in integration test')
         }
         resultPersisterService.metricReportingService = metricReportingService
-    }
-
-    void removeStubs() {
-        resultPersisterService.timeToCsMappingService =
-                grailsApplication.mainContext.getBean('timeToCsMappingService')
-        resultPersisterService.csiAggregationUpdateService =
-                grailsApplication.mainContext.getBean('csiAggregationUpdateService')
-        resultPersisterService.metricReportingService =
-                grailsApplication.mainContext.getBean('metricReportingService')
     }
 }

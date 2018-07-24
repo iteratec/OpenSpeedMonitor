@@ -1,16 +1,18 @@
 package de.iteratec.osm.result.dao
 
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import grails.testing.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.ErQueryParams
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MvQueryParams
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
-
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalIntegrationSpec {
 

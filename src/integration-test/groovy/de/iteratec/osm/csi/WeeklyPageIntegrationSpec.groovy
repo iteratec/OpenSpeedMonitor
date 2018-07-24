@@ -27,22 +27,16 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.WptStatus
-import grails.testing.mixin.integration.Integration
+import de.iteratec.osm.result.*
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
-import spock.lang.Unroll
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
-@Unroll
 class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     PageCsiAggregationService pageCsiAggregationService

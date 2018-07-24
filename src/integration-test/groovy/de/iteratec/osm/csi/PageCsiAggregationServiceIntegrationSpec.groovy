@@ -43,7 +43,7 @@ import org.joda.time.DateTimeZone
  * Test-suite of {@link PageCsiAggregationService}.
  */
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class PageCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 

@@ -5,10 +5,10 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.TrimQualifier
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalIntegrationSpec {
 

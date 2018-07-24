@@ -11,8 +11,8 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmRickshawChart
 import de.iteratec.osm.util.I18nService
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
 
 @Integration(applicationClass = openspeedmonitor.Application.class)

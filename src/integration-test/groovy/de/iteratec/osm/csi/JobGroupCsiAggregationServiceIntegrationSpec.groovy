@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval

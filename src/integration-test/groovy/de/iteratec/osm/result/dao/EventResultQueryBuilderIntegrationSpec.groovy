@@ -8,12 +8,12 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.TrimQualifier
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegrationSpec {
 

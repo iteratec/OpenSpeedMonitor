@@ -49,6 +49,9 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
         mocksCommonForAllTests()
     }
 
+    def cleanup() {
+        resultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
+    }
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
@@ -60,9 +63,6 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         then: "persisted EventResult has no csi value"
         resultsWithCsiCalculated.size() == 0
-
-        cleanup:
-        cleanUpStubs()
     }
 
     void "csi must be calculated with csi-configuration, all values are 100%"() {
@@ -77,9 +77,6 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "persisted EventResult has csi value of 100%"
         results.size() > 0
         results*.csByWptDocCompleteInPercent.unique(false) == [100d]
-
-        cleanup:
-        cleanUpStubs()
     }
 
     void "csi must be calculated with csi-configuration, all values are 50%"() {
@@ -94,9 +91,6 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "persisted EventResult has csi value of 50%"
         results.size() > 0
         results*.csByWptDocCompleteInPercent.unique(false) == [50d]
-
-        cleanup:
-        cleanUpStubs()
     }
 
     private void createTestDataCommonForAllTests() {
@@ -123,9 +117,5 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
         resultPersisterService.timeToCsMappingService = service
-    }
-
-    private void cleanUpStubs() {
-        resultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
     }
 }

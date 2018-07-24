@@ -39,7 +39,7 @@ import spock.util.mop.ConfineMetaClassChanges
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 @ConfineMetaClassChanges([CsiByEventResultsService])
 class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {

@@ -9,12 +9,12 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 
 import java.time.Duration
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
