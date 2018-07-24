@@ -1,4 +1,12 @@
 ---
+
+de:
+  iteratec:
+    osm:
+     application-dashboard:
+      metrics-max-age-in-h: 6
+
+
 hibernate:
     cache:
         queries: false
@@ -17,6 +25,11 @@ dataSource:
 
 environments:
     development:
+      de:
+        iteratec:
+          osm:
+           application-dashboard:
+            metrics-max-age-in-h: 672 # 4 Weeks as Hours (24x7x4)
         grails:
             logging:
                 jul:

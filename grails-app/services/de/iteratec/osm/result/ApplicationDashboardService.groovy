@@ -9,15 +9,20 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
+import grails.config.Config
+import grails.core.support.GrailsConfigurationAware
 import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
 @Transactional
-class ApplicationDashboardService {
+class ApplicationDashboardService implements GrailsConfigurationAware {
+
 
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
+
+    Integer metricsMaxAgeInH;
 
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
@@ -71,7 +76,7 @@ class ApplicationDashboardService {
         SelectedMeasurand speedIndex = new SelectedMeasurand(Measurand.SPEED_INDEX.toString(), CachedView.UNCACHED)
         SelectedMeasurand docCompleteTime = new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME.toString(), CachedView.UNCACHED)
 
-        Date from = new DateTime().minusWeeks(4).toDate()
+        Date from = new DateTime().minusHours(metricsMaxAgeInH).toDate()
         Date to = new DateTime().toDate()
         return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIdsIn([jobGroupId], false)
@@ -115,4 +120,8 @@ class ApplicationDashboardService {
 
     }
 
+    @Override
+    void setConfiguration(Config co) {
+        metricsMaxAgeInH = co.getProperty("de.iteratec.osm.application-dashboard.metrics-max-age-in-h", Integer, 6)
+    }
 }
