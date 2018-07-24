@@ -22,7 +22,7 @@ class ApplicationDashboardService implements GrailsConfigurationAware {
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
 
-    Integer metricsMaxAgeInH;
+    Integer metricsMaxAgeInH
 
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
