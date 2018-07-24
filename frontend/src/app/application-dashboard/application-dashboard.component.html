@@ -1,4 +1,10 @@
 <h1>
-  <osm-application-select (selectApplication)="updateApplication($event)"></osm-application-select>
+  <osm-application-select [selectedApplication]="selectedApplication"
+                          [applications]="applications$ | async"
+                          (selectedApplicationChange)="updateApplication($event)"></osm-application-select>
 </h1>
+<ng-container *ngIf="selectedApplication">
+  <osm-application-csi></osm-application-csi>
+  <osm-page-list></osm-page-list>
+</ng-container>
 

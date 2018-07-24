@@ -1,0 +1,11 @@
+<div>
+  <h3>{{page.name}}</h3>
+  <div *ngIf="pageCsi$ | async, let pageCsiDto">
+    <div>PageCsi ({{pageCsiDto.date}}): {{pageCsiDto.csiDocComplete}}</div>
+  </div>
+  <div *ngIf="metricsForPage$ |async, let metricsDto">
+    <div>SpeedIndex: {{transform(metricsDto.speedIndex)}}</div>
+    <div>DocComplete: {{transform(metricsDto.docCompleteTimeInMillisecs)}}</div>
+    <div>Size: {{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
+  </div>
+</div>

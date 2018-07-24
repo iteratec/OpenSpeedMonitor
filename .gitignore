@@ -97,3 +97,6 @@ frontend/typings
 # frontend System Files
 frontend/.DS_Store
 frontend/Thumbs.db
+
+# frontends i18n files (get generated automatically)
+src/main/resources/public/i18n/*.json

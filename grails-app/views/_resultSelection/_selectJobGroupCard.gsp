@@ -17,7 +17,7 @@ A card with controls to select a job group
             <div class="btn-group">
                 <g:each in="${tagSubset}" var="tag">
                     <button type="button" class="btn btn-xs btn-default filter-button" data-tag="${tag}">
-                        <i class="fa fa-filter"></i>&nbsp;${tag}
+                        <i class="fas fa-filter"></i>&nbsp;${tag}
                     </button>
                 </g:each>
             </div>

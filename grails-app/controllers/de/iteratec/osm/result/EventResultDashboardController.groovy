@@ -19,7 +19,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
@@ -28,9 +28,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-
 import de.iteratec.osm.util.ParameterBindingUtility
-
 import grails.converters.JSON
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
@@ -46,7 +44,7 @@ import org.supercsv.prefs.CsvPreference
 
 class EventResultDashboardController {
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     EventService eventService
@@ -565,19 +563,19 @@ class EventResultDashboardController {
             [(browser.id): locations.findResults { browser.id == it.browser.id ? it.id : null } as HashSet<Long>]
         }
         return [
-                'aggrGroupValuesCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
+                'aggrGroupValuesCached'  : SelectedMeasurand.createDataMapForOptGroupSelect(),
                 'aggrGroupValuesUnCached': SelectedMeasurand.createDataMapForOptGroupSelect(),
-                'aggregationIntervals': AGGREGATION_INTERVALS,
-                'folders': eventResultDashboardService.getAllJobGroups(),
-                'pages': pages,
-                'measuredEvents': measuredEvents,
-                'browsers': browsers,
-                'locations': locations,
-                'avaiableConnectivities': eventResultDashboardService.getAllConnectivities(true),
-                'dateFormat': DATE_FORMAT_STRING_FOR_HIGH_CHART,
-                'tagToJobGroupNameMap' : jobGroupDaoService.getTagToJobGroupNameMap(),
-                'eventsOfPages': eventsOfPages,
-                'locationsOfBrowsers': locationsOfBrowsers,
+                'aggregationIntervals'   : AGGREGATION_INTERVALS,
+                'folders'                : eventResultDashboardService.getAllJobGroups(),
+                'pages'                  : pages,
+                'measuredEvents'         : measuredEvents,
+                'browsers'               : browsers,
+                'locations'              : locations,
+                'avaiableConnectivities' : eventResultDashboardService.getAllConnectivities(true),
+                'dateFormat'             : DATE_FORMAT_STRING_FOR_HIGH_CHART,
+                'tagToJobGroupNameMap'   : jobGroupService.getTagToJobGroupNameMap(),
+                'eventsOfPages'          : eventsOfPages,
+                'locationsOfBrowsers'    : locationsOfBrowsers,
         ]
     }
 

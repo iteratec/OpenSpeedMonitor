@@ -22,13 +22,16 @@
 
 <div class="row">
     <div class="col-md-12">
-        <g:if test="${errors}">
+        <g:if test="${errors || customError}">
             <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
+                <strong><g:message code="de.iteratec.osm.measurement.setup.errorsTitle"/></strong>
                 <ul>
                     <g:each var="currentError" in="${errors}">
                         <li><g:message error="${currentError}"/></li>
                     </g:each>
+                <g:if test="${customError}">
+                    <li><g:message code="${customError}"/></li>
+                </g:if>
                 </ul>
             </div>
         </g:if>
@@ -44,26 +47,26 @@
     <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
         <li class="wizardStep active wasActive">
             <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
-                <i class="fa fa-folder-open-o fa-2x" aria-hidden="true"></i>
+                <i class="fas fa-folderpen-o fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#createScript" id="createScriptTab">
-                <i class="fa fa-file-text-o fa-2x" aria-hidden="true"></i>
+                <i class="fas fa-file-alt fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#selectLocationAndConnectivity" id="selectLocationAndConnectivityTab">
-                <i class="fa fa-signal fa-2x" aria-hidden="true"></i>
+                <i class="fas fa-signal fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.selectLocationAndConnectivity"
                            default="Select Location and Connectivity"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#createJob" id="createJobTab">
-                <i class="fa fa-check fa-2x" aria-hidden="true"></i>
+                <i class="fas fa-check fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createJob" default="Create Job"/>
             </a>
         </li>

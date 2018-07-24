@@ -100,7 +100,7 @@
         </div>
     </div>
     <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-        <i class="fa fa-undo"></i> Reset
+        <i class="fas fa-undo"></i> Reset
     </button>
 </form>
 

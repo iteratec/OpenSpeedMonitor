@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule.quartzjobs
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.TriggerGroup
@@ -35,6 +36,7 @@ class JobProcessingQuartzHandlerJob {
 
 	JobProcessingService jobProcessingService
     PerformanceLoggingService performanceLoggingService
+    InMemoryConfigService inMemoryConfigService
 
     static triggers = {}
     /**
@@ -50,6 +52,10 @@ class JobProcessingQuartzHandlerJob {
      */
     def execute(JobExecutionContext context) {
 
+        if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
+            log.info("Measurements are disabled, skip job ${context.mergedJobDataMap.getLong("jobId")} processing")
+            return
+        }
         Job.withNewTransaction {
 
             Long jobId = context.mergedJobDataMap.getLong("jobId")

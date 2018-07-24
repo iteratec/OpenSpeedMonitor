@@ -1,5 +1,6 @@
 package openspeedmonitor
 
+import de.iteratec.osm.FrontendWatcher
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 import org.grails.config.yaml.YamlPropertySourceLoader
@@ -15,6 +16,10 @@ import org.springframework.core.io.ResourceLoader
 class Application extends GrailsAutoConfiguration implements ExternalConfig {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
+
+        if (grails.util.Environment.getCurrent() == grails.util.Environment.DEVELOPMENT) {
+            FrontendWatcher.initializeFrontendWatcher()
+        }
     }
 }
 

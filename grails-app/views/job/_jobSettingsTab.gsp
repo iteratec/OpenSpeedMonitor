@@ -67,7 +67,7 @@
             <div class="col-md-2 no-left-gutter">
                 <a id="jobGroupModalLink" href="#jobGroupModal" data-toggle="modal"
                    title="Create New Job Group" role="button" class="btn btn-link col-md-2">
-                    <i id="button_create_jobGroup" class="fa fa-plus" aria-hidden="true"></i>
+                    <i id="button_create_jobGroup" class="fas fa-plus" aria-hidden="true"></i>
                     <g:message code="default.button.create.new" default="Create New"/>
                 </a>
             </div>
@@ -172,7 +172,7 @@
 <div class="col-md-6">
     <div class="panel panel-info hidden help-panel" id="cronInfoPanel">
         <div class="panel-heading">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
             <g:message code="default.info.title" default="Information"/>
         </div>
 

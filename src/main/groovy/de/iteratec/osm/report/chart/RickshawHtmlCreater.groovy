@@ -49,10 +49,10 @@ class RickshawHtmlCreater {
 			<div id="rickshaw_main" style="height: ${height}">
                 <div class="in-chart-buttons">
                     <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
-                        <i class="fa fa-sliders"></i>
+                        <i class="fas fa-sliders-h"></i>
                     </a>
                     <a href="#" id="dia-save-chart-as-png" title="${downloadPngLabel}">
-                        <i class="fa fa-download"></i>
+                        <i class="fas fa-download"></i>
                     </a>
                 </div>
                 

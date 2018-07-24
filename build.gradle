@@ -1,3 +1,5 @@
+import de.iteratec.osm.frontendBuild.Grails2FrontendI18nTask
+
 /*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
@@ -134,7 +136,7 @@ dependencies {
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
-    testCompile('com.athaydes:spock-reports:1.3.0'){
+    testCompile('com.athaydes:spock-reports:1.3.0') {
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
 
@@ -172,18 +174,21 @@ npmInstall {
 }
 
 task installFrontendDependencies(type: NpmTask) {
+    group "frontend build"
     description = "Installs frontend package dependencies"
     workingDir = file("${project.projectDir}/frontend")
     args = ['install']
 }
 
 task compileFrontend(type: NpmTask, dependsOn: installFrontendDependencies) {
+    group "frontend build"
     description = "Compiles frontend"
     workingDir = file("${project.projectDir}/frontend")
     args = ['run', 'build:prod']
 }
 
 task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
+    group "frontend build"
     description = "Syncs frontend javascript files"
     from 'frontend/dist/frontend'
     include '*.js'
@@ -192,6 +197,7 @@ task syncFrontendJavascripts(type: Sync, dependsOn: compileFrontend) {
 }
 
 task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
+    group "frontend build"
     description = "Syncs frontend stylesheet files"
     from 'frontend/dist/frontend'
     include '*.css'
@@ -199,7 +205,14 @@ task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
     rename('(styles)\\..*\\.css', '$1.css')
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['nodePackages']) {
+task generateFrontendI18nFiles(type: Grails2FrontendI18nTask) {
+    group "frontend build"
+    description "Generate i18n files for angular frontend from grails msg bundles."
+
+    frontendKeyPrefix = "frontend."
+}
+
+task jasmineRun(type: NodeTask, dependsOn: ['nodeSyncJavascript', 'nodeSyncStylesheets']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
@@ -212,6 +225,7 @@ task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
 test.dependsOn jasmineRun
 
 task nodeSyncJavascript(type: Sync) {
+    description "Copy 3rd party js libs to grails asset folder."
     from 'node_modules'
     into "grails-app/assets/javascripts/node_modules"
     include 'jquery/dist/jquery.min.js'
@@ -243,13 +257,14 @@ task nodeSyncJavascript(type: Sync) {
 }
 
 task nodeSyncStylesheets(type: Sync) {
+    description "Copy 3rd party js libs to grails asset folder."
     from 'node_modules'
     into "grails-app/assets/stylesheets/node_modules"
     include 'bootstrap/dist/css/bootstrap*.min.css'
     include 'bootstrap/less/*.less'
     include 'bootstrap/less/mixins/*.less'
-    include 'components-font-awesome/css/font-awesome.min.css'
-    include 'components-font-awesome/fonts/*'
+    include '@fortawesome/fontawesome-free/less/*'
+    include '@fortawesome/fontawesome-free/webfonts/*'
     include 'jquery-contextmenu/dist/jquery.contextMenu.min.css'
     include 'bootstrap-chosen/bootstrap-chosen.less'
     include 'bootstrap-chosen/bootstrap-chosen-variables.less'
@@ -266,16 +281,13 @@ task nodeSyncStylesheets(type: Sync) {
     dependsOn npmInstall
 }
 
-
-task nodePackages() {
-    dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets
-}
-
-processResources.dependsOn nodePackages
-assetCompile.dependsOn nodePackages
+processResources.dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies, generateFrontendI18nFiles
+assetCompile.dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets, generateFrontendI18nFiles
 
 clean.delete << file('grails-app/assets/javascripts/node_modules')
+clean.delete << file('grails-app/assets/javascripts/frontend')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
+clean.delete << file('grails-app/assets/stylesheets/frontend')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
@@ -306,14 +318,16 @@ sourceSets {
 }
 
 integrationTest {
-    if (System.getProperty('webdriver.chrome.driver')){
+    if (System.getProperty('webdriver.chrome.driver')) {
         systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     }
-    if (System.getProperty('grails.env')){
+    if (System.getProperty('grails.env')) {
         systemProperty 'grails.env', 'test'
     }
-    if (System.getProperty('geb.env')){
+    if (System.getProperty('geb.env')) {
         systemProperty 'geb.env', 'chrome'
     }
 }
-
+bootRun {
+    addResources = true
+}

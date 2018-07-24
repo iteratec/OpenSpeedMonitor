@@ -12,7 +12,7 @@
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="initPngDownloadModal()"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
-            <i class="fa fa-download"></i>
+            <i class="fas fa-download"></i>
         </a>
     </div>
 

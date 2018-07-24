@@ -145,7 +145,7 @@ class ResultPersisterService implements iResultListener {
     private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
         jobResult.testAgent = resultXml.getTestAgent()
         jobResult.wptVersion = resultXml.version.toString()
-        jobResult.save(failOnError: true)
+        jobResult.save(failOnError: true, flush: true)
     }
 
     /**
@@ -210,7 +210,7 @@ class ResultPersisterService implements iResultListener {
 
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
         result.setDescription('')
-        result.save(failOnError: true)
+        result.save(failOnError: true, flush: true)
 
         return result
     }
@@ -381,7 +381,6 @@ class ResultPersisterService implements iResultListener {
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
 
-        jobRun.merge(failOnError: true)
         result.save(failOnError: true)
 
         return result
@@ -620,6 +619,6 @@ class ResultPersisterService implements iResultListener {
      * @param testId
      */
     void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId) {
-        JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true)
+        JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true, flush: true)
     }
 }

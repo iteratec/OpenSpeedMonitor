@@ -23,7 +23,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
@@ -49,7 +49,7 @@ class TabularResultPresentationController {
 
     private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     BrowserService browserService
 
     EventResultDaoService eventResultDaoService
@@ -201,7 +201,7 @@ class TabularResultPresentationController {
         Map<String, Object> result = [:]
 
         // JobGroups
-        result.put('csiGroups', jobGroupDaoService.findAll().sort(false, { it.name }))
+        result.put('csiGroups', jobGroupService.findAll().sort(false, { it.name }))
 
         // Pages
         List<Page> pages = Page.list().sort(false, { it.name })
@@ -256,7 +256,7 @@ class TabularResultPresentationController {
 
         // ConnectivityProfiles
         result['avaiableConnectivities'] = eventResultDashboardService.getAllConnectivities(true)
-        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        result.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result;

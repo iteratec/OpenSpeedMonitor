@@ -17,19 +17,13 @@
 
 package spring
 
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
-import io.swagger.models.Contact
-import io.swagger.models.Info
-import io.swagger.models.License
-import io.swagger.models.Scheme
-import io.swagger.models.Swagger
+import io.swagger.models.*
 import org.apache.commons.lang.StringUtils
 
 // Place your Spring DSL code here
 
 beans = {
-    jobGroupDaoService(DefaultJobGroupDaoService)
     graphiteSocketProvider(DefaultGraphiteSocketProvider)
 
     swagger(Swagger) {

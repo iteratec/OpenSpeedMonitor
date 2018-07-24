@@ -6,8 +6,8 @@
 </head>
 
 <body>
-<osm-application-dashboard
-        data-module-path="src/app/application-dashboard/application-dashboard.module#ApplicationDashboardModule"></osm-application-dashboard>
+<osm-application-dashboard-entry
+        data-module-path="src/app/application-dashboard/application-dashboard.module#ApplicationDashboardModule"></osm-application-dashboard-entry>
 
 <asset:stylesheet src="frontend/styles.css"/>
 <asset:javascript src="frontend/runtime.js"/>

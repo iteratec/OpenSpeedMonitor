@@ -3,7 +3,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -19,7 +19,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
 
@@ -38,7 +38,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
 
         modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return modelToRender
