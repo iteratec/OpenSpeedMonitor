@@ -61,8 +61,8 @@ class CloseExpiredUpdateEventsIntegrationSpec extends NonTransactionalIntegratio
     DateTime dateOfUpdate
 
     def setup() {
-            mocksCommonToAllTests()
-            createTestDataCommonToAllTests()
+        mocksCommonToAllTests()
+        createTestDataCommonToAllTests()
     }
 
     def cleanup() {
