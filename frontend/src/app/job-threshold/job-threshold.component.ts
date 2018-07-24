@@ -1,13 +1,11 @@
-import { Component, OnInit, ElementRef, OnChanges} from '@angular/core';
-import { ThresholdRestService } from './service/rest/threshold-rest.service';
-import { ActualMeasuredEventsService } from './service/actual-measured-events.service';
-import {Measurand} from './service/model/measurand.model'
-import {MeasuredEvent} from './service/model/measured-event.model'
-import {ThresholdForJob} from './service/model/threshold-for-job.model'
+import {Component, ElementRef, OnChanges, OnInit} from "@angular/core";
+import {ThresholdRestService} from "./service/rest/threshold-rest.service";
+import {ActualMeasuredEventsService} from "./service/actual-measured-events.service";
+import {Measurand} from "./service/model/measurand.model";
+import {MeasuredEvent} from "./service/model/measured-event.model";
+import {ThresholdForJob} from "./service/model/threshold-for-job.model";
 import {Threshold} from "./service/model/threshold.model";
 import {ActualThresholdsForJobService} from "./service/actual-thresholds-for-job.service";
-import {Observable} from "rxjs/index";
-import {log} from "util";
 
 
 @Component({
@@ -25,7 +23,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   newThresholdForJob: ThresholdForJob;
   addMeasuredEventDisabled: boolean = false;
   isEmpty: boolean = false;
-
 
   constructor(private thresholdRestService: ThresholdRestService,
               private actualMeasuredEventsService: ActualMeasuredEventsService,
@@ -74,8 +71,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.thresholdsForJobList.push(this.newThresholdForJob);
     this.addMeasuredEventDisabled = true;
     this.isEmpty = false;
-
-
   }
 
   createScript() {
@@ -86,7 +81,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     this.thresholdsForJobList.pop();
     this.addMeasuredEventDisabled= false;
     this.thresholdsForJobList.length > 0? this.isEmpty = false :this.isEmpty = true ;
-
   }
 
   removeOldMeasuredEvent() {

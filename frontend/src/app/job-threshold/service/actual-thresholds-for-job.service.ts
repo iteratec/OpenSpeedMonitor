@@ -1,15 +1,12 @@
-import { Injectable } from '@angular/core';
-import {MeasuredEvent} from "./model/measured-event.model";
+import {Injectable} from "@angular/core";
 import {ThresholdForJob} from "./model/threshold-for-job.model";
-import {Measurand} from './model/measurand.model'
 import {Threshold} from "./model/threshold.model";
-import {Observable, ObservableLike, Subject} from "rxjs/index";
-import {ActualMeasuredEventsService} from "./actual-measured-events.service";
-import {log} from "util";
+import {Subject} from "rxjs/index";
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ActualThresholdsForJobService {
 
   thresholdsforJobList: ThresholdForJob[];

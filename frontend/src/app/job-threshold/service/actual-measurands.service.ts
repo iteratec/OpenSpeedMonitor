@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import {Measurand} from './model/measurand.model'
+import {Injectable} from "@angular/core";
+import {Measurand} from "./model/measurand.model";
 import {Threshold} from "./model/threshold.model";
-import {log} from "util";
-
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ActualMeasurandsService {
 
   measurandList: Measurand[];
