@@ -1,7 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.Job
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
 @Transactional
