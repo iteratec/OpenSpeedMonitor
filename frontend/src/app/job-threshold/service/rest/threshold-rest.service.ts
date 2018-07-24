@@ -102,7 +102,7 @@ export class ThresholdRestService {
 
   /** GET Script */
   getScritpt () {
-    var self = this;
+    let self = this;
     let params = new HttpParams().set('jobId', this.actualJobId.toString());
     const url =`/job/getCiScript`;
     this.http.get(url, { params: params, responseType: 'text' })
@@ -110,13 +110,13 @@ export class ThresholdRestService {
   }
 
   download(data) {
-    var fileName = "CI_Script_" + this.actualJobId + ".groovy";
-    var blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    let fileName = "CI_Script_" + this.actualJobId + ".groovy";
+    let blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
     this.saveData(blob, fileName);
   }
 
   saveData(blob, fileName) {
-    var a = document.createElement("a");
+    let a = document.createElement("a");
     document.body.appendChild(a);
     let url = window.URL.createObjectURL(blob);
     a.href = url;
