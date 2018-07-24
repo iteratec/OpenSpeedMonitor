@@ -34,10 +34,7 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
 
 
     def setupForFeatureMethod() {
-        EventResult.withNewSession { session ->
-            createTestDataCommonToAllTests()
-            session.flush()
-        }
+        createTestDataCommonToAllTests()
     }
 
     def "select event results by single predefined connectivity profile"() {
@@ -46,20 +43,18 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for one single predefined connectivity profile is executed"
-        EventResult.withNewSession {
 
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "the only event result with this connectivity profile is found"
         results.size() == 1
@@ -73,22 +68,20 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for two connectivity profiles is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.connectivityProfileIds.addAll([
-                    predefinedConnectivityProfile1.id,
-                    predefinedConnectivityProfile2.id
-            ])
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.connectivityProfileIds.addAll([
+                predefinedConnectivityProfile1.id,
+                predefinedConnectivityProfile2.id
+        ])
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "both event results with the corresponding connectivity profile is found"
         results.size() == 2
@@ -129,22 +122,20 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query with all custom connectivity names is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.customConnectivityNames.addAll([
-                    CUSTOM_CONNECTIVITY_NAME_1,
-                    CUSTOM_CONNECTIVITY_NAME_2
-            ])
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.customConnectivityNames.addAll([
+                CUSTOM_CONNECTIVITY_NAME_1,
+                CUSTOM_CONNECTIVITY_NAME_2
+        ])
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "both event results (one for each custom connectivity) are found"
         results.size() == 2
@@ -161,19 +152,17 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for event results with native connectivity is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.includeNativeConnectivity = true
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.includeNativeConnectivity = true
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "the only event result with native connectivity is found"
         results.size() == 1
@@ -186,20 +175,18 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for all event results with one specific custom connectivity name or native connectivity is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
-            queryParams.includeNativeConnectivity = true
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
+        queryParams.includeNativeConnectivity = true
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "both event results, one for custom and one for native connectivity are found"
         results.size() == 2
@@ -213,23 +200,21 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for all custom connectivity names or a specific predefined connectivity profile is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.customConnectivityNames.addAll([
-                    CUSTOM_CONNECTIVITY_NAME_1,
-                    CUSTOM_CONNECTIVITY_NAME_2
-            ])
-            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.customConnectivityNames.addAll([
+                CUSTOM_CONNECTIVITY_NAME_1,
+                CUSTOM_CONNECTIVITY_NAME_2
+        ])
+        queryParams.connectivityProfileIds.add(predefinedConnectivityProfile1.id)
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "all three event results, one for each custom connectivity and one with a predefined connectivity profile are found"
         results.size() == 3
@@ -244,20 +229,18 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for event results with native connectivity and one predefined connectivity is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
-            queryParams.includeNativeConnectivity = true
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
+        queryParams.includeNativeConnectivity = true
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "then two event results, one for each case are found"
         results.size() == 2
@@ -271,21 +254,19 @@ class QueryEventResultsByConnectivityIntegrationSpec extends NonTransactionalInt
         Collection<EventResult> results = null
 
         when: "a query for one custom, one predefined and native connectivity is executed"
-        EventResult.withNewSession {
-            MvQueryParams queryParams = new ErQueryParams()
-            queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
-            queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
-            queryParams.includeNativeConnectivity = true
+        MvQueryParams queryParams = new ErQueryParams()
+        queryParams.connectivityProfileIds.add(predefinedConnectivityProfile2.id)
+        queryParams.customConnectivityNames.add(CUSTOM_CONNECTIVITY_NAME_1)
+        queryParams.includeNativeConnectivity = true
 
-            results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    runDate.toDate(),
-                    runDate.plusHours(1).toDate(),
-                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
-                    queryParams,
-                    [:],
-                    new CriteriaSorting(sortingActive: false)
-            )
-        }
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                runDate.toDate(),
+                runDate.plusHours(1).toDate(),
+                [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                queryParams,
+                [:],
+                new CriteriaSorting(sortingActive: false)
+        )
 
         then: "three event results, one for each case are found"
         results.size() == 3

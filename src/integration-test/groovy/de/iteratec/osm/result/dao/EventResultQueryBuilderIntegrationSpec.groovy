@@ -8,8 +8,8 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.TrimQualifier
-import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
@@ -29,20 +29,17 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check minimal specification"(boolean medianValue, def fullyLoaded) {
         given: "two matching and 10 other Eventresults"
-        EventResult.withNewSession { session ->
-            10.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: fullyLoaded,
-                        medianValue: medianValue
-                )
-            }
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: fullyLoaded,
+                    medianValue: medianValue
+            )
+        }
+        2.times {
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
         }
 
 
@@ -64,38 +61,35 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check base projections"() {
         given: "two matching and 10 other Eventresults"
-        EventResult.withNewSession { session ->
-            page = Page.build()
-            jobGroup = JobGroup.build()
-            browser = Browser.build()
-            location = Location.build()
-            measuredEvent = MeasuredEvent.build()
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
-            jobResult = JobResult.build()
+        page = Page.build()
+        jobGroup = JobGroup.build()
+        browser = Browser.build()
+        location = Location.build()
+        measuredEvent = MeasuredEvent.build()
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        jobResult = JobResult.build()
 
-            10.times {
-                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
-            }
-            2.times {
-                EventResult.build(
-                        jobGroup: jobGroup,
-                        page: page,
-                        measuredEvent: measuredEvent,
-                        browser: browser,
-                        location: location,
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 500,
-                        numberOfWptRun: 23,
-                        cachedView: CachedView.UNCACHED,
-                        oneBasedStepIndexInJourney: 15,
-                        testDetailsWaterfallURL: testDetailsWaterfallURL,
-                        jobResultDate: runDate.toDate(),
-                        medianValue: true,
-                        testAgent: "testAgent",
-                        jobResult: jobResult
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
+        }
+        2.times {
+            EventResult.build(
+                    jobGroup: jobGroup,
+                    page: page,
+                    measuredEvent: measuredEvent,
+                    browser: browser,
+                    location: location,
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 500,
+                    numberOfWptRun: 23,
+                    cachedView: CachedView.UNCACHED,
+                    oneBasedStepIndexInJourney: 15,
+                    testDetailsWaterfallURL: testDetailsWaterfallURL,
+                    jobResultDate: runDate.toDate(),
+                    medianValue: true,
+                    testAgent: "testAgent",
+                    jobResult: jobResult
+            )
         }
 
 
@@ -127,42 +121,38 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check trims "(MeasurandGroup measurandGroup) {
         given: "two matching and 20 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 300,
-                        fullyLoadedRequestCount: 300,
-                        firstByteInMillisecs: 300,
-                        fullyLoadedIncomingBytes: 300,
-                        medianValue: true
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        fullyLoadedRequestCount: 200,
-                        firstByteInMillisecs: 200,
-                        fullyLoadedIncomingBytes: 200,
-                        medianValue: true
-                )
-            }
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
-                        fullyLoadedRequestCount: 100,
-                        firstByteInMillisecs: 100,
-                        fullyLoadedIncomingBytes: 100,
-                        medianValue: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 300,
+                    fullyLoadedRequestCount: 300,
+                    firstByteInMillisecs: 300,
+                    fullyLoadedIncomingBytes: 300,
+                    medianValue: true
+            )
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    fullyLoadedRequestCount: 200,
+                    firstByteInMillisecs: 200,
+                    fullyLoadedIncomingBytes: 200,
+                    medianValue: true
+            )
+        }
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 100,
+                    fullyLoadedRequestCount: 100,
+                    firstByteInMillisecs: 100,
+                    fullyLoadedIncomingBytes: 100,
+                    medianValue: true
+            )
+        }
 
         when: "the builder is trimmed"
         SelectedMeasurand selectedMeasurandFullyLoadedTime = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
@@ -193,34 +183,31 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check if trim for percentages"() {
         given: "two matching and 20 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        csByWptDocCompleteInPercent: new Double(300),
-                        medianValue: true
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        csByWptDocCompleteInPercent: new Double(200),
-                        medianValue: true
-                )
-            }
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        csByWptDocCompleteInPercent: new Double(100),
-                        medianValue: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    csByWptDocCompleteInPercent: new Double(300),
+                    medianValue: true
+            )
+        }
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    csByWptDocCompleteInPercent: new Double(200),
+                    medianValue: true
+            )
+        }
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    csByWptDocCompleteInPercent: new Double(100),
+                    medianValue: true
+            )
         }
 
         when: "the builder is trimmed with precentage"
@@ -242,45 +229,44 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check trims for UserTiming Marks"() {
         given: "two matching and 20 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 300,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", startTime: new Double(300), duration: null, type: UserTimingType.MARK),
-                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
-                        ]
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", startTime: new Double(200), duration: null, type: UserTimingType.MARK),
-                                UserTiming.build(name: "usertimingME", duration: new Double(300), type: UserTimingType.MEASURE)
-                        ]
-                )
-            }
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", startTime: new Double(100), duration: null, type: UserTimingType.MARK),
-                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
-                        ]
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 300,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", startTime: new Double(300), duration: null, type: UserTimingType.MARK),
+                            UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
+                    ],
+                    flush: true
+            )
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", startTime: new Double(200), duration: null, type: UserTimingType.MARK),
+                            UserTiming.build(name: "usertimingME", duration: new Double(300), type: UserTimingType.MEASURE)
+                    ],
+                    flush: true
+            )
+        }
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 100,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", startTime: new Double(100), duration: null, type: UserTimingType.MARK),
+                            UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE)
+                    ],
+                    flush: true
+            )
+        }
 
         when: "the builder is trimmed"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTMK_usertiming", CachedView.UNCACHED)
@@ -300,48 +286,46 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check mixed trims"() {
         given: "two matching and 20 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 300,
-                        firstByteInMillisecs: 100,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        firstByteInMillisecs: 100,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 100,
-                        firstByteInMillisecs: 100,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 300,
+                    firstByteInMillisecs: 100,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                    ],
+                    flush: true
+            )
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    firstByteInMillisecs: 100,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                    ],
+                    flush: true
+            )
+        }
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 100,
+                    firstByteInMillisecs: 100,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertimingME", duration: new Double(200), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                    ]
+            )
+        }
 
         when: "the builder is trimmed with two selectedMeasurands"
         SelectedMeasurand selectedMeasurandMatching = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
@@ -363,21 +347,15 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check impossible trims"() {
         given: "one Eventresult"
-        EventResult.withNewSession { session ->
-
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 600,
-                    firstByteInMillisecs: 600,
-                    medianValue: true,
-                    userTimings: [
-                            UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
-                            UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
-                    ]
-            )
-
-            session.flush()
-        }
-
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 600,
+                firstByteInMillisecs: 600,
+                medianValue: true,
+                userTimings: [
+                        UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
+                        UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
+                ]
+        )
 
         when: "the builder is trimmed with two selectedMeasurands"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
@@ -394,45 +372,44 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check trims for UserTiming Measures"() {
         given: "two matching and 20 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", duration: new Double(300), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", duration: new Double(200), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [
-                                UserTiming.build(name: "usertiming", duration: new Double(100), type: UserTimingType.MEASURE),
-                                UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
-                        ]
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", duration: new Double(300), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
+                    ],
+                    flush: true
+            )
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", duration: new Double(200), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(300), duration: null, type: UserTimingType.MARK)
+                    ],
+                    flush: true
+            )
+        }
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [
+                            UserTiming.build(name: "usertiming", duration: new Double(100), type: UserTimingType.MEASURE),
+                            UserTiming.build(name: "usertimingMK", startTime: new Double(200), duration: null, type: UserTimingType.MARK)
+                    ],
+                    flush: true
+            )
+        }
 
         when: "the builder is trimmed"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_usertiming", CachedView.UNCACHED)
@@ -452,28 +429,26 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check if UserTimings Marks are found"() {
         given: "two matching and 10 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", startTime: new Double(200), type: UserTimingType.MARK)]
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark2", startTime: new Double(100), type: UserTimingType.MARK)]
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", startTime: new Double(200), type: UserTimingType.MARK)],
+                    flush: true
+            )
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark2", startTime: new Double(100), type: UserTimingType.MARK)],
+                    flush: true
+            )
+        }
 
         when: "the builder is configured for marks"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTMK_mark2", CachedView.UNCACHED)
@@ -495,26 +470,25 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
     void "check if UserTimings Measures are found"() {
         given: "two matching and 10 other Eventresults"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 200,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark2", duration: new Double(100), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
+        }
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 200,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark2", duration: new Double(100), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
         }
 
 
@@ -539,21 +513,17 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     void "check custom connectivity"() {
         given: "two matching and 10 other Eventresults"
         String customConnectivityName = "custom connectivity"
-        EventResult.withNewSession { session ->
-            10.times {
-                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: null,
-                        customConnectivityName: customConnectivityName,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: null,
+                    customConnectivityName: customConnectivityName,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
+        }
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
@@ -570,30 +540,26 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     void "check custom and non custom connectivity"() {
         given: "two matching and 10 other Eventresults"
         String customConnectivityName = "custom connectivity"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: null,
-                        customConnectivityName: customConnectivityName,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: null,
+                    customConnectivityName: customConnectivityName,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
+        }
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
+        }
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
@@ -610,39 +576,35 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     void "check custom, native and non custom connectivity"() {
         given: "two matching and 10 other Eventresults"
         String customConnectivityName = "custom connectivity"
-        EventResult.withNewSession { session ->
-            connectivityProfile = ConnectivityProfile.build(name: "my-name")
+        connectivityProfile = ConnectivityProfile.build(name: "my-name")
 
-            10.times {
-                EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: null,
-                        customConnectivityName: customConnectivityName,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: connectivityProfile,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true
-                )
-            }
-            2.times {
-                EventResult.build(
-                        connectivityProfile: null,
-                        customConnectivityName: null,
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        noTrafficShapingAtAll: true
-                )
-            }
-            session.flush()
+        10.times {
+            EventResult.build(fullyLoadedTimeInMillisecs: 500, medianValue: true)
         }
-
+        2.times {
+            EventResult.build(
+                    connectivityProfile: null,
+                    customConnectivityName: customConnectivityName,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
+        }
+        2.times {
+            EventResult.build(
+                    connectivityProfile: connectivityProfile,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true
+            )
+        }
+        2.times {
+            EventResult.build(
+                    connectivityProfile: null,
+                    customConnectivityName: null,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+                    noTrafficShapingAtAll: true
+            )
+        }
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)

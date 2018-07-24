@@ -376,7 +376,7 @@ class ResultPersisterService implements iResultListener {
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
 
-        result.save(failOnError: true)
+        result.save(failOnError: true, flush: true)
 
         return result
 

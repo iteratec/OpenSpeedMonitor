@@ -60,16 +60,14 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
         setup: "Given a weekly JobGroup CsiAggregation with a date without EventResults."
         Date startDateWithoutResults = new DateTime(2012, 01, 12, 0, 0, DateTimeZone.UTC).toDate()
         CsiAggregation csiAggWeeklyShop
-        CsiAggregation.withNewTransaction {
-            csiAggWeeklyShop = CsiAggregation.build(
-                    started: startDateWithoutResults,
-                    interval: weekly,
-                    aggregationType: AggregationType.JOB_GROUP,
-                    jobGroup: JobGroup.get(jobGroupId),
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: ''
-            )
-        }
+        csiAggWeeklyShop = CsiAggregation.build(
+                started: startDateWithoutResults,
+                interval: weekly,
+                aggregationType: AggregationType.JOB_GROUP,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: ''
+        )
 
         when: "It get calculated."
         jobGroupCsiAggregationService.calcCsiAggregations([csiAggWeeklyShop.id])
@@ -99,17 +97,15 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
         Date startDateWithData = new DateTime(2012, 11, 12, 0, 0, DateTimeZone.UTC).toDate()
         Double expectedValue = getAverage()
         long csiAggregationId
-        CsiAggregation.withNewTransaction {
-            CsiAggregation aggregation = CsiAggregation.build(
-                    started: startDateWithData,
-                    interval: weekly,
-                    aggregationType: AggregationType.JOB_GROUP,
-                    jobGroup: JobGroup.get(jobGroupId),
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: ''
-            )
-            csiAggregationId = aggregation.id
-        }
+        CsiAggregation aggregation = CsiAggregation.build(
+                started: startDateWithData,
+                interval: weekly,
+                aggregationType: AggregationType.JOB_GROUP,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: ''
+        )
+        csiAggregationId = aggregation.id
 
         when: "It get calculated."
         jobGroupCsiAggregationService.calcCsiAggregations([csiAggregationId])
@@ -148,104 +144,96 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
     private createTestDataCommonToAllTests() {
         OsmConfiguration.build()
         jobGroupId = JobGroup.build().ident()
-        CsiAggregation.withNewTransaction {
-            CsiAggregationInterval.build(
-                    name: "hourly",
-                    intervalInMinutes: CsiAggregationInterval.HOURLY
-            )
-            CsiAggregationInterval.build(
-                    name: "daily",
-                    intervalInMinutes: CsiAggregationInterval.DAILY
-            )
-            weekly = CsiAggregationInterval.build(
-                    name: "weekly",
-                    intervalInMinutes: CsiAggregationInterval.WEEKLY
-            )
-        }
+        CsiAggregationInterval.build(
+                name: "hourly",
+                intervalInMinutes: CsiAggregationInterval.HOURLY
+        )
+        CsiAggregationInterval.build(
+                name: "daily",
+                intervalInMinutes: CsiAggregationInterval.DAILY
+        )
+        weekly = CsiAggregationInterval.build(
+                name: "weekly",
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
+        )
     }
 
     private createResultDataFromCsv() {
-        CsiAggregation.withNewTransaction {
-            Map<String, Location> locations
-            Map<String, MeasuredEvent> measuredEvents
-            Map<String, Page> pages
-            Map<String, Browser> browsers
-            def browserNames = ["IE8", "FF"]
-            def stepNrs = 1..6 as List
+        Map<String, Location> locations
+        Map<String, MeasuredEvent> measuredEvents
+        Map<String, Page> pages
+        Map<String, Browser> browsers
+        def browserNames = ["IE8", "FF"]
+        def stepNrs = 1..6 as List
 
-            browsers = browserNames.collectEntries {
-                [(it): Browser.build()]
-            }
+        browsers = browserNames.collectEntries {
+            [(it): Browser.build()]
+        }
 
-            locations = browserNames.collectEntries {
-                [(it): Location.build(browser: browsers[it])]
-            }
-            measuredEvents = stepNrs.collectEntries {
-                [("Step0$it".toString()): MeasuredEvent.build()]
-            }
-            pages = stepNrs.collectEntries {
-                [("Step0$it".toString()): Page.build()]
-            }
+        locations = browserNames.collectEntries {
+            [(it): Location.build(browser: browsers[it])]
+        }
+        measuredEvents = stepNrs.collectEntries {
+            [("Step0$it".toString()): MeasuredEvent.build()]
+        }
+        pages = stepNrs.collectEntries {
+            [("Step0$it".toString()): Page.build()]
+        }
 
-            ConnectivityProfile profile = ConnectivityProfile.build()
-            Job job = Job.build()
+        ConnectivityProfile profile = ConnectivityProfile.build()
+        Job job = Job.build()
 
-            new File("src/test/resources/CsiData/weekly_page.csv").eachLine { String csvLine ->
-                if (!isHeaderLine(csvLine)) {
+        new File("src/test/resources/CsiData/weekly_page.csv").eachLine { String csvLine ->
+            if (!isHeaderLine(csvLine)) {
 
-                    List<String> csvFields = csvLine.split(';')
+                List<String> csvFields = csvLine.split(';')
 
-                    String browserAndLocation = csvFields[0]
-                    String pageAndMeasuredEvent = csvFields[1]
-                    String docCompleteTime = csvFields[7]
-                    String customerSatisfaction = csvFields[8]
-                    Date dateOfJobRun = new Date(csvFields[3] + " " + csvFields[4]);
+                String browserAndLocation = csvFields[0]
+                String pageAndMeasuredEvent = csvFields[1]
+                String docCompleteTime = csvFields[7]
+                String customerSatisfaction = csvFields[8]
+                Date dateOfJobRun = new Date(csvFields[3] + " " + csvFields[4]);
 
-                    log.info("logged from test")
+                log.info("logged from test")
 
-                    JobResult jobResult = JobResult.build(
-                            date: dateOfJobRun,
-                            job: job
-                    )
-                    EventResult.build(
-                            cachedView: CachedView.UNCACHED,
-                            numberOfWptRun: 1,
-                            wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
-                            medianValue: true,
-                            docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
-                            csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,
-                            connectivityProfile: profile,
-                            jobResult: jobResult,
-                            jobResultDate: dateOfJobRun,
-                            jobGroup: JobGroup.get(jobGroupId),
-                            measuredEvent: measuredEvents[pageAndMeasuredEvent],
-                            page: pages[pageAndMeasuredEvent],
-                            location: locations[browserAndLocation],
-                            browser: browsers[browserAndLocation]
-                    )
-                }
+                JobResult jobResult = JobResult.build(
+                        date: dateOfJobRun,
+                        job: job
+                )
+                EventResult.build(
+                        cachedView: CachedView.UNCACHED,
+                        numberOfWptRun: 1,
+                        wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
+                        medianValue: true,
+                        docCompleteTimeInMillisecs: docCompleteTime ? Integer.valueOf(docCompleteTime) : null,
+                        csByWptDocCompleteInPercent: customerSatisfaction ? Double.valueOf(customerSatisfaction) : null,
+                        connectivityProfile: profile,
+                        jobResult: jobResult,
+                        jobResultDate: dateOfJobRun,
+                        jobGroup: JobGroup.get(jobGroupId),
+                        measuredEvent: measuredEvents[pageAndMeasuredEvent],
+                        page: pages[pageAndMeasuredEvent],
+                        location: locations[browserAndLocation],
+                        browser: browsers[browserAndLocation]
+                )
             }
 
         }
-        CsiAggregation.withNewTransaction {
-            CsiConfiguration csiConfiguration = CsiConfiguration.build()
-            ConnectivityProfile.findAll().each { connectivityProfile ->
-                Browser.findAll().each { browser ->
-                    csiConfiguration.browserConnectivityWeights.
-                            add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
-                }
-                Page.findAll().each { page ->
-                    csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
-                }
+        CsiConfiguration csiConfiguration = CsiConfiguration.build()
+        ConnectivityProfile.findAll().each { connectivityProfile ->
+            Browser.findAll().each { browser ->
+                csiConfiguration.browserConnectivityWeights.
+                        add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
             }
-            JobGroup jobGroup = JobGroup.get(jobGroupId)
-            jobGroup.csiConfiguration = csiConfiguration
-            jobGroup.save(failOnError: true)
+            Page.findAll().each { page ->
+                csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+            }
         }
-        CsiAggregation.withNewTransaction {
-            EventResult.findAll().each {
-                resultPersisterService.informDependentCsiAggregations(it)
-            }
+        JobGroup jobGroup = JobGroup.get(jobGroupId)
+        jobGroup.csiConfiguration = csiConfiguration
+        jobGroup.save(failOnError: true)
+        EventResult.findAll().each {
+            resultPersisterService.informDependentCsiAggregations(it)
         }
     }
 
