@@ -9,15 +9,13 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.result.dao.EventResultDaoService
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultDashboardServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -52,74 +50,70 @@ class EventResultDashboardServiceIntegrationSpec extends NonTransactionalIntegra
     void "get event result dashboard chart map with trimmed values"(int csiAggregationInterval, int expectedNumberOfPoints, int expectedValue) {
         given: "four event results with different domTimeInMillisecs"
 
-        EventResult.withNewSession { session ->
-            OsmConfiguration.build()
-            page = Page.build()
-            jobGroup = JobGroup.build()
-            browser = Browser.build()
-            location = Location.build()
-            measuredEvent = MeasuredEvent.build()
-            connectivityProfile = ConnectivityProfile.build()
+        OsmConfiguration.build()
+        page = Page.build()
+        jobGroup = JobGroup.build()
+        browser = Browser.build()
+        location = Location.build()
+        measuredEvent = MeasuredEvent.build()
+        connectivityProfile = ConnectivityProfile.build()
 
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 2000
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 2000
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 4000
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 4000
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 6000
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 6000
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 8000
-            )
-
-            session.flush()
-        }
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 8000
+        )
 
         when: "the data for the time series chart gets created and we trim the data below and above some given values"
         Date startTime = runDate.minusHours(1).toDate()
@@ -146,47 +140,42 @@ class EventResultDashboardServiceIntegrationSpec extends NonTransactionalIntegra
 
     void "get event result dashboard chart map"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, SelectedMeasurandType selectedType) {
         given: "two event results with attribute uncached and cached respectively"
-        EventResult.withNewSession { session ->
-            OsmConfiguration.build()
-            page = Page.build()
-            jobGroup = JobGroup.build()
-            browser = Browser.build()
-            location = Location.build()
-            measuredEvent = MeasuredEvent.build()
-            connectivityProfile = ConnectivityProfile.build()
+        OsmConfiguration.build()
+        page = Page.build()
+        jobGroup = JobGroup.build()
+        browser = Browser.build()
+        location = Location.build()
+        measuredEvent = MeasuredEvent.build()
+        connectivityProfile = ConnectivityProfile.build()
 
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 2000
-            )
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 2000
+        )
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.UNCACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 3000
-            )
-
-            session.flush()
-        }
-
+                cachedView: CachedView.UNCACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 3000
+        )
 
         when: "the data for the time series chart gets created"
         Date startTime = runDate.minusHours(1).toDate()
@@ -218,64 +207,62 @@ class EventResultDashboardServiceIntegrationSpec extends NonTransactionalIntegra
 
     void "get event result dashboard chart map for usertimings"(List<CachedView> cached, int csiAggregationInterval, int expectedNumberOfGraphs, List expectedValues, UserTimingType userTimingType) {
         given: "two event results with attribute uncached and cached respectively"
-        EventResult.withNewSession { session ->
-            OsmConfiguration.build()
-            page = Page.build()
-            jobGroup = JobGroup.build()
-            browser = Browser.build()
-            location = Location.build()
-            measuredEvent = MeasuredEvent.build()
-            connectivityProfile = ConnectivityProfile.build()
+        OsmConfiguration.build()
+        page = Page.build()
+        jobGroup = JobGroup.build()
+        browser = Browser.build()
+        location = Location.build()
+        measuredEvent = MeasuredEvent.build()
+        connectivityProfile = ConnectivityProfile.build()
 
-            UserTiming userTiming1 = UserTiming.build(
-                    type: userTimingType,
-                    startTime: userTimingType == UserTimingType.MARK ? 2000 : 1,
-                    duration: userTimingType == UserTimingType.MEASURE ? 2000 : null,
-                    name: 'name'
-            )
+        UserTiming userTiming1 = UserTiming.build(
+                type: userTimingType,
+                startTime: userTimingType == UserTimingType.MARK ? 2000 : 1,
+                duration: userTimingType == UserTimingType.MEASURE ? 2000 : null,
+                name: 'name',
+                flush: true
+        )
 
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.CACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 1,
-                    userTimings: [userTiming1]
-            )
+                cachedView: CachedView.CACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 1,
+                userTimings: [userTiming1],
+                flush: true
+        )
 
-            UserTiming userTiming2 = UserTiming.build(
-                    type: userTimingType,
-                    startTime: userTimingType == UserTimingType.MARK ? 3000 : 1,
-                    duration: userTimingType == UserTimingType.MEASURE ? 3000 : null,
-                    name: 'name'
-            )
+        UserTiming userTiming2 = UserTiming.build(
+                type: userTimingType,
+                startTime: userTimingType == UserTimingType.MARK ? 3000 : 1,
+                duration: userTimingType == UserTimingType.MEASURE ? 3000 : null,
+                name: 'name'
+        )
 
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    connectivityProfile: connectivityProfile,
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                connectivityProfile: connectivityProfile,
 
-                    cachedView: CachedView.UNCACHED,
-                    jobGroup: jobGroup,
-                    page: page,
-                    measuredEvent: measuredEvent,
-                    browser: browser,
-                    location: location,
-                    jobResultDate: runDate.toDate(),
-                    domTimeInMillisecs: 1,
-                    userTimings: [userTiming2]
-            )
-
-            session.flush()
-        }
-
+                cachedView: CachedView.UNCACHED,
+                jobGroup: jobGroup,
+                page: page,
+                measuredEvent: measuredEvent,
+                browser: browser,
+                location: location,
+                jobResultDate: runDate.toDate(),
+                domTimeInMillisecs: 1,
+                userTimings: [userTiming2],
+                flush: true
+        )
 
         when: "the data for the time series chart gets created"
         Date startTime = runDate.minusHours(1).toDate()

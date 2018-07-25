@@ -1,6 +1,6 @@
 package de.iteratec.osm.result
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 import org.joda.time.Days
 

@@ -5,10 +5,10 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.TrimQualifier
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -17,38 +17,35 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurands with page"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            jobGroup1 = JobGroup.build()
-            jobGroup2 = JobGroup.build()
-            jobGroup3 = JobGroup.build()
+        page1 = Page.build()
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
 
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
-                    medianValue: true,
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 600,
-                    medianValue: true,
-            )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 600,
+                medianValue: true,
+        )
 
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                )
-            }
-            session.flush()
+        2.times {
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+            )
         }
 
         when: "the builder is configured for measurand and page"
@@ -68,41 +65,42 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for userTimings with page"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            jobGroup1 = JobGroup.build()
-            jobGroup2 = JobGroup.build()
-            jobGroup3 = JobGroup.build()
+        page1 = Page.build()
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
 
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
             EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
                     fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
             )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
-            )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for usertiming and page"
@@ -122,41 +120,42 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurands and userTimings with page"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            jobGroup1 = JobGroup.build()
-            jobGroup2 = JobGroup.build()
-            jobGroup3 = JobGroup.build()
+        page1 = Page.build()
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
 
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 600,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
             EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
+                    fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
             )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 600,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
-            )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for usertiming and measurand with page"
@@ -178,37 +177,34 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurands with jobGroup"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            page2 = Page.build()
-            page3 = Page.build()
-            jobGroup1 = JobGroup.build()
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
 
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 600,
+                medianValue: true,
+        )
+        2.times {
             EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
+                    fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
             )
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-            )
-            EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 600,
-                    medianValue: true,
-            )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for measurand and jobGroup"
@@ -228,42 +224,43 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            page2 = Page.build()
-            page3 = Page.build()
-            jobGroup1 = JobGroup.build()
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
 
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
 
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
             EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup1,
                     fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
             )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for usertiming and jobGroup"
@@ -284,41 +281,42 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurands and userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            page2 = Page.build()
-            page3 = Page.build()
-            jobGroup1 = JobGroup.build()
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
 
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 600,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
             EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
+                    fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
             )
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 600,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
-            )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for usertiming and measurand with jobGroup"
@@ -340,39 +338,40 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurand and usertiming with page and jobGroup"() {
         given: "three matching and two other Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            jobGroup1 = JobGroup.build()
+        page1 = Page.build()
+        jobGroup1 = JobGroup.build()
 
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 600,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
             EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
+                    fullyLoadedTimeInMillisecs: 500,
                     medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
             )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 600,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)]
-            )
-            2.times {
-                EventResult.build(
-                        fullyLoadedTimeInMillisecs: 500,
-                        medianValue: true,
-                        userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)]
-                )
-            }
-            session.flush()
         }
 
         when: "the builder is configured for usertiming and measurand with page and jobGroup"
@@ -396,82 +395,78 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check average for measurand and usertiming with page and jobGroup without aggregation"() {
         given: "nine different but matching Eventresults"
-        EventResult.withNewSession { session ->
-            page1 = Page.build()
-            page2 = Page.build()
-            page3 = Page.build()
-            jobGroup1 = JobGroup.build()
-            jobGroup2 = JobGroup.build()
-            jobGroup3 = JobGroup.build()
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
 
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page1,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 300,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
-            )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 300,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+        )
 
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page2,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 300,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
-            )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 300,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+        )
 
-            EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup1,
-                    fullyLoadedTimeInMillisecs: 100,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup2,
-                    fullyLoadedTimeInMillisecs: 200,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
-            )
-            EventResult.build(
-                    page: page3,
-                    jobGroup: jobGroup3,
-                    fullyLoadedTimeInMillisecs: 300,
-                    medianValue: true,
-                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
-            )
-            session.flush()
-        }
-
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)]
+        )
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 300,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)]
+        )
 
         when: "the builder is configured for usertiming and measurand with all pages and jobGroups"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
@@ -488,21 +483,15 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
     void "check impossible trims"() {
         given: "one Eventresult"
-        EventResult.withNewSession { session ->
-
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 600,
-                    firstByteInMillisecs: 600,
-                    medianValue: true,
-                    userTimings: [
-                            UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
-                            UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
-                    ]
-            )
-
-            session.flush()
-        }
-
+        EventResult.build(
+                fullyLoadedTimeInMillisecs: 600,
+                firstByteInMillisecs: 600,
+                medianValue: true,
+                userTimings: [
+                        UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
+                        UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
+                ]
+        )
 
         when: "the builder is trimmed with two selectedMeasurands"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)

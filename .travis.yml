@@ -4,12 +4,26 @@ cache:
   directories:
     - node_modules
     - frontend/node_modules
+    - build/npm
+    - $HOME/.npm
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - openjdk8
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/
+install: true
+
+# Don't email me the results of the test runs.
+notifications:
+  email: false
+
 jobs:
   include:
-    - stage: Tests
+    - stage: tests
       script: ./gradlew -x jasmineRun test
+    - script: ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+    - script: ./gradlew jasmineRun
+
