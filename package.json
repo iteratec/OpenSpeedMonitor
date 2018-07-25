@@ -55,7 +55,7 @@
     "save-svg-as-png": "1.1.0",
     "spin.js": "^2.0.1",
     "sticky-table-headers": "0.1.19",
-    "tag-it": "^2.0.0",
+    "tag-it": "HirokiDaido/tag-it",
     "vue": "2.4.4"
   }
 }
