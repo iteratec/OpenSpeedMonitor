@@ -51,7 +51,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     }
 
     def cleanup() {
-        resultPersissterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
+        resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
