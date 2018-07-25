@@ -230,7 +230,6 @@ task nodeSyncJavascript(type: Sync) {
     into "grails-app/assets/javascripts/node_modules"
     include 'jquery/dist/jquery.min.js'
     include 'jquery-ui-dist/jquery-ui.min.js'
-    include 'jquery-migrate/dist/jquery-migrate.js'
     include 'bootstrap/dist/js/bootstrap.min.js'
     include 'clipboard/dist/clipboard.min.js'
     include 'jquery-contextmenu/dist/jquery.contextMenu.min.js'

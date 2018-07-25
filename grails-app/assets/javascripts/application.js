@@ -16,7 +16,6 @@
  */
 //= require_tree node_modules/jquery
 //= require_tree node_modules/jquery-ui-dist
-//= require_tree node_modules/jquery-migrate
 //= require_tree node_modules/bootstrap
 //= require_tree node_modules/bootstrap-colorpicker/dist/js/
 //= require_tree node_modules/chosen-js
