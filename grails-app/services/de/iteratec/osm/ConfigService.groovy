@@ -168,6 +168,10 @@ class ConfigService {
         return url
     }
 
+	Integer getMaxAgeForMetricsInHours() {
+		return grailsApplication.config.getProperty("de.iteratec.osm.application-dashboard.metrics-max-age-in-h", Integer, 6)
+	}
+
     private OsmConfiguration getConfig(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
         int confCount = osmConfigs.size()
