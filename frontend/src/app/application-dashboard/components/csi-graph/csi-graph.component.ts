@@ -1,4 +1,13 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {select} from "d3-selection";
 import {axisBottom, axisLeft} from "d3-axis";
@@ -12,7 +21,7 @@ import {CsiDTO} from "../../models/csi.model";
   templateUrl: './csi-graph.component.html',
   styleUrls: ['./csi-graph.component.scss']
 })
-export class CsiGraphComponent implements OnInit, OnChanges {
+export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy {
   @Input() csiData: ApplicationCsiListDTO;
   @ViewChild("svg") svgElement: ElementRef;
 
@@ -21,13 +30,14 @@ export class CsiGraphComponent implements OnInit, OnChanges {
   private yScale: ScaleLinear<number, number>;
   private xScale: ScaleTime<number, number>;
 
+  private svgChanges: MutationObserver;
+
   constructor() {
-    this.initGenerators();
   }
 
-  private initGenerators() {
+  private initGenerators(width: number) {
     // console.log(this.svgElement.nativeElement.width);
-    this.xScale = this.getXScale(800);
+    this.xScale = this.getXScale(width);
     this.yScale = this.getYScale(100);
     this.lineGenerator = this.getLineGenerator(this.xScale, this.yScale);
     this.areaGenerator = this.getAreaGenerator(this.xScale, this.yScale);
@@ -61,13 +71,10 @@ export class CsiGraphComponent implements OnInit, OnChanges {
       .y0(yScale(0))
   }
 
-  ngOnInit(): void {
-
-    this.drawGraph();
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
-    this.drawGraph()
+    if (this.areaGenerator) {
+      this.drawGraph();
+    }
   }
 
   private drawGraph() {
@@ -132,5 +139,24 @@ export class CsiGraphComponent implements OnInit, OnChanges {
     selection.remove()
   }
 
+  ngAfterContentInit(): void {
+    let value = this.svgElement.nativeElement.width.baseVal.value;
+    this.initGenerators(value ? value : 1000);
+    this.drawGraph();
 
+
+    this.svgChanges = new MutationObserver(((mutations: MutationRecord[]) => {
+      console.log(mutations);
+      let width = this.svgElement.nativeElement.width.baseVal.value;
+      console.log(width);
+      this.initGenerators(width ? width : 1000);
+    }));
+
+    const config = {attributes: true, childList: true, characterData: true};
+    this.svgChanges.observe(this.svgElement.nativeElement, config);
+  }
+
+  ngOnDestroy(): void {
+    this.svgChanges.disconnect();
+  }
 }

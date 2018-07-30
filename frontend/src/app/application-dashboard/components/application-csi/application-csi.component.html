@@ -1,7 +1,7 @@
 <div *ngIf="hasConfiguration$ | async; else returnError">
   <div class="card" style="display: flex" *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
     <osm-csi-value [csiValue]="recentCsiValue.csiDocComplete" [isBig]="true" [description]="'today'"></osm-csi-value>
-    <osm-csi-graph [csiData]="csiValues$ | async"></osm-csi-graph>
+    <osm-csi-graph style="width:100%" [csiData]="csiValues$ | async"></osm-csi-graph>
   </div>
   <ng-template #noRecentCsi>
     No CSI available
