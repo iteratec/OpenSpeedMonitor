@@ -40,7 +40,7 @@ export class CsiGraphComponent implements OnInit, OnChanges {
   }
 
   private getYScale(height: number): ScaleLinear<number, number> {
-    return scaleLinear().range([0, height]).domain([100, 0]);
+    return scaleLinear().domain([0, 100]).range([height, 0]);
   }
 
 
@@ -48,7 +48,7 @@ export class CsiGraphComponent implements OnInit, OnChanges {
     return line<CsiDTO>()
       .curve(curveLinear)
       .x((csiDTO: CsiDTO) => xScale(new Date(csiDTO.date)))
-      .y((csiDTO: CsiDTO) => yScale(csiDTO.csiDocComplete));
+      .y((csiDTO: CsiDTO) => yScale(csiDTO.csiDocComplete))
   }
 
   ngOnInit(): void {
@@ -60,7 +60,7 @@ export class CsiGraphComponent implements OnInit, OnChanges {
   }
 
   private drawGraph() {
-    const selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
+    let selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
 
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
@@ -68,18 +68,18 @@ export class CsiGraphComponent implements OnInit, OnChanges {
   }
 
   private enter(selection: any) {
+    let height = 100;
+
     const csiGraph = selection
       .append("g")
       .attr("class", "csi-graph")
-
-    let height = 100;
 
 
     // Add the X Axis
     csiGraph
       .append("g")
       .attr("class", "axis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", `translate(0,${height})`)
       .call(axisBottom(this.xScale)
         .tickFormat(timeFormat("%Y-%m-%d")))
     // .selectAll("text")
@@ -93,17 +93,17 @@ export class CsiGraphComponent implements OnInit, OnChanges {
       .append("g")
       .attr("class", "axis")
       .call(axisLeft(this.yScale));
-    
+
+    csiGraph
+      .append("path")
+      .attr("class", "csi-graph-value")
+      .attr("fill", "none")
+      .attr("stroke", "currentColor")
   }
 
   private update(selection: any) {
     selection
-      .append("path")
-      // .append("g")
-      // .attr("class", "csi-graph")
-      // .data(this.csiData.csiDtoList)
-      //.datum(this.csiData.csiDtoList)
-      .attr("class", "line")
+      .select("path.csi-graph-value")
       .attr("d", this.lineGenerator);
   }
 
