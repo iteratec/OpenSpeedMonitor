@@ -17,16 +17,10 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.script.ScriptService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.SetupDashboardService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-import groovy.transform.EqualsAndHashCode
-import org.hibernate.criterion.CriteriaSpecification
 
 /**
  * PageController
@@ -34,7 +28,6 @@ import org.hibernate.criterion.CriteriaSpecification
  */
 class PageController {
     PageService pageService
-    SetupDashboardService setupDashboardService
     I18nService i18nService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
@@ -137,11 +130,6 @@ class PageController {
 
     def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command) {
         render command.measuredEventList*.testedPageId as Set
-    }
-
-    def getPagesForActiveJobGroups() {
-
-        return ControllerUtils.sendObjectAsJSON(response, setupDashboardService.getPagesForActiveJobGroups())
     }
 }
 
