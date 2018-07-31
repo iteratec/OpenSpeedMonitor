@@ -22,6 +22,12 @@ notifications:
     on_success: never
     on_failure: always
 
+addons:
+  chrome: stable
+
+before_install:
+  - google-chrome-stable --headless --disable-gpu
+
 jobs:
   include:
     - stage: tests

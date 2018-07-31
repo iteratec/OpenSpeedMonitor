@@ -137,7 +137,9 @@ class ConfigService {
 	}
 
 	void setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus state){
-		getConfig().infrastructureSetupRan = state;
+		OsmConfiguration config = getConfig()
+		config.infrastructureSetupRan = state;
+		config.save(flush: true)
 	}
 
     /**
