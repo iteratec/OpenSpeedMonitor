@@ -124,7 +124,7 @@
 <div class="row navigationRow form-horizontal">
     <div class="col-md-12">
         %{-- cancel button --}%
-        <a class="btn btn-default" href="/InfrastructureSetup/cancel" data-toggle="modal" id="cancelSetup">
+        <a class="btn btn-default" href="/InfrastructureSetup/cancel" id="cancelSetup">
             <i class="fas fa-times" aria-hidden="true"></i>
             <g:message code="script.versionControl.cancel.button" default=" Cancel"/>
         </a>
