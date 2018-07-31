@@ -17,6 +17,7 @@ import {CsiDTO} from "../../models/csi.model";
 import {timeDay} from "d3-time";
 import {timeFormat} from "d3-time-format";
 
+
 @Component({
   selector: 'osm-csi-graph',
   templateUrl: './csi-graph.component.html',
@@ -32,10 +33,10 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private yScale: ScaleLinear<number, number>;
   private xScale: ScaleTime<number, number>;
 
-  private width: number = 500;
-  private height: number = 100;
-  private marginLeft: number = 30;
-  private marginRight = 30;
+  private width: number;
+  private height: number;
+  private marginLeft: number = 50;
+  private marginRight = 20;
   private marginTop: number = 10;
   private marginBottom = 30;
 
@@ -57,7 +58,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
   private getXScale(width: number): ScaleTime<number, number> {
     const offset = (24 * 60 * 60 * 1000) * 7 * 4; //4 Weeks;
-    let endDate: Date = this.dayStart(new Date(Date.now())); // + 24 * 60 * 60
+    let endDate: Date = this.dayStart(new Date(Date.now()));
     const startDate: Date = new Date(endDate.getTime() - offset);
     return scaleTime().domain([startDate, endDate]).range([0, width]);
   }
@@ -106,32 +107,24 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private enter(selection: any) {
     const csiGraph = selection
       .append("g")
-      .attr("transform", "translate(" + this.marginLeft + "," + this.marginTop + ")") //transform: translate(30px, 10px)
+      .attr("transform", `translate(${this.marginLeft},${this.marginTop})`) //transform: translate(30px, 10px)
       .attr("class", "csi-graph");
 
     csiGraph
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0,${this.height})`)
-    // .call(axisBottom(this.xScale)
-    //   .tickFormat(timeFormat("%Y-%m-%d")))
-    // .selectAll("text")
-    // .style("text-anchor", "end")
-    // .attr("dx", "-.8em")
-    // .attr("dy", ".15em")
-    // .attr("transform", "rotate(-65)");
+      .attr("transform", `translate(0,${this.height})`);
 
     csiGraph
       .append("g")
-      .attr("class", "y-axis")
-    // .call(axisLeft(this.yScale));
+      .attr("class", "y-axis");
 
     const csiGraphDrawingSpace = csiGraph
       .append("g");
 
     csiGraphDrawingSpace
       .append("path")
-      .attr("class", "csi-graph-line")
+      .attr("class", "csi-graph-line");
 
     csiGraphDrawingSpace
       .append("path")
@@ -145,12 +138,12 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .call(axisBottom(this.xScale)
         .ticks(timeDay.every(7))
         .tickFormat(timeFormat("%Y-%m-%d")));
-    // .tickFormat(timeFormat("%Y-%m-%d")));
 
     selection
       .select("g.y-axis")
       .call(axisLeft(this.yScale)
-        .tickValues(this.yAxisLabels));
+        .tickValues(this.yAxisLabels)
+        .tickFormat((tick => tick + "%")));
 
     selection
       .select("path.csi-graph-line")
@@ -166,20 +159,25 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   ngAfterContentInit(): void {
+    console.log("after content init");
     this.redraw()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.drawGraph();
+    console.log("on changes");
+    this.redraw();
   }
 
   onResize(event) {
+    console.log("on resize");
     this.redraw();
   }
 
   private redraw() {
+    console.log(this.svgElement.nativeElement.parentElement.offsetWidth);
     this.width = this.svgElement.nativeElement.parentElement.offsetWidth - this.marginLeft - this.marginRight;
     this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.marginTop - this.marginBottom;
+    console.log(this.width);
     this.initGenerators();
     this.drawGraph();
   }
