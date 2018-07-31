@@ -1,13 +1,4 @@
-import {
-  AfterContentInit,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnDestroy,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {select} from "d3-selection";
 import {axisBottom, axisLeft} from "d3-axis";
@@ -21,7 +12,7 @@ import {CsiDTO} from "../../models/csi.model";
   templateUrl: './csi-graph.component.html',
   styleUrls: ['./csi-graph.component.scss']
 })
-export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy {
+export class CsiGraphComponent implements AfterContentInit, OnChanges {
   @Input() csiData: ApplicationCsiListDTO;
   @ViewChild("svg") svgElement: ElementRef;
 
@@ -30,13 +21,15 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy
   private yScale: ScaleLinear<number, number>;
   private xScale: ScaleTime<number, number>;
 
-  private svgChanges: MutationObserver;
 
   constructor() {
   }
 
   private initGenerators(width: number) {
-    // console.log(this.svgElement.nativeElement.width);
+    if (!width) {
+      return;
+    }
+
     this.xScale = this.getXScale(width);
     this.yScale = this.getYScale(100);
     this.lineGenerator = this.getLineGenerator(this.xScale, this.yScale);
@@ -71,29 +64,29 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy
       .y0(yScale(0))
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.areaGenerator) {
-      this.drawGraph();
+  private drawGraph() {
+    if (this.canDraw()) {
+      let selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
+
+      this.enter(selection.enter());
+      this.update(selection.merge(selection.enter()));
+      this.exit(selection.exit());
     }
   }
 
-  private drawGraph() {
-    let selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
-
-    this.enter(selection.enter());
-    this.update(selection.merge(selection.enter()));
-    this.exit(selection.exit());
+  private canDraw(): boolean {
+    return !!this.xScale && !!this.yScale && !!this.areaGenerator && !!this.lineGenerator
   }
+
 
   private enter(selection: any) {
     let height = 100;
 
     const csiGraph = selection
       .append("g")
+      // .attr("transform", "translate(" + 30 + "," + 10 + ")") //transform: translate(30px, 10px)
       .attr("class", "csi-graph")
 
-
-    // Add the X Axis
     csiGraph
       .append("g")
       .attr("class", "axis")
@@ -106,7 +99,6 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy
     // .attr("dy", ".15em")
     // .attr("transform", "rotate(-65)");
 
-    // Add the Y Axis
     csiGraph
       .append("g")
       .attr("class", "axis")
@@ -140,23 +132,19 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges, OnDestroy
   }
 
   ngAfterContentInit(): void {
-    let value = this.svgElement.nativeElement.width.baseVal.value;
-    this.initGenerators(value ? value : 1000);
+    let width = this.svgElement.nativeElement.parentElement.offsetWidth;
+    console.log("width: " + width);
+    this.initGenerators(width);
     this.drawGraph();
-
-
-    this.svgChanges = new MutationObserver(((mutations: MutationRecord[]) => {
-      console.log(mutations);
-      let width = this.svgElement.nativeElement.width.baseVal.value;
-      console.log(width);
-      this.initGenerators(width ? width : 1000);
-    }));
-
-    const config = {attributes: true, childList: true, characterData: true};
-    this.svgChanges.observe(this.svgElement.nativeElement, config);
   }
 
-  ngOnDestroy(): void {
-    this.svgChanges.disconnect();
+  ngOnChanges(changes: SimpleChanges): void {
+    this.drawGraph();
+  }
+
+  onResize(event) {
+    let width = this.svgElement.nativeElement.parentElement.offsetWidth;
+    this.initGenerators(width);
+    this.drawGraph();
   }
 }
