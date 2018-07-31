@@ -21,52 +21,65 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private yScale: ScaleLinear<number, number>;
   private xScale: ScaleTime<number, number>;
 
+  private width: number = 500;
+  private height: number = 100;
+  private marginLeft: number = 30;
+  private marginRight = 30;
+  private marginTop: number = 10;
+  private marginBottom = 30;
 
   constructor() {
   }
 
-  private initGenerators(width: number) {
-    if (!width) {
+  private initGenerators() {
+    if (!this.width || !this.height) {
       return;
     }
 
-    this.xScale = this.getXScale(width);
-    this.yScale = this.getYScale(100);
+    this.xScale = this.getXScale(this.width);
+    this.yScale = this.getYScale(this.height);
     this.lineGenerator = this.getLineGenerator(this.xScale, this.yScale);
     this.areaGenerator = this.getAreaGenerator(this.xScale, this.yScale);
   }
 
   private getXScale(width: number): ScaleTime<number, number> {
     const offset = (24 * 60 * 60 * 1000) * 7 * 4; //4 Weeks;
-    let endDate: Date = new Date();
-    let startDate: Date = new Date();
-    startDate.setTime(startDate.getTime() - offset);
-
-    return scaleTime().range([0, width]).domain([startDate, endDate]);
+    let endDate: Date = this.dayStart(new Date(Date.now())); // + 24 * 60 * 60
+    const startDate: Date = new Date(endDate.getTime() - offset);
+    return scaleTime().domain([startDate, endDate]).range([0, width]);
   }
 
   private getYScale(height: number): ScaleLinear<number, number> {
     return scaleLinear().domain([0, 100]).range([height, 0]);
   }
 
+  private dayStart(input: Date): Date {
+    let date: Date = new Date(input.getTime());
+    date.setUTCHours(0, 0, 0, 0)
+    return date;
+  }
+
 
   private getLineGenerator(xScale: ScaleTime<number, number>, yScale: ScaleLinear<number, number>): Line<CsiDTO> {
     return line<CsiDTO>()
       .curve(curveLinear)
-      .x((csiDTO: CsiDTO) => xScale(new Date(csiDTO.date)))
+      .x((csiDTO: CsiDTO) => xScale(this.dayStart(new Date(csiDTO.date))))
       .y((csiDTO: CsiDTO) => yScale(csiDTO.csiDocComplete))
   }
 
   private getAreaGenerator(xScale: ScaleTime<number, number>, yScale: ScaleLinear<number, number>): Area<CsiDTO> {
     return area<CsiDTO>()
-      .x((csiDTO: CsiDTO) => xScale(new Date(csiDTO.date)))
+      .x((csiDTO: CsiDTO) => xScale(this.dayStart(new Date(csiDTO.date))))
       .y1((csiDTO: CsiDTO) => yScale(csiDTO.csiDocComplete))
       .y0(yScale(0))
   }
 
   private drawGraph() {
     if (this.canDraw()) {
-      let selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
+      const svgSelection = select(this.svgElement.nativeElement);
+      let selection = svgSelection.selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
+      svgSelection.attr("width", this.width + this.marginLeft + this.marginRight);
+      svgSelection.attr("height", this.height + this.marginTop + this.marginBottom);
 
       this.enter(selection.enter());
       this.update(selection.merge(selection.enter()));
@@ -80,17 +93,15 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
 
   private enter(selection: any) {
-    let height = 100;
-
     const csiGraph = selection
       .append("g")
-      // .attr("transform", "translate(" + 30 + "," + 10 + ")") //transform: translate(30px, 10px)
+      .attr("transform", "translate(" + this.marginLeft + "," + this.marginTop + ")") //transform: translate(30px, 10px)
       .attr("class", "csi-graph")
 
     csiGraph
       .append("g")
       .attr("class", "axis")
-      .attr("transform", `translate(0,${height})`)
+      .attr("transform", `translate(0,${this.height})`)
       .call(axisBottom(this.xScale)
         .tickFormat(timeFormat("%Y-%m-%d")))
     // .selectAll("text")
@@ -104,13 +115,17 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("class", "axis")
       .call(axisLeft(this.yScale));
 
-    csiGraph
+    const csiGraphDrawingSpace = csiGraph
+      .append("g");
+
+    csiGraphDrawingSpace
       .append("path")
       .attr("class", "csi-graph-line")
       .attr("fill", "none")
-      .attr("stroke", "currentColor");
+      .attr("stroke", "currentColor")
 
-    csiGraph
+
+    csiGraphDrawingSpace
       .append("path")
       .attr("class", "csi-graph-area")
       .attr("fill", "currentColor")
@@ -132,10 +147,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   ngAfterContentInit(): void {
-    let width = this.svgElement.nativeElement.parentElement.offsetWidth;
-    console.log("width: " + width);
-    this.initGenerators(width);
-    this.drawGraph();
+    this.redraw()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -143,8 +155,13 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   onResize(event) {
-    let width = this.svgElement.nativeElement.parentElement.offsetWidth;
-    this.initGenerators(width);
+    this.redraw();
+  }
+
+  private redraw() {
+    this.width = this.svgElement.nativeElement.parentElement.offsetWidth - this.marginLeft - this.marginRight;
+    this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.marginTop - this.marginBottom;
+    this.initGenerators();
     this.drawGraph();
   }
 }
