@@ -1,16 +1,27 @@
-import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {select} from "d3-selection";
 import {axisBottom, axisLeft} from "d3-axis";
-import {timeFormat} from "d3-time-format";
 import {ScaleLinear, scaleLinear, ScaleTime, scaleTime} from "d3-scale";
 import {area, Area, curveLinear, Line, line} from "d3-shape";
 import {CsiDTO} from "../../models/csi.model";
+import {timeDay} from "d3-time";
+import {timeFormat} from "d3-time-format";
 
 @Component({
   selector: 'osm-csi-graph',
   templateUrl: './csi-graph.component.html',
-  styleUrls: ['./csi-graph.component.scss']
+  styleUrls: ['./csi-graph.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CsiGraphComponent implements AfterContentInit, OnChanges {
   @Input() csiData: ApplicationCsiListDTO;
@@ -27,6 +38,8 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private marginRight = 30;
   private marginTop: number = 10;
   private marginBottom = 30;
+
+  private yAxisLabels = [60, 85, 100];
 
   constructor() {
   }
@@ -100,8 +113,8 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${this.height})`)
-      .call(axisBottom(this.xScale)
-        .tickFormat(timeFormat("%Y-%m-%d")))
+    // .call(axisBottom(this.xScale)
+    //   .tickFormat(timeFormat("%Y-%m-%d")))
     // .selectAll("text")
     // .style("text-anchor", "end")
     // .attr("dx", "-.8em")
@@ -111,7 +124,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraph
       .append("g")
       .attr("class", "y-axis")
-      .call(axisLeft(this.yScale));
+    // .call(axisLeft(this.yScale));
 
     const csiGraphDrawingSpace = csiGraph
       .append("g");
@@ -119,26 +132,25 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraphDrawingSpace
       .append("path")
       .attr("class", "csi-graph-line")
-      .attr("fill", "none")
-      .attr("stroke", "currentColor")
-
 
     csiGraphDrawingSpace
       .append("path")
       .attr("class", "csi-graph-area")
-      .attr("fill", "currentColor")
-      .attr("opacity", 0.2);
+
   }
 
   private update(selection: any) {
     selection
       .select("g.x-axis")
       .call(axisBottom(this.xScale)
-        .tickFormat(timeFormat("%Y-%m-%d")))
+        .ticks(timeDay.every(7))
+        .tickFormat(timeFormat("%Y-%m-%d")));
+    // .tickFormat(timeFormat("%Y-%m-%d")));
 
     selection
       .select("g.y-axis")
-      .call(axisLeft(this.yScale));
+      .call(axisLeft(this.yScale)
+        .tickValues(this.yAxisLabels));
 
     selection
       .select("path.csi-graph-line")

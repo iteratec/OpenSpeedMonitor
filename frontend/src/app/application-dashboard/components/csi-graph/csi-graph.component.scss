@@ -1,9 +1,28 @@
-.csi-graph {
-  color: #008cd2;
-  height: 100%;
-  min-height: 200px;
-  width: 100%;
-  min-width: 400px;
-  //padding-left: 30px;
-  //padding-top: 10px;
+osm-csi-graph {
+  .csi-graph {
+    height: 100%;
+    min-height: 200px;
+    width: 100%;
+    min-width: 400px;
+  }
+
+  .csi-graph-area {
+    fill: #008cd2;
+    opacity: 0.2;
+  }
+
+  .csi-graph-line {
+    stroke: #008cd2;
+    fill: none;
+  }
+
+  .y-axis .tick line {
+    color: #fe1d1d;
+    fill: #00bd58;
+    stroke: #ffa605;
+  }
+
+  svg g text {
+    fill: green;
+  }
 }
