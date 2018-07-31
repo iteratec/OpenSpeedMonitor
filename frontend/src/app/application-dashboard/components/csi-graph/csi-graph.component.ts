@@ -78,8 +78,6 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     if (this.canDraw()) {
       const svgSelection = select(this.svgElement.nativeElement);
       let selection = svgSelection.selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
-      svgSelection.attr("width", this.width + this.marginLeft + this.marginRight);
-      svgSelection.attr("height", this.height + this.marginTop + this.marginBottom);
 
       this.enter(selection.enter());
       this.update(selection.merge(selection.enter()));
@@ -96,11 +94,11 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     const csiGraph = selection
       .append("g")
       .attr("transform", "translate(" + this.marginLeft + "," + this.marginTop + ")") //transform: translate(30px, 10px)
-      .attr("class", "csi-graph")
+      .attr("class", "csi-graph");
 
     csiGraph
       .append("g")
-      .attr("class", "axis")
+      .attr("class", "x-axis")
       .attr("transform", `translate(0,${this.height})`)
       .call(axisBottom(this.xScale)
         .tickFormat(timeFormat("%Y-%m-%d")))
@@ -112,7 +110,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
     csiGraph
       .append("g")
-      .attr("class", "axis")
+      .attr("class", "y-axis")
       .call(axisLeft(this.yScale));
 
     const csiGraphDrawingSpace = csiGraph
@@ -133,6 +131,15 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   private update(selection: any) {
+    selection
+      .select("g.x-axis")
+      .call(axisBottom(this.xScale)
+        .tickFormat(timeFormat("%Y-%m-%d")))
+
+    selection
+      .select("g.y-axis")
+      .call(axisLeft(this.yScale));
+
     selection
       .select("path.csi-graph-line")
       .attr("d", this.lineGenerator);
