@@ -112,15 +112,27 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
     csiGraph
       .append("g")
-      .attr("class", "x-axis")
+      .attr("class", "x axis")
       .attr("transform", `translate(0,${this.height})`);
 
     csiGraph
       .append("g")
-      .attr("class", "y-axis");
+      .attr("class", "y axis");
 
     const csiGraphDrawingSpace = csiGraph
       .append("g");
+
+    csiGraphDrawingSpace
+      .append("rect")
+      .attr("class", "graph-border")
+      .attr("id", "graph-border");
+
+    selection
+      .append("defs")
+      .append("clipPath")
+      .attr("id", "graph-border-clip-path")
+      .append("use")
+      .attr("xlink:href", "#graph-border");
 
     csiGraphDrawingSpace
       .append("path")
@@ -129,18 +141,18 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraphDrawingSpace
       .append("path")
       .attr("class", "csi-graph-area")
-
+      .attr("clip-path", "url(#graph-border-clip-path)");
   }
 
   private update(selection: any) {
     selection
-      .select("g.x-axis")
+      .select("g.x.axis")
       .call(axisBottom(this.xScale)
         .ticks(timeDay.every(7))
         .tickFormat(timeFormat("%Y-%m-%d")));
 
     selection
-      .select("g.y-axis")
+      .select("g.y.axis")
       .call(axisLeft(this.yScale)
         .tickValues(this.yAxisLabels)
         .tickFormat((tick => tick + "%")));
@@ -152,6 +164,13 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     selection
       .select("path.csi-graph-area")
       .attr("d", this.areaGenerator);
+
+    selection
+      .select("rect.graph-border")
+      .attr("transform", `translate(0,-${this.marginTop - 2})`)
+      .attr("width", this.width)
+      .attr("height", this.height + this.marginTop - 2)
+      .attr("rx", 4).attr("ry", 4);
   }
 
   private exit(selection: any) {
@@ -159,25 +178,20 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   ngAfterContentInit(): void {
-    console.log("after content init");
     this.redraw()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("on changes");
     this.redraw();
   }
 
   onResize(event) {
-    console.log("on resize");
     this.redraw();
   }
 
   private redraw() {
-    console.log(this.svgElement.nativeElement.parentElement.offsetWidth);
     this.width = this.svgElement.nativeElement.parentElement.offsetWidth - this.marginLeft - this.marginRight;
     this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.marginTop - this.marginBottom;
-    console.log(this.width);
     this.initGenerators();
     this.drawGraph();
   }

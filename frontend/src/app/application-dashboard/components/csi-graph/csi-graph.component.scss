@@ -18,9 +18,15 @@ osm-csi-graph {
     fill: none;
   }
 
-  .y-axis .tick line {
-    color: #fe1d1d;
-    fill: #00bd58;
+  .graph-border {
+    fill: none;
+    stroke: gray;
+  }
+
+  .axis path {
+    stroke: transparent;
+  }
+  .axis .tick line {
     stroke: #ffa605;
   }
 
