@@ -34,4 +34,8 @@ export class PageComponent {
   convertToMib(value: number): number {
     return CalculationUtil.convertBytesToMiB(value);
   }
+
+  convertMillisecsToSecs(value: number): number {
+    return CalculationUtil.convertMillisecsToSecs(value);
+  }
 }
