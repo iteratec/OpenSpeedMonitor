@@ -66,35 +66,35 @@ $.contextMenu({
     items: {
         "summary": {
             name: chartContextMenuI18N.summary,
-            icon: "fa-file-text-o"
+            icon: "fas fa-file-alt"
         },
         "waterfallView": {
             name: chartContextMenuI18N.waterfall,
-            icon: "fa-bars"
+            icon: "fas fa-bars"
         },
         "performanceReview": {
             name: chartContextMenuI18N.performanceReview,
-            icon: "fa-check"
+            icon: "fas fa-check"
         },
         "contentBreakdown": {
             name: chartContextMenuI18N.contentBreakdown,
-            icon: "fa-pie-chart"
+            icon: "fas fa-chart-pie"
         },
         "domains": {
             name: chartContextMenuI18N.domains,
-            icon: "fa-list"
+            icon: "fas fa-list"
         },
         "screenshot": {
             name: chartContextMenuI18N.screenshot,
-            icon: "fa-picture-o"
+            icon: "fas fa-image"
         },
         "filmstrip": {
             name: chartContextMenuI18N.filmstrip,
-            icon: "fa-film"
+            icon: "fas fa-film"
         },
         "compare": {
             name: chartContextMenuI18N.compareFilmstrips,
-            icon: "fa-columns",
+            icon: "fas fa-columns",
             // show only if at least one point is already selected and
             // also only if comparison is not only with itself
             visible: function () {
@@ -117,7 +117,7 @@ $.contextMenu({
         separator: "-----",
         "selectPoint": {
             name: chartContextMenuI18N.selectPoint,
-            icon: "fa-dot-circle-o",
+            icon: "fas fa-dot-circle",
             // show only if point is not selected yet
             visible: function () {
                 return OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
@@ -128,7 +128,7 @@ $.contextMenu({
         },
         "deselectPoint": {
             name: chartContextMenuI18N.deselectPoint,
-            icon: "fa-trash-o",
+            icon: "fas fa-trash",
             // show only if point is already selected
             visible: function () {
                 return !OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
