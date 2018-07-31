@@ -40,7 +40,9 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private marginTop: number = 10;
   private marginBottom = 30;
 
-  private yAxisLabels = [60, 85, 100];
+  private bad: number = 60;
+  private good: number = 85;
+  private perfect: number = 100;
 
   constructor() {
   }
@@ -105,9 +107,11 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
 
   private enter(selection: any) {
+
+
     const csiGraph = selection
       .append("g")
-      .attr("transform", `translate(${this.marginLeft},${this.marginTop})`) //transform: translate(30px, 10px)
+      .attr("transform", `translate(${this.marginLeft},${this.marginTop + 1})`) //transform: translate(30px, 10px)
       .attr("class", "csi-graph");
 
     csiGraph
@@ -118,6 +122,9 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraph
       .append("g")
       .attr("class", "y axis");
+    csiGraph
+      .append("g")
+      .attr("class", "y grid-lines axis");
 
     const csiGraphDrawingSpace = csiGraph
       .append("g");
@@ -151,11 +158,19 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
         .ticks(timeDay.every(7))
         .tickFormat(timeFormat("%Y-%m-%d")));
 
+    const yAxisGenerator = axisLeft(this.yScale)
+      .tickValues([this.bad, this.good, this.perfect]);
+
     selection
       .select("g.y.axis")
-      .call(axisLeft(this.yScale)
-        .tickValues(this.yAxisLabels)
+      .call(yAxisGenerator
         .tickFormat((tick => tick + "%")));
+
+    selection
+      .select("g.y.grid-lines.axis")
+      .call(yAxisGenerator
+        .tickSize(-this.width)
+        .tickFormat((tick => "")));
 
     selection
       .select("path.csi-graph-line")
@@ -167,9 +182,9 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
     selection
       .select("rect.graph-border")
-      .attr("transform", `translate(0,-${this.marginTop - 2})`)
+      .attr("transform", `translate(0,-${this.marginTop})`)
       .attr("width", this.width)
-      .attr("height", this.height + this.marginTop - 2)
+      .attr("height", this.height + this.marginTop)
       .attr("rx", 4).attr("ry", 4);
   }
 

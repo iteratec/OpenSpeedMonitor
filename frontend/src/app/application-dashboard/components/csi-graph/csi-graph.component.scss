@@ -1,4 +1,8 @@
 osm-csi-graph {
+  $color-text-light: #606060;
+  $color-primary: #008cd2;
+  $color-contour-light: #d6d6d6;
+  $color-background: #ededed;
   display: block;
 
   .csi-graph-svg {
@@ -9,28 +13,33 @@ osm-csi-graph {
   }
 
   .csi-graph-area {
-    fill: #008cd2;
+    fill: $color-primary;
     opacity: 0.2;
   }
 
   .csi-graph-line {
-    stroke: #008cd2;
+    stroke: $color-primary;
     fill: none;
   }
 
   .graph-border {
     fill: none;
-    stroke: gray;
+    stroke: $color-contour-light;
+    stroke-width: 1px;
   }
 
   .axis path {
     stroke: transparent;
   }
   .axis .tick line {
-    stroke: #ffa605;
+    stroke: $color-contour-light;
+  }
+  .grid-lines .tick line {
+    stroke: $color-background;
   }
 
   svg g text {
-    fill: green;
+    fill: $color-text-light;
   }
+
 }
