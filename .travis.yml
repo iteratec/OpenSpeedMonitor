@@ -45,4 +45,5 @@ jobs:
       - whereis chromedriver
       - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
     - script: ./gradlew jasmineRun
+    - script: ./gradlew angularTests
 
