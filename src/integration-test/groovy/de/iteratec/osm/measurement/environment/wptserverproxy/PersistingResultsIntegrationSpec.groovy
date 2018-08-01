@@ -18,19 +18,21 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.*
+import de.iteratec.osm.csi.CsiAggregationUpdateService
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 
-
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -39,17 +41,25 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     WebPageTestServer server
 
-    def setup() {
-        WebPageTestServer.withNewTransaction {
-            OsmConfiguration.build()
-            createTestDataCommonToAllTests()
-        }
+    def setupData() {
+        OsmConfiguration.build()
+        createTestDataCommonToAllTests()
         createMocksCommonToAllTests()
+    }
+
+    def cleanup() {
+        resultPersisterService.timeToCsMappingService =
+                grailsApplication.mainContext.getBean('timeToCsMappingService')
+        resultPersisterService.csiAggregationUpdateService =
+                grailsApplication.mainContext.getBean('csiAggregationUpdateService')
+        resultPersisterService.metricReportingService =
+                grailsApplication.mainContext.getBean('metricReportingService')
     }
 
     void "Results get persisted even after failed csi aggregation."() {
 
         given: "a wpt result and a failing CsiAggregationUpdateService"
+        setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         mockCsiAggregationUpdateService()
 
@@ -59,12 +69,12 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 4
-
     }
 
     void "Results get persisted even after failed metric reporting."() {
 
         given: "a wpt result and a failing MetricReportingService"
+        setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
         mockMetricReportingService()
 
@@ -74,12 +84,12 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
         EventResult.list().size() == 4
-
     }
 
     void "No EventResults get persisted when Persistence of JobResults throws an exception."() {
 
         given: "a wpt result without a test id"
+        setupData()
         WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
         xmlResult.getTestId() >> null
 
@@ -89,12 +99,12 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         then: "nothing should be persisted"
         JobResult.list().size() == 0
         EventResult.list().size() == 0
-
     }
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
 
         given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
+        setupData()
         WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
         xmlResult.getStepNode(0) >> null
 
@@ -111,9 +121,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
             Page.build(name: pageName)
         }
         server = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
+        Browser browser = Browser.build()
         Location loc = Location.build(
                 wptServer: server,
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
+                browser: browser
         )
         Job.build(
                 label: 'FF_BV1_Multistep_2',

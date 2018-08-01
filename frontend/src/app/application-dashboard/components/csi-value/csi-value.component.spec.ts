@@ -4,7 +4,7 @@ import {CsiValueComponent} from './csi-value.component';
 import {DebugElement} from "@angular/core";
 import {By} from "@angular/platform-browser";
 
-fdescribe('CsiValueComponent', () => {
+describe('CsiValueComponent', () => {
   let component: CsiValueComponent;
   let fixture: ComponentFixture<CsiValueComponent>;
 

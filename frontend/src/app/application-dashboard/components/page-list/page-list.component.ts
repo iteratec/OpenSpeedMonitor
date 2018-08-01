@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges} from '@angular/core';
+import {Component} from '@angular/core';
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {Observable} from "rxjs/index";
 import {PageDto} from "../../models/page.model";
@@ -8,15 +8,10 @@ import {PageDto} from "../../models/page.model";
   templateUrl: './page-list.component.html',
   styleUrls: ['./page-list.component.scss']
 })
-export class PageListComponent implements OnChanges {
-  @Input() applicationId: number;
+export class PageListComponent {
   pages$: Observable<PageDto[]>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
+    this.pages$ = this.applicationDashboardService.pages$;
   }
-
-  ngOnChanges() {
-    this.pages$ = this.applicationDashboardService.getPagesForJobGroup(this.applicationId);
-  }
-
 }

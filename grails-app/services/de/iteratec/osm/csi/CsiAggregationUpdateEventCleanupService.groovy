@@ -143,7 +143,7 @@ class CsiAggregationUpdateEventCleanupService {
 
             toClose.each { CsiAggregation aggregation ->
                 aggregation.closedAndCalculated = true
-                aggregation.save(failOnError: true)
+                aggregation.save(failOnError: true, flush: true)
             }
     }
 
@@ -159,7 +159,7 @@ class CsiAggregationUpdateEventCleanupService {
                 List<CsiAggregation> csiAggregationsToClose = CsiAggregation.getAll(sublist)
                 csiAggregationsToClose.each { CsiAggregation toClose ->
                     toClose.closedAndCalculated = true
-                    toClose.save(failOnError: true)
+                    toClose.save(failOnError: true, flush: true)
                 }
 
                 activityUpdater?.addProgressToStage(sublist.size())

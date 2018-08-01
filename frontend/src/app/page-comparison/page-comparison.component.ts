@@ -1,8 +1,8 @@
-import {JobGroupToPagesMappingDto} from "../shared/models/job-group-to-page-mapping.model";
 import {Component, NgZone} from '@angular/core';
-import {PageComparisonSelectionDto} from "./models/page-comparison-selection.model";
-import {JobGroupService} from "../shared/services/rest/job-group.service";
+import {JobGroupService} from "./services/job-group.service";
 import {Observable} from "rxjs/internal/Observable";
+import {JobGroupToPagesMappingDto} from "./models/job-group-to-page-mapping.model";
+import {PageComparisonSelectionDto} from "./models/page-comparison-selection.model";
 import {PageComparisonComponentAdapter} from "./page-comparison.adapter";
 
 @Component({

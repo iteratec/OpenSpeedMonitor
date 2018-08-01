@@ -1,4 +1,4 @@
-export interface JobGroupDTO {
+export interface PageDto {
   name: string;
   id: number;
 }

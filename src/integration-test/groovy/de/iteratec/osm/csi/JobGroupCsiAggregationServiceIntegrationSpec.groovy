@@ -27,11 +27,10 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import spock.lang.Shared
-import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
@@ -39,9 +38,8 @@ import static org.junit.Assert.assertTrue
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
-@ConfineMetaClassChanges([WeightingService])
 class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     @Shared JobGroup jobGroup1, jobGroup2, jobGroup3

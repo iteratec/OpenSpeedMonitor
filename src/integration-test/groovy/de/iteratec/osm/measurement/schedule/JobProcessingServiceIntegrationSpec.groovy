@@ -27,8 +27,8 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
@@ -40,7 +40,7 @@ import org.quartz.impl.triggers.CronTriggerImpl
  *
  * @author dri
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     JobProcessingService jobProcessingService
@@ -118,6 +118,10 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
                 active: true
         ).save(failOnError: true)
         connectivityProfile.connectivityProfileService = new ConnectivityProfileService()
+    }
+
+    def cleanup() {
+        jobProcessingService.proxyService = grailsApplication.mainContext.getBean('proxyService')
     }
 
 
@@ -220,9 +224,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
 
     void "statusOfRepeatedJobExecution test"() {
         given: "an inactive job and a date"
-        Job.withNewTransaction {
-            createJob(false)
-        }
+        createJob(false)
         Job job = jobDaoService.getJobById(1)
         Date now = new Date()
         Date oldestDate = now - 5

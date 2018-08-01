@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://api.travis-ci.org/openspeedmonitor/UtilityBehaviors.png)](https://api.travis-ci.org/openspeedmonitor/UtilityBehaviors.png)
+
 OpenSpeedMonitor
 ================
 Open Source Web Performance Monitoring.

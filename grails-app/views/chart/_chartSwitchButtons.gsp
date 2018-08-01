@@ -1,5 +1,5 @@
 <g:set var="chartSwitchLinks" value="${[
-        ['name': 'timeSeries', 'text': message(code: 'eventResultDashboard.label', default: 'Time Series'), 'icon': 'fa-line-chart'],
+        ['name': 'timeSeries', 'text': message(code: 'eventResultDashboard.label', default: 'Time Series'), 'icon': 'fa-chart-line'],
         ['name': 'pageAggregation', 'text': message(code: 'de.iteratec.isocsi.pageAggregation', default: 'Page Aggregation'), 'icon': 'fa-chart-bar'],
         ['name': 'jobGroupAggregation', 'text': message(code: 'de.iteratec.jobGroupAggregation.title', default: 'Job Group Aggregation'), 'icon': 'fa-chart-bar fa-rotate-90'],
         ['name': 'distribution', 'text': message(code: 'de.iteratec.osm.distributionChart', default: 'Distribution Chart'), 'icon': 'fa-chart-area'],

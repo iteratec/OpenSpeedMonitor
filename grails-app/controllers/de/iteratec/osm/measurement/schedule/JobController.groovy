@@ -33,6 +33,7 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
@@ -171,6 +172,7 @@ class JobController {
         return [job: job] << getStaticModelPartForEditOrCreateViewWithJob(job)
     }
 
+    @Transactional
     def update() {
         params.executionSchedule = "0 " + params.executionSchedule
 

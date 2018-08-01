@@ -9,7 +9,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
@@ -26,7 +26,7 @@ class PageAggregationController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -61,7 +61,7 @@ class PageAggregationController extends ExceptionHandlerController {
 
         modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return modelToRender
@@ -180,7 +180,7 @@ class PageAggregationController extends ExceptionHandlerController {
             List<List<Page>> testedPagesPerJob = []
 
             jobList.findAll { it.script == currentScript }.each { j ->
-                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript).getTestedPages().unique()
+                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript.label).getTestedPages().unique()
             }
 
             // if all lists are equal take any

@@ -33,7 +33,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
-import org.springframework.transaction.annotation.Propagation
 
 import java.util.zip.GZIPOutputStream
 
@@ -93,7 +92,7 @@ class ResultPersisterService implements iResultListener {
         return callListenerAsync
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult) throws OsmResultPersistanceException {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
@@ -106,7 +105,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     void persistJobResult(WptResultXml resultXml) throws OsmResultPersistanceException {
 
         performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
@@ -124,7 +123,7 @@ class ResultPersisterService implements iResultListener {
 
     }
 
-    private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId) {
+    private void removePendingAndCreateFinishedJobResult(resultXml, String testId) {
 
         String jobLabel = resultXml.getLabel()
         Job job = jobDaoService.getJob(jobLabel)
@@ -138,14 +137,12 @@ class ResultPersisterService implements iResultListener {
         } else {
             updateJobResult(jobResult, resultXml)
         }
-
-        return jobResult;
     }
 
     private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
         jobResult.testAgent = resultXml.getTestAgent()
         jobResult.wptVersion = resultXml.version.toString()
-        jobResult.save(failOnError: true)
+        jobResult.save(failOnError: true, flush: true)
     }
 
     /**
@@ -176,7 +173,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    protected JobResult persistNewJobRun(Job job, WptResultXml resultXml) {
+    protected void persistNewJobRun(Job job, WptResultXml resultXml) {
 
         String testId = resultXml.getTestId()
 
@@ -210,9 +207,7 @@ class ResultPersisterService implements iResultListener {
 
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
         result.setDescription('')
-        result.save(failOnError: true)
-
-        return result
+        result.save(failOnError: true, flush: true)
     }
 
     void persistResultsForAllTeststeps(WptResultXml resultXml) {
@@ -236,7 +231,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
 
         String testId = resultXml.getTestId()
@@ -381,9 +376,7 @@ class ResultPersisterService implements iResultListener {
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
 
-        jobRun.merge(failOnError: true)
-        result.save(failOnError: true)
-
+        result.save(failOnError: true, flush: true)
         return result
 
     }
@@ -495,7 +488,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     private void informDependents(WptResultXml resultXml) {
 
         JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), resultXml.getTestId())
@@ -534,7 +527,8 @@ class ResultPersisterService implements iResultListener {
     void informDependentCsiAggregations(EventResult result) {
         try {
             if (csiValueService.isCsiRelevant(result)) {
-                csiAggregationUpdateService.createOrUpdateDependentMvs(result.ident())
+                long resultId = result.ident()
+                csiAggregationUpdateService.createOrUpdateDependentMvs(resultId)
             }
         } catch (Exception e) {
             log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)
@@ -620,6 +614,6 @@ class ResultPersisterService implements iResultListener {
      * @param testId
      */
     void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId) {
-        JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true)
+        JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true, flush: true)
     }
 }

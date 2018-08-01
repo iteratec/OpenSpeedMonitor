@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.Page
@@ -15,6 +16,8 @@ import org.joda.time.DateTime
 @Transactional
 class ApplicationDashboardService {
 
+
+    ConfigService configService
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
@@ -71,7 +74,7 @@ class ApplicationDashboardService {
         SelectedMeasurand speedIndex = new SelectedMeasurand(Measurand.SPEED_INDEX.toString(), CachedView.UNCACHED)
         SelectedMeasurand docCompleteTime = new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME.toString(), CachedView.UNCACHED)
 
-        Date from = new DateTime().minusWeeks(4).toDate()
+        Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
         return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIdsIn([jobGroupId], false)

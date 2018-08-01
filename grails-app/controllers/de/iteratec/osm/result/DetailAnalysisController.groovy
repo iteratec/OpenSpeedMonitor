@@ -3,7 +3,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.util.ControllerUtils
 import grails.web.mapping.LinkGenerator
 import org.joda.time.Interval
@@ -12,7 +12,7 @@ import javax.xml.ws.http.HTTPException
 import java.lang.reflect.InvocationTargetException
 
 class DetailAnalysisController {
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     LinkGenerator grailsLinkGenerator
     EventResultDashboardService eventResultDashboardService
     DetailAnalysisPersisterService detailAnalysisPersisterService
@@ -81,11 +81,11 @@ class DetailAnalysisController {
     private Map constructStaticViewDataOfShowAll() {
         boolean detailAnalysisEnabled = grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true'
         return[
-            'folders': eventResultDashboardService.getAllJobGroups(),
-            'pages': eventResultDashboardService.getAllPages(),
-            'dateFormat': JS_DATE_FORMAT,
-            'tagToJobGroupNameMap': jobGroupDaoService.getTagToJobGroupNameMap(),
-            'persistenceOfDetailAnalysisDataEnabled': detailAnalysisEnabled
+                'folders'                               : eventResultDashboardService.getAllJobGroups(),
+                'pages'                                 : eventResultDashboardService.getAllPages(),
+                'dateFormat'                            : JS_DATE_FORMAT,
+                'tagToJobGroupNameMap'                  : jobGroupService.getTagToJobGroupNameMap(),
+                'persistenceOfDetailAnalysisDataEnabled': detailAnalysisEnabled
         ]
     }
 

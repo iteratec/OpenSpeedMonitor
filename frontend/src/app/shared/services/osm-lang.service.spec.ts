@@ -1,7 +1,7 @@
 import {TestBed} from '@angular/core/testing';
 
 import {OsmLangService} from './osm-lang.service';
-import {GrailsBridgeService} from "../../shared/services/grails-bridge.service";
+import {GrailsBridgeService} from "./grails-bridge.service";
 
 describe('OsmLangService', () => {
 

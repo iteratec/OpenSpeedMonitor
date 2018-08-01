@@ -34,7 +34,6 @@ import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.apache.commons.lang.exception.ExceptionUtils
-import org.apache.http.HttpStatus
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
@@ -472,7 +471,7 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, WptStatus.COMPLETED.getWptStatusCode())
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
-            result.delete(failOnError: true)
+            result.delete(failOnError: true, flush: true)
             log.info("Deleting the following JobResult as requested: ${result}... DONE")
             log.info("Canceling respective test on wptserver.")
             proxyService.cancelTest(job.location.wptServer, [test: testId])

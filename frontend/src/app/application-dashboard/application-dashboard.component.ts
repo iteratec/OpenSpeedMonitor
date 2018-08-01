@@ -1,6 +1,5 @@
 import {Component, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {JobGroupService} from '../shared/services/rest/job-group.service';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {ApplicationDashboardService} from './services/application-dashboard.service';
@@ -17,12 +16,11 @@ export class ApplicationDashboardComponent implements OnDestroy {
   destroyed$ = new Subject<void>();
 
   constructor(
-    private jobGroupService: JobGroupService,
     private route: ActivatedRoute,
     private router: Router,
     private dashboardService: ApplicationDashboardService
   ) {
-    this.applications$ = jobGroupService.activeOrRecentlyMeasured$.pipe(
+    this.applications$ = dashboardService.activeOrRecentlyMeasured$.pipe(
       map((applications: ApplicationDTO[]) => this.sortApplicationsByName(applications))
     );
 
@@ -38,7 +36,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     }
     this.selectedApplication = this.findApplicationById(applications, applicationId);
     if (this.selectedApplication) {
-      this.dashboardService.updateApplicationPages(this.selectedApplication);
+      this.dashboardService.updateApplicationData(this.selectedApplication);
     }
   }
 

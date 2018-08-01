@@ -203,6 +203,36 @@ if (Environment.getCurrent() == Environment.TEST && targetDir) {
     }
     appenders << "CONSOLE"
 
+    appender("osmAppenderDetails", RollingFileAppender) {
+        file = "logs/OpenSpeedMonitorDetails.log"
+        append = true
+        rollingPolicy(FixedWindowRollingPolicy ) {
+            FileNamePattern = "logs/OpenSpeedMonitorDetails%i.log.zip"
+            minIndex = 1
+            maxIndex = 20
+        }
+        triggeringPolicy(SizeBasedTriggeringPolicy){
+            maxFileSize= '20MB'
+        }
+
+        encoder(PatternLayoutEncoder) {
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
+        }
+        filter(ThresholdFilter) {
+            level = DEBUG
+        }
+    }
+    appender('asyncOsmAppenderDetails', AsyncAppender){
+        discardingThreshold=0
+        appenderRef('osmAppenderDetails')
+
+    }
+    appenders << "asyncOsmAppenderDetails"
+
+    // our packages
+    logger("de.iteratec.osm", ALL,['CONSOLE', 'osmAppenderDetails'], false)
+    logger("de.iteratec.osm.da", ALL,['CONSOLE', 'osmAppenderDetails'], false)
+
     logger("grails.app", INFO)
     logger("org.grails.commons",INFO)
     logger("org.grails.web.mapping",INFO)

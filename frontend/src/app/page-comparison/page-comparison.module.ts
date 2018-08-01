@@ -1,8 +1,8 @@
 import {NgModule} from '@angular/core';
 import {PageComparisonComponent} from './page-comparison.component';
-import {PageComparisonRowComponent} from "./components/page-comparison-row/page-comparison-row.component";
-import {JobGroupService} from "../shared/services/rest/job-group.service";
 import {SharedModule} from "../shared/shared.module";
+import {JobGroupService} from "./services/job-group.service";
+import {PageComparisonRowComponent} from "./components/page-comparison-row/page-comparison-row.component";
 
 @NgModule({
   imports: [

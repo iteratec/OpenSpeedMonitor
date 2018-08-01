@@ -10,7 +10,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.MeasuredEvent
@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus
 @Api(value = "/rest", tags = ["Generally measurement concerned"], description = "Generally measurement concerned Api", position = 2)
 class GeneralMeasurementApiController {
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     BrowserService browserService
     EventDaoService eventDaoService
     InMemoryConfigService inMemoryConfigService
@@ -35,7 +35,7 @@ class GeneralMeasurementApiController {
         responseContainer = "List"
     )
     public Map<String, Object> allSystems() {
-        Set<JobGroup> systems = jobGroupDaoService.findCSIGroups();
+        Set<JobGroup> systems = jobGroupService.findCSIGroups();
         Set<JobGroupDto> systemsAsJson = JobGroupDto.create(systems)
         return ControllerUtils.sendObjectAsJSON(response, [target: systemsAsJson], params.pretty && params.pretty == 'true')
     }
