@@ -25,7 +25,18 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false
+    singleRun: false,
+    customLaunchers: {
+      ChromeHeadlessForDocker: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--disable-web-security',
+          '--disable-gpu',
+          '--no-sandbox'
+        ],
+        displayName: 'Chrome Headless for docker'
+      }
+    },
+    browsers: ['ChromeHeadlessForDocker']
   });
 };
