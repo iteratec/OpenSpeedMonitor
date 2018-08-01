@@ -5,7 +5,7 @@
     <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
       <div class="metric">
         <i class="far fa-eye metric-icon"></i>
-        <div class="metric-value">{{transform(convertMilliSecsToSecs(metricsDto.speedIndex))}}</div>
+        <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.speedIndex))}}</div>
         <div class="metric-unit">s</div>
         <div class="metric-description">SpeedIndex</div>
       </div>
