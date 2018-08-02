@@ -4,6 +4,7 @@
     <head>
 
         <asset:stylesheet src="application.css"/>
+        <asset:stylesheet src="frontend/styles.css"/>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><g:layoutTitle default="${meta(name:'app.name')}" /></title>
         <meta charset="utf-8">

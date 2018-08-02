@@ -23,6 +23,7 @@ import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
@@ -34,7 +35,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -46,15 +47,17 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     WebPageTestServer server
 
     def setup() {
-        WebPageTestServer.withNewTransaction {
-            OsmConfiguration.build()
-            createTestDataCommonToAllTests()
-        }
+        OsmConfiguration.build()
+    }
+
+    def cleanup() {
+        resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
 
         given: ""
+        createTestDataCommonToAllTests()
         File file = new File("src/test/resources/WptResultXmls/MULTISTEP_1Run_5Steps.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
@@ -65,7 +68,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         then: ""
         JobResult.list().size() == 1
         eventResults.size() == 5
-        eventResults.findAll {it.csByWptDocCompleteInPercent}.size() == 3
+        eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3
 
     }
 
@@ -81,9 +84,11 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         MeasuredEvent meAds = MeasuredEvent.build(testedPage: ads, name: 'OTTO_ADS_arizona-jeans_XL')
         MeasuredEvent meHp = MeasuredEvent.build(testedPage: hp, name: 'OTTO_HP_NichtEinstiegsseite_XL')
         server = WebPageTestServer.build(baseUrl: "http://prod.server01.wpt.iteratec.de")
+        Browser browser = Browser.build()
         Location loc = Location.build(
                 wptServer: server,
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
+                browser: browser,
         )
         CsiConfiguration csiConf = CsiConfiguration.build()
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConf)
@@ -121,7 +126,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
                                 name: indexToMappingName[defaultMappingindex + 1],
                                 loadTimeInMilliSecs: tokenized[0],
                                 customerSatisfactionInPercent: tokenized[defaultMappingindex + 1]
-                        ).save(failOnError: true)
+                        ).save(failOnError: true, flush: true)
                     }
 
                 }

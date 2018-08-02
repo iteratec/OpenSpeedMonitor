@@ -336,7 +336,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
         JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
         WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
-        Location location1 = Location.build(uniqueIdentifierForServer: location1Name).save(failOnError: true)
+        Location location1 = Location.build(uniqueIdentifierForServer: location1Name, browser: browser, wptServer: wpt).save(failOnError: true)
         Job job1 = Job.build().save(failOnError: true)
         CsiSystem csiSystem = new CsiSystem([label: "TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))

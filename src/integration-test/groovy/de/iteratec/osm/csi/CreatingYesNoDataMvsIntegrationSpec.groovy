@@ -21,8 +21,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 
 /**
@@ -31,7 +31,7 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class CreatingYesNoDataMvsIntegrationSpec extends NonTransactionalIntegrationSpec {
     /** injected by grails */
