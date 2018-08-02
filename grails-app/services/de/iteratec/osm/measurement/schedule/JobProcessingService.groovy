@@ -37,7 +37,6 @@ import org.apache.commons.lang.exception.ExceptionUtils
 import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 import org.quartz.*
-import org.springframework.transaction.annotation.Propagation
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -224,7 +223,7 @@ class JobProcessingService {
      * specified Job/test is running and that this is not the result of a finished
      * test execution.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null, String description = '') {
         // If no testId was provided some error occurred and needs to be logged
         Job job = Job.get(jobId)
@@ -242,6 +241,7 @@ class JobProcessingService {
 
     }
 
+    @Transactional
     private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus, String description) {
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
         if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)) {

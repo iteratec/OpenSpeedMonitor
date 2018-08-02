@@ -3,7 +3,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
 import grails.gorm.transactions.Transactional
-import org.springframework.transaction.annotation.Propagation
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 @Transactional
 class JobStatisticService {
@@ -13,7 +13,7 @@ class JobStatisticService {
      * The statistic is updated.
      * @param job
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void updateStatsFor(Job job) {
 
         List<JobResult> results = getLast150CompletedJobResultsFor(job)
@@ -28,9 +28,8 @@ class JobStatisticService {
         stat.percentageSuccessfulTestsOfLast5 = results.size() >= 5 ?
             (results.take(5).count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/5)*100 :
                 null
-
         try {
-            stat.save(failOnError: true, flush: true)
+            stat.save(failOnError: true)
         } catch (e) {
             System.out.println(e.toString())
         }
@@ -39,10 +38,11 @@ class JobStatisticService {
 
     private JobStatistic getStatOf(Job job){
         JobStatistic jobStatistic = job.jobStatistic
+        jobStatistic = GrailsHibernateUtil.unwrapIfProxy(jobStatistic)
         if (jobStatistic == null){
             jobStatistic = new JobStatistic()
             job.jobStatistic = jobStatistic
-            job.save(failOnError: true)
+            job.save(failOnError: true, flush: true)
         }
         return jobStatistic
     }
