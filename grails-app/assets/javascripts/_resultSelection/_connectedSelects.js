@@ -59,8 +59,8 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
      * @param: allElements all elements that can be contained in the target select box.
      */
     var updateChildValues = function() {
-        var parentSelection = parentSelect.val() || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
-        var childSelection = childSelect.val();
+        var parentSelection = (parentSelect.val().length !== 0) || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
+        var childSelection = (childSelect.val().length !== 0);
         var parentId;
         childSelect.empty();
 
