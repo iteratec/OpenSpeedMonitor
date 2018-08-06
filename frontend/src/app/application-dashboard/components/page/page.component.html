@@ -1,5 +1,5 @@
 <div class="card">
-  <h2>{{page.name}}</h2>
+  <h2>{{page?.name}}</h2>
   <div class="page-metrics">
     <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"></osm-csi-value>
     <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
