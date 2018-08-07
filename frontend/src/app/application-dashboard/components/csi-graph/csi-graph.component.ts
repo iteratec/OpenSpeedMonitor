@@ -1,20 +1,11 @@
-import {
-  AfterContentInit,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
-import {ApplicationCsiListDTO} from "../../models/csi-list.model";
-import {select} from "d3-selection";
-import {axisBottom, axisLeft} from "d3-axis";
-import {CsiDTO} from "../../models/csi.model";
-import {timeDay} from "d3-time";
-import {timeFormat} from "d3-time-format";
-import {CsiGraphCalculator} from "./csi-graph.calculator";
+import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
+import {ApplicationCsiListDTO} from '../../models/csi-list.model';
+import {select} from 'd3-selection';
+import {axisBottom, axisLeft} from 'd3-axis';
+import {CsiDTO} from '../../models/csi.model';
+import {timeDay} from 'd3-time';
+import {timeFormat} from 'd3-time-format';
+import {CsiGraphCalculator} from './csi-graph.calculator';
 
 
 @Component({

@@ -1,8 +1,6 @@
+@import "../../../../styles/colors";
+
 osm-csi-graph {
-  $color-text-light: #606060;
-  $color-primary: #008cd2;
-  $color-contour-light: #d6d6d6;
-  $color-background: #ededed;
   display: block;
 
   .csi-graph-svg {
