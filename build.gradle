@@ -212,6 +212,16 @@ task generateFrontendI18nFiles(type: Grails2FrontendI18nTask) {
     frontendKeyPrefix = "frontend."
 }
 
+task rebuildNodeSass(type: NpmTask) {
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['rebuild', 'node-sass']
+}
+
+task angularTests(type: NpmTask, dependsOn: [installFrontendDependencies, npmInstall, rebuildNodeSass]) {
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['test']
+}
+
 task jasmineRun(type: NodeTask, dependsOn: ['nodeSyncJavascript', 'nodeSyncStylesheets']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
@@ -223,6 +233,7 @@ task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
 }
 
 test.dependsOn jasmineRun
+test.dependsOn angularTests
 
 task nodeSyncJavascript(type: Sync) {
     description "Copy 3rd party js libs to grails asset folder."
