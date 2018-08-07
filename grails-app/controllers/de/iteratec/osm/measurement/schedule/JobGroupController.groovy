@@ -105,18 +105,21 @@ class JobGroupController {
 
             // arrange page time to cs mapping chart data
             MultiLineChart pageTimeToCsMappingsChart
+            boolean mappingExists = false
             if (config.timeToCsMappings) {
                 pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
+                mappingExists = true
+            } else {
+                pageTimeToCsMappingsChart = [:]
             }
-
-
             modelToRender = [matrixViewData          : matrixViewDataJSON,
                              treemapData             : treemapDataJSON,
                              barchartData            : barChartJSON,
                              defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
                              selectedCsiConfiguration: config,
                              pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
-                             pageMappingsExist       : pageTimeToCsMappingsChart ? true : false]
+                             pageMappingsExist       : mappingExists]
+
         }
 
         modelToRender.put("jobGroup", jobGroup)
