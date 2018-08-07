@@ -47,13 +47,11 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private enter(selection: any) {
     const csiGraph = selection
       .append("g")
-      .attr("transform", `translate(${this.marginLeft},${this.marginTop + 1})`) //transform: translate(30px, 10px)
       .attr("class", "csi-graph");
 
     csiGraph
       .append("g")
-      .attr("class", "x axis")
-      .attr("transform", `translate(0,${this.height})`);
+      .attr('class', 'x axis');
 
     csiGraph
       .append("g")
@@ -89,7 +87,12 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
   private update(selection: any) {
     selection
+      .select('.csi-graph')
+      .attr('transform', `translate(${this.marginLeft},${this.marginTop + 1})`);
+
+    selection
       .select("g.x.axis")
+      .attr('transform', `translate(0,${this.height})`)
       .call(axisBottom(this.csiGraphCalculator.xScale)
         .ticks(timeDay.every(7))
         .tickFormat(timeFormat("%Y-%m-%d")));
