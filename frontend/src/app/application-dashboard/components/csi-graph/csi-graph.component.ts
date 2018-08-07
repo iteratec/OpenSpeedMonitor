@@ -36,7 +36,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   private drawGraph() {
-    if (this.csiGraphCalculator.isValid()) {
+    if (this.csiGraphCalculator.isValid() && this.csiData) {
       const selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
 
       this.enter(selection.enter());
