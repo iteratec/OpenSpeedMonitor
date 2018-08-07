@@ -35,33 +35,6 @@
   /*padding-right: 1%;*/
 }
 
-.good {
-  color: #2ECC71;
-  font-size: 1.15em;
-  font-weight: bold;
-  text-align: right;
-}
-
-.bad {
-  color: #EB5E55;
-  font-size: 1.15em;
-  font-weight: bold;
-  text-align: left;
-}
-
-.ok {
-  color: #FFC762;
-  font-size: 1.15em;
-  font-weight: bold;
-  text-align: center;
-}
-
-.symbol {
-  font-size: 1.15em;
-  font-weight: bold;
-  text-align: center;
-}
-
 .threshold {
   font-size: 1em;
   font-weight: bold;

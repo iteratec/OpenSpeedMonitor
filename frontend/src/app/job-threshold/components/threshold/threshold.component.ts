@@ -20,26 +20,94 @@ export class ThresholdComponent implements OnInit {
   @Output() removeOldThreshold = new EventEmitter();
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
+  allowInput = false;
+  deleteConfirmation = false;
+  leftButtonLabel = "Editieren";
+  rightButtonLabel = "Löschen";
+  firstUpperBoundary: number;
+  firstLowerBoundary: number;
+  leftButtonLabelDisable: boolean = false;
+  lowerInput: number = 0;
+  upperInput: number = 0;
 
   constructor(private thresholdRestService: ThresholdRestService) {
   }
 
   ngOnInit() {
+    /*this.firstUpperBoundary = this.threshold.upperBoundary;
+     this.firstLowerBoundary = this.threshold.lowerBoundary;*/
     if (this.threshold.measuredEvent.state == "new") {
       this.selectedMeasuredEvent = this.measuredEventList[0];
     }
     if (this.threshold.state == "new") {
       this.selectedMeasurand = this.actualMeasurandList[0].name;
+      //this.leftButtonLabelDisable = true;
     }
-  }
-
-  edit() {
-    this.thresholdRestService.editThreshold(this.threshold)
   }
 
   delete() {
     this.thresholdRestService.deleteThreshold(this.threshold);
+    this.removeOldThreshold.emit();
+
+    /*if (this.deleteConfirmation) {
+     this.deleteConfirmation = !this.deleteConfirmation;
+     this.thresholdRestService.deleteThreshold(threshold);
+     this.removeOldThreshold.emit();
+     } else {
+     this.rightButtonLabel == "Löschen"
+     ? (
+     this.deleteConfirmation = !this.deleteConfirmation,
+     this.rightButtonLabel = "Nein",
+     this.leftButtonLabel = "Ja"
+     )
+     : (
+     this.allowInput = !this.allowInput,
+     this.threshold.upperBoundary = this.firstUpperBoundary,
+     this.threshold.lowerBoundary = this.firstLowerBoundary,
+     this.rightButtonLabel = "Löschen",
+     this.leftButtonLabel = "Editieren"
+     )
+     }*/
   }
+
+  /*cancelDelete() {
+   this.deleteConfirmation = !this.deleteConfirmation;
+   this.rightButtonLabel = "Löschen";
+   this.leftButtonLabel = "Editieren";
+   }*/
+
+  edit() {
+    this.thresholdRestService.editThreshold(this.threshold)
+    /* this.allowInput = !this.allowInput;
+     this.allowInput
+     ? (
+     this.rightButtonLabel = "Zurücksetzen",
+     this.leftButtonLabel = "Übernehmen"
+     )
+     : (
+     this.rightButtonLabel = "Löschen",
+     this.leftButtonLabel = "Editieren",
+     this.thresholdRestService.editThreshold(this.threshold)
+     );*/
+  }
+
+  /*onLowerInput(event: any) {
+   this.lowerInput = event.target.value;
+   if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
+   this.leftButtonLabelDisable = false;
+   } else {
+   this.leftButtonLabelDisable = true;
+   }
+   }
+
+   onUpperInput(event: any) {
+   this.upperInput = event.target.value;
+   if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
+   this.leftButtonLabelDisable = false;
+   } else {
+   this.leftButtonLabelDisable = true;
+   }
+   }*/
 
   saveNew(obj) {
     this.threshold.measurand.name = this.selectedMeasurand;

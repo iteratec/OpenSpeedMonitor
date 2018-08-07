@@ -1,7 +1,7 @@
 <div class="flex-container">
   <div class="flex-item good">Gut</div>
   <div class="flex-item symbol"><</div>
-  <div class="input-group thresholdInput flex-item">
+  <div class="input-group  flex-input-item">
     <input [(ngModel)]="lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"
            (change)="onLowerInput($event)" class="form-control">
     <div class="input-group-addon">ms</div>
@@ -9,7 +9,7 @@
   <div class="flex-item symbol"><</div>
   <div class="flex-item ok">Ok</div>
   <div class="flex-item symbol"><</div>
-  <div class="input-group thresholdInput flex-item">
+  <div class="input-group flex-input-item">
     <input [(ngModel)]="upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"
            (change)="onUpperInput($event)" class="form-control">
     <div class="input-group-addon">ms</div>
