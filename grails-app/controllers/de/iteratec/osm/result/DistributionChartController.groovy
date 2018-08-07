@@ -93,6 +93,7 @@ class DistributionChartController extends ExceptionHandlerController {
 
 //      TODO: see ticket [IT-1614]
         distributionChartDTO.filterRules = createFilterRules(allPages, allJobGroups)
+        println distributionChartDTO.series
 //        distributionChartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, distributionChartDTO)
@@ -196,7 +197,7 @@ class DistributionChartController extends ExceptionHandlerController {
                     if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
                         JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
                         Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
-                        String identifier = "${page} | ${jobGroup}"
+                        String identifier = "${page} | ${jobGroup.name}"
                         if (!distributionChartDTO.series.get(identifier)) {
                             distributionChartDTO.series.put(identifier, new DistributionTrace(page: page, jobGroup: jobGroup))
                         }
