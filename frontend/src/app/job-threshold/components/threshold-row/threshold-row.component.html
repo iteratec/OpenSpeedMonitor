@@ -17,19 +17,55 @@
   <div class="flex-item symbol"><</div>
   <div class="flex-item bad">Schlecht</div>
 
-  <div class="flex-container">
+  <!--Buttons to save-->
+  <div *ngIf="thresholdState=='new'" class="flex-container">
     <div class="flex-item">
       <button type="button"
               class="btn btn-success btn-sm"
               [disabled]="leftButtonLabelDisable"
-              (click)="save()">Speichern
+              (click)="save()">{{leftButtonLabel}}
       </button>
     </div>
     <div class="flex-item">
       <button type="button"
               class="btn btn-danger btn-sm"
-              (click)="cancel()">Entfernen
+              (click)="cancel()">{{rightButtonLabel}}
       </button>
     </div>
   </div>
+  <!--Buttons to Edit-->
+  <div *ngIf="thresholdState=='normal' && !deleteConfirmation" class="flex-container">
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-primary btn-sm"
+              [disabled]="leftButtonLabelDisable"
+              (click)="edit()">{{leftButtonLabel}}
+      </button>
+    </div>
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-danger btn-sm"
+              (click)="delete()">{{rightButtonLabel}}
+      </button>
+    </div>
+  </div>
+
+  <!--Buttons to delete-->
+  <div *ngIf="thresholdState=='normal' && deleteConfirmation" class="flex-container"> Sicher?
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-success btn-sm"
+              [disabled]="leftButtonLabelDisable"
+              (click)="delete()">{{leftButtonLabel}}
+      </button>
+    </div>
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-danger btn-sm"
+              (click)="cancelDelete()">{{rightButtonLabel}}
+      </button>
+    </div>
+  </div>
+
+
 </div>

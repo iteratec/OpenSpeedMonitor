@@ -7,6 +7,7 @@
 
 .flex-row-item {
   flex-basis: auto;
+  margin-top: 1%;
 }
 
 .flex-row-group {
@@ -24,6 +25,7 @@
   align-content: center;
   line-height: 2;
   margin-right: 2%;
+  margin-top: 1%;
 
 }
 
@@ -32,7 +34,6 @@
   margin-right: 2%;
   /*padding-right: 1%;*/
 }
-
 
 .good {
   color: #2ECC71;

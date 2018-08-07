@@ -37,7 +37,6 @@ export class JobThresholdComponent implements OnInit, OnChanges {
       this.actualMeasuredEventsService.setActualMeasuredEvents(this.measuredEventList);
       this.actualThresholdsForJobService.actualThresholdsforJobList$.subscribe((next: ThresholdForJob[]) => {
         this.thresholdsForJobList = next;
-        console.log("this.thresholdsForJobList: " + JSON.stringify(this.thresholdsForJobList));
         if (this.thresholdsForJobList.length == 0) {
           this.isEmpty = true;
         }
