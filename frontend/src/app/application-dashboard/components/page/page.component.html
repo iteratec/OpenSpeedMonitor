@@ -1,11 +1,26 @@
-<div>
-  <h3>{{page.name}}</h3>
-  <div *ngIf="pageCsi$ | async, let pageCsiDto">
-    <div>PageCsi ({{pageCsiDto.date}}): {{pageCsiDto.csiDocComplete}}</div>
-  </div>
-  <div *ngIf="metricsForPage$ |async, let metricsDto">
-    <div>SpeedIndex: {{transform(metricsDto.speedIndex)}}</div>
-    <div>DocComplete: {{transform(metricsDto.docCompleteTimeInMillisecs)}}</div>
-    <div>Size: {{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
+<div class="card">
+  <h2>{{page.name}}</h2>
+  <div class="page-metrics">
+    <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"></osm-csi-value>
+    <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
+      <div class="metric">
+        <i class="far fa-eye metric-icon"></i>
+        <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.speedIndex))}}</div>
+        <div class="metric-unit">s</div>
+        <div class="metric-description">SpeedIndex</div>
+      </div>
+      <div class="metric">
+        <i class="fas fa-stopwatch metric-icon"></i>
+        <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.docCompleteTimeInMillisecs))}}</div>
+        <div class="metric-unit">s</div>
+        <div class="metric-description">Document Complete</div>
+      </div>
+      <div class="metric">
+        <i class="fas fa-weight-hanging metric-icon"></i>
+        <div class="metric-value">{{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
+        <div class="metric-unit">MiB</div>
+        <div class="metric-description">Bytes Fully Loaded</div>
+      </div>
+    </div>
   </div>
 </div>

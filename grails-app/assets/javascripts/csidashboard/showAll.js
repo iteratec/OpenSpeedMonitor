@@ -22,11 +22,11 @@
  */
 function doOnDomReady(noResultsTextForChosenSelects) {
 
-    $("input[name='aggrGroupAndInterval']").change(setFilterElementsVisibility);
+    $("input[name='aggrGroupAndInterval']").on('change', setFilterElementsVisibility);
 
     $("input[name='aggrGroupAndInterval']:checked").each(setFilterElementsVisibility);
 
-    $("#override-long-processing-time").click(function () {
+    $("#override-long-processing-time").on('click', function () {
         $("#overwriteWarningAboutLongProcessingTime").prop('checked', true);
         $("#chart-submit").submit();
     });
@@ -57,7 +57,7 @@ var setFilterElementsVisibility = function () {
         $("#filter-navtab-browser-and-location").fadeOut();
 		$("#filter-navtab-connectivityprofile").fadeOut();
         $("#filter-measured-event").fadeOut();
-        $('#filter-navtab-page a').click();
+        $('#filter-navtab-page a').trigger('click');
     }
 
     if (selectedAggrGroupAndInterval == 'weekly_page' || selectedAggrGroupAndInterval == 'daily_page') {

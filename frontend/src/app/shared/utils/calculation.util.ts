@@ -9,6 +9,10 @@ export class CalculationUtil {
     return bytes / 1048576;
   }
 
+  static convertMillisecsToSecs(milliSeconds: number): number {
+    return milliSeconds / 1000;
+  }
+
   static toRoundedStringWithFixedDecimals(value: number, decimals: number): string {
     return this.round(value).toFixed(decimals);
   }

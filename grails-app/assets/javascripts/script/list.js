@@ -33,7 +33,8 @@ function filterScriptList() {
         $(this).toggleClass("stripe", !!(index & 1));
     });
 }
-$(document).ready(function(){
+
+$(function () {
   $("#script-table").stickyTableHeaders({
     cacheHeaderHeight: true
   });

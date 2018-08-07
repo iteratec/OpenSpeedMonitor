@@ -33,13 +33,13 @@ OpenSpeedMonitor.resultSelection = (function () {
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
-    var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
-    var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
+    var hasJobGroupSelection = selectJobGroupCard.length == 0 || ($("#folderSelectHtmlId").val().length != 0);
+    var hasPageSelection = pageTabElement.length == 0 || ($("#pageSelectHtmlId").val().length != 0);
 
     //Workaround for vue component in page comparison chart [IT-1930]
     var pageSelectionAvailable = $("#pageSelectHtmlId").length;
 
-    var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
+    var hasMeasuredEventSelection = pageTabElement.length == 0 || ($("#selectedMeasuredEventsHtmlId").val().length != 0);
     var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
     var needsNoPageSelectionDueToCsiAggregation = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
     var csiSystemSelected = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && ($("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system");
@@ -53,7 +53,7 @@ OpenSpeedMonitor.resultSelection = (function () {
 
         // if caller is CsiDashboard there is a need for a changeListener on aggregation card
         if (currentQueryArgs['caller'] == "CsiAggregation") {
-            $("input[name='aggrGroupAndInterval']").change(function () {
+            $("input[name='aggrGroupAndInterval']").on('change', function () {
                 needsNoPageSelectionDueToCsiAggregation = aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
                 csiSystemSelected = $("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system";
                 validateForm();
@@ -61,10 +61,10 @@ OpenSpeedMonitor.resultSelection = (function () {
         }
 
         // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
-        $(".removeMeasurandSeriesButton").click(function () {
+        $(".removeMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
-        $("#addMeasurandSeriesButton").click(function () {
+        $("#addMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
 

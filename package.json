@@ -37,8 +37,8 @@
     "eonasdan-bootstrap-datetimepicker": "4.17.47",
     "file-saver": "1.3.3",
     "jasmine-core": "2.4.1",
-    "jquery": "^2.1.0",
-    "jquery-contextmenu": "2.2.4",
+    "jquery": "^3.3.1",
+    "jquery-contextmenu": "2.7.0",
     "jquery-ui-dist": "^1.12.1",
     "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
@@ -53,8 +53,8 @@
     "reductio": "0.6.3",
     "save-svg-as-png": "1.1.0",
     "spin.js": "^2.0.1",
-    "sticky-table-headers": "0.1.19",
-    "tag-it": "^2.0.0",
+    "sticky-table-headers": "0.1.24",
+    "tag-it": "HirokiDaido/tag-it",
     "vue": "2.4.4"
   }
 }

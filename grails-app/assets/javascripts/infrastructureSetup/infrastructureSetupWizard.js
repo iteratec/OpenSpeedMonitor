@@ -18,8 +18,8 @@ OpenSpeedMonitor.InfrastructureSetupWizard.Wizard = (function () {
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
 
     var init = function () {
-        serverSelectBox.change(updateInputFields);
-        finishButton.click(function () {
+        serverSelectBox.on('change', updateInputFields);
+        finishButton.on('click', function () {
             if (!finishButton.hasClass("disabled")) {
                 spinner.start();
             }

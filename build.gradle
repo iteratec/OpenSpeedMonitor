@@ -243,7 +243,7 @@ task nodeSyncJavascript(type: Sync) {
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
-    include 'sticky-table-headers/js/jquery.stickytableheaders.js'
+    include 'sticky-table-headers/js/jquery.stickytableheaders.min.js'
     include 'file-saver/FileSaver.min.js'
     include 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
     include 'save-svg-as-png/saveSvgAsPng.js'

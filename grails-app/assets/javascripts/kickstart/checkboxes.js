@@ -1,15 +1,15 @@
 if (typeof jQuery !== 'undefined') {
-	$(document).ready(function() {
+    $(function () {
 		/**
 		 * A checkbox using Bootstrap CSS's radio buttons
 		 */
-		$('.radiocheckbox .btn.on').click(function() {
+        $('.radiocheckbox .btn.on').on('click', function () {
 			var $checkbox = $(this).parent().siblings("input[type=checkbox]")
 			$checkbox.attr('checked', true);
 			$(this).addClass("btn-primary")
 			$(this).siblings().removeClass("btn-primary")
 		})
-		$('.radiocheckbox .btn.off').click(function() {
+        $('.radiocheckbox .btn.off').on('click', function () {
 			var $checkbox = $(this).parent().siblings("input[type=checkbox]")
 			$checkbox.attr('checked', false);
 			$(this).addClass("btn-primary")
@@ -19,7 +19,7 @@ if (typeof jQuery !== 'undefined') {
 		/**
 		 * A checkbox using Bootstrap CSS's buttons
 		 */
-		$('.buttoncheckbox').click(function() {
+        $('.buttoncheckbox').on('click', function () {
 			var $text = $(this).text()
 			$(this).text($(this).attr('data-complete-text'))
 			$(this).attr('data-complete-text', $text)

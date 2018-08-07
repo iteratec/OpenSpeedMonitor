@@ -71,7 +71,7 @@ OpenSpeedMonitor.script.codemirrorEditor = OpenSpeedMonitor.script.codemirrorEdi
         editor.on('change', function(){
             updateWarnings.call()
         });
-        $('#lineBreakToggle').click(function() {
+        $('#lineBreakToggle').on('click', function () {
             editor.setOption('lineWrapping', $(this).prop('checked'));
             editor.refresh();
         });

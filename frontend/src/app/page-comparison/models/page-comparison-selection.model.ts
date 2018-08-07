@@ -1,4 +1,4 @@
-export type PageComparisonSelectionDto = {
+export interface PageComparisonSelectionDto {
   firstJobGroupId: number;
   firstPageId: number;
   secondJobGroupId: number;

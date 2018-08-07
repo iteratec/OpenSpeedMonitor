@@ -110,7 +110,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
 </div>
 
 <asset:script type="text/javascript">
-	$(window).load(function() {
+	$(window).on('load', function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectIntervalTimeframeCard.js" />', 'selectIntervalTimeframeCard');
     });
 </asset:script>

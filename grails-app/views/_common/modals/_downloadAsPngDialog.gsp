@@ -39,7 +39,7 @@
 </div>
 
 <asset:script type="text/javascript">
-    $(window).load(function () {
+    $(window).on('load', function() {
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/pngDownloader.js" />', 'pngDownloadModal');
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/node_modules/save-svg-as-png/saveSvgAsPng.js"/>', 'pngDownloader');
     });
