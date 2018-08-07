@@ -137,7 +137,9 @@ class ConfigService {
 	}
 
 	void setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus state){
-		getConfig().infrastructureSetupRan = state;
+		OsmConfiguration config = getConfig()
+		config.infrastructureSetupRan = state;
+		config.save(flush: true)
 	}
 
     /**
@@ -167,6 +169,10 @@ class ConfigService {
         }
         return url
     }
+
+	Integer getMaxAgeForMetricsInHours() {
+		return grailsApplication.config.getProperty("de.iteratec.osm.application-dashboard.metrics-max-age-in-h", Integer, 6)
+	}
 
     private OsmConfiguration getConfig(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()

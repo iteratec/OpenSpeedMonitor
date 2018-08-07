@@ -1,1 +1,3 @@
-<osm-page *ngFor="let page of pages$| async" [page]="page"></osm-page>
+<div class="page-grid">
+  <osm-page *ngFor="let page of pages$| async" [page]="page" class="page-grid-child"></osm-page>
+</div>

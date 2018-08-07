@@ -81,7 +81,7 @@
 <content tag="include.bottom">
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="jobGroupAggregation/jobGroupAggregation.js"/>', "jobGroupAggregation");
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', 'resultSelection');
         });

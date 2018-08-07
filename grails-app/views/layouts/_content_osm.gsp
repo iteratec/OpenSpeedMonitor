@@ -1,4 +1,4 @@
-<div id="Content" class="container-fluid">
+<div id="Content" class="content container-fluid">
     <g:if test="${entityName}">
         <h3>${entityName}</h3>
 

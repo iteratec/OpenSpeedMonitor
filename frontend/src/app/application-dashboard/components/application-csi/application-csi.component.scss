@@ -7,6 +7,10 @@ osm-csi-value {
   width: 200px;
 }
 
-.card {
+.card > .csi {
   display: flex;
+}
+
+.application-csi {
+  margin-bottom: 30px;
 }

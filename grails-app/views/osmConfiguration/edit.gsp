@@ -60,7 +60,7 @@
 
 <content tag="include.bottom">
     <asset:script type="text/javascript">
-        $(window).load(function() {
+        $(window).on('load', function() {
         $('[data-toggle="popover"]').popover();
     });
     </asset:script>

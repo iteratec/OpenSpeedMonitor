@@ -10,19 +10,21 @@ import {PageCsiDto} from "../../models/page-csi.model";
 @Component({
   selector: 'osm-page',
   templateUrl: './page.component.html',
-  styleUrls: ['./page.component.css']
+  styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
   @Input() page: PageDto;
   metricsForPage$: Observable<MetricsDto>;
-  pageCsi$: Observable<PageCsiDto>;
+  pageCsi$: Observable<number>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.metricsForPage$ = applicationDashboardService.metrics$.pipe(
       map((next: MetricsDto[]) => next.find((metricsDto: MetricsDto) => metricsDto.pageId == this.page.id)));
 
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
-      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)));
+      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)),
+      map((pageCsiDto: PageCsiDto) => pageCsiDto ? pageCsiDto.csiDocComplete : null)
+    );
   }
 
   transform(value: number): string {
@@ -31,5 +33,9 @@ export class PageComponent {
 
   convertToMib(value: number): number {
     return CalculationUtil.convertBytesToMiB(value);
+  }
+
+  convertMillisecsToSecs(value: number): number {
+    return CalculationUtil.convertMillisecsToSecs(value);
   }
 }

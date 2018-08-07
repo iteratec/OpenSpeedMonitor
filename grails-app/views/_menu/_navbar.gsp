@@ -11,7 +11,6 @@
 <g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
-<g:elseif test="${request.forwardURI.equals('/setupDashboard')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unknown"/></g:else>
 
 <nav class="navbar navbar-inverse sidebar-fixed">
@@ -132,14 +131,6 @@
                     <g:message code="de.iteratec.isr.managementDashboard" default="Measurement"/> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <sec:ifLoggedIn>
-                        <li class="${request.forwardURI.equals('/setupDashboard') ? 'active' : ''}">
-                            <a href="${createLink(uri: '/setupDashboard')}">
-                                <i class="fas fa-bars"></i>
-                                <g:message message="Overview"/>
-                            </a>
-                        </li>
-                    </sec:ifLoggedIn>
                     <li class="${controllerName.equals('job') ? 'active' : ''}">
                         <g:link controller="job" action="index" title="${message(code:'de.iteratec.isj.jobs', default:'Jobs')}">
                             <i class="fas fa-calendar-alt"></i>

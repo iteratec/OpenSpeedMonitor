@@ -1,6 +1,9 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { PageComponent } from './page.component';
+import {PageComponent} from './page.component';
+import {CsiValueComponent} from '../csi-value/csi-value.component';
+import {ApplicationDashboardService} from '../../services/application-dashboard.service';
+import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 
 describe('PageComponent', () => {
   let component: PageComponent;
@@ -8,7 +11,16 @@ describe('PageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PageComponent ]
+      declarations: [
+        PageComponent,
+        CsiValueComponent
+      ],
+      imports: [
+        SharedMocksModule
+      ],
+      providers: [
+        ApplicationDashboardService
+      ]
     })
     .compileComponents();
   }));

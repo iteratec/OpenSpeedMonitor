@@ -21,9 +21,6 @@ const DashboardRoutes: Routes = [
     SharedModule,
     RouterModule.forChild(DashboardRoutes)
   ],
-  exports: [
-    RouterModule
-  ],
   declarations: [
     ApplicationDashboardEntryComponent,
     ApplicationDashboardComponent,
@@ -33,6 +30,9 @@ const DashboardRoutes: Routes = [
     PageComponent,
     CsiValueComponent,
     CsiGraphComponent
+  ],
+  exports: [
+    RouterModule
   ],
   providers: [
     {

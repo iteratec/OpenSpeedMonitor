@@ -16,7 +16,7 @@
 */
 
 "use strict";
-
+// TODO: deprecated methods by modules! check dependencies/alternatives for compatibility with jQuery 3.3.*
 //= require /node_modules/air-datepicker/dist/js/datepicker.min.js
 //= require /node_modules/air-datepicker/dist/js/i18n/datepicker.en.js
 //= require /node_modules/moment/min/moment.min.js
@@ -68,7 +68,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
                 pickerTo.update("minDate", date);
                 if (!pickerFrom.timepickerIsActive && !wasManualChange) {
                     pickerFrom.hide();
-                    userInputToElement.focus();
+                    userInputToElement.trigger('focus');
                 }
                 wasManualChange = false;
                 triggerRangeChanged();
@@ -78,7 +78,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
             pickerFrom.views[pickerFrom.currentView]._update();
         });
         pickerFrom.update("onRenderCell", pickerFromOnRenderCell);
-        userInputFromElement.click(function () {
+        userInputFromElement.on('click', function () {
             pickerTo.hide();
         });
     };
@@ -107,7 +107,7 @@ OpenSpeedMonitor.timeRangePicker = function (timeRangePickerElement) {
             pickerTo.views[pickerTo.currentView]._update();
         });
         pickerTo.update("onRenderCell", pickerToOnRenderCell);
-        userInputToElement.click(function () {
+        userInputToElement.on('click', function () {
             pickerFrom.hide();
         });
     };

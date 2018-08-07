@@ -15,11 +15,13 @@ export class CsiValueComponent implements OnInit, OnChanges {
   @Input() description: string;
   @Input() csiValue: number;
 
+  formattedCsiValue: string;
   csiValueClass: string;
   size: number;
   outerRadius: number;
   valueFontSize: string;
   descriptionFontSize: string;
+  isNA: boolean;
 
   arcGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
@@ -34,14 +36,27 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private drawCircle(previousCsiValue: number = 0) {
-    const calculatedPreviousCsi = this.calculateCsiArcTarget(this.roundCsiValue(previousCsiValue));
-    this.csiValue = this.roundCsiValue(this.csiValue);
+    const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
+    this.isNA = !this.csiValue && this.csiValue !== 0;
+    this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
+    this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()), calculatedPreviousCsi);
     this.exit(selection.exit());
+  }
+
+  private formatCsiValue(csiValue: number): string {
+    if (this.isNA) {
+      return "n/a";
+    }
+    if (csiValue >= 100) {
+      return "100%";
+    }
+
+    return csiValue.toFixed(1) + "%";
   }
 
   private initByInputs() {
@@ -120,6 +135,9 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
+    if (this.isNA) {
+      return "not-available";
+    }
     if (csiValue >= 90) {
       return "good";
     }
@@ -129,11 +147,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     return "bad";
   }
 
-  private roundCsiValue(csiValue: number): number {
-    return CalculationUtil.round(csiValue)
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this.arcGenerator) {
+      return;
+    }
     if (changes.csiValue) {
       this.drawCircle(changes.csiValue.previousValue);
     }
