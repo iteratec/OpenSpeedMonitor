@@ -43,7 +43,7 @@
 </div>
 <g:render template="adjustBarchartModal"/>
 <asset:script type="text/javascript">
-    $(window).load(function() {
+    $(window).on('load', function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/csiBenchmark/csiBenchmarkChart.js" />', 'barchart')
     });
 </asset:script>

@@ -2368,7 +2368,7 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
 			
 			$(this.legend.list).sortable( {
 				start: function(event, ui) {
-					ui.item.bind('no.onclick',
+                    ui.item.on('no.onclick',
 						function(event) {
 							event.preventDefault();
 						}
@@ -2376,7 +2376,7 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
 				},
 				stop: function(event, ui) {
 					setTimeout(function(){
-						ui.item.unbind('no.onclick');
+                        ui.item.off('no.onclick');
 					}, 250);
 				}
 			});

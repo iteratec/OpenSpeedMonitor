@@ -17,13 +17,10 @@
     <content tag="include.bottom">
         <asset:javascript src="responsiveTable/responsiveTable.js"/>
         <asset:script type="text/javascript">
-            $(document).ready(
-                OpenSpeedMonitor.responsiveTable.init( '${createLink(action: 'updateTable')}',
+            $(OpenSpeedMonitor.responsiveTable.init( '${createLink(action: 'updateTable')}',
                     {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
                     "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"},
-                    "secretKey")
-        );
-
+                    "secretKey"));
         </asset:script>
     </content>
 </section>

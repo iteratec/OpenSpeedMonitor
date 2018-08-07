@@ -27,7 +27,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageComparison = (function () {
             spinner.start();
             renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
-        drawGraphButton.click(function () {
+        drawGraphButton.on('click', function () {
             loadData(true);
         });
         window.addEventListener("pageComparisonValidation", function (event) {

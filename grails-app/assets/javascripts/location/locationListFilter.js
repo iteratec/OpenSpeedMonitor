@@ -27,8 +27,8 @@ OpenSpeedMonitor.locationListFilter = (function () {
     function init() {
         var filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
         filterTextInput.val(filterText);
-        filterTextInput.change(saveState);
-        filterTextInput.keyup(saveState);
+        filterTextInput.on('change', saveState);
+        filterTextInput.on('keyup', saveState);
     }
 
     var saveState = function () {
