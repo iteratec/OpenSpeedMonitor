@@ -1,9 +1,9 @@
-import { Component, OnInit, Input, EventEmitter, Output, OnChanges  } from '@angular/core';
-import {MeasuredEvent} from '../../service/model/measured-event.model';
-import {Threshold} from '../../service/model/threshold.model';
-import {Measurand} from "../../service/model/measurand.model";
-import { ThresholdRestService } from '../../service/rest/threshold-rest.service';
-import { ActualMeasurandsService } from '../../service/actual-measurands.service';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
+import {MeasuredEvent} from "../../models/measured-event.model";
+import {Threshold} from "../../models/threshold.model";
+import {Measurand} from "../../models/measurand.model";
+import {ThresholdRestService} from "../../services/threshold-rest.service";
+import {ActualMeasurandsService} from "../../services/actual-measurands.service";
 
 @Component({
   selector: 'osm-measured-event',

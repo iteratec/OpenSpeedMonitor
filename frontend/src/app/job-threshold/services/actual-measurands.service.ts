@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
-import {Measurand} from "./model/measurand.model";
-import {Threshold} from "./model/threshold.model";
+import {Measurand} from "../models/measurand.model";
+import {Threshold} from "../models/threshold.model";
 
 @Injectable({
   providedIn: 'root'

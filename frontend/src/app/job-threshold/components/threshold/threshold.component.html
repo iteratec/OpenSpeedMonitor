@@ -1,0 +1,174 @@
+<div>
+  <div *ngIf="threshold.state=='normal'">
+    <div class="flex-column">
+      <div class="flex-row-item">
+        <label class="threshold">{{threshold.measurand.name}} </label>
+      </div>
+      <div class="flex-row-group">
+        <div class="flex-container">
+          <div class="flex-item  good">Gut</div>
+          <div class="flex-item  symbol"><</div>
+          <div class="input-group thresholdInput flex-item ">
+            <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput"  class="form-control">
+            <div class="input-group-addon">ms</div>
+          </div>
+          <div class="flex-item  symbol"><</div>
+          <div class="flex-item  ok">Ok</div>
+          <div class="flex-item  symbol"><</div>
+          <div class="input-group thresholdInput flex-item ">
+            <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!allowInput" class="form-control">
+            <div class="input-group-addon">ms</div>
+          </div>
+          <div class="flex-item  symbol"><</div>
+          <div class="flex-item  bad">Schlecht</div>
+        </div>
+
+        <!--BUTTONS WITHOUT delete Confirmation-->
+        <div *ngIf="!deleteConfirmation" class="flex-container">
+          <div class="flex-item ">
+            <button type="button"
+                    class="btn btn-primary btn-sm"
+                    (click)="edit()" >{{leftButtonLabel}}</button>
+          </div>
+          <div class="flex-item ">
+            <button type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="delete(threshold)">{{rightButtonLabel}}</button>
+          </div>
+        </div>
+
+        <!--BUTTONS WITH delete Confirmation-->
+        <div *ngIf="deleteConfirmation" class="flex-container"> Sicher?
+          <div class="flex-item ">
+            <button type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="delete(threshold)">{{leftButtonLabel}}</button>
+          </div>
+          <div class="flex-item ">
+            <button type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="cancelDelete()">{{rightButtonLabel}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!--New Measured Event-->
+    <div class="flex-row-group-parent" *ngIf="threshold.measuredEvent.state=='new' && threshold.state=='new'">
+      <div class="flex-column-left">
+        <select class="thresholdSelects"
+                [(ngModel)]="selectedMeasuredEvent"
+                required>
+          <option *ngFor="let measuredEvent of measuredEventList" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
+        </select>
+      </div>
+      <div class="flex-column-right">
+        <div class="">
+          <div class="flex-column">
+            <div class="flex-row-item">
+              <select class="thresholdSelects"
+                      [(ngModel)]="selectedMeasurand"
+                      required>
+                <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.name">{{measurand.name}}</option>
+              </select>
+            </div>
+            <div class="flex-row-group">
+              <osm-threshold-row
+                [state]="threshold.state"
+                [lowerBoundary]="threshold.lowerBoundary"
+                [upperBoundary]="threshold.upperBoundary"
+                (saveNew)="saveNew($event)"
+                (cancelNew)="cancelNew()"></osm-threshold-row>
+              <!--              <div class="flex-container">
+                              <div class="flex-item good">Gut</div>
+                              <div class="flex-item symbol"><</div>
+                              <div class="input-group thresholdInput flex-item">
+                                <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onLowerInput($event)" class="form-control">
+                                <div class="input-group-addon">ms</div>
+                              </div>
+                              <div class="flex-item symbol"><</div>
+                              <div class="flex-item ok">Ok</div>
+                              <div class="flex-item symbol"><</div>
+                              <div class="input-group thresholdInput flex-item">
+                                <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onUpperInput($event)" class="form-control">
+                                <div class="input-group-addon">ms</div>
+                              </div>
+                              <div class="flex-item symbol"><</div>
+                              <div class="flex-item bad">Schlecht</div>
+
+                              <div class="flex-container">
+                                <div class="flex-item">
+                                  <button type="button"
+                                          class="btn btn-success btn-sm"
+                                          [disabled]="leftButtonLabelDisable"
+                                          (click)="save()">Speichern</button>
+                                </div>
+                                <div class="flex-item">
+                                  <button type="button"
+                                          class="btn btn-danger btn-sm"
+                                          (click)="cancelNew()">Entfernen</button>
+                                </div>
+                              </div>
+                            </div>-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!--New Threshold-->
+  <div  *ngIf="threshold.state=='new' && threshold.measuredEvent.state=='normal'">
+    <div class="flex-column">
+      <div class="flex-row-item">
+        <select class="thresholdSelects"
+                [(ngModel)]="selectedMeasurand"
+                required>
+          <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.name">{{measurand.name}}</option>
+        </select>
+      </div>
+      <div class="flex-row-group">
+        <osm-threshold-row
+          [state]="threshold.state"
+          [lowerBoundary]="threshold.lowerBoundary"
+          [upperBoundary]="threshold.upperBoundary"
+          (saveNew)="saveNew($event)"
+          (cancelNew)="cancelNew()"></osm-threshold-row>
+        <!--        <div class="flex-container">
+                  <div class="flex-item good">Gut</div>
+                  <div class="flex-item symbol"><</div>
+                  <div class="input-group thresholdInput flex-item">
+                    <input [(ngModel)]= "threshold.lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onLowerInput($event)"  class="form-control">
+                    <div class="input-group-addon">ms</div>
+                  </div>
+                  <div class="flex-item symbol"><</div>
+                  <div class="flex-item ok">Ok</div>
+                  <div class="flex-item symbol"><</div>
+                  <div class="input-group thresholdInput flex-item">
+                    <input [(ngModel)]= "threshold.upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false" (change)="onUpperInput($event)" class="form-control">
+                    <div class="input-group-addon">ms</div>
+                  </div>
+                  <div class="flex-item symbol"><</div>
+                  <div class="flex-item bad">Schlecht</div>
+
+                  <div class="flex-container">
+                    <div class="flex-item">
+                      <button type="button"
+                              class="btn btn-success btn-sm"
+                              [disabled]="leftButtonLabelDisable"
+                              (click)="save()">Speichern</button>
+                    </div>
+                    <div class="flex-item">
+                      <button type="button"
+                              class="btn btn-danger btn-sm"
+                              (click)="cancelNew()">Entfernen</button>
+                    </div>
+                  </div>
+                </div>
+              </div>-->
+    </div>
+  </div>
+</div>
+
+
+

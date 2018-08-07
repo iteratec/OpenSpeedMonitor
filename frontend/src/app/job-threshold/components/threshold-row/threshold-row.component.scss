@@ -1,0 +1,41 @@
+.flex-container {
+  display: flex;
+  /*align-items: space-around;*/
+  justify-content: flex-start;
+  align-content: center;
+  line-height: 2;
+  margin-right: 2%;
+}
+
+.flex-item {
+  margin: auto;
+  margin-right: 2%;
+  /*padding-right: 1%;*/
+}
+
+.good {
+  color: #2ECC71;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.bad {
+  color: #EB5E55;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: left;
+}
+
+.ok {
+  color: #FFC762;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.symbol {
+  font-size: 1.15em;
+  font-weight: bold;
+  text-align: center;
+}

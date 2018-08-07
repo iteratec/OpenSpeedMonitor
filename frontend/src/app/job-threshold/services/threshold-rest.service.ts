@@ -1,12 +1,12 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {ReplaySubject} from "rxjs/index";
-import {Measurand} from "../model/measurand.model";
-import {MeasuredEvent} from "../model/measured-event.model";
-import {ThresholdForJob} from "../model/threshold-for-job.model";
-import {Threshold} from "../model/threshold.model";
-import {ActualMeasurandsService} from "../actual-measurands.service";
-import {ActualThresholdsForJobService} from "../actual-thresholds-for-job.service";
+import {Measurand} from "../models/measurand.model";
+import {MeasuredEvent} from "../models/measured-event.model";
+import {ThresholdForJob} from "../models/threshold-for-job.model";
+import {Threshold} from "../models/threshold.model";
+import {ActualMeasurandsService} from "./actual-measurands.service";
+import {ActualThresholdsForJobService} from "./actual-thresholds-for-job.service";
 
 @Injectable({
   providedIn: 'root'

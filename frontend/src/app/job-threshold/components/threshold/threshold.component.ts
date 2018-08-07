@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import {Threshold} from '../../service/model/threshold.model';
-import { ThresholdRestService } from '../../service/rest/threshold-rest.service';
-import {Measurand} from "../../service/model/measurand.model";
-import {MeasuredEvent} from '../../service/model/measured-event.model';
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Threshold} from "../../models/threshold.model";
+import {ThresholdRestService} from "../../services/threshold-rest.service";
+import {Measurand} from "../../models/measurand.model";
+import {MeasuredEvent} from "../../models/measured-event.model";
 
 @Component({
   selector: 'osm-threshold',
@@ -10,10 +10,10 @@ import {MeasuredEvent} from '../../service/model/measured-event.model';
   styleUrls: ['./threshold.component.css']
 })
 
-export class ThresholdComponent implements OnInit{
+export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() measuredEventList: MeasuredEvent[];
-  @Input()  actualMeasurandList: Measurand [];
+  @Input() actualMeasurandList: Measurand [];
   @Output() cancelEvent = new EventEmitter();
   @Output() addedMeasuredEvent = new EventEmitter();
   @Output() addedThreshold = new EventEmitter();
@@ -22,15 +22,16 @@ export class ThresholdComponent implements OnInit{
   selectedMeasurand: string;
   allowInput = false;
   deleteConfirmation = false;
-  leftButtonLabel= "Editieren";
-  rightButtonLabel= "Löschen";
+  leftButtonLabel = "Editieren";
+  rightButtonLabel = "Löschen";
   firstUpperBoundary: number;
   firstLowerBoundary: number;
   leftButtonLabelDisable: boolean = false;
   lowerInput: number = 0;
   upperInput: number = 0;
 
-  constructor(private thresholdRestService: ThresholdRestService) {}
+  constructor(private thresholdRestService: ThresholdRestService) {
+  }
 
   ngOnInit() {
     this.firstUpperBoundary = this.threshold.upperBoundary;
@@ -44,7 +45,7 @@ export class ThresholdComponent implements OnInit{
     }
   }
 
-  delete(threshold: Threshold ) {
+  delete(threshold: Threshold) {
 
     if (this.deleteConfirmation) {
       this.deleteConfirmation = !this.deleteConfirmation;
@@ -79,16 +80,37 @@ export class ThresholdComponent implements OnInit{
       ? (
       this.rightButtonLabel = "Zurücksetzen",
         this.leftButtonLabel = "Übernehmen"
-      )
+    )
       : (
       this.rightButtonLabel = "Löschen",
         this.leftButtonLabel = "Editieren",
-          this.thresholdRestService.editThreshold(this.threshold)
-      ) ;
+        this.thresholdRestService.editThreshold(this.threshold)
+    );
   }
 
-  save() {
+  onLowerInput(event: any) {
+    this.lowerInput = event.target.value;
+    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
+      this.leftButtonLabelDisable = false;
+    } else {
+      this.leftButtonLabelDisable = true;
+    }
+  }
+
+  onUpperInput(event: any) {
+    this.upperInput = event.target.value;
+    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
+      this.leftButtonLabelDisable = false;
+    } else {
+      this.leftButtonLabelDisable = true;
+    }
+  }
+
+  saveNew(obj) {
+    console.log("THRESHOLD saveNew ob: " + JSON.stringify(obj))
     this.threshold.measurand.name = this.selectedMeasurand;
+    this.threshold.lowerBoundary = obj.lowerBoundary;
+    this.threshold.upperBoundary = obj.upperBoundary;
     if (this.threshold.measuredEvent.state == "new") {
       this.threshold.measuredEvent = this.selectedMeasuredEvent;
       this.threshold.measuredEvent.state = "new";
@@ -98,24 +120,6 @@ export class ThresholdComponent implements OnInit{
     else {
       this.thresholdRestService.addThreshold(this.threshold);
       this.addedThreshold.emit();
-    }
-  }
-
-  onLowerInput(event: any) {
-    this.lowerInput = event.target.value ;
-    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
-      this.leftButtonLabelDisable = false;
-    } else {
-      this.leftButtonLabelDisable = true;
-    }
-  }
-
-  onUpperInput(event: any) {
-    this.upperInput = event.target.value ;
-    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
-      this.leftButtonLabelDisable = false;
-    } else {
-      this.leftButtonLabelDisable = true;
     }
   }
 

@@ -66,7 +66,13 @@
   font-weight: bold;
 }
 
-
+/*New Threshold/MeasuredEvent*/
+.thresholdSelects {
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  width: auto;
+  font-size: 1.2em;
+}
 
 /*Parent style*/
 

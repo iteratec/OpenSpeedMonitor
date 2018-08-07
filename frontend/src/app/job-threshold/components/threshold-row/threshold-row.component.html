@@ -1,0 +1,35 @@
+<div class="flex-container">
+  <div class="flex-item good">Gut</div>
+  <div class="flex-item symbol"><</div>
+  <div class="input-group thresholdInput flex-item">
+    <input [(ngModel)]="lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"
+           (change)="onLowerInput($event)" class="form-control">
+    <div class="input-group-addon">ms</div>
+  </div>
+  <div class="flex-item symbol"><</div>
+  <div class="flex-item ok">Ok</div>
+  <div class="flex-item symbol"><</div>
+  <div class="input-group thresholdInput flex-item">
+    <input [(ngModel)]="upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="false"
+           (change)="onUpperInput($event)" class="form-control">
+    <div class="input-group-addon">ms</div>
+  </div>
+  <div class="flex-item symbol"><</div>
+  <div class="flex-item bad">Schlecht</div>
+
+  <div class="flex-container">
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-success btn-sm"
+              [disabled]="leftButtonLabelDisable"
+              (click)="save()">Speichern
+      </button>
+    </div>
+    <div class="flex-item">
+      <button type="button"
+              class="btn btn-danger btn-sm"
+              (click)="cancel()">Entfernen
+      </button>
+    </div>
+  </div>
+</div>

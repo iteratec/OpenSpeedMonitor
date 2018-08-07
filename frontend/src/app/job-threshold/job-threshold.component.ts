@@ -1,11 +1,11 @@
 import {Component, ElementRef, OnChanges, OnInit} from "@angular/core";
-import {ThresholdRestService} from "./service/rest/threshold-rest.service";
-import {ActualMeasuredEventsService} from "./service/actual-measured-events.service";
-import {Measurand} from "./service/model/measurand.model";
-import {MeasuredEvent} from "./service/model/measured-event.model";
-import {ThresholdForJob} from "./service/model/threshold-for-job.model";
-import {Threshold} from "./service/model/threshold.model";
-import {ActualThresholdsForJobService} from "./service/actual-thresholds-for-job.service";
+import {ThresholdRestService} from "./services/threshold-rest.service";
+import {ActualMeasuredEventsService} from "./services/actual-measured-events.service";
+import {Measurand} from "./models/measurand.model";
+import {MeasuredEvent} from "./models/measured-event.model";
+import {ThresholdForJob} from "./models/threshold-for-job.model";
+import {Threshold} from "./models/threshold.model";
+import {ActualThresholdsForJobService} from "./services/actual-thresholds-for-job.service";
 
 
 @Component({

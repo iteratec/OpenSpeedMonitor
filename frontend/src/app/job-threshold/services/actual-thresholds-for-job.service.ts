@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
-import {ThresholdForJob} from "./model/threshold-for-job.model";
-import {Threshold} from "./model/threshold.model";
+import {ThresholdForJob} from "../models/threshold-for-job.model";
+import {Threshold} from "../models/threshold.model";
 import {Subject} from "rxjs/index";
 
 @Injectable({

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import {MeasuredEvent} from "./model/measured-event.model";
-import {ThresholdForJob} from "./model/threshold-for-job.model";
+import {Injectable} from "@angular/core";
+import {MeasuredEvent} from "../models/measured-event.model";
+import {ThresholdForJob} from "../models/threshold-for-job.model";
 
 @Injectable({
   providedIn: 'root'

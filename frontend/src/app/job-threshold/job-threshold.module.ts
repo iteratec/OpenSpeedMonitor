@@ -1,19 +1,18 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {JobThresholdComponent} from './job-threshold.component';
-import {HttpClientModule} from "@angular/common/http";
-import {ThresholdRestService} from "../job-threshold/service/rest/threshold-rest.service";
-import {ActualMeasurandsService} from "../job-threshold/service/actual-measurands.service";
-import {ActualMeasuredEventsService} from "../job-threshold/service/actual-measured-events.service";
-import {FormsModule} from '@angular/forms';
-import { MeasuredEventComponent } from './component/measured-event/measured-event.component';
-import { ThresholdComponent } from './component/threshold/threshold.component';
+import {NgModule} from "@angular/core";
+import {JobThresholdComponent} from "./job-threshold.component";
+import {ThresholdRestService} from "./services/threshold-rest.service";
+import {ActualMeasurandsService} from "./services/actual-measurands.service";
+import {ActualMeasuredEventsService} from "./services/actual-measured-events.service";
+import {MeasuredEventComponent} from "./components/measured-event/measured-event.component";
+import {ThresholdComponent} from "./components/threshold/threshold.component";
+import {SharedModule} from "../shared/shared.module";
+import { ThresholdRowComponent } from './components/threshold-row/threshold-row.component';
 
 @NgModule({
   imports: [
-    CommonModule, HttpClientModule, FormsModule
+    SharedModule
   ],
-  declarations: [JobThresholdComponent, MeasuredEventComponent, ThresholdComponent],
+  declarations: [JobThresholdComponent, MeasuredEventComponent, ThresholdComponent, ThresholdRowComponent],
   providers: [
     { provide: 'components', useValue: [JobThresholdComponent], multi: true}, ThresholdRestService, ActualMeasurandsService, ActualMeasuredEventsService
   ],
