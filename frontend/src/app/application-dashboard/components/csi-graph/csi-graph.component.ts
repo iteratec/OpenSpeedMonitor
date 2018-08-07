@@ -6,6 +6,7 @@ import {CsiDTO} from '../../models/csi.model';
 import {timeDay} from 'd3-time';
 import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
+import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY} from '../../utils/csi-utils';
 
 
 @Component({
@@ -22,14 +23,14 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
   private width: number;
   private height: number;
-  private marginLeft: number = 50;
+  private marginLeft = 50;
   private marginRight = 20;
-  private marginTop: number = 10;
+  private marginTop = 10;
   private marginBottom = 30;
 
-  private bad: number = 60;
-  private good: number = 85;
-  private perfect: number = 100;
+  private csiOkay = CSI_THRESHOLD_OKAY;
+  private csiGood = CSI_THRESHOLD_GOOD;
+  private csiMax = CSI_MAX;
 
   constructor() {
   }
@@ -98,7 +99,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
         .tickFormat(timeFormat("%Y-%m-%d")));
 
     const yAxisGenerator = axisLeft(this.csiGraphCalculator.yScale)
-      .tickValues([this.bad, this.good, this.perfect]);
+      .tickValues([this.csiOkay, this.csiGood, this.csiMax]);
 
     selection
       .select("g.y.axis")

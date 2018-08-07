@@ -1,6 +1,9 @@
-import {scaleLinear, ScaleLinear, scaleTime, ScaleTime} from "d3-scale";
-import {area, Area, curveLinear, line, Line} from "d3-shape";
-import {CsiDTO} from "../../models/csi.model";
+import {scaleLinear, ScaleLinear, scaleTime, ScaleTime} from 'd3-scale';
+import {area, Area, curveLinear, line, Line} from 'd3-shape';
+import {CsiDTO} from '../../models/csi.model';
+import {CSI_MAX, CSI_MIN} from '../../utils/csi-utils';
+
+const DATE_RANGE = (24 * 60 * 60 * 1000) * 7 * 4; //4 Weeks
 
 export class CsiGraphCalculator {
   lineGenerator: Line<CsiDTO>;
@@ -22,14 +25,13 @@ export class CsiGraphCalculator {
   }
 
   private static getXScale(width: number): ScaleTime<number, number> {
-    const offset = (24 * 60 * 60 * 1000) * 7 * 4; //4 Weeks;
     let endDate: Date = CsiGraphCalculator.dayStart(new Date(Date.now()));
-    const startDate: Date = new Date(endDate.getTime() - offset);
+    const startDate: Date = new Date(endDate.getTime() - DATE_RANGE);
     return scaleTime().domain([startDate, endDate]).range([0, width]);
   }
 
   private static getYScale(height: number): ScaleLinear<number, number> {
-    return scaleLinear().domain([0, 100]).range([height, 0]);
+    return scaleLinear().domain([CSI_MIN, CSI_MAX]).range([height, 0]);
   }
 
   private static dayStart(input: Date): Date {
