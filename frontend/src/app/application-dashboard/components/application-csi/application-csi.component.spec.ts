@@ -4,6 +4,7 @@ import {ApplicationCsiComponent} from './application-csi.component';
 import {CsiValueComponent} from '../csi-value/csi-value.component';
 import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 import {ApplicationDashboardService} from '../../services/application-dashboard.service';
+import {CsiGraphComponent} from '../csi-graph/csi-graph.component';
 
 describe('ApplicationCsiComponent', () => {
   let component: ApplicationCsiComponent;
@@ -13,7 +14,8 @@ describe('ApplicationCsiComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         ApplicationCsiComponent,
-        CsiValueComponent
+        CsiValueComponent,
+        CsiGraphComponent
       ],
       providers: [
         ApplicationDashboardService

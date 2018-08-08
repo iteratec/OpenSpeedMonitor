@@ -1,9 +1,10 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {arc} from "d3-shape";
-import {select} from "d3-selection";
-import {transition} from "d3-transition";
-import {interpolate} from "d3-interpolate";
-import {CalculationUtil} from "../../../shared/utils/calculation.util";
+import {arc} from 'd3-shape';
+import {select} from 'd3-selection';
+import {transition} from 'd3-transition';
+import {interpolate} from 'd3-interpolate';
+import {CalculationUtil} from '../../../shared/utils/calculation.util';
+import {CsiUtils} from '../../utils/csi-utils';
 
 @Component({
   selector: 'osm-csi-value',
@@ -135,16 +136,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
-    if (this.isNA) {
-      return "not-available";
-    }
-    if (csiValue >= 90) {
-      return "good";
-    }
-    if (csiValue >= 70) {
-      return "okay";
-    }
-    return "bad";
+    return this.isNA ? 'not-available' : CsiUtils.getClassByThresholds(csiValue);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
