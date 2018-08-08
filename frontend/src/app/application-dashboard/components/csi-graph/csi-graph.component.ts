@@ -1,4 +1,13 @@
-import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {ApplicationCsiListDTO} from '../../models/csi-list.model';
 import {select} from 'd3-selection';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -6,7 +15,7 @@ import {CsiDTO} from '../../models/csi.model';
 import {timeDay} from 'd3-time';
 import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
-import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY} from '../../utils/csi-utils';
+import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../utils/csi-utils';
 
 
 @Component({
@@ -17,6 +26,7 @@ import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY} from '../../utils/csi-u
 })
 export class CsiGraphComponent implements AfterContentInit, OnChanges {
   @Input() csiData: ApplicationCsiListDTO;
+  @Input() recentCsiData: CsiDTO;
   @ViewChild("svg") svgElement: ElementRef;
 
   private csiGraphCalculator: CsiGraphCalculator;
@@ -31,6 +41,8 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private csiOkay = CSI_THRESHOLD_OKAY;
   private csiGood = CSI_THRESHOLD_GOOD;
   private csiMax = CSI_MAX;
+
+  csiValueClass: string;
 
   constructor() {
   }
@@ -84,6 +96,16 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .append("path")
       .attr("class", "csi-graph-area")
       .attr("clip-path", "url(#graph-border-clip-path)");
+
+    const highlightedValueGroup = csiGraphDrawingSpace
+      .append("g")
+      .attr("class", "highlightedCsi");
+
+    highlightedValueGroup
+      .append("line");
+
+    highlightedValueGroup
+      .append("circle");
   }
 
   private update(selection: any) {
@@ -126,6 +148,22 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("width", this.width)
       .attr("height", this.height + this.marginTop)
       .attr("rx", 4).attr("ry", 4);
+
+    selection
+      .select("g.highlightedCsi circle")
+      .attr("cx", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
+      .attr("cy", () => this.csiGraphCalculator.calculateY(this.recentCsiData))
+      .attr("r", 3)
+      .attr("fill", "currentColor");
+
+    selection
+      .select("g.highlightedCsi line")
+      .attr("x1", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
+      .attr("x2", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
+      .attr("y1", this.csiGraphCalculator.calculateY(this.recentCsiData))
+      .attr("y2", this.height)
+      .attr("stroke-width", "2px")
+      .attr("stroke", "currentColor");
   }
 
   private exit(selection: any) {
@@ -137,6 +175,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.csiValueClass = CsiUtils.getClassByThresholds(this.recentCsiData.csiDocComplete);
     this.redraw();
   }
 
@@ -150,4 +189,5 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     this.csiGraphCalculator = new CsiGraphCalculator(this.width, this.height);
     this.drawGraph();
   }
+
 }
