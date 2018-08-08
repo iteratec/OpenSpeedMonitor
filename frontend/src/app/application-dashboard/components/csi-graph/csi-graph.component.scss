@@ -40,4 +40,8 @@ osm-csi-graph {
     fill: $color-text-light;
   }
 
+  .highlightedCsi {
+    filter: url(#glow);
+  }
+
 }
