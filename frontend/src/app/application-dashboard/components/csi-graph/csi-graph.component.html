@@ -1,1 +1,10 @@
-<svg #svg class="csi-graph-svg" (window:resize)="onResize($event)"></svg>
+<svg #svg class="csi-graph-svg" (window:resize)="onResize($event)" [ngClass]="csiValueClass"
+     xmlns="http://www.w3.org/1999/html">
+  <filter id="glow">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="colBlur"/>
+    <feMerge>
+      <feMergeNode in="colBlur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</svg>
