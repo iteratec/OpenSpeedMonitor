@@ -97,6 +97,16 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("class", "csi-graph-area")
       .attr("clip-path", "url(#graph-border-clip-path)");
 
+    const highlightedCsiGroupGlow = csiGraphDrawingSpace
+      .append("g")
+      .attr("class", "highlightedCsi glow");
+
+    highlightedCsiGroupGlow
+      .append("line");
+
+    highlightedCsiGroupGlow
+      .append("circle");
+
     const highlightedValueGroup = csiGraphDrawingSpace
       .append("g")
       .attr("class", "highlightedCsi");
@@ -105,16 +115,6 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .append("line");
 
     highlightedValueGroup
-      .append("circle");
-
-    const highlightedValueGroupBlur = csiGraphDrawingSpace
-      .append("g")
-      .attr("class", "highlightedCsiBlur");
-
-    highlightedValueGroupBlur
-      .append("line");
-
-    highlightedValueGroupBlur
       .append("circle");
   }
 
@@ -160,14 +160,14 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("rx", 4).attr("ry", 4);
 
     selection
-      .select("g.highlightedCsi circle")
+      .selectAll("g.highlightedCsi circle")
       .attr("cx", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
       .attr("cy", () => this.csiGraphCalculator.calculateY(this.recentCsiData))
       .attr("r", 3)
       .attr("fill", "currentColor");
 
     selection
-      .select("g.highlightedCsi line")
+      .selectAll("g.highlightedCsi line")
       .attr("x1", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
       .attr("x2", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
       .attr("y1", this.csiGraphCalculator.calculateY(this.recentCsiData))
@@ -176,23 +176,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("stroke", "currentColor");
 
     selection
-      .select("g.highlightedCsiBlur circle")
-      .attr("cx", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
-      .attr("cy", () => this.csiGraphCalculator.calculateY(this.recentCsiData))
-      .attr("r", 3)
-      .attr("fill", "currentColor");
-
-    selection
-      .select("g.highlightedCsiBlur line")
-      .attr("x1", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
-      .attr("x2", () => this.csiGraphCalculator.calculateX(this.recentCsiData))
-      .attr("y1", this.csiGraphCalculator.calculateY(this.recentCsiData))
-      .attr("y2", this.height)
-      .attr("stroke-width", "2px")
-      .attr("stroke", "currentColor");
-
-    selection
-      .select("g.highlightedCsiBlur")
+      .select("g.highlightedCsi.glow")
       .style("opacity", 0)
       .transition()
       .duration(1000)
