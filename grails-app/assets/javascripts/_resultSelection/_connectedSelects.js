@@ -16,8 +16,8 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         OpenSpeedMonitor.SelectWithSelectAllCheckBox(parentSelect, parentSelectAllCheckbox);
         OpenSpeedMonitor.SelectWithSelectAllCheckBox(childSelect, childSelectAllCheckbox);
         initParentChildMapping();
-        parentSelect.change(updateChildValues);
-        parentSelectAllCheckbox.change(updateChildValues);
+        parentSelect.on('change', updateChildValues);
+        parentSelectAllCheckbox.on('change', updateChildValues);
         updateChildValues();
         childSelect.chosen({ search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.i18n.noResultsMsg });
     };
@@ -59,8 +59,8 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
      * @param: allElements all elements that can be contained in the target select box.
      */
     var updateChildValues = function() {
-        var parentSelection = parentSelect.val() || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
-        var childSelection = childSelect.val();
+        var parentSelection = (parentSelect.val().length !== 0) || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
+        var childSelection = (childSelect.val().length !== 0);
         var parentId;
         childSelect.empty();
 

@@ -33,10 +33,10 @@ OpenSpeedMonitor.BarchartMeasurings = (function () {
     var addCloneChangeListener = function () {
         //We already add the listener to the clones to make sure that they
         //are the first events to be fired, even if there will be additional listeners be added in the future
-        additionalBarClone.find(".removeMeasurandButton").click(removeMeasurand);
+        additionalBarClone.find(".removeMeasurandButton").on('click', removeMeasurand);
 
-        $("#addMeasurandButton").click(addMeasurand);
-        additionalMeasurandClone.find(".removeMeasurandButton").click(removeMeasurand);
+        $("#addMeasurandButton").on('click', addMeasurand);
+        additionalMeasurandClone.find(".removeMeasurandButton").on('click', removeMeasurand);
     };
 
     var addMeasurand = function (e) {

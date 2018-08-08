@@ -129,7 +129,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         var selects = $(".measurand-select");
         if (measurand.startsWith("_UTM")) {
             var optGroupUserTimings = $(selects[0]).find('.measurand-opt-group-USER_TIMINGS');
-            var alreadyThere = optGroupUserTimings.size() > 1;
+            var alreadyThere = optGroupUserTimings.length > 1;
             if (!alreadyThere) {
                 OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{
                     id: measurand,

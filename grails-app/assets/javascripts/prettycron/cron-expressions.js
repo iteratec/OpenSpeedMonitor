@@ -36,6 +36,6 @@ function updatePrettyCrons() {
 }
 
 
-$(document).ready(function() {
+$(function () {
 	updatePrettyCrons();
 });

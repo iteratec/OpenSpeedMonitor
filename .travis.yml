@@ -38,11 +38,12 @@ install:
 jobs:
   include:
     - stage: tests
-      script: ./gradlew -x jasmineRun test
+      script: ./gradlew -x jasmineRun -x angularTests test
     - script: ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
     - script:
       - whereis google-chrome-stable
       - whereis chromedriver
       - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
     - script: ./gradlew jasmineRun
+    - script: ./gradlew angularTests
 

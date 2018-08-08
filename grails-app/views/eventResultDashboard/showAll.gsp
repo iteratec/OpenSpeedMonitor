@@ -263,14 +263,14 @@
             initGraphColors(graphColors);
 
             if (eval(showDataMarkers)) {
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             if (eval(showDataLabels)) {
-                $("#to-enable-label").click();
+                $("#to-enable-label").trigger('click');
             }
         }
 
-        $(document).ready(function () {
+        $(function () {
 
             doOnDomReady(
                 '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
@@ -282,7 +282,7 @@
             setAdjustments();
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             if (!$("#graph_container").data("isAggregatedData")) {
                 OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js"/>', 'chartContextUtilities');
             }

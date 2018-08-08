@@ -283,7 +283,7 @@
         var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
         var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
-        $(document).ready(function () {
+        $(function () {
             $('#updateCsiConfModal').on('shown', function () {
                 $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
                 $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
@@ -292,7 +292,7 @@
             });
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="csi/configurationPost.js"/>');
         });
 

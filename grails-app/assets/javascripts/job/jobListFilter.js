@@ -99,8 +99,8 @@ OpenSpeedMonitor.jobListFilter = (function(){
     var initFilterInput = function () {
         var filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
         filterTextInput.val(filterText);
-        filterTextInput.change(filter);
-        filterTextInput.keyup(filter);
+        filterTextInput.on('change', filter);
+        filterTextInput.on('keyup', filter);
     };
 
     var initFilterCheckboxes = function () {
@@ -111,12 +111,12 @@ OpenSpeedMonitor.jobListFilter = (function(){
                 checkbox.element.prop("checked", checkbox.isChecked);
                 checkbox.element.parent().toggleClass("active", checkbox.isChecked); // bootstrap button-style
             }
-            checkbox.element.change(filter);
+            checkbox.element.on('change', filter);
         });
     };
 
     var initClearFilterButton = function () {
-        clearFilterButton.click(clearFilter);
+        clearFilterButton.on('click', clearFilter);
     };
 
     var clearFilter = function () {

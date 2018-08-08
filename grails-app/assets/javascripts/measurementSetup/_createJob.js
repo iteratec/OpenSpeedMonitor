@@ -21,10 +21,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
 
     var init = function () {
         // set change listeners
-        predefinedCronSelectBox.change(updateCronStringFromPredefined);
-        cronStringInputField.keyup(validateCronExpression);
-        jobNameInput.change(function() { validateInputs(); });
-        jobNameInput.keyup(function() { validateInputs(); });
+        predefinedCronSelectBox.on('change', updateCronStringFromPredefined);
+        cronStringInputField.on('keyup', validateCronExpression);
+        jobNameInput.on('change', function() { validateInputs(); });
+        jobNameInput.on('keyup', function() { validateInputs(); });
 
         // init value
         var initValue = cronStringInputField.val()

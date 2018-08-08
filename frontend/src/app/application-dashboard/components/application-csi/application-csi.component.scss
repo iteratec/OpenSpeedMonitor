@@ -1,3 +1,16 @@
+osm-csi-graph {
+  display: block;
+  flex-grow: 1;
+}
+
+osm-csi-value {
+  width: 200px;
+}
+
+.card > .csi {
+  display: flex;
+}
+
 .application-csi {
   margin-bottom: 30px;
 }

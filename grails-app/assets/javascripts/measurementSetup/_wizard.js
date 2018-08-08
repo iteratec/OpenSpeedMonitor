@@ -61,7 +61,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
     }
 
     var initTabNavigation = function () {
-        setJobGroupTabNextButton.click(function () {
+        setJobGroupTabNextButton.on('click', function () {
             $("#setJobGroupTab").parent().toggleClass("active");
             $("#createScriptTab").parent().toggleClass("active");
 
@@ -73,7 +73,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
                 OpenSpeedMonitor.script.codemirrorEditor.refresh()
             }, 1); // so codemirror is properly initialized after the browser has layouted the page
         });
-        createScriptTabNextButton.click(function () {
+        createScriptTabNextButton.on('click', function () {
             $("#createScriptTab").parent().toggleClass("active");
             $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
 
@@ -82,7 +82,7 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
 
             $("#selectLocationAndConnectivityTab").parent().addClass("wasActive");
         });
-        $("#selectLocationAndConnectivityTabNextButton").click(function () {
+        $("#selectLocationAndConnectivityTabNextButton").on('click', function () {
             $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
             $("#createJobTab").parent().toggleClass("active");
 
@@ -92,15 +92,15 @@ OpenSpeedMonitor.MeasurementSetupWizard.Wizard = (function () {
             $("#createJobTab").parent().addClass("wasActive");
         });
 
-        $("#createScriptTabPreviousButton").click(function () {
+        $("#createScriptTabPreviousButton").on('click', function () {
             $("#createScriptTab").parent().toggleClass("active");
             $("#setJobGroupTab").parent().toggleClass("active");
         });
-        $("#selectLocationAndConnectivityTabPreviousButton").click(function () {
+        $("#selectLocationAndConnectivityTabPreviousButton").on('click', function () {
             $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
             $("#createScriptTab").parent().toggleClass("active");
         });
-        $("#createJobTabPreviousButton").click(function () {
+        $("#createJobTabPreviousButton").on('click', function () {
             $("#createJobTab").parent().toggleClass("active");
             $("#selectLocationAndConnectivityTab").parent().toggleClass("active");
         });

@@ -80,7 +80,7 @@
                     }
                 }
 
-                $(document).ready(function() {
+                $(function () {
 
                     doOnDomReady(
         ${job.label == null},
@@ -91,7 +91,7 @@
                     );
 
                 });
-                $( window).load(function(){
+                $(window).on('load', function(){
 
                     document.getElementById('authPassword').setAttribute('type', 'password');
 
@@ -113,13 +113,13 @@
                             readonly: true,
                             parsedScriptUrl: '${createLink(controller: 'script', action: 'getParsedScript')}'
                         });
-                        $('#scriptTabLink').bind("click", function() {
+                        $('#scriptTabLink').on("click", function() {
                             editor.update();
                         });
-                        $('#script').bind("change", function() {
+                        $('#script').on("change", function() {
                             editor.update();
                         });
-                        $('#script').change();
+                        $('#script').trigger('change');
 
                         if (${job?.id != null}) {
                             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");

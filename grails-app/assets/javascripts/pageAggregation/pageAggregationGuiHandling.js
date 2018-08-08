@@ -68,7 +68,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var medianLoaded = false;
 
     var init = function () {
-        drawGraphButton.click(function () {
+        drawGraphButton.on('click', function () {
             $("#chart-card").removeClass("hidden");
             loadData(true);
         });
@@ -85,7 +85,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             spinner.start();
             renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
-        $(".chart-filter").click(onFilterClick);
+        $(".chart-filter").on('click', onFilterClick);
     };
 
     var getSelectedFilter = function () {
@@ -119,7 +119,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fas fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             var link = $("a", listItem);
             link.data('filter', filterRuleKey);
-            link.click(onFilterClick);
+            link.on('click', onFilterClick);
             listItem.insertAfter($customerJourneyHeader);
         });
 

@@ -29,7 +29,7 @@
         clone.attr('id', 'jobGroupWeights_' + childCount);
         $("#childList").append(clone);
         clone.show();
-        jobGroupWeightInput.focus();
+        jobGroupWeightInput.trigger('focus');
         childCount++;
         ${'jobGroupWeightCount'}.
         value = childCount;
