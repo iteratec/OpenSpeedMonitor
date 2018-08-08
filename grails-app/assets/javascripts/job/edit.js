@@ -30,27 +30,27 @@ function doOnDomReady(newJob,
     $("[rel=tooltip]").tooltip({html: true});
     $("[rel=popover]").popover();
 
-    $('#active').change(function () {
-        $('[name="execution-schedule-shown"]').keyup();
+    $('#active').on('change', function () {
+        $('[name="execution-schedule-shown"]').trigger('keyup');
     });
 
     prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
-    $('#connectivityProfile').change();
+    $('#connectivityProfile').trigger('change');
 
     initializeSelects();
 
-    $('#maxDownloadTimeInMinutes a').click(function () {
+    $('#maxDownloadTimeInMinutes a').on('click', function () {
         $('#maxDownloadTimeInMinutes input')
             .removeClass('non-editable')
-            .removeAttr('readonly');
+            .prop('readonly', false);
         $('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
     });
 
     fixChosen();
 
     // trigger change event if user input received
-    $("#execution-schedule-shown").keyup(function () {
-        $("#execution-schedule-shown").change();
+    $("#execution-schedule-shown").on('keyup', function () {
+        $("#execution-schedule-shown").trigger('change');
     });
 
     addCronValidatorToForm($("form"), cronInputHelpBlock);
@@ -97,16 +97,16 @@ function initializeSelects() {
         width: "100%",
         search_contains: true
     };
-    if ($('select#jobgroup').size() > 0) {
+    if ($('select#jobgroup').length > 0) {
         $('select#jobgroup').chosen(chosenOptions);
     }
-    if ($('select#location').size() > 0) {
+    if ($('select#location').length > 0) {
         $('select#location').chosen(chosenOptions);
     }
-    if ($('select#connectivityProfile').size() > 0) {
+    if ($('select#connectivityProfile').length > 0) {
         $('select#connectivityProfile').chosen(chosenOptions);
     }
-    if ($('select#script').size() > 0) {
+    if ($('select#script').length > 0) {
         chosenOptions.allow_single_deselect = true;
         $('select#script').chosen(chosenOptions);
     }
@@ -185,7 +185,7 @@ function registerEventHandlers() {
     $("#provideAuthenticateInformation").on("change", toggleAuthOptions);
     toggleAuthOptions();
 
-    predefinedCronSelectBox.change(updateCronStringFromPredefined);
+    predefinedCronSelectBox.on('change', updateCronStringFromPredefined);
     var initValue = cronStringInputField.val();
     if (initValue) {
         // check if init value is a predefined cron string
@@ -231,8 +231,8 @@ function toggleAuthOptions() {
         $("#authPassword").attr("disabled", "");
     }
     else {
-        $("#authUsername").removeAttr("disabled");
-        $("#authPassword").removeAttr("disabled");
+        $("#authUsername").prop("disabled", false);
+        $("#authPassword").prop("disabled", false);
     }
 }
 
@@ -457,7 +457,7 @@ function createJobGroup(createJobGroupUrl) {
         success: function (data, textStatus) {
             var newJobGroupOption = $("<option/>").val(data.jobGroupId).text(data.jobGroupName);
             newJobGroupOption.appendTo("#jobgroup");
-            $('#jobgroup option').removeAttr('selected');
+            $('#jobgroup option').prop('selected', false);
             newJobGroupOption.attr("selected", true);
             $('.chosen').trigger("chosen:updated");
         },

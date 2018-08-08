@@ -41,12 +41,12 @@ This is a dialog to choose from different default csi mappings.
         var defaults = ${defaultMultiLineChart}
         var selectedDefault = $.grep(defaults.lines, function(e){ return e.name == newLine; });
         var pages = ${pageData};
-        $("#CsiMappingModal").find("#selectPageMapping").change(function(d){handlePageDefaultSelect($(this))});
+        $("#CsiMappingModal").find("#selectPageMapping").on('change', function(d){handlePageDefaultSelect($(this))});
         var colorScale = d3.scale.ordinal()
                                           .domain([newLine, ""])
                                           .range(["#DBDBDB", color]);
 
-        $("#applyMapping").click(applyPageMapping);
+        $("#applyMapping").on('click', applyPageMapping);
         handlePageDefaultSelect($());
 
         function handlePageDefaultSelect(elementId){

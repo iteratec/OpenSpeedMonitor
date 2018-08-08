@@ -149,7 +149,7 @@
                                             <div class="input-group">
                                                 <span class="input-group-btn">
                                                     <a class="btn btn-default"
-                                                       onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
+                                                       onclick="$('input[id=defaultTimeToCsMappingCsvFile]').trigger('click');">
                                                         <i class="fas fa-folderpen-o"
                                                            aria-hidden="true"></i>
                                                     </a>
@@ -241,7 +241,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
-                                       onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
+                                       onclick="$('input[id=theBrowserConnectivityCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
@@ -293,7 +293,8 @@
 
                             <div class="input-group">
                                 <span class="input-group-btn">
-                                    <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
+                                    <a class="btn btn-default"
+                                       onclick="$('input[id=thePageCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
@@ -345,7 +346,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
-                                       onclick="$('input[id=theHourOfDayCsvFile]').click();">
+                                       onclick="$('input[id=theHourOfDayCsvFile]').trigger('click');">
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
@@ -378,7 +379,7 @@
 
         registerEventHandlersForFileUploadControls();
 
-        $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
+        $('#defaultTimeToCsMappingCsvFile').on('change', function () {
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
@@ -388,27 +389,27 @@
     };
 
     var registerEventHandlersForFileUploadControls = function () {
-        $('input[id=theBrowserConnectivityCsvFile]').change(function () {
+        $('input[id=theBrowserConnectivityCsvFile]').on('change', function () {
              var vals = $(this).val(),
                 val = vals.length ? vals.split('\\').pop() : '';
             $('#theBrowserConnectivityCsvFileTwitter').val(val);
         });
-        $('input[id=theBrowserCsvFile]').change(function () {
+        $('input[id=theBrowserCsvFile]').on('change', function () {
             var vals = $(this).val(),
                 val = vals.length ? vals.split('\\').pop() : '';
             $('#theBrowserCsvFileTwitter').val(val);
         });
-        $('input[id=thePageCsvFile]').change(function () {
+        $('input[id=thePageCsvFile]').on('change', function () {
             var vals = $(this).val(),
                 val = vals.length ? vals.split('\\').pop() : '';
             $('#thePageCsvFileTwitter').val(val);
         });
-        $('input[id=theHourOfDayCsvFile]').change(function () {
+        $('input[id=theHourOfDayCsvFile]').on('change', function () {
             var vals = $(this).val(),
                 val = vals.length ? vals.split('\\').pop() : '';
             $('#theHourOfDayCsvFileTwitter').val(val);
         });
-        $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
+        $('input[id=defaultTimeToCsMappingCsvFile]').on('change', function () {
             var vals = $(this).val(),
                 val = vals.length ? vals.split('\\').pop() : '';
             $('#defaultTimeToCsMappingCsvFileVisible').val(val);
@@ -461,7 +462,7 @@
         $(document).scrollTop(scrollposition);
     });
 
-    $(document).ready(function () {
+    $(function () {
         %{-- if passed, show the given nav tab at the start --}%
         var hash = window.location.hash;
         $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {
@@ -474,6 +475,6 @@
         createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
         createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
 
-        $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+        $("#${defaultIdentifier}").find(".diagramKey").on('click', defaultSelectChange);
     });
 </asset:script>

@@ -15,7 +15,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var medianLoaded = false;
 
     var init = function () {
-        drawGraphButton.click(function () {
+        drawGraphButton.on('click', function () {
             $("#chart-card").removeClass("hidden");
             loadData(true);
         });
@@ -30,7 +30,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             spinner.start();
             renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
-        $(".chart-filter").click(onFilterClick);
+        $(".chart-filter").on('click', onFilterClick);
     };
 
     var getSelectedFilter = function () {

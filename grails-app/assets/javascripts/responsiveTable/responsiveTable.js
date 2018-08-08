@@ -66,16 +66,16 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
             $('#elementPager .page_link:first').addClass('active');
 
 
-            $('#elementPager li a').click(function () {
+            $('#elementPager li a').on('click', function () {
                 if ($.isNumeric($(this).html())) {
                     var clickedPage = $(this).html() - 1;
                     goTo(clickedPage, perPage);
                 }
             });
-            $('<li><a href="#" class="prevLink">' + i18n["previous"] + '</a></li>').click(function () {
+            $('<li><a href="#" class="prevLink">' + i18n["previous"] + '</a></li>').on('click', function () {
                 previous();
             }).prependTo('#elementPager');
-            $('<li><a href="#" class="nextLink">' + i18n["next"] + '</a></li>').click(function () {
+            $('<li><a href="#" class="nextLink">' + i18n["next"] + '</a></li>').on('click', function () {
                 next();
             }).appendTo('#elementPager');
 
@@ -125,7 +125,7 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || (function
                     success: function (jsonResponse) {
                         $("#elementTable").html(jsonResponse.table);
                         createPagination(jsonResponse.count);
-                        $('#elementFilter').focus();
+                        $('#elementFilter').trigger('focus');
                         updateInProgress = false;
                         if (updateRequired) {
                             updateRequired = false;

@@ -82,7 +82,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart = (function () {
     };
 
     var clickShowButton = function () {
-        $("#graphButtonHtmlId").click()
+        $("#graphButtonHtmlId").trigger('click');
     };
 
     var setMeasurands = function (params) {
@@ -97,7 +97,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart = (function () {
             var addButton = $("#addMeasurandSeriesButton");
             var length = measurandGroups.length;
             for (var i = 0; i < length; i++) {
-                addButton.click();
+                addButton.trigger('click');
                 addMeasurands(JSON.parse(decodeURIComponent(measurandGroups.shift())), i + 1);
             }
         } else {
@@ -113,7 +113,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart = (function () {
         var currentPanel = firstSelect.closest(".panel");
         var currentAddButton = currentPanel.find(".addMeasurandButton");
         for (var i = 0; i < length; i++) {
-            currentAddButton.click();
+            currentAddButton.trigger('click');
             currentPanel.find(".additionalMeasurand").eq(i).val(measurands['values'].shift());
             currentAddButton = currentPanel.find(".addMeasurandButton").eq(i + 1);
         }

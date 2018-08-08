@@ -31,11 +31,11 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         chartContainer = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        $("#all-bars-desc").click(function (e) {
+        $("#all-bars-desc").on('click', function (e) {
             sortBars(data, "desc");
             toogleFilterCheckmarks(e.target)
         });
-        $("#all-bars-asc").click(function (e) {
+        $("#all-bars-asc").on('click', function (e) {
             sortBars(data, "asc");
             toogleFilterCheckmarks(e.target)
         })
