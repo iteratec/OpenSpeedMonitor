@@ -172,7 +172,7 @@ class ProxyService {
                 this.resultListeners.each { listener ->
                     if (listener.callListenerAsync()) {
                         Promise p = task {
-                            JobResult.withNewTransaction {
+                            JobResult.withNewSession {
                                 listener.listenToResult(resultXml, wptserverOfResult)
                             }
                         }

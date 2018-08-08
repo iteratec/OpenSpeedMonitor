@@ -57,15 +57,16 @@ class JobProcessingQuartzHandlerJob {
             log.info("Measurements are disabled, skip job ${context.mergedJobDataMap.getLong("jobId")} processing")
             return
         }
+        Job.withNewSession {
+            Long jobId = context.mergedJobDataMap.getLong("jobId")
+            Job job = Job.get(jobId)
 
-        Long jobId = context.mergedJobDataMap.getLong("jobId")
-        Job job = Job.get(jobId)
-
-        if (!job) {
-            throw new IllegalStateException(
-                    "JobProcessingQuartzHandler: No job found in execution of quartz job with id ${context.getTrigger().getKey().getName()}")
-        } else {
-            handleQuartzExecution(context, job)
+            if (!job) {
+                throw new IllegalStateException(
+                        "JobProcessingQuartzHandler: No job found in execution of quartz job with id ${context.getTrigger().getKey().getName()}")
+            } else {
+                handleQuartzExecution(context, job)
+            }
         }
     }
 
