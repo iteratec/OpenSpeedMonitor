@@ -185,7 +185,7 @@ function RickshawGraphBuilder(args) {
                 $(this).html(originName);
             }
         });
-        this.calculateLegendColumnWidth();
+        self.calculateLegendColumnWidth();
     };
 
     this.calculateLegendColumnWidth = function () {
