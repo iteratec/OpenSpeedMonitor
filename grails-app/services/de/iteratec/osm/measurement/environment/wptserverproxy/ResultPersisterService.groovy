@@ -33,6 +33,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
+import org.springframework.transaction.annotation.Propagation
 
 import java.util.zip.GZIPOutputStream
 
@@ -92,7 +93,7 @@ class ResultPersisterService implements iResultListener {
         return callListenerAsync
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult) throws OsmResultPersistanceException {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
@@ -105,7 +106,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     void persistJobResult(WptResultXml resultXml) throws OsmResultPersistanceException {
 
         performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
@@ -231,7 +232,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
 
         String testId = resultXml.getTestId()
@@ -488,7 +489,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private void informDependents(WptResultXml resultXml) {
 
         JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), resultXml.getTestId())

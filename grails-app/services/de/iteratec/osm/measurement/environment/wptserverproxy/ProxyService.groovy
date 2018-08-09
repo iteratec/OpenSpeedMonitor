@@ -170,9 +170,10 @@ class ProxyService {
 
                 lock.lockInterruptibly();
                 this.resultListeners.each { listener ->
+                    log.info("calling listener ${listener.listenerName} for ${jobLabel}")
                     if (listener.callListenerAsync()) {
                         Promise p = task {
-                            JobResult.withNewTransaction {
+                            JobResult.withNewSession {
                                 listener.listenToResult(resultXml, wptserverOfResult)
                             }
                         }
