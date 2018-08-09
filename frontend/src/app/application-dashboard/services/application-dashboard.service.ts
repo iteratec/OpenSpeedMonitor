@@ -6,13 +6,14 @@ import {MetricsDto} from "../models/metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
+import {PageCsiResponse} from "../models/page-csi-response.model";
 
 @Injectable()
 export class ApplicationDashboardService {
   metrics$: ReplaySubject<MetricsDto[]> = new ReplaySubject<MetricsDto[]>(1);
   pages$: ReplaySubject<PageDto[]> = new ReplaySubject<PageDto[]>(1);
   csiValues$: ReplaySubject<ApplicationCsiListDTO> = new ReplaySubject<ApplicationCsiListDTO>(1);
-  pageCsis$: ReplaySubject<PageCsiDto[]> = new ReplaySubject<PageCsiDto[]>(1);
+  pageCsis$: ReplaySubject<PageCsiResponse> = new ReplaySubject<PageCsiResponse>(1);
   activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
 
   constructor(private http: HttpClient) {
@@ -43,14 +44,20 @@ export class ApplicationDashboardService {
   }
 
   private updateCsiForApplication(params) {
+    this.csiValues$.next({
+      csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
+      hasCsiConfiguration: false,
+      isLoading: true
+    });
     this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params: params})
       .subscribe((response: ApplicationCsiListDTO) => this.csiValues$.next(response), error => this.handleError(error));
   }
 
   private updateCsiForPages(params) {
+    this.pageCsis$.next({pageCsis: [], isLoading: true});
     this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params})
       .subscribe((response: PageCsiDto[]) => {
-        this.pageCsis$.next(response)
+        this.pageCsis$.next({pageCsis: response, isLoading: false});
       }, error => this.handleError(error));
   }
 

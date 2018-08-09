@@ -16,14 +16,19 @@ export class PageComponent {
   @Input() page: PageDto;
   metricsForPage$: Observable<MetricsDto>;
   pageCsi$: Observable<number>;
+  isLoading: boolean = true;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.metricsForPage$ = applicationDashboardService.metrics$.pipe(
       map((next: MetricsDto[]) => next.find((metricsDto: MetricsDto) => metricsDto.pageId == this.page.id)));
 
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
-      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)),
-      map((pageCsiDto: PageCsiDto) => pageCsiDto ? pageCsiDto.csiDocComplete : null)
+      map((next: any) => {
+        this.isLoading = next.isLoading;
+        if (this.isLoading) return 0;
+        const pageCsiDto: PageCsiDto = next.pageCsis.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id);
+        return pageCsiDto ? pageCsiDto.csiDocComplete : null;
+      })
     );
   }
 
