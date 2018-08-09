@@ -28,13 +28,14 @@ import java.util.concurrent.locks.ReentrantLock
 
 import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
  * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
  */
 class JobProcessingQuartzHandlerJob {
 
-	JobProcessingService jobProcessingService
+    JobProcessingService jobProcessingService
     PerformanceLoggingService performanceLoggingService
     InMemoryConfigService inMemoryConfigService
 
@@ -56,8 +57,7 @@ class JobProcessingQuartzHandlerJob {
             log.info("Measurements are disabled, skip job ${context.mergedJobDataMap.getLong("jobId")} processing")
             return
         }
-        Job.withNewTransaction {
-
+        Job.withNewSession {
             Long jobId = context.mergedJobDataMap.getLong("jobId")
             Job job = Job.get(jobId)
 
@@ -65,20 +65,17 @@ class JobProcessingQuartzHandlerJob {
                 throw new IllegalStateException(
                         "JobProcessingQuartzHandler: No job found in execution of quartz job with id ${context.getTrigger().getKey().getName()}")
             } else {
-
                 handleQuartzExecution(context, job)
-
             }
         }
-
     }
 
-    private void handleQuartzExecution(JobExecutionContext context, Job job){
+    private void handleQuartzExecution(JobExecutionContext context, Job job) {
 
         String triggerGroup = context.getTrigger().getKey().getGroup();
         String testId = context.mergedJobDataMap.getString("testId")
 
-        switch (triggerGroup){
+        switch (triggerGroup) {
             case (TriggerGroup.JOB_TRIGGER_LAUNCH.value()):
                 handleLaunching(job)
                 break
@@ -96,21 +93,21 @@ class JobProcessingQuartzHandlerJob {
         performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
             try {
                 jobProcessingService.launchJobRun(job)
-            } catch(Exception exception) {
+            } catch (Exception exception) {
                 log.error(exception.getMessage(), exception)
             }
         }
     }
 
-    private void handlePolling(Job job, String testId){
+    private void handlePolling(Job job, String testId) {
         String lockKey = getOrCreateLockKeyFor(job, testId)
         if (pollingLocks[lockKey].tryLock()) {
-            try{
+            try {
                 performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", 1) {
                     jobProcessingService.pollJobRun(job, testId)
                 }
-            }finally{
-                if(pollingLocks[lockKey]) pollingLocks[lockKey].unlock()
+            } finally {
+                if (pollingLocks[lockKey]) pollingLocks[lockKey].unlock()
             }
         }
     }
@@ -129,7 +126,7 @@ class JobProcessingQuartzHandlerJob {
      * @param testId
      *          The {@link de.iteratec.osm.result.JobResult#testId} of the job run to remove the polling lock from.
      */
-    static synchronized void removePollingLock(Job job, String testId){
+    static synchronized void removePollingLock(Job job, String testId) {
         String lockKey = getLockKeyFor(job, testId)
         pollingLocks.remove(lockKey)
     }
@@ -142,7 +139,7 @@ class JobProcessingQuartzHandlerJob {
      */
     private static synchronized String getOrCreateLockKeyFor(Job job, String testId) {
         String lockKey = getLockKeyFor(job, testId)
-        if (!pollingLocks[lockKey]){
+        if (!pollingLocks[lockKey]) {
             pollingLocks[lockKey] = new ReentrantLock()
         }
         return lockKey
