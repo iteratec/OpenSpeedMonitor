@@ -129,7 +129,7 @@ function initTable(nextExecutionLink) {
     updatePrettyCrons();
     //The server will send the next run time with the server timezone.
     //The mouseenter makes sure to convert it into the locale timezone.
-    $(".timeago").mouseenter(function(){
+    $(".timeago").on('mouseenter', function () {
         if($(this).attr("converted") != "true"){
             $(this).attr("title",moment($(this).attr("title")).format("D. MMM YYYY HH:mm"));
             $(this).attr("converted", true);// Save state, so we won't try to change the format again
@@ -215,8 +215,8 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
     });
 
     // pass along filter settings when sorting columns:
-    $('thead a').click(function (e) {
-        $('form').attr('action', $(this).attr('href')).submit();
+    $('thead a').on('click', function (e) {
+        $('form').attr('action', $(this).attr('href')).trigger('submit');
         return false;
     });
 
@@ -235,7 +235,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
 
     function initEventHandlers() {
 
-        $("#actionForSelected").click(function () {
+        $("#actionForSelected").on('click', function () {
             $("#remove-tag-select .tagLink").remove();
             $.ajax({
                 url: OpenSpeedMonitor.urls.jobTags.getTagsForJobs,
@@ -244,7 +244,7 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
                 fillDropdown(result.tags);
             });
         });
-        $("#add-tag-confirm-button").click(function () {
+        $("#add-tag-confirm-button").on('click', function () {
             var tag = $("#add-tag-input").val();
             $.ajax({
                 url: OpenSpeedMonitor.urls.jobTags.addTagToJobs,
@@ -275,11 +275,11 @@ function doOnDomReady(getRunningAndRecentlyFinishedJobsLink,
         var selectContainer = $("#remove-tag-select");
         tags.forEach(function (tag) {
             var tagElem = $("<option class='tagLink'><a href='#'>" + tag + "</a></option>");
-            tagElem.click(removeTag);
+            tagElem.on('click', removeTag);
             selectContainer.append(tagElem);
         });
         $("#remove-tag-select").val("0");
-        $("#remove-tag-select").parent().click(function (e) {
+        $("#remove-tag-select").parent().on('click', function (e) {
             e.stopPropagation();
         });
         $(".chosen-select").chosen({search_contains: true});

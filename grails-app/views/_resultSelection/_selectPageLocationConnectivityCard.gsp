@@ -100,7 +100,7 @@ A card to select page & measured step, browser & location, and the connectivity
     </div>
 </div>
 <asset:script type="text/javascript">
-    $(window).load(function() {
+    $(window).on('load', function() {
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectPageLocationConnectivityCard.js" />', 'selectPageLocationConnectivityCard');
     });
 </asset:script>

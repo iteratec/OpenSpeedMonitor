@@ -19,9 +19,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateScriptCard = (function () {
     var navigationScriptHelpBlock = $("#navigationScriptHelpBlock");
 
     var init = function () {
-        scriptNameInput.keyup(function() { validateInputs(); });
-        navigationScriptInput.keyup(function() { validateInputs(); });
-        nextButton.click(function() { validateInputs(); });
+        scriptNameInput.on('keyup', function() { validateInputs(); });
+        navigationScriptInput.on('keyup', function() { validateInputs(); });
+        nextButton.on('click', function() { validateInputs(); });
         getExistingScriptNames();
 
         if (!String(OpenSpeedMonitor.script.codemirrorEditor.getContent()).trim()) {

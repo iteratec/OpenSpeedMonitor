@@ -28,7 +28,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             draw();
         });
 
-        $(window).resize(drawUpdatedSize);
+        $(window).on('resize', drawUpdatedSize);
     };
 
     var drawUpdatedSize = function () {
@@ -355,7 +355,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
                 var link = $("<li class='filterRule'><a href='#'><i class='fas fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
-                link.click(function (e) {
+                link.on('click', function (e) {
                     filterCustomerJourney(e.target.innerText);
                     toogleFilterCheckmarks(e.target);
                 });
@@ -363,11 +363,11 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             }
         }
 
-        $filterDropdownGroup.find("#all-violins-desc").click(function (e) {
+        $filterDropdownGroup.find("#all-violins-desc").on('click', function (e) {
             filterCustomerJourney(null, true);
             toogleFilterCheckmarks(e.target);
         });
-        $filterDropdownGroup.find("#all-violins-asc").click(function (e) {
+        $filterDropdownGroup.find("#all-violins-asc").on('click', function (e) {
             filterCustomerJourney(null, false);
             toogleFilterCheckmarks(e.target);
         })

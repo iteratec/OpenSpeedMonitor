@@ -196,6 +196,7 @@
     </g:if>
 </section>
 <content tag="include.bottom">
+    <asset:javascript src="d3/multiLineChart.js"/>
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>

@@ -23,7 +23,7 @@
             </g:if>
 
             <asset:script type="text/javascript">
-                $(document).ready(function() {
+                $(function() {
                     $('#serverdown').hide();
                     $('abbr.timeago').timeago();
 

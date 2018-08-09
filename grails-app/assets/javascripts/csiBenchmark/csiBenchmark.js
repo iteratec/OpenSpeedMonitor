@@ -56,7 +56,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.CsiBenchmark = (function () {
     };
 
     var clickShowButton = function () {
-        $("#graphButtonHtmlId").click()
+        $("#graphButtonHtmlId").trigger('click')
     };
 
     var timecardResolved = false;

@@ -1,9 +1,10 @@
 <div class="card application-csi">
   <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.kpi.title' | translate }}</h2>
-  <div *ngIf="hasConfiguration$ | async; else returnError">
-    <div *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
+  <div *ngIf="hasConfiguration$ | async; else returnError" class="csi">
+    <ng-container *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
       <osm-csi-value [csiValue]="recentCsiValue.csiDocComplete" [isBig]="true" [description]="'today'"></osm-csi-value>
-    </div>
+      <osm-csi-graph [csiData]="csiValues$ | async"></osm-csi-graph>
+    </ng-container>
     <ng-template #noRecentCsi>
       No CSI available
     </ng-template>

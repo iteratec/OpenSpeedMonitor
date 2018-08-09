@@ -13,7 +13,7 @@ OpenSpeedMonitor.batchActivity = OpenSpeedMonitor.batchActivity || (function(res
      *          url to update all rows (method getUpdate within BatchActivityController)
      */
     var initBatchActivity= function(updateTableUrlParameter, checkUrl, rowUpdateUrl,batchActivityCount, i18nParameter, columnToSortByParameter) {
-        $('#filterBatchesByActiveCheckbox').change(function () {
+        $('#filterBatchesByActiveCheckbox').on('change', function () {
             responsiveTable.setOnlyActive($('#filterBatchesByActiveCheckbox').is(":checked"));
         });
         responsiveTable.init(updateTableUrlParameter, i18nParameter, columnToSortByParameter, $('#filterBatchesByActiveCheckbox').is(":checked"));
