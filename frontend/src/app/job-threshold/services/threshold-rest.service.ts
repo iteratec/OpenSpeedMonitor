@@ -96,8 +96,8 @@ export class ThresholdRestService {
     this.http.post(url,  params ).subscribe(response => {
       let newId : number=  Number(Object.values(response));
       this.actualThreshold.id= newId;
-      self.actualThresholdsforJobList.addToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);}
-    );
+      self.actualThresholdsforJobList.addToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
+    });
   }
 
   /** GET Script */

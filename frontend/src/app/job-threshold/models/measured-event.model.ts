@@ -5,7 +5,6 @@ import {TestedPage} from "./tested-page.model";
 export type MeasuredEvent = {
   id: number;
   name: string;
-  translationsKey: string;
   testedPage: TestedPage;
   testedPageId: number;
   state: string;

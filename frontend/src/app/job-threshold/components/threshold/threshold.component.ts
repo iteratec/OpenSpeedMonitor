@@ -44,7 +44,10 @@ export class ThresholdComponent implements OnInit {
   }
 
   saveNew(obj) {
-    this.threshold.measurand.name = this.selectedMeasurand;
+    let tempArray = this.selectedMeasurand.split('.');
+    let selected = tempArray[tempArray.length - 1]; // selected = the selected measurands name instead of measurands translationkey
+    this.threshold.measurand.name = selected;
+    this.threshold.measurand.translationsKey = this.selectedMeasurand;
     this.threshold.lowerBoundary = obj.lowerBoundary;
     this.threshold.upperBoundary = obj.upperBoundary;
     if (this.threshold.measuredEvent.state == "new") {
