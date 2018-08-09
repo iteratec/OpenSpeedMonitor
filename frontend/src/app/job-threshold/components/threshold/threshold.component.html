@@ -9,7 +9,7 @@
           [thresholdState]="threshold.state"
           [lowerBoundary]="threshold.lowerBoundary"
           [upperBoundary]="threshold.upperBoundary"
-          (editThreshold)="edit()"
+          (editThreshold)="edit($event)"
           (deleteThreshold)="delete()"
           (saveNew)="saveNew($event)"
           (cancelNew)="cancelNew()"></osm-threshold-row>
@@ -43,7 +43,7 @@
                 [thresholdState]="threshold.state"
                 [lowerBoundary]="threshold.lowerBoundary"
                 [upperBoundary]="threshold.upperBoundary"
-                (editThreshold)="edit()"
+                (editThreshold)="edit($event)"
                 (deleteThreshold)="delete()"
                 (saveNew)="saveNew($event)"
                 (cancelNew)="cancelNew()"></osm-threshold-row>
@@ -70,7 +70,7 @@
           [thresholdState]="threshold.state"
           [lowerBoundary]="threshold.lowerBoundary"
           [upperBoundary]="threshold.upperBoundary"
-          (editThreshold)="edit()"
+          (editThreshold)="edit($event)"
           (deleteThreshold)="delete()"
           (saveNew)="saveNew($event)"
           (cancelNew)="cancelNew()"></osm-threshold-row>

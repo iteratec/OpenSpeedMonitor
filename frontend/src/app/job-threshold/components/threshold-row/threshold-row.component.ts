@@ -27,7 +27,7 @@ export class ThresholdRowComponent implements OnInit {
   originalLowerBoundary: number;
 
   leftButtonLabelDisable: boolean = false;  //disable for save and accept buttons
-  allowInput: boolean = false;
+  disableInput: boolean = true;
   deleteConfirmation: boolean = false;
 
   constructor() {
@@ -37,25 +37,26 @@ export class ThresholdRowComponent implements OnInit {
     this.originalUpperBoundary = this.upperBoundary;
     this.originalLowerBoundary = this.lowerBoundary;
     if (this.thresholdState == "new") {
+      this.disableInput = false;
       this.leftButtonLabelDisable = true;
-      this.leftButtonLabel = "Speichern";
-      this.rightButtonLabel = "Entfernen";
+      this.leftButtonLabel = "frontend.job.threshold.save";
+      this.rightButtonLabel = "frontend.job.threshold.remove";
     } else {
-      this.leftButtonLabel = "Editieren";
-      this.rightButtonLabel = "Löschen";
+      this.leftButtonLabel = "frontend.job.threshold.edit";
+      this.rightButtonLabel = "frontend.job.threshold.delete";
     }
   }
 
 
   edit() {
-    this.allowInput = !this.allowInput;
-    if (this.allowInput) {
-      this.rightButtonLabel = "Zurücksetzen";
-      this.leftButtonLabel = "Übernehmen";
+    this.disableInput = !this.disableInput;
+    if (!this.disableInput) {
+      this.rightButtonLabel = "frontend.job.threshold.discard";
+      this.leftButtonLabel = "frontend.job.threshold.submit";
     } else {
-      this.rightButtonLabel = "Löschen";
-      this.leftButtonLabel = "Editieren";
-      this.editThreshold.emit();
+      this.rightButtonLabel = "frontend.job.threshold.delete";
+      this.leftButtonLabel = "frontend.job.threshold.edit";
+      this.editThreshold.emit({lowerBoundary: this.lowerBoundary, upperBoundary: this.upperBoundary});
     }
   }
 
@@ -64,24 +65,24 @@ export class ThresholdRowComponent implements OnInit {
       this.deleteConfirmation = !this.deleteConfirmation;
       this.deleteThreshold.emit();
     } else {
-      if (this.rightButtonLabel == "Löschen") {
+      if (this.rightButtonLabel == "frontend.job.threshold.delete") {
         this.deleteConfirmation = !this.deleteConfirmation;
-        this.rightButtonLabel = "Nein";
-        this.leftButtonLabel = "Ja";
+        this.rightButtonLabel = "frontend.job.threshold.deleteNo";
+        this.leftButtonLabel = "frontend.job.threshold.deleteYes";
       } else {
-        this.allowInput = !this.allowInput;
+        this.disableInput = !this.disableInput;
         this.upperBoundary = this.originalUpperBoundary;
         this.lowerBoundary = this.originalLowerBoundary;
-        this.rightButtonLabel = "Löschen";
-        this.leftButtonLabel = "Editieren";
+        this.rightButtonLabel = "frontend.job.threshold.delete";
+        this.leftButtonLabel = "frontend.job.threshold.edit";
       }
     }
   }
 
   cancelDelete() {
     this.deleteConfirmation = !this.deleteConfirmation;
-    this.rightButtonLabel = "Löschen";
-    this.leftButtonLabel = "Editieren";
+    this.rightButtonLabel = "frontend.job.threshold.delete";
+    this.leftButtonLabel = "frontend.job.threshold.edit";
   }
 
   save() {

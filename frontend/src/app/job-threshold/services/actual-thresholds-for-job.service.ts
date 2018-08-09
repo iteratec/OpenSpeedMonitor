@@ -68,6 +68,7 @@ export class ActualThresholdsForJobService {
     if(addedThreshold.measuredEvent.state=="new") {
       let newThresholdForJob = {} as ThresholdForJob;
       addedThreshold.state = "normal";
+      //addedThreshold.measurand.name
       addedThreshold.measuredEvent.state= "normal";
       let newMeasuredEvent = addedThreshold.measuredEvent;
       newMeasuredEvent.state = "normal"; //?

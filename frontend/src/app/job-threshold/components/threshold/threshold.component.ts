@@ -34,7 +34,9 @@ export class ThresholdComponent implements OnInit {
     }
   }
 
-  edit() {
+  edit(obj) {
+    this.threshold.lowerBoundary = obj.lowerBoundary;
+    this.threshold.upperBoundary = obj.upperBoundary;
     this.thresholdRestService.editThreshold(this.threshold)
   }
 

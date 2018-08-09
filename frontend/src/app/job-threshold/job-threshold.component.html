@@ -8,17 +8,17 @@
                       (removeEvent)="cancelNewMeasuredEvent()">
   </osm-measured-event>
 
-  <p class="message" *ngIf="isEmpty == true">
-    Für diesen Job existieren noch keine Thresholds. Thresholds haben einen unteren und einen oberen Schwellenwert für ausgewählte Measured Events und Metriken. Thresholds ermöglichen die Erstellung eines Skriptes, welches in eine CI-Pipeline eingebunden werden kann. Das Skript started diesen Job und überprüft ob die Ergebnisse innerhalb der hier konfigurierten Schwellenwerten liegen.
-  </p>
+  <p class="message" *ngIf="isEmpty == true"> {{"frontend.job.threshold.description" | translate}}</p>
 
   <button type="button"
           class="btn btn-primary"
           [disabled] = "addMeasuredEventDisabled"
-          (click)="addMeasuredEvent() ">Measure hinzufügen</button>
+          (click)="addMeasuredEvent() ">{{"frontend.job.threshold.addMeasuredEvent" | translate}}
+  </button>
   <button type="button"
           class="btn btn-default"
-          (click)="createScript()">CI-Script Erstellen</button>
+          (click)="createScript()">{{"frontend.job.threshold.createScript" | translate}}
+  </button>
 </div>
 
 

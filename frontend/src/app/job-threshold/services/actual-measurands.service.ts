@@ -20,8 +20,6 @@ export class ActualMeasurandsService {
     this.measurandList.map(measurand => {
       measurand.translationsKey = "frontend.de.iteratec.isr.measurand." + measurand.name;
     })
-    //this.measurandList = measurands;
-    console.log("FORMAT: " + JSON.stringify(this.measurandList));
   }
 
 

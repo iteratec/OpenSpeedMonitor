@@ -1,6 +1,6 @@
 .flex-container {
   display: flex;
-  /*align-items: space-around;*/
+  flex: 4;
   justify-content: flex-start;
   align-content: center;
   line-height: 2;
@@ -10,15 +10,13 @@
 .flex-item {
   margin: auto;
   margin-right: 2%;
-  flex-grow: 1;
-  /*padding-right: 1%;*/
 }
 
 .flex-input-item {
-  flex-grow: 2;
   max-width: 9.4em;
-  font-size: 1.2em;
+  font-size: 1.5em;
   text-align: right;
+  margin-right: 2%;
 }
 
 
