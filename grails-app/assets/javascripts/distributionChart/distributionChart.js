@@ -380,7 +380,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var journey = chartData.filterRules[journeyKey];
 
             journey.forEach( function (trace) {
-                filteredAndSortedSeries[trace] = chartData.series[trace];
+                const series = chartData.series[trace];
+                if (series !== undefined) filteredAndSortedSeries[trace] = series;
             });
         } else {
             var sortingOrder = desc ? "desc" : "asc";
