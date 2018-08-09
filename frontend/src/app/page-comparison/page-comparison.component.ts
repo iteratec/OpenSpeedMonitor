@@ -31,6 +31,7 @@ export class PageComparisonComponent {
       this.pageComparisonSelections.splice(index, 1)
     }
     this.checkIfRowsAreRemovable();
+    this.validateComparisons();
   }
 
   validateComparisons() {
