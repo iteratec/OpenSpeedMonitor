@@ -25,7 +25,7 @@ function addAlias() {
 
     $("#graphAliasChildlist").append(clone);
     clone.show();
-    graphNameSelect.change(function () {
+    graphNameSelect.on('change', function () {
         var selectedValue = $(this).val();
         $(this).closest(".graphAlias-div").attr('id', 'graphAlias_' + selectedValue);
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");

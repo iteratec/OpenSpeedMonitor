@@ -352,16 +352,16 @@
             $(".dia-y-axis-max").val(loadTimeMaximum);
             $(".dia-y-axis-min").val(loadTimeMinimum);
             if (eval(showDataMarkers)) {
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             if (eval(showDataLabels)) {
-                $("#to-enable-label").click();
+                $("#to-enable-label").trigger('click');
             }
             initGraphNameAliases(graphNameAliases);
             initGraphColors(graphColors);
         }
 
-        $(document).ready(function () {
+        $(function () {
 
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
@@ -373,7 +373,7 @@
             setAdjustments();
 
         });
-        $(window).load(function() {
+        $(window).on('load', function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
         });
 

@@ -94,7 +94,7 @@
 
         OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart().init();
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/distributionChart/distributionChart.js" />', 'distributionChart');
             OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);

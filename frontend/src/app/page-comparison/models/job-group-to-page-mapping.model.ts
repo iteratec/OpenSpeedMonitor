@@ -1,6 +1,6 @@
 import {PageDto} from "./page.model";
 
-export type JobGroupToPagesMappingDto = {
+export interface JobGroupToPagesMappingDto {
   id: number;
   name: string;
   pages: PageDto[];

@@ -89,11 +89,11 @@ OpenSpeedMonitor.script.versionControl = OpenSpeedMonitor.script.versionControl 
             $('#versionControlModal').on('shown.bs.modal', function () {
                 _initAutoResize($(versionDescriptionTextAreaId)[0]);
             });
-            $(versionDescriptionTextAreaId).keyup(function () {
+            $(versionDescriptionTextAreaId).on('keyup', function () {
                 _showSaveButton(archivedScriptId);
                 _resizeTextArea(this)
             });
-            $(versionDescriptionTextAreaId).change(function () {
+            $(versionDescriptionTextAreaId).on('change', function () {
                 _showSaveButton(archivedScriptId);
                 _resizeTextArea(this)
             });
@@ -109,7 +109,7 @@ OpenSpeedMonitor.script.versionControl = OpenSpeedMonitor.script.versionControl 
         });
         $('#versionControlModal').on('shown.bs.modal', function () {
             if (!$('#versionControlModal')[0].alreadyInitialized) {
-                $('#archivedNavigationScriptTableBody').children('tr:first').click();
+                $('#archivedNavigationScriptTableBody').children('tr:first').trigger('click');
                 $('#versionControlModal')[0].alreadyInitialized = true;
             }
         })

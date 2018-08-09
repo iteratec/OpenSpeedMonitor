@@ -30,7 +30,7 @@ buildscript {
         classpath 'org.grails.plugins:database-migration:3.0.3'
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.13.1'
-        classpath "org.grails.plugins:hibernate5:6.1.9"
+        classpath "org.grails.plugins:hibernate5:6.1.10"
         classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
     }
 }
@@ -86,7 +86,7 @@ dependencies {
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
     compile "org.grails.plugins:scaffolding"
-    compile "org.grails.plugins:hibernate5:6.1.9"
+    compile "org.grails.plugins:hibernate5:6.1.10"
     compile 'org.grails.plugins:log-hibernate-stats:1.0.20'
     compile "org.hibernate:hibernate-ehcache"
     compile "io.swagger:swagger-core:${swaggerVersion}"
@@ -128,7 +128,7 @@ dependencies {
     compile 'io.dropwizard.metrics:metrics-graphite:3.2.3'
     compile 'io.dropwizard.metrics:metrics-jvm:3.2.3'
     compile 'p6spy:p6spy:3.0.0'
-    compile 'org.grails.plugins:build-test-data:3.3.0.RC2'
+    compile 'org.grails.plugins:build-test-data:3.3.1'
     compile 'io.github.http-builder-ng:http-builder-ng-core:0.17.0'
     compile 'org.grails.plugins:http-builder-helper:1.0.2'
 
@@ -212,6 +212,16 @@ task generateFrontendI18nFiles(type: Grails2FrontendI18nTask) {
     frontendKeyPrefix = "frontend."
 }
 
+task rebuildNodeSass(type: NpmTask) {
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['rebuild', 'node-sass']
+}
+
+task angularTests(type: NpmTask, dependsOn: [installFrontendDependencies, npmInstall, rebuildNodeSass]) {
+    workingDir = file("${project.projectDir}/frontend")
+    args = ['test']
+}
+
 task jasmineRun(type: NodeTask, dependsOn: ['nodeSyncJavascript', 'nodeSyncStylesheets']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
@@ -223,6 +233,7 @@ task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
 }
 
 test.dependsOn jasmineRun
+test.dependsOn angularTests
 
 task nodeSyncJavascript(type: Sync) {
     description "Copy 3rd party js libs to grails asset folder."
@@ -243,7 +254,7 @@ task nodeSyncJavascript(type: Sync) {
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
-    include 'sticky-table-headers/js/jquery.stickytableheaders.js'
+    include 'sticky-table-headers/js/jquery.stickytableheaders.min.js'
     include 'file-saver/FileSaver.min.js'
     include 'bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'
     include 'save-svg-as-png/saveSvgAsPng.js'
@@ -318,6 +329,7 @@ sourceSets {
 }
 
 integrationTest {
+ beforeTest { descriptor -> logger.lifecycle("Running test: " + descriptor) }
     if (System.getProperty('webdriver.chrome.driver')) {
         systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     }

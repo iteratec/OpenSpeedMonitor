@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScriptComponent } from './script.component';
+import { CsiGraphComponent } from './csi-graph.component';
 
-describe('ScriptComponent', () => {
-  let component: ScriptComponent;
-  let fixture: ComponentFixture<ScriptComponent>;
+describe('CsiGraphComponent', () => {
+  let component: CsiGraphComponent;
+  let fixture: ComponentFixture<CsiGraphComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ScriptComponent ]
+      declarations: [ CsiGraphComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ScriptComponent);
+    fixture = TestBed.createComponent(CsiGraphComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

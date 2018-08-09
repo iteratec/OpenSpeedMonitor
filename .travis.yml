@@ -4,12 +4,55 @@ cache:
   directories:
     - node_modules
     - frontend/node_modules
+    - build/npm
+    - $HOME/.npm
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - openjdk8
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/
+install: true
+
+# Don't email me the results of the test runs.
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+
+# get google-chrome-stable
+addons:
+  chrome: stable
+
+# Install ChromeDriver
+install:
+  - wget -N https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -P ~/
+  - unzip ~/chromedriver_linux64.zip -d ~/
+  - rm ~/chromedriver_linux64.zip
+  - sudo mv -f ~/chromedriver /usr/local/share/
+  - sudo chmod +x /usr/local/share/chromedriver
+  - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
+
 jobs:
   include:
-    - stage: Tests
-      script: ./gradlew -x jasmineRun test
+  - stage: Tests
+    name: "unitTests"
+    script:
+    - ./gradlew -x jasmineRun -x angularTests test
+  - name: "integrationTests"
+    script:
+    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+  - name: "gebTests"
+    script:
+    - whereis google-chrome-stable
+    - whereis chromedriver
+    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+  - name: "jasmineTests"
+    script:
+    - ./gradlew jasmineRun
+  - name: "angularTests"
+    script:
+    - ./gradlew angularTests
+

@@ -100,7 +100,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         $(".measurandSeries-clone").remove();
         var currentAddButton = $("#addMeasurandButton");
         for (var i = 0; i < measurands.length - 1; i++) {
-            currentAddButton.click();
+            currentAddButton.trigger('click');
         }
 
         var selects = $(".measurand-select");
@@ -109,7 +109,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
             if (measurand.startsWith("_UTM")) {
 
                 var optGroupUserTimings = $(selects[i]).find('.measurand-opt-group-USER_TIMINGS');
-                var alreadyThere = optGroupUserTimings.size() > 1;
+                var alreadyThere = optGroupUserTimings.length > 1;
                 if (!alreadyThere) {
                     OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{
                         id: measurand,

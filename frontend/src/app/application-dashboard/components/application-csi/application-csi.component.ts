@@ -13,8 +13,11 @@ import {ApplicationDashboardService} from "../../services/application-dashboard.
 export class ApplicationCsiComponent {
   recentCsiValue$: Observable<CsiDTO>;
   hasConfiguration$: Observable<boolean>;
+  csiValues$: Observable<ApplicationCsiListDTO>;
 
   constructor(private dashboardService: ApplicationDashboardService) {
+    this.csiValues$ = this.dashboardService.csiValues$;
+
     this.recentCsiValue$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.csiDtoList.slice(-1)[0]));
 

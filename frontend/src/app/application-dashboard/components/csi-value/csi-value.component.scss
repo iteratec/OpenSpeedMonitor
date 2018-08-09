@@ -1,3 +1,5 @@
+@import "../../../../styles/colors";
+
 .csi-circle-container {
   position: relative;
   display: inline-block;
@@ -14,19 +16,13 @@
 
 .csi-value-text {
   font-weight: bold;
-  color: #000000;
+  color: $color-text-normal;
 }
 
 .csi-value-description {
-  color: #333333;
+  color: $color-text-medium;
 }
 
-.good{
-  color: #00bd58;
-}
-.okay{
-  color: #ffa605;
-}
-.bad{
-  color: #fe1d1d;
+.not-available {
+  color: $color-text-medium;
 }

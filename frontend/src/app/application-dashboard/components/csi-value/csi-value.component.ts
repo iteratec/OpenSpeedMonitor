@@ -1,9 +1,10 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {arc} from "d3-shape";
-import {select} from "d3-selection";
-import {transition} from "d3-transition";
-import {interpolate} from "d3-interpolate";
-import {CalculationUtil} from "../../../shared/utils/calculation.util";
+import {arc} from 'd3-shape';
+import {select} from 'd3-selection';
+import {transition} from 'd3-transition';
+import {interpolate} from 'd3-interpolate';
+import {CalculationUtil} from '../../../shared/utils/calculation.util';
+import {CsiUtils} from '../../utils/csi-utils';
 
 @Component({
   selector: 'osm-csi-value',
@@ -15,11 +16,13 @@ export class CsiValueComponent implements OnInit, OnChanges {
   @Input() description: string;
   @Input() csiValue: number;
 
+  formattedCsiValue: string;
   csiValueClass: string;
   size: number;
   outerRadius: number;
   valueFontSize: string;
   descriptionFontSize: string;
+  isNA: boolean;
 
   arcGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
@@ -34,14 +37,27 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private drawCircle(previousCsiValue: number = 0) {
-    const calculatedPreviousCsi = this.calculateCsiArcTarget(this.roundCsiValue(previousCsiValue));
-    this.csiValue = this.roundCsiValue(this.csiValue);
+    const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
+    this.isNA = !this.csiValue && this.csiValue !== 0;
+    this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
+    this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()), calculatedPreviousCsi);
     this.exit(selection.exit());
+  }
+
+  private formatCsiValue(csiValue: number): string {
+    if (this.isNA) {
+      return "n/a";
+    }
+    if (csiValue >= 100) {
+      return "100%";
+    }
+
+    return csiValue.toFixed(1) + "%";
   }
 
   private initByInputs() {
@@ -120,20 +136,13 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
-    if (csiValue >= 90) {
-      return "good";
-    }
-    if (csiValue >= 70) {
-      return "okay";
-    }
-    return "bad";
-  }
-
-  private roundCsiValue(csiValue: number): number {
-    return CalculationUtil.round(csiValue)
+    return this.isNA ? 'not-available' : CsiUtils.getClassByThresholds(csiValue);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this.arcGenerator) {
+      return;
+    }
     if (changes.csiValue) {
       this.drawCircle(changes.csiValue.previousValue);
     }

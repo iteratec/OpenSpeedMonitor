@@ -25,7 +25,7 @@ A card with controls to select a job group
     </div>
 </div>
 <asset:script type="text/javascript">
-    $(window).load(function() {
+    $(window).on('load', function() {
         OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectJobGroupCard.js" />', 'selectJobGroupCard');
     });
 </asset:script>

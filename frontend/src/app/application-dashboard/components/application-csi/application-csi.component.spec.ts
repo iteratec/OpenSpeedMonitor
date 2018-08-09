@@ -1,6 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ApplicationCsiComponent } from './application-csi.component';
+import {ApplicationCsiComponent} from './application-csi.component';
+import {CsiValueComponent} from '../csi-value/csi-value.component';
+import {SharedMocksModule} from '../../../testing/shared-mocks.module';
+import {ApplicationDashboardService} from '../../services/application-dashboard.service';
+import {CsiGraphComponent} from '../csi-graph/csi-graph.component';
 
 describe('ApplicationCsiComponent', () => {
   let component: ApplicationCsiComponent;
@@ -8,7 +12,17 @@ describe('ApplicationCsiComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ApplicationCsiComponent ]
+      declarations: [
+        ApplicationCsiComponent,
+        CsiValueComponent,
+        CsiGraphComponent
+      ],
+      providers: [
+        ApplicationDashboardService
+      ],
+      imports: [
+        SharedMocksModule
+      ]
     })
     .compileComponents();
   }));

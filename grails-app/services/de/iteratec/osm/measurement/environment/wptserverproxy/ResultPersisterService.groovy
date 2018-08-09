@@ -124,7 +124,7 @@ class ResultPersisterService implements iResultListener {
 
     }
 
-    private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId) {
+    private void removePendingAndCreateFinishedJobResult(resultXml, String testId) {
 
         String jobLabel = resultXml.getLabel()
         Job job = jobDaoService.getJob(jobLabel)
@@ -138,8 +138,6 @@ class ResultPersisterService implements iResultListener {
         } else {
             updateJobResult(jobResult, resultXml)
         }
-
-        return jobResult;
     }
 
     private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
@@ -176,7 +174,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    protected JobResult persistNewJobRun(Job job, WptResultXml resultXml) {
+    protected void persistNewJobRun(Job job, WptResultXml resultXml) {
 
         String testId = resultXml.getTestId()
 
@@ -211,8 +209,6 @@ class ResultPersisterService implements iResultListener {
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
         result.setDescription('')
         result.save(failOnError: true, flush: true)
-
-        return result
     }
 
     void persistResultsForAllTeststeps(WptResultXml resultXml) {
@@ -381,8 +377,7 @@ class ResultPersisterService implements iResultListener {
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
 
-        result.save(failOnError: true)
-
+        result.save(failOnError: true, flush: true)
         return result
 
     }
@@ -533,7 +528,8 @@ class ResultPersisterService implements iResultListener {
     void informDependentCsiAggregations(EventResult result) {
         try {
             if (csiValueService.isCsiRelevant(result)) {
-                csiAggregationUpdateService.createOrUpdateDependentMvs(result.ident())
+                long resultId = result.ident()
+                csiAggregationUpdateService.createOrUpdateDependentMvs(resultId)
             }
         } catch (Exception e) {
             log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)

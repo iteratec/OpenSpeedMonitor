@@ -28,18 +28,17 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.result.*
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.util.mop.ConfineMetaClassChanges
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 @ConfineMetaClassChanges([CsiByEventResultsService])
 class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
@@ -67,14 +66,18 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
 
     def setup() {
-        CsiAggregation.withNewTransaction {
-            createOsmConfig()
-            createPagesAndEvents()
-            createBrowsers()
-            createJobGroup()
-            createEventResults()
+        createOsmConfig()
+        createPagesAndEvents()
+        createBrowsers()
+        createJobGroup()
+        createEventResults()
+        csiByEventResultsService.csTargetGraphDaoService = Spy(CsTargetGraphDaoService) {
+            getActualCsTargetGraph() >> null
         }
-        csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
+    }
+
+    def cleanup() {
+        csiByEventResultsService.csTargetGraphDaoService = grailsApplication.mainContext.getBean("csTargetGraphDaoService")
     }
 
     void "test retrieveCsi with system and page"() {
@@ -125,7 +128,7 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
         Math.abs(expectedCsi - systemCsi.csiValueAsPercentage) < DELTA
     }
 
-    void "test duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi)" () {
+    void "test duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi)"() {
         given: "a query for all Jobgroups and a pre-calculated expected csi"
         MvQueryParams queryParams = new MvQueryParams()
         queryParams.jobGroupIds.addAll(JobGroup.list()*.id)
@@ -164,7 +167,7 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
         cleanup: "clean up and delete the duplicated event results"
         // delete last six eventResults
         def eventResults = EventResult.list(sort: "id", order: "desc")
-        (0..6).each {eventResults[it].delete()}
+        (0..6).each { eventResults[it].delete() }
     }
 
 
@@ -197,9 +200,9 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
         //data is needed to create a JobResult
         JobGroup group = JobGroup.list()[0]
         Script script = Script.build(
-                label:"label${groups}",
-                description:  "description",
-                navigationScript:"navigationScript")
+                label: "label${groups}",
+                description: "description",
+                navigationScript: "navigationScript")
         WebPageTestServer webPageTestServer = WebPageTestServer.build(
                 label: "label",
                 proxyIdentifier: "1",
@@ -209,14 +212,14 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 wptServer: webPageTestServer,
                 uniqueIdentifierForServer: "id",
                 browser: browser,
-                active:  true)
+                active: true)
         Job job = Job.build(
                 label: "Label${groups++}",
                 script: script,
                 location: location,
                 jobGroup: group,
                 runs: 1,
-                active:  false,
+                active: false,
                 maxDownloadTimeInMinutes: 20)
 
         JobResult expectedResult = new JobResult(jobGroupName: "Group", jobConfigLabel: "label", jobConfigRuns: 1, httpStatusCode: 200, job: job, description: "description", date: new Date(), testId: "TestJob").save(validate: false);
