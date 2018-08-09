@@ -1,5 +1,7 @@
+
 .thresholdContainer {
-  width:150% ;
+  width: auto;
+  display: block;
 }
 
 .flex-row-group {
@@ -10,7 +12,7 @@
 }
 
 .flex-column-left {
-  flex: 0 1 230px;
+  flex: 0 1 200px;
   justify-content: flex-start;
   align-items: flex-start;
   line-height: 2;
@@ -26,7 +28,7 @@
   align-items: flex-start;
   */
   line-height: 2;
-  flex-basis: 850px;
+  flex-basis: 800px;
 }
 
 .flex-up {
