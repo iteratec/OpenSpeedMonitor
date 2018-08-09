@@ -42,7 +42,7 @@ class JobStatisticService {
         if (jobStatistic == null){
             jobStatistic = new JobStatistic()
             job.jobStatistic = jobStatistic
-            job.save(failOnError: true, flush: true)
+            job.save(failOnError: true)
         }
         return jobStatistic
     }
