@@ -42,7 +42,7 @@
                 <ul class="dropdown-menu">
                     <li class="${request.forwardURI.equals('/applicationDashboard') ? 'active' : ''}">
                         <a href="${createLink(uri: '/applicationDashboard')}">
-                            <i class="fas fa-bars"></i>
+                            <i class="fas fa-table"></i>
                             <g:message message="frontend.de.iteratec.osm.applicationDashboard.title"/>
                         </a>
                     </li>
