@@ -15,7 +15,7 @@ OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 OpenSpeedMonitor.i18n.measurands = OpenSpeedMonitor.i18n.measurands || {};
 
 new Vue({
-    el: '#threshold',
+    /*el: '#threshold',*/
     data: {
         activeMeasuredEvents: [],
         measuredEvents: [],
@@ -38,19 +38,19 @@ new Vue({
             return this.copiedMeasuredEvents;
         }
     },
-    beforeMount: function () {                                      /*GUACAMOLE*/
+    beforeMount: function () {
         this.jobId = this.$el.attributes['jobId'].value;
         this.scriptId = this.$el.attributes['scriptId'].value;
     },
-    mounted: function () {                                          /*GUACAMOLE*/
+    mounted: function () {
         this.fetchData();
     },
     methods: {
-        fetchData: function () {                                     /*GUACAMOLE*/
+        fetchData: function () {
             this.getMeasurands();
             this.getMeasuredEvents(this.scriptId);
         },
-        getMeasuredEvents: function (scriptId) {                    /*GUACAMOLE*/
+        getMeasuredEvents: function (scriptId) {
             var self = this;
             if (scriptId) {
                 $.ajax({
@@ -69,7 +69,7 @@ new Vue({
                 });
             }
         },
-        getMeasurands: function () {                                        /*GUACAMOLE*/
+        getMeasurands: function () {
             var self = this;
             $.ajax({
                 type: 'GET',
@@ -79,7 +79,6 @@ new Vue({
                     result.forEach(function (measurand) {
                         measurand.translatedName = OpenSpeedMonitor.i18n.measurands[measurand.name];    //TODO
                     });
-                    /*console.log("VUE Measurands result: " + JSON.stringify(result));*/
                     self.measurands = result;
                 },
                 error: function () {
@@ -87,7 +86,7 @@ new Vue({
                 }
             });
         },
-        getThresholds: function () {                        /*GUACAMOLE*/
+        getThresholds: function () {
             this.activeMeasuredEvents = [];
             var self = this;
             this.getThresholdsForJob(this.jobId).success(function (result) {
@@ -114,7 +113,7 @@ new Vue({
                 console.log(e);
             });
         },
-        createThreshold: function (newThreshold) {                       /*GUACAMOLE*/
+        createThreshold: function (newThreshold) {
             var self = this;
             $.ajax({
                 type: 'POST',
@@ -170,7 +169,7 @@ new Vue({
                 }
             });
         },
-        updateThreshold: function (threshold) {                  /*GUACAMOLE*/
+        updateThreshold: function (threshold) {
             var self = this;
             var updatedThreshold = threshold;
             $.ajax({
@@ -196,7 +195,7 @@ new Vue({
                 }
             });
         },
-        getThresholdsForJob: function (jobId) {             /*GUACAMOLE*/
+        getThresholdsForJob: function (jobId) {
             var targetUrl = "/job/getThresholdsForJob";
             return $.ajax({
                 type: 'GET',

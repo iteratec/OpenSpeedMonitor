@@ -1,6 +1,7 @@
 <app-job-threshold data-job-id="${job?.id}"
                    data-job-scriptId="${job?.script?.id}"
                    data-module-path="src/app/job-threshold/job-threshold.module#ThresholdModule"></app-job-threshold>
+%{--
 <div id="threshold" jobId="${job?.id}" scriptId="${job?.script?.id}">
     <h4>VUE Component</h4>
     <hr>
@@ -53,4 +54,4 @@
     </span>
 </div>
 
-<g:render template="threshold/measuredEventVue"/>
+<g:render template="threshold/measuredEventVue"/>--}%

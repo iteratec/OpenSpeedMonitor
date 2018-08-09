@@ -30,7 +30,7 @@ export class ThresholdComponent implements OnInit {
       this.selectedMeasuredEvent = this.measuredEventList[0];
     }
     if (this.threshold.state == "new") {
-      this.selectedMeasurand = this.actualMeasurandList[0].name;
+      this.selectedMeasurand = this.actualMeasurandList[0].translationsKey;
     }
   }
 

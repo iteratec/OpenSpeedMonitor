@@ -2,7 +2,7 @@
   <div *ngIf="threshold.state=='normal'">
     <div class="flex-column">
       <div class="flex-row-item">
-        <label class="threshold">{{threshold.measurand.name}} </label>
+        <label class="threshold">{{threshold.measurand.translationsKey | translate}} </label>
       </div>
       <div class="flex-row-group">
         <osm-threshold-row
@@ -33,7 +33,9 @@
               <select class="thresholdSelects"
                       [(ngModel)]="selectedMeasurand"
                       required>
-                <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.name">{{measurand.name}}</option>
+                <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.translationsKey">
+                  {{measurand.translationsKey | translate}}
+                </option>
               </select>
             </div>
             <div class="flex-row-group">
@@ -58,7 +60,9 @@
         <select class="thresholdSelects"
                 [(ngModel)]="selectedMeasurand"
                 required>
-          <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.name">{{measurand.name}}</option>
+          <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.translationsKey">
+            {{measurand.translationsKey | translate}}
+          </option>
         </select>
       </div>
       <div class="flex-row-group">
