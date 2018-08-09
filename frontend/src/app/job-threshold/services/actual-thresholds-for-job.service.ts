@@ -21,6 +21,9 @@ export class ActualThresholdsForJobService {
       element.measuredEvent.state = "normal";
       element.thresholds.map(threshold => {
         threshold.state = "normal";
+        /*
+         threshold.measurand.name = frontend.de.iteratec.isr.measurand[threshold.measurand.name]; // format from messages.properties
+         */
       })
     });
 
