@@ -33,20 +33,32 @@
             <h2><g:message code="de.iteratec.isr.measurementresults" default="Results"/> <i class="fas fa-tachometer-alt"></i></h2>
             <img src="${resource(dir: 'images', file: 'results.png')}"
                  alt="Page Aggregation Chart" class="intro-img img-rounded"/>
-            <p class="intro-text">
-                <g:message code="landing.results.text"
-                           default="Review and analyze the results of your measurements. Show {0} by page, the {1} or dive into the {2}."
-                           encodeAs="raw" args="[
-                        link(controller: 'pageAggregation', action: 'show') { message(code:'landing.results.link.pageAggregation', default:'aggregated results')},
-                        link(controller: 'eventResultDashboard', action: 'showAll') { message(code:'landing.results.link.timeSeries', default:'development over time')},
-                        (grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true' ?
-                                link(controller: 'detailAnalysis', action: 'show') { message(code:'landing.results.link.detailAnalysis', default:'request details')}
-                                : message(code:'landing.results.link.detailAnalysis', default:'request details'))
-                ]"/>
-            </p>
+
+            <div class="intro-text">
+                <p>
+                    <g:message code="landing.results.text"
+                               default="Review and analyze the results of your measurements. Show {0} by page, the {1} or dive into the {2}."
+                               encodeAs="raw" args="[
+                            link(controller: 'pageAggregation', action: 'show') {
+                                message(code: 'landing.results.link.pageAggregation', default: 'aggregated results')
+                            },
+                            link(controller: 'eventResultDashboard', action: 'showAll') {
+                                message(code: 'landing.results.link.timeSeries', default: 'development over time')
+                            },
+                            (grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true' ?
+                                    link(controller: 'detailAnalysis', action: 'show') {
+                                        message(code: 'landing.results.link.detailAnalysis', default: 'request details')
+                                    } : message(code: 'landing.results.link.detailAnalysis', default: 'request details'))
+                    ]"/>
+                </p>
+                <a href="/applicationDashboard"
+                   class="btn btn-primary"><g:message code="landing.results.showOverview"
+                                                      default="Create New Measurement"/></a>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
+
+    <div class=" col-md-4">
         <div class="card intro-card">
             <h2><g:message code="customerSatisfation.label" default="Customer Satisfaction"/> <i
                     class="fas fa-users"></i></h2>
