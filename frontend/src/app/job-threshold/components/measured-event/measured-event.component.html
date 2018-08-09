@@ -1,13 +1,12 @@
-<div class="thresholdContainer">
-
+<div>
   <!-- Normal MeasuredEvent-->
-  <div class="" *ngIf="measuredEvent.state=='normal'">
+  <div *ngIf="measuredEvent.state=='normal'">
     <div class="flex-row-group">
       <div class="flex-column-left">
           <label class="measuredEvent">{{measuredEvent.name}}</label>
       </div>
       <div class="flex-column-right">
-        <div class="">
+        <div>
           <osm-threshold *ngFor="let threshold of thresholds"
                          [threshold]="threshold"
                          [measuredEventList]="measuredEventList"
@@ -28,7 +27,7 @@
   </div>
 
   <!--New MeasuredEvent-->
-  <div class="" *ngIf="measuredEvent.state=='new'">
+  <div *ngIf="measuredEvent.state=='new'">
     <osm-threshold *ngFor="let threshold of thresholds"
                    [threshold]="threshold"
                    [measuredEventList]="measuredEventList"

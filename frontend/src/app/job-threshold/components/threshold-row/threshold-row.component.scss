@@ -1,6 +1,5 @@
 .flex-container {
   display: flex;
-  flex: 4;
   justify-content: flex-start;
   align-content: center;
   line-height: 2;
@@ -14,11 +13,9 @@
 
 .flex-input-item {
   max-width: 9.4em;
-  font-size: 1.5em;
-  text-align: right;
   margin-right: 1%;
+  flex-shrink: 0
 }
-
 
 .good {
   color: #2ECC71;

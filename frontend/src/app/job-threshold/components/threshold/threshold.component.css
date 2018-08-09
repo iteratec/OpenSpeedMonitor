@@ -7,7 +7,7 @@
 
 .flex-row-item {
   flex-basis: auto;
-  margin-top: 1%;
+  margin-bottom: 1%;
 }
 
 .flex-row-group {
@@ -16,6 +16,7 @@
   flex-flow: row nowrap;
   align-content: center;
   margin-left: 2%;
+  margin-bottom: 1%;
 }
 
 .flex-container {
@@ -37,6 +38,13 @@
 
 .threshold {
   font-size: 1em;
+  font-weight: bold;
+}
+
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
