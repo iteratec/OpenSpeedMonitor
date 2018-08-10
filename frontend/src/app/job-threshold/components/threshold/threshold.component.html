@@ -1,5 +1,5 @@
 <div>
-  <div *ngIf="threshold.state=='normal'">
+  <div *ngIf="threshold?.state=='normal'">
     <div class="flex-column">
       <div class="flex-row-item">
         <label class="threshold">{{threshold.measurand.translationsKey | translate}} </label>
@@ -18,7 +18,7 @@
   </div>
 
   <!--New Measured Event-->
-    <div class="flex-row-group-parent" *ngIf="threshold.measuredEvent.state=='new' && threshold.state=='new'">
+  <div class="flex-row-group-parent" *ngIf="threshold?.measuredEvent.state=='new' && threshold?.state=='new'">
       <div class="flex-column-left">
         <select class="thresholdSelects"
                 [(ngModel)]="selectedMeasuredEvent"
@@ -54,7 +54,7 @@
     </div>
 
   <!--New Threshold-->
-  <div  *ngIf="threshold.state=='new' && threshold.measuredEvent.state=='normal'">
+  <div *ngIf="threshold?.state=='new' && threshold?.measuredEvent.state=='normal'">
     <div class="flex-column">
       <div class="flex-row-item">
         <select class="thresholdSelects"

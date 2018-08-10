@@ -26,11 +26,15 @@ export class ThresholdComponent implements OnInit {
 
   ngOnInit() {
 
-    if (this.threshold.measuredEvent.state == "new") {
-      this.selectedMeasuredEvent = this.measuredEventList[0];
-    }
-    if (this.threshold.state == "new") {
-      this.selectedMeasurand = this.actualMeasurandList[0].translationsKey;
+    if (this.threshold) {
+      if (this.threshold.measuredEvent.state == "new") {
+        this.selectedMeasuredEvent = this.measuredEventList[0];
+      }
+      if (this.threshold.state == "new") {
+        this.selectedMeasurand = this.actualMeasurandList[0].translationsKey;
+      }
+    } else {
+      return undefined;
     }
   }
 

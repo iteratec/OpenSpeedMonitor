@@ -1,6 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 
-import { ThresholdComponent } from './threshold.component';
+import {ThresholdComponent} from "./threshold.component";
+import {ThresholdRowComponent} from "../threshold-row/threshold-row.component";
+import {ThresholdRestService} from "../../services/threshold-rest.service";
+import {SharedMocksModule} from "../../../testing/shared-mocks.module";
+import {SharedModule} from "../../../shared/shared.module";
 
 describe('ThresholdComponent', () => {
   let component: ThresholdComponent;
@@ -8,7 +12,9 @@ describe('ThresholdComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ThresholdComponent ]
+      imports: [SharedModule, SharedMocksModule],
+      declarations: [ThresholdComponent, ThresholdRowComponent],
+      providers: [ThresholdRestService]
     })
     .compileComponents();
   }));

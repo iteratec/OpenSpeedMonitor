@@ -8,8 +8,8 @@ import {Threshold} from "../models/threshold.model";
 
 export class ActualMeasurandsService {
 
-  measurandList: Measurand[];
-  actualMeasurandList: Measurand[];
+  measurandList: Measurand[] = [];
+  actualMeasurandList: Measurand[] = [];
 
   constructor() {}
 
@@ -24,6 +24,9 @@ export class ActualMeasurandsService {
 
 
   getActualMeasurands(thresholds: Threshold[]) {
+    if (!thresholds) {
+      return;
+    }
     this.actualMeasurandList = [];
     this.measurandList.map( measurand => {
         if (thresholds.map(threshold => threshold.measurand.name).indexOf(measurand.name) == -1) {

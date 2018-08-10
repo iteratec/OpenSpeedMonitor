@@ -1,8 +1,7 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {MeasuredEvent} from "../../models/measured-event.model";
 import {Threshold} from "../../models/threshold.model";
 import {Measurand} from "../../models/measurand.model";
-import {ThresholdRestService} from "../../services/threshold-rest.service";
 import {ActualMeasurandsService} from "../../services/actual-measurands.service";
 
 @Component({
@@ -11,9 +10,9 @@ import {ActualMeasurandsService} from "../../services/actual-measurands.service"
   styleUrls: ['./measured-event.component.css']
 })
 
-export class MeasuredEventComponent implements OnInit, OnChanges {
+export class MeasuredEventComponent implements OnInit {
   @Input() measuredEvent: MeasuredEvent;
-  @Input() thresholds: Threshold[];
+  @Input() thresholds: Threshold[] = [];
   @Input() measuredEventList: MeasuredEvent[];
   @Output() addedMeasure = new EventEmitter();
   @Output() removeEvent = new EventEmitter();
@@ -23,18 +22,21 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
   actualMeasurandList: Measurand[];
 
 
-  constructor(private thresholdRestService: ThresholdRestService,
-              private actualMeasurandsService: ActualMeasurandsService,
-  ) {}
-
-  ngOnInit() {
-    this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    this.actualMeasurandList.length < 1 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
+  constructor(private actualMeasurandsService: ActualMeasurandsService) {
   }
 
-  ngOnChanges() {}
+  ngOnInit() {
+    if (this.thresholds) {
+      this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+      this.addThresholdDisabled = this.actualMeasurandList.length < 1;
+    }
+
+  }
 
   addThreshold() {
+    if (!this.thresholds) {
+      return;
+    }
     this.addThresholdDisabled = true;
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
     this.newThreshold = {} as Threshold;
@@ -43,11 +45,12 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
     let newThresholdName: string;
     newThresholdName = this.actualMeasurandList[0].name;
     newMeasuredEvent = this.measuredEvent;
-
-    if (this.measuredEvent.state == "new"){
-      newMeasuredEvent.state='new';
-    } else {
-      newMeasuredEvent.state='normal'
+    if (this.measuredEvent) {
+      if (this.measuredEvent.state == "new") {
+        newMeasuredEvent.state = 'new';
+      } else {
+        newMeasuredEvent.state = 'normal'
+      }
     }
     this.newThreshold.measurand = newMeasurand;
     this.newThreshold.measurand.name = newThresholdName;
@@ -56,6 +59,8 @@ export class MeasuredEventComponent implements OnInit, OnChanges {
     this.newThreshold.state = "new";
     this.newThreshold.measuredEvent = newMeasuredEvent;
     this.thresholds.push(this.newThreshold);
+
+
   }
 
   addedMeasuredEvent() {
