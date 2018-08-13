@@ -25,6 +25,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   descriptionFontSize: string;
   isNA: boolean;
   isOutdated: boolean;
+  toolTip: string;
 
   arcGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
@@ -47,7 +48,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
     this.csiValueClass = this.determineClass(this.csiValue);
 
     if (this.isOutdated && this.isBig) {
-      this.description = new Date(this.csiDate).toLocaleDateString("de-DE")
+      this.description = new Date(this.csiDate).toLocaleDateString("de-DE");
+      this.toolTip = this.generateToolTip(this.description);
     }
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
@@ -150,6 +152,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     }
 
     return CsiUtils.getClassByThresholds(csiValue);
+  }
+
+  private generateToolTip(lastDate: string): string {
+    return "This value is from " + lastDate + ",\nas there are no measurements today.";
   }
 
   ngOnChanges(changes: SimpleChanges): void {
