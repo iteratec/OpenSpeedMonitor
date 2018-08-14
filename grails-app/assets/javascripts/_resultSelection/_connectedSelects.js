@@ -5,7 +5,7 @@
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckbox, childSelect, childSelectAllCheckbox) {
+OpenSpeedMonitor.ConnectedSelects = function (parentSelect, parentSelectAllCheckbox, childSelect, childSelectAllCheckbox) {
     parentSelect = $(parentSelect);
     parentSelectAllCheckbox = $(parentSelectAllCheckbox);
     childSelect = $(childSelect);
@@ -19,10 +19,10 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         parentSelect.on('change', updateChildValues);
         parentSelectAllCheckbox.on('change', updateChildValues);
         updateChildValues();
-        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.i18n.noResultsMsg });
+        childSelect.chosen({search_contains: true, width: "100%", no_results_text: OpenSpeedMonitor.i18n.noResultsMsg});
     };
 
-    var initParentChildMapping = function() {
+    var initParentChildMapping = function () {
         var allChildValues = collectAllValues(childSelect);
         var rawParentChildMapping = childSelect.data('parent-child-mapping') || {};
         parentChildMapping = {};
@@ -36,15 +36,15 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
     };
 
 
-    var collectAllValues = function(selector) {
+    var collectAllValues = function (selector) {
         var allValues = {};
-        $(selector).find('option').each(function(i, element) {
+        $(selector).find('option').each(function (i, element) {
             allValues[element.value] = $(element).text();
         });
         return allValues;
     };
 
-    var sortAlpha = function (a,b) {
+    var sortAlpha = function (a, b) {
         return $(a).text().toLowerCase().localeCompare($(b).text().toLowerCase());
     };
 
@@ -58,11 +58,14 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
      * @param: fromTo array that contains the relations, example: key: page -> value: browser
      * @param: allElements all elements that can be contained in the target select box.
      */
-    var updateChildValues = function() {
-        if (parentSelection) {
-            var parentSelection = (parentSelect.val().length !== 0) || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
-        } else {
-            var parentSelection = parentSelect.val() || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
+    var updateChildValues = function () {
+        var parentSelection = [];
+
+        if (parentSelect.length) {
+            parentSelection = parentSelect.val();
+            if (parentSelection.length === 0) {
+                parentSelection = OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
+            }
         }
 
         var childSelection = childSelect.val();
