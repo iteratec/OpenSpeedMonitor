@@ -70,25 +70,25 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var getMeasuredEventSelection = function () {
         return {
-            ids: measuredEventsSelectElement.val().length === 0 ? null : measuredEventsSelectElement.val()
+            ids: measuredEventsSelectElement.val()
         };
     };
 
     var getPageSelection = function () {
         return {
-            ids: pageSelectElement.val().length === 0 ? null : pageSelectElement.val()
+            ids: pageSelectElement.val()
         };
     };
 
     var getLocationSelection = function() {
         return {
-            ids: locationsSelectElement.val().length === 0 ? null : locationsSelectElement.val()
+            ids: locationsSelectElement.val()
         };
     };
 
     var getBrowserSelection = function() {
         return {
-            ids: browserSelectElement.val().length === 0 ? null : browserSelectElement.val()
+            ids: browserSelectElement.val()
         };
     };
 

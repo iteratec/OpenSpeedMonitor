@@ -39,7 +39,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     //Workaround for vue component in page comparison chart [IT-1930]
     var pageSelectionAvailable = $("#pageSelectHtmlId").length;
 
-    var hasMeasuredEventSelection = pageTabElement.length == 0 || ($("#selectedMeasuredEventsHtmlId").val().length != 0);
+    var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
     var needsNoPageSelectionDueToCsiAggregation = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
     var csiSystemSelected = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && ($("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system");
