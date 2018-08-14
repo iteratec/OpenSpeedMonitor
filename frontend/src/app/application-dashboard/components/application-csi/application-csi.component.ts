@@ -14,6 +14,8 @@ export class ApplicationCsiComponent {
   recentCsiValue$: Observable<CsiDTO>;
   hasConfiguration$: Observable<boolean>;
   csiValues$: Observable<ApplicationCsiListDTO>;
+  recentCsiDate$: Observable<string>;
+  toolTip: string;
 
   constructor(private dashboardService: ApplicationDashboardService) {
     this.csiValues$ = this.dashboardService.csiValues$;
@@ -21,7 +23,17 @@ export class ApplicationCsiComponent {
     this.recentCsiValue$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.csiDtoList.slice(-1)[0]));
 
+    this.recentCsiDate$ = this.dashboardService.csiValues$.pipe(
+      map((res: ApplicationCsiListDTO) => res.csiDtoList.slice(-1)[0].date));
+
     this.hasConfiguration$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.hasCsiConfiguration));
+  }
+
+  generateToolTip(lastDate: string): string {
+    if (!(lastDate === new Date().toISOString().substring(0, 10))) {
+      return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
+    }
+    return "";
   }
 }

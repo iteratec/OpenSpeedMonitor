@@ -5,8 +5,5 @@
     <div class="csi-value-text" [style.font-size.px]="valueFontSize">{{formattedCsiValue}}</div>
     <div class="csi-value-description" [style.font-size.px]="descriptionFontSize">{{description}}</div>
   </div>
-  <i *ngIf="isBig && isOutdated" data-toggle="tooltip" title="{{toolTip}}"
-     class="fas fa-info-circle info-icon"></i>
+  <i *ngIf="isBig && isOutdated" class="fas fa-info-circle info-icon"></i>
 </div>
-
-

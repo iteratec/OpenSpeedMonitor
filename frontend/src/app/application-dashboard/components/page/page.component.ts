@@ -16,6 +16,7 @@ export class PageComponent {
   @Input() page: PageDto;
   metricsForPage$: Observable<MetricsDto>;
   pageCsi$: Observable<number>;
+  pageCsiDate$: Observable<string>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.metricsForPage$ = applicationDashboardService.metrics$.pipe(
@@ -24,6 +25,11 @@ export class PageComponent {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)),
       map((pageCsiDto: PageCsiDto) => pageCsiDto ? pageCsiDto.csiDocComplete : null)
+    );
+
+    this.pageCsiDate$ = applicationDashboardService.pageCsis$.pipe(
+      map((next: PageCsiDto[]) => next.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.page.id)),
+      map((pageCsiDto: PageCsiDto) => pageCsiDto ? pageCsiDto.date : null)
     );
   }
 
@@ -37,5 +43,12 @@ export class PageComponent {
 
   convertMillisecsToSecs(value: number): number {
     return CalculationUtil.convertMillisecsToSecs(value);
+  }
+
+  generateToolTip(lastDate: string): string {
+    if (lastDate < new Date().toISOString().substring(0, 10)) {
+      return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
+    }
+    return "";
   }
 }

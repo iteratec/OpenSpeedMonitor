@@ -1,7 +1,8 @@
-<div class="card">
+<div class="card" data-toggle="tooltip" title="{{generateToolTip((pageCsiDate$ | async))}}">
   <h2>{{page?.name}}</h2>
   <div class="page-metrics">
-    <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"></osm-csi-value>
+    <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"
+                   [csiDate]="pageCsiDate$ | async"></osm-csi-value>
     <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
       <div class="metric">
         <i class="far fa-eye metric-icon"></i>
