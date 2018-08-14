@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.ResultSelectionCommand
 import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
@@ -67,6 +68,7 @@ class JobGroupService {
                 distinct('jobGroup')
             }
         })
+
         List recentAndFormattedJobGroups = recentJobGroups.collect {
             [
                     id  : it.id,
@@ -74,6 +76,24 @@ class JobGroupService {
             ]
         }
         allActiveAndRecent.addAll(recentAndFormattedJobGroups)
-        return allActiveAndRecent
+
+        List allActiveAndRecentFormattedJobGroups = new ArrayList()
+        recentJobGroups.each {
+            def name = it.name
+            def result = JobResult.createCriteria().list(max: 1) {
+                eq("jobGroupName", name)
+                order("id", "desc")
+            }
+
+            allActiveAndRecentFormattedJobGroups.add(
+                    [
+                            id               : it.id,
+                            name             : it.name,
+                            dateOfLastResults: result[0].date.format("yyyy-MM-dd")
+                    ]
+            )
+        }
+
+        return allActiveAndRecentFormattedJobGroups
     }
 }
