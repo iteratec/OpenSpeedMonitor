@@ -222,6 +222,56 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         }
     }
 
+    void "excluding pages in measurand median calculation for jobGroup"() {
+        given: "three EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 300,
+                medianValue: true,
+        )
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 1000,
+                    medianValue: true,
+            )
+        }
+
+        when: "the builder is configured for measurand and jobGroup"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withSelectedMeasurands([selectedMeasurand])
+                .withoutPageIn([page3])
+                .getMedianData()
+
+        then: "only one aggregation is returned"
+        result.size() == 1
+        result.every {
+            it.fullyLoadedTimeInMillisecs == 200 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
     void "check median for userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
             page1 = Page.build()
@@ -278,6 +328,65 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         }
     }
 
+    void "excluding pages in userTimings median calculation for jobGroup"() {
+        given: "three EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(1000), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
+        }
+
+        when: "the builder is configured for usertiming and jobGroup"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withSelectedMeasurands([selectedMeasurand])
+                .withoutPageIn([page3])
+                .getMedianData()
+
+        then: "only one aggregation is returned"
+        result.size() == 1
+        result.every {
+            it.mark1 == 200 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
     void "check median for measurands and userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
             page1 = Page.build()
@@ -324,6 +433,67 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
+                .getMedianData()
+
+        then: "only one aggregation is returned"
+        result.size() == 1
+        result.every {
+            it.mark1 == 200 &&
+                    it.fullyLoadedTimeInMillisecs == 200 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
+    void "excluding pages in measurand and userTimings median calculation for jobGroup"() {
+        given: "three EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 300,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(300), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(500), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
+        }
+
+        when: "the builder is configured for usertiming and measurand with jobGroup"
+        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
+        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
+                .withoutPageIdsIn([page3.id])
                 .getMedianData()
 
         then: "only one aggregation is returned"
