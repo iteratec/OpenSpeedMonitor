@@ -7,7 +7,4 @@
         </div>
     </div>
 </g:if>
-<g:if test="${job.id == null}">
-    <p>job.id == null</p>
-</g:if>
 
