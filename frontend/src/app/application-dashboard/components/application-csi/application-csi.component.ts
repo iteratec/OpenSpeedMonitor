@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CsiDTO} from "../../models/csi.model";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";
@@ -11,11 +11,12 @@ import {ApplicationDashboardService} from "../../services/application-dashboard.
   styleUrls: ['./application-csi.component.scss']
 })
 export class ApplicationCsiComponent {
+  @Input() lastDateOfResults: string;
+
   recentCsiValue$: Observable<CsiDTO>;
   hasConfiguration$: Observable<boolean>;
   csiValues$: Observable<ApplicationCsiListDTO>;
   recentCsiDate$: Observable<string>;
-  toolTip: string;
 
   constructor(private dashboardService: ApplicationDashboardService) {
     this.csiValues$ = this.dashboardService.csiValues$;
@@ -31,7 +32,8 @@ export class ApplicationCsiComponent {
   }
 
   generateToolTip(lastDate: string): string {
-    if (!(lastDate === new Date().toISOString().substring(0, 10))) {
+    console.log(this.lastDateOfResults);
+    if (lastDate < new Date(this.lastDateOfResults).toISOString().substring(0, 10)) {
       return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
     }
     return "";

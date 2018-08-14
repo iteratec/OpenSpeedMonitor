@@ -16,6 +16,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   @Input() description: string;
   @Input() csiValue: number;
   @Input() csiDate: string;
+  @Input() lastResultDate: string;
 
   formattedCsiValue: string;
   csiValueClass: string;
@@ -42,13 +43,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     this.isNA = !this.csiValue && this.csiValue !== 0;
     this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
-    this.isOutdated = this.csiDate < new Date().toISOString().substring(0, 10);
+    this.isOutdated = this.csiDate < new Date(this.lastResultDate).toISOString().substring(0, 10);
     this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
-
-    if (this.isOutdated && this.isBig) {
-      this.description = new Date(this.csiDate).toLocaleDateString("de-DE");
-    }
+    this.updateDescription();
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
@@ -150,6 +148,16 @@ export class CsiValueComponent implements OnInit, OnChanges {
     }
 
     return CsiUtils.getClassByThresholds(csiValue);
+  }
+
+  private updateDescription() {
+    if (this.isOutdated && this.isBig) {
+      this.description = new Date(this.csiDate).toLocaleDateString("de-DE");
+    } else if (!this.isBig) {
+      this.description = 'CSI';
+    } else {
+      this.description = 'today';
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

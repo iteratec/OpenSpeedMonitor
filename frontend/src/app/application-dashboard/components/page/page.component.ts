@@ -14,6 +14,7 @@ import {PageCsiDto} from "../../models/page-csi.model";
 })
 export class PageComponent {
   @Input() page: PageDto;
+  @Input() lastDateOfResult: string;
   metricsForPage$: Observable<MetricsDto>;
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
@@ -46,7 +47,8 @@ export class PageComponent {
   }
 
   generateToolTip(lastDate: string): string {
-    if (lastDate < new Date().toISOString().substring(0, 10)) {
+    console.log(this.lastDateOfResult)
+    if (lastDate < new Date(this.lastDateOfResult).toISOString().substring(0, 10)) {
       return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
     }
     return "";
