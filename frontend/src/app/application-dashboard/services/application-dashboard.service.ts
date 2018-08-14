@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {ReplaySubject} from "rxjs/index";
+import {EMPTY, Observable, ReplaySubject, Subject} from "rxjs/index";
 import {PageDto} from "../models/page.model";
 import {MetricsDto} from "../models/metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
+import {catchError, switchMap} from "rxjs/internal/operators";
 
 @Injectable()
 export class ApplicationDashboardService {
@@ -15,8 +16,25 @@ export class ApplicationDashboardService {
   pageCsis$: ReplaySubject<PageCsiDto[]> = new ReplaySubject<PageCsiDto[]>(1);
   activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
 
+  selectedApplication$ = new Subject<ApplicationDTO>();
+
   constructor(private http: HttpClient) {
     this.updateActiveOrRecentlyMeasured()
+    this.selectedApplication$.pipe(
+      switchMap((application: ApplicationDTO) => this.updateMetricsForApplication(application))
+    ).subscribe(this.metrics$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: ApplicationDTO) => this.updatePagesForApplication(application))
+    ).subscribe(this.pages$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: ApplicationDTO) => this.updateCsiForApplication(application))
+    ).subscribe(this.csiValues$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: ApplicationDTO) => this.updateCsiForPages(application))
+    ).subscribe(this.pageCsis$);
   }
 
   updateActiveOrRecentlyMeasured() {
@@ -25,33 +43,47 @@ export class ApplicationDashboardService {
   }
 
   updateApplicationData(application: ApplicationDTO) {
-    const params = this.createParams(application.id);
-    this.updateMetricsForApplication(params);
-    this.updatePagesForApplication(params);
-    this.updateCsiForApplication(params);
-    this.updateCsiForPages(params);
+    this.selectedApplication$.next(application);
   }
 
-  private updateMetricsForApplication(params) {
-    this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params: params})
-      .subscribe((response: MetricsDto[]) => this.metrics$.next(response), error => this.handleError(error));
+  private updateMetricsForApplication(applicationDto: ApplicationDTO): Observable<MetricsDto[]> {
+    const params = this.createParams(applicationDto.id);
+    return this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
+      catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      })
+    )
   }
 
-  private updatePagesForApplication(params) {
-    this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', {params: params})
-      .subscribe((response: PageDto[]) => this.pages$.next(response), error => this.handleError(error))
+  private updatePagesForApplication(applicationDto: ApplicationDTO): Observable<PageDto[]> {
+    const params = this.createParams(applicationDto.id);
+    return this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', {params}).pipe(
+      catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      })
+    )
   }
 
-  private updateCsiForApplication(params) {
-    this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params: params})
-      .subscribe((response: ApplicationCsiListDTO) => this.csiValues$.next(response), error => this.handleError(error));
+  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ApplicationCsiListDTO> {
+    const params = this.createParams(applicationDto.id);
+    return this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
+      catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      })
+    )
   }
 
-  private updateCsiForPages(params) {
-    this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params})
-      .subscribe((response: PageCsiDto[]) => {
-        this.pageCsis$.next(response)
-      }, error => this.handleError(error));
+  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<PageCsiDto[]> {
+    const params = this.createParams(applicationDto.id);
+    return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
+      catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      })
+    )
   }
 
 
