@@ -23,9 +23,10 @@
         </div>
     </div>
 </g:if>
+%{--
 <g:if test="${showWptInfoPanel == false}">
     <div class="col-md-12">
         <g:render template="${targetTabTemplate}" model="${['job': job]}"/>
     </div>
 
-</g:if>
+</g:if>--}%

@@ -32,13 +32,13 @@
                     <g:message code="job.tab.custom.label" default="Custom Metrics"/>
                 </a>
             </li>
-            <g:if test="${job.id != null}">
-                <li>
-                    <a data-toggle="pill" href="#ThresholdContent">
-                        <g:message code="job.tab.threshold.label" default="Thresholds"/>
-                    </a>
-                </li>
-            </g:if>
+            %{-- <g:if test="${job.id != null}">
+                 <li>
+                     <a data-toggle="pill" href="#ThresholdContent">
+                         <g:message code="job.tab.threshold.label" default="Thresholds"/>
+                     </a>
+                 </li>
+             </g:if>--}%
         </ul>
     </div>
 
@@ -67,11 +67,11 @@
             <div id="CustomContent" class="tab-pane">
                 <g:render template="advancedSettingsTabContent" model="${['targetTabTemplate': 'customTab', 'job': job, 'showWptInfoPanel': true]}" />
             </div>
-            <g:if test="${job.id != null}">
-                <div id="ThresholdContent" class="tab-pane">
-                    <g:render template="advancedSettingsTabContent" model="${['targetTabTemplate': 'threshold/thresholdTab', 'job': job, 'showWptInfoPanel': false]}" />
-                </div>
-            </g:if>
+            %{--            <g:if test="${job.id != null}">
+                            <div id="ThresholdContent" class="tab-pane">
+                                <g:render template="advancedSettingsTabContent" model="${['targetTabTemplate': 'threshold/thresholdTab', 'job': job, 'showWptInfoPanel': false]}" />
+                            </div>
+                        </g:if>--}%
         </div>
     </div>
 
