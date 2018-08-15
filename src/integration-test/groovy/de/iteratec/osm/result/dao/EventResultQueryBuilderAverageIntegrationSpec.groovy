@@ -255,7 +255,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .withoutPageIdsIn([page3.id])
+                .withoutPageIn([page3])
                 .getAverageData()
 
         then: "the result with excluded page is not included in average"

@@ -110,12 +110,8 @@ class EventResultQueryBuilder {
         return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
     }
 
-    EventResultQueryBuilder withoutPageIn(List<Long> pages) {
+    EventResultQueryBuilder withoutPageIn(List<Page> pages) {
         return withAssociatedDomainIdsNotIn(pages.collect { it.ident() }, 'page')
-    }
-
-    EventResultQueryBuilder withoutPageIdsIn(List<Long> pageIds) {
-        return withAssociatedDomainIdsNotIn(pageIds, 'page')
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
