@@ -13,11 +13,11 @@ import {CsiUtils} from '../../utils/csi-utils';
 })
 export class CsiValueComponent implements OnInit, OnChanges {
   @Input() isBig: boolean;
-  @Input() description: string;
   @Input() csiValue: number;
   @Input() csiDate: string;
   @Input() lastResultDate: string;
 
+  description: string;
   formattedCsiValue: string;
   csiValueClass: string;
   size: number;
@@ -151,7 +151,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private updateDescription() {
-    if (new Date().toISOString().substring(0, 10) > this.csiDate && this.isBig) {
+    if (this.isBig && new Date().toISOString().substring(0, 10) > this.csiDate) {
       this.description = CalculationUtil.toGermanDateFormat(this.csiDate);
     } else if (!this.isBig) {
       this.description = 'CSI';

@@ -6,8 +6,7 @@
   <div *ngIf=" hasConfiguration$ | async; else returnError" class="csi">
     <ng-container *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
       <osm-csi-value [csiValue]="recentCsiValue.csiDocComplete" [csiDate]="recentCsiValue.date"
-                     [lastResultDate]="lastDateOfResults" [isBig]="true"
-                     [description]="'today'"></osm-csi-value>
+                     [lastResultDate]="lastDateOfResults" [isBig]="true"></osm-csi-value>
       <osm-csi-graph [csiData]="csiValues$ | async"></osm-csi-graph>
     </ng-container>
     <ng-template #noRecentCsi>

@@ -32,11 +32,10 @@ describe('CsiValueComponent', () => {
     const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
     expect(descriptionEl.textContent).toEqual('CSI');
   });
-  it('should be described as is set', () =>{
-    const description: string = "description";
-    component.description = description;
+  it('should be described as "CSI" if the circle is not big', () => {
+    component.isBig = false;
     component.ngOnInit();
-    expect(component.description).toEqual('description');
+    expect(component.description).toEqual('CSI');
 
     fixture.detectChanges();
     const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
