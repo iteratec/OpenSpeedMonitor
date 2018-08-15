@@ -6,6 +6,7 @@ import {ApplicationDashboardService} from "../../services/application-dashboard.
 import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../shared/utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
+import {CsiUtils} from "../../utils/csi-utils";
 
 @Component({
   selector: 'osm-page',
@@ -44,5 +45,13 @@ export class PageComponent {
 
   convertMillisecsToSecs(value: number): number {
     return CalculationUtil.convertMillisecsToSecs(value);
+  }
+
+  isCsiOutdated(csiDate: string, jobDate: string): boolean {
+    return CsiUtils.isCsiOutdated(csiDate, jobDate);
+  }
+
+  toGermanDateFormat(date: string): string {
+    return CalculationUtil.toGermanDateFormat(date);
   }
 }

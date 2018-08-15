@@ -4,6 +4,8 @@ import {Observable} from "rxjs/index";
 import {map} from "rxjs/internal/operators";
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {CsiUtils} from "../../utils/csi-utils";
+import {CalculationUtil} from "../../../shared/utils/calculation.util";
 
 @Component({
   selector: 'osm-application-csi',
@@ -29,5 +31,13 @@ export class ApplicationCsiComponent {
 
     this.hasConfiguration$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.hasCsiConfiguration));
+  }
+
+  isCsiOutdated(csiDate: string, jobDate: string): boolean {
+    return CsiUtils.isCsiOutdated(csiDate, jobDate);
+  }
+
+  toGermanDateFormat(date: string): string {
+    return CalculationUtil.toGermanDateFormat(date);
   }
 }

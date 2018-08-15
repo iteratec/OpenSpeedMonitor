@@ -43,7 +43,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
     const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     this.isNA = !this.csiValue && this.csiValue !== 0;
     this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
-    this.isOutdated = this.csiDate < this.lastResultDate;
+    this.isOutdated = CsiUtils.isCsiOutdated(this.csiDate, this.lastResultDate);
     this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
     this.updateDescription();
