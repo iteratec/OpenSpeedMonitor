@@ -43,7 +43,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
     const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     this.isNA = !this.csiValue && this.csiValue !== 0;
     this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
-    this.isOutdated = this.csiDate < new Date(this.lastResultDate).toISOString().substring(0, 10);
+    this.isOutdated = this.csiDate < this.lastResultDate;
     this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
     this.updateDescription();
@@ -151,8 +151,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private updateDescription() {
-    if (this.isOutdated && this.isBig) {
-      this.description = new Date(this.csiDate).toLocaleDateString("de-DE");
+    if (new Date().toISOString().substring(0, 10) > this.csiDate && this.isBig) {
+      this.description = CalculationUtil.toGermanDateFormat(this.csiDate);
     } else if (!this.isBig) {
       this.description = 'CSI';
     } else {

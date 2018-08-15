@@ -45,12 +45,4 @@ export class PageComponent {
   convertMillisecsToSecs(value: number): number {
     return CalculationUtil.convertMillisecsToSecs(value);
   }
-
-  generateToolTip(lastDate: string): string {
-    console.log(this.lastDateOfResult)
-    if (lastDate < new Date(this.lastDateOfResult).toISOString().substring(0, 10)) {
-      return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
-    }
-    return "";
-  }
 }

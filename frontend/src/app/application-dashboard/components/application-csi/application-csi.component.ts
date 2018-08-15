@@ -30,12 +30,4 @@ export class ApplicationCsiComponent {
     this.hasConfiguration$ = this.dashboardService.csiValues$.pipe(
       map((res: ApplicationCsiListDTO) => res.hasCsiConfiguration));
   }
-
-  generateToolTip(lastDate: string): string {
-    console.log(this.lastDateOfResults);
-    if (lastDate < new Date(this.lastDateOfResults).toISOString().substring(0, 10)) {
-      return "This value is from " + new Date(lastDate).toLocaleDateString("de-DE") + ",\nas there are no measurements today.";
-    }
-    return "";
-  }
 }

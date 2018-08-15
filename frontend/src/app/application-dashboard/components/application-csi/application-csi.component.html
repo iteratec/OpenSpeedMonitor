@@ -1,7 +1,9 @@
-<div class="card application-csi" data-toggle="tooltip"
-     title="{{generateToolTip((recentCsiDate$ | async))}}">
+<div class="card application-csi"
+     title="{{CsiUtils.isCsiOutdated((recentCsiDate$ | async), lastDateOfResults) ?
+     ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: CalculationUtil.toGermanDateFormat(recentCsiDate$ | async)}) :
+     ''}}">
   <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.kpi.title' | translate }}</h2>
-  <div *ngIf="hasConfiguration$ | async; else returnError" class="csi">
+  <div *ngIf=" hasConfiguration$ | async; else returnError" class="csi">
     <ng-container *ngIf="recentCsiValue$ | async; let recentCsiValue; else noRecentCsi">
       <osm-csi-value [csiValue]="recentCsiValue.csiDocComplete" [csiDate]="recentCsiValue.date"
                      [lastResultDate]="lastDateOfResults" [isBig]="true"

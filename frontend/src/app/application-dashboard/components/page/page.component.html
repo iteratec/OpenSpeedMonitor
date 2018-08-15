@@ -1,4 +1,7 @@
-<div class="card" data-toggle="tooltip" title="{{generateToolTip((pageCsiDate$ | async))}}">
+<div class="card" data-toggle="tooltip"
+     title="{{CsiUtils.isCsiOutdated((pageCsiDate$ | async), lastDateOfResult) ?
+     ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: CalculationUtil.toGermanDateFormat(pageCsiDate$ | async) }) :
+     '' }}">
   <h2>{{page?.name}}</h2>
   <div class="page-metrics">
     <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [description]="'CSI'"
