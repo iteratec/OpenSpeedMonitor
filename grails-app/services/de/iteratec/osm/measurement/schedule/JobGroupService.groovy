@@ -60,7 +60,7 @@ class JobGroupService {
         DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
-        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
+        List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
             if (existing) {
                 not { 'in'('jobGroup', existing) }
             }
@@ -68,19 +68,12 @@ class JobGroupService {
                 distinct('jobGroup')
             }
         })
-
-        List recentAndFormattedJobGroups = recentJobGroups.collect {
-            [
-                    id  : it.id,
-                    name: it.name
-            ]
-        }
-        allActiveAndRecent.addAll(recentAndFormattedJobGroups)
+        allActiveAndRecent.addAll(recentJobGroups)
 
         List allActiveAndRecentFormattedJobGroups = new ArrayList()
         recentJobGroups.each {
             def name = it.name
-            def result = JobResult.createCriteria().list(max: 1) {
+            def lastDateOfResult = JobResult.createCriteria().list(max: 1) {
                 eq("jobGroupName", name)
                 order("id", "desc")
             }
@@ -89,7 +82,7 @@ class JobGroupService {
                     [
                             id               : it.id,
                             name             : it.name,
-                            dateOfLastResults: result[0].date.format("yyyy-MM-dd")
+                            dateOfLastResults: lastDateOfResult[0].date.format("yyyy-MM-dd")
                     ]
             )
         }
