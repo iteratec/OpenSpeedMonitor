@@ -16,4 +16,8 @@ export class CalculationUtil {
   static toRoundedStringWithFixedDecimals(value: number, decimals: number): string {
     return this.round(value).toFixed(decimals);
   }
+
+  static toGermanDateFormat(date: string): string {
+    return new Date(date).toLocaleDateString("de-DE");
+  }
 }
