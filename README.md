@@ -1,5 +1,5 @@
 ### Status
-[![Build Status](https://api.travis-ci.org/openspeedmonitor/UtilityBehaviors.png)](https://api.travis-ci.org/openspeedmonitor/UtilityBehaviors.png)
+[![Build Status](https://travis-ci.org/iteratec/OpenSpeedMonitor.svg?branch=develop)](https://travis-ci.org/iteratec/OpenSpeedMonitor)
 
 OpenSpeedMonitor
 ================
