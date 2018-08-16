@@ -60,7 +60,12 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands(selectedMeasurands)
                 .withJobGroupIn(jobGroups)
-                .withPageIn(pages)
+
+        if (pages){
+            queryBuilder = queryBuilder.withPageIn(pages)
+        } else {
+            queryBuilder = queryBuilder.withoutPageIn([Page.findByName(Page.UNDEFINED)])
+        }
 
         List<EventResultProjection> eventResultProjections = []
         switch(selectedAggregationValue) {
@@ -100,7 +105,7 @@ class BarchartAggregationService {
         if (comparativeValues) {
             comparativeValues.each { comparative ->
                 BarchartAggregation matches = values.find { it == comparative }
-                matches.valueComparative = comparative.value
+                if (matches) matches.valueComparative = comparative.value
             }
         }
         return values
