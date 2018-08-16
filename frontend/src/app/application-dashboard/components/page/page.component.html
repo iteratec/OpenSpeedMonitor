@@ -1,30 +1,28 @@
-<div class="card" data-toggle="tooltip"
+<div class="card"
      title="{{isCsiOutdated((pageCsiDate$ | async), lastDateOfResult) ?
      ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: toGermanDateFormat(pageCsiDate$ | async) }) :
-     '' }}">
+     ''}}">
   <h2>{{page?.name}}</h2>
   <div class="page-metrics">
     <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [csiDate]="pageCsiDate$ | async"
                    [lastResultDate]="lastDateOfResult"></osm-csi-value>
-    <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
-      <div class="metric">
-        <i class="far fa-eye metric-icon"></i>
-        <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.speedIndex))}}</div>
-        <div class="metric-unit">s</div>
-        <div class="metric-description">SpeedIndex</div>
-      </div>
-      <div class="metric">
-        <i class="fas fa-stopwatch metric-icon"></i>
-        <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.docCompleteTimeInMillisecs))}}</div>
-        <div class="metric-unit">s</div>
-        <div class="metric-description">Document Complete</div>
-      </div>
-      <div class="metric">
-        <i class="fas fa-weight-hanging metric-icon"></i>
-        <div class="metric-value">{{transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))}}</div>
-        <div class="metric-unit">MiB</div>
-        <div class="metric-description">Bytes Fully Loaded</div>
-      </div>
+    <div *ngIf="metricsForPage$ | async, let metricsDto; else noMeasurands" class="metric-list">
+      <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsDto.speedIndex))" [unit]="'s'"
+                       [metric]="'SpeedIndex'" [icon]="'far fa-eye'"></osm-page-metric>
+      <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsDto.docCompleteTimeInMillisecs))" [unit]="'s'"
+                       [metric]="'Document Complete'" [icon]="'fas fa-stopwatch'"></osm-page-metric>
+      <osm-page-metric [value]="transform(convertToMib(metricsDto.fullyLoadedIncomingBytes))" [unit]="'MiB'"
+                       [metric]="'Bytes Fully Loaded'" [icon]="'fas fa-weight-hanging'"></osm-page-metric>
     </div>
+    <ng-template #noMeasurands>
+      <div class="metric-list" title="No measured value available">
+        <osm-page-metric [icon]="'far fa-eye'" [value]="" [unit]=""
+                         [metric]="'SpeedIndex'"></osm-page-metric>
+        <osm-page-metric [icon]="'fas fa-stopwatch'" [value]="" [unit]=""
+                         [metric]="'Document Complete'"></osm-page-metric>
+        <osm-page-metric [icon]="'fas fa-weight-hanging'" [value]="" [unit]=""
+                         [metric]="'Bytes Fully Loaded'"></osm-page-metric>
+      </div>
+    </ng-template>
   </div>
 </div>
