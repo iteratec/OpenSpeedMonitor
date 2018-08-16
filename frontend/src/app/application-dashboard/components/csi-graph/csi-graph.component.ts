@@ -1,13 +1,4 @@
-import {
-  AfterContentInit,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
 import {ApplicationCsiListDTO} from '../../models/csi-list.model';
 import {select} from 'd3-selection';
 import {axisBottom, axisLeft} from 'd3-axis';
@@ -97,25 +88,16 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr("class", "csi-graph-area")
       .attr("clip-path", "url(#graph-border-clip-path)");
 
-    const highlightedCsiGroupGlow = csiGraphDrawingSpace
+    csiGraphDrawingSpace
       .append("g")
       .attr("class", "highlightedCsi glow");
+    csiGraphDrawingSpace
+      .append('g')
+      .attr('class', 'highlightedCsi');
 
-    highlightedCsiGroupGlow
-      .append("line");
-
-    highlightedCsiGroupGlow
-      .append("circle");
-
-    const highlightedValueGroup = csiGraphDrawingSpace
-      .append("g")
-      .attr("class", "highlightedCsi");
-
-    highlightedValueGroup
-      .append("line");
-
-    highlightedValueGroup
-      .append("circle");
+    const highlightedValueGroups = csiGraphDrawingSpace.selectAll('.highlightedCsi');
+    highlightedValueGroups.append('line');
+    highlightedValueGroups.append('circle');
   }
 
   private update(selection: any) {
