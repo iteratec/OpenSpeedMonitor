@@ -39,9 +39,8 @@ describe('CsiValueComponent', () => {
 
     fixture.detectChanges();
     const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
-    expect(descriptionEl.textContent).toEqual('description');
+    expect(descriptionEl.textContent).toEqual('CSI');
   });
-
   it('should be bad if csi value is bad', () => {
     const badValue: number = 69.4;
     component.csiValue =  badValue;
