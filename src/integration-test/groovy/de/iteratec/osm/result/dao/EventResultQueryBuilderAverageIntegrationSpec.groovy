@@ -222,6 +222,50 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         }
     }
 
+    void "excluding pages in measurand average calculation for jobGroup"() {
+        given: "two EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+        )
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+            )
+        }
+
+        when: "the builder is configured for measurand and jobGroup and excludes a page"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withSelectedMeasurands([selectedMeasurand])
+                .withoutPageIn([page3])
+                .getAverageData()
+
+        then: "the result with excluded page is not included in average"
+        result.size() == 1
+        result.every {
+            it.fullyLoadedTimeInMillisecs == (100+200) / 2 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
     void "check average for userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
         page1 = Page.build()
@@ -279,6 +323,57 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         }
     }
 
+    void "excluding pages in userTiming average calculation for jobGroup"() {
+        given: "two EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 500,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(800), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
+        }
+
+        when: "the builder is configured for measurand and jobGroup and excludes a page"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withoutPageIn([page3])
+                .withSelectedMeasurands([selectedMeasurand])
+                .getAverageData()
+
+        then: "the result with excluded page is not included in average"
+        result.size() == 1
+        result.every {
+            it.mark1 == (100 + 200) / 2 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
     void "check average for measurands and userTimings with jobGroup"() {
         given: "three matching and two other Eventresults"
         page1 = Page.build()
@@ -332,6 +427,58 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         result.every {
             it.mark1 == 300 &&
                     it.fullyLoadedTimeInMillisecs == 300 &&
+                    it.jobGroupId == jobGroup1.id
+        }
+    }
+
+    void "excluding pages in average calculation for jobGroup"() {
+        given: "two EventResults with valid and some with excluded page"
+        page1 = Page.build()
+        page2 = Page.build()
+        page3 = Page.build()
+        jobGroup1 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(100), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        EventResult.build(
+                page: page2,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 200,
+                medianValue: true,
+                userTimings: [UserTiming.build(name: "mark1", duration: new Double(200), type: UserTimingType.MEASURE)],
+                flush: true
+        )
+        2.times {
+            EventResult.build(
+                    page: page3,
+                    jobGroup: jobGroup1,
+                    fullyLoadedTimeInMillisecs: 600,
+                    medianValue: true,
+                    userTimings: [UserTiming.build(name: "mark1", duration: new Double(600), type: UserTimingType.MEASURE)],
+                    flush: true
+            )
+        }
+
+        when: "the builder is configured for measurand and userTimings and jobGroup and excludes a page"
+        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
+        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder(0, 1000)
+                .withJobGroupIdsIn([jobGroup1.id])
+                .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
+                .withoutPageIn([page3])
+                .getAverageData()
+
+        then: "the result with excluded page is not included in averages"
+        result.size() == 1
+        result.every {
+            it.mark1 == (100 + 200) / 2 &&
+                    it.fullyLoadedTimeInMillisecs == (100 + 200) / 2 &&
                     it.jobGroupId == jobGroup1.id
         }
     }
