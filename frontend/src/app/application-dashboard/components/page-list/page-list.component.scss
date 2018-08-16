@@ -10,7 +10,6 @@ $grid-gap: 20px;
 
 .page-grid-child {
   min-width: 290px;
-  margin-bottom: $grid-gap;
   padding-left: $grid-gap;
   width: calc(100% / #{$items-per-row});
 }
