@@ -54,11 +54,11 @@ export class CsiGraphCalculator {
       .y0(this.yScale(0))
   }
 
-  private calculateX(csiDTO: CsiDTO): number {
+  calculateX(csiDTO: CsiDTO): number {
     return this.xScale(CsiGraphCalculator.dayStart(new Date(csiDTO.date)));
   }
 
-  private calculateY(csiDTO: CsiDTO): number {
+  calculateY(csiDTO: CsiDTO): number {
     return this.yScale(csiDTO.csiDocComplete);
   }
 }
