@@ -160,6 +160,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     }
   }
 
+  toGermanDateFormat(date: string): string {
+    return CalculationUtil.toGermanDateFormat(date);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.arcGenerator) {
       return;
