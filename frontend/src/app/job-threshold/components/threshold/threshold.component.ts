@@ -15,7 +15,7 @@ export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() actualMeasurandList: Measurand [];
   @Output() cancelEvent = new EventEmitter();
-  @Output() addedqqThreshold = new EventEmitter();
+  @Output() addedThreshold = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
