@@ -123,9 +123,11 @@ class ScriptController {
         }
 
         script.properties = params;
-        if (!script.save(flush: true)) {
-            render(view: 'edit', model: [script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(script)])
-            return
+        Script.withNewTransaction {
+            if (!script.save(flush: true)) {
+                render(view: 'edit', model: [script: script, pages: Page.list() as JSON, measuredEvents: MeasuredEvent.list() as JSON, archivedScripts: getListOfArchivedScripts(script)])
+                return
+            }
         }
         scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
         archivedScript.save(failOnError: true, flush: true)
@@ -190,13 +192,13 @@ class ScriptController {
      * @param scriptId The selected script id.
      * @return All measured events for the script id.
      */
-	def getMeasuredEventsForScript(String scriptId) {
-		Long id = Long.parseLong(scriptId)
+    def getMeasuredEventsForScript(String scriptId) {
+        Long id = Long.parseLong(scriptId)
 
         def output = scriptService.getMeasuredEventsForScript(id)
 
-		render output as JSON
-	}
+        render output as JSON
+    }
 
     def getArchivedNavigationScript(long scriptId) {
         def navigationScript = ArchivedScript.findById(scriptId).navigationScript
