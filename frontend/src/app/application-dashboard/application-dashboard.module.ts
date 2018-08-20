@@ -10,7 +10,7 @@ import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-
 import {RouterModule, Routes} from "@angular/router";
 import {CsiValueComponent} from "./components/csi-value/csi-value.component";
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
-import {PageMetricComponent} from '../application-dashboard/components/page-metric/page-metric.component';
+import {PageMetricComponent} from './components/page-metric/page-metric.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -34,7 +34,8 @@ const DashboardRoutes: Routes = [
     PageMetricComponent
   ],
   exports: [
-    RouterModule
+    RouterModule,
+    PageMetricComponent
   ],
   providers: [
     {

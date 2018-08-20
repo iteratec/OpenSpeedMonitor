@@ -5,6 +5,7 @@ import {ApplicationDashboardService} from '../../services/application-dashboard.
 import {PageComponent} from '../page/page.component';
 import {CsiValueComponent} from '../csi-value/csi-value.component';
 import {SharedMocksModule} from '../../../testing/shared-mocks.module';
+import {PageMetricComponent} from "../page-metric/page-metric.component";
 
 describe('PageListComponent', () => {
   let component: PageListComponent;
@@ -15,7 +16,8 @@ describe('PageListComponent', () => {
       declarations: [
         PageListComponent,
         PageComponent,
-        CsiValueComponent
+        CsiValueComponent,
+        PageMetricComponent
       ],
       imports: [
         SharedMocksModule
