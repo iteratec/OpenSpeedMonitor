@@ -196,9 +196,9 @@ class DistributionChartController extends ExceptionHandlerController {
                     if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
                         JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
                         Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
-                        String identifier = "${page} | ${jobGroup}"
+                        String identifier = "${page} | ${jobGroup.name}"
                         if (!distributionChartDTO.series.get(identifier)) {
-                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: page, jobGroup: jobGroup))
+                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: page, jobGroup: jobGroup.name))
                         }
                         def newTrace = distributionChartDTO.series.get(identifier)
                         newTrace.data.add(selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"))
