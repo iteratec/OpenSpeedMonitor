@@ -1,11 +1,11 @@
 import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
-import {MetricsDto} from "../../models/metrics.model";
+import {PageMetricsDto} from "../../models/page-metrics.model";
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../shared/utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
-import {PageCsiResponse} from "../../models/page-csi-response.model";
+import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-page',
@@ -13,16 +13,16 @@ import {PageCsiResponse} from "../../models/page-csi-response.model";
   styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
-  @Input() metricsForPage: MetricsDto;
+  @Input() metricsForPage: PageMetricsDto;
   pageCsi$: Observable<number>;
   isLoading: boolean = true;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
-      map((next: PageCsiResponse) => {
+      map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;
         if (this.isLoading) return 0;
-        const pageCsiDto: PageCsiDto = next.pageCsis.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.metricsForPage.pageId);
+        const pageCsiDto: PageCsiDto = next.data.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.metricsForPage.pageId);
         return pageCsiDto ? pageCsiDto.csiDocComplete : null;
       })
     );

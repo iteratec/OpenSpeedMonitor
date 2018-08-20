@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {Observable} from "rxjs/index";
-import {MetricsDto} from "../../models/metrics.model";
+import {PageMetricsDto} from "../../models/page-metrics.model";
 
 @Component({
   selector: 'osm-page-list',
@@ -9,7 +9,7 @@ import {MetricsDto} from "../../models/metrics.model";
   styleUrls: ['./page-list.component.scss']
 })
 export class PageListComponent {
-  metrics$: Observable<MetricsDto[]>;
+  metrics$: Observable<PageMetricsDto[]>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.metrics$ = this.applicationDashboardService.metrics$;

@@ -1,18 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EMPTY, Observable, ReplaySubject, Subject} from "rxjs/index";
-import {MetricsDto} from "../models/metrics.model";
+import {PageMetricsDto} from "../models/page-metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
-import {PageCsiResponse} from "../models/page-csi-response.model";
 import {catchError, map, switchMap} from "rxjs/internal/operators";
+import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 
 @Injectable()
 export class ApplicationDashboardService {
-  metrics$: ReplaySubject<MetricsDto[]> = new ReplaySubject<MetricsDto[]>(1);
-  csiValues$: ReplaySubject<ApplicationCsiListDTO> = new ReplaySubject<ApplicationCsiListDTO>(1);
-  pageCsis$: ReplaySubject<PageCsiResponse> = new ReplaySubject<PageCsiResponse>(1);
+  metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
+  csiValues$: ReplaySubject<ResponseWithLoadingState<ApplicationCsiListDTO>> = new ReplaySubject(1);
+  pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
 
   selectedApplication$ = new Subject<ApplicationDTO>();
@@ -41,10 +41,10 @@ export class ApplicationDashboardService {
     this.selectedApplication$.next(application);
   }
 
-  private updateMetricsForPages(applicationDto: ApplicationDTO): Observable<MetricsDto[]> {
+  private updateMetricsForPages(applicationDto: ApplicationDTO): Observable<PageMetricsDto[]> {
     const params = this.createParams(applicationDto.id);
     this.metrics$.next(null);
-    return this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
+    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
@@ -52,14 +52,17 @@ export class ApplicationDashboardService {
     );
   }
 
-  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ApplicationCsiListDTO> {
+  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<ApplicationCsiListDTO>> {
     this.csiValues$.next({
-      csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
-      hasCsiConfiguration: false,
+      data: {
+        csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
+        hasCsiConfiguration: false,
+      },
       isLoading: true
     });
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
+      map(dto => <ResponseWithLoadingState<ApplicationCsiListDTO>>{isLoading: false, data: dto}),
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
@@ -67,11 +70,11 @@ export class ApplicationDashboardService {
     );
   }
 
-  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<PageCsiResponse> {
-    this.pageCsis$.next({pageCsis: [], isLoading: true});
+  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<PageCsiDto[]>> {
+    this.pageCsis$.next({data: [], isLoading: true});
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
-      map(dto => <PageCsiResponse>{isLoading: false, pageCsis: dto}),
+      map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
