@@ -17,7 +17,7 @@ This is a dialog to choose from different default csi mappings.
                                     'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />
             </div>
             <div class="modal-footer">
-                <g:form class="form-inline">
+                <form class="form-inline">
                     <div class="form-group">
                         <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
                         <label for="selectPageMapping">
@@ -29,7 +29,7 @@ This is a dialog to choose from different default csi mappings.
                             <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
                         </button>
                     </div>
-                </g:form>
+                </form>
             </div>
         </div>
     </div>
