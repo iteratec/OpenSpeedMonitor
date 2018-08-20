@@ -3,6 +3,8 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CsiValueComponent} from './csi-value.component';
 import {DebugElement} from "@angular/core";
 import {By} from "@angular/platform-browser";
+import {TranslateModule} from "@ngx-translate/core";
+import {CalculationUtil} from "../../../shared/utils/calculation.util";
 
 describe('CsiValueComponent', () => {
   let component: CsiValueComponent;
@@ -10,7 +12,10 @@ describe('CsiValueComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CsiValueComponent ]
+      declarations: [CsiValueComponent],
+      imports: [
+        TranslateModule.forRoot()
+      ]
     })
     .compileComponents();
   }));
@@ -108,5 +113,74 @@ describe('CsiValueComponent', () => {
     const containerDe: DebugElement = fixture.debugElement.query(By.css('.csi-circle-container'));
     const containerEl: HTMLElement = containerDe.nativeElement;
     expect(containerEl.clientWidth).toBe(expectedSize);
+  });
+  it('should be described by the date of the recent csi date if the csi date is not today and the circle is big', () => {
+    component.isBig = true;
+    component.csiDate = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().substring(0, 10);
+    component.ngOnInit();
+
+    expect(component.description).toBe(CalculationUtil.toGermanDateFormat(component.csiDate));
+    fixture.detectChanges();
+    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    expect(descriptionEl.textContent).toEqual(CalculationUtil.toGermanDateFormat(component.csiDate));
+  });
+  it('should be grey if the csi is outdated', () => {
+    const goodValue: number = 90;
+    component.csiValue = goodValue;
+    component.csiDate = new Date("01.02.2017").toISOString();
+    component.lastResultDate = new Date("01.03.2017").toISOString();
+    component.ngOnInit();
+
+    expect(component.isOutdated).toBe(true);
+    expect(component.csiValueClass).toEqual('outdated');
+
+    fixture.detectChanges();
+    const circleDe: DebugElement = fixture.debugElement;
+    const svgDe: DebugElement = circleDe.query(By.css('svg'));
+    expect(svgDe.classes.bad).toBeFalsy();
+    expect(svgDe.classes.okay).toBeFalsy();
+    expect(svgDe.classes.good).toBeFalsy();
+    expect(svgDe.classes.outdated).toBeTruthy();
+  });
+  it('should be good if csi value is good and up-to-date', () => {
+    const goodValue: number = 90;
+    component.csiValue = goodValue;
+    component.csiDate = new Date("01.02.2017").toISOString();
+    component.lastResultDate = new Date("01.02.2017").toISOString();
+    component.ngOnInit();
+
+    expect(component.isOutdated).toBe(false);
+    expect(component.csiValueClass).toEqual('good');
+
+    fixture.detectChanges();
+    const circleDe: DebugElement = fixture.debugElement;
+    const svgDe: DebugElement = circleDe.query(By.css('svg'));
+    expect(svgDe.classes.bad).toBeFalsy();
+    expect(svgDe.classes.okay).toBeFalsy();
+    expect(svgDe.classes.good).toBeTruthy();
+    expect(svgDe.classes.outdated).toBeFalsy();
+  });
+  it('should be described by "CSI" and be "outdated" (grey) if the csi value is outdated and the circle is small', () => {
+    const goodValue: number = 90;
+    component.csiValue = goodValue;
+    component.isBig = false;
+    component.csiDate = new Date("01.02.2017").toISOString();
+    component.lastResultDate = new Date("01.03.2017").toISOString();
+    component.ngOnInit();
+
+    expect(component.isOutdated).toBe(true);
+    expect(component.description).toBe('CSI');
+    expect(component.csiValueClass).toEqual('outdated');
+
+    fixture.detectChanges();
+    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    expect(descriptionEl.textContent).toEqual('CSI');
+
+    const circleDe: DebugElement = fixture.debugElement;
+    const svgDe: DebugElement = circleDe.query(By.css('svg'));
+    expect(svgDe.classes.bad).toBeFalsy();
+    expect(svgDe.classes.okay).toBeFalsy();
+    expect(svgDe.classes.good).toBeFalsy();
+    expect(svgDe.classes.outdated).toBeTruthy();
   });
 });
