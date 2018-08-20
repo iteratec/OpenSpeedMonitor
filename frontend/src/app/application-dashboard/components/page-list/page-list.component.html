@@ -1,4 +1,4 @@
 <div class="page-grid">
-  <osm-page *ngFor="let page of pages$| async" [page]="page" [lastDateOfResult]="lastDateOfResult"
+  <osm-page *ngFor="let metric of metrics$ | async" [metricsForPage]="metric" [lastDateOfResult]="lastDateOfResult"
             class="page-grid-child"></osm-page>
 </div>

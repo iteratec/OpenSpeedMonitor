@@ -55,10 +55,11 @@ export class CsiGraphCalculator {
   }
 
   calculateX(csiDTO: CsiDTO): number {
-    return this.xScale(CsiGraphCalculator.dayStart(new Date(csiDTO.date)));
+    const date: Date = csiDTO ? new Date(csiDTO.date) : new Date();
+    return this.xScale(CsiGraphCalculator.dayStart(date));
   }
 
   calculateY(csiDTO: CsiDTO): number {
-    return this.yScale(csiDTO.csiDocComplete);
+    return this.yScale(csiDTO ? csiDTO.csiDocComplete : 0);
   }
 }
