@@ -1,12 +1,13 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {ReplaySubject} from "rxjs/index";
+import {EMPTY, Observable, ReplaySubject} from "rxjs/index";
 import {Measurand} from "../models/measurand.model";
 import {MeasuredEvent} from "../models/measured-event.model";
-import {ThresholdForJob} from "../models/threshold-for-job.model";
+import {ThresholdGroup} from "../models/threshold-for-job.model";
 import {Threshold} from "../models/threshold.model";
-import {ActualMeasurandsService} from "./actual-measurands.service";
-import {ActualThresholdsForJobService} from "./actual-thresholds-for-job.service";
+import {MeasurandService} from "./measurand.service";
+import {ThresholdService} from "./threshold.service";
+import {catchError} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,6 @@ import {ActualThresholdsForJobService} from "./actual-thresholds-for-job.service
 
 export class ThresholdRestService {
 
-  public measuredEvents$ = new ReplaySubject<MeasuredEvent[]>(1);
   public actualJobId : number;
   public actualThresholdId: number;
   public actualMeasuredEventId: number;
@@ -22,33 +22,38 @@ export class ThresholdRestService {
 
 
   constructor(private http: HttpClient,
-              private actualMeasurandService: ActualMeasurandsService,
-              private actualThresholdsforJobList: ActualThresholdsForJobService) {
+              private measurandService: MeasurandService,
+              private thresholdService: ThresholdService) {
     this.getMeasurands();
   }
 
   /** GET Measurands */
   getMeasurands () {
     const url = `/job/getAllMeasurands`;
-    this.http.get< Measurand[]>(url).subscribe((measurands:Measurand[]) => this.actualMeasurandService.setActualMeasurands(measurands));
+    this.http.get< Measurand[]>(url).subscribe((measurands:Measurand[]) => this.measurandService.setActualMeasurands(measurands));
   }
 
   /** GET MeasuredEvents */
-  getMeasuredEvents (scriptId: number, jobId: number){
+  getMeasuredEvents (scriptId: number, jobId: number): Observable<MeasuredEvent[]>{
     this.actualJobId = jobId;
     const url = `/script/getMeasuredEventsForScript?scriptId=${scriptId}`;
-    this.http.get<MeasuredEvent[]>(url)
-      .subscribe(next => {
-        this.measuredEvents$.next(next);
-        this.getThresholdsForJob(this.actualJobId)
-      }, error => this.handleError(error)) ;
+    this.getThresholdsForJob(this.actualJobId);
+    return this.http.get<MeasuredEvent[]>(url).pipe(
+      catchError(error => {
+        this.handleError(error);
+        return EMPTY;
+      })
+    )
   }
 
   /** GET Thresholds For a Job */
   getThresholdsForJob (jobId: number){
     const url = `/job/getThresholdsForJob?jobId=${jobId}` ;
-    this.http.get<ThresholdForJob[]>(url)
-      .subscribe(next => this.actualThresholdsforJobList.setActualThresholdsforJobList(next), error => this.handleError(error)) ;
+    this.http.get<ThresholdGroup[]>(url)
+      .subscribe(
+        next => this.thresholdService.setThresholdGroups(next),
+          error => this.handleError(error)
+      );
   }
 
   /** DELETE Threshold */
@@ -59,7 +64,7 @@ export class ThresholdRestService {
     let formData = new FormData()
     formData.append("thresholdId", threshold.id.toString())
     this.http.post(url, formData).subscribe(() => {
-      self.actualThresholdsforJobList.deleteFromActualThresholdsforJob(this.actualThreshold);
+      self.thresholdService.deleteFromActualThresholdsforJob(this.actualThreshold);
     });
   }
 
@@ -76,7 +81,7 @@ export class ThresholdRestService {
     params = params.set('upperBoundary', threshold.upperBoundary.toString());
 
     this.http.post(url, params).subscribe(() => {
-      self.actualThresholdsforJobList.editThresholdOfActualThresholdsforJob(this.actualThresholdId, this.actualThreshold );
+      self.thresholdService.updateThreshold(this.actualThreshold);
       }
     );
   }
@@ -96,7 +101,7 @@ export class ThresholdRestService {
     this.http.post(url,  params ).subscribe(response => {
       let newId : number=  Number(Object.values(response));
       this.actualThreshold.id= newId;
-      self.actualThresholdsforJobList.addToActualThresholdsforJob(this.actualMeasuredEventId, this.actualThreshold);
+      self.thresholdService.addThreshold(this.actualThreshold);
     });
   }
 

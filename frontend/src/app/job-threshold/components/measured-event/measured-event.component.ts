@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {MeasuredEvent} from "../../models/measured-event.model";
 import {Threshold} from "../../models/threshold.model";
 import {Measurand} from "../../models/measurand.model";
-import {ActualMeasurandsService} from "../../services/actual-measurands.service";
+import {MeasurandService} from "../../services/measurand.service";
 
 @Component({
   selector: 'osm-measured-event',
@@ -13,8 +13,6 @@ import {ActualMeasurandsService} from "../../services/actual-measurands.service"
 export class MeasuredEventComponent implements OnInit {
   @Input() measuredEvent: MeasuredEvent;
   @Input() thresholds: Threshold[] = [];
-  @Input() measuredEventList: MeasuredEvent[];
-  @Output() addedMeasure = new EventEmitter();
   @Output() removeEvent = new EventEmitter();
   @Output() removeOldMeasuredEvent = new EventEmitter();
   newThreshold: Threshold;
@@ -22,7 +20,7 @@ export class MeasuredEventComponent implements OnInit {
   actualMeasurandList: Measurand[];
 
 
-  constructor(private actualMeasurandsService: ActualMeasurandsService) {
+  constructor(private actualMeasurandsService: MeasurandService) {
   }
 
   ngOnInit() {
@@ -39,34 +37,18 @@ export class MeasuredEventComponent implements OnInit {
     }
     this.addThresholdDisabled = true;
     this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
-    this.newThreshold = {} as Threshold;
-    let newMeasurand = {} as Measurand;
-    let newMeasuredEvent = {} as MeasuredEvent;
-    let newThresholdName: string;
-    newThresholdName = this.actualMeasurandList[0].name;
-    newMeasuredEvent = this.measuredEvent;
-    if (this.measuredEvent) {
-      if (this.measuredEvent.state == "new") {
-        newMeasuredEvent.state = 'new';
-      } else {
-        newMeasuredEvent.state = 'normal'
-      }
-    }
-    this.newThreshold.measurand = newMeasurand;
-    this.newThreshold.measurand.name = newThresholdName;
-    this.newThreshold.lowerBoundary = 0;
-    this.newThreshold.upperBoundary = 0;
-    this.newThreshold.state = "new";
-    this.newThreshold.measuredEvent = newMeasuredEvent;
-    this.thresholds.push(this.newThreshold);
 
+    this.newThreshold = {
+      measurand:  this.actualMeasurandList[0],
+      lowerBoundary:  0,
+      upperBoundary:  0,
+      state: "new",
+      measuredEvent: this.measuredEvent
+    };
 
   }
 
-  addedMeasuredEvent() {
-    this.addedMeasure.emit()
-  }
-  addedThreshold(){
+  addedThreshold() {
     this.actualMeasurandList.length < 2 ? this.addThresholdDisabled = true : this.addThresholdDisabled = false;
   }
 
@@ -77,7 +59,7 @@ export class MeasuredEventComponent implements OnInit {
     this.addThresholdDisabled = false;
   }
 
-  cancelNewThreshold(){
+  cancelNewThreshold() {
     this.thresholds.pop();
     this.addThresholdDisabled = false;
 

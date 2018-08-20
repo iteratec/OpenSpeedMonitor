@@ -6,7 +6,7 @@ import {MeasuredEvent} from "./measured-event.model"
 import {Measurand} from "./measurand.model"
 
 export type Threshold = {
-  id: number;
+  id?: number;
   lowerBoundary: number;
   measurand: Measurand;
   measuredEvent: MeasuredEvent;

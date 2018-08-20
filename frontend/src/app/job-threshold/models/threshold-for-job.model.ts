@@ -4,7 +4,7 @@
 import {MeasuredEvent} from "./measured-event.model"
 import {Threshold} from "./threshold.model"
 
-export type ThresholdForJob = {
+export type ThresholdGroup = {
   measuredEvent: MeasuredEvent;
   thresholds: Threshold[];
 }
