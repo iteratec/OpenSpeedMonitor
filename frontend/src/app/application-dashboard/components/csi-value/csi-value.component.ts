@@ -15,6 +15,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   @Input() isBig: boolean;
   @Input() description: string;
   @Input() csiValue: number;
+  @Input() showLoading: boolean;
 
   formattedCsiValue: string;
   csiValueClass: string;
@@ -37,6 +38,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private drawCircle(previousCsiValue: number = 0) {
+    this.setFontSize();
     const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     this.isNA = !this.csiValue && this.csiValue !== 0;
     this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
@@ -50,34 +52,41 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private formatCsiValue(csiValue: number): string {
-    if (this.isNA) {
-      return "n/a";
+    if (this.showLoading) {
+      return "loading...";
+    } else {
+      if (this.isNA) {
+        return "n/a";
+      }
+      if (csiValue >= 100) {
+        return "100%";
+      }
+      return csiValue.toFixed(1) + "%";
     }
-    if (csiValue >= 100) {
-      return "100%";
-    }
-
-    return csiValue.toFixed(1) + "%";
   }
 
   private initByInputs() {
     if (!this.description) {
       this.description = "CSI";
     }
-
     if (this.isBig) {
       this.size = 150;
-      this.valueFontSize = '34';
-      this.descriptionFontSize = '14';
     } else {
       this.size = 75;
-      this.valueFontSize = '18';
-      this.descriptionFontSize = '12';
     }
-
     this.outerRadius = this.size / 2;
     let innerRadius = this.outerRadius - this.outerRadius * 0.15;
     this.arcGenerator = this.getArcGenerator(innerRadius, this.outerRadius);
+  }
+
+  private setFontSize() {
+    if (this.isBig) {
+      this.valueFontSize = this.showLoading ? '24' : '34';
+      this.descriptionFontSize = '14';
+    } else {
+      this.valueFontSize = this.showLoading ? '10' : '18';
+      this.descriptionFontSize = '12';
+    }
   }
 
   private getArcGenerator(innerRadius: number, outerRadius: number) {
