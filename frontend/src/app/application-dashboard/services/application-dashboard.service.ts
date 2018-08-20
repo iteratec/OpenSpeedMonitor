@@ -1,32 +1,27 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EMPTY, Observable, ReplaySubject, Subject} from "rxjs/index";
-import {PageDto} from "../models/page.model";
-import {MetricsDto} from "../models/metrics.model";
+import {PageMetricsDto} from "../models/page-metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
-import {catchError, switchMap} from "rxjs/internal/operators";
+import {catchError, map, switchMap} from "rxjs/internal/operators";
+import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 
 @Injectable()
 export class ApplicationDashboardService {
-  metrics$: ReplaySubject<MetricsDto[]> = new ReplaySubject<MetricsDto[]>(1);
-  pages$: ReplaySubject<PageDto[]> = new ReplaySubject<PageDto[]>(1);
-  csiValues$: ReplaySubject<ApplicationCsiListDTO> = new ReplaySubject<ApplicationCsiListDTO>(1);
-  pageCsis$: ReplaySubject<PageCsiDto[]> = new ReplaySubject<PageCsiDto[]>(1);
+  metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
+  csiValues$: ReplaySubject<ResponseWithLoadingState<ApplicationCsiListDTO>> = new ReplaySubject(1);
+  pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
 
   selectedApplication$ = new Subject<ApplicationDTO>();
 
   constructor(private http: HttpClient) {
-    this.updateActiveOrRecentlyMeasured()
+    this.updateActiveOrRecentlyMeasured();
     this.selectedApplication$.pipe(
-      switchMap((application: ApplicationDTO) => this.updateMetricsForApplication(application))
+      switchMap((application: ApplicationDTO) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
-
-    this.selectedApplication$.pipe(
-      switchMap((application: ApplicationDTO) => this.updatePagesForApplication(application))
-    ).subscribe(this.pages$);
 
     this.selectedApplication$.pipe(
       switchMap((application: ApplicationDTO) => this.updateCsiForApplication(application))
@@ -46,44 +41,45 @@ export class ApplicationDashboardService {
     this.selectedApplication$.next(application);
   }
 
-  private updateMetricsForApplication(applicationDto: ApplicationDTO): Observable<MetricsDto[]> {
+  private updateMetricsForPages(applicationDto: ApplicationDTO): Observable<PageMetricsDto[]> {
     const params = this.createParams(applicationDto.id);
-    return this.http.get<MetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
+    this.metrics$.next(null);
+    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
       })
-    )
+    );
   }
 
-  private updatePagesForApplication(applicationDto: ApplicationDTO): Observable<PageDto[]> {
-    const params = this.createParams(applicationDto.id);
-    return this.http.get<PageDto[]>('/applicationDashboard/rest/getPagesForApplication', {params}).pipe(
-      catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      })
-    )
-  }
-
-  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ApplicationCsiListDTO> {
+  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<ApplicationCsiListDTO>> {
+    this.csiValues$.next({
+      data: {
+        csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
+        hasCsiConfiguration: false,
+      },
+      isLoading: true
+    });
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
+      map(dto => <ResponseWithLoadingState<ApplicationCsiListDTO>>{isLoading: false, data: dto}),
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
       })
-    )
+    );
   }
 
-  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<PageCsiDto[]> {
+  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<PageCsiDto[]>> {
+    this.pageCsis$.next({data: [], isLoading: true});
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
+      map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
       catchError((error) => {
         this.handleError(error);
         return EMPTY;
       })
-    )
+    );
   }
 
 
@@ -94,7 +90,7 @@ export class ApplicationDashboardService {
   private createParams(applicationId: number) {
     return {
       applicationId: applicationId ? applicationId.toString() : ""
-    }
+    };
   }
 
 }
