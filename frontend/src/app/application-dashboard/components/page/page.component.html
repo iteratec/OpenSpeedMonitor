@@ -1,9 +1,9 @@
 <div class="card">
-  <h2>{{page?.name}}</h2>
+  <h2>{{metricsForPage?.pageName}}</h2>
   <div class="page-metrics">
     <osm-csi-value [csiValue]="pageCsi$ | async" [showLoading]="isLoading" [isBig]="false"
                    [description]="'CSI'"></osm-csi-value>
-    <div *ngIf="metricsForPage$ | async, let metricsDto" class="metric-list">
+    <div *ngIf="metricsForPage, let metricsDto" class="metric-list">
       <div class="metric">
         <i class="far fa-eye metric-icon"></i>
         <div class="metric-value">{{transform(convertMillisecsToSecs(metricsDto.speedIndex))}}</div>

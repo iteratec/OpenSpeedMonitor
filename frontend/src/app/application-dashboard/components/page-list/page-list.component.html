@@ -1,3 +1,4 @@
 <div class="page-grid">
-  <osm-page *ngFor="let page of pages$ | async" [page]="page" class="page-grid-child"></osm-page>
+  <osm-page *ngFor="let metric of metrics$ | async" [metricsForPage]="metric"
+            class="page-grid-child"></osm-page>
 </div>
