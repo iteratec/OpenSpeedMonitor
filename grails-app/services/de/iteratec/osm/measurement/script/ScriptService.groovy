@@ -10,9 +10,6 @@ class ScriptService {
     PageService pageService
 
     def createNewPagesAndMeasuredEvents(ScriptParser parser) {
-        parser.newPages.each { String name ->
-            Page.findOrSaveByName(name)
-        }
         parser.newMeasuredEvents.each { String measuredEventName, String pageName ->
             def page = Page.findByName(pageName)
             if (page) {
