@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.d3Data.ScheduleChartData
 import de.iteratec.osm.d3Data.ScheduleChartJob
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
 import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService

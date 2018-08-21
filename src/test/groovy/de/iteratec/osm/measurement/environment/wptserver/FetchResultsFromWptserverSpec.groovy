@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiConfiguration
@@ -48,13 +48,13 @@ import static org.junit.Assert.assertThat
  * get xml result and proof the data registered {@link iResultListener}s get in their called fetchResults() method.
  */
 @Ignore('[IT-1703] Re-Write these tests without mocking http requests (e.g. without betamax or similar library')
-class FetchResultsFromWptserverTests extends Specification implements ServiceUnitTest<ProxyService>, DataTest {
+class FetchResultsFromWptserverTests extends Specification implements ServiceUnitTest<WptInstructionService>, DataTest {
 
     public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
     public static final String WPTSERVER_SINGLESTEP_URL = 'www.webpagetest.org'
     private static final String LOCATION_IDENTIFIER_MULTISTEP = 'iteratec-dev-iteraHH-win7:IE'
     private static final String LOCATION_IDENTIFIER_SINGLESTEP = 'iteratec-dev-netlab-win7:IE'
-    ProxyService serviceUnderTest
+    WptInstructionService serviceUnderTest
 
     Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule
