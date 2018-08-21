@@ -1,9 +1,9 @@
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
@@ -14,8 +14,8 @@ class WptServerServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void "Create official wpt-server (webpagetest.org)"() {
-        setup: "ProxyService returns 3 locations for the server to create."
-        service.proxyService = Stub(ProxyService){
+        setup: "WptInstructionService returns 3 locations for the server to create."
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> { WebPageTestServer server -> [Location.build(wptServer: server)] }
         }
         when: "Trying to make official wpt-server."
@@ -36,8 +36,8 @@ class WptServerServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void "Create custom server without API key."() {
-        setup: "ProxyService returns 3 locations for the server to create."
-        service.proxyService = Stub(ProxyService){
+        setup: "WptInstructionService returns 3 locations for the server to create."
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> { WebPageTestServer server -> [Location.build(wptServer: server)] }
         }
         when: "Trying to make a custom server without API key."
@@ -58,8 +58,8 @@ class WptServerServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void "Create custom server with API key."() {
-        setup: "ProxyService returns 3 locations for the server to create."
-        service.proxyService = Stub(ProxyService){
+        setup: "WptInstructionService returns 3 locations for the server to create."
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> { WebPageTestServer server -> [Location.build(wptServer: server)] }
         }
         when: "Trying to make a custom server with API key."
@@ -80,8 +80,8 @@ class WptServerServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void "test with invalid url"() {
-        setup: "ProxyService returns no locations for the server to create."
-        service.proxyService = Stub(ProxyService){
+        setup: "WptInstructionService returns no locations for the server to create."
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> []
         }
         when: "Trying to make a custom wpt server with an invalid url."
@@ -97,8 +97,8 @@ class WptServerServiceSpec extends Specification implements BuildDataTest, Servi
     }
 
     void "test with invalid server"() {
-        setup: "ProxyService throws exception trying to fetch Locations."
-        service.proxyService = Stub(ProxyService){
+        setup: "WptInstructionService throws exception trying to fetch Locations."
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> { WebPageTestServer server -> throw Exception("No valid WptServer.") }
         }
         when: "Trying to make a custom wpt server which can't be reached to fetch Locations."

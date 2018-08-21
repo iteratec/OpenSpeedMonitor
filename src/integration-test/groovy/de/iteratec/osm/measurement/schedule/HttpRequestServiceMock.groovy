@@ -30,7 +30,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 
 	private int fetchResultCallCount = 0;
 
-	// called from ProxyService.fetchResult()
+	// called from WptInstructionService.fetchResult()
 	GPathResult getWptServerHttpGetResponse(WebPageTestServer wptserver, String path, Map query, String contentType, Map headers){
 		fetchResultCallCount++
 		int statusCode = fetchResultCallCount <= statusCodes.length ? statusCodes[fetchResultCallCount - 1] : 200

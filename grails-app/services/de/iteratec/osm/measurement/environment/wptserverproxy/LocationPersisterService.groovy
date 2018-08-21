@@ -26,7 +26,7 @@ import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 
 /**
- * Persists locations and results. Observer of ProxyService.
+ * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett , nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */

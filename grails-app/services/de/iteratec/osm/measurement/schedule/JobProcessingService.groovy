@@ -20,7 +20,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
 import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobExecutionException
@@ -77,7 +77,7 @@ enum TriggerGroup {
 @Transactional
 class JobProcessingService {
 
-    ProxyService proxyService
+    WptInstructionService wptInstructionService
     def quartzScheduler
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
@@ -364,7 +364,7 @@ class JobProcessingService {
 
             def result
             performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
-                result = proxyService.runtest(wptserver, parameters);
+                result = wptInstructionService.runtest(wptserver, parameters);
             }
 
             NodeChild runtestResponseXml = parseResponse(result, wptserver)
@@ -411,7 +411,7 @@ class JobProcessingService {
         WptResultXml resultXml
         try {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", 1) {
-                resultXml = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
+                resultXml = wptInstructionService.fetchResult(job.location.wptServer, [resultId: testId])
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", 1) {
                 if (resultXml.statusCodeOfWholeTest < 200) {
@@ -452,7 +452,7 @@ class JobProcessingService {
                 unscheduleTest(job, testId)
                 String description = lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
                 persistUnfinishedJobResult(job.id, testId, WptStatus.TIME_OUT.getWptStatusCode(), '', description)
-                proxyService.cancelTest(job.location.wptServer, [test: testId])
+                wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             }
         }
     }
@@ -474,7 +474,7 @@ class JobProcessingService {
             result.delete(failOnError: true, flush: true)
             log.info("Deleting the following JobResult as requested: ${result}... DONE")
             log.info("Canceling respective test on wptserver.")
-            proxyService.cancelTest(job.location.wptServer, [test: testId])
+            wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             log.info("Canceling respective test on wptserver... DONE")
         }
     }

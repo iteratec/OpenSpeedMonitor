@@ -39,7 +39,7 @@ import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 /**
- * Persists locations and results. Observer of ProxyService.
+ * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett , nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */
@@ -52,7 +52,7 @@ class ResultPersisterService implements iResultListener {
     CsiAggregationUpdateService csiAggregationUpdateService
     TimeToCsMappingService timeToCsMappingService
     PageService pageService
-    ProxyService proxyService
+    WptInstructionService wptInstructionService
     MetricReportingService metricReportingService
     PerformanceLoggingService performanceLoggingService
     CsiValueService csiValueService
@@ -553,7 +553,7 @@ class ResultPersisterService implements iResultListener {
         if (location == null) {
 
             log.warn("Location not found trying to refresh ${wptserverOfResult} and ${locationIdentifier}.")
-            proxyService.fetchLocations(wptserverOfResult);
+            wptInstructionService.fetchLocations(wptserverOfResult);
 
             location = queryForLocation(wptserverOfResult, locationIdentifier);
 

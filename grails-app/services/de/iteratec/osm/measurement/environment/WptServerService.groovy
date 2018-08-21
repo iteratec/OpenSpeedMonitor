@@ -1,12 +1,13 @@
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
 import grails.gorm.transactions.Transactional
 
 @Transactional
 class WptServerService {
 
-    ProxyService proxyService
+    WptInstructionService wptInstructionService
 
     static final String OFFICIAL_WPT_URL = "www.webpagetest.org"
 
@@ -46,7 +47,7 @@ class WptServerService {
 
     List<Location> tryFetchLocations(WebPageTestServer server) {
         try {
-            List<Location> addedLocations = proxyService.fetchLocations(server)
+            List<Location> addedLocations = wptInstructionService.fetchLocations(server)
             return addedLocations;
         }
         catch (Exception e) {

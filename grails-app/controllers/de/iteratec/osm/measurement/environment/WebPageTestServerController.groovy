@@ -1,14 +1,10 @@
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
-import groovy.json.JsonSlurper
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus
-
-import javax.servlet.http.HttpServletResponse
 
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
@@ -16,7 +12,7 @@ import static org.springframework.http.HttpStatus.*
 class WebPageTestServerController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
-    ProxyService proxyService
+    WptInstructionService wptInstructionService
     I18nService i18nService
 
     static scaffold = WebPageTestServer
@@ -26,7 +22,7 @@ class WebPageTestServerController {
         if (webPageTestServer == null){
             flash.message = i18nService.msg('', "No WebPageTestServer found with id ${params.id}")
         }else{
-            List<Location> addedLocations = proxyService.fetchLocations(webPageTestServer)
+            List<Location> addedLocations = wptInstructionService.fetchLocations(webPageTestServer)
             String message = "Location-Request was successful."
             if(addedLocations.empty) {
                 message += " But no locations were added"

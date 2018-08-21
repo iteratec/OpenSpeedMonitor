@@ -46,7 +46,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  * Tests the saving of EventResults.
  * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
- * @see {@link ProxyService}
+ * @see {@link WptInstructionService}
  *
  */
 @Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
