@@ -1,4 +1,6 @@
-<div>
+<div title="{{ isOutdated ?
+               ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: toGermanDateFormat(csiDate) })
+               :'' }}">
   <div class="csi-circle-container">
     <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass">
     </svg>

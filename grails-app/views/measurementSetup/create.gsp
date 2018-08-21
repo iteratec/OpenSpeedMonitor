@@ -47,13 +47,13 @@
     <ul id="measurementSetupSteps" class="nav nav-tabs nav-justified">
         <li class="wizardStep active wasActive">
             <a data-toggle="tab" href="#setJobGroup" id="setJobGroupTab">
-                <i class="fas fa-folderpen-o fa-2x" aria-hidden="true"></i>
+                <i class="far fa-folder-open fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.setJobGroup" default="Set Job Group"/>
             </a>
         </li>
         <li class="wizardStep">
             <a data-toggle="tab" href="#createScript" id="createScriptTab">
-                <i class="fas fa-file-alt fa-2x" aria-hidden="true"></i>
+                <i class="far fa-file-alt fa-2x" aria-hidden="true"></i>
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.createScript" default="Create Script"/>
             </a>
         </li>

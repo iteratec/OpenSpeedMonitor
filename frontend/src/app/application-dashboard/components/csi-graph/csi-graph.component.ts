@@ -1,12 +1,21 @@
-import {AfterContentInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {ApplicationCsiListDTO} from '../../models/csi-list.model';
-import {select} from 'd3-selection';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {CsiDTO} from '../../models/csi.model';
 import {timeDay} from 'd3-time';
 import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
 import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../utils/csi-utils';
+import {select} from "d3-selection";
 
 
 @Component({
@@ -174,7 +183,9 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.csiValueClass = CsiUtils.getClassByThresholds(this.recentCsiData.csiDocComplete);
+    if (this.recentCsiData) {
+      this.csiValueClass = CsiUtils.getClassByThresholds(this.recentCsiData.csiDocComplete);
+    }
     this.redraw();
   }
 
