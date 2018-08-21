@@ -52,10 +52,10 @@ interface iLocationListener {
 //				* https://github.com/robfletcher/betamax/tree/master/examples/grails-betamax 
 
 /**
- * Business logic for functionality of wptserver-proxy. Observers can register with {@link ProxyService#addResultListener(iResultListener)}.
+ * Business logic for functionality of wptserver-proxy. Observers can register with {@link WptInstructionService#addResultListener(iResultListener)}.
  * @author rschuett , nkuhn
  */
-class ProxyService {
+class WptInstructionService {
 
     protected List<iResultListener> resultListeners = new ArrayList<iResultListener>()
     protected List<iLocationListener> locationListeners = new ArrayList<iLocationListener>()
