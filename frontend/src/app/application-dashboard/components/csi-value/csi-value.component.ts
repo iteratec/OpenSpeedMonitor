@@ -13,10 +13,12 @@ import {CsiUtils} from '../../utils/csi-utils';
 })
 export class CsiValueComponent implements OnInit, OnChanges {
   @Input() isBig: boolean;
-  @Input() description: string;
   @Input() csiValue: number;
+  @Input() csiDate: string;
+  @Input() lastResultDate: string;
   @Input() showLoading: boolean;
 
+  description: string;
   formattedCsiValue: string;
   csiValueClass: string;
   size: number;
@@ -24,6 +26,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
   valueFontSize: string;
   descriptionFontSize: string;
   isNA: boolean;
+  isOutdated: boolean;
 
   arcGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
@@ -42,8 +45,10 @@ export class CsiValueComponent implements OnInit, OnChanges {
     const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     this.isNA = !this.csiValue && this.csiValue !== 0;
     this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
+    this.isOutdated = CsiUtils.isCsiOutdated(this.csiDate, this.lastResultDate);
     this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
+    this.updateDescription();
 
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
@@ -145,7 +150,27 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
-    return this.isNA ? 'not-available' : CsiUtils.getClassByThresholds(csiValue);
+    if (this.isNA) {
+      return 'not-available';
+    } else if (this.isOutdated) {
+      return 'outdated';
+    }
+
+    return CsiUtils.getClassByThresholds(csiValue);
+  }
+
+  private updateDescription() {
+    if (this.isBig && new Date().toISOString().substring(0, 10) > this.csiDate) {
+      this.description = CalculationUtil.toGermanDateFormat(this.csiDate);
+    } else if (!this.isBig) {
+      this.description = 'CSI';
+    } else {
+      this.description = 'today';
+    }
+  }
+
+  toGermanDateFormat(date: string): string {
+    return CalculationUtil.toGermanDateFormat(date);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

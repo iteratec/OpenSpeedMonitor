@@ -14,4 +14,8 @@ export class CsiUtils {
     }
     return 'bad';
   }
+
+  static isCsiOutdated(csiDate: string, jobDate: string): boolean {
+    return csiDate < jobDate;
+  }
 }
