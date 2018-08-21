@@ -361,10 +361,8 @@ class CsiConfigurationController {
         }
 
         log.info("Delete ${toDelete.size()} Mappings...")
-        toDelete.each { mappingToDelete ->
-            csiConfigurationToRemovePageMappingFrom.removeFromTimeToCsMappings(mappingToDelete)
-            mappingToDelete.delete()
-        }
+        csiConfigurationToRemovePageMappingFrom.timeToCsMappings.removeAll(toDelete)
+        csiConfigurationToRemovePageMappingFrom.save(flush: true)
         log.info("...DONE")
 
         response.status = 200
