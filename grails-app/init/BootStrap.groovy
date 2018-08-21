@@ -24,10 +24,10 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.DetailAnalysisPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.LocationPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService

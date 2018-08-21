@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.environment
 
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import grails.gorm.transactions.Transactional
 
 @Transactional

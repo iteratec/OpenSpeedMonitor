@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer

@@ -16,14 +16,10 @@
 */
 
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.BrowserService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script

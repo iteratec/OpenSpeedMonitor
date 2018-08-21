@@ -20,8 +20,8 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob

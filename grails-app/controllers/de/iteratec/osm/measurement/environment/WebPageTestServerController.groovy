@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.environment
 
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import org.springframework.dao.DataIntegrityViolationException

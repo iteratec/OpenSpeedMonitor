@@ -18,7 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
 import de.iteratec.osm.result.WptStatus
 import groovy.util.slurpersupport.GPathResult
 
