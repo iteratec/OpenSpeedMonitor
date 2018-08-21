@@ -1,4 +1,4 @@
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 /**
  * Created by nkuhn on 29.05.15.

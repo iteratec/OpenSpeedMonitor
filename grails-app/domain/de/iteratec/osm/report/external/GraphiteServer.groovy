@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.report.external
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
+import de.iteratec.osm.measurement.environment.wptserver.Protocol
 import de.iteratec.osm.report.external.provider.*
 import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity

@@ -59,8 +59,8 @@
             class="required-indicator">*</span></label>
 
     <div class="col-md-6">
-        <g:select name="webappProtocol" from="${de.iteratec.osm.measurement.environment.wptserverproxy.Protocol.values()}"
-                   value="${graphiteServer?.webappProtocol}" class="form-control"/>
+        <g:select name="webappProtocol" from="${de.iteratec.osm.measurement.environment.wptserver.Protocol.values()}"
+                  value="${graphiteServer?.webappProtocol}" class="form-control"/>
     </div>
 </div>
 

@@ -21,8 +21,8 @@ import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult

@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -28,15 +28,10 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.result.CsiValueService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -231,7 +226,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
     }
 
     void createMocksCommonForAllTests() {
-        service.proxyService = Mock(ProxyService)
+        service.wptInstructionService = Mock(WptInstructionService)
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
     }

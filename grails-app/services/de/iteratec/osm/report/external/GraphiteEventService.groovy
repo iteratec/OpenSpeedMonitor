@@ -20,10 +20,10 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime

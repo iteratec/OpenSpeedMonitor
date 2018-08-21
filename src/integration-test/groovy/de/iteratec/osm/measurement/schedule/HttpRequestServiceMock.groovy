@@ -18,7 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
 import de.iteratec.osm.result.WptStatus
 import groovy.util.slurpersupport.GPathResult
 
@@ -30,7 +30,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 
 	private int fetchResultCallCount = 0;
 
-	// called from ProxyService.fetchResult()
+	// called from WptInstructionService.fetchResult()
 	GPathResult getWptServerHttpGetResponse(WebPageTestServer wptserver, String path, Map query, String contentType, Map headers){
 		fetchResultCallCount++
 		int statusCode = fetchResultCallCount <= statusCodes.length ? statusCodes[fetchResultCallCount - 1] : 200
