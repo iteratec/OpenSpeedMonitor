@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.ResultSelectionCommand
 import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
@@ -59,7 +60,7 @@ class JobGroupService {
         DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
-        def recentJobGroups = resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
+        List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
             if (existing) {
                 not { 'in'('jobGroup', existing) }
             }
@@ -67,13 +68,25 @@ class JobGroupService {
                 distinct('jobGroup')
             }
         })
-        List recentAndFormattedJobGroups = recentJobGroups.collect {
-            [
-                    id  : it.id,
-                    name: it.name
-            ]
+        allActiveAndRecent.addAll(recentJobGroups)
+
+        List allActiveAndRecentFormattedJobGroups = new ArrayList()
+        recentJobGroups.each {
+            def name = it.name
+            List<JobResult> lastDateOfResult = (List<JobResult>) JobResult.createCriteria().list(max: 1) {
+                eq("jobGroupName", name)
+                order("date", "desc")
+            }
+
+            allActiveAndRecentFormattedJobGroups.add(
+                    [
+                            id               : it.id,
+                            name             : it.name,
+                            dateOfLastResults: lastDateOfResult?.get(0)?.date?.format("yyyy-MM-dd")
+                    ]
+            )
         }
-        allActiveAndRecent.addAll(recentAndFormattedJobGroups)
-        return allActiveAndRecent
+
+        return allActiveAndRecentFormattedJobGroups
     }
 }

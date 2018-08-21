@@ -1,8 +1,8 @@
 <div class="card">
   <h2>{{metricsForPage?.pageName}}</h2>
   <div class="page-metrics">
-    <osm-csi-value [csiValue]="pageCsi$ | async" [showLoading]="isLoading" [isBig]="false"
-                   [description]="'CSI'"></osm-csi-value>
+    <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [csiDate]="pageCsiDate$ | async"
+                   [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value>
     <div *ngIf="metricsForPage, let metricsDto" class="metric-list">
       <div class="metric">
         <i class="far fa-eye metric-icon"></i>

@@ -13,8 +13,10 @@ import {ResponseWithLoadingState} from "../../models/response-with-loading-state
   styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
+  @Input() lastDateOfResult: string;
   @Input() metricsForPage: PageMetricsDto;
   pageCsi$: Observable<number>;
+  pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
@@ -24,6 +26,15 @@ export class PageComponent {
         if (this.isLoading) return 0;
         const pageCsiDto: PageCsiDto = next.data.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.metricsForPage.pageId);
         return pageCsiDto ? pageCsiDto.csiDocComplete : null;
+      })
+    );
+
+    this.pageCsiDate$ = applicationDashboardService.pageCsis$.pipe(
+      map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
+        this.isLoading = next.isLoading;
+        if (this.isLoading) return null;
+        const pageCsiDto: PageCsiDto = next.data.find((pageCsiDto: PageCsiDto) => pageCsiDto.pageId == this.metricsForPage.pageId);
+        return pageCsiDto ? pageCsiDto.date : null;
       })
     );
   }

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {Observable} from "rxjs/index";
 import {PageMetricsDto} from "../../models/page-metrics.model";
@@ -9,6 +9,7 @@ import {PageMetricsDto} from "../../models/page-metrics.model";
   styleUrls: ['./page-list.component.scss']
 })
 export class PageListComponent {
+  @Input() lastDateOfResult: string;
   metrics$: Observable<PageMetricsDto[]>;
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {

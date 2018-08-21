@@ -1,9 +1,13 @@
-<div class="csi-circle-container">
-  <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass">
-  </svg>
-  <div class="csi-circle-text-container">
-    <div class="csi-value-text" [style.font-size.px]="valueFontSize">{{formattedCsiValue}}</div>
-    <div class="csi-value-description" [style.font-size.px]="descriptionFontSize">{{description}}</div>
+<div title="{{ isOutdated ?
+               ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: toGermanDateFormat(csiDate) })
+               :'' }}">
+  <div class="csi-circle-container">
+    <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass">
+    </svg>
+    <div class="csi-circle-text-container">
+      <div class="csi-value-text" [style.font-size.px]="valueFontSize">{{formattedCsiValue}}</div>
+      <div class="csi-value-description" [style.font-size.px]="descriptionFontSize">{{description}}</div>
+    </div>
   </div>
+  <i *ngIf="isBig && isOutdated" class="fas fa-info-circle info-icon"></i>
 </div>
-
