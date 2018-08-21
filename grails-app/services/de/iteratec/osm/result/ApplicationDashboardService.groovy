@@ -76,12 +76,21 @@ class ApplicationDashboardService {
 
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
+
         return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
+    }
+
+    List<Page> getRecentPagesForJobGroup(Long jobGroupId) {
+        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
+        DateTime to = new DateTime()
+
+        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
+        return pages
     }
 
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {

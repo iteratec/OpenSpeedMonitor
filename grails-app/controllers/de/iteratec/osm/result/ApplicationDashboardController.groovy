@@ -76,10 +76,30 @@ class ApplicationDashboardController {
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
         Long jobGroupId = command.applicationId
+
         List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
             it.projectedProperties.pageName = Page.findById(it.pageId).name
             return it.projectedProperties
         }
+
+        applicationDashboardService.getRecentPagesForJobGroup().each {
+            Page page = it
+            if (recentMetrics.find {
+                it.pageId == page.Id
+            }.size() == 0) {
+                recentMetrics.add(
+                        [
+                                'speedIndex'                : null,
+                                'docCompleteTimeInMillisecs': null,
+                                'fullyLoadedIncomingBytes'  : null,
+                                'pageId'                    : page.id,
+                                'pageName'                  : page.name
+
+                        ]
+                )
+            }
+        }
+
         return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
     }
 
