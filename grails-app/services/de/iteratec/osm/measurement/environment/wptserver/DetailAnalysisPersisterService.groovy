@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.batch.Activity
@@ -32,7 +32,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.WptXmlResultVersion
 import grails.web.mapping.LinkGenerator
 /**
- * Persists locations and results. Observer of ProxyService.
+ * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett, nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */
