@@ -82,23 +82,23 @@ class ApplicationDashboardController {
             return it.projectedProperties
         }
 
-        applicationDashboardService.getRecentPagesForJobGroup().each {
+        applicationDashboardService.getRecentPagesForJobGroup(jobGroupId).each {
             Page page = it
-            if (recentMetrics.find {
-                it.pageId == page.Id
-            }.size() == 0) {
+            if (!recentMetrics.any { it.pageId == page.id }) {
                 recentMetrics.add(
                         [
                                 'speedIndex'                : null,
                                 'docCompleteTimeInMillisecs': null,
-                                'fullyLoadedIncomingBytes'  : null,
                                 'pageId'                    : page.id,
-                                'pageName'                  : page.name
+                                'pageName'                  : page.name,
+                                'fullyLoadedIncomingBytes'  : null
 
                         ]
                 )
             }
         }
+
+        recentMetrics.removeAll { it.pageName == Page.UNDEFINED }
 
         return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
     }
