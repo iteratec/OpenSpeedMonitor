@@ -36,7 +36,6 @@ OpenSpeedMonitor.resultSelection = (function () {
     var hasJobGroupSelection = selectJobGroupCard.length == 0 || ($("#folderSelectHtmlId").val().length != 0);
     var hasPageSelection = pageTabElement.length == 0 || ($("#pageSelectHtmlId").val().length != 0);
 
-    //Workaround for vue component in page comparison chart [IT-1930]
     var pageSelectionAvailable = $("#pageSelectHtmlId").length;
 
     var hasMeasuredEventSelection = pageTabElement.length == 0 || ($("#selectedMeasuredEventsHtmlId").val().length != 0);
@@ -193,7 +192,6 @@ OpenSpeedMonitor.resultSelection = (function () {
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
         warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
 
-        //Workaround for vue component in page comparison chart [IT-1930]
         if(pageSelectionAvailable){
             warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         }
