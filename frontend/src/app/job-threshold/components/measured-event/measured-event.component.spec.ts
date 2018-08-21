@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 
 import {MeasuredEventComponent} from "./measured-event.component";
 import {ThresholdComponent} from "../threshold/threshold.component";
-import {ActualMeasurandsService} from "../../services/actual-measurands.service";
+import {MeasurandService} from "../../services/measurand.service";
 import {ThresholdRowComponent} from "../threshold-row/threshold-row.component";
 import {SharedMocksModule} from "../../../testing/shared-mocks.module";
 import {SharedModule} from "../../../shared/shared.module";
@@ -15,7 +15,7 @@ describe('MeasuredEventComponent', () => {
     TestBed.configureTestingModule({
       imports: [SharedModule, SharedMocksModule],
       declarations: [MeasuredEventComponent, ThresholdComponent, ThresholdRowComponent],
-      providers: [ActualMeasurandsService]
+      providers: [MeasurandService]
     })
     .compileComponents();
   }));

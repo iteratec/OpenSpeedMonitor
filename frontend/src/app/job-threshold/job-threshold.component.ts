@@ -1,11 +1,13 @@
-import {Component, ElementRef, OnChanges, OnInit} from "@angular/core";
+import {Component, ElementRef} from "@angular/core";
 import {ThresholdRestService} from "./services/threshold-rest.service";
-import {ActualMeasuredEventsService} from "./services/actual-measured-events.service";
+import {MeasuredEventService} from "./services/measured-event.service";
 import {Measurand} from "./models/measurand.model";
 import {MeasuredEvent} from "./models/measured-event.model";
-import {ThresholdForJob} from "./models/threshold-for-job.model";
+import {ThresholdGroup} from "./models/threshold-for-job.model";
 import {Threshold} from "./models/threshold.model";
-import {ActualThresholdsForJobService} from "./services/actual-thresholds-for-job.service";
+import {ThresholdService} from "./services/threshold.service";
+import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
+import {map} from "rxjs/operators";
 
 
 @Component({
@@ -14,46 +16,54 @@ import {ActualThresholdsForJobService} from "./services/actual-thresholds-for-jo
   styleUrls: ['./job-threshold.component.css']
 })
 
-export class JobThresholdComponent implements OnInit, OnChanges {
-  thresholdsForJobList: ThresholdForJob[];
-  actualMeasuredEventList: MeasuredEvent[];
-  measuredEventList: MeasuredEvent[];
-  jobId : number;
-  scriptId : number;
-  newThresholdForJob: ThresholdForJob;
+export class JobThresholdComponent {
+
+  jobId: number;
+  scriptId: number;
+
   addMeasuredEventDisabled: boolean = false;
   isEmpty: boolean = false;
 
+  private newThreshold$ = new BehaviorSubject<ThresholdGroup>(null);
+  allThresholds$: Observable<ThresholdGroup[]>;
+
   constructor(private thresholdRestService: ThresholdRestService,
-              private actualMeasuredEventsService: ActualMeasuredEventsService,
-              private actualThresholdsForJobService: ActualThresholdsForJobService,
+              private measuredEventService: MeasuredEventService,
+              private thresholdService: ThresholdService,
               elm: ElementRef) {
+
     this.jobId = elm.nativeElement.getAttribute('data-job-id');
     this.scriptId = elm.nativeElement.getAttribute('data-job-scriptId');
-    this.thresholdRestService.actualJobId = this.jobId;
-    this.thresholdRestService.getMeasuredEvents(this.scriptId, this.jobId);
-    this.thresholdRestService.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
-      this.measuredEventList = next;
-      this.actualMeasuredEventsService.setActualMeasuredEvents(this.measuredEventList);
-      this.actualThresholdsForJobService.actualThresholdsforJobList$.subscribe((next: ThresholdForJob[]) => {
-        this.thresholdsForJobList = next;
-        if (this.thresholdsForJobList.length == 0) {
-          this.isEmpty = true;
-        }
-        if(this.thresholdsForJobList.length === this.measuredEventList.length) {
-         this.addMeasuredEventDisabled= true;
-         }
-      });
-    });
+
+    this.initialize();
+    this.measuredEventService.fetchEvents(this.scriptId, this.jobId);
   }
 
-  ngOnInit() {}
+  private initialize() {
 
-  ngOnChanges() {}
+    this.allThresholds$ = combineLatest(
+      this.thresholdService.thresholdGroups$,
+      this.newThreshold$
+    ).pipe(
+      map(([measuredEventsWithThresholds, newThresholdForJob]: [ThresholdGroup[], ThresholdGroup]) => {
+        return newThresholdForJob ?
+          [...measuredEventsWithThresholds, newThresholdForJob] : measuredEventsWithThresholds
+      }));
+
+    combineLatest(
+      this.measuredEventService.measuredEvents$,
+      this.allThresholds$
+    ).subscribe(([measuredEvents, measuredEventsWithThresholds]: [MeasuredEvent[], ThresholdGroup[]]) => {
+      this.isEmpty = measuredEventsWithThresholds.length == 0;
+      if (measuredEventsWithThresholds.length === measuredEvents.length) {
+        this.addMeasuredEventDisabled = true;
+      }
+    });
+
+  }
 
   addMeasuredEvent() {
-    this.actualMeasuredEventList = this.actualMeasuredEventsService.getActualMeasuredEvents(this.thresholdsForJobList);
-    this.newThresholdForJob = {} as ThresholdForJob;
+    const newThresholdForJob = {} as ThresholdGroup;
     let newThreshold = {} as Threshold;
     let newMeasuredEvent = {} as MeasuredEvent;
     let newMeasurand = {} as Measurand;
@@ -64,12 +74,11 @@ export class JobThresholdComponent implements OnInit, OnChanges {
     newThreshold.state = "new";
     newThreshold.measuredEvent = newMeasuredEvent;
     newThreshold.measuredEvent.state = "new";
-    this.newThresholdForJob.measuredEvent = newMeasuredEvent;
-    this.newThresholdForJob.thresholds = [];
-    this.newThresholdForJob.thresholds.push(newThreshold);
-    this.thresholdsForJobList.push(this.newThresholdForJob);
+    newThresholdForJob.measuredEvent = newMeasuredEvent;
+    newThresholdForJob.thresholds = [];
+    newThresholdForJob.thresholds.push(newThreshold);
+    this.newThreshold$.next(newThresholdForJob);
     this.addMeasuredEventDisabled = true;
-    this.isEmpty = false;
   }
 
   createScript() {
@@ -77,18 +86,12 @@ export class JobThresholdComponent implements OnInit, OnChanges {
   }
 
   cancelNewMeasuredEvent() {
-    this.thresholdsForJobList.pop();
-    this.addMeasuredEventDisabled= false;
-    this.thresholdsForJobList.length > 0? this.isEmpty = false :this.isEmpty = true ;
+    this.newThreshold$.next(null);
+    this.addMeasuredEventDisabled = false;
   }
 
   removeOldMeasuredEvent() {
-    this.addMeasuredEventDisabled= false;
-    this.thresholdsForJobList.length > 1? this.isEmpty = false :this.isEmpty = true ;
-  }
-
-  addedMeasure() {
-    this.actualMeasuredEventList.length < 1 ? this.addMeasuredEventDisabled = true : this.addMeasuredEventDisabled = false;
+    this.addMeasuredEventDisabled = false;
   }
 
 }

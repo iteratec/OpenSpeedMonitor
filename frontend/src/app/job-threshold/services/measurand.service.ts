@@ -6,7 +6,7 @@ import {Threshold} from "../models/threshold.model";
   providedIn: 'root'
 })
 
-export class ActualMeasurandsService {
+export class MeasurandService {
 
   measurandList: Measurand[] = [];
   actualMeasurandList: Measurand[] = [];

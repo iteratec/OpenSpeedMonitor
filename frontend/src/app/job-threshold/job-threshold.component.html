@@ -1,10 +1,8 @@
 <div>
-  <osm-measured-event *ngFor="let thresholdForJob of thresholdsForJobList"
+  <osm-measured-event *ngFor="let thresholdForJob of allThresholds$ | async"
                       [measuredEvent]="thresholdForJob.measuredEvent"
                       [thresholds]="thresholdForJob.thresholds"
-                      [measuredEventList]="actualMeasuredEventList"
                       (removeOldMeasuredEvent) = "removeOldMeasuredEvent()"
-                      (addedMeasure) = "addedMeasure()"
                       (removeEvent)="cancelNewMeasuredEvent()">
   </osm-measured-event>
 
