@@ -4,6 +4,10 @@ import {ThresholdRestService} from "../../services/threshold-rest.service";
 import {Measurand} from "../../models/measurand.model";
 import {MeasuredEvent} from "../../models/measured-event.model";
 import {MeasuredEventService} from "../../services/measured-event.service";
+import {combineLatest, Observable, ReplaySubject} from "rxjs";
+import {filter, map} from "rxjs/operators";
+import {ThresholdService} from "../../services/threshold.service";
+import {ThresholdGroup} from "../../models/threshold-for-job.model";
 
 @Component({
   selector: 'osm-threshold',
@@ -19,16 +23,30 @@ export class ThresholdComponent implements OnInit {
   @Output() removeOldThreshold = new EventEmitter();
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
+  measuredEventsStillAvailable$: Observable<MeasuredEvent[]>;
 
-  constructor(private thresholdRestService: ThresholdRestService, private actualMeasuredEventsService: MeasuredEventService) {
+  constructor(
+    private thresholdRestService: ThresholdRestService,
+    private measuredEventsService: MeasuredEventService,
+    private thresholdService: ThresholdService) {
+
+    this.measuredEventsStillAvailable$ = combineLatest(
+      this.thresholdService.thresholdGroups$,
+      this.measuredEventsService.measuredEvents$
+    ).pipe(
+      map(([thresholdGroups, measuredEvents]: [ThresholdGroup[], MeasuredEvent[]]) => {
+        return measuredEvents
+      })
+    )
+
   }
 
   ngOnInit() {
 
     if (this.threshold) {
-      if (this.threshold.measuredEvent.state == "new") {
-        this.selectedMeasuredEvent = this.actualMeasuredEventsService.measuredEventList[0];
-      }
+      // if (this.threshold.measuredEvent.state == "new") {
+      //   this.selectedMeasuredEvent = this.measuredEventsService.measuredEventList[0];
+      // }
       if (this.threshold.state == "new") {
         this.selectedMeasurand = this.actualMeasurandList[0].translationsKey;
       }

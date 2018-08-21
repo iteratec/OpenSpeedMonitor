@@ -23,7 +23,7 @@
         <select class="thresholdSelects"
                 [(ngModel)]="selectedMeasuredEvent"
                 required>
-          <option *ngFor="let measuredEvent of measuredEventList" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
+          <option *ngFor="let measuredEvent of measuredEvents$ | async" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
         </select>
       </div>
       <div class="flex-column-right">

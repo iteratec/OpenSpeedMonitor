@@ -24,8 +24,8 @@ export class JobThresholdComponent {
   addMeasuredEventDisabled: boolean = false;
   isEmpty: boolean = false;
 
-  private newThreshold$ = new BehaviorSubject<ThresholdGroup>(null);
-  allThresholds$: Observable<ThresholdGroup[]>;
+  private newThresholGroup$ = new BehaviorSubject<ThresholdGroup>(null);
+  allThresholdGroups$: Observable<ThresholdGroup[]>;
 
   constructor(private thresholdRestService: ThresholdRestService,
               private measuredEventService: MeasuredEventService,
@@ -41,29 +41,29 @@ export class JobThresholdComponent {
 
   private initialize() {
 
-    this.allThresholds$ = combineLatest(
+    this.allThresholdGroups$ = combineLatest(
       this.thresholdService.thresholdGroups$,
-      this.newThreshold$
+      this.newThresholGroup$
     ).pipe(
-      map(([measuredEventsWithThresholds, newThresholdForJob]: [ThresholdGroup[], ThresholdGroup]) => {
-        return newThresholdForJob ?
-          [...measuredEventsWithThresholds, newThresholdForJob] : measuredEventsWithThresholds
+      map(([thresholdGroups, newThresholdGroup]: [ThresholdGroup[], ThresholdGroup]) => {
+        return newThresholdGroup ?
+          [...thresholdGroups, newThresholdGroup] : thresholdGroups
       }));
 
     combineLatest(
       this.measuredEventService.measuredEvents$,
-      this.allThresholds$
-    ).subscribe(([measuredEvents, measuredEventsWithThresholds]: [MeasuredEvent[], ThresholdGroup[]]) => {
-      this.isEmpty = measuredEventsWithThresholds.length == 0;
-      if (measuredEventsWithThresholds.length === measuredEvents.length) {
+      this.allThresholdGroups$
+    ).subscribe(([measuredEvents, thresholdGroups]: [MeasuredEvent[], ThresholdGroup[]]) => {
+      this.isEmpty = thresholdGroups.length == 0;
+      if (thresholdGroups.length === measuredEvents.length) {
         this.addMeasuredEventDisabled = true;
       }
     });
 
   }
 
-  addMeasuredEvent() {
-    const newThresholdForJob = {} as ThresholdGroup;
+  addThresholdGroup() {
+    const newThresholdGroup = {} as ThresholdGroup;
     let newThreshold = {} as Threshold;
     let newMeasuredEvent = {} as MeasuredEvent;
     let newMeasurand = {} as Measurand;
@@ -74,10 +74,10 @@ export class JobThresholdComponent {
     newThreshold.state = "new";
     newThreshold.measuredEvent = newMeasuredEvent;
     newThreshold.measuredEvent.state = "new";
-    newThresholdForJob.measuredEvent = newMeasuredEvent;
-    newThresholdForJob.thresholds = [];
-    newThresholdForJob.thresholds.push(newThreshold);
-    this.newThreshold$.next(newThresholdForJob);
+    newThresholdGroup.measuredEvent = newMeasuredEvent;
+    newThresholdGroup.thresholds = [];
+    newThresholdGroup.thresholds.push(newThreshold);
+    this.newThresholGroup$.next(newThresholdGroup);
     this.addMeasuredEventDisabled = true;
   }
 
@@ -86,7 +86,7 @@ export class JobThresholdComponent {
   }
 
   cancelNewMeasuredEvent() {
-    this.newThreshold$.next(null);
+    this.newThresholGroup$.next(null);
     this.addMeasuredEventDisabled = false;
   }
 

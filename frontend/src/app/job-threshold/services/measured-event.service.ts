@@ -21,20 +21,16 @@ export class MeasuredEventService {
     this.thresholdRestService.actualJobId = jobId;
     this.thresholdRestService.getMeasuredEvents(scriptId, jobId).subscribe(this.measuredEvents$);
 
-    this.measuredEvents$.subscribe((next: MeasuredEvent[]) => {
-      this.setActualMeasuredEvents(this.measuredEventList);
+    this.measuredEvents$.subscribe((measuredEventsFromServer: MeasuredEvent[]) => {
+      this.measuredEventList = measuredEventsFromServer;
     });
 
   }
 
-  setActualMeasuredEvents(measuredEvents: MeasuredEvent[]) {
-    this.measuredEventList = measuredEvents;
-  }
-
-  getActualMeasuredEvents(thresholdsforJob: ThresholdGroup[]) {
+  getThresholdGroups(thresholdGroups: ThresholdGroup[]) {
     this.actualMeasuredEventList = [];
     this.measuredEventList.map(measuredEvent => {
-      if (thresholdsforJob.map(thresholdForJob => thresholdForJob.measuredEvent.name).indexOf(measuredEvent.name) == -1) {
+      if (thresholdGroups.map(thresholdGroup => thresholdGroup.measuredEvent.name).indexOf(measuredEvent.name) == -1) {
         this.actualMeasuredEventList.push(measuredEvent);
       }
     });

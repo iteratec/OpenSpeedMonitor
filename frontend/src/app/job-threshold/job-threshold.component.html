@@ -1,7 +1,7 @@
 <div>
-  <osm-measured-event *ngFor="let thresholdForJob of allThresholds$ | async"
-                      [measuredEvent]="thresholdForJob.measuredEvent"
-                      [thresholds]="thresholdForJob.thresholds"
+  <osm-measured-event *ngFor="let thresholdGroup of allThresholdGroups$ | async"
+                      [measuredEvent]="thresholdGroup.measuredEvent"
+                      [thresholds]="thresholdGroup.thresholds"
                       (removeOldMeasuredEvent) = "removeOldMeasuredEvent()"
                       (removeEvent)="cancelNewMeasuredEvent()">
   </osm-measured-event>
@@ -11,7 +11,7 @@
   <button type="button"
           class="btn btn-primary"
           [disabled] = "addMeasuredEventDisabled"
-          (click)="addMeasuredEvent() ">{{"frontend.job.threshold.addMeasuredEvent" | translate}}
+          (click)="addThresholdGroup() ">{{"frontend.job.threshold.addMeasuredEvent" | translate}}
   </button>
   <button type="button"
           class="btn btn-default"

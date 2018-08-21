@@ -11,7 +11,6 @@ export class ThresholdService {
 
   thresholdGroups$= new BehaviorSubject<ThresholdGroup[]>([]);
 
-
   constructor() { }
 
   setThresholdGroups(thresholdGroups: ThresholdGroup[]): void {

@@ -20,12 +20,12 @@ export class MeasuredEventComponent implements OnInit {
   actualMeasurandList: Measurand[];
 
 
-  constructor(private actualMeasurandsService: MeasurandService) {
+  constructor(private measurandsService: MeasurandService) {
   }
 
   ngOnInit() {
     if (this.thresholds) {
-      this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+      this.actualMeasurandList = this.measurandsService.getActualMeasurands(this.thresholds);
       this.addThresholdDisabled = this.actualMeasurandList.length < 1;
     }
 
@@ -36,7 +36,7 @@ export class MeasuredEventComponent implements OnInit {
       return;
     }
     this.addThresholdDisabled = true;
-    this.actualMeasurandList = this.actualMeasurandsService.getActualMeasurands(this.thresholds);
+    this.actualMeasurandList = this.measurandsService.getActualMeasurands(this.thresholds);
 
     this.newThreshold = {
       measurand:  this.actualMeasurandList[0],
