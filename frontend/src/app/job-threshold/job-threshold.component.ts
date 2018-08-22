@@ -1,13 +1,11 @@
-import {Component, ElementRef} from "@angular/core";
-import {ThresholdRestService} from "./services/threshold-rest.service";
-import {MeasuredEventService} from "./services/measured-event.service";
-import {Measurand} from "./models/measurand.model";
-import {MeasuredEvent} from "./models/measured-event.model";
-import {ThresholdGroup} from "./models/threshold-for-job.model";
-import {Threshold} from "./models/threshold.model";
-import {ThresholdService} from "./services/threshold.service";
-import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
-import {map} from "rxjs/operators";
+import {Component, ElementRef} from '@angular/core';
+import {ThresholdRestService} from './services/threshold-rest.service';
+import {MeasuredEventService} from './services/measured-event.service';
+import {MeasuredEvent} from './models/measured-event.model';
+import {ThresholdGroup} from './models/threshold-for-job.model';
+import {ThresholdService} from './services/threshold.service';
+import {combineLatest, Observable} from 'rxjs';
+import {map, take} from 'rxjs/operators';
 
 
 @Component({
@@ -24,7 +22,6 @@ export class JobThresholdComponent {
   addMeasuredEventDisabled: boolean = false;
   isEmpty: boolean = false;
 
-  private newThresholGroup$ = new BehaviorSubject<ThresholdGroup>(null);
   allThresholdGroups$: Observable<ThresholdGroup[]>;
   unusedMeasuredEvents$: Observable<MeasuredEvent[]>;
 
@@ -44,11 +41,10 @@ export class JobThresholdComponent {
 
     this.allThresholdGroups$ = combineLatest(
       this.thresholdService.thresholdGroups$,
-      this.newThresholGroup$
+      this.thresholdService.newThresholdGroup$
     ).pipe(
       map(([thresholdGroups, newThresholdGroup]: [ThresholdGroup[], ThresholdGroup]) => {
-        return newThresholdGroup ?
-          [...thresholdGroups, newThresholdGroup] : thresholdGroups
+        return newThresholdGroup ? [...thresholdGroups, newThresholdGroup] : thresholdGroups;
       }));
 
     combineLatest(
@@ -56,9 +52,7 @@ export class JobThresholdComponent {
       this.allThresholdGroups$
     ).subscribe(([measuredEvents, thresholdGroups]: [MeasuredEvent[], ThresholdGroup[]]) => {
       this.isEmpty = thresholdGroups.length == 0;
-      if (thresholdGroups.length === measuredEvents.length) {
-        this.addMeasuredEventDisabled = true;
-      }
+      this.addMeasuredEventDisabled = thresholdGroups.length === measuredEvents.length;
     });
 
     this.unusedMeasuredEvents$ = combineLatest(
@@ -74,35 +68,13 @@ export class JobThresholdComponent {
   }
 
   addThresholdGroup() {
-    const newThresholdGroup = {} as ThresholdGroup;
-    let newThreshold = {} as Threshold;
-    let newMeasuredEvent = {} as MeasuredEvent;
-    let newMeasurand = {} as Measurand;
-    newMeasuredEvent.state = "new";
-    newThreshold.measurand = newMeasurand;
-    newThreshold.lowerBoundary = 0;
-    newThreshold.upperBoundary = 0;
-    newThreshold.state = "new";
-    newThreshold.measuredEvent = newMeasuredEvent;
-    newThreshold.measuredEvent.state = "new";
-    newThresholdGroup.measuredEvent = newMeasuredEvent;
-    newThresholdGroup.thresholds = [];
-    newThresholdGroup.thresholds.push(newThreshold);
-    this.newThresholGroup$.next(newThresholdGroup);
-    this.addMeasuredEventDisabled = true;
+    this.unusedMeasuredEvents$.pipe(take(1)).subscribe((unusedMeasuredEvents: MeasuredEvent[]) => {
+      this.thresholdService.createNewThresholdGroup(unusedMeasuredEvents[0]);
+    });
   }
 
   createScript() {
     this.thresholdRestService.getScritpt();
-  }
-
-  cancelNewMeasuredEvent() {
-    this.newThresholGroup$.next(null);
-    this.addMeasuredEventDisabled = false;
-  }
-
-  removeOldMeasuredEvent() {
-    this.addMeasuredEventDisabled = false;
   }
 
 }

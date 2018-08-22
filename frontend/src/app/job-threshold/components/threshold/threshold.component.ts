@@ -1,14 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {Threshold} from "../../models/threshold.model";
-import {ThresholdRestService} from "../../services/threshold-rest.service";
-import {Measurand} from "../../models/measurand.model";
-import {MeasuredEvent} from "../../models/measured-event.model";
-import {MeasuredEventService} from "../../services/measured-event.service";
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {filter, map, take, takeLast} from "rxjs/operators";
-import {ThresholdService} from "../../services/threshold.service";
-import {ThresholdGroup} from "../../models/threshold-for-job.model";
-import {MeasurandService} from "../../services/measurand.service";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Threshold} from '../../models/threshold.model';
+import {ThresholdRestService} from '../../services/threshold-rest.service';
+import {Measurand} from '../../models/measurand.model';
+import {ThresholdService} from '../../services/threshold.service';
 
 @Component({
   selector: 'osm-threshold',
@@ -19,23 +13,19 @@ import {MeasurandService} from "../../services/measurand.service";
 export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
   @Input() unusedMeasurands: Measurand [];
-  @Input() unusedMeasuredEvents: MeasuredEvent[];
   @Output() cancelEvent = new EventEmitter();
   @Output() addedThreshold = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
-  selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
 
   constructor(
-    private thresholdRestService: ThresholdRestService) {
-
+    private thresholdRestService: ThresholdRestService,
+    private thresholdService: ThresholdService
+  ) {
   }
 
   ngOnInit() {
     if (this.threshold) {
-      if (this.threshold.measuredEvent.state == "new") {
-        this.selectedMeasuredEvent = this.unusedMeasuredEvents[0];
-      }
       if (this.threshold.state == "new") {
         this.selectedMeasurand = this.unusedMeasurands[0].translationsKey;
       }
@@ -60,18 +50,12 @@ export class ThresholdComponent implements OnInit {
     this.threshold.measurand.translationsKey = this.selectedMeasurand;
     this.threshold.lowerBoundary = obj.lowerBoundary;
     this.threshold.upperBoundary = obj.upperBoundary;
-    if (this.threshold.measuredEvent.state == "new") {
-      this.threshold.measuredEvent = this.selectedMeasuredEvent;
-      this.threshold.measuredEvent.state = "new";
-      this.thresholdRestService.addThreshold(this.threshold);
-    }
-    else {
-      this.thresholdRestService.addThreshold(this.threshold);
-      this.addedThreshold.emit();
-    }
+    this.thresholdRestService.addThreshold(this.threshold);
+    this.addedThreshold.emit();
   }
 
   cancelNew() {
+    this.thresholdService.cancelNew(this.threshold);
     this.cancelEvent.emit();
   }
 }

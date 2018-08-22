@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {MeasuredEvent} from "../../models/measured-event.model";
-import {Threshold} from "../../models/threshold.model";
-import {Measurand} from "../../models/measurand.model";
-import {MeasurandService} from "../../services/measurand.service";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {MeasuredEvent} from '../../models/measured-event.model';
+import {Threshold} from '../../models/threshold.model';
+import {Measurand} from '../../models/measurand.model';
+import {MeasurandService} from '../../services/measurand.service';
+import {ThresholdGroup} from '../../models/threshold-for-job.model';
 
 @Component({
   selector: 'osm-measured-event',
@@ -11,41 +12,42 @@ import {MeasurandService} from "../../services/measurand.service";
 })
 
 export class MeasuredEventComponent {
-  private _thresholds: Threshold[] = [];
+  private _thresholdGroup: ThresholdGroup;
 
-  @Input() measuredEvent: MeasuredEvent;
   @Input() unusedMeasuredEvents: MeasuredEvent[];
   @Output() removeEvent = new EventEmitter();
-  @Output() removeOldMeasuredEvent = new EventEmitter();
-  newThreshold: Threshold;
+  @Input() newThreshold: Threshold;
   addThresholdDisabled: boolean = false;
   unusedMeasurands: Measurand[];
 
   @Input()
-  set thresholds(thresholds: Threshold[]) {
-    this._thresholds = thresholds;
-    this.unusedMeasurands = this.measurandsService.getUnusedMeasurands(thresholds);
+  set thresholdGroup(thresholdGroup: ThresholdGroup) {
+    this._thresholdGroup = thresholdGroup;
+    this.unusedMeasurands = this.measurandsService.getUnusedMeasurands(thresholdGroup.thresholds);
     this.addThresholdDisabled = this.unusedMeasurands.length < 1;
+    if (thresholdGroup.isNew) {
+      this.addThreshold();
+    }
   };
-  get thresholds(): Threshold[] {
-    return this._thresholds;
+
+  get thresholdGroup(): ThresholdGroup {
+    return this._thresholdGroup;
   }
 
   constructor(private measurandsService: MeasurandService) {
   }
 
   addThreshold() {
-    if (!this.thresholds) {
+    if (!this.thresholdGroup) {
       return;
     }
     this.addThresholdDisabled = true;
-
     this.newThreshold = {
       measurand:  this.unusedMeasurands[0],
       lowerBoundary:  0,
       upperBoundary:  0,
       state: "new",
-      measuredEvent: this.measuredEvent
+      measuredEvent: this.thresholdGroup.measuredEvent
     };
   }
 
@@ -55,19 +57,12 @@ export class MeasuredEventComponent {
   }
 
   removeThreshold() {
-    if (this.thresholds.length == 1) {
-      this.removeOldMeasuredEvent.emit();
-    }
     this.addThresholdDisabled = false;
   }
 
   cancelNewThreshold() {
     this.newThreshold = null;
     this.addThresholdDisabled = false;
-
   }
 
-  cancelNewMeasuredEvent() {
-    this.removeEvent.emit();
-  }
 }

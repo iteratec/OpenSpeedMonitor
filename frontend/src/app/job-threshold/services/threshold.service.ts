@@ -1,7 +1,8 @@
-import {Injectable} from "@angular/core";
-import {ThresholdGroup} from "../models/threshold-for-job.model";
-import {Threshold} from "../models/threshold.model";
-import {BehaviorSubject} from "rxjs/index";
+import {Injectable} from '@angular/core';
+import {ThresholdGroup} from '../models/threshold-for-job.model';
+import {Threshold} from '../models/threshold.model';
+import {BehaviorSubject} from 'rxjs/index';
+import {MeasuredEvent} from '../models/measured-event.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import {BehaviorSubject} from "rxjs/index";
 export class ThresholdService {
 
   thresholdGroups$= new BehaviorSubject<ThresholdGroup[]>([]);
+  newThresholdGroup$ = new BehaviorSubject<ThresholdGroup>(null);
 
   constructor() { }
 
@@ -70,10 +72,27 @@ export class ThresholdService {
     newThreshold.measuredEvent.state = "normal";
     if (thresholdGroupIndex < 0) {
       this.insertThresholdGroup(thresholdGroups, newThreshold);
+      this.newThresholdGroup$.next(null);
     } else {
       this.addThresholdToGroup(thresholdGroups, thresholdGroupIndex, newThreshold);
     }
     this.thresholdGroups$.next(thresholdGroups);
+  }
+
+  createNewThresholdGroup(measuredEvent: MeasuredEvent) {
+    const newThresholdGroup: ThresholdGroup = {
+      thresholds: [],
+      measuredEvent: measuredEvent,
+      isNew: true
+    };
+    this.newThresholdGroup$.next(newThresholdGroup);
+  }
+
+  cancelNew(threshold: Threshold) {
+    const newThresholdGroup = this.newThresholdGroup$.getValue();
+    if (newThresholdGroup && newThresholdGroup.measuredEvent == threshold.measuredEvent) {
+      this.newThresholdGroup$.next(null);
+    }
   }
 
   private addThresholdToGroup(thresholdGroups, thresholdGroupIndex, newThreshold: Threshold) {
@@ -87,7 +106,8 @@ export class ThresholdService {
   private insertThresholdGroup(thresholdGroups, newThreshold: Threshold) {
     thresholdGroups.push({
       measuredEvent: newThreshold.measuredEvent,
-      thresholds: [newThreshold]
+      thresholds: [newThreshold],
+      isNew: false
     });
   }
 }
