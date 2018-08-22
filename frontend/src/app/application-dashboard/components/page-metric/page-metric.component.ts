@@ -8,7 +8,8 @@ import {Component, Input} from '@angular/core';
 
 export class PageMetricComponent {
   @Input() icon: string;
-  @Input() value: number;
+  @Input() value: string;
   @Input() unit: string;
   @Input() metric: string;
+  @Input() isAvailable: boolean;
 }

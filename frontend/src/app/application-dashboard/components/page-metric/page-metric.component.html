@@ -1,6 +1,7 @@
-<div class="metric">
+<div class="metric"
+     title=" {{ value ? '' : ('frontend.de.iteratec.osm.applicationDashboard.noMeasuredValue.hint' | translate) }}">
   <i class="{{icon}} metric-icon"></i>
-  <div class="metric-value">{{ value ? value : 'n/a' }}</div>
-  <div class="metric-unit">{{ unit }}</div>
+  <div class="metric-value">{{ value ? value : "n/a"}}</div>
+  <div class="metric-unit">{{ value ? unit : '' }}</div>
   <div class="metric-description">{{ metric }}</div>
 </div>

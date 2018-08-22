@@ -165,7 +165,7 @@ describe('CsiValueComponent', () => {
     component.csiValue = goodValue;
     component.isBig = false;
     component.csiDate = new Date("01.02.2017").toISOString();
-    component.lastResultDate = new Date("01.03.2017").toISOString();
+    component.lastResultDate = new Date("02.02.2017").toISOString();
     component.ngOnInit();
 
     expect(component.isOutdated).toBe(true);

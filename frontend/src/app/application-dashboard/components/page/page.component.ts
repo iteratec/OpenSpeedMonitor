@@ -39,15 +39,25 @@ export class PageComponent {
     );
   }
 
+
   transform(value: number): string {
-    return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
+    if (value) {
+      return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
+    }
+    return null;
   }
 
   convertToMib(value: number): number {
-    return CalculationUtil.convertBytesToMiB(value);
+    if (value) {
+      return CalculationUtil.convertBytesToMiB(value);
+    }
+    return null;
   }
 
   convertMillisecsToSecs(value: number): number {
-    return CalculationUtil.convertMillisecsToSecs(value);
+    if (value) {
+      return CalculationUtil.convertMillisecsToSecs(value);
+    }
+    return null;
   }
 }
