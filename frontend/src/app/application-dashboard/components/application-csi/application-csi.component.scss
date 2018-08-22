@@ -4,7 +4,10 @@ osm-csi-graph {
 }
 
 osm-csi-value {
-  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 260px;
 }
 
 .card > .csi {
