@@ -5,6 +5,7 @@ import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -52,6 +53,17 @@ class ApplicationDashboardController {
                     applicationCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
                     applicationCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
                     csiDtoList << applicationCsiDto
+                }
+            }
+
+            if (!csiDtoList) {
+                List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(selectedJobGroup), fourWeeksAgo)
+                if (jobResults) {
+                    applicationCsiListDto.hasJobResults = true
+                    applicationCsiListDto.hasInvalidJobResults = jobResults.every {it.wptStatus ? true : false}
+                }
+                else {
+                    applicationCsiListDto.hasJobResults = false
                 }
             }
 
