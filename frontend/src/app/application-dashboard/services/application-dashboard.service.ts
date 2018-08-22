@@ -57,6 +57,8 @@ export class ApplicationDashboardService {
       data: {
         csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
         hasCsiConfiguration: false,
+        hasInvalidJobResults: false,
+        hasJobResults: false,
       },
       isLoading: true
     });
@@ -81,7 +83,6 @@ export class ApplicationDashboardService {
       })
     );
   }
-
 
   private handleError(error: any) {
     console.log(error);
