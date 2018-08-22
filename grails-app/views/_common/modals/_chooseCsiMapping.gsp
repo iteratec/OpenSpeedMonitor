@@ -74,6 +74,7 @@ This is a dialog to choose from different default csi mappings.
             jQuery.ajax({
                 type: 'GET',
                 url: "<g:createLink action="applyNewMappingToPage" />",
+                async: false,
                 data:{'defaultMappingName':newLine, 'csiConfigurationId':actualCsiConfigurationId, 'pageId':pageId},
                 success: function (content) {
                     window.location.href="<g:createLink action="configurations" />/"+actualCsiConfigurationId;
