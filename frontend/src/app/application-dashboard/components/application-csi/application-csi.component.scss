@@ -1,13 +1,19 @@
+$items-per-row: 5;
+$grid-gap: 20px;
+
 osm-csi-graph {
   display: block;
   flex-grow: 1;
+  padding-left: 20px;
 }
 
 osm-csi-value {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 260px;
+  margin-left: -$grid-gap;
+  min-width: calc(290px - #{$grid-gap});
+  width: calc(100% / #{$items-per-row} - 8px);
 }
 
 .card > .csi {
