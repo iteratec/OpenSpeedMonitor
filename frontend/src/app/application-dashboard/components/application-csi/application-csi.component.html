@@ -4,7 +4,17 @@
     <ng-container>
       <osm-csi-value [csiValue]="(recentCsiValue$ | async)?.csiDocComplete" [csiDate]="recentCsiDate$ | async"
                      [showLoading]="isLoading" [isBig]="true"></osm-csi-value>
-      <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async"></osm-csi-graph>
+
+      <div *ngIf="!isLoading && !(csiValues$ | async)?.csiDtoList.length; then showInfo else showGraph"></div>
+
+      <ng-template #showInfo>
+        <osm-csi-info [csiData]="csiValues$ | async"></osm-csi-info>
+      </ng-template>
+
+      <ng-template #showGraph>
+        <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async"></osm-csi-graph>
+      </ng-template>
+
     </ng-container>
   </div>
 </div>
