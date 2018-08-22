@@ -1,0 +1,27 @@
+@import "../../../../styles/colors";
+
+.csi-info-container {
+  display: grid;
+  place-content: center;
+  align-items: center;
+  grid-template-columns: 50px 900px;
+  grid-gap: 20px;
+
+  height: 100%;
+  min-height: 205px;
+  width: 100%;
+  min-width: 400px;
+
+  border: $color-contour-light solid 2px;
+  border-radius: 10px;
+}
+
+.info-icon {
+  font-size: 25px;
+}
+
+.info-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+}
