@@ -26,6 +26,7 @@ export class JobThresholdComponent {
 
   private newThresholGroup$ = new BehaviorSubject<ThresholdGroup>(null);
   allThresholdGroups$: Observable<ThresholdGroup[]>;
+  unusedMeasuredEvents$: Observable<MeasuredEvent[]>;
 
   constructor(private thresholdRestService: ThresholdRestService,
               private measuredEventService: MeasuredEventService,
@@ -60,6 +61,16 @@ export class JobThresholdComponent {
       }
     });
 
+    this.unusedMeasuredEvents$ = combineLatest(
+      this.thresholdService.thresholdGroups$,
+      this.measuredEventService.measuredEvents$
+    ).pipe(
+      map(([thresholdGroups, measuredEvents]: [ThresholdGroup[], MeasuredEvent[]]) => {
+        return measuredEvents.filter((measuredEvent: MeasuredEvent) =>
+          !thresholdGroups.some(thresholdGroup => thresholdGroup.measuredEvent.id == measuredEvent.id)
+        )
+      })
+    )
   }
 
   addThresholdGroup() {

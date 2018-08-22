@@ -5,9 +5,10 @@ import {Measurand} from "../../models/measurand.model";
 import {MeasuredEvent} from "../../models/measured-event.model";
 import {MeasuredEventService} from "../../services/measured-event.service";
 import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {filter, map} from "rxjs/operators";
+import {filter, map, take, takeLast} from "rxjs/operators";
 import {ThresholdService} from "../../services/threshold.service";
 import {ThresholdGroup} from "../../models/threshold-for-job.model";
+import {MeasurandService} from "../../services/measurand.service";
 
 @Component({
   selector: 'osm-threshold',
@@ -17,41 +18,27 @@ import {ThresholdGroup} from "../../models/threshold-for-job.model";
 
 export class ThresholdComponent implements OnInit {
   @Input() threshold: Threshold;
-  @Input() actualMeasurandList: Measurand [];
+  @Input() unusedMeasurands: Measurand [];
+  @Input() unusedMeasuredEvents: MeasuredEvent[];
   @Output() cancelEvent = new EventEmitter();
   @Output() addedThreshold = new EventEmitter();
   @Output() removeOldThreshold = new EventEmitter();
   selectedMeasuredEvent: MeasuredEvent;
   selectedMeasurand: string;
-  measuredEventsStillAvailable$: Observable<MeasuredEvent[]>;
 
   constructor(
-    private thresholdRestService: ThresholdRestService,
-    private measuredEventsService: MeasuredEventService,
-    private thresholdService: ThresholdService) {
-
-    this.measuredEventsStillAvailable$ = combineLatest(
-      this.thresholdService.thresholdGroups$,
-      this.measuredEventsService.measuredEvents$
-    ).pipe(
-      map(([thresholdGroups, measuredEvents]: [ThresholdGroup[], MeasuredEvent[]]) => {
-        return measuredEvents
-      })
-    )
+    private thresholdRestService: ThresholdRestService) {
 
   }
 
   ngOnInit() {
-
     if (this.threshold) {
-      // if (this.threshold.measuredEvent.state == "new") {
-      //   this.selectedMeasuredEvent = this.measuredEventsService.measuredEventList[0];
-      // }
-      if (this.threshold.state == "new") {
-        this.selectedMeasurand = this.actualMeasurandList[0].translationsKey;
+      if (this.threshold.measuredEvent.state == "new") {
+        this.selectedMeasuredEvent = this.unusedMeasuredEvents[0];
       }
-    } else {
-      return undefined;
+      if (this.threshold.state == "new") {
+        this.selectedMeasurand = this.unusedMeasurands[0].translationsKey;
+      }
     }
   }
 

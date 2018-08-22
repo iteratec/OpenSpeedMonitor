@@ -1,44 +1,32 @@
-<div>
-  <!-- Normal MeasuredEvent-->
-  <div *ngIf="measuredEvent?.state=='normal'">
-    <div class="flex-row-group">
-      <div class="flex-column-left">
-          <label class="measuredEvent">{{measuredEvent.name}}</label>
-      </div>
-      <div class="flex-column-right">
-        <div>
-          <osm-threshold *ngFor="let threshold of thresholds"
-                         [threshold]="threshold"
-                         [actualMeasurandList]="actualMeasurandList"
-                         (removeOldThreshold)="removeThreshold()"
-                         (addedThreshold)="addedThreshold()"
-                         (cancelEvent)="cancelNewThreshold()"></osm-threshold>
-
-          <osm-threshold *ngIf="newThreshold"
-                         [threshold]="newThreshold"
-                         [actualMeasurandList]="actualMeasurandList"
-                         (removeOldThreshold)="removeThreshold()"
-                         (addedThreshold)="addedThreshold()"
-                         (cancelEvent)="cancelNewThreshold()"></osm-threshold>
-        </div>
-        <div class="flex-down">
-          <button type="button"
-                  class="btn btn-primary"
-                  [disabled] = "addThresholdDisabled"
-                  (click)="addThreshold()">{{"frontend.job.threshold.add" | translate}}</button>
-        </div>
-      </div>
-    </div>
-    <hr>
+<!-- Normal MeasuredEvent-->
+<div class="flex-row-group">
+  <div class="flex-column-left" *ngIf="measuredEvent?.state!='new'">
+      <label class="measuredEvent">{{measuredEvent.name}}</label>
   </div>
+  <div class="flex-column-right">
+    <div>
+      <osm-threshold *ngFor="let threshold of thresholds"
+                     [threshold]="threshold"
+                     [unusedMeasurands]="unusedMeasurands"
+                     [unusedMeasuredEvents]="unusedMeasuredEvents"
+                     (removeOldThreshold)="removeThreshold()"
+                     (addedThreshold)="addedThreshold()"
+                     (cancelEvent)="cancelNewThreshold()"></osm-threshold>
 
-  <!--New MeasuredEvent-->
-  <div *ngIf="measuredEvent?.state=='new'">
-    <osm-threshold *ngFor="let threshold of thresholds"
-                   [threshold]="threshold"
-                   [actualMeasurandList]="actualMeasurandList"
-                   (cancelEvent)="cancelNewMeasuredEvent()"></osm-threshold>
-    <hr>
+      <osm-threshold *ngIf="newThreshold"
+                     [threshold]="newThreshold"
+                     [unusedMeasuredEvents]="unusedMeasuredEvents"
+                     [unusedMeasurands]="unusedMeasurands"
+                     (removeOldThreshold)="removeThreshold()"
+                     (addedThreshold)="addedThreshold()"
+                     (cancelEvent)="cancelNewThreshold()"></osm-threshold>
+    </div>
+    <div class="flex-down" *ngIf="measuredEvent?.state!='new'">
+      <button type="button"
+              class="btn btn-primary"
+              [disabled] = "addThresholdDisabled"
+              (click)="addThreshold()">{{"frontend.job.threshold.add" | translate}}</button>
+    </div>
   </div>
 </div>
-
+<hr>

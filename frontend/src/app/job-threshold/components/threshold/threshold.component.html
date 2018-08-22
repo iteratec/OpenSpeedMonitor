@@ -23,7 +23,8 @@
         <select class="thresholdSelects"
                 [(ngModel)]="selectedMeasuredEvent"
                 required>
-          <option *ngFor="let measuredEvent of measuredEvents$ | async" [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
+          <option *ngFor="let measuredEvent of unusedMeasuredEvents"
+                  [ngValue]="measuredEvent">{{measuredEvent.name}}</option>
         </select>
       </div>
       <div class="flex-column-right">
@@ -33,7 +34,7 @@
               <select class="thresholdSelects"
                       [(ngModel)]="selectedMeasurand"
                       required>
-                <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.translationsKey">
+                <option *ngFor="let measurand of unusedMeasurands" [value]="measurand.translationsKey">
                   {{measurand.translationsKey | translate}}
                 </option>
               </select>
@@ -60,7 +61,7 @@
         <select class="thresholdSelects"
                 [(ngModel)]="selectedMeasurand"
                 required>
-          <option *ngFor="let measurand of actualMeasurandList" [value]="measurand.translationsKey">
+          <option *ngFor="let measurand of unusedMeasurands" [value]="measurand.translationsKey">
             {{measurand.translationsKey | translate}}
           </option>
         </select>

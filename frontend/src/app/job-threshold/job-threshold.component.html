@@ -1,6 +1,7 @@
 <div>
   <osm-measured-event *ngFor="let thresholdGroup of allThresholdGroups$ | async"
                       [measuredEvent]="thresholdGroup.measuredEvent"
+                      [unusedMeasuredEvents]="unusedMeasuredEvents$ | async"
                       [thresholds]="thresholdGroup.thresholds"
                       (removeOldMeasuredEvent) = "removeOldMeasuredEvent()"
                       (removeEvent)="cancelNewMeasuredEvent()">

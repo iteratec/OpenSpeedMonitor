@@ -2,7 +2,8 @@ import {Injectable} from "@angular/core";
 import {MeasuredEvent} from "../models/measured-event.model";
 import {ThresholdGroup} from "../models/threshold-for-job.model";
 import {ThresholdRestService} from "./threshold-rest.service";
-import {ReplaySubject} from "rxjs";
+import {combineLatest, ReplaySubject} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
