@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'osm-threshold-row',
@@ -6,7 +6,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
   styleUrls: ['./threshold-row.component.scss']
 })
 export class ThresholdRowComponent implements OnInit {
-  @Input() thresholdState: string;
+  @Input() isNew: boolean;
   @Input() lowerBoundary: number;
   @Input() upperBoundary: number;
   @Output() deleteThreshold = new EventEmitter();
@@ -36,7 +36,7 @@ export class ThresholdRowComponent implements OnInit {
   ngOnInit() {
     this.originalUpperBoundary = this.upperBoundary;
     this.originalLowerBoundary = this.lowerBoundary;
-    if (this.thresholdState == "new") {
+    if (this.isNew) {
       this.disableInput = false;
       this.leftButtonLabelDisable = true;
       this.leftButtonLabel = "frontend.job.threshold.save";

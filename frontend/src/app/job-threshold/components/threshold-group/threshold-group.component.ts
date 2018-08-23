@@ -6,12 +6,12 @@ import {MeasurandService} from '../../services/measurand.service';
 import {ThresholdGroup} from '../../models/threshold-for-job.model';
 
 @Component({
-  selector: 'osm-measured-event',
-  templateUrl: './measured-event.component.html',
-  styleUrls: ['./measured-event.component.css']
+  selector: 'osm-threshold-group',
+  templateUrl: './threshold-group.component.html',
+  styleUrls: ['./threshold-group.component.scss']
 })
 
-export class MeasuredEventComponent {
+export class ThresholdGroupComponent {
   private _thresholdGroup: ThresholdGroup;
 
   @Input() unusedMeasuredEvents: MeasuredEvent[];
@@ -46,7 +46,7 @@ export class MeasuredEventComponent {
       measurand:  this.unusedMeasurands[0],
       lowerBoundary:  0,
       upperBoundary:  0,
-      state: "new",
+      isNew: true,
       measuredEvent: this.thresholdGroup.measuredEvent
     };
   }

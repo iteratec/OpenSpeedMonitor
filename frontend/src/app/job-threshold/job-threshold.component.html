@@ -1,8 +1,8 @@
 <div>
-  <osm-measured-event *ngFor="let thresholdGroup of allThresholdGroups$ | async"
-                      [thresholdGroup]="thresholdGroup"
-                      [unusedMeasuredEvents]="unusedMeasuredEvents$ | async">
-  </osm-measured-event>
+  <osm-threshold-group *ngFor="let thresholdGroup of allThresholdGroups$ | async"
+                       [thresholdGroup]="thresholdGroup"
+                       [unusedMeasuredEvents]="unusedMeasuredEvents$ | async">
+  </osm-threshold-group>
 
   <p class="message" *ngIf="isEmpty == true"> {{"frontend.job.threshold.description" | translate}}</p>
 

@@ -1,7 +1,7 @@
 <div class="flex-column">
   <div class="flex-row-item">
-    <label class="threshold" *ngIf="threshold?.state!='new'">{{threshold.measurand.translationsKey | translate}} </label>
-    <select class="thresholdSelects" *ngIf="threshold?.state=='new'" [(ngModel)]="selectedMeasurand" required>
+    <label class="threshold" *ngIf="!threshold?.isNew">{{threshold.measurand.translationsKey | translate}} </label>
+    <select class="thresholdSelects" *ngIf="threshold?.isNew" [(ngModel)]="selectedMeasurand" required>
       <option *ngFor="let measurand of unusedMeasurands" [value]="measurand.translationsKey">
         {{measurand.translationsKey | translate}}
       </option>
@@ -9,7 +9,7 @@
   </div>
   <div class="flex-row-group">
     <osm-threshold-row
-      [thresholdState]="threshold.state"
+      [isNew]="threshold?.isNew"
       [lowerBoundary]="threshold.lowerBoundary"
       [upperBoundary]="threshold.upperBoundary"
       (editThreshold)="edit($event)"

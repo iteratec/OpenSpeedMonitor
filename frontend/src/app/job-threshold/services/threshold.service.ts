@@ -18,9 +18,8 @@ export class ThresholdService {
   setThresholdGroups(thresholdGroups: ThresholdGroup[]): void {
     /*State Initialization*/
     thresholdGroups.forEach(element => {
-      element.measuredEvent.state = "normal";
       element.thresholds.forEach(threshold => {
-        threshold.state = "normal";
+        threshold.isNew = false;
         threshold.measurand.translationsKey = "frontend.de.iteratec.isr.measurand." + threshold.measurand.name; // format from messages.properties
       })
     });
@@ -68,8 +67,7 @@ export class ThresholdService {
        thresholdGroup.measuredEvent.id == newThreshold.measuredEvent.id
     );
 
-    newThreshold.state = "normal";
-    newThreshold.measuredEvent.state = "normal";
+    newThreshold.isNew = false;
     if (thresholdGroupIndex < 0) {
       this.insertThresholdGroup(thresholdGroups, newThreshold);
       this.newThresholdGroup$.next(null);

@@ -2,8 +2,8 @@
  * Created by glastra on 27.06.18.
  */
 
-import {MeasuredEvent} from "./measured-event.model"
-import {Measurand} from "./measurand.model"
+import {MeasuredEvent} from './measured-event.model';
+import {Measurand} from './measurand.model';
 
 export type Threshold = {
   id?: number;
@@ -11,5 +11,5 @@ export type Threshold = {
   measurand: Measurand;
   measuredEvent: MeasuredEvent;
   upperBoundary: number;
-  state: string;
+  isNew?: boolean;
 }

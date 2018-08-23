@@ -1,24 +1,24 @@
 <div class="flex-container">
   <div class="flex-item good">{{"frontend.job.threshold.good" | translate}}</div>
-  <div class="flex-item symbol"><</div>
+  <div class="flex-item symbol">&lt;</div>
   <div class="input-group  flex-input-item">
     <input [(ngModel)]="lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="disableInput"
            (change)="onLowerInput($event)" class="form-control">
     <div class="input-group-addon">ms</div>
   </div>
-  <div class="flex-item symbol"><</div>
+  <div class="flex-item symbol">&lt;</div>
   <div class="flex-item ok">Ok</div>
-  <div class="flex-item symbol"><</div>
+  <div class="flex-item symbol">&lt;</div>
   <div class="input-group flex-input-item">
     <input [(ngModel)]="upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="disableInput"
            (change)="onUpperInput($event)" class="form-control">
     <div class="input-group-addon">ms</div>
   </div>
-  <div class="flex-item symbol"><</div>
+  <div class="flex-item symbol">&lt;</div>
   <div class="flex-item bad">{{"frontend.job.threshold.bad" | translate}}</div>
 
   <!--Buttons to save-->
-  <div *ngIf="thresholdState=='new'" class="flex-container">
+  <div *ngIf="isNew" class="flex-container">
     <div class="flex-item">
       <button type="button"
               class="btn btn-success btn-sm"
@@ -34,7 +34,7 @@
     </div>
   </div>
   <!--Buttons to Edit-->
-  <div *ngIf="thresholdState=='normal' && !deleteConfirmation" class="flex-container">
+  <div *ngIf="!isNew && !deleteConfirmation" class="flex-container">
     <div class="flex-item">
       <button type="button"
               class="btn btn-primary btn-sm"
@@ -51,7 +51,7 @@
   </div>
 
   <!--Buttons to delete-->
-  <div *ngIf="thresholdState=='normal' && deleteConfirmation" class="flex-container">
+  <div *ngIf="!isNew && deleteConfirmation" class="flex-container">
     {{"frontend.job.threshold.deleteSure" | translate}}
     <div class="flex-item">
       <button type="button"
