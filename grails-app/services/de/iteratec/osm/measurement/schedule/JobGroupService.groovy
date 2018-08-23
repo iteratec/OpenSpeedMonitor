@@ -80,9 +80,10 @@ class JobGroupService {
 
             allActiveAndRecentFormattedJobGroups.add(
                     [
-                            id               : it.id,
-                            name             : it.name,
-                            dateOfLastResults: lastDateOfResult?.get(0)?.date?.format("yyyy-MM-dd")
+                            id                : it.id,
+                            name              : it.name,
+                            dateOfLastResults : lastDateOfResult?.get(0)?.date?.format("yyyy-MM-dd"),
+                            csiConfigurationId: it.csiConfigurationId
                     ]
             )
         }
