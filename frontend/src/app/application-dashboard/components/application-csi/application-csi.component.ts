@@ -5,6 +5,7 @@ import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {CsiDTO} from "../../models/csi.model";
 import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
+import {ApplicationDTO} from "../../models/application.model";
 
 @Component({
   selector: 'osm-application-csi',
@@ -13,6 +14,7 @@ import {ResponseWithLoadingState} from "../../models/response-with-loading-state
 })
 export class ApplicationCsiComponent {
   @Input() lastDateOfResults: string;
+  @Input() selectedApplication: ApplicationDTO;
   csiValues$: Observable<ApplicationCsiListDTO>;
   recentCsiDate$: Observable<string>;
   recentCsiValue$: Observable<CsiDTO>;

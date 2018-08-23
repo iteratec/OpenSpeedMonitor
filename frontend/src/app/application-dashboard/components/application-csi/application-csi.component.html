@@ -8,7 +8,7 @@
       <div *ngIf="!isLoading && !(csiValues$ | async)?.csiDtoList.length; then showInfo else showGraph"></div>
 
       <ng-template #showInfo>
-        <osm-csi-info [csiData]="csiValues$ | async"></osm-csi-info>
+        <osm-csi-info [csiData]="csiValues$ | async" [selectedApplication]="selectedApplication"></osm-csi-info>
       </ng-template>
 
       <ng-template #showGraph>
