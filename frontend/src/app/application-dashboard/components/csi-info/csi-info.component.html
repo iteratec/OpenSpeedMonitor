@@ -1,4 +1,13 @@
 <div class="csi-info-container">
-  <i class="fas fa-info-circle info-icon"></i>
+  <i ngClass="{{ iconClass }}"></i>
   <div class="info-text">{{ infoText }}</div>
+  <div *ngIf="errorCase === 2">
+    <a href="/" class="info-button">Create CSI Configuration</a>
+  </div>
+  <div *ngIf="errorCase === 3">
+    <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">Configure CSI Configuration</a>
+  </div>
+  <div *ngIf="errorCase === 4">
+    <a href="/job" class="info-button">Check Measurements</a>
+  </div>
 </div>

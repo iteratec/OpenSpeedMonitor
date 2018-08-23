@@ -4,7 +4,7 @@
   display: grid;
   place-content: center;
   align-items: center;
-  grid-template-columns: 50px 900px;
+  grid-template-columns: 50px 900px auto;
   grid-gap: 20px;
 
   height: 100%;
@@ -16,12 +16,34 @@
   border-radius: 10px;
 }
 
-.info-icon {
-  font-size: 25px;
+.icon-info {
+  font-size: 30px;
+  color: $color-primary;
+}
+
+.icon-warning {
+  font-size: 30px;
+  color: $color-warning;
 }
 
 .info-text {
   font-size: 18px;
+  color: $color-text-normal;
+}
+
+.info-button {
+  opacity: 0.7;
+  transition: 0.3s;
+  background-color: $color-primary;
+  color: $color-background;
+  text-decoration: none;
   font-weight: bold;
-  color: #000000;
+  border: 2px solid $color-primary;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.info-button:hover {
+  opacity: 1;
 }
