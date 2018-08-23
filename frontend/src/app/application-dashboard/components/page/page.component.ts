@@ -44,20 +44,20 @@ export class PageComponent {
     if (value) {
       return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
     }
-    return null;
+    return "";
   }
 
   convertToMib(value: number): number {
     if (value) {
       return CalculationUtil.convertBytesToMiB(value);
     }
-    return null;
+    return value;
   }
 
   convertMillisecsToSecs(value: number): number {
     if (value) {
       return CalculationUtil.convertMillisecsToSecs(value);
     }
-    return null;
+    return value;
   }
 }
