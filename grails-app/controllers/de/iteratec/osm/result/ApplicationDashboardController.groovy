@@ -84,7 +84,8 @@ class ApplicationDashboardController {
 
         applicationDashboardService.getRecentPagesForJobGroup(jobGroupId).each {
             Page page = it
-            if (!recentMetrics.any { it.pageId == page.id }) {
+            if (page.name != Page.UNDEFINED &&
+                    !recentMetrics.any { it.pageId == page.id }) {
                 recentMetrics.add(
                         [
                                 'speedIndex'                : null,
@@ -97,8 +98,6 @@ class ApplicationDashboardController {
                 )
             }
         }
-
-        recentMetrics.removeAll { it.pageName == Page.UNDEFINED }
 
         return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
     }

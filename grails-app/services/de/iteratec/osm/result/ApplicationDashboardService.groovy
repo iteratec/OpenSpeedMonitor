@@ -81,6 +81,7 @@ class ApplicationDashboardService {
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)
+                .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
     }
