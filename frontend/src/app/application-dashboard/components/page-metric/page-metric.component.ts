@@ -1,4 +1,5 @@
 import {Component, Input} from '@angular/core';
+import {Metric} from "../../../shared/enums/metric.enum";
 
 @Component({
   selector: 'osm-page-metric',
@@ -7,9 +8,10 @@ import {Component, Input} from '@angular/core';
 })
 
 export class PageMetricComponent {
-  @Input() icon: string;
+  @Input() metric: Metric;
   @Input() value: string;
-  @Input() unit: string;
-  @Input() metric: string;
-  @Input() isAvailable: boolean;
+
+  public isAvailable(): boolean {
+    return this.value !== '';
+  }
 }

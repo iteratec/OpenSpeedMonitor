@@ -4,16 +4,12 @@
     <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [csiDate]="pageCsiDate$ | async"
                    [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value>
     <div class="metric-list">
-      <osm-page-metric [isAvailable]="metricsForPage?.speedIndex"
-                       [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))" [unit]="'s'"
-                       [metric]="'SpeedIndex'" [icon]="'far fa-eye'"></osm-page-metric>
-      <osm-page-metric [isAvailable]="metricsForPage?.docCompleteTimeInMillisecs"
-                       [value]="transform(convertMillisecsToSecs(metricsForPage?.docCompleteTimeInMillisecs))"
-                       [unit]="'s'"
-                       [metric]="'Document Complete'" [icon]="'fas fa-stopwatch'"></osm-page-metric>
-      <osm-page-metric [isAvailable]="metricsForPage?.fullyLoadedIncomingBytes"
-                       [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))" [unit]="'MiB'"
-                       [metric]="'Bytes Fully Loaded'" [icon]="'fas fa-weight-hanging'"></osm-page-metric>
+      <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))"
+                       [metric]="metrics.SPEED_INDEX"></osm-page-metric>
+      <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.docCompleteTimeInMillisecs))"
+                       [metric]="metrics.DOCUMENT_COMPLETE"></osm-page-metric>
+      <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
+                       [metric]="metrics.BYTES_FULLY_LOADED"></osm-page-metric>
     </div>
   </div>
 </div>
