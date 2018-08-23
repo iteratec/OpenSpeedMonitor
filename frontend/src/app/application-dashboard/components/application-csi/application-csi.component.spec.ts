@@ -5,6 +5,7 @@ import {CsiValueComponent} from '../csi-value/csi-value.component';
 import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 import {ApplicationDashboardService} from '../../services/application-dashboard.service';
 import {CsiGraphComponent} from '../csi-graph/csi-graph.component';
+import {CsiInfoComponent} from "../csi-info/csi-info.component";
 
 describe('ApplicationCsiComponent', () => {
   let component: ApplicationCsiComponent;
@@ -15,7 +16,8 @@ describe('ApplicationCsiComponent', () => {
       declarations: [
         ApplicationCsiComponent,
         CsiValueComponent,
-        CsiGraphComponent
+        CsiGraphComponent,
+        CsiInfoComponent
       ],
       providers: [
         ApplicationDashboardService
