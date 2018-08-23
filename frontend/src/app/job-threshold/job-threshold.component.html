@@ -6,13 +6,10 @@
 
   <p class="message" *ngIf="isEmpty == true"> {{"frontend.job.threshold.description" | translate}}</p>
 
-  <button type="button"
-          class="btn btn-primary"
-          [disabled] = "addMeasuredEventDisabled"
+  <button type="button" class="btn btn-primary" [disabled]="addMeasuredEventDisabled"
           (click)="addThresholdGroup() ">{{"frontend.job.threshold.addMeasuredEvent" | translate}}
   </button>
-  <button type="button"
-          class="btn btn-default"
+  <button *ngIf="hasSavedThresholds$ | async" type="button" class="btn btn-default"
           (click)="createScript()">{{"frontend.job.threshold.createScript" | translate}}
   </button>
 </div>

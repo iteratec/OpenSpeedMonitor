@@ -12,9 +12,17 @@ import {ThresholdRowComponent} from './components/threshold-row/threshold-row.co
   imports: [
     SharedModule
   ],
-  declarations: [JobThresholdComponent, ThresholdGroupComponent, ThresholdComponent, ThresholdRowComponent],
+  declarations: [
+    JobThresholdComponent,
+    ThresholdGroupComponent,
+    ThresholdComponent,
+    ThresholdRowComponent
+  ],
   providers: [
-    { provide: 'components', useValue: [JobThresholdComponent], multi: true}, ThresholdRestService, MeasurandService, MeasuredEventService
+    {provide: 'components', useValue: [JobThresholdComponent], multi: true},
+    ThresholdRestService,
+    MeasurandService,
+    MeasuredEventService
   ],
   entryComponents: [JobThresholdComponent]
 })

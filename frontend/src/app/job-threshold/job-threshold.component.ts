@@ -24,6 +24,7 @@ export class JobThresholdComponent {
 
   allThresholdGroups$: Observable<ThresholdGroup[]>;
   unusedMeasuredEvents$: Observable<MeasuredEvent[]>;
+  hasSavedThresholds$: Observable<boolean>;
 
   constructor(private measuredEventService: MeasuredEventService,
               private thresholdService: ThresholdService,
@@ -40,7 +41,7 @@ export class JobThresholdComponent {
   }
 
   private initialize() {
-
+    this.hasSavedThresholds$ = this.thresholdService.thresholdGroups$.pipe(map(thresholdGroups => !!thresholdGroups.length));
     this.allThresholdGroups$ = combineLatest(
       this.thresholdService.thresholdGroups$,
       this.thresholdService.newThresholdGroup$
