@@ -1,49 +1,30 @@
-.flex-row-group {
+osm-threshold {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.threshold-group {
   display: flex;
   justify-content: flex-start;
   flex-flow: row wrap;
-  line-height: 2;
 }
 
-.flex-column-left {
-  flex: 0 1 21%;
-  justify-content: flex-start;
-  align-items: flex-start;
-  line-height: 2;
-  margin-right: 1%;
+.measured-event-name {
+  flex: 0 1 20%;
+  margin-right: 20px;
 }
 
-.flex-column-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-content:flex-end;
-  margin-left: 2%;
-  line-height: 2;
-  flex-basis: 700px;
-}
-
-.flex-up {
-  font-weight: bold;
-}
-
-.flex-down {
-  margin-top: 2%;
-  font-weight: bold;
-}
-
-.measuredEvent {
+label.measured-event-name {
   font-size: 1em;
   font-weight: bold;
   word-break: break-all;
+  margin-bottom: 20px;
 }
 
-label {
-  display: inline-block;
-  max-width: 100%;
-  margin-bottom: 5px;
-  font-weight: bold;
+.flex-column-right {
+  flex-basis: 700px;
+  flex-grow: 1;
+  button {
+    width: auto;
+  }
 }
-
-
-

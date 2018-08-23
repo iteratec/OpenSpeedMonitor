@@ -11,7 +11,7 @@ import {map, take} from 'rxjs/operators';
 @Component({
   selector: 'app-job-threshold',
   templateUrl: './job-threshold.component.html',
-  styleUrls: ['./job-threshold.component.css']
+  styleUrls: ['./job-threshold.component.scss']
 })
 
 export class JobThresholdComponent {

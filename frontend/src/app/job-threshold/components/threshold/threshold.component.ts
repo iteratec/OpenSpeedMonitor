@@ -7,7 +7,7 @@ import {ThresholdService} from '../../services/threshold.service';
 @Component({
   selector: 'osm-threshold',
   templateUrl: './threshold.component.html',
-  styleUrls: ['./threshold.component.css']
+  styleUrls: ['./threshold.component.scss']
 })
 
 export class ThresholdComponent implements OnInit {
