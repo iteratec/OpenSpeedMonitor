@@ -6,6 +6,7 @@ import {MeasurandService} from '../../services/measurand.service';
 import {ThresholdRowComponent} from '../threshold-row/threshold-row.component';
 import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 import {SharedModule} from '../../../shared/shared.module';
+import {ThresholdRestService} from '../../services/threshold-rest.service';
 
 describe('ThresholdGroupComponent', () => {
   let component: ThresholdGroupComponent;
@@ -15,7 +16,7 @@ describe('ThresholdGroupComponent', () => {
     TestBed.configureTestingModule({
       imports: [SharedModule, SharedMocksModule],
       declarations: [ThresholdGroupComponent, ThresholdComponent, ThresholdRowComponent],
-      providers: [MeasurandService]
+      providers: [MeasurandService, ThresholdRestService]
     })
     .compileComponents();
   }));
