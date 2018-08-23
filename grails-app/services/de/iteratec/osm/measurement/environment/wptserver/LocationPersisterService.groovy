@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
@@ -26,7 +26,7 @@ import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 
 /**
- * Persists locations and results. Observer of ProxyService.
+ * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett , nkuhn
  * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
  */
