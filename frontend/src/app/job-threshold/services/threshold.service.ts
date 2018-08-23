@@ -5,10 +5,7 @@ import {BehaviorSubject} from 'rxjs/index';
 import {MeasuredEvent} from '../models/measured-event.model';
 import {ThresholdRestService} from './threshold-rest.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable()
 export class ThresholdService {
   thresholdGroups$= new BehaviorSubject<ThresholdGroup[]>([]);
   newThresholdGroup$ = new BehaviorSubject<ThresholdGroup>(null);
@@ -94,7 +91,7 @@ export class ThresholdService {
   }
 
   downloadScript(jobId: number) {
-    this.thresholdRestService.getScript().subscribe(
+    this.thresholdRestService.getScript(jobId).subscribe(
       result => this.download(result, jobId)
     );
   }

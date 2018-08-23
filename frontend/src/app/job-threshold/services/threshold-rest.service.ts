@@ -7,10 +7,7 @@ import {ThresholdGroup} from '../models/threshold-for-job.model';
 import {Threshold} from '../models/threshold.model';
 import {catchError, map} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable()
 export class ThresholdRestService {
 
   private jobId: number;
@@ -37,10 +34,8 @@ export class ThresholdRestService {
   }
 
   deleteThreshold(threshold: Threshold): Observable<void> {
-    const url = "/threshold/deleteThreshold" ;
-    let formData = new HttpParams();
-    formData.append('thresholdId', threshold.id.toString());
-    return this.http.post(url, formData).pipe(catchError(error => this.handleError(error)));
+    const url = `/threshold/deleteThreshold?thresholdId=${threshold.id}`;
+    return this.http.delete(url).pipe(catchError(error => this.handleError(error)));
   }
 
   updateThreshold(threshold: Threshold): Observable<void> {
@@ -67,8 +62,8 @@ export class ThresholdRestService {
     );
   }
 
-  getScript(): Observable<string> {
-    let params = new HttpParams().set('jobId', this.jobId.toString());
+  getScript(jobId: number): Observable<string> {
+    let params = new HttpParams().set('jobId', jobId.toString());
     const url =`/job/getCiScript`;
     return this.http.get(url, {params: params, responseType: 'text'}).pipe(
       catchError(error => this.handleError(error))

@@ -3,9 +3,7 @@ import {MeasuredEvent} from '../models/measured-event.model';
 import {ThresholdRestService} from './threshold-rest.service';
 import {ReplaySubject} from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class MeasuredEventService {
 
   measuredEventList: MeasuredEvent[];

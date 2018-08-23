@@ -3,10 +3,7 @@ import {Measurand} from '../models/measurand.model';
 import {Threshold} from '../models/threshold.model';
 import {ThresholdRestService} from './threshold-rest.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable()
 export class MeasurandService {
   private measurands: Measurand[] = [];
 

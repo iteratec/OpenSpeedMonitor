@@ -1,12 +1,13 @@
 import {NgModule} from '@angular/core';
 import {JobThresholdComponent} from './job-threshold.component';
-import {ThresholdRestService} from './services/threshold-rest.service';
-import {MeasurandService} from './services/measurand.service';
-import {MeasuredEventService} from './services/measured-event.service';
 import {ThresholdGroupComponent} from './components/threshold-group/threshold-group.component';
 import {ThresholdComponent} from './components/threshold/threshold.component';
 import {SharedModule} from '../shared/shared.module';
 import {ThresholdRowComponent} from './components/threshold-row/threshold-row.component';
+import {MeasurandService} from './services/measurand.service';
+import {MeasuredEventService} from './services/measured-event.service';
+import {ThresholdService} from './services/threshold.service';
+import {ThresholdRestService} from './services/threshold-rest.service';
 
 @NgModule({
   imports: [
@@ -20,9 +21,10 @@ import {ThresholdRowComponent} from './components/threshold-row/threshold-row.co
   ],
   providers: [
     {provide: 'components', useValue: [JobThresholdComponent], multi: true},
-    ThresholdRestService,
     MeasurandService,
-    MeasuredEventService
+    MeasuredEventService,
+    ThresholdService,
+    ThresholdRestService
   ],
   entryComponents: [JobThresholdComponent]
 })
