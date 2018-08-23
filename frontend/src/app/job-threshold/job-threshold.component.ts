@@ -1,11 +1,11 @@
 import {Component, ElementRef} from '@angular/core';
-import {ThresholdRestService} from './services/threshold-rest.service';
 import {MeasuredEventService} from './services/measured-event.service';
 import {MeasuredEvent} from './models/measured-event.model';
 import {ThresholdGroup} from './models/threshold-for-job.model';
 import {ThresholdService} from './services/threshold.service';
 import {combineLatest, Observable} from 'rxjs';
 import {map, take} from 'rxjs/operators';
+import {MeasurandService} from './services/measurand.service';
 
 
 @Component({
@@ -25,9 +25,9 @@ export class JobThresholdComponent {
   allThresholdGroups$: Observable<ThresholdGroup[]>;
   unusedMeasuredEvents$: Observable<MeasuredEvent[]>;
 
-  constructor(private thresholdRestService: ThresholdRestService,
-              private measuredEventService: MeasuredEventService,
+  constructor(private measuredEventService: MeasuredEventService,
               private thresholdService: ThresholdService,
+              private measurandService: MeasurandService,
               elm: ElementRef) {
 
     this.jobId = elm.nativeElement.getAttribute('data-job-id');
@@ -35,6 +35,8 @@ export class JobThresholdComponent {
 
     this.initialize();
     this.measuredEventService.fetchEvents(this.scriptId, this.jobId);
+    this.thresholdService.fetchThresholds(this.jobId);
+    this.measurandService.fetchMeasurands();
   }
 
   private initialize() {
@@ -74,7 +76,7 @@ export class JobThresholdComponent {
   }
 
   createScript() {
-    this.thresholdRestService.getScritpt();
+    this.thresholdService.downloadScript(this.jobId);
   }
 
 }

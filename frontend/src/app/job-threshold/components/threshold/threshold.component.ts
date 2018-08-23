@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Threshold} from '../../models/threshold.model';
-import {ThresholdRestService} from '../../services/threshold-rest.service';
 import {Measurand} from '../../models/measurand.model';
 import {ThresholdService} from '../../services/threshold.service';
 
@@ -18,10 +17,7 @@ export class ThresholdComponent implements OnInit {
   @Output() removeOldThreshold = new EventEmitter();
   selectedMeasurand: string;
 
-  constructor(
-    private thresholdRestService: ThresholdRestService,
-    private thresholdService: ThresholdService
-  ) {
+  constructor(private thresholdService: ThresholdService) {
   }
 
   ngOnInit() {
@@ -33,11 +29,11 @@ export class ThresholdComponent implements OnInit {
   edit(obj) {
     this.threshold.lowerBoundary = obj.lowerBoundary;
     this.threshold.upperBoundary = obj.upperBoundary;
-    this.thresholdRestService.editThreshold(this.threshold)
+    this.thresholdService.updateThreshold(this.threshold);
   }
 
   delete() {
-    this.thresholdRestService.deleteThreshold(this.threshold);
+    this.thresholdService.deleteThreshold(this.threshold);
     this.removeOldThreshold.emit();
   }
 
@@ -48,7 +44,7 @@ export class ThresholdComponent implements OnInit {
     this.threshold.measurand.translationsKey = this.selectedMeasurand;
     this.threshold.lowerBoundary = obj.lowerBoundary;
     this.threshold.upperBoundary = obj.upperBoundary;
-    this.thresholdRestService.addThreshold(this.threshold);
+    this.thresholdService.addThreshold(this.threshold);
     this.addedThreshold.emit();
   }
 

@@ -7,7 +7,7 @@ import {ThresholdRowComponent} from '../threshold-row/threshold-row.component';
 import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 import {SharedModule} from '../../../shared/shared.module';
 
-describe('MeasuredEventComponent', () => {
+describe('ThresholdGroupComponent', () => {
   let component: ThresholdGroupComponent;
   let fixture: ComponentFixture<ThresholdGroupComponent>;
 

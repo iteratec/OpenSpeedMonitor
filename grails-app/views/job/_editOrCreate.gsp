@@ -126,8 +126,6 @@
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });
     </asset:script>
-
-    <asset:stylesheet src="frontend/styles.css"/>
     <asset:javascript src="frontend/runtime.js"/>
     <asset:javascript src="frontend/polyfills.js"/>
     <asset:javascript src="frontend/main.js"/>

@@ -1,5 +1,5 @@
 <div class="threshold-group">
-  <label class="measured-event-name" *ngIf="!thresholdGroup?.isNew">{{thresholdGroup.measuredEvent.name}}</label>
+  <label class="measured-event-name" *ngIf="!thresholdGroup?.isNew">{{thresholdGroup?.measuredEvent?.name}}</label>
   <select *ngIf="thresholdGroup?.isNew && newThreshold" class="measured-event-name form-control"
           [(ngModel)]="newThreshold.measuredEvent"
           required>
@@ -8,7 +8,7 @@
     </option>
   </select>
   <div class="flex-column-right">
-    <osm-threshold *ngFor="let threshold of thresholdGroup.thresholds"
+    <osm-threshold *ngFor="let threshold of thresholdGroup?.thresholds"
                    [threshold]="threshold"
                    [unusedMeasurands]="unusedMeasurands"
                    (removeOldThreshold)="removeThreshold()"
