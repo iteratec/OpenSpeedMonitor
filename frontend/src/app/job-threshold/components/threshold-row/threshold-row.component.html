@@ -2,68 +2,68 @@
   <div class="flex-item good">{{"frontend.job.threshold.good" | translate}}</div>
   <div class="flex-item symbol">&lt;</div>
   <div class="input-group  flex-input-item">
-    <input [(ngModel)]="lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="disableInput"
-           (change)="onLowerInput($event)" class="form-control">
+    <input [(ngModel)]="lowerBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!editMode"
+           (input)="validateInput()" class="form-control">
     <div class="input-group-addon">ms</div>
   </div>
   <div class="flex-item symbol">&lt;</div>
   <div class="flex-item ok">Ok</div>
   <div class="flex-item symbol">&lt;</div>
   <div class="input-group flex-input-item">
-    <input [(ngModel)]="upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="disableInput"
-           (change)="onUpperInput($event)" class="form-control">
+    <input [(ngModel)]="upperBoundary" type="number" min="1" size="40" maxlength="12" [readonly]="!editMode"
+           (input)="validateInput()" class="form-control">
     <div class="input-group-addon">ms</div>
   </div>
   <div class="flex-item symbol">&lt;</div>
   <div class="flex-item bad">{{"frontend.job.threshold.bad" | translate}}</div>
 
   <!--Buttons to save-->
-  <div *ngIf="isNew" class="flex-container">
+  <div *ngIf="editMode" class="flex-container">
     <div class="flex-item">
       <button type="button"
               class="btn btn-success btn-sm"
               [disabled]="leftButtonLabelDisable"
-              (click)="save()">{{leftButtonLabel | translate}}
+              (click)="save()">{{"frontend.job.threshold.submit" | translate}}
       </button>
     </div>
     <div class="flex-item">
       <button type="button"
               class="btn btn-danger btn-sm"
-              (click)="cancel()">{{rightButtonLabel | translate}}
+              (click)="cancel()">{{"frontend.job.threshold.discard" | translate}}
       </button>
     </div>
   </div>
   <!--Buttons to Edit-->
-  <div *ngIf="!isNew && !deleteConfirmation" class="flex-container">
+  <div *ngIf="!editMode && !deleteConfirmation" class="flex-container">
     <div class="flex-item">
       <button type="button"
               class="btn btn-primary btn-sm"
               [disabled]="leftButtonLabelDisable"
-              (click)="edit()">{{leftButtonLabel | translate}}
+              (click)="edit()">{{"frontend.job.threshold.edit" | translate}}
       </button>
     </div>
     <div class="flex-item">
       <button type="button"
               class="btn btn-danger btn-sm"
-              (click)="delete()">{{rightButtonLabel | translate}}
+              (click)="delete()">{{"frontend.job.threshold.delete" | translate}}
       </button>
     </div>
   </div>
 
   <!--Buttons to delete-->
-  <div *ngIf="!isNew && deleteConfirmation" class="flex-container">
+  <div *ngIf="!editMode && deleteConfirmation" class="flex-container">
     {{"frontend.job.threshold.deleteSure" | translate}}
     <div class="flex-item">
       <button type="button"
               class="btn btn-success btn-sm"
               [disabled]="leftButtonLabelDisable"
-              (click)="delete()">{{leftButtonLabel | translate}}
+              (click)="delete()">{{"frontend.job.threshold.deleteYes" | translate}}
       </button>
     </div>
     <div class="flex-item">
       <button type="button"
               class="btn btn-danger btn-sm"
-              (click)="cancelDelete()">{{rightButtonLabel | translate}}
+              (click)="cancelDelete()">{{"frontend.job.threshold.deleteNo" | translate}}
       </button>
     </div>
   </div>

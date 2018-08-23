@@ -14,20 +14,11 @@ export class ThresholdRowComponent implements OnInit {
   @Output() saveNew = new EventEmitter();
   @Output() cancelNew = new EventEmitter();
 
-  /* Variables fort input validation*/
-  lowerInput: number = 0;
-  upperInput: number = 0;
-
-  /*Variables to determine buttons label*/
-  leftButtonLabel: string;
-  rightButtonLabel: string;
-
-  /* Variables to recover original boundary value*/
   originalUpperBoundary: number;
   originalLowerBoundary: number;
 
-  leftButtonLabelDisable: boolean = false;  //disable for save and accept buttons
-  disableInput: boolean = true;
+  leftButtonLabelDisable: boolean = false;
+  editMode: boolean = false;
   deleteConfirmation: boolean = false;
 
   constructor() {
@@ -37,78 +28,50 @@ export class ThresholdRowComponent implements OnInit {
     this.originalUpperBoundary = this.upperBoundary;
     this.originalLowerBoundary = this.lowerBoundary;
     if (this.isNew) {
-      this.disableInput = false;
+      this.editMode = true;
       this.leftButtonLabelDisable = true;
-      this.leftButtonLabel = "frontend.job.threshold.save";
-      this.rightButtonLabel = "frontend.job.threshold.remove";
-    } else {
-      this.leftButtonLabel = "frontend.job.threshold.edit";
-      this.rightButtonLabel = "frontend.job.threshold.delete";
     }
   }
 
-
   edit() {
-    this.disableInput = !this.disableInput;
-    if (!this.disableInput) {
-      this.rightButtonLabel = "frontend.job.threshold.discard";
-      this.leftButtonLabel = "frontend.job.threshold.submit";
-    } else {
-      this.rightButtonLabel = "frontend.job.threshold.delete";
-      this.leftButtonLabel = "frontend.job.threshold.edit";
-      this.editThreshold.emit({lowerBoundary: this.lowerBoundary, upperBoundary: this.upperBoundary});
-    }
+    this.editMode = true;
   }
 
   delete() {
-    if (this.deleteConfirmation) {
-      this.deleteConfirmation = !this.deleteConfirmation;
-      this.deleteThreshold.emit();
+    if (!this.deleteConfirmation) {
+      this.deleteConfirmation = true;
     } else {
-      if (this.rightButtonLabel == "frontend.job.threshold.delete") {
-        this.deleteConfirmation = !this.deleteConfirmation;
-        this.rightButtonLabel = "frontend.job.threshold.deleteNo";
-        this.leftButtonLabel = "frontend.job.threshold.deleteYes";
-      } else {
-        this.disableInput = !this.disableInput;
-        this.upperBoundary = this.originalUpperBoundary;
-        this.lowerBoundary = this.originalLowerBoundary;
-        this.rightButtonLabel = "frontend.job.threshold.delete";
-        this.leftButtonLabel = "frontend.job.threshold.edit";
-      }
+      this.deleteConfirmation = false;
+      this.deleteThreshold.emit();
     }
   }
 
   cancelDelete() {
     this.deleteConfirmation = !this.deleteConfirmation;
-    this.rightButtonLabel = "frontend.job.threshold.delete";
-    this.leftButtonLabel = "frontend.job.threshold.edit";
   }
 
   save() {
-    this.saveNew.emit({lowerBoundary: this.lowerBoundary, upperBoundary: this.upperBoundary});
-  }
-
-  onLowerInput(event: any) {
-    this.lowerInput = event.target.value;
-    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
-      this.leftButtonLabelDisable = false;
+    const newBoundaries = {lowerBoundary: this.lowerBoundary, upperBoundary: this.upperBoundary};
+    if (this.isNew) {
+      this.saveNew.emit(newBoundaries);
     } else {
-      this.leftButtonLabelDisable = true;
+      this.editMode = false;
+      this.editThreshold.emit(newBoundaries);
     }
   }
 
-  onUpperInput(event: any) {
-    this.upperInput = event.target.value;
-    if (this.upperInput > 0 && this.upperInput > this.lowerInput) {
-      this.leftButtonLabelDisable = false;
-    } else {
-      this.leftButtonLabelDisable = true;
-    }
+  validateInput() {
+    this.leftButtonLabelDisable = !(this.upperBoundary > 0 && this.upperBoundary > this.lowerBoundary);
   }
 
   cancel() {
-    this.cancelNew.emit();
+    if (this.isNew) {
+      this.cancelNew.emit();
+    } else {
+      this.editMode = false;
+      this.upperBoundary = this.originalUpperBoundary;
+      this.lowerBoundary = this.originalLowerBoundary;
+    }
   }
 
 
