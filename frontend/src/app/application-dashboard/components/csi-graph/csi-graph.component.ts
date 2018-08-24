@@ -119,7 +119,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .attr('transform', `translate(0,${this.height})`)
       .call(axisBottom(this.csiGraphCalculator.xScale)
         .ticks(timeDay.every(7))
-        .tickFormat(timeFormat("%Y-%m-%d")));
+        .tickFormat(timeFormat("%d.%m.")));
 
     const yAxisGenerator = axisLeft(this.csiGraphCalculator.yScale)
       .tickValues([this.csiOkay, this.csiGood, this.csiMax]);
