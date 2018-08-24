@@ -39,6 +39,8 @@ class PageCsiAggregationService {
     CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     private final ReentrantLock lock = new ReentrantLock()
+    /** We need to avoid calculating the same page CsiAggregations from different threads. */
+    private final MapWithDefault<Long, ReentrantLock> locksByJobGroupId = [:].withDefault { new ReentrantLock() }
 
     /**
      * <p>
@@ -121,7 +123,7 @@ class PageCsiAggregationService {
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
         try {
-            lock.lockInterruptibly()
+            csiGroups.each {JobGroup jobGroup -> locksByJobGroupId[jobGroup.ident()].lockInterruptibly()}
             while (!currentDateTime.isAfter(toDateTime)) {
                 List<Long> pageCsiAggregationIds
                 List<Long> pageCsiAggregationIdsToCalculate
@@ -140,7 +142,7 @@ class PageCsiAggregationService {
             return CsiAggregation.getAll(allCsiAggregationIds)
 
         } finally {
-            lock.unlock()
+            csiGroups.each {locksByJobGroupId[it.ident()].unlock()}
         }
 
     }
