@@ -14,7 +14,7 @@ import grails.transaction.Rollback
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec {
-    ApplicationDashboardService serviceUnderTest
+    ApplicationDashboardService applicationDashboardService
 
     JobGroup jobGroup1, jobGroup2
     Page page1, page2, page3, pageUndefined
@@ -65,9 +65,9 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup1.id)
-        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup1.id)
-        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup1.id)
+        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup1.id)
+        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup1.id)
+        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
 
         then: "there is one page found by the event result and two pages by an active job"
         recentMeasuredPages.size() == 1
@@ -95,9 +95,9 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup1.id)
-        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup1.id)
-        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup1.id)
+        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup1.id)
+        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup1.id)
+        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
 
         then: "there is no page found by an event result and two by the active job"
         recentMeasuredPages.size() == 0
@@ -135,9 +135,9 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         )
 
         when: "the application service determines the recent measured or/and active pages without undefined"
-        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup2.id)
-        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup2.id)
-        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup2.id)
+        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup2.id)
+        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup2.id)
+        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup2.id)
 
         then: "there is one page found by an event result and no page by an active job"
         recentMeasuredPages.size() == 1
@@ -166,9 +166,9 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup2.id)
-        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup2.id)
-        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup2.id)
+        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup2.id)
+        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup2.id)
+        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup2.id)
 
         then: "there is no page found by an event result and no page by an active job"
         recentMeasuredPages.size() == 0
