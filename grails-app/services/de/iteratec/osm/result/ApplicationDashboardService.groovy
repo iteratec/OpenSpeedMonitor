@@ -134,7 +134,7 @@ class ApplicationDashboardService {
             return it.projectedProperties
         }
 
-        getRecentPagesForJobGroup(jobGroupId).each {
+        getPagesOfActiveJobs(jobGroupId).each {
             Page page = it
             if (page.name != Page.UNDEFINED &&
                     !recentMetrics.any { it.pageId == page.id }) {
