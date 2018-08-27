@@ -128,4 +128,29 @@ class ApplicationDashboardService {
 
     }
 
+    List<Map> getAllActivePagesAndMetrics(Long jobGroupId) {
+        List<Map> recentMetrics = getRecentMetricsForJobGroup(jobGroupId).collect {
+            it.projectedProperties.pageName = Page.findById(it.pageId).name
+            return it.projectedProperties
+        }
+
+        getRecentPagesForJobGroup(jobGroupId).each {
+            Page page = it
+            if (page.name != Page.UNDEFINED &&
+                    !recentMetrics.any { it.pageId == page.id }) {
+                recentMetrics.add(
+                        [
+                                'speedIndex'                : null,
+                                'docCompleteTimeInMillisecs': null,
+                                'pageId'                    : page.id,
+                                'pageName'                  : page.name,
+                                'fullyLoadedIncomingBytes'  : null
+
+                        ]
+                )
+            }
+        }
+
+        return recentMetrics
+    }
 }
