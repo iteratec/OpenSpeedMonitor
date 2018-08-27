@@ -14,12 +14,19 @@ import grails.transaction.Rollback
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec {
-    ApplicationDashboardService applicationDashboardService
+    ApplicationDashboardService serviceUnderTest
 
-    JobGroup jobGroup1
-    Page page1, page2, page3, pageUndefiend
+    JobGroup jobGroup1, jobGroup2
+    Page page1, page2, page3, pageUndefined
     Job job1
     Script script1
+
+    private static final String NAVIGATION_SCRIPT =
+            "setEventName\tHomepage:::Homepage\n" +
+                    "navigate\thttps://www.iteratec.de/\n" +
+                    "setEventName\tDetail:::Branchen\n" +
+                    "navigate\thttps://www.iteratec.de/branch"
+
 
     def setup() {
         createTestDataCommonForAllTests()
@@ -28,76 +35,159 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     def cleanup() {
     }
 
-    void "get active or measured pages and metrics of jobgroup without undefined"() {
+    void "get pages by event results and active jobs"() {
+        given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
         EventResult.build(
                 page: page1,
-                jobGroup: jobGroup1,
+                jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                flush: true
         )
-        EventResult.build(
-                page: page2,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date()
-        )
+
         EventResult.build(
                 page: page3,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                flush: true
         )
+
         EventResult.build(
-                page: pageUndefiend,
+                page: pageUndefined,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                flush: true
         )
 
-        def result = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
+        when: "the application service determines the recent measured or/and active pages (without undefined page)"
+        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup1.id)
+        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup1.id)
+        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup1.id)
 
-        expect: "fix me"
-        result.size() == 2
+        then: "there is one page found by the event result and two pages by an active job"
+        recentMeasuredPages.size() == 1
+        activePages.size() == 2
+        allActiveOrMeasuredPages.size() == 3
     }
 
-    void "get empty result if no page of jobgroup is active or has relevant measured values"() {
+    void "get pages only by an active job without results"() {
+        given: "one 'undefined' matching and one other EventResult"
+        EventResult.build(
+                page: page3,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                dateCreated: new Date(),
+                flush: true
+        )
+        EventResult.build(
+                page: pageUndefined,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                dateCreated: new Date(),
+                flush: true
+        )
+
+        when: "the application service determines the recent measured or/and active pages (without undefined page)"
+        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup1.id)
+        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup1.id)
+        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup1.id)
+
+        then: "there is no page found by an event result and two by the active job"
+        recentMeasuredPages.size() == 0
+        activePages.size() == 2
+        allActiveOrMeasuredPages.size() == 2
+    }
+
+    void "get pages only by event results"() {
+        given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
         EventResult.build(
                 page: page3,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                flush: true
         )
+
         EventResult.build(
-                page: pageUndefiend,
+                page: page3,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                dateCreated: new Date(),
+                flush: true
+        )
+
+        EventResult.build(
+                page: pageUndefined,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                dateCreated: new Date(),
+                flush: true
+        )
+
+        when: "the application service determines the recent measured or/and active pages without undefined"
+        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup2.id)
+        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup2.id)
+        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup2.id)
+
+        then: "there is one page found by an event result and no page by an active job"
+        recentMeasuredPages.size() == 1
+        activePages.size() == 0
+        allActiveOrMeasuredPages.size() == 1
+    }
+
+    void "get no page by EventResults or active jobs"() {
+        given: "one 'undefined' matching EventResult and one other Result"
+        EventResult.build(
+                page: page3,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                flush: true
         )
 
-        def result = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
+        EventResult.build(
+                page: pageUndefined,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                dateCreated: new Date(),
+                flush: true
+        )
 
-        expect: "fix me"
-        result.size() == 0
+        when: "the application service determines the recent measured or/and active pages (without undefined page)"
+        def recentMeasuredPages = serviceUnderTest.getRecentMetricsForJobGroup(jobGroup2.id)
+        def activePages = serviceUnderTest.getPagesOfActiveJobs(jobGroup2.id)
+        def allActiveOrMeasuredPages = serviceUnderTest.getAllActivePagesAndMetrics(jobGroup2.id)
+
+        then: "there is no page found by an event result and no page by an active job"
+        recentMeasuredPages.size() == 0
+        activePages.size() == 0
+        allActiveOrMeasuredPages.size() == 0
     }
 
     private void createTestDataCommonForAllTests() {
         OsmConfiguration.build()
 
-        page1 = Page.build()
-        page2 = Page.build()
-        page3 = Page.build()
-        pageUndefiend = Page.build(name: Page.UNDEFINED)
+        page1 = Page.build(name: "Homepage")
+        page2 = Page.build(name: "Detail")
+        page3 = Page.build(name: "Test")
+        pageUndefined = Page.build(name: Page.UNDEFINED)
 
-        script1 = Script.build(
-                testedPages: [page1, page2, pageUndefiend]
-        )
         jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+
+        script1 = Script.build(navigationScript: NAVIGATION_SCRIPT)
 
         job1 = Job.build(
                 active: true,

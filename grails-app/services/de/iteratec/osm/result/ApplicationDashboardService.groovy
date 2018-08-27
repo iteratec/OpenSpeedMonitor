@@ -15,8 +15,6 @@ import org.joda.time.DateTime
 
 @Transactional
 class ApplicationDashboardService {
-
-
     ConfigService configService
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
