@@ -199,7 +199,7 @@
                                                     default="Delete Default Mapping"/>
                                         </button>
                                     </g:if>
-                                    <g:render template="/_common/modals/deleteDialogCustomAction"
+                                    <g:render template="/_common/modals/deleteDialogCsiPageMapping"
                                               model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
                                     <g:if test="${!readOnly}">
                                         <g:render template="/_common/modals/chooseCsiMapping"
