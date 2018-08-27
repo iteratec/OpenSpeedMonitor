@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import groovy.util.slurpersupport.GPathResult

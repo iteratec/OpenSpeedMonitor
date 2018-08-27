@@ -21,8 +21,8 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdaterDummy
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
-import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event

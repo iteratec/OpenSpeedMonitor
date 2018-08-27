@@ -56,35 +56,6 @@ class UrlMappings {
         "503"(view: '/_errors/503')
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        // wpt-server-proxy-mappings
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-
-        "/proxy/$wptserver/getLocations.php" {
-            controller = "WptProxy"
-            action = [GET: "getLocations"]
-        }
-
-        "/proxy/$wptserver/runtest.php" {
-            controller = "WptProxy"
-            action = [POST: "runtest"]
-        }
-
-        "/proxy/$wptserver/results/$resultYear/$resultMonth/$resultDay/$resultFolder/$resultId/$fileToDownload" {
-            controller = "WptProxy"
-            action = [GET: "resultFileDownload"]
-        }
-
-        "/proxy/$wptserver/result/$resultId/" {
-            controller = "WptProxy"
-            action = [GET: "result"]
-        }
-
-        "/proxy/$wptserver/xmlResult/$resultId/" {
-            controller = "WptProxy"
-            action = [GET: "xmlResult"]
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////
         // rest api of osm
         ////////////////////////////////////////////////////////////////////////////////////////////////
 

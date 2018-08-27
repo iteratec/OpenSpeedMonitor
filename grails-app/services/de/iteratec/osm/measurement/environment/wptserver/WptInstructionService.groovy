@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -46,16 +46,17 @@ interface iLocationListener {
     public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserver)
 }
 
-//TODO: Write further tests for this service. Recording of http-responses is necessary!
-//				See the following for that:
-//				* http://freeside.co/betamax/
-//				* https://github.com/robfletcher/betamax/tree/master/examples/grails-betamax 
-
 /**
- * Business logic for functionality of wptserver-proxy. Observers can register with {@link ProxyService#addResultListener(iResultListener)}.
+ * Business logic to control WebpageTest server via http(s).
+ *
+ * Observers can register with {@link WptInstructionService#addResultListener(de.iteratec.osm.measurement.environment.wptserver.iResultListener)}
+ *      to get informed about new successful wpt results.
+ * Observers can register with {@link WptInstructionService#addLocationListener(de.iteratec.osm.measurement.environment.wptserver.iLocationListener)}
+ *      to get informed about new successful wpt locations.
+
  * @author rschuett , nkuhn
  */
-class ProxyService {
+class WptInstructionService {
 
     protected List<iResultListener> resultListeners = new ArrayList<iResultListener>()
     protected List<iLocationListener> locationListeners = new ArrayList<iLocationListener>()
