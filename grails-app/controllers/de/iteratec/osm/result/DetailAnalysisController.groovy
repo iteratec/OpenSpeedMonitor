@@ -1,7 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.DetailAnalysisPersisterService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.util.ControllerUtils

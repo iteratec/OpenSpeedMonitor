@@ -252,6 +252,9 @@ grails:
             logout:
                 postOnly: false
             securityConfigType: 'InterceptUrlMap'
+            successHandler:
+              alwaysUseDefault: true
+              defaultTargetUrl: '/'
             interceptUrlMap: [
                             {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/static/**',                                     access: ["permitAll"]},

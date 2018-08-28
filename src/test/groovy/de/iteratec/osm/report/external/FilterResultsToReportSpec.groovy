@@ -2,7 +2,7 @@ package de.iteratec.osm.report.external
 
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
@@ -10,7 +10,8 @@ import de.iteratec.osm.result.MeasuredEvent
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
-import spock.lang.*
+import spock.lang.Specification
+import spock.lang.Unroll
 
 @Unroll
 @Build([Page, EventResult, MeasuredEvent])

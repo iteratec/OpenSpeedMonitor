@@ -1,4 +1,4 @@
-package de.iteratec.osm.measurement.environment.wptserverproxy
+package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.*
@@ -23,8 +23,8 @@ import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 /**
  * Tests persistence of wpt infrastructure domains like locations, browsers, WebPagetestserver, etc
@@ -228,7 +228,7 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
     }
 
     private void mockProxyService(String locationIdentifier) {
-        service.proxyService = Stub(ProxyService){
+        service.wptInstructionService = Stub(WptInstructionService) {
             fetchLocations(_) >> { WebPageTestServer server ->
                 createLocationIfNotExistent(locationIdentifier, server);
             }
