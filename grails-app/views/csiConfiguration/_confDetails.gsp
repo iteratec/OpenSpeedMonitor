@@ -2,6 +2,7 @@
 <%@ defaultCodec="none" %>
 
 
+<g:set var="defaultIdentifier" value='default_csi_mappings'/>
 %{-- nav tabs for the mapping and the weights --}%
 <ul id="csiConfigurationDetailsTabs" class="nav nav-tabs">
     <li class="active">
@@ -124,8 +125,6 @@
                                     </span>
                                 </div>
                             </div>
-
-                            <g:set var="defaultIdentifier" value='default_csi_mappings'/>
 
                             <div class="row">
                                 %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
@@ -422,7 +421,7 @@
     };
 
     var prepareConfigurationListAndCopy = function(){
-        return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
+        return copyCsiConfiguration(${(csiConfigurations ?: [:]) as grails.converters.JSON})
     };
 
     var legendEntryClickCallback = function(nameOfClickedLegendEntry){
