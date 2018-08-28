@@ -1,10 +1,8 @@
 <div class="card application-csi">
   <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.kpi.title' | translate }}</h2>
   <div class="csi">
-    <ng-container>
-      <osm-csi-value [csiValue]="(recentCsiValue$ | async)?.csiDocComplete" [csiDate]="recentCsiDate$ | async"
-                     [showLoading]="isLoading" [isBig]="true"></osm-csi-value>
-      <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async"></osm-csi-graph>
-    </ng-container>
+    <osm-csi-value [csiValue]="(recentCsiValue$ | async)?.csiDocComplete" [csiDate]="recentCsiDate$ | async"
+                   [showLoading]="isLoading" [isBig]="true" [lastResultDate]="lastDateOfResults"></osm-csi-value>
+    <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async"></osm-csi-graph>
   </div>
 </div>
