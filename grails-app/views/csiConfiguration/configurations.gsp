@@ -262,7 +262,8 @@
                                              matrixViewData          : matrixViewData,
                                              treemapData             : treemapData,
                                              barchartData            : barchartData,
-                                             pageTimeToCsMappings    : pageTimeToCsMappings]"/>
+                                             pageTimeToCsMappings    : pageTimeToCsMappings,
+                                             hideDeleteMappingButton : false]"/>
 
 </div>
 %{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
