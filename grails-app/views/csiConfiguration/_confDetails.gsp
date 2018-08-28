@@ -2,6 +2,7 @@
 <%@ defaultCodec="none" %>
 
 
+<g:set var="defaultIdentifier" value='default_csi_mappings'/>
 %{-- nav tabs for the mapping and the weights --}%
 <ul id="csiConfigurationDetailsTabs" class="nav nav-tabs">
     <li class="active">
@@ -81,19 +82,21 @@
                                                     'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                                                     'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
                                 <div class="col-md-4">
-                                    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-                                        <button href="#" type="button" class="btn btn-primary"
-                                                style="display: none;"
-                                                id="removePageMapping"
-                                                onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping')}',
-                                                    actualCsiConfigurationId);">
-                                            <g:message
-                                                    code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
-                                                    default="Remove Mapping"/>
-                                        </button>
+                                    <g:if test="${!hideDeleteMappingButton}">
+                                        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                                            <button href="#" type="button" class="btn btn-primary"
+                                                    style="display: none;"
+                                                    id="removePageMapping"
+                                                    onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping')}',
+                                                        actualCsiConfigurationId);">
+                                                <g:message
+                                                        code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
+                                                        default="Remove Mapping"/>
+                                            </button>
 
-                                        <div id="page-mapping-deletions"></div>
-                                    </sec:ifAllGranted>
+                                            <div id="page-mapping-deletions"></div>
+                                        </sec:ifAllGranted>
+                                    </g:if>
                                 </div>
                             </div>
                         </g:if>
@@ -122,8 +125,6 @@
                                     </span>
                                 </div>
                             </div>
-
-                            <g:set var="defaultIdentifier" value='default_csi_mappings'/>
 
                             <div class="row">
                                 %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
@@ -420,7 +421,7 @@
     };
 
     var prepareConfigurationListAndCopy = function(){
-        return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
+        return copyCsiConfiguration(${(csiConfigurations ?: [:]) as grails.converters.JSON})
     };
 
     var legendEntryClickCallback = function(nameOfClickedLegendEntry){

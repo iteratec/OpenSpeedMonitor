@@ -192,7 +192,8 @@
         <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
                                                                    showDefaultMappings    : false,
                                                                    defaultTimeToCsMappings: defaultTimeToCsMappings,
-                                                                   pageMappingsExist      : pageMappingsExist]"/>
+                                                                   pageMappingsExist      : pageMappingsExist,
+                                                                   hideDeleteMappingButton: true]"/>
     </g:if>
 </section>
 <content tag="include.bottom">
