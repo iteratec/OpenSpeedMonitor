@@ -2,12 +2,14 @@
 
 .csi-circle-container {
   position: relative;
-  display: inline-block;
+
+  svg {
+    display: block;
+  }
 }
 
 .csi-circle-text-container {
   position: absolute;
-  display: inline-block;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);

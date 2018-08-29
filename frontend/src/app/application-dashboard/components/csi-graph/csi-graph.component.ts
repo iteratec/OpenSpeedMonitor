@@ -16,6 +16,7 @@ import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
 import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../utils/csi-utils';
 import {select} from "d3-selection";
+import {TranslateService} from "@ngx-translate/core";
 
 
 @Component({
@@ -35,7 +36,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private height: number;
   private marginLeft = 50;
   private marginRight = 40;
-  private marginTop = 10;
+  private marginTop = 30;
   private marginBottom = 30;
 
   private csiOkay = CSI_THRESHOLD_OKAY;
@@ -44,7 +45,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
   csiValueClass: string;
 
-  constructor() {
+  constructor(private translationService: TranslateService) {
   }
 
   private drawGraph() {
@@ -69,9 +70,17 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraph
       .append("g")
       .attr("class", "y axis");
+
     csiGraph
       .append("g")
       .attr("class", "y axis grid-lines");
+
+    csiGraph
+      .append("text")
+      .attr("class", "title")
+      .text(this.translationService.instant("frontend.de.iteratec.osm.applicationDashboard.kpi.graph.title"))
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central");
 
     const csiGraphDrawingSpace = csiGraph
       .append("g");
@@ -134,6 +143,11 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
       .call(yAxisGenerator
         .tickSize(-this.width)
         .tickFormat((tick => "")));
+
+    selection
+      .select(".title")
+      .attr("dx", this.width / 2)
+      .attr("dy", -this.marginTop / 2);
 
     selection
       .select("path.csi-graph-line")
