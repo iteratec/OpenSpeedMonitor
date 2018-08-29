@@ -64,7 +64,7 @@ jobs:
       provider: script
       script:
           groovy scripts/ci/building/set_new_versionnumber_travis_dev;
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin;
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
           docker build -t iteratec/openspeedmonitor OpenSpeedMonitor/
       on:
         all_branches: true
