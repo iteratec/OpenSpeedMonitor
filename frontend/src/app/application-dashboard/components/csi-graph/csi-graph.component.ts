@@ -34,7 +34,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   private width: number;
   private height: number;
   private marginLeft = 50;
-  private marginRight = 20;
+  private marginRight = 40;
   private marginTop = 10;
   private marginBottom = 30;
 
