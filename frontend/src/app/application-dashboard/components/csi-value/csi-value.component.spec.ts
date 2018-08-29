@@ -132,7 +132,7 @@ describe('CsiValueComponent', () => {
     component.ngOnInit();
 
     expect(component.isOutdated).toBe(true);
-    expect(component.csiValueClass).toEqual('outdated');
+    expect(component.csiValueClass).toEqual('neutral');
 
     fixture.detectChanges();
     const circleDe: DebugElement = fixture.debugElement;
@@ -140,7 +140,7 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.bad).toBeFalsy();
     expect(svgDe.classes.okay).toBeFalsy();
     expect(svgDe.classes.good).toBeFalsy();
-    expect(svgDe.classes.outdated).toBeTruthy();
+    expect(svgDe.classes.neutral).toBeTruthy();
   });
   it('should be good if csi value is good and up-to-date', () => {
     const goodValue: number = 90;
@@ -158,7 +158,7 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.bad).toBeFalsy();
     expect(svgDe.classes.okay).toBeFalsy();
     expect(svgDe.classes.good).toBeTruthy();
-    expect(svgDe.classes.outdated).toBeFalsy();
+    expect(svgDe.classes.neutral).toBeFalsy();
   });
   it('should be described by "CSI" and be "outdated" (grey) if the csi value is outdated and the circle is small', () => {
     const goodValue: number = 90;
@@ -170,7 +170,7 @@ describe('CsiValueComponent', () => {
 
     expect(component.isOutdated).toBe(true);
     expect(component.description).toBe('CSI');
-    expect(component.csiValueClass).toEqual('outdated');
+    expect(component.csiValueClass).toEqual('neutral');
 
     fixture.detectChanges();
     const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
@@ -181,7 +181,7 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.bad).toBeFalsy();
     expect(svgDe.classes.okay).toBeFalsy();
     expect(svgDe.classes.good).toBeFalsy();
-    expect(svgDe.classes.outdated).toBeTruthy();
+    expect(svgDe.classes.neutral).toBeTruthy();
   });
   it('should be described by "CSI" and be "outdated" (grey) if the csi value is loading', () => {
     component.showLoading = true;
@@ -198,6 +198,24 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.bad).toBeFalsy();
     expect(svgDe.classes.okay).toBeFalsy();
     expect(svgDe.classes.good).toBeFalsy();
-    expect(svgDe.classes.outdated).toBeTruthy();
+    expect(svgDe.classes.neutral).toBeTruthy();
+  });
+
+  it('should be N/A if no value is there', () => {
+    component.csiValue = null;
+    component.ngOnInit();
+    expect(component.isNA).toBe(true);
+    expect(component.formattedCsiValue).toEqual("n/a");
+
+    fixture.detectChanges();
+    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-text')).nativeElement;
+    expect(descriptionEl.textContent).toEqual('n/a');
+
+    const circleDe: DebugElement = fixture.debugElement;
+    const svgDe: DebugElement = circleDe.query(By.css('svg'));
+    expect(svgDe.classes.bad).toBeFalsy();
+    expect(svgDe.classes.okay).toBeFalsy();
+    expect(svgDe.classes.good).toBeFalsy();
+    expect(svgDe.classes.neutral).toBeTruthy();
   });
 });

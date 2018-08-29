@@ -149,11 +149,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
-    if (this.isNA) {
-      return 'not-available';
-    }
-    if (this.isOutdated || this.showLoading) {
-      return 'outdated';
+    if (this.isNA || this.isOutdated || this.showLoading) {
+      return 'neutral';
     }
 
     return CsiUtils.getClassByThresholds(csiValue);
