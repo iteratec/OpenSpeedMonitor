@@ -59,9 +59,10 @@ jobs:
     script:
     - ./gradlew angularTests
   - stage: Build and Push Docker Image
+    script: skip # You do not want to run the tests again
     deploy:
       provider: script
       script: groovy scripts/ci/set_new_versionnumber_travis.groovy
-      on:
-        branch: develop
+#      on:
+#        branch: develop
 
