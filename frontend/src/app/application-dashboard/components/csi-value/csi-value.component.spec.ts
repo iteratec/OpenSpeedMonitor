@@ -183,4 +183,21 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.good).toBeFalsy();
     expect(svgDe.classes.outdated).toBeTruthy();
   });
+  it('should be described by "CSI" and be "outdated" (grey) if the csi value is loading', () => {
+    component.showLoading = true;
+    component.ngOnInit();
+
+    expect(component.formattedCsiValue).toEqual("loading...");
+
+    fixture.detectChanges();
+    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-text')).nativeElement;
+    expect(descriptionEl.textContent).toEqual('loading...');
+
+    const circleDe: DebugElement = fixture.debugElement;
+    const svgDe: DebugElement = circleDe.query(By.css('svg'));
+    expect(svgDe.classes.bad).toBeFalsy();
+    expect(svgDe.classes.okay).toBeFalsy();
+    expect(svgDe.classes.good).toBeFalsy();
+    expect(svgDe.classes.outdated).toBeTruthy();
+  });
 });
