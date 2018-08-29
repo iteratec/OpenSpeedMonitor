@@ -62,7 +62,7 @@ jobs:
     script: skip # You do not want to run the tests again
     deploy:
       provider: script
-      script: ls -a scripts/ci/building/
+      script: groovy scripts/ci/building/set_new_versionnumber_travis_dev
       on:
         all_branches: true
 #      on:
