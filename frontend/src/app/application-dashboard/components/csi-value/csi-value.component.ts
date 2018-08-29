@@ -59,15 +59,14 @@ export class CsiValueComponent implements OnInit, OnChanges {
   private formatCsiValue(csiValue: number): string {
     if (this.showLoading) {
       return "loading...";
-    } else {
-      if (this.isNA) {
-        return "n/a";
-      }
-      if (csiValue >= 100) {
-        return "100%";
-      }
-      return csiValue.toFixed(1) + "%";
     }
+    if (this.isNA) {
+      return "n/a";
+    }
+    if (csiValue >= 100) {
+      return "100%";
+    }
+    return csiValue.toFixed(1) + "%";
   }
 
   private initByInputs() {
@@ -152,7 +151,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
   private determineClass(csiValue: number): string {
     if (this.isNA) {
       return 'not-available';
-    } else if (this.isOutdated) {
+    }
+    if (this.isOutdated || this.showLoading) {
       return 'outdated';
     }
 
