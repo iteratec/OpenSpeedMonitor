@@ -19,7 +19,7 @@ export class PageComponent {
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
-  metrics: Metrics = Metrics.getMetrics();
+  metrics = Metrics;
 
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {

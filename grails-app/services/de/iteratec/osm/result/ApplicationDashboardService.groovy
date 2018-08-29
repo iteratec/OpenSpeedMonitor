@@ -132,21 +132,17 @@ class ApplicationDashboardService {
             return it.projectedProperties
         }
 
-        getPagesOfActiveJobs(jobGroupId).each {
-            Page page = it
-            if (page.name != Page.UNDEFINED &&
-                    !recentMetrics.any { it.pageId == page.id }) {
-                recentMetrics.add(
-                        [
-                                'speedIndex'                : null,
-                                'docCompleteTimeInMillisecs': null,
-                                'pageId'                    : page.id,
-                                'pageName'                  : page.name,
-                                'fullyLoadedIncomingBytes'  : null
+        List<Page> activePagesWithoutUndefined = (List<Page>) getPagesOfActiveJobs(jobGroupId).find { page ->
+            page.name != Page.UNDEFINED && !recentMetrics.any { it.pageId == page.id }
+        }
 
-                        ]
-                )
-            }
+        activePagesWithoutUndefined.each { Page page ->
+            recentMetrics.add(
+                    [
+                            'pageId'  : page.id,
+                            'pageName': page.name
+                    ]
+            )
         }
 
         return recentMetrics

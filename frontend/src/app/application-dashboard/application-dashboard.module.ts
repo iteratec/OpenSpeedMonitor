@@ -34,8 +34,7 @@ const DashboardRoutes: Routes = [
     PageMetricComponent
   ],
   exports: [
-    RouterModule,
-    PageMetricComponent
+    RouterModule
   ],
   providers: [
     {
