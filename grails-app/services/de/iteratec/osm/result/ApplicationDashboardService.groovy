@@ -20,6 +20,22 @@ class ApplicationDashboardService {
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
 
+    Closure addPageMetaData = { Page page ->
+        Map entry = recentMetrics.find {
+            it.pageId == page.id
+        }
+        if (!entry) {
+            recentMetrics.add(
+                    [
+                            'pageId'  : page.id,
+                            'pageName': page.name
+                    ]
+            )
+        } else {
+            entry.pageName = page.name
+        }
+    }
+
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
@@ -128,20 +144,25 @@ class ApplicationDashboardService {
 
     List<Map> getAllActivePagesAndMetrics(Long jobGroupId) {
         List<Map> recentMetrics = getRecentMetricsForJobGroup(jobGroupId).collect {
-            it.projectedProperties.pageName = Page.findById(it.pageId).name
             return it.projectedProperties
         }
 
         getPagesOfActiveJobs(jobGroupId)
                 .findAll { Page page -> page.name != Page.UNDEFINED }
-                .findAll { Page page -> !recentMetrics.any { it.pageId == page.id } }
                 .each { Page page ->
-            recentMetrics.add(
-                    [
-                            'pageId'  : page.id,
-                            'pageName': page.name
-                    ]
-            )
+            Map entry = recentMetrics.find {
+                it.pageId == page.id
+            }
+            if (!entry) {
+                recentMetrics.add(
+                        [
+                                'pageId'  : page.id,
+                                'pageName': page.name
+                        ]
+                )
+            } else {
+                entry.pageName = page.name
+            }
         }
 
         return recentMetrics
