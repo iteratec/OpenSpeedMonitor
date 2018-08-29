@@ -12,6 +12,9 @@ language: groovy
 jdk:
   - openjdk8
 
+services:
+  - docker
+
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
 install: true
@@ -55,4 +58,10 @@ jobs:
   - name: "angularTests"
     script:
     - ./gradlew angularTests
+  - stage: Build and Push Docker Image
+    deploy:
+      provider: script
+      script: groovy scripts/ci/set_new_versionnumber_travis.groovy
+      on:
+        branch: develop
 
