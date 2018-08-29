@@ -19,23 +19,7 @@ class ApplicationDashboardService {
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
-
-    Closure addPageMetaData = { Page page ->
-        Map entry = recentMetrics.find {
-            it.pageId == page.id
-        }
-        if (!entry) {
-            recentMetrics.add(
-                    [
-                            'pageId'  : page.id,
-                            'pageName': page.name
-                    ]
-            )
-        } else {
-            entry.pageName = page.name
-        }
-    }
-
+    
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
