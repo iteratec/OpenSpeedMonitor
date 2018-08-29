@@ -1,6 +1,6 @@
 import {Unit} from "./unit.enum";
 
-class Metric {
+export class Metric {
   constructor(public name: string, public unit: Unit, public icon: string) {
   }
 }

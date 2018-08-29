@@ -4,9 +4,9 @@ import {PageMetricComponent} from './page-metric.component';
 import {SharedMocksModule} from "../../../testing/shared-mocks.module";
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {By} from "@angular/platform-browser";
-import {Metric} from "../../../shared/enums/metric.enum";
 import {Unit} from "../../../shared/enums/unit.enum";
 import {DebugElement} from "@angular/core";
+import {Metric} from "../../../shared/enums/metric.enum";
 
 describe('PageMetricComponent', () => {
   let component: PageMetricComponent;
