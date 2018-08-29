@@ -1,0 +1,23 @@
+
+.main-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+
+  .csi-value {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    margin-bottom: 10px;
+  }
+
+  osm-csi-graph {
+    z-index: 1;
+    grid-column: 2 / -1;
+    margin-left: -20px;
+    padding-left: 20px;
+    width: calc(100% + 20px);
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin-bottom: 10px;
+  }
+}
