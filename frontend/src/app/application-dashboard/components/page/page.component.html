@@ -5,7 +5,7 @@
                    [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value>
     <div class="metric-list">
       <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))"
-                       [metric]="metrics.SPEED_INDEX.name"></osm-page-metric>
+                       [metric]="metrics.SPEED_INDEX"></osm-page-metric>
       <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.docCompleteTimeInMillisecs))"
                        [metric]="metrics.DOCUMENT_COMPLETE"></osm-page-metric>
       <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
