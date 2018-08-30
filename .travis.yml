@@ -69,6 +69,7 @@ jobs:
           docker build -t iteratec/openspeedmonitor . ;
           docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:develop;
           docker push iteratec/openspeedmonitor:develop
+          git stash -u
       on:
         all_branches: true
 #      on:
