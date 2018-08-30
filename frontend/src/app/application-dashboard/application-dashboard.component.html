@@ -11,7 +11,9 @@
                    [showLoading]="isLoading" [isBig]="true"
                    [lastResultDate]="selectedApplication.dateOfLastResults"></osm-csi-value>
   </div>
-  <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async" class="card"></osm-csi-graph>
+  <div class="csi-graph card">
+    <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async"></osm-csi-graph>
+  </div>
   <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric"
             [lastDateOfResult]="selectedApplication.dateOfLastResults"></osm-page>
 </div>
