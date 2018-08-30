@@ -63,15 +63,13 @@ jobs:
     deploy:
       provider: script
       script:
-          ./gradlew assemble;
           groovy scripts/ci/building/set_new_versionnumber_travis_dev;
+          ./gradlew assemble;
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
           docker build -t iteratec/openspeedmonitor . ;
           docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:develop;
           docker push iteratec/openspeedmonitor:develop;
           git stash -u; # in order to prevent double checking of chached resources
       on:
-        all_branches: true
-#      on:
-#        branch: develop
+        branch: develop
 
