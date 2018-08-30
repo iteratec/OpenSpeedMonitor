@@ -34,7 +34,7 @@ describe('CsiValueComponent', () => {
 
   it('should be described as CSI since no description is set', () =>{
     expect(component.description).toEqual('CSI');
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-description');
     expect(descriptionEl.textContent).toEqual('CSI');
   });
   it('should be described as "CSI" if the circle is not big', () => {
@@ -43,7 +43,7 @@ describe('CsiValueComponent', () => {
     expect(component.description).toEqual('CSI');
 
     fixture.detectChanges();
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-description');
     expect(descriptionEl.textContent).toEqual('CSI');
   });
   it('should be bad if csi value is bad', () => {
@@ -94,8 +94,7 @@ describe('CsiValueComponent', () => {
     const expectedDescriptionFontSize: string = '12';
     expect(component.descriptionFontSize).toBe(expectedDescriptionFontSize);
 
-    const containerDe: DebugElement = fixture.debugElement.query(By.css('.csi-circle-container'));
-    const containerEl: HTMLElement = containerDe.nativeElement;
+    const containerEl: HTMLElement = fixture.nativeElement.querySelector('svg');
     expect(containerEl.clientWidth).toBe(expectedSize);
   });
   it('should be big if set', ()=>{
@@ -110,8 +109,7 @@ describe('CsiValueComponent', () => {
     expect(component.descriptionFontSize).toBe(expectedDescriptionFontSize);
 
     fixture.detectChanges();
-    const containerDe: DebugElement = fixture.debugElement.query(By.css('.csi-circle-container'));
-    const containerEl: HTMLElement = containerDe.nativeElement;
+    const containerEl: HTMLElement = fixture.nativeElement.querySelector('svg');
     expect(containerEl.clientWidth).toBe(expectedSize);
   });
   it('should be described by the date of the recent csi date if the csi date is not today and the circle is big', () => {
@@ -121,7 +119,7 @@ describe('CsiValueComponent', () => {
 
     expect(component.description).toBe(CalculationUtil.toGermanDateFormat(component.csiDate));
     fixture.detectChanges();
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-description');
     expect(descriptionEl.textContent).toEqual(CalculationUtil.toGermanDateFormat(component.csiDate));
   });
   it('should be grey if the csi is outdated', () => {
@@ -173,7 +171,7 @@ describe('CsiValueComponent', () => {
     expect(component.csiValueClass).toEqual('neutral');
 
     fixture.detectChanges();
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-description')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-description');
     expect(descriptionEl.textContent).toEqual('CSI');
 
     const circleDe: DebugElement = fixture.debugElement;
@@ -190,7 +188,7 @@ describe('CsiValueComponent', () => {
     expect(component.formattedCsiValue).toEqual("loading...");
 
     fixture.detectChanges();
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-text')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-text');
     expect(descriptionEl.textContent).toEqual('loading...');
 
     const circleDe: DebugElement = fixture.debugElement;
@@ -208,7 +206,7 @@ describe('CsiValueComponent', () => {
     expect(component.formattedCsiValue).toEqual("n/a");
 
     fixture.detectChanges();
-    const descriptionEl: HTMLElement = fixture.debugElement.query(By.css('.csi-value-text')).nativeElement;
+    const descriptionEl: HTMLElement = fixture.nativeElement.querySelector('.csi-value-text');
     expect(descriptionEl.textContent).toEqual('n/a');
 
     const circleDe: DebugElement = fixture.debugElement;
