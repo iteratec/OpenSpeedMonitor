@@ -1,25 +1,17 @@
 @import "../../../../styles/colors";
 
-.card {
-  margin: 0;
-}
-
 .page-metrics {
   display: flex;
-  flex-direction: row;
 }
 
 osm-csi-value {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1 1 auto;
-  padding: 0 15px;
+  flex: 1 1 0;
+  padding-right: 20px;
 }
 
 .metric-list {
-  flex: 0 1 auto;
-  padding: 0 25px;
+  flex: 1 1 0;
+  padding-left: 20px;
 }
 
 .metric {

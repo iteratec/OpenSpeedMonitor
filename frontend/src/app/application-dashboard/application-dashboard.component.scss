@@ -1,7 +1,7 @@
 
 .main-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
   margin-left: -20px;
 
   h2 {
@@ -24,6 +24,7 @@
     z-index: 2;
     grid-column: 2 / -1;
     margin-bottom: 30px;
+    padding-left: 40px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
