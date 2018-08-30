@@ -1,32 +1,50 @@
 @import "../../../../styles/colors";
 
-.csi-circle-container {
-  position: relative;
-
-  svg {
-    display: block;
-    margin: 0 auto;
+osm-csi-value {
+  .csi-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
-}
 
-.csi-circle-text-container {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
+  .csi-value {
+    position: relative;
 
-.csi-value-text {
-  font-weight: bold;
-  color: $color-text-normal;
-}
+    svg {
+      display: block;
+    }
+  }
 
-.csi-value-description {
-  color: $color-text-medium;
-}
+  .csi-value-text {
+    font-weight: bold;
+    color: $color-text-normal;
+  }
 
-.info-icon {
-  vertical-align: top;
-  color: $color-text-light;
+  .csi-value-description {
+    color: $color-text-medium;
+  }
+
+  .info-icon {
+    position: absolute;
+    right: -0.85em;
+    top: -0.85em;
+    color: $color-text-light;
+
+    &.small {
+      font-size: 0.8em;
+    }
+
+    .fa-circle {
+      font-size: 1.7em;
+    }
+
+    .fa-info {
+      display: block;
+      text-align: center;
+      margin-top: -2em;
+      line-height: 2em;
+      font-size: 0.9em;
+    }
+  }
 }
