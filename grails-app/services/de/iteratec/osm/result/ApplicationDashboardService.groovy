@@ -15,13 +15,11 @@ import org.joda.time.DateTime
 
 @Transactional
 class ApplicationDashboardService {
-
-
     ConfigService configService
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
-
+    
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
@@ -76,12 +74,22 @@ class ApplicationDashboardService {
 
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
+
         return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)
+                .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
+    }
+
+    List<Page> getRecentPagesForJobGroup(Long jobGroupId) {
+        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
+        DateTime to = new DateTime()
+
+        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
+        return pages
     }
 
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
@@ -118,4 +126,29 @@ class ApplicationDashboardService {
 
     }
 
+    List<Map> getAllActivePagesAndMetrics(Long jobGroupId) {
+        List<Map> recentMetrics = getRecentMetricsForJobGroup(jobGroupId).collect {
+            return it.projectedProperties
+        }
+
+        getPagesOfActiveJobs(jobGroupId)
+                .findAll { Page page -> page.name != Page.UNDEFINED }
+                .each { Page page ->
+            Map entry = recentMetrics.find {
+                it.pageId == page.id
+            }
+            if (!entry) {
+                recentMetrics.add(
+                        [
+                                'pageId'  : page.id,
+                                'pageName': page.name
+                        ]
+                )
+            } else {
+                entry.pageName = page.name
+            }
+        }
+
+        return recentMetrics
+    }
 }

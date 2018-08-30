@@ -17,39 +17,3 @@ osm-csi-value {
   flex: 0 1 auto;
   padding: 0 25px;
 }
-
-.metric {
-  margin: 10px 0;
-}
-
-.metric-icon {
-  display: inline-block;
-  width: 25px;
-  text-align: left;
-  font-size: 18px;
-  color: $color-text-medium;
-}
-
-.metric-value {
-  display: inline-block;
-  min-width: 45px;
-  text-align: right;
-  font: {
-    size: 18px;
-    weight: bold;
-  }
-  color: $color-text-medium;
-}
-
-.metric-unit {
-  display: inline-block;
-  margin-left: 3px;
-  font-size: 14px;
-  color: $color-text-medium;
-}
-
-.metric-description {
-  min-width: 120px;
-  font-size: 12px;
-  color: $color-text-light;
-}
