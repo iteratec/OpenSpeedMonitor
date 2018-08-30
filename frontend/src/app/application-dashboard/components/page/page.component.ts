@@ -6,6 +6,7 @@ import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../shared/utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
+import {Metrics} from "../../../shared/enums/metric.enum";
 
 @Component({
   selector: 'osm-page',
@@ -18,6 +19,8 @@ export class PageComponent {
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
+  metrics = Metrics;
+
 
   constructor(private applicationDashboardService: ApplicationDashboardService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
@@ -39,15 +42,25 @@ export class PageComponent {
     );
   }
 
+
   transform(value: number): string {
-    return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
+    if (value) {
+      return CalculationUtil.toRoundedStringWithFixedDecimals(value, 2);
+    }
+    return "";
   }
 
   convertToMib(value: number): number {
-    return CalculationUtil.convertBytesToMiB(value);
+    if (value) {
+      return CalculationUtil.convertBytesToMiB(value);
+    }
+    return value;
   }
 
   convertMillisecsToSecs(value: number): number {
-    return CalculationUtil.convertMillisecsToSecs(value);
+    if (value) {
+      return CalculationUtil.convertMillisecsToSecs(value);
+    }
+    return value;
   }
 }

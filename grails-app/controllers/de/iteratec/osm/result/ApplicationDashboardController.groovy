@@ -4,7 +4,6 @@ import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -76,11 +75,10 @@ class ApplicationDashboardController {
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
-            it.projectedProperties.pageName = Page.findById(it.pageId).name
-            return it.projectedProperties
-        }
-        return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
+
+        List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
     }
 
     def getAllActiveAndAllRecent() {

@@ -110,7 +110,7 @@ class EventResultQueryBuilder {
         return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
     }
 
-    EventResultQueryBuilder withoutPageIn(List<Page> pages) {
+    EventResultQueryBuilder withoutPagesIn(List<Page> pages) {
         return withAssociatedDomainIdsNotIn(pages.collect { it.ident() }, 'page')
     }
 
