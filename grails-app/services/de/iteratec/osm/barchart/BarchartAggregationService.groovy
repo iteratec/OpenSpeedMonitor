@@ -64,7 +64,7 @@ class BarchartAggregationService {
         if (pages){
             queryBuilder = queryBuilder.withPageIn(pages)
         } else {
-            queryBuilder = queryBuilder.withoutPageIn([Page.findByName(Page.UNDEFINED)])
+            queryBuilder = queryBuilder.withoutPagesIn([Page.findByName(Page.UNDEFINED)])
         }
 
         List<EventResultProjection> eventResultProjections = []

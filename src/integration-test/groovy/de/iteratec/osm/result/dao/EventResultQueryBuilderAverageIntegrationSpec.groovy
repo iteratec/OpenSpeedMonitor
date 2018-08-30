@@ -255,7 +255,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .getAverageData()
 
         then: "the result with excluded page is not included in average"
@@ -362,7 +362,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getAverageData()
 
@@ -471,7 +471,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .getAverageData()
 
         then: "the result with excluded page is not included in averages"

@@ -261,7 +261,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .getMedianData()
 
         then: "only one aggregation is returned"
@@ -376,7 +376,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .getMedianData()
 
         then: "only one aggregation is returned"
@@ -493,7 +493,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         def result = new EventResultQueryBuilder(0, 1000)
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .withoutPageIn([page3])
+                .withoutPagesIn([page3])
                 .getMedianData()
 
         then: "only one aggregation is returned"
