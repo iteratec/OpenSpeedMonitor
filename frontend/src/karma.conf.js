@@ -38,6 +38,6 @@ module.exports = function (config) {
         displayName: 'Chrome Headless for docker'
       }
     },
-    browsers: ['Chrome']
+    browsers: ['ChromeHeadlessForDocker']
   });
 };
