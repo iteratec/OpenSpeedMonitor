@@ -1,4 +1,13 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {arc} from 'd3-shape';
 import {select} from 'd3-selection';
 import {transition} from 'd3-transition';
@@ -9,7 +18,8 @@ import {CsiUtils} from '../../utils/csi-utils';
 @Component({
   selector: 'osm-csi-value',
   templateUrl: './csi-value.component.html',
-  styleUrls: ['./csi-value.component.scss']
+  styleUrls: ['./csi-value.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CsiValueComponent implements OnInit, OnChanges {
   @Input() isBig: boolean;
@@ -117,18 +127,41 @@ export class CsiValueComponent implements OnInit, OnChanges {
       .attr("d", baseCircle)
       .attr("fill", "currentColor")
       .style("opacity", 0.1);
+
     circleGroup
       .append("path")
-      .attr("class", "csi-circle-value")
-      .attr("fill", "currentColor")
+      .attr("class", "csi-circle-foreground")
+      .attr("fill", "currentColor");
+
+    circleGroup
+      .append("text")
+      .attr("class", "csi-value-text")
+      .attr("text-anchor", "middle");
+
+    circleGroup
+      .append("text")
+      .attr("class", "csi-value-description")
+      .attr("text-anchor", "middle");
+
   }
 
   private update(selection: any, start: number) {
     selection
-      .select("path.csi-circle-value")
+      .select("path.csi-circle-foreground")
       .transition()
       .duration(1000)
-      .attrTween("d", this.tweenArc(this.calculateCsiArcTarget(this.csiValue), start))
+      .attrTween("d", this.tweenArc(this.calculateCsiArcTarget(this.csiValue), start));
+
+    selection
+      .select(".csi-value-text")
+      .text(this.formattedCsiValue)
+      .style("font-size", this.valueFontSize + "px");
+
+    selection
+      .select(".csi-value-description")
+      .text(this.description)
+      .style("font-size", this.descriptionFontSize + "px")
+      .attr("dy", this.isBig ? "20" : "15");
   }
 
   private exit(selection: any) {
@@ -149,11 +182,8 @@ export class CsiValueComponent implements OnInit, OnChanges {
   }
 
   private determineClass(csiValue: number): string {
-    if (this.isNA) {
-      return 'not-available';
-    }
-    if (this.isOutdated || this.showLoading) {
-      return 'outdated';
+    if (this.isNA || this.isOutdated || this.showLoading) {
+      return 'neutral';
     }
 
     return CsiUtils.getClassByThresholds(csiValue);
