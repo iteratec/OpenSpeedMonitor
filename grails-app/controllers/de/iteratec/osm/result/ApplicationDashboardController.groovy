@@ -6,6 +6,7 @@ import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
