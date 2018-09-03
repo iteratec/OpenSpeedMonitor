@@ -95,11 +95,14 @@ export class ApplicationDashboardService {
     };
   }
 
-  createCsiConfiguration (applicationDto: ApplicationDTO) {
+  createCsiConfiguration(applicationDto: ApplicationDTO) {
     return this.http.post('/applicationDashboard/rest/createCsiConfiguration', {applicationId: applicationDto.id})
       .subscribe((res: any) => {
         window.location.href = '/csiConfiguration/configurations/' + res.csiConfigurationId
-    });
+      }, catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      }));
   }
 
 }
