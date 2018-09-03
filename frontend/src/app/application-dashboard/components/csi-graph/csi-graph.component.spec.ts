@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CsiGraphComponent } from './csi-graph.component';
+import {CsiGraphComponent} from './csi-graph.component';
+import {SharedMocksModule} from "../../../testing/shared-mocks.module";
 
 describe('CsiGraphComponent', () => {
   let component: CsiGraphComponent;
@@ -8,7 +9,8 @@ describe('CsiGraphComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CsiGraphComponent ]
+      declarations: [CsiGraphComponent],
+      imports: [SharedMocksModule]
     })
     .compileComponents();
   }));

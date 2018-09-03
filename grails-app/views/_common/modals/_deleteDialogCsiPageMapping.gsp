@@ -1,6 +1,3 @@
-<!--
-This is the standard dialog that initiates the delete action.
--->
 <div id="DeleteModal${customPrefix}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel" aria-hidden="true" onshow="OpenSpeedMonitor.postLoaded.setDeleteConfirmationInformations('${controllerLink}');">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -26,9 +23,3 @@ This is the standard dialog that initiates the delete action.
         </div>
     </div>
 </div>
-<asset:script>
-    function changeValueToDelete(value, customPrefix){
-        $('#DeleteModal'+customPrefix).find('#deleteValue').attr("value", value);
-        $('#DeleteModal'+customPrefix).find('#itemConfirm').html("${itemLabel}: " + value);
-    }
-</asset:script>

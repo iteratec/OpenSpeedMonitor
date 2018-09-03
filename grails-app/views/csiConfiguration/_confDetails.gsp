@@ -2,6 +2,7 @@
 <%@ defaultCodec="none" %>
 
 
+<g:set var="defaultIdentifier" value='default_csi_mappings'/>
 %{-- nav tabs for the mapping and the weights --}%
 <ul id="csiConfigurationDetailsTabs" class="nav nav-tabs">
     <li class="active">
@@ -77,22 +78,25 @@
                             <div class="row">
                                 %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
                                 <g:render template="/chart/csi-mappings"
-                                              model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
-                                                        'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                                                        'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+                                          model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
+                                                    'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                                                    'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
                                 <div class="col-md-4">
-                                    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-                                        <button href="#" type="button" class="btn btn-primary"
-                                                style="display: none;"
-                                                id="removePageMapping"
-                                                onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping')}',
+                                    <g:if test="${!hideDeleteMappingButton}">
+                                        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                                            <button href="#" type="button" class="btn btn-primary"
+                                                    style="display: none;"
+                                                    id="removePageMapping"
+                                                    onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping')}',
                                                         actualCsiConfigurationId);">
-                                            <g:message
-                                                    code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
-                                                    default="Remove Mapping"/>
-                                        </button>
-                                        <div id="page-mapping-deletions"></div>
-                                    </sec:ifAllGranted>
+                                                <g:message
+                                                        code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
+                                                        default="Remove Mapping"/>
+                                            </button>
+
+                                            <div id="page-mapping-deletions"></div>
+                                        </sec:ifAllGranted>
+                                    </g:if>
                                 </div>
                             </div>
                         </g:if>
@@ -122,8 +126,6 @@
                                 </div>
                             </div>
 
-                            <g:set var="defaultIdentifier" value='default_csi_mappings'/>
-
                             <div class="row">
                                 %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
                                 <g:render template="/chart/csi-mappings"
@@ -146,6 +148,7 @@
                                                         code="de.iteratec.ism.label.upload_default_mappings"
                                                         default="Neue Default-Mappings hochladen (CSV)"/>
                                             </label>
+
                                             <div class="input-group">
                                                 <span class="input-group-btn">
                                                     <a class="btn btn-default"
@@ -197,7 +200,7 @@
                                                     default="Delete Default Mapping"/>
                                         </button>
                                     </g:if>
-                                    <g:render template="/_common/modals/deleteDialogCustomAction"
+                                    <g:render template="/_common/modals/deleteDialogCsiPageMapping"
                                               model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
                                     <g:if test="${!readOnly}">
                                         <g:render template="/_common/modals/chooseCsiMapping"
@@ -245,7 +248,8 @@
                                         <i class="fas fa-folderpen-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
-                                <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text" readonly>
+                                <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text"
+                                       readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
                                         <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
@@ -417,7 +421,7 @@
     };
 
     var prepareConfigurationListAndCopy = function(){
-        return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
+        return copyCsiConfiguration(${(csiConfigurations ?: [:]) as grails.converters.JSON})
     };
 
     var legendEntryClickCallback = function(nameOfClickedLegendEntry){
@@ -439,13 +443,22 @@
         $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
         $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
         changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
+
+    }
+
+    function changeValueToDelete(value, customPrefix){
+        var deleteModal = $('#DeleteModal'+customPrefix);
+        if (deleteModal){
+            deleteModal.find('#deleteValue').attr("value", value);
+            deleteModal.find('#itemConfirm').html("${itemLabel}: " + value);
+        }
     }
 
     function showMappingDialog(){
-        %{-- Resize the modal dialog because the width of the chart is initialized with half the width of the screen --}%
-        var newModalWidth = parseFloat($('#csiMappingModalDialogSVG').attr('width'));
-        $('#csiMappingModalDialog').width(newModalWidth);
-        var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
+%{-- Resize the modal dialog because the width of the chart is initialized with half the width of the screen --}%
+    var newModalWidth = parseFloat($('#csiMappingModalDialogSVG').attr('width'));
+    $('#csiMappingModalDialog').width(newModalWidth);
+    var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
     }
 
@@ -454,7 +467,7 @@
         spinner.start();
     }
 
-    %{-- show the nav tab anchor id as hash in the url --}%
+%{-- show the nav tab anchor id as hash in the url --}%
     $('#csiConfigurationDetailsTabs > li > a').on('shown.bs.tab', function (e) {
         scrollposition = $(document).scrollTop();
         var id = $(e.target).attr('href').substr(1);
@@ -463,15 +476,15 @@
     });
 
     $(function () {
-        %{-- if passed, show the given nav tab at the start --}%
-        var hash = window.location.hash;
-        $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {
-        $(document).scrollTop();
-        });
+%{-- if passed, show the given nav tab at the start --}%
+    var hash = window.location.hash;
+    $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {
+    $(document).scrollTop();
+    });
 
-        registerEventHandlers();
+    registerEventHandlers();
 
-        createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
+    createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
         createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
         createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
 

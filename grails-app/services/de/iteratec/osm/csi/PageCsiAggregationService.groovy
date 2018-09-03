@@ -27,6 +27,8 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.joda.time.DateTime
 
+import java.util.concurrent.locks.ReentrantLock
+
 class PageCsiAggregationService {
 
     EventCsiAggregationService eventCsiAggregationService
@@ -36,6 +38,9 @@ class PageCsiAggregationService {
     CsiAggregationUtilService csiAggregationUtilService
     CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+    private final ReentrantLock lock = new ReentrantLock()
+    /** We need to avoid calculating the same page CsiAggregations from different threads. */
+    private final MapWithDefault<Long, ReentrantLock> locksByJobGroupId = [:].withDefault { new ReentrantLock() }
 
     /**
      * <p>
@@ -117,22 +122,29 @@ class PageCsiAggregationService {
 
         DateTime currentDateTime = fromDateTime
         List<Long> allCsiAggregationIds = []
+        try {
+            csiGroups.each {JobGroup jobGroup -> locksByJobGroupId[jobGroup.ident()].lockInterruptibly()}
+            while (!currentDateTime.isAfter(toDateTime)) {
+                List<Long> pageCsiAggregationIds
+                List<Long> pageCsiAggregationIdsToCalculate
 
-        while (!currentDateTime.isAfter(toDateTime)) {
-            List<Long> pageCsiAggregationIds
-            List<Long> pageCsiAggregationIdsToCalculate
-            pageCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups, pages)
-            pageCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(pageCsiAggregationIds)
+                pageCsiAggregationIds = ensurePresence(currentDateTime, interval, csiGroups, pages)
+                pageCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(pageCsiAggregationIds)
 
-            if (pageCsiAggregationIdsToCalculate)
-                calcCsiAggregations(pageCsiAggregationIdsToCalculate)
+                if (pageCsiAggregationIdsToCalculate) {
+                    calcCsiAggregations(pageCsiAggregationIdsToCalculate)
+                }
 
-            allCsiAggregationIds.addAll(pageCsiAggregationIds)
+                allCsiAggregationIds.addAll(pageCsiAggregationIds)
+                currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
+            }
 
-            currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
+            return CsiAggregation.getAll(allCsiAggregationIds)
 
+        } finally {
+            csiGroups.each {locksByJobGroupId[it.ident()].unlock()}
         }
-        return CsiAggregation.getAll(allCsiAggregationIds)
+
     }
 
     /**
@@ -148,8 +160,7 @@ class PageCsiAggregationService {
 
         jobGroups.each { currentJobGroup ->
             pages.each { currentPage ->
-                CsiAggregation csiAggregation
-                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroupAndPage(startDate.toDate(), interval, AggregationType.PAGE, currentJobGroup, currentPage)
+                CsiAggregation csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregationTypeAndJobGroupAndPage(startDate.toDate(), interval, AggregationType.PAGE, currentJobGroup, currentPage)
                 if (!csiAggregation) {
                     csiAggregation = new CsiAggregation(
                             started: startDate.toDate(),
@@ -159,9 +170,8 @@ class PageCsiAggregationService {
                             page: currentPage,
                             csByWptDocCompleteInPercent: null,
                             underlyingEventResultsByWptDocComplete: ''
-                    ).save(failOnError: true, flush: true)
+                    ).save(failOnError: true)
                 }
-
                 result << csiAggregation.id
             }
         }
