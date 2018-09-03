@@ -10,6 +10,6 @@
     <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">Configure CSI Configuration</a>
   </div>
   <div *ngIf="errorCase === 4">
-    <a href="/job" class="info-button">Check Measurements</a>
+    <a href="/job/index/#/jobGroup={{selectedApplication.name}}" class="info-button">Check Measurements</a>
   </div>
 </div>
