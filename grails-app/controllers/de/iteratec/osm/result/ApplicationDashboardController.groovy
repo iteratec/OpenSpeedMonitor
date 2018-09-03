@@ -3,6 +3,8 @@ package de.iteratec.osm.result
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -20,7 +22,7 @@ class ApplicationDashboardController {
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     JobGroupService jobGroupService
 
-    def getPagesForApplication(PagesForApplicationCommand command) {
+    def getPagesForApplication(DefaultApplicationCommand command) {
 
         DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
         DateTime to = new DateTime()
@@ -30,7 +32,7 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }
 
-    def getCsiValuesForApplication(PagesForApplicationCommand command) {
+    def getCsiValuesForApplication(DefaultApplicationCommand command) {
         ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
 
@@ -77,7 +79,7 @@ class ApplicationDashboardController {
         }
     }
 
-    def getCsiValuesForPages(PagesForApplicationCommand command) {
+    def getCsiValuesForPages(DefaultApplicationCommand command) {
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
         List<PageCsiDto> pageCsiDtos = []
         if (selectedJobGroup.hasCsiConfiguration()) {
@@ -86,7 +88,7 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }
 
-    def getMetricsForApplication(PagesForApplicationCommand command) {
+    def getMetricsForApplication(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
         List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
             it.projectedProperties.pageName = Page.findById(it.pageId).name
@@ -100,9 +102,30 @@ class ApplicationDashboardController {
 
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
+
+    def createCsiConfiguration (DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+
+        if (jobGroup.hasCsiConfiguration()){
+            return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId: jobGroup.csiConfiguration.id])
+        }
+        CsiConfiguration csiConfiguration
+        csiConfiguration = CsiConfiguration.findByLabel(jobGroup.name)
+        if (!csiConfiguration) {
+            csiConfiguration = new CsiConfiguration(
+                    label: jobGroup.name,
+                    description: "Initial CSI configuration for JobGroup ${jobGroup.name}",
+                    csiDay: CsiDay.findAll()[0]
+            )
+        }
+        jobGroup.csiConfiguration = csiConfiguration
+        jobGroup.save(failOnError: true, flush: true)
+        return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId : csiConfiguration.id])
+    }
 }
 
-class PagesForApplicationCommand implements Validateable {
+class DefaultApplicationCommand implements Validateable {
     Long applicationId
 
     static constraints = {

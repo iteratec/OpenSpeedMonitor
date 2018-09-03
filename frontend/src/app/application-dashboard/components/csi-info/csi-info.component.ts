@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {ApplicationDTO} from "../../models/application.model";
+import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 
 @Component({
   selector: 'osm-csi-info',
@@ -15,6 +16,9 @@ export class CsiInfoComponent implements OnChanges {
   errorCase: number;
   infoText: string;
   iconClass: string;
+
+  constructor(private applicationDashboardService: ApplicationDashboardService) {
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.selectedApplication);
@@ -43,6 +47,10 @@ export class CsiInfoComponent implements OnChanges {
     // Case 1: Application has not been measured
     this.iconClass = 'icon-info fas fa-info-circle';
     return 'This application has not been measured yet.'
+  }
+
+  private createCsiConfiguration () {
+    this.applicationDashboardService.createCsiConfiguration(this.selectedApplication);
   }
 
 }
