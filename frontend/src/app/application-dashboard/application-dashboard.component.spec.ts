@@ -8,6 +8,7 @@ import {SharedMocksModule} from '../testing/shared-mocks.module';
 import {ApplicationDashboardService} from './services/application-dashboard.service';
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
 import {PageMetricComponent} from "./components/page-metric/page-metric.component";
+import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -20,6 +21,7 @@ describe('ApplicationDashboardComponent', () => {
         PageComponent,
         CsiValueComponent,
         CsiGraphComponent,
+        CsiInfoComponent,
         ApplicationSelectComponent,
         PageMetricComponent
       ],
