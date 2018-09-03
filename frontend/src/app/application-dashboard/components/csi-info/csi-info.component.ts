@@ -21,7 +21,6 @@ export class CsiInfoComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(this.selectedApplication);
     this.infoText = this.setInformation();
   }
 
