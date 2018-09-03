@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CsiInfoComponent } from './csi-info.component';
+import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {SharedMocksModule} from "../../../testing/shared-mocks.module";
 
 describe('CsiInfoComponent', () => {
   let component: CsiInfoComponent;
@@ -8,7 +10,15 @@ describe('CsiInfoComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CsiInfoComponent ]
+      declarations: [
+        CsiInfoComponent
+      ],
+      imports: [
+        SharedMocksModule
+      ],
+      providers: [
+        ApplicationDashboardService
+      ]
     })
     .compileComponents();
   }));
