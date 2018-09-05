@@ -1,19 +1,11 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
 import {arc} from 'd3-shape';
 import {select} from 'd3-selection';
 import {transition} from 'd3-transition';
 import {interpolate} from 'd3-interpolate';
 import {CalculationUtil} from '../../../shared/utils/calculation.util';
 import {CsiUtils} from '../../utils/csi-utils';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'osm-csi-value',
@@ -33,33 +25,36 @@ export class CsiValueComponent implements OnInit, OnChanges {
   csiValueClass: string;
   size: number;
   outerRadius: number;
-  valueFontSize: string;
-  descriptionFontSize: string;
   isNA: boolean;
   isOutdated: boolean;
+  hint: string;
+  padding = 5;
 
   arcGenerator: any;
   @ViewChild("svg") svgElement: ElementRef;
 
-  constructor() {
+  constructor(private translateService: TranslateService) {
     transition() // needed for the import statement
   }
 
   ngOnInit(): void {
     this.initByInputs();
-    this.drawCircle();
+    this.updateComponent();
   }
 
-  private drawCircle(previousCsiValue: number = 0) {
-    this.setFontSize();
-    const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
+  private updateComponent(previousCsiValue: number = 0) {
     this.isNA = !this.csiValue && this.csiValue !== 0;
-    this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
     this.isOutdated = CsiUtils.isCsiOutdated(this.csiDate, this.lastResultDate);
+    this.csiValue = this.isNA ? 0 : CalculationUtil.round(this.csiValue);
     this.formattedCsiValue = this.formatCsiValue(this.csiValue);
     this.csiValueClass = this.determineClass(this.csiValue);
-    this.updateDescription();
+    this.description = this.getDescription();
+    this.hint = this.getHint();
+    this.drawCircle(previousCsiValue);
+  }
 
+  private drawCircle(previousCsiValue) {
+    const calculatedPreviousCsi = this.calculateCsiArcTarget(CalculationUtil.round(previousCsiValue));
     const selection = select(this.svgElement.nativeElement).selectAll("g.csi-circle").data([this.csiValue]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()), calculatedPreviousCsi);
@@ -83,24 +78,11 @@ export class CsiValueComponent implements OnInit, OnChanges {
     if (!this.description) {
       this.description = "CSI";
     }
-    if (this.isBig) {
-      this.size = 150;
-    } else {
-      this.size = 75;
-    }
-    this.outerRadius = this.size / 2;
+    const diameter = this.isBig ? 150 : 76;
+    this.size = diameter + 2 * this.padding;
+    this.outerRadius = diameter / 2;
     let innerRadius = this.outerRadius - this.outerRadius * 0.15;
     this.arcGenerator = this.getArcGenerator(innerRadius, this.outerRadius);
-  }
-
-  private setFontSize() {
-    if (this.isBig) {
-      this.valueFontSize = this.showLoading ? '24' : '34';
-      this.descriptionFontSize = '14';
-    } else {
-      this.valueFontSize = this.showLoading ? '10' : '18';
-      this.descriptionFontSize = '12';
-    }
   }
 
   private getArcGenerator(innerRadius: number, outerRadius: number) {
@@ -119,7 +101,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
     const circleGroup = selection
       .append("g")
       .attr("class", "csi-circle")
-      .attr("transform", `translate(${this.outerRadius},${this.outerRadius})`);
+      .attr('transform', `translate(${(this.outerRadius + this.padding)},${(this.outerRadius + this.padding)})`);
 
     circleGroup
       .append("path")
@@ -132,17 +114,6 @@ export class CsiValueComponent implements OnInit, OnChanges {
       .append("path")
       .attr("class", "csi-circle-foreground")
       .attr("fill", "currentColor");
-
-    circleGroup
-      .append("text")
-      .attr("class", "csi-value-text")
-      .attr("text-anchor", "middle");
-
-    circleGroup
-      .append("text")
-      .attr("class", "csi-value-description")
-      .attr("text-anchor", "middle");
-
   }
 
   private update(selection: any, start: number) {
@@ -151,17 +122,6 @@ export class CsiValueComponent implements OnInit, OnChanges {
       .transition()
       .duration(1000)
       .attrTween("d", this.tweenArc(this.calculateCsiArcTarget(this.csiValue), start));
-
-    selection
-      .select(".csi-value-text")
-      .text(this.formattedCsiValue)
-      .style("font-size", this.valueFontSize + "px");
-
-    selection
-      .select(".csi-value-description")
-      .text(this.description)
-      .style("font-size", this.descriptionFontSize + "px")
-      .attr("dy", this.isBig ? "20" : "15");
   }
 
   private exit(selection: any) {
@@ -189,18 +149,29 @@ export class CsiValueComponent implements OnInit, OnChanges {
     return CsiUtils.getClassByThresholds(csiValue);
   }
 
-  private updateDescription() {
-    if (this.isBig && new Date().toISOString().substring(0, 10) > this.csiDate) {
-      this.description = CalculationUtil.toGermanDateFormat(this.csiDate);
-    } else if (!this.isBig) {
-      this.description = 'CSI';
-    } else {
-      this.description = 'today';
-    }
+  private isBeforeToday(isoDate: string) {
+    return new Date().toISOString().substring(0, 10) > isoDate;
   }
 
-  toGermanDateFormat(date: string): string {
-    return CalculationUtil.toGermanDateFormat(date);
+  private getDescription() {
+    if (this.isBig && this.isBeforeToday(this.csiDate)) {
+      return CalculationUtil.toGermanDateFormat(this.csiDate);
+    }
+    if (!this.isBig) {
+      return 'CSI';
+    }
+    return 'today';
+  }
+
+  private getHint() {
+    const dateParams = {date: CalculationUtil.toGermanDateFormat(this.csiDate)};
+    if (this.isOutdated) {
+      return this.translateService.instant('frontend.de.iteratec.osm.applicationDashboard.csi-older-than-results', dateParams);
+    }
+    if (this.isBeforeToday(this.csiDate)) {
+      return this.translateService.instant('frontend.de.iteratec.osm.applicationDashboard.outdated-results', dateParams);
+    }
+    return '';
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -208,7 +179,7 @@ export class CsiValueComponent implements OnInit, OnChanges {
       return;
     }
     if (changes.csiValue) {
-      this.drawCircle(changes.csiValue.previousValue);
+      this.updateComponent(changes.csiValue.previousValue);
     }
   }
 }
