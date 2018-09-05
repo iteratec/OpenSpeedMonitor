@@ -61,9 +61,8 @@ class ApplicationDashboardController {
                 List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(selectedJobGroup), fourWeeksAgo)
                 if (jobResults) {
                     applicationCsiListDto.hasJobResults = true
-                    applicationCsiListDto.hasInvalidJobResults = jobResults.every {it.wptStatus ? true : false}
-                }
-                else {
+                    applicationCsiListDto.hasInvalidJobResults = jobResults.every { it.wptStatus ? true : false }
+                } else {
                     applicationCsiListDto.hasJobResults = false
                 }
             }
@@ -101,25 +100,11 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
 
-    def createCsiConfiguration (DefaultApplicationCommand command) {
+    def createCsiConfiguration(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        Long csiConfigurationId = applicationDashboardService.createOrReturnCsiConfiguration(jobGroupId)
 
-        if (jobGroup.hasCsiConfiguration()){
-            return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId: jobGroup.csiConfiguration.id])
-        }
-        CsiConfiguration csiConfiguration
-        csiConfiguration = CsiConfiguration.findByLabel(jobGroup.name)
-        if (!csiConfiguration) {
-            csiConfiguration = new CsiConfiguration(
-                    label: jobGroup.name,
-                    description: "Initial CSI configuration for JobGroup ${jobGroup.name}",
-                    csiDay: CsiDay.findAll()[0]
-            )
-        }
-        jobGroup.csiConfiguration = csiConfiguration
-        jobGroup.save(failOnError: true, flush: true)
-        return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId : csiConfiguration.id])
+        return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId: csiConfigurationId])
     }
 }
 
