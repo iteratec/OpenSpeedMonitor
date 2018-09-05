@@ -1,10 +1,10 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {CsiValueComponent} from './csi-value.component';
-import {DebugElement} from "@angular/core";
-import {By} from "@angular/platform-browser";
-import {TranslateModule} from "@ngx-translate/core";
-import {CalculationUtil} from "../../../shared/utils/calculation.util";
+import {DebugElement} from '@angular/core';
+import {By} from '@angular/platform-browser';
+import {TranslateModule} from '@ngx-translate/core';
+import {CalculationUtil} from '../../../shared/utils/calculation.util';
 
 describe('CsiValueComponent', () => {
   let component: CsiValueComponent;
@@ -85,30 +85,24 @@ describe('CsiValueComponent', () => {
     expect(svgDe.classes.okay).toBeFalsy();
     expect(svgDe.classes.good).toBeTruthy();
   });
-
   it('should be small by default', ()=>{
-    const expectedSize: number = 75;
-    expect(component.size).toBe(expectedSize);
-    const expectedValueFontSize: string = '18';
-    expect(component.valueFontSize).toBe(expectedValueFontSize);
-    const expectedDescriptionFontSize: string = '12';
-    expect(component.descriptionFontSize).toBe(expectedDescriptionFontSize);
-
+    const expectedSize: number = 86;
     const containerEl: HTMLElement = fixture.nativeElement.querySelector('svg');
+    const container: DebugElement = fixture.debugElement.query(By.css('.csi-value-container'));
+
+    expect(container.classes.big).toBeFalsy();
+    expect(component.size).toBe(expectedSize);
     expect(containerEl.clientWidth).toBe(expectedSize);
   });
   it('should be big if set', ()=>{
     component.isBig = true;
     component.ngOnInit();
-
-    const expectedSize: number = 150;
-    expect(component.size).toBe(expectedSize);
-    const expectedValueFontSize: string = '34';
-    expect(component.valueFontSize).toBe(expectedValueFontSize);
-    const expectedDescriptionFontSize: string = '14';
-    expect(component.descriptionFontSize).toBe(expectedDescriptionFontSize);
-
+    const container: DebugElement = fixture.debugElement.query(By.css('.csi-value-container'));
+    const expectedSize: number = 160;
     fixture.detectChanges();
+
+    expect(component.size).toBe(expectedSize);
+    expect(container.classes.big).toBeTruthy();
     const containerEl: HTMLElement = fixture.nativeElement.querySelector('svg');
     expect(containerEl.clientWidth).toBe(expectedSize);
   });
