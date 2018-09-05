@@ -48,7 +48,7 @@ export class CsiInfoComponent implements OnChanges {
     return 'This application has not been measured yet.'
   }
 
-  private createCsiConfiguration () {
+  createCsiConfiguration () {
     this.applicationDashboardService.createCsiConfiguration(this.selectedApplication);
   }
 
