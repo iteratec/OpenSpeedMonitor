@@ -40,7 +40,7 @@ install:
 
 jobs:
   include:
-  - stage: Tests
+#  - stage: Tests
 #    name: "unitTests"
 #    script:
 #    - ./gradlew -x jasmineRun -x angularTests test
