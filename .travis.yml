@@ -73,5 +73,4 @@ jobs:
       on:
         branch: feature/travisDockerBuild
     after_success:
-    - sudo chmod +x /scripts/ci/deploy/travis_curltrigger.sh;
-    - sudo ./scripts/ci/deploy/travis_curltrigger.sh;
+    - ./scripts/ci/deploy/travis_curltrigger.sh;
