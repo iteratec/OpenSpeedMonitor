@@ -69,7 +69,7 @@ jobs:
 #          docker build -t iteratec/openspeedmonitor . ;
 #          docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:develop;
 #          docker push iteratec/openspeedmonitor:develop;
+          ./scripts/ci/deploy/travis_curltrigger.sh;
           git stash -u; # in order to prevent double checking of cached resources
       on:
         branch: feature/travisDockerBuild
-    after_success: ./scripts/ci/deploy/travis_curltrigger.sh
