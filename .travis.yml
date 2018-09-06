@@ -72,6 +72,6 @@ jobs:
           git stash -u; # in order to prevent double checking of cached resources
       on:
         branch: feature/travisDockerBuild
-      after_success:
-      - sudo chmod +x /scripts/ci/deploy/travis_curltrigger.sh;
-      - sudo ./scripts/ci/deploy/travis_curltrigger.sh;
+    after_success:
+    - sudo chmod +x /scripts/ci/deploy/travis_curltrigger.sh;
+    - sudo ./scripts/ci/deploy/travis_curltrigger.sh;
