@@ -40,37 +40,36 @@ install:
 
 jobs:
   include:
-#  - stage: Tests
-#    name: "unitTests"
-#    script:
-#    - ./gradlew -x jasmineRun -x angularTests test
-#  - name: "integrationTests"
-#    script:
-#    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
-#  - name: "gebTests"
-#    script:
-#    - whereis google-chrome-stable
-#    - whereis chromedriver
-#    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
-#  - name: "jasmineTests"
-#    script:
-#    - ./gradlew jasmineRun
-#  - name: "angularTests"
-#    script:
-#    - ./gradlew angularTests
+  - stage: Tests
+    name: "unitTests"
+    script:
+    - ./gradlew -x jasmineRun -x angularTests test
+  - name: "integrationTests"
+    script:
+    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+  - name: "gebTests"
+    script:
+    - whereis google-chrome-stable
+    - whereis chromedriver
+    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+  - name: "jasmineTests"
+    script:
+    - ./gradlew jasmineRun
+  - name: "angularTests"
+    script:
+    - ./gradlew angularTests
   - stage: Build and Push Docker Image
     script: skip # You do not want to run the tests again
     deploy:
       provider: script
       script:
-#          groovy scripts/ci/building/set_new_versionnumber_travis_dev;
-#          ./gradlew assemble;
-#          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-#          docker build -t iteratec/openspeedmonitor . ;
-#          docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:develop;
-#          docker push iteratec/openspeedmonitor:develop;
+          groovy scripts/ci/building/set_new_versionnumber_travis_dev;
+          ./gradlew assemble;
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+          docker build -t iteratec/openspeedmonitor:develop;
+          docker push iteratec/openspeedmonitor:develop;
           git stash -u; # in order to prevent double checking of cached resources
       on:
-        branch: feature/travisDockerBuild
+        branch: develop
     after_success:
     - ./scripts/ci/deploy/travis_curltrigger.sh;
