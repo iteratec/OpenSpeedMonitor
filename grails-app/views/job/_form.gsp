@@ -12,8 +12,14 @@
       <a id="scriptTabLink" href="#scriptTab" data-toggle="tab"><g:message code="job.form.script.label" default="Script"/></a>
     </li>
     <li>
-      <a id="advancedSettingsTabLink" href="#advancedSettingsTab" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced Settings"/></a>
+      <a id="advancedSettingsTabLink" href="#advancedSettingsTab" data-toggle="tab"><g:message
+              code="job.form.advanced.label" default="Advanced Settings"/></a>
     </li>
+    <li>
+      <a id="thresholdsTabLink" href="#thresholdsTab" data-toggle="tab"><g:message code="job.form.threshold.label"
+                                                                                   default="Thresholds"/></a>
+    </li>
+
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="jobSettingsTab" >
@@ -24,6 +30,9 @@
     </div>
     <div class="tab-pane" id="advancedSettingsTab" >
       <g:render template="advancedSettingsTab" model="${['job': job, 'globalUserAgentSuffix': globalUserAgentSuffix]}" />
+    </div>
+    <div class="tab-pane" id="thresholdsTab">
+      <g:render template="thresholdsTab" model="${['job': job]}"/>
     </div>
   </div>
 </div>

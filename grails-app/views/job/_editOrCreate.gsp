@@ -120,18 +120,15 @@
                             editor.update();
                         });
                         $('#script').trigger('change');
-
-                        if (${job?.id != null}) {
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdVue.js"/>', "thresholdVue");
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdComponents/buttonVue.js"/>', "buttonVue");
-                        }
                     });
 
                     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });
     </asset:script>
+    <asset:javascript src="frontend/runtime.js"/>
+    <asset:javascript src="frontend/polyfills.js"/>
+    <asset:javascript src="frontend/main.js"/>
 </content>
 </body>
 </html>
