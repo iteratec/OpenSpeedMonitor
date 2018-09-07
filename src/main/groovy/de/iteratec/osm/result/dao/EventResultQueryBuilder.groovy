@@ -110,6 +110,10 @@ class EventResultQueryBuilder {
         return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
     }
 
+    EventResultQueryBuilder withoutPagesIn(List<Page> pages) {
+        return withAssociatedDomainIdsNotIn(pages.collect { it.ident() }, 'page')
+    }
+
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
         filters.add({
             'eq' 'cachedView', cachedView
@@ -152,6 +156,16 @@ class EventResultQueryBuilder {
             if (project) {
                 return withProjectedIdForAssociatedDomain(associatedDomainFieldName)
             }
+        }
+        return this
+    }
+
+    private EventResultQueryBuilder withAssociatedDomainIdsNotIn(List<Long> associatedDomainIds, String associatedDomainFieldName) {
+        if (associatedDomainIds) {
+            Closure filterClosure = {
+                not {'in' "${associatedDomainFieldName}.id", associatedDomainIds}
+            }
+            filters.add(filterClosure)
         }
         return this
     }

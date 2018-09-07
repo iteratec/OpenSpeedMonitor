@@ -16,4 +16,12 @@ export class CalculationUtil {
   static toRoundedStringWithFixedDecimals(value: number, decimals: number): string {
     return this.round(value).toFixed(decimals);
   }
+
+  static toGermanDateFormat(date: string): string {
+    let currentDate: Date = new Date(date);
+    let monthString: string = currentDate.getMonth() < 9 ? '0' + (currentDate.getMonth() + 1) : (currentDate.getMonth() + 1).toString();
+    let dayString: string = currentDate.getDate() < 10 ? '0' + currentDate.getDate() : currentDate.getDate().toString();
+
+    return dayString + "." + monthString + "." + currentDate.getFullYear();
+  }
 }

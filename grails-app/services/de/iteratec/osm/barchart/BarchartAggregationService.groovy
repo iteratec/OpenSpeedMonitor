@@ -60,7 +60,12 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands(selectedMeasurands)
                 .withJobGroupIn(jobGroups)
-                .withPageIn(pages)
+
+        if (pages){
+            queryBuilder = queryBuilder.withPageIn(pages)
+        } else {
+            queryBuilder = queryBuilder.withoutPagesIn([Page.findByName(Page.UNDEFINED)])
+        }
 
         List<EventResultProjection> eventResultProjections = []
         switch(selectedAggregationValue) {

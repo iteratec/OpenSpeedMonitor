@@ -1,5 +1,5 @@
 import {scaleLinear, ScaleLinear, scaleTime, ScaleTime} from 'd3-scale';
-import {area, Area, curveLinear, line, Line} from 'd3-shape';
+import {area, Area, curveCatmullRom, line, Line} from 'd3-shape';
 import {CsiDTO} from '../../models/csi.model';
 import {CSI_MAX, CSI_MIN} from '../../utils/csi-utils';
 
@@ -42,23 +42,25 @@ export class CsiGraphCalculator {
 
   private getLineGenerator(): Line<CsiDTO> {
     return line<CsiDTO>()
-      .curve(curveLinear)
+      .curve(curveCatmullRom)
       .x((csiDTO: CsiDTO) => this.calculateX(csiDTO))
       .y((csiDTO: CsiDTO) => this.calculateY(csiDTO))
   }
 
   private getAreaGenerator(): Area<CsiDTO> {
     return area<CsiDTO>()
+      .curve(curveCatmullRom)
       .x((csiDTO: CsiDTO) => this.calculateX(csiDTO))
       .y1((csiDTO: CsiDTO) => this.calculateY(csiDTO))
       .y0(this.yScale(0))
   }
 
-  private calculateX(csiDTO: CsiDTO): number {
-    return this.xScale(CsiGraphCalculator.dayStart(new Date(csiDTO.date)));
+  calculateX(csiDTO: CsiDTO): number {
+    const date: Date = csiDTO ? new Date(csiDTO.date) : new Date();
+    return this.xScale(CsiGraphCalculator.dayStart(date));
   }
 
-  private calculateY(csiDTO: CsiDTO): number {
-    return this.yScale(csiDTO.csiDocComplete);
+  calculateY(csiDTO: CsiDTO): number {
+    return this.yScale(csiDTO ? csiDTO.csiDocComplete : 0);
   }
 }

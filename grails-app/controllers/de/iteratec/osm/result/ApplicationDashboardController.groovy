@@ -75,11 +75,10 @@ class ApplicationDashboardController {
 
     def getMetricsForApplication(PagesForApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
-            it.projectedProperties
-        }
 
-        return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
+        List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
     }
 
     def getAllActiveAndAllRecent() {
