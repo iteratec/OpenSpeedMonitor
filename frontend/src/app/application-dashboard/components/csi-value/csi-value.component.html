@@ -1,11 +1,9 @@
-<div class="csi-value-container">
-  <div class="csi-value" title="{{ isOutdated ?
-               ('frontend.de.iteratec.osm.applicationDashboard.outdated.hint' | translate:{ date: toGermanDateFormat(csiDate) })
-               :'' }}">
+<div class="csi-value-container" [ngClass]="{big: isBig, loading: showLoading, hint: !!hint}">
+  <div class="csi-value">
+    <span class="csi-value-text">{{this.formattedCsiValue}}</span>
+    <span class="csi-value-description">{{this.description}}</span>
+  </div>
+  <div class="hint-container" [title]="hint">
     <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass"></svg>
-    <span *ngIf="isOutdated" class="info-icon" [ngClass]="{small: !isBig}">
-      <i class="far fa-circle"></i>
-      <i class="fas fa-info"></i>
-    </span>
   </div>
 </div>
