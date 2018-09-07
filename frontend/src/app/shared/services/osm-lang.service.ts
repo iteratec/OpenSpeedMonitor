@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable} from "@angular/core";
 import {GrailsBridgeService} from "./grails-bridge.service";
 
 @Injectable()
@@ -8,6 +8,12 @@ export class OsmLangService {
   }
 
   getOsmLang(): string {
-    return this.grailsBridgeService.globalOsmNamespace.i18n.lang;
+    if (this.grailsBridgeService.globalOsmNamespace &&
+      this.grailsBridgeService.globalOsmNamespace.i18n) {
+      return this.grailsBridgeService.globalOsmNamespace.i18n.lang;
+    } else {
+      return undefined;
+    }
+
   }
 }

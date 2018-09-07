@@ -1,0 +1,22 @@
+.threshold-row {
+  display: flex;
+  justify-content: flex-start;
+  align-content: center;
+  line-height: 2;
+
+  > * {
+    margin-right: 5px;
+  }
+
+  span {
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.15em;
+  }
+}
+
+.input-group {
+  max-width: 9.4em;
+  margin-right: 5px;
+  flex-shrink: 0;
+}

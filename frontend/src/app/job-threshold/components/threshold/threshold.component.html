@@ -1,0 +1,14 @@
+<label *ngIf="!threshold?.isNew">{{threshold?.measurand?.translationsKey | translate}} </label>
+<select *ngIf="threshold?.isNew" class="form-control" [(ngModel)]="selectedMeasurand" required>
+  <option *ngFor="let measurand of unusedMeasurands" [value]="measurand?.translationsKey">
+    {{measurand.translationsKey | translate}}
+  </option>
+</select>
+<osm-threshold-row
+  [isNew]="threshold?.isNew"
+  [lowerBoundary]="threshold?.lowerBoundary"
+  [upperBoundary]="threshold?.upperBoundary"
+  (editThreshold)="edit($event)"
+  (deleteThreshold)="delete()"
+  (saveNew)="saveNew($event)"
+  (cancelNew)="cancelNew()"></osm-threshold-row>

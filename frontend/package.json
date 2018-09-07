@@ -6,8 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --prod",
-    "test": "ng test --watch=false",
-    "test:watch": "ng test --watch",
+    "test": "ng test --watch=false --sourceMap=false",
+    "test:watch": "ng test --watch --sourceMap=false",
     "lint": "ng lint"
   },
   "private": true,
