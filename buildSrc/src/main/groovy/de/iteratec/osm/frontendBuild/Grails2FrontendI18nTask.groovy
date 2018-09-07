@@ -25,7 +25,7 @@ class Grails2FrontendI18nTask extends DefaultTask {
             String frontendBundleName = grails2FrontendBundles[grailsMsgBundleFile.getName()]
             if (frontendBundleName){
                 Properties grailsMsgBundle = new Properties()
-                grailsMsgBundle.load(grailsMsgBundleFile.newDataInputStream())
+                grailsMsgBundle.load(grailsMsgBundleFile.newReader("UTF-8"))
                 File frontendBundle = new File(pathFrontendI18nFolder + frontendBundleName)
                 frontendBundle << new JsonBuilder(grailsMsgBundle.findAll {it.key.startsWith(frontendKeyPrefix)})
                         .toPrettyString()
