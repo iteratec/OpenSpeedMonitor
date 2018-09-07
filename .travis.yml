@@ -40,24 +40,24 @@ install:
 
 jobs:
   include:
-#  - stage: Tests
-#    name: "unitTests"
-#    script:
-#    - ./gradlew -x jasmineRun -x angularTests test
-#  - name: "integrationTests"
-#    script:
-#    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
-#  - name: "gebTests"
-#    script:
-#    - whereis google-chrome-stable
-#    - whereis chromedriver
-#    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
-#  - name: "jasmineTests"
-#    script:
-#    - ./gradlew jasmineRun
-#  - name: "angularTests"
-#    script:
-#    - ./gradlew angularTests
+  - stage: Tests
+    name: "unitTests"
+    script:
+    - ./gradlew -x jasmineRun -x angularTests test
+  - name: "integrationTests"
+    script:
+    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+  - name: "gebTests"
+    script:
+    - whereis google-chrome-stable
+    - whereis chromedriver
+    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+  - name: "jasmineTests"
+    script:
+    - ./gradlew jasmineRun
+  - name: "angularTests"
+    script:
+    - ./gradlew angularTests
   - stage: Build and Push Docker Image
     script: skip # You do not want to run the tests again
     deploy:
@@ -71,4 +71,4 @@ jobs:
           curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
           git stash -u; # in order to prevent double checking of cached resources
       on:
-        branch:   feature/travisDockerBuild
+        branch:   develop
