@@ -66,7 +66,7 @@ jobs:
           groovy scripts/ci/building/set_new_versionnumber_travis_dev;
           ./gradlew assemble;
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-          docker build -t iteratec/openspeedmonitor:develop;
+          docker build -t iteratec/openspeedmonitor:develop .;
           docker push iteratec/openspeedmonitor:develop;
           curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
           git stash -u; # in order to prevent double checking of cached resources
