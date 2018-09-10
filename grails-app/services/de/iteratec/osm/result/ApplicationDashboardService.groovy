@@ -166,7 +166,7 @@ class ApplicationDashboardService {
             csiConfiguration = new CsiConfiguration(
                     label: jobGroup.name,
                     description: "Initial CSI configuration for JobGroup ${jobGroup.name}",
-                    csiDay: CsiDay.findAll()[0]
+                    csiDay: CsiDay.first()
             )
         }
         jobGroup.csiConfiguration = csiConfiguration

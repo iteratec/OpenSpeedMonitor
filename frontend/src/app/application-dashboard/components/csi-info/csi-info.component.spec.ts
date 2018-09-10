@@ -66,7 +66,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBeUndefined();
+    expect(component.errorCase).toBe(1);
     expect(component.iconClass).toEqual(infoIconClass);
     expect(component.infoText).toEqual(caseOneText);
 

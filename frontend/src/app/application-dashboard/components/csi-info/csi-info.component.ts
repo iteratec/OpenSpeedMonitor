@@ -44,6 +44,7 @@ export class CsiInfoComponent implements OnChanges {
       return 'The configuration of the customer satisfaction index (CSI) does not produce a CSI value for this application or there are no new measurements since the CSI configuration has been updated.'
     }
     // Case 1: Application has not been measured
+    this.errorCase = 1;
     this.iconClass = 'icon-info fas fa-info-circle';
     return 'This application has not been measured yet.'
   }
