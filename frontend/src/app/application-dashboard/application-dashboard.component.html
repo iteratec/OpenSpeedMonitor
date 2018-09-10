@@ -9,7 +9,17 @@
   <osm-csi-value [csiValue]="(recentCsiValue$ | async)?.csiDocComplete" [csiDate]="recentCsiDate$ | async"
                  [showLoading]="isLoading" [isBig]="true"
                  [lastResultDate]="selectedApplication.dateOfLastResults" class="card"></osm-csi-value>
-  <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async" class="card"></osm-csi-graph>
+
+  <div *ngIf="!isLoading && !(csiValues$ | async)?.csiDtoList.length; then showInfo else showGraph"></div>
+
+  <ng-template #showInfo>
+    <osm-csi-info [csiData]="csiValues$ | async" [selectedApplication]="selectedApplication" class="card"></osm-csi-info>
+  </ng-template>
+
+  <ng-template #showGraph>
+    <osm-csi-graph [csiData]="csiValues$ | async" [recentCsiData]="recentCsiValue$ | async" class="card"></osm-csi-graph>
+  </ng-template>
+
   <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric"
             [lastDateOfResult]="selectedApplication.dateOfLastResults" class="card"></osm-page>
 </div>

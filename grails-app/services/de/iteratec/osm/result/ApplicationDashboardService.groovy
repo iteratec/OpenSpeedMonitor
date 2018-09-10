@@ -3,6 +3,8 @@ package de.iteratec.osm.result
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
@@ -19,7 +21,7 @@ class ApplicationDashboardService {
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
-    
+
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
         def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
         def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
@@ -150,5 +152,25 @@ class ApplicationDashboardService {
         }
 
         return recentMetrics
+    }
+
+    def createOrReturnCsiConfiguration(Long jobGroupId) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+
+        if (jobGroup.hasCsiConfiguration()) {
+            return jobGroup.csiConfiguration.id
+        }
+        CsiConfiguration csiConfiguration
+        csiConfiguration = CsiConfiguration.findByLabel(jobGroup.name)
+        if (!csiConfiguration) {
+            csiConfiguration = new CsiConfiguration(
+                    label: jobGroup.name,
+                    description: "Initial CSI configuration for JobGroup ${jobGroup.name}",
+                    csiDay: CsiDay.first()
+            )
+        }
+        jobGroup.csiConfiguration = csiConfiguration
+        jobGroup.save(failOnError: true, flush: true)
+        return csiConfiguration.id
     }
 }
