@@ -9,6 +9,7 @@ import {RouterModule, Routes} from "@angular/router";
 import {CsiValueComponent} from "./components/csi-value/csi-value.component";
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
 import {PageMetricComponent} from './components/page-metric/page-metric.component';
+import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -27,6 +28,7 @@ const DashboardRoutes: Routes = [
     PageComponent,
     CsiValueComponent,
     CsiGraphComponent,
+    CsiInfoComponent,
     PageMetricComponent
   ],
   exports: [

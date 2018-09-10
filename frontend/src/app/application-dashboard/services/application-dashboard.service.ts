@@ -7,6 +7,7 @@ import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
 import {catchError, map, switchMap} from "rxjs/internal/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
+import {error} from "util";
 
 @Injectable()
 export class ApplicationDashboardService {
@@ -57,6 +58,8 @@ export class ApplicationDashboardService {
       data: {
         csiDtoList: [{csiDocComplete: 0, csiVisComplete: 0, date: null}],
         hasCsiConfiguration: false,
+        hasInvalidJobResults: false,
+        hasJobResults: false,
       },
       isLoading: true
     });
@@ -82,7 +85,6 @@ export class ApplicationDashboardService {
     );
   }
 
-
   private handleError(error: any) {
     console.log(error);
   }
@@ -91,6 +93,16 @@ export class ApplicationDashboardService {
     return {
       applicationId: applicationId ? applicationId.toString() : ""
     };
+  }
+
+  createCsiConfiguration(applicationDto: ApplicationDTO) {
+    return this.http.post('/applicationDashboard/rest/createCsiConfiguration', {applicationId: applicationDto.id})
+      .subscribe((res: any) => {
+        window.location.href = '/csiConfiguration/configurations/' + res.csiConfigurationId
+      }, catchError((error) => {
+        this.handleError(error);
+        return EMPTY;
+      }));
   }
 
 }

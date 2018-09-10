@@ -1,6 +1,7 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
@@ -20,6 +21,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     Page page1, page2, page3, pageUndefined
     Job job1
     Script script1
+    CsiConfiguration existingCsiConfiguration
 
     private static final String NAVIGATION_SCRIPT =
             "setEventName\tHomepage:::Homepage\n" +
@@ -174,6 +176,22 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         recentMeasuredPages.size() == 0
         activePages.size() == 0
         allActiveOrMeasuredPages.size() == 0
+    }
+
+    void "create a new inital csi for a job group if none exists"() {
+        given: "one JobGroup without and one JobGroup with CSI Configuration"
+        existingCsiConfiguration = CsiConfiguration.build()
+        jobGroup1.csiConfiguration = existingCsiConfiguration
+        jobGroup1.save(failOnError: true, flush: true)
+
+        when: "the application service creates a csi configuration for a job group if none exists"
+        def csiConfigurationId1 = applicationDashboardService.createOrReturnCsiConfiguration(jobGroup1.id)
+        def csiConfigurationId2 = applicationDashboardService.createOrReturnCsiConfiguration(jobGroup2.id)
+
+        then: "a csi has been created for the jobgroup which had none"
+        jobGroup1.csiConfiguration.id == csiConfigurationId1
+        JobGroup jobGroupWithCreatedCsiConfiguration = JobGroup.findById(jobGroup2.id)
+        jobGroupWithCreatedCsiConfiguration.csiConfiguration.id == csiConfigurationId2
     }
 
     private void createTestDataCommonForAllTests() {
