@@ -4,8 +4,10 @@
     OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
     OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 
+    var language = '${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}'
+
     OpenSpeedMonitor.i18n = {
-      lang: '${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}',
+        lang: language ? language : navigator.language.substr(0, 2),
         duplicatePrompt: '${message(code: 'de.iteratec.actions.duplicate.prompt')}',
         duplicateSuffix: '${message(code: 'de.iteratec.actions.duplicate.copy')}',
         deletionConfirmMessage: '${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}',
