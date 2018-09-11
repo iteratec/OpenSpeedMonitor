@@ -17,6 +17,7 @@ import {CsiGraphCalculator} from './csi-graph.calculator';
 import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../utils/csi-utils';
 import {select} from "d3-selection";
 import {TranslateService} from "@ngx-translate/core";
+import {take} from "rxjs/operators";
 
 
 @Component({
@@ -78,7 +79,6 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
     csiGraph
       .append("text")
       .attr("class", "title")
-      .text(this.translationService.instant("frontend.de.iteratec.osm.applicationDashboard.kpi.graph.title"))
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central");
 
@@ -119,6 +119,13 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
   }
 
   private update(selection: any) {
+
+    this.translationService.get("frontend.de.iteratec.osm.applicationDashboard.kpi.graph.title").pipe(take(1)).subscribe(title => {
+      selection
+        .select("text.title")
+        .text(title)
+    });
+
     selection
       .select('.csi-graph')
       .attr('transform', `translate(${this.marginLeft},${this.marginTop + 1})`);
