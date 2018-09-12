@@ -68,7 +68,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(1);
+    expect(component.errorCase).toBe('notMeasured');
     expect(component.iconClass).toEqual(infoIconClass);
     expect(component.infoText).toEqual(caseOneText);
 
@@ -92,7 +92,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(2);
+    expect(component.errorCase).toBe('noCsiConfig');
     expect(component.iconClass).toEqual(infoIconClass);
     expect(component.infoText).toEqual(caseTwoText);
 
@@ -117,7 +117,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(3);
+    expect(component.errorCase).toBe('noCsiValue');
     expect(component.iconClass).toEqual(warningIconClass);
     expect(component.infoText).toEqual(caseThreeText);
 
@@ -142,7 +142,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(4);
+    expect(component.errorCase).toBe('invalidMeasurement');
     expect(component.iconClass).toEqual(warningIconClass);
     expect(component.infoText).toEqual(caseFourText);
 
