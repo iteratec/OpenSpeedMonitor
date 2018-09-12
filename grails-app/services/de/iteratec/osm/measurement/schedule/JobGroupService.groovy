@@ -71,18 +71,23 @@ class JobGroupService {
         allActiveAndRecent.addAll(recentJobGroups)
 
         List allActiveAndRecentFormattedJobGroups = new ArrayList()
-        recentJobGroups.each {
+        allActiveAndRecent.each {
             def name = it.name
-            List<JobResult> lastDateOfResult = (List<JobResult>) JobResult.createCriteria().list(max: 1) {
+            JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
                 eq("jobGroupName", name)
                 order("date", "desc")
+            }[0]
+
+            def formattedLastDateOfResult
+            if (lastDateOfResult) {
+                formattedLastDateOfResult = lastDateOfResult.date?.format("yyyy-MM-dd")
             }
 
             allActiveAndRecentFormattedJobGroups.add(
                     [
                             id                : it.id,
                             name              : it.name,
-                            dateOfLastResults : lastDateOfResult?.get(0)?.date?.format("yyyy-MM-dd"),
+                            dateOfLastResults : formattedLastDateOfResult,
                             csiConfigurationId: it.csiConfigurationId
                     ]
             )
