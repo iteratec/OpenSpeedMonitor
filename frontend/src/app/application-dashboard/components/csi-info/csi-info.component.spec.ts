@@ -9,16 +9,15 @@ describe('CsiInfoComponent', () => {
   let fixture: ComponentFixture<CsiInfoComponent>;
   let applicationDashboardService: ApplicationDashboardService;
 
-  let caseOneText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
-  let caseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
-  let caseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiValue';
-  let caseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.invalidMeasurement';
-  let buttonCaseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiConfig';
-  let buttonCaseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiValue';
-  let buttonCaseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement';
-
-  let infoIconClass = 'icon-info fas fa-info-circle';
-  let warningIconClass = 'icon-warning fas fa-exclamation-triangle';
+  const caseOneText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
+  const caseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
+  const caseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiValue';
+  const caseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.invalidMeasurement';
+  const buttonCaseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiConfig';
+  const buttonCaseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiValue';
+  const buttonCaseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement';
+  const infoIconClass = 'icon-info fas fa-info-circle';
+  const warningIconClass = 'icon-warning fas fa-exclamation-triangle';
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
