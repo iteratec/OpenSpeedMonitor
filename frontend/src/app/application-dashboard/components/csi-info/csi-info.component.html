@@ -4,12 +4,12 @@
     <div class="info-text">{{ infoText }}</div>
   </div>
   <div *ngIf="errorCase === 2">
-    <a (click)="createCsiConfiguration()" class="info-button">Create CSI Configuration</a>
+    <a (click)="createCsiConfiguration()" class="info-button">{{ buttonText }}</a>
   </div>
   <div *ngIf="errorCase === 3">
-    <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">Configure CSI Configuration</a>
+    <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">{{ buttonText }}</a>
   </div>
   <div *ngIf="errorCase === 4">
-    <a href="/job/#/jobGroup={{selectedApplication.name}}" class="info-button">Check Measurements</a>
+    <a href="/job/#/jobGroup={{ selectedApplication.name }}" class="info-button">{{ buttonText }}</a>
   </div>
 </div>
