@@ -10,6 +10,7 @@
     <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">{{ 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiValue' | translate }}</a>
   </div>
   <div *ngIf="errorCase === 'invalidMeasurement'">
-    <a href="/job/#/jobGroup={{ selectedApplication.name }}" class="info-button">{{ 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement' | translate }}</a>
+    <a href="/job/index#/jobGroup={{ selectedApplication.name }}" class="info-button">{{
+      'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement' | translate }}</a>
   </div>
 </div>
