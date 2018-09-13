@@ -84,7 +84,7 @@ jobs:
 #          docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
           sudo chmod +x scripts/ci/building/read_version.sh;
-          ./scripts/ci/building/read_version.sh;
+          bash scripts/ci/building/read_version.sh;
       on:
         branch: feature/travisRelease
 
