@@ -59,6 +59,7 @@ jobs:
 #    script:
 #    - ./gradlew angularTests
   - stage: Build and Push Docker Image for Develop
+    if: branch = develop
     script: skip # You do not want to run the tests again
     deploy:
       provider: script
@@ -73,6 +74,7 @@ jobs:
       on:
         branch:   develop
   - stage: Build and Push Docker Image for Release
+    if: branch = feature/travisRelease
     script: skip
     deploy:
       provider: script
