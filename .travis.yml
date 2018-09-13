@@ -84,7 +84,7 @@ jobs:
 #          docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
           sudo chmod +x scripts/ci/building/push_and_tag_dockerimage_travis.sh;
-          bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
+#          bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS
           git stash -u;
           #     merge release into dev after success
