@@ -56,18 +56,6 @@ else
       git tag "v${jira_version}"
       echo "git push --tags $remote HEAD:refs/heads/release"
       git push --tags $remote HEAD:refs/heads/release
-
-      echo "merge version update commit from release to develop branch and push that"
-      echo "########################################'"
-      echo "git checkout develop"
-      git checkout develop
-      echo "git merge release"
-      git merge release
-      echo "git pull $remote develop"
-      git pull $remote develop
-      echo "git push $remote HEAD:refs/heads/develop"
-      git push $remote HEAD:refs/heads/develop
-
     else
       echo 'Wrong branch. Committing only into the release branch.'
     fi
