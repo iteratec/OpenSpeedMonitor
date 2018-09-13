@@ -82,7 +82,7 @@ jobs:
 #          docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
           sudo chmod +x /scripts/ci/building/read_version.sh;
-#          . ./scripts/ci/building/read_version.sh;
+          source ./scripts/ci/building/read_version.sh;
 #          tagAndPush () {
 #            tag=$1
 #            echo tag
