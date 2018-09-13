@@ -59,7 +59,6 @@ jobs:
 #    script:
 #    - ./gradlew angularTests
   - stage: Build and Push Docker Image for Develop
-    if: branch = develop
     script: skip # You do not want to run the tests again
     deploy:
       provider: script
