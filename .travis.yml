@@ -89,9 +89,9 @@ jobs:
             # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
             # docker push iteratec/openspeedmonitor:$tag
           };
-#          tagAndPush $app_version_major;
-#          tagAndPush $app_version_minor;
-#          tagAndPush $app_version_patch;
+          tagAndPush $app_version_major;
+          tagAndPush $app_version_minor;
+          tagAndPush $app_version_patch;
           tagAndPush "latest";
 
 #          trigger bamboo deployment for release
