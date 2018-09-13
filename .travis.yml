@@ -72,29 +72,29 @@ jobs:
           git stash -u; # in order to prevent double checking of cached resources
       on:
         branch:   develop
-#  - stage: Build and Push Docker Image for Release
-#    script: skip
-#    deploy:
-#      provider: script
-#      script:
-##          ./gradlew assemble;
-##          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-##          docker build iteratec/openspeedmonitor .;
-#          groovy scripts/ci/building/set_new_versionnumber;
+  - stage: Build and Push Docker Image for Release
+    script: skip
+    deploy:
+      provider: script
+      script:
+#          ./gradlew assemble;
+#          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+#          docker build iteratec/openspeedmonitor .;
+          groovy scripts/ci/building/set_new_versionnumber;
 #          sudo chmod +x /scripts/ci/building/read_version.sh;
 #          . ./scripts/ci/building/read_version.sh;
-##          tagAndPush () {
-##            tag=$1
-##            echo tag
-##            # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
-##            # docker push iteratec/openspeedmonitor:$tag
-##          };
+#          tagAndPush () {
+#            tag=$1
+#            echo tag
+#            # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
+#            # docker push iteratec/openspeedmonitor:$tag
+#          };
 #          tagAndPush $app_version_major;
 #          tagAndPush $app_version_minor;
 #          tagAndPush $app_version_patch;
 #          tagAndPush "latest";
-#      on:
-#        branch: feature/travisRelease
+      on:
+        branch: feature/travisRelease
 
 #          trigger bamboo deployment for release
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
