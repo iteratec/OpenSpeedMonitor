@@ -13,7 +13,7 @@ export class CsiInfoComponent implements OnChanges {
   @Input() csiData: ApplicationCsiListDTO;
   @Input() selectedApplication: ApplicationDTO;
 
-  errorCase: number;
+  errorCase: string;
   infoText: string;
   iconClass: string;
 
@@ -21,32 +21,32 @@ export class CsiInfoComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.infoText = this.setInformation();
+    this.setInformation();
   }
 
-  private setInformation () {
+  private setInformation (): void {
     if (!this.csiData.hasCsiConfiguration) {
-      // Case 2: No CSI configuration for application
-      this.errorCase = 2;
+      this.errorCase = 'noCsiConfig';
+      this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
       this.iconClass = 'icon-info fas fa-info-circle';
-      return 'The calculation of the customer satisfaction index (CSI) is not configured for this application.'
+      return
     }
     if (this.csiData.hasJobResults) {
       if (this.csiData.hasInvalidJobResults) {
-        // Case 4: Measurements have errors
-        this.errorCase = 4;
+        this.errorCase = 'invalidMeasurement';
+        this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.invalidMeasurement';
         this.iconClass = 'icon-warning fas fa-exclamation-triangle';
-        return 'The measurements are not working properly.'
+        return
       }
-      // Case 3: CSI config and job results but no csi value
-      this.errorCase = 3;
+      this.errorCase = 'noCsiValue';
       this.iconClass = 'icon-warning fas fa-exclamation-triangle';
-      return 'The configuration of the customer satisfaction index (CSI) does not produce a CSI value for this application or there are no new measurements since the CSI configuration has been updated.'
+      this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiValue';
+      return
     }
-    // Case 1: Application has not been measured
-    this.errorCase = 1;
+    this.errorCase = 'notMeasured';
+    this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
     this.iconClass = 'icon-info fas fa-info-circle';
-    return 'This application has not been measured yet.'
+    return
   }
 
   createCsiConfiguration () {

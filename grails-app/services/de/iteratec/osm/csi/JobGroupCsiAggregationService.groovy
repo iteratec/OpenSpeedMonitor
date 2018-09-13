@@ -198,8 +198,8 @@ class JobGroupCsiAggregationService {
             if (weightedCsiValuesVisuallyComplete.size() > 0) {
                 toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
             }
+            toBeCalculated.save(failOnError: true, flush: true)
             csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-            toBeCalculated.save(failOnError: true)
         }
         return csiAggregationsToCalculate
     }
