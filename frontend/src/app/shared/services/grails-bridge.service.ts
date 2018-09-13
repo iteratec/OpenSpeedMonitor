@@ -9,5 +9,4 @@ export class GrailsBridgeService {
 
   constructor() {
   }
-
 }
