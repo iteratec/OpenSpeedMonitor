@@ -83,6 +83,8 @@ jobs:
           groovy scripts/ci/building/set_new_versionnumber;
           sudo chmod +x /scripts/ci/building/read_version.sh;
           ./scripts/ci/building/read_version.sh;
+      on:
+        branch: feature/travisRelease
 
 #          trigger bamboo deployment for release
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
