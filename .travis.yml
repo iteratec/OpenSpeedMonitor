@@ -71,6 +71,8 @@ jobs:
           docker push iteratec/openspeedmonitor:develop;
           curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
           git stash -u; # in order to prevent double checking of cached resources
+      on:
+        branch: develop
   - stage: Build and Push Docker Image for Release
     if: branch = feature/travisRelease
     script: skip
@@ -81,7 +83,7 @@ jobs:
 #          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
 #          docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
-          sudo chmod +x /scripts/ci/building/read_version.sh;
+          sudo chmod +x scripts/ci/building/read_version.sh;
           ./scripts/ci/building/read_version.sh;
       on:
         branch: feature/travisRelease
