@@ -2,12 +2,13 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
+import de.iteratec.osm.result.JobResult
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@Build([JobGroup, CsiConfiguration])
+@Build([JobGroup, CsiConfiguration, JobResult, Job])
 class JobGroupServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<JobGroupService> {
     void setupSpec() {
         mockDomains(JobGroup, CsiConfiguration, CsiDay)
