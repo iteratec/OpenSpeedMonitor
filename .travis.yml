@@ -83,12 +83,12 @@ jobs:
           groovy scripts/ci/building/set_new_versionnumber;
           sudo chmod +x /scripts/ci/building/read_version.sh;
           source ./scripts/ci/building/read_version.sh;
-#          function tagAndPush {
-#            tag=$1
-#            echo tag
-#            # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
-#            # docker push iteratec/openspeedmonitor:$tag
-#          };
+          function tagAndPush {
+            tag=$1
+            echo tag
+            # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
+            # docker push iteratec/openspeedmonitor:$tag
+          };
           tagAndPush $app_version_major;
           tagAndPush $app_version_minor;
           tagAndPush $app_version_patch;
