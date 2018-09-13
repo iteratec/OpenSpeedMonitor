@@ -92,7 +92,7 @@ jobs:
 #          tagAndPush $app_version_major;
 #          tagAndPush $app_version_minor;
 #          tagAndPush $app_version_patch;
-#          tagAndPush "latest";
+          tagAndPush "latest";
 
 #          trigger bamboo deployment for release
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
