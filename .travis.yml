@@ -71,8 +71,9 @@ jobs:
           docker push iteratec/openspeedmonitor:develop;
           curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
           git stash -u; # in order to prevent double checking of cached resources
+      on:
+        branch:   develop
   - stage: Build and Push Docker Image for Release
-    if: branch = feature/travisRelease
     script: skip
     deploy:
       provider: script
@@ -93,6 +94,8 @@ jobs:
           tagAndPush $app_version_minor;
           tagAndPush $app_version_patch;
           tagAndPush "latest";
+      on:
+        branch: feature/travisRelease
 
 #          trigger bamboo deployment for release
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
