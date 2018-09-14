@@ -30,34 +30,34 @@ addons:
   chrome: stable
 
 # Install ChromeDriver
-#install:
-#  - wget -N https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -P ~/
-#  - unzip ~/chromedriver_linux64.zip -d ~/
-#  - rm ~/chromedriver_linux64.zip
-#  - sudo mv -f ~/chromedriver /usr/local/share/
-#  - sudo chmod +x /usr/local/share/chromedriver
-#  - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
+install:
+  - wget -N https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -P ~/
+  - unzip ~/chromedriver_linux64.zip -d ~/
+  - rm ~/chromedriver_linux64.zip
+  - sudo mv -f ~/chromedriver /usr/local/share/
+  - sudo chmod +x /usr/local/share/chromedriver
+  - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
 
 jobs:
   include:
-#  - stage: Tests
-#    name: "unitTests"
-#    script:
-#    - ./gradlew -x jasmineRun -x angularTests test
-#  - name: "integrationTests"
-#    script:
-#    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
-#  - name: "gebTests"
-#    script:
-#    - whereis google-chrome-stable
-#    - whereis chromedriver
-#    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
-#  - name: "jasmineTests"
-#    script:
-#    - ./gradlew jasmineRun
-#  - name: "angularTests"
-#    script:
-#    - ./gradlew angularTests
+  - stage: Tests
+    name: "unitTests"
+    script:
+    - ./gradlew -x jasmineRun -x angularTests test
+  - name: "integrationTests"
+    script:
+    - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+  - name: "gebTests"
+    script:
+    - whereis google-chrome-stable
+    - whereis chromedriver
+    - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+  - name: "jasmineTests"
+    script:
+    - ./gradlew jasmineRun
+  - name: "angularTests"
+    script:
+    - ./gradlew angularTests
   - stage: Build and Push Docker Image for Develop
     if: branch = develop
     script: skip # You do not want to run the tests again
@@ -84,7 +84,7 @@ jobs:
           docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
           bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
-          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS
+          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
           git stash -u;
           bash scripts/ci/building/merge_release_into_dev_and_master.sh;
       on:
