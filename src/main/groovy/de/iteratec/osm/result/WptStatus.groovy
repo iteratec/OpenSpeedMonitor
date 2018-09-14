@@ -22,4 +22,8 @@ enum WptStatus{
     int getWptStatusCode(){
         return statusCode
     }
+
+    static boolean isFailed(Integer httpStatusCode) {
+        return httpStatusCode > 200 && httpStatusCode < 99999
+    }
 }
