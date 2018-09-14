@@ -83,14 +83,16 @@ class JobGroupService {
                 formattedLastDateOfResult = lastDateOfResult.date?.format("yyyy-MM-dd")
             }
 
-            allActiveAndRecentFormattedJobGroups.add(
-                    [
-                            id                : it.id,
-                            name              : it.name,
-                            dateOfLastResults : formattedLastDateOfResult,
-                            csiConfigurationId: it.csiConfigurationId
-                    ]
-            )
+            if (!allActiveAndRecentFormattedJobGroups.find { jobGroup -> jobGroup.id == it.id }) {
+                allActiveAndRecentFormattedJobGroups.add(
+                        [
+                                id                : it.id,
+                                name              : it.name,
+                                dateOfLastResults : formattedLastDateOfResult,
+                                csiConfigurationId: it.csiConfigurationId
+                        ]
+                )
+            }
         }
 
         return allActiveAndRecentFormattedJobGroups
