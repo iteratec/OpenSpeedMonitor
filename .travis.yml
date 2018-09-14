@@ -74,21 +74,19 @@ jobs:
       on:
         branch: develop
   - stage: Build and Push Docker Image for Release
-    if: branch = feature/travisRelease
+    if: branch = release
     script: skip
     deploy:
       provider: script
       script:
-#          ./gradlew assemble;
-#          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-#          docker build iteratec/openspeedmonitor .;
+          ./gradlew assemble;
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+          docker build iteratec/openspeedmonitor .;
           groovy scripts/ci/building/set_new_versionnumber;
           bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
+          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS
+          git stash -u;
           bash scripts/ci/building/merge_release_into_dev_and_master.sh;
-#          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS
-#          git stash -u;
-          #     merge release into dev after success
-          #     merge release into master after success
       on:
-        branch: feature/travisRelease
+        branch: release
 
