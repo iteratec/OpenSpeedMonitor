@@ -86,6 +86,7 @@ jobs:
           bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS
 #          git stash -u;
+          git checkout develop;
           #     merge release into dev after success
           #     merge release into master after success
       on:
