@@ -9,13 +9,15 @@ describe('CsiInfoComponent', () => {
   let fixture: ComponentFixture<CsiInfoComponent>;
   let applicationDashboardService: ApplicationDashboardService;
 
-  let caseOneText = 'This application has not been measured yet.';
-  let caseTwoText = 'The calculation of the customer satisfaction index (CSI) is not configured for this application.';
-  let caseThreeText = 'The configuration of the customer satisfaction index (CSI) does not produce a CSI value for this application or there are no new measurements since the CSI configuration has been updated.';
-  let caseFourText = 'The measurements are not working properly.';
-
-  let infoIconClass = 'icon-info fas fa-info-circle';
-  let warningIconClass = 'icon-warning fas fa-exclamation-triangle';
+  const caseOneText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
+  const caseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
+  const caseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiValue';
+  const caseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.invalidMeasurement';
+  const buttonCaseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiConfig';
+  const buttonCaseThreeText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiValue';
+  const buttonCaseFourText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement';
+  const infoIconClass = 'icon-info fas fa-info-circle';
+  const warningIconClass = 'icon-warning fas fa-exclamation-triangle';
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -66,7 +68,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(1);
+    expect(component.errorCase).toBe('notMeasured');
     expect(component.iconClass).toEqual(infoIconClass);
     expect(component.infoText).toEqual(caseOneText);
 
@@ -90,7 +92,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(2);
+    expect(component.errorCase).toBe('noCsiConfig');
     expect(component.iconClass).toEqual(infoIconClass);
     expect(component.infoText).toEqual(caseTwoText);
 
@@ -101,7 +103,7 @@ describe('CsiInfoComponent', () => {
     const infoIconEl: HTMLElement = fixture.nativeElement.querySelector('.icon-info');
     expect(infoIconEl.className).toEqual(infoIconClass);
     const infoButtonEl: HTMLElement = fixture.nativeElement.querySelector('.info-button');
-    expect(infoButtonEl.textContent).toEqual('Create CSI Configuration');
+    expect(infoButtonEl.textContent).toEqual(buttonCaseTwoText);
   });
 
   it('should show message that no csi results exist and an option to go to related configuration (case 3)', () => {
@@ -115,7 +117,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(3);
+    expect(component.errorCase).toBe('noCsiValue');
     expect(component.iconClass).toEqual(warningIconClass);
     expect(component.infoText).toEqual(caseThreeText);
 
@@ -126,7 +128,7 @@ describe('CsiInfoComponent', () => {
     const infoIconEl: HTMLElement = fixture.nativeElement.querySelector('.icon-warning');
     expect(infoIconEl.className).toEqual(warningIconClass);
     const infoButtonEl: HTMLElement = fixture.nativeElement.querySelector('.info-button');
-    expect(infoButtonEl.textContent).toEqual('Configure CSI Configuration');
+    expect(infoButtonEl.textContent).toEqual(buttonCaseThreeText);
     expect(infoButtonEl.attributes.getNamedItem('href').value).toEqual('/csiConfiguration/configurations/8');
   });
 
@@ -140,7 +142,7 @@ describe('CsiInfoComponent', () => {
 
     component.ngOnChanges({});
 
-    expect(component.errorCase).toBe(4);
+    expect(component.errorCase).toBe('invalidMeasurement');
     expect(component.iconClass).toEqual(warningIconClass);
     expect(component.infoText).toEqual(caseFourText);
 
@@ -151,7 +153,7 @@ describe('CsiInfoComponent', () => {
     const infoIconEl: HTMLElement = fixture.nativeElement.querySelector('.icon-warning');
     expect(infoIconEl.className).toEqual(warningIconClass);
     const infoButtonEl: HTMLElement = fixture.nativeElement.querySelector('.info-button');
-    expect(infoButtonEl.textContent).toEqual('Check Measurements');
+    expect(infoButtonEl.textContent).toEqual(buttonCaseFourText);
     expect(infoButtonEl.attributes.getNamedItem('href').value).toEqual('/job/#/jobGroup=Example');
   });
 
