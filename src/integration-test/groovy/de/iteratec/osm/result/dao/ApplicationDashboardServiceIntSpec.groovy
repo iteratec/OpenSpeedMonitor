@@ -1,14 +1,18 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.ApplicationDashboardService
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
@@ -20,6 +24,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     JobGroup jobGroup1, jobGroup2
     Page page1, page2, page3, pageUndefined
     Job job1
+    JobResult jobResult1, jobResult2
     Script script1
     CsiConfiguration existingCsiConfiguration
 
@@ -192,6 +197,36 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         jobGroup1.csiConfiguration.id == csiConfigurationId1
         JobGroup jobGroupWithCreatedCsiConfiguration = JobGroup.findById(jobGroup2.id)
         jobGroupWithCreatedCsiConfiguration.csiConfiguration.id == csiConfigurationId2
+    }
+
+    void "return error for invalid JobResults if all JobResults are invalid"() {
+        given: "two JobResults with an error"
+        existingCsiConfiguration = CsiConfiguration.build()
+        CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
+        jobGroup1.csiConfiguration = existingCsiConfiguration
+        jobResult1 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+
+        when: "the application service tests for errors"
+        ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
+
+        then: "an error is returned, all JobResults are invalid"
+        applicationCsiDto.hasInvalidJobResults
+    }
+
+    void "return no error for invalid JobResults if not all JobResults are invalid"() {
+        given: "one JobResult without and one with error"
+        existingCsiConfiguration = CsiConfiguration.build()
+        CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
+        jobGroup1.csiConfiguration = existingCsiConfiguration
+        jobResult1 = JobResult.build(httpStatusCode: WptStatus.SUCCESSFUL.getWptStatusCode(), job: job1)
+        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+
+        when: "the application service tests for errors"
+        ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
+
+        then: "no error is returned, not all JobResults are invalid"
+        !applicationCsiDto.hasInvalidJobResults
     }
 
     private void createTestDataCommonForAllTests() {
