@@ -12,6 +12,9 @@ language: groovy
 jdk:
   - openjdk8
 
+services:
+  - docker
+
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
 install: true
@@ -55,4 +58,17 @@ jobs:
   - name: "angularTests"
     script:
     - ./gradlew angularTests
-
+  - stage: Build and Push Docker Image
+    script: skip # You do not want to run the tests again
+    deploy:
+      provider: script
+      script:
+          groovy scripts/ci/building/set_new_versionnumber_travis_dev;
+          ./gradlew assemble;
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+          docker build -t iteratec/openspeedmonitor:develop .;
+          docker push iteratec/openspeedmonitor:develop;
+          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
+          git stash -u; # in order to prevent double checking of cached resources
+      on:
+        branch:   develop

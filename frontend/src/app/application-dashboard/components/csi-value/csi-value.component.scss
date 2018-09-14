@@ -1,33 +1,74 @@
 @import "../../../../styles/colors";
 
-.csi-circle-container {
-  position: relative;
-  display: inline-block;
-}
+osm-csi-value {
+  .csi-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
 
-.csi-circle-text-container {
-  position: absolute;
-  display: inline-block;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
+    svg {
+      display: block;
+    }
+  }
 
-.csi-value-text {
-  font-weight: bold;
-  color: $color-text-normal;
-}
+  .csi-value-text, .csi-value-description {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 5;
+  }
 
-.csi-value-description {
-  color: $color-text-medium;
-}
+  .csi-value-text {
+    font-weight: bold;
+    color: $color-text-normal;
+    font-size: 18px;
+    line-height: 0;
+    bottom: 50%;
 
-.not-available {
-  color: $color-text-medium;
-}
+    &::after {
+      // this way the text is positioned by its baseline
+      content: "";
+      display: inline-block;
+    }
+  }
+  .csi-value-description {
+    color: $color-text-medium;
+    font-size: 12px;
+    top: 50%;
+    line-height: 1em;
+    margin-top: 4px;
+  }
 
-.info-icon {
-  vertical-align: top;
-  color: $color-text-light;
+  .big {
+    .csi-value-text {
+      font-size: 34px;
+    }
+    .csi-value-description {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+  }
+
+  .loading {
+    .csi-value-text {
+      font-size: 10px;
+    }
+    &.big .csi-value-text {
+      font-size: 24px;
+    }
+  }
+
+  .hint {
+    .hint-container {
+      cursor: help;
+      z-index: 10;
+      position: relative;
+    }
+    .csi-value-description {
+      text-decoration: underline dotted $color-text-medium;
+    }
+  }
 }

@@ -3,6 +3,8 @@ package de.iteratec.osm.result
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
@@ -15,8 +17,6 @@ import org.joda.time.DateTime
 
 @Transactional
 class ApplicationDashboardService {
-
-
     ConfigService configService
     OsmConfigCacheService osmConfigCacheService
     ResultSelectionService resultSelectionService
@@ -76,12 +76,22 @@ class ApplicationDashboardService {
 
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
+
         return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)
+                .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
                 .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
                 .getAverageData()
+    }
+
+    List<Page> getRecentPagesForJobGroup(Long jobGroupId) {
+        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
+        DateTime to = new DateTime()
+
+        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
+        return pages
     }
 
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
@@ -118,4 +128,49 @@ class ApplicationDashboardService {
 
     }
 
+    List<Map> getAllActivePagesAndMetrics(Long jobGroupId) {
+        List<Map> recentMetrics = getRecentMetricsForJobGroup(jobGroupId).collect {
+            return it.projectedProperties
+        }
+
+        getPagesOfActiveJobs(jobGroupId)
+                .findAll { Page page -> page.name != Page.UNDEFINED }
+                .each { Page page ->
+            Map entry = recentMetrics.find {
+                it.pageId == page.id
+            }
+            if (!entry) {
+                recentMetrics.add(
+                        [
+                                'pageId'  : page.id,
+                                'pageName': page.name
+                        ]
+                )
+            } else {
+                entry.pageName = page.name
+            }
+        }
+
+        return recentMetrics
+    }
+
+    def createOrReturnCsiConfiguration(Long jobGroupId) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+
+        if (jobGroup.hasCsiConfiguration()) {
+            return jobGroup.csiConfiguration.id
+        }
+        CsiConfiguration csiConfiguration
+        csiConfiguration = CsiConfiguration.findByLabel(jobGroup.name)
+        if (!csiConfiguration) {
+            csiConfiguration = new CsiConfiguration(
+                    label: jobGroup.name,
+                    description: "Initial CSI configuration for JobGroup ${jobGroup.name}",
+                    csiDay: CsiDay.first()
+            )
+        }
+        jobGroup.csiConfiguration = csiConfiguration
+        jobGroup.save(failOnError: true, flush: true)
+        return csiConfiguration.id
+    }
 }

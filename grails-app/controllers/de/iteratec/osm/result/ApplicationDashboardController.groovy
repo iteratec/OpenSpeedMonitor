@@ -3,8 +3,10 @@ package de.iteratec.osm.result
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
-import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -19,7 +21,7 @@ class ApplicationDashboardController {
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     JobGroupService jobGroupService
 
-    def getPagesForApplication(PagesForApplicationCommand command) {
+    def getPagesForApplication(DefaultApplicationCommand command) {
 
         DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
         DateTime to = new DateTime()
@@ -29,7 +31,7 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }
 
-    def getCsiValuesForApplication(PagesForApplicationCommand command) {
+    def getCsiValuesForApplication(DefaultApplicationCommand command) {
         ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
 
@@ -55,6 +57,16 @@ class ApplicationDashboardController {
                 }
             }
 
+            if (!csiDtoList) {
+                List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(selectedJobGroup), fourWeeksAgo)
+                if (jobResults) {
+                    applicationCsiListDto.hasJobResults = true
+                    applicationCsiListDto.hasInvalidJobResults = jobResults.every { it.wptStatus ? true : false }
+                } else {
+                    applicationCsiListDto.hasJobResults = false
+                }
+            }
+
             applicationCsiListDto.csiDtoList = csiDtoList
             return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
 
@@ -65,7 +77,7 @@ class ApplicationDashboardController {
         }
     }
 
-    def getCsiValuesForPages(PagesForApplicationCommand command) {
+    def getCsiValuesForPages(DefaultApplicationCommand command) {
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
         List<PageCsiDto> pageCsiDtos = []
         if (selectedJobGroup.hasCsiConfiguration()) {
@@ -74,13 +86,12 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }
 
-    def getMetricsForApplication(PagesForApplicationCommand command) {
+    def getMetricsForApplication(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        List<Map> recentMetrics = applicationDashboardService.getRecentMetricsForJobGroup(jobGroupId).collect {
-            it.projectedProperties.pageName = Page.findById(it.pageId).name
-            return it.projectedProperties
-        }
-        return ControllerUtils.sendObjectAsJSON(response, recentMetrics)
+
+        List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
     }
 
     def getAllActiveAndAllRecent() {
@@ -88,9 +99,16 @@ class ApplicationDashboardController {
 
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
+
+    def createCsiConfiguration(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        Long csiConfigurationId = applicationDashboardService.createOrReturnCsiConfiguration(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId: csiConfigurationId])
+    }
 }
 
-class PagesForApplicationCommand implements Validateable {
+class DefaultApplicationCommand implements Validateable {
     Long applicationId
 
     static constraints = {

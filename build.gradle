@@ -76,7 +76,7 @@ dependencyManagement {
 
 dependencies {
     // Default Grails-Stuff
-    runtime 'org.grails.plugins:grails-console:2.0.8'
+    runtime 'org.grails.plugins:grails-console:2.1.1'
     compile "org.grails:grails-core"
     compile 'org.grails:grails-logging'
     compile "org.springframework.boot:spring-boot-starter-logging"
@@ -263,8 +263,6 @@ task nodeSyncJavascript(type: Sync) {
     include "air-datepicker/dist/js/i18n/datepicker.en.js"
     include "air-datepicker/dist/js/i18n/datepicker.de.js"
     include "bootstrap-validator/js/validator.js"
-    include "vue/dist/vue.js"
-    include "vue/dist/vue.min.js"
     dependsOn npmInstall
 }
 
