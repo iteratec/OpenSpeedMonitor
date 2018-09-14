@@ -42,6 +42,11 @@ OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
  */
 OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
 
+/**
+ * Map for user to use
+ */
+OpenSpeedMonitor.user = OpenSpeedMonitor.user || {};
+
 
 /**
  * Loads all registered JavaScript files. Used by microservices.

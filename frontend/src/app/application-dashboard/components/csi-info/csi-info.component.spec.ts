@@ -3,11 +3,14 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CsiInfoComponent} from './csi-info.component';
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
 import {SharedMocksModule} from "../../../testing/shared-mocks.module";
+import {GrailsBridgeService} from "../../../shared/services/grails-bridge.service";
+import {GlobalOsmNamespace} from "../../../shared/models/global-osm-namespace.model";
 
 describe('CsiInfoComponent', () => {
   let component: CsiInfoComponent;
   let fixture: ComponentFixture<CsiInfoComponent>;
   let applicationDashboardService: ApplicationDashboardService;
+  let grailsBridgeService: GrailsBridgeService;
 
   const caseOneText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
   const caseTwoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
@@ -28,7 +31,8 @@ describe('CsiInfoComponent', () => {
         SharedMocksModule
       ],
       providers: [
-        ApplicationDashboardService
+        ApplicationDashboardService,
+        {provide: GrailsBridgeService, useClass: MockGrailsBridgeService}
       ]
     })
       .compileComponents();
@@ -50,9 +54,8 @@ describe('CsiInfoComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be able to call the createCsiConfiguration method from the ApplicationDashboardService', () => {
+  it('should be able to call the createCsiConfiguration method from the ApplicationDashboardService if the user is logged in', () => {
     applicationDashboardService = TestBed.get(ApplicationDashboardService);
-
     spyOn(applicationDashboardService, "createCsiConfiguration");
     component.createCsiConfiguration();
     expect(applicationDashboardService.createCsiConfiguration).toHaveBeenCalledWith(component.selectedApplication);
@@ -154,7 +157,10 @@ describe('CsiInfoComponent', () => {
     expect(infoIconEl.className).toEqual(warningIconClass);
     const infoButtonEl: HTMLElement = fixture.nativeElement.querySelector('.info-button');
     expect(infoButtonEl.textContent).toEqual(buttonCaseFourText);
-    expect(infoButtonEl.attributes.getNamedItem('href').value).toEqual('/job/#/jobGroup=Example');
+    expect(infoButtonEl.attributes.getNamedItem('href').value).toEqual('/job/index#/jobGroup=Example');
   });
-
 });
+
+class MockGrailsBridgeService extends GrailsBridgeService {
+  globalOsmNamespace: GlobalOsmNamespace = {i18n: {lang: 'de'}, user: {loggedIn: true}};
+}

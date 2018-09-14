@@ -3,6 +3,7 @@
     var OpenSpeedMonitor = OpenSpeedMonitor || {};
     OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
     OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
+    OpenSpeedMonitor.user = OpenSpeedMonitor.user || {};
 
     OpenSpeedMonitor.i18n = {
       lang: '${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}',
@@ -107,4 +108,6 @@
         delete: '${message(code: 'job.threshold.delete')}',
         remove: '${message(code: 'job.threshold.remove')}'
     }
+
+    OpenSpeedMonitor.user.loggedIn = ${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") ? 'true': 'false'};
 </script>
