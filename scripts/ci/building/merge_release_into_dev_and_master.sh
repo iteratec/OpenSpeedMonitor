@@ -7,4 +7,4 @@ git checkout test/file
 touch test
 git add .
 git commit -m "test push of travis"
-git push
+git push https://iteraspeed:$GITHUB_USER_TOKEN@github.com/iteratec/OpenSpeedMonitor.git
