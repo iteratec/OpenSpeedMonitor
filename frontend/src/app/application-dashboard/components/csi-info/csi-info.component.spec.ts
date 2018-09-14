@@ -56,9 +56,6 @@ describe('CsiInfoComponent', () => {
 
   it('should be able to call the createCsiConfiguration method from the ApplicationDashboardService if the user is logged in', () => {
     applicationDashboardService = TestBed.get(ApplicationDashboardService);
-    grailsBridgeService = TestBed.get(GrailsBridgeService);
-    grailsBridgeService.globalOsmNamespace.user.loggedIn = true;
-
     spyOn(applicationDashboardService, "createCsiConfiguration");
     component.createCsiConfiguration();
     expect(applicationDashboardService.createCsiConfiguration).toHaveBeenCalledWith(component.selectedApplication);
