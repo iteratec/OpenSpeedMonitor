@@ -2,6 +2,7 @@ import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {ApplicationDTO} from "../../models/application.model";
 import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {GrailsBridgeService} from "../../../shared/services/grails-bridge.service";
 
 @Component({
   selector: 'osm-csi-info',
@@ -17,7 +18,7 @@ export class CsiInfoComponent implements OnChanges {
   infoText: string;
   iconClass: string;
 
-  constructor(private applicationDashboardService: ApplicationDashboardService) {
+  constructor(private applicationDashboardService: ApplicationDashboardService, private grailsBridgeService: GrailsBridgeService) {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,7 +51,11 @@ export class CsiInfoComponent implements OnChanges {
   }
 
   createCsiConfiguration () {
-    this.applicationDashboardService.createCsiConfiguration(this.selectedApplication);
+    if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
+      this.applicationDashboardService.createCsiConfiguration(this.selectedApplication);
+    } else {
+      window.location.href = '/login/auth';
+    }
   }
 
 }
