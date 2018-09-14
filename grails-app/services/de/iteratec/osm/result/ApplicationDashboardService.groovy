@@ -182,6 +182,13 @@ class ApplicationDashboardService {
     ApplicationCsiDto getCsiValuesAndErrorsForJobGroup(JobGroup jobGroup) {
         ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
 
+        if (!jobGroup.hasCsiConfiguration()) {
+            applicationCsiListDto.hasCsiConfiguration = false
+            applicationCsiListDto.csiDtoList = []
+            return applicationCsiListDto
+        }
+
+        applicationCsiListDto.hasCsiConfiguration = true
         DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
         Date today = todayDateTime.toDate()
         Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
@@ -212,7 +219,6 @@ class ApplicationDashboardService {
         }
 
         applicationCsiListDto.csiDtoList = csiDtoList
-
         return applicationCsiListDto
     }
 }

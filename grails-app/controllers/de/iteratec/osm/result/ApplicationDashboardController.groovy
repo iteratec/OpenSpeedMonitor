@@ -32,17 +32,8 @@ class ApplicationDashboardController {
 
     def getCsiValuesForApplication(DefaultApplicationCommand command) {
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
-
-        if (selectedJobGroup.hasCsiConfiguration()) {
-            ApplicationCsiDto applicationCsiListDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(selectedJobGroup)
-            applicationCsiListDto.hasCsiConfiguration = true
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-        } else {
-            ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
-            applicationCsiListDto.hasCsiConfiguration = false
-            applicationCsiListDto.csiDtoList = []
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-        }
+        ApplicationCsiDto applicationCsiListDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(selectedJobGroup)
+        return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
     }
 
     def getCsiValuesForPages(DefaultApplicationCommand command) {

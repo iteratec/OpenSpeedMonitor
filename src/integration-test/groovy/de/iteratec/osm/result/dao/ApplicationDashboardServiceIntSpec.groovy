@@ -211,7 +211,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
 
         then: "an error is returned, all JobResults are invalid"
-        applicationCsiDto.hasInvalidJobResults
+        applicationCsiDto.hasInvalidJobResults == true
     }
 
     void "return no error for invalid JobResults if not all JobResults are invalid"() {
@@ -226,7 +226,24 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
 
         then: "no error is returned, not all JobResults are invalid"
-        !applicationCsiDto.hasInvalidJobResults
+        applicationCsiDto.hasInvalidJobResults == false
+    }
+
+    void "check if csi config flag is set correctly"() {
+        given: "one JobGroup with CsiConfiguration and one without"
+        existingCsiConfiguration = CsiConfiguration.build()
+        CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
+        jobGroup2.csiConfiguration = existingCsiConfiguration
+        jobGroup2.save(failOnError: true, flush: true)
+
+        when: "the application service tests for csi configuration"
+        ApplicationCsiDto applicationCsiDto1 = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
+        ApplicationCsiDto applicationCsiDto2 = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup2)
+
+        then: "the JobGroup without config should return false, the other true"
+        applicationCsiDto1.hasCsiConfiguration == false
+        applicationCsiDto1.csiDtoList.length == 0
+        applicationCsiDto2.hasCsiConfiguration == true
     }
 
     private void createTestDataCommonForAllTests() {
