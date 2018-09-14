@@ -2,46 +2,46 @@
 
 .info-container {
   min-height: 175px;
-  min-width: 400px;
   border: $color-contour-light solid 1px;
   border-radius: 10px;
   margin: 0 40px 30px 50px;
 }
 
 .csi-info {
-  display: inline-flex;
-  height: 150px;
-  justify-content: flex-start;
+  display: flex;
+  height: 175px;
   align-items: center;
+  justify-content: center;
 }
 
 .icon-info {
-  width: 10%;
   text-align: center;
   font-size: 40px;
   color: $color-primary;
   padding: 0 20px;
-  margin: 0 15px;
+  margin: 0 20px;
 }
 
 .icon-warning {
-  width: 10%;
   text-align: center;
   font-size: 40px;
   color: $color-warning;
   padding: 0 20px;
+  margin: 0 20px;
 }
 
 .info-text {
-  width: 70%;
+  text-overflow: ellipsis;
+  overflow: hidden;
   font-size: 18px;
-  font-weight: bold;
+  max-width: 800px;
+  margin-right: 20px;
   color: $color-text-normal;
 }
 
 .info-button {
   position: relative;
-  bottom: 35px;
+  bottom: 60px;
   float: right;
   color: $color-background;
   background-color: $color-primary;
