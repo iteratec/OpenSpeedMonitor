@@ -11,7 +11,7 @@
         var lang = '${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}';
         if (!lang) {
             lang = navigator.language.substr(0, 2);
-            if (lang != "en" || lang != "de") {
+            if (lang != "en" && lang != "de") {
                 lang = "en";
             }
         }
