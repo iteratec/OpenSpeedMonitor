@@ -7,8 +7,8 @@ cache:
     - frontend/node_modules
     - build/npm
     - $HOME/.npm
-#    - $HOME/.gradle/caches/
-#    - $HOME/.gradle/wrapper/
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - openjdk8
