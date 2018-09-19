@@ -174,6 +174,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
 
         if ($.isEmptyObject(data)) {
             $('#warning-no-data').show();
+            spinner.stop();
             return;
         }
 
