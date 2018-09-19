@@ -16,6 +16,9 @@ jdk:
 services:
   - docker
 
+before_install:
+ - chmod +x gradlew
+
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
 install: true
