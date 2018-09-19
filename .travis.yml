@@ -7,17 +7,14 @@ cache:
     - frontend/node_modules
     - build/npm
     - $HOME/.npm
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+#    - $HOME/.gradle/caches/
+#    - $HOME/.gradle/wrapper/
 language: groovy
 jdk:
   - openjdk8
 
 services:
   - docker
-
-before_install:
- - chmod +x gradlew
 
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
