@@ -1,15 +1,16 @@
 <div class="info-container">
   <div class="csi-info">
     <i ngClass="{{ iconClass }}"></i>
-    <div class="info-text">{{ infoText }}</div>
+    <div class="info-text">{{ infoText | translate }}</div>
   </div>
-  <div *ngIf="errorCase === 2">
-    <a (click)="createCsiConfiguration()" class="info-button">Create CSI Configuration</a>
+  <div *ngIf="errorCase === 'noCsiConfig'">
+    <a (click)="createCsiConfiguration()" class="info-button">{{ 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiConfig' | translate }}</a>
   </div>
-  <div *ngIf="errorCase === 3">
-    <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">Configure CSI Configuration</a>
+  <div *ngIf="errorCase === 'noCsiValue'">
+    <a href="/csiConfiguration/configurations/{{ selectedApplication.csiConfigurationId }}" class="info-button">{{ 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.noCsiValue' | translate }}</a>
   </div>
-  <div *ngIf="errorCase === 4">
-    <a href="/job/#/jobGroup={{selectedApplication.name}}" class="info-button">Check Measurements</a>
+  <div *ngIf="errorCase === 'invalidMeasurement'">
+    <a href="/job/index#/jobGroup={{ selectedApplication.name }}" class="info-button">{{
+      'frontend.de.iteratec.osm.applicationDashboard.csiInfo.button.invalidMeasurement' | translate }}</a>
   </div>
 </div>

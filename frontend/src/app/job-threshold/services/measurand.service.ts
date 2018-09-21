@@ -23,6 +23,7 @@ export class MeasurandService {
     if (!thresholds) {
       return;
     }
-    return this.measurands.filter(measurand => !thresholds.some(threshold => threshold.measurand.name == measurand.name));
+    this.fetchMeasurands();
+    return this.measurands.filter(measurand => !thresholds.some(threshold => threshold.measurand.name == measurand.name))
   }
 }

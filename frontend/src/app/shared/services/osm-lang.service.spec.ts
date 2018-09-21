@@ -20,10 +20,10 @@ describe('OsmLangService', () => {
   });
 
   it('should provide language set in global OpenSpeedMonitor namespace (from grails)', () => {
-    grailsBridgeService.globalOsmNamespace = {i18n: {lang: 'de'}};
+    grailsBridgeService.globalOsmNamespace = {i18n: {lang: 'de'}, user: {loggedIn: false}};
     expect(osmLangService.getOsmLang()).toBe('de');
 
-    grailsBridgeService.globalOsmNamespace = {i18n: {lang: 'en'}};
+    grailsBridgeService.globalOsmNamespace = {i18n: {lang: 'en'}, user: {loggedIn: false}};
     expect(osmLangService.getOsmLang()).toBe('en');
   });
 });

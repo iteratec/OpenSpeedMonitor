@@ -18,7 +18,6 @@ class ApplicationDashboardController {
     final static FOUR_WEEKS = 4
 
     ApplicationDashboardService applicationDashboardService
-    JobGroupCsiAggregationService jobGroupCsiAggregationService
     JobGroupService jobGroupService
 
     def getPagesForApplication(DefaultApplicationCommand command) {
@@ -32,49 +31,9 @@ class ApplicationDashboardController {
     }
 
     def getCsiValuesForApplication(DefaultApplicationCommand command) {
-        ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
         JobGroup selectedJobGroup = JobGroup.findById(command.applicationId)
-
-        if (selectedJobGroup.hasCsiConfiguration()) {
-            applicationCsiListDto.hasCsiConfiguration = true
-
-            DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
-            Date today = todayDateTime.toDate()
-            Date fourWeeksAgo = todayDateTime.minusWeeks(FOUR_WEEKS).toDate()
-
-            List<JobGroup> csiGroups = [selectedJobGroup]
-            CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
-
-            List<CsiDto> csiDtoList = []
-
-            jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups).each {
-                CsiDto applicationCsiDto = new CsiDto()
-                if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                    applicationCsiDto.date = it.started.format("yyyy-MM-dd")
-                    applicationCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                    applicationCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                    csiDtoList << applicationCsiDto
-                }
-            }
-
-            if (!csiDtoList) {
-                List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(selectedJobGroup), fourWeeksAgo)
-                if (jobResults) {
-                    applicationCsiListDto.hasJobResults = true
-                    applicationCsiListDto.hasInvalidJobResults = jobResults.every { it.wptStatus ? true : false }
-                } else {
-                    applicationCsiListDto.hasJobResults = false
-                }
-            }
-
-            applicationCsiListDto.csiDtoList = csiDtoList
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-
-        } else {
-            applicationCsiListDto.hasCsiConfiguration = false
-            applicationCsiListDto.csiDtoList = []
-            return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
-        }
+        ApplicationCsiDto applicationCsiListDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(selectedJobGroup)
+        return ControllerUtils.sendObjectAsJSON(response, applicationCsiListDto)
     }
 
     def getCsiValuesForPages(DefaultApplicationCommand command) {
