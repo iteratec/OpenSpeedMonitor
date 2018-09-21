@@ -15,9 +15,8 @@ fi
 
 function tagAndPush () {
   tag=$1
-  echo $tag
-  # docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
-  # docker push iteratec/openspeedmonitor:$tag
+  docker tag iteratec/openspeedmonitor iteratec/openspeedmonitor:$tag
+  docker push iteratec/openspeedmonitor:$tag
 }
 
 tagAndPush $app_version_major
