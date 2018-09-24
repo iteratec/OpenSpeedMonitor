@@ -1,9 +1,7 @@
 FROM java:openjdk-8
-MAINTAINER nils.kuhn@iteratec.de, birger.kamp@iteratec.de
 
-#ENV OSM_VERSION 3.4.8-build293
 ENV OSM_HOME /osm
-ENV OSM_CONFIG_HOME /home/osm/.grails
+ENV OSM_CONFIG_HOME /osm/config
 ENV JAVA_OPTS "-server -Dgrails.env=prod -Dfile.encoding=UTF-8"
 ENV DOCKERIZE_VERSION v0.3.0
 
@@ -16,7 +14,10 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 # get osm-sources and build war-file
-RUN mkdir -p $OSM_HOME $OSM_HOME/logs $OSM_CONFIG_HOME
+RUN mkdir -p $OSM_HOME $OSM_HOME/logs $OSM_CONFIG_HOME && \
+    chmod -R 775 $OSM_HOME $OSM_CONFIG_HOME && \
+    chown -R osm:100 $OSM_HOME $OSM_CONFIG_HOME
+
 WORKDIR $OSM_HOME
 ADD ./build/libs/OpenSpeedMonitor*.war $OSM_HOME/
 
@@ -25,8 +26,7 @@ ADD docker/templates/osm-config.yml.j2 $OSM_CONFIG_HOME/OpenSpeedMonitor-config.
 
 # add entrypoint script
 ADD docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && \
-    chown osm:osm -R $OSM_HOME $OSM_CONFIG_HOME
+RUN chmod 775 /entrypoint.sh
 
 USER osm
 EXPOSE 8080
