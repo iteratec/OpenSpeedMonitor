@@ -228,13 +228,13 @@
 </div>
 </form>
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-<g:render template="/_common/modals/chartContextMenuErrorDialog"/>
 <g:if test="${params.dashboardID}">
     <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
         <g:render template="/_common/modals/deleteDialog"
                   model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
     </g:if>
 </g:if>
+<g:render template="/_common/modals/chartContextMenuErrorDialog"/>
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
