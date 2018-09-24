@@ -19,6 +19,7 @@ git config user.name 'bamboo iteratec'
 echo "########################################'"
 echo "git fetch release"
 git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+git tag -d $(git tag -l)
 git fetch --all
 echo "git checkout release"
 git checkout release
