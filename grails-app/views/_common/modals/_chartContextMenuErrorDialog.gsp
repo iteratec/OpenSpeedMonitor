@@ -8,6 +8,7 @@ This is the dialog that informs about errors while calling the context menu
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <h4 class="modal-title"><g:message code="de.iteratec.chart.errorHeader" default="Error"/></h4>
+            </div>
             <div class="modal-body">
                 <p><g:message code="de.iteratec.chart.datapointSelection.error.multipleServer"
                               default="Comparison of the filmstrips is only possible for measurements on the same server."/></p>

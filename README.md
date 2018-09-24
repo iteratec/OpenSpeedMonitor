@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://travis-ci.org/iteratec/OpenSpeedMonitor.svg?branch=develop)](https://travis-ci.org/iteratec/OpenSpeedMonitor)
+
 OpenSpeedMonitor
 ================
 Open Source Web Performance Monitoring.

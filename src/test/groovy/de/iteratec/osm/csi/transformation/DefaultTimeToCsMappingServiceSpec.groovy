@@ -1,15 +1,15 @@
 package de.iteratec.osm.csi.transformation
 
 import de.iteratec.osm.csi.*
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(DefaultTimeToCsMappingService)
 @Build([DefaultTimeToCsMapping, Page, CsiConfiguration])
-@Mock([DefaultTimeToCsMapping, Page, CsiConfiguration, CsiDay, TimeToCsMapping])
-class DefaultTimeToCsMappingServiceSpec extends Specification{
+class DefaultTimeToCsMappingServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<DefaultTimeToCsMappingService> {
 
     final String DEFAULT_TTCS_MAPPING_1_NAME = "mapping1"
     final String DEFAULT_TTCS_MAPPING_2_NAME = "mapping2"
@@ -18,6 +18,9 @@ class DefaultTimeToCsMappingServiceSpec extends Specification{
         createDefaultTimeToCsMappings()
     }
 
+    void setupSpec() {
+        mockDomains(DefaultTimeToCsMapping, Page, CsiConfiguration, CsiDay, TimeToCsMapping)
+    }
 
     void "test copyDefaultMappingToPage to empty csiConfiguration" () {
         given:

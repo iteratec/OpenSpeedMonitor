@@ -4,13 +4,12 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
-import de.iteratec.osm.barchart.BarchartQueryAndCalculationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
@@ -27,7 +26,7 @@ class PageAggregationController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -35,7 +34,6 @@ class PageAggregationController extends ExceptionHandlerController {
     OsmConfigCacheService osmConfigCacheService
     BarchartAggregationService barchartAggregationService
     PerformanceLoggingService performanceLoggingService
-    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     def index() {
         redirect(action: 'show')
@@ -63,7 +61,7 @@ class PageAggregationController extends ExceptionHandlerController {
 
         modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return modelToRender
@@ -111,22 +109,7 @@ class PageAggregationController extends ExceptionHandlerController {
         chartDto.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        barchartAggregations.each {
-            if (it.value) {
-                PageAggregationChartSeriesDTO seriesDto = new PageAggregationChartSeriesDTO(
-                    unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
-                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
-                    measurand: it.selectedMeasurand.name,
-                    measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
-                    value: it.value,
-                    valueComparative: it.valueComparative,
-                    page: it.page,
-                    jobGroup: it.jobGroup,
-                    aggregationValue: it.aggregationValue
-                )
-                chartDto.series.add(seriesDto)
-            }
-        }
+        chartDto.series.addAll(convertToPageAggregationChartSeriesDTOs(barchartAggregations))
 
 //      TODO: see ticket [IT-1614]
         chartDto.filterRules = createFilterRules(allPages, allJobGroups)
@@ -150,12 +133,32 @@ class PageAggregationController extends ExceptionHandlerController {
         List<Job> jobs = jobDaoService.getJobs(jobGroup)
         Set<Page> uniqueTestedPages = [] as Set
 
-        jobs*.script*.navigationScript.each { String navigationScript ->
-            List<Page> pagesOfThisScript = new ScriptParser(pageService, navigationScript).getTestedPages()
+        jobs*.script.each { Script script ->
+            List<Page> pagesOfThisScript = new ScriptParser(pageService, script.navigationScript, script.label).getTestedPages()
             uniqueTestedPages.addAll(pagesOfThisScript)
         }
         uniqueTestedPages.each {
 
+        }
+    }
+
+    private List<PageAggregationChartSeriesDTO> convertToPageAggregationChartSeriesDTOs(List<BarchartAggregation> barchartAggregations) {
+        return barchartAggregations.collectMany {
+            if (!it.value) {
+                return []
+            } else {
+                return [new PageAggregationChartSeriesDTO(
+                    unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
+                    measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
+                    measurand: it.selectedMeasurand.name,
+                    measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
+                    value: it.value,
+                    valueComparative: it.valueComparative,
+                    page: it.page.name,
+                    jobGroup: it.jobGroup.name,
+                    aggregationValue: it.aggregationValue
+                )]
+            }
         }
     }
 
@@ -177,7 +180,7 @@ class PageAggregationController extends ExceptionHandlerController {
             List<List<Page>> testedPagesPerJob = []
 
             jobList.findAll { it.script == currentScript }.each { j ->
-                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables)).getTestedPages().unique()
+                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript.label).getTestedPages().unique()
             }
 
             // if all lists are equal take any

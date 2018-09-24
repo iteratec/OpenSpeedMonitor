@@ -28,11 +28,11 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.apache.commons.lang.time.DateUtils
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -49,9 +49,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
     private MeasuredEvent measuredEvent
 
     def setup() {
-        EventResult.withNewTransaction {
-            initTestData()
-        }
+        initTestData()
     }
 
     void "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE"() {
@@ -117,8 +115,8 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
         JobGroup jobGroup = JobGroup.build(
                 name: "TestGroup").save(failOnError: true)
 
-        Browser fireFoxBrowser = Browser.build(name:'FF').save(failOnError:true)
-        Browser ieBrowser = Browser.build(name:'IE').save(failOnError:true)
+        Browser fireFoxBrowser = Browser.build(name: 'FF').save(failOnError: true)
+        Browser ieBrowser = Browser.build(name: 'IE').save(failOnError: true)
 
         Location ffAgent1 = Location.build(
                 active: true,

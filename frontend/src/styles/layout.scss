@@ -1,0 +1,22 @@
+@import "colors";
+
+.content {
+  background-color: $color-background;
+  padding: 20px;
+}
+
+.good {
+  color: $color-good;
+}
+
+.okay {
+  color: $color-warning;
+}
+
+.bad {
+  color: $color-error;
+}
+
+.neutral {
+  color: $color-text-light;
+}

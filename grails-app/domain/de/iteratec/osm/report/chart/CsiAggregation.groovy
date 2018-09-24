@@ -26,7 +26,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
-import org.grails.databinding.BindUsing
+import grails.databinding.BindUsing
 
 
 /**

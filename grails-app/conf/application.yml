@@ -1,4 +1,12 @@
 ---
+
+de:
+  iteratec:
+    osm:
+     application-dashboard:
+      metrics-max-age-in-h: 6
+
+
 hibernate:
     cache:
         queries: false
@@ -13,10 +21,15 @@ dataSource:
     driverClassName: org.h2.Driver
     username: sa
     password: ''
-    dbCreate: 'managed by liquibase'
+    dbCreate: none
 
 environments:
     development:
+      de:
+        iteratec:
+          osm:
+           application-dashboard:
+            metrics-max-age-in-h: 672 # 4 Weeks as Hours (24x7x4)
         grails:
             logging:
                 jul:
@@ -33,7 +46,7 @@ environments:
             assets:
                 bundle: true
         dataSource:
-            url: jdbc:h2:mem:devaDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+            url: jdbc:h2:mem:devaDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1
         logHibernateStats:
             enabled: 'ALWAYS' # From ALWAYS, ALLOWED, NEVER
     test:
@@ -55,7 +68,7 @@ environments:
                     autoMigrateScripts: 'TestApp'
                     forceAutoMigrate: true
         dataSource:
-            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1
     production:
         greenmail:
             disabled: true
@@ -75,7 +88,7 @@ environments:
                         remote:
                             enabled: false
         dataSource:
-            url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+            url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1
             properties:
                 jmxEnabled: true
                 initialSize: 5
@@ -222,8 +235,7 @@ grails:
     plugin:
         databasemigration:
             updateOnStart: true
-            updateOnStartFileNames:
-                - 'changelog.groovy'
+            updateOnStartFileName: 'changelog.groovy'
         cookie:
             cookieage:
                 default: 3110400
@@ -240,6 +252,9 @@ grails:
             logout:
                 postOnly: false
             securityConfigType: 'InterceptUrlMap'
+            successHandler:
+              alwaysUseDefault: true
+              defaultTargetUrl: '/'
             interceptUrlMap: [
                             {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/static/**',                                     access: ["permitAll"]},
@@ -249,7 +264,7 @@ grails:
                             {pattern: '/css/**',                                        access: ["permitAll"]},
                             {pattern: '/js/**',                                         access: ["permitAll"]},
                             {pattern: '/images/**',                                     access: ["permitAll"]},
-                            {pattern: '/fonts/**',                                     access: ["permitAll"]},
+                            {pattern: '/fonts/**',                                      access: ["permitAll"]},
                             {pattern: '/less/**',                                       access: ["permitAll"]},
                             {pattern: '/',                                              access: ["permitAll"]},
                             {pattern: '/proxy/**',                                      access: ["permitAll"]},
@@ -276,6 +291,7 @@ grails:
                             {pattern: '/rest/**',                                       access: ["permitAll"]},
                             {pattern: '/webjars/swagger-ui/**',                         access: ["permitAll"]},
                             {pattern: '/resultSelection/**',                            access: ["permitAll"]},
+                            {pattern: '/jobGroup/getJobGroupsWithPages',                access: ["permitAll"]},
                             {pattern: '/login/**',                                      access: ["permitAll"]},
                             {pattern: '/logout/**',                                     access: ["permitAll"]},
                             {pattern: '/job/index',                                     access: ["permitAll"]},
@@ -300,6 +316,8 @@ grails:
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
                             {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
                             {pattern: '/landing/**',                                    access: ["permitAll"]},
+                            {pattern: '/applicationDashboard/rest/createCsiConfiguration', access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
+                            {pattern: '/applicationDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/securityInfo/config',                           access: ["denyAll"]},
                             {pattern: '/securityInfo/mappings',                         access: ["denyAll"]},
                             {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},

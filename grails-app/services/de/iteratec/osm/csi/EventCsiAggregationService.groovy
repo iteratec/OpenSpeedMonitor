@@ -28,7 +28,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
 @Transactional

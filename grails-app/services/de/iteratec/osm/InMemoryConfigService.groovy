@@ -16,9 +16,6 @@
 */
 
 package de.iteratec.osm
-
-import grails.transaction.Transactional
-
 /**
  * InMemoryConfigService
  * A service class encapsulates the core business logic of a Grails application

@@ -21,18 +21,22 @@ import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 /**
  * Test-suite of {@link CustomerSatisfactionWeightService}.
  */
-@TestFor(CustomerSatisfactionWeightService)
 @Build([Browser, ConnectivityProfile, Page, CsiConfiguration, BrowserConnectivityWeight, PageWeight, CsiDay])
-@Mock([Page, Browser, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping, CsiConfiguration, PageWeight, CsiDay])
-class CustomerSatisfactionWeightServiceSpec extends Specification {
+class CustomerSatisfactionWeightServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<CustomerSatisfactionWeightService> {
+
+    void setupSpec() {
+        mockDomains(Page, Browser, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping,
+                CsiConfiguration, PageWeight, CsiDay)
+    }
 
     void "validate csv format"(String path, String fileNameExtension, WeightFactor weightFactor, int expectedEmptyfErrors, int expectedLineErrors, int expectedHeaderErrors, int nonFormatErrors) {
         setup: "I18Service mock with expected calls"
@@ -61,7 +65,7 @@ class CustomerSatisfactionWeightServiceSpec extends Specification {
         "src/test/resources/CsiData/" | "_weights_should_fail_2.csv" | WeightFactor.HOUROFDAY                        | 0                    | 0                  | 0                    | 1
     }
 
-    void "validate csv for Browser Connectivity Combination"(String path, String fileNameExtension, WeightFactor weightFactor, int expectedBrowserErrors, int expectedConnectivityErrors, int formatErrors) {
+    void "validate csv for Browser Connectivity Combination"() {
         setup: "I18Service mock with expected calls and provide needed Browsers as well as ConnectivityProfiles"
         I18nService i18nService = Mock(I18nService) {
             expectedBrowserErrors * msg("de.iteratec.osm.csi.csvErrors.browserDoesNotExist", "browser nicht vorhanden", _) >> "browser"

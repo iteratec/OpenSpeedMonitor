@@ -17,7 +17,7 @@ This is a dialog to choose from different default csi mappings.
                                     'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />
             </div>
             <div class="modal-footer">
-                <g:form class="form-inline">
+                <form class="form-inline">
                     <div class="form-group">
                         <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
                         <label for="selectPageMapping">
@@ -29,7 +29,7 @@ This is a dialog to choose from different default csi mappings.
                             <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
                         </button>
                     </div>
-                </g:form>
+                </form>
             </div>
         </div>
     </div>
@@ -41,12 +41,12 @@ This is a dialog to choose from different default csi mappings.
         var defaults = ${defaultMultiLineChart}
         var selectedDefault = $.grep(defaults.lines, function(e){ return e.name == newLine; });
         var pages = ${pageData};
-        $("#CsiMappingModal").find("#selectPageMapping").change(function(d){handlePageDefaultSelect($(this))});
+        $("#CsiMappingModal").find("#selectPageMapping").on('change', function(d){handlePageDefaultSelect($(this))});
         var colorScale = d3.scale.ordinal()
                                           .domain([newLine, ""])
                                           .range(["#DBDBDB", color]);
 
-        $("#applyMapping").click(applyPageMapping);
+        $("#applyMapping").on('click', applyPageMapping);
         handlePageDefaultSelect($());
 
         function handlePageDefaultSelect(elementId){
@@ -74,6 +74,7 @@ This is a dialog to choose from different default csi mappings.
             jQuery.ajax({
                 type: 'GET',
                 url: "<g:createLink action="applyNewMappingToPage" />",
+                async: false,
                 data:{'defaultMappingName':newLine, 'csiConfigurationId':actualCsiConfigurationId, 'pageId':pageId},
                 success: function (content) {
                     window.location.href="<g:createLink action="configurations" />/"+actualCsiConfigurationId;

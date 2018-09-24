@@ -34,7 +34,7 @@
                            placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerName', default: 'e.g. My WPT Server')}"
                            required
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingName', default: 'Please set a name.')}"/>
-                    <span class="fa form-control-feedback" aria-hidden="true"></span>
+                    <span class="fas form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                            placeholder="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.enterServerAddress', default: 'e.g. http://wpt.mycompany.org')}"
                            type="url" required pattern="((https?:\/\/)[\-a-zA-Z\d]+(\.[a-zA-Z\d]+)*)(:\d+)?(\/[a-zA-Z&=\d_?]+)*\/?"
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingUrl', default: 'Please set a valid URL.')}"/>
-                    <span class="fa form-control-feedback" aria-hidden="true"></span>
+                    <span class="fas form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@
                     <input name="serverApiKey" class="form-control" id="serverApiKey" value="${serverApiKey}"
                            data-error="${g.message(code: 'de.iteratec.osm.ui.setupwizards.infra.errors.missingKey', default: 'Please set a key.')}"
                            required/>
-                    <span class="fa form-control-feedback" aria-hidden="true"></span>
+                    <span class="fas form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
         <div id="wptKeyInfo">
             <div class="panel panel-info" id="wptKeyInfoPanel">
                 <div class="panel-heading">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <g:message code="default.info.title" default="Information"/>
                 </div>
 
@@ -106,7 +106,7 @@
         <div class="hidden" id="customServerInfo">
             <div class="panel panel-info" id="customServerInfoPanel">
                 <div class="panel-heading">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <g:message code="default.info.title" default="Information"/>
                 </div>
 
@@ -124,8 +124,8 @@
 <div class="row navigationRow form-horizontal">
     <div class="col-md-12">
         %{-- cancel button --}%
-        <a class="btn btn-default" href="/InfrastructureSetup/cancel" data-toggle="modal" id="cancelSetup">
-            <i class="fa fa-times" aria-hidden="true"></i>
+        <a class="btn btn-default" href="/InfrastructureSetup/cancel" id="cancelSetup">
+            <i class="fas fa-times" aria-hidden="true"></i>
             <g:message code="script.versionControl.cancel.button" default=" Cancel"/>
         </a>
         %{-- done button --}%

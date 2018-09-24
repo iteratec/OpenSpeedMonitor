@@ -317,7 +317,7 @@
     </div>
 </form>
 <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-    <i class="fa fa-undo"></i> Reset
+    <i class="fas fa-undo"></i> Reset
 </button>
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 <g:if test="${params.dashboardID}">
@@ -352,16 +352,16 @@
             $(".dia-y-axis-max").val(loadTimeMaximum);
             $(".dia-y-axis-min").val(loadTimeMinimum);
             if (eval(showDataMarkers)) {
-                $("#to-enable-marker").click();
+                $("#to-enable-marker").trigger('click');
             }
             if (eval(showDataLabels)) {
-                $("#to-enable-label").click();
+                $("#to-enable-label").trigger('click');
             }
             initGraphNameAliases(graphNameAliases);
             initGraphColors(graphColors);
         }
 
-        $(document).ready(function () {
+        $(function () {
 
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
@@ -373,7 +373,7 @@
             setAdjustments();
 
         });
-        $(window).load(function() {
+        $(window).on('load', function() {
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
         });
 

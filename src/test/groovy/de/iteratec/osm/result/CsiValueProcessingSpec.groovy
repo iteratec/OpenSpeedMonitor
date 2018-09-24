@@ -8,12 +8,13 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -23,13 +24,10 @@ import static de.iteratec.osm.report.chart.CsiAggregationUpdateEvent.UpdateCause
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@TestFor(CsiValueService)
-@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
-        JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 @Build([EventResult, CsiAggregation, CsiConfiguration, Browser, Page, BrowserConnectivityWeight, PageWeight, JobGroup,
         CsiSystem, CsiDay, ConnectivityProfile, CsiAggregationUpdateEvent, JobGroupWeight])
 @Unroll
-class CsiValueProcessingSpec extends Specification {
+class CsiValueProcessingSpec extends Specification implements BuildDataTest, ServiceUnitTest<CsiValueService> {
 
     CsiValueService serviceUnderTest
 
@@ -52,19 +50,24 @@ class CsiValueProcessingSpec extends Specification {
     static CsiConfiguration CSI_CONFIGURATION
     static CsiSystem CSI_SYSTEM
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        weightingService(WeightingService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            weightingService(WeightingService)
+        }
     }
 
     void setup() {
-
         serviceUnderTest = service
 
         mocksCommonToAllTests()
         createTestDataCommonToAllTests()
         initSpringBeans()
+    }
 
+    void setupSpec() {
+        mockDomains(EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser,
+                ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration, CsiSystem, Script)
     }
 
     void "Method getWeightedCsiValues works as expected without any WeightFactors for EventResults."() {
@@ -538,7 +541,7 @@ class CsiValueProcessingSpec extends Specification {
         JOB_GROUP_1 = JobGroup.build(csiConfiguration: CSI_CONFIGURATION)
         JOB_GROUP_2 = JobGroup.build(csiConfiguration: CSI_CONFIGURATION)
 
-        CSI_SYSTEM = CsiSystem.buildWithoutSave()
+        CSI_SYSTEM = CsiSystem.build(save: false)
         CSI_SYSTEM.addToJobGroupWeights(jobGroup: JOB_GROUP_1, weight: WEIGHT_JOB_GROUP_1)
         CSI_SYSTEM.addToJobGroupWeights(jobGroup: JOB_GROUP_2, weight: WEIGHT_JOB_GROUP_2)
         CSI_SYSTEM.save()

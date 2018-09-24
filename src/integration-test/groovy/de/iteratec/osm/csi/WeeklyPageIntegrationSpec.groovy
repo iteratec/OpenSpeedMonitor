@@ -20,29 +20,23 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.WptStatus
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import de.iteratec.osm.result.*
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
-import spock.lang.Unroll
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
 import static spock.util.matcher.HamcrestSupport.that
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
-@Unroll
 class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     PageCsiAggregationService pageCsiAggregationService
@@ -77,24 +71,19 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
         createResultDataFromCsv()
         Date startDate = START_OF_WEEK.toDate()
         long csiAggregationId
-        CsiAggregation.withNewTransaction {
-            CsiAggregation aggregation = CsiAggregation.build(
-                    started: startDate,
-                    interval: weekly,
-                    aggregationType: AggregationType.PAGE,
-                    jobGroup: JobGroup.get(jobGroupId),
-                    csByWptDocCompleteInPercent: null,
-                    underlyingEventResultsByWptDocComplete: '',
-                    page: Page.findByName(pageName)
-            )
-            csiAggregationId = aggregation.id
-        }
+        CsiAggregation aggregation = CsiAggregation.build(
+                started: startDate,
+                interval: weekly,
+                aggregationType: AggregationType.PAGE,
+                jobGroup: JobGroup.get(jobGroupId),
+                csByWptDocCompleteInPercent: null,
+                underlyingEventResultsByWptDocComplete: '',
+                page: Page.findByName(pageName)
+        )
+        csiAggregationId = aggregation.id
 
         when: "We calculate the CsiAgg."
-        CsiAggregation.withNewSession { session ->
-            pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
-            session.flush()
-        }
+        pageCsiAggregationService.calcCsiAggregations([csiAggregationId])
         CsiAggregation csiAggWeeklyPage = CsiAggregation.get(csiAggregationId)
 
         then: "There should be the correct value for csByWptDocCompleteInPercent."
@@ -114,7 +103,6 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
     private createTestDataCommonToAllTests() {
         OsmConfiguration.build()
         jobGroupId = JobGroup.build().ident()
-        CsiAggregation.withNewTransaction {
             CsiAggregationInterval.build(
                     name: "hourly",
                     intervalInMinutes: CsiAggregationInterval.HOURLY
@@ -127,10 +115,8 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
                     name: "weekly",
                     intervalInMinutes: CsiAggregationInterval.WEEKLY
             )
-        }
     }
     private createResultDataFromCsv() {
-        CsiAggregation.withNewTransaction {
 
             browsers = [
                     "IE8": Browser.build(name: "IE8"),
@@ -193,10 +179,8 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
                             browser: browsers[browserAndLocation]
                     )
                 }
-            }
 
         }
-        CsiAggregation.withNewTransaction {
             CsiConfiguration csiConfiguration = CsiConfiguration.build()
             ConnectivityProfile.findAll().each { connectivityProfile ->
                 Browser.findAll().each { browser ->
@@ -207,15 +191,12 @@ class WeeklyPageIntegrationSpec extends NonTransactionalIntegrationSpec {
                     csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
                 }
             }
-            JobGroup jobGroup = JobGroup.get(jobGroupId)
+        jobGroup = JobGroup.get(jobGroupId)
             jobGroup.csiConfiguration = csiConfiguration
             jobGroup.save(failOnError: true)
-        }
-        CsiAggregation.withNewTransaction {
             EventResult.findAll().each {
                 resultPersisterService.informDependentCsiAggregations(it)
             }
-        }
     }
 
     private boolean isHeaderLine(String csvLine) {

@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 /**
  * ConnectivityProfileDaoService

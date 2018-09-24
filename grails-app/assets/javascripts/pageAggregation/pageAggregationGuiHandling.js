@@ -64,9 +64,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var stackBarSwitch = $("#stackBarSwitch");
     var inFrontButton = $("#inFrontButton");
     var besideButton = $("#besideButton");
+    var avgLoaded = false;
+    var medianLoaded = false;
 
     var init = function () {
-        drawGraphButton.click(function () {
+        drawGraphButton.on('click', function () {
+            $("#chart-card").removeClass("hidden");
             loadData(true);
         });
         $(window).on('historyStateLoaded', function () {
@@ -79,9 +82,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             renderChart({stackBars: getStackBars()}, true);
         });
         $("input[name='aggregationValue']").on("change", function () {
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            spinner.start();
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
-        $(".chart-filter").click(onFilterClick);
+        $(".chart-filter").on('click', onFilterClick);
     };
 
     var getSelectedFilter = function () {
@@ -112,10 +116,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $filterDropdownGroup.toggleClass("hidden", false);
 
         Object.keys(filterRules).forEach(function (filterRuleKey) {
-            var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fa fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+            var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fas fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             var link = $("a", listItem);
             link.data('filter', filterRuleKey);
-            link.click(onFilterClick);
+            link.on('click', onFilterClick);
             listItem.insertAfter($customerJourneyHeader);
         });
 
@@ -165,12 +169,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
-        spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
 
         if ($.isEmptyObject(data)) {
             $('#warning-no-data').show();
+            spinner.stop();
             return;
         }
 
@@ -185,21 +189,30 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
+        if (avgLoaded && getAggregationValue() === "avg") {
+            spinner.stop()
+        }
+        if (medianLoaded && getAggregationValue() === "median") {
+            spinner.stop()
+        }
         if (data) {
             pageAggregationChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.series) pageAggregationChart.render();
+        if (!data.series) pageAggregationChart.render(isAggregationValueChange);
         if (data.series && getAggregationValue() === data.series[0].aggregationValue) {
-            pageAggregationChart.render();
+            pageAggregationChart.render(isAggregationValueChange);
         }
     };
 
     var loadData = function (isStateChange) {
         pageAggregationChart.resetData();
+        avgLoaded = false;
+        medianLoaded = false;
+
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
@@ -233,6 +246,11 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             url: OpenSpeedMonitor.urls.pageAggregationGetData,
             dataType: "json",
             success: function (data) {
+                if (aggregationValue === "avg") {
+                    avgLoaded = true;
+                } else {
+                    medianLoaded = true;
+                }
                 handleNewData(data, isStateChange);
             },
             error: function (e) {

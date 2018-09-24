@@ -241,7 +241,7 @@
     <div id="header">
         <h2 id="headerCsiConfLabel">${selectedCsiConfiguration.label}</h2>
         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-            <a href="#updateCsiConfModal" class="fa fa-edit" data-toggle="modal"></a>
+            <a href="#updateCsiConfModal" class="fas fa-edit" data-toggle="modal"></a>
         </sec:ifAnyGranted>
     </div>
     <div>
@@ -262,7 +262,8 @@
                                              matrixViewData          : matrixViewData,
                                              treemapData             : treemapData,
                                              barchartData            : barchartData,
-                                             pageTimeToCsMappings    : pageTimeToCsMappings]"/>
+                                             pageTimeToCsMappings    : pageTimeToCsMappings,
+                                             hideDeleteMappingButton : false]"/>
 
 </div>
 %{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
@@ -283,7 +284,7 @@
         var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
         var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
-        $(document).ready(function () {
+        $(function () {
             $('#updateCsiConfModal').on('shown', function () {
                 $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
                 $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
@@ -292,7 +293,7 @@
             });
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="csi/configurationPost.js"/>');
         });
 

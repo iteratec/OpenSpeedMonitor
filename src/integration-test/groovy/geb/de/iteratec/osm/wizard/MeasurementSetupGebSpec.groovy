@@ -11,8 +11,8 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.wizards.MeasurementSetupPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -41,7 +41,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
 
     def setupAndLogin(){
         User.withNewTransaction {
-            if(OsmConfiguration.count()<1) OsmConfiguration.build()
+            OsmConfiguration.build()
             createAdminUser()
             location = Location.build(label: "location1", location: "local", active: true, wptServer: WebPageTestServer.build(active: true))
             ConnectivityProfile.build(active: true)
@@ -59,7 +59,7 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
             WebPageTestServer.list().each { it.delete() }
             Browser.list().each { it.delete() }
             Script.list().each { it.delete() }
-            OsmConfiguration.list().each { it.delete() }
+            OsmConfiguration.first().delete()
         }
     }
 

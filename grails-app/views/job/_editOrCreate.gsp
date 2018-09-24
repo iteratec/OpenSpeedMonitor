@@ -80,7 +80,7 @@
                     }
                 }
 
-                $(document).ready(function() {
+                $(function () {
 
                     doOnDomReady(
         ${job.label == null},
@@ -91,7 +91,7 @@
                     );
 
                 });
-                $( window).load(function(){
+                $(window).on('load', function(){
 
                     document.getElementById('authPassword').setAttribute('type', 'password');
 
@@ -113,25 +113,22 @@
                             readonly: true,
                             parsedScriptUrl: '${createLink(controller: 'script', action: 'getParsedScript')}'
                         });
-                        $('#scriptTabLink').bind("click", function() {
+                        $('#scriptTabLink').on("click", function() {
                             editor.update();
                         });
-                        $('#script').bind("change", function() {
+                        $('#script').on("change", function() {
                             editor.update();
                         });
-                        $('#script').change();
-
-                        if (${job?.id != null}) {
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/rootVue.js"/>', "rootVue");
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdVue.js"/>', "thresholdVue");
-                            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="job/threshold/thresholdComponents/buttonVue.js"/>', "buttonVue");
-                        }
+                        $('#script').trigger('change');
                     });
 
                     OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js"/>');
                     OpenSpeedMonitor.postLoader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css"/>');
                 });
     </asset:script>
+    <asset:javascript src="frontend/runtime.js"/>
+    <asset:javascript src="frontend/polyfills.js"/>
+    <asset:javascript src="frontend/main.js"/>
 </content>
 </body>
 </html>

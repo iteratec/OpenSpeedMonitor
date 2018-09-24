@@ -102,25 +102,25 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <button type="submit" name="_action_execute">
-                                    <i class="fa fa-play"></i>
+                                    <i class="fas fa-play"></i>
                                     <g:message code="de.iteratec.isj.job.runonce" default="Run now"/>
                                 </button>
                             </li>
                             <li>
                                 <button type="submit" name="_action_activate">
-                                    <i class="fa fa-toggle-on"></i>
+                                    <i class="fas fa-toggle-on"></i>
                                     <g:message code="de.iteratec.isj.job.activate" default="Activate"/>
                                 </button>
                             </li>
                             <li>
                                 <button type="submit" name="_action_deactivate">
-                                    <i class="fa fa-toggle-off"></i>
+                                    <i class="fas fa-toggle-off"></i>
                                     <g:message code="de.iteratec.isj.job.deactivate" default="Deactivate"/>
                                 </button>
                             </li>
                             <li>
                                 <button type="submit" name="_action_deleteSelectedJobs">
-                                    <i class="fa fa-trash-o"></i>
+                                    <i class="fas fa-trash-alt"></i>
                                     <g:message code="de.iteratec.isj.job.delete" default="Delete"/>
                                 </button>
                             </li>
@@ -151,7 +151,7 @@
                 <input class="form-control" type="text" id="filterInput"
                        placeholder="<g:message code="job.list.filter" default="Jobs filtern"/>"
                        name="filter" value="${filters?.filter}"/>
-                <span class="fa fa-times-circle" id="clearFilter"></span>
+                <span class="fas fa-times-circle" id="clearFilter"></span>
             </div>
 
             <div class="filterButtonsContainer">
@@ -211,7 +211,7 @@
 
             <div id="createJobContainer">
                 <a href="<g:createLink action="create"/>" class="btn btn-primary pull-right">
-                    <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
+                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                 </a>
             </div>
         </div>
@@ -255,8 +255,7 @@
         <asset:javascript src="timeago/timeagoDe.js"/>
     </g:if>
     <asset:script type="text/javascript">
-        $(document).ready(
-            doOnDomReady(
+        $(doOnDomReady(
                 '${createLink(action: 'getRunningAndRecentlyFinishedJobs')}',
                 '${createLink(action: 'cancelJobRun')}',
                 '${createLink(action: 'getLastRun')}',
@@ -264,8 +263,8 @@
             )
         );
 
-        $(document).ready(function() {
-          $(window).keydown(function(event){
+        $(function() {
+          $(window).on('keydown', function(event){
             if(event.keyCode == 13) {
               event.preventDefault();
               return false;
@@ -273,7 +272,7 @@
           });
         });
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             doOnWindowLoad(
                 '${createLink(action: 'list')}',
                 "${createLink(action: 'nextExecution')}"

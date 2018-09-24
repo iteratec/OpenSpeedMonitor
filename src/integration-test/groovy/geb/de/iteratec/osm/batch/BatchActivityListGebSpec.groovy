@@ -10,8 +10,8 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.batch.BatchActivityListPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import spock.lang.Stepwise
 
 @Integration
@@ -43,7 +43,7 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
 
     private void createData() {
         BatchActivity.withNewTransaction {
-            if(OsmConfiguration.count()<1) OsmConfiguration.build()
+            OsmConfiguration.build()
             createAdminUser()
             BatchActivity.build(status: Status.ACTIVE, lastUpdate: new Date()).save(failOnError: true)
             3.times{
@@ -56,7 +56,7 @@ class BatchActivityListGebSpec extends CustomUrlGebReportingSpec implements OsmT
         doLogout()
         BatchActivity.withNewTransaction {
             BatchActivity.list()*.delete()
-            OsmConfiguration.list()*.delete()
+            OsmConfiguration.first().delete()
             UserRole.list()*.delete()
             User.list()*.delete()
             Role.list()*.delete()

@@ -24,20 +24,21 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
-import de.iteratec.osm.result.dao.TrimQualifier
+import de.iteratec.osm.result.dao.query.TrimQualifier
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
+
 /**
  * <p>
  * A utility service for the event result dashboard and related operations.
@@ -47,7 +48,7 @@ import static de.iteratec.osm.util.Constants.TIMESERIES_CHART_LEGEND_DELIMITTER
 public class EventResultDashboardService {
 
     BrowserService browserService
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     I18nService i18nService
     EventResultDaoService eventResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
@@ -141,14 +142,14 @@ public class EventResultDashboardService {
      * Fetches all {@link JobGroup}s from Database.
      *
      * <p>
-     * 	Proxy for {@link JobGroupDaoService}
+     * 	Proxy for {@link JobGroupService}
      * </p>
      *
      * @return all {@link JobGroup} ordered by their name.
      *
      */
     public List<JobGroup> getAllJobGroups() {
-        return jobGroupDaoService.findAll().sort(false, { it.name.toLowerCase() })
+        return jobGroupService.findAll().sort(false, { it.name.toLowerCase() })
     }
 
     /**

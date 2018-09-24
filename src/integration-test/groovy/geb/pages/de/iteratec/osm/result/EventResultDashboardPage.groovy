@@ -1,10 +1,7 @@
 package geb.pages.de.iteratec.osm.result
 
-import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurandType
 import geb.pages.de.iteratec.osm.I18nGebPage
-import org.openqa.selenium.Keys
-
 /**
  * Created by marcus on 16.06.16.
  */
@@ -72,7 +69,7 @@ class EventResultDashboardPage extends I18nGebPage {
         selectConnectivityProfilesList{$("#selectedConnectivityProfilesHtmlId").find("option").contextElements }
         selectAllConnectivityButton{$("#selectedAllConnectivityProfiles")}
         selectLocationField{$("#selectedLocationsHtmlId_chosen")}
-        selectLocationList{$(".active-result")}
+        selectLocationList { $("#selectedBrowsersHtmlId").find("option").contextElements }
         selectAllLocationsButton{$("#selectedAllLocations")}
 
         tabJobSelection{$("#tabJobSelectionElement")}

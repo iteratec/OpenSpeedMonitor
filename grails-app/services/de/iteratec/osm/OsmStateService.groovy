@@ -2,7 +2,7 @@ package de.iteratec.osm
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class OsmStateService {

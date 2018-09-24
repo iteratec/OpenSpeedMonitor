@@ -25,32 +25,15 @@
 }
 
 .card {
-  box-shadow: @default-drop-shadow;
-  padding: 15px;
-  background: @card-bg;
-  margin: 0 0 15px 0;
-
   .clearfix();
 
-  h2 {
-    display: block;
-    width: 100%;
-    padding: 0;
-    margin: 0 0 @line-height-computed 0;
-    font-size: (@font-size-base * 1.5);
-    line-height: inherit;
-    color: @legend-color;
-    border: 0;
-    border-bottom: 1px solid @legend-border-color;
-  }
-
   .tab-content {
-    margin: 0 0 15px 0;
+    margin: 0 0 16px 0;
   }
 }
 
 .card > .nav {
-  margin-bottom: @line-height-computed;
+  margin-bottom: 8px;
 }
 
 .card > .nav li a {
@@ -112,7 +95,6 @@
   z-index: 1;
 }
 
-
 .card .ribbon {
   width: 0;
   height: 0;
@@ -124,7 +106,7 @@
   top: 0;
   z-index: 100;
 
-  .fa {
+  .fas {
     margin-top: -43px;
     margin-left: 10px;
     font-size: 1.3em;

@@ -66,7 +66,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
         <div class="row form-group" id="comparativeTimeFrameButton">
             <div class="col-md-8 col-md-offset-4">
                 <button type="button" id="addComparativeTimeFrame" class="btn btn-default btn-block">
-                    <i class="fa fa-plus"></i>
+					<i class="fas fa-plus"></i>
                     <g:message code="de.iteratec.osm.comparative-timeframe.heading" default="Comparative time frame"/>
                 </button>
             </div>
@@ -78,7 +78,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
                     <label for="timeframe-picker-previous" class="text-muted sub">
                         <g:message code="de.iteratec.osm.comparative-timeframe.label" default="Comparison" />
                     </label>
-                    <a href="#/" id="removeComparativeTimeFrame"><i class="fa fa-times" aria-hidden="true"></i></a>
+					<a href="#/" id="removeComparativeTimeFrame"><i class="fas fa-times" aria-hidden="true"></i></a>
                 </div>
                 <div class="col-md-8" id="timeframe-picker-previous">
                     <g:render template="/_resultSelection/timeRangePicker" model="${[
@@ -110,7 +110,7 @@ a control to select an aggregation interval (if aggregationIntervals is set)
 </div>
 
 <asset:script type="text/javascript">
-	$(window).load(function() {
+	$(window).on('load', function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/selectIntervalTimeframeCard.js" />', 'selectIntervalTimeframeCard');
     });
 </asset:script>

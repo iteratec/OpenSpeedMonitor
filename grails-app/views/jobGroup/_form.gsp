@@ -26,7 +26,7 @@
 
     <div class="col-md-3">
         <a href="#" id="deselectAllGraphiteServer" onclick="selectAllGraphiteServer(false)">
-            <i class="fa fa-undo" aria-hidden="true"></i>
+            <i class="fas fa-undo" aria-hidden="true"></i>
             <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
         </a>
     </div>

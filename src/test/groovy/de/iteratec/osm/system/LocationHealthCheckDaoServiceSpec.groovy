@@ -3,17 +3,16 @@ package de.iteratec.osm.system
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
-@TestFor(LocationHealthCheckDaoService)
-@Mock([Location, WebPageTestServer, Browser, LocationHealthCheck])
 @Build([LocationHealthCheck, Location])
-class LocationHealthCheckDaoServiceSpec extends Specification {
+class LocationHealthCheckDaoServiceSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<LocationHealthCheckDaoService> {
 
     private static final DateTime NOW = new DateTime(DateTimeZone.UTC)
 
@@ -23,6 +22,10 @@ class LocationHealthCheckDaoServiceSpec extends Specification {
 
     def setup() {
         createLocations()
+    }
+
+    void setupSpec() {
+        mockDomains(Location, WebPageTestServer, Browser, LocationHealthCheck)
     }
 
     def cleanup() {

@@ -1,15 +1,19 @@
 package de.iteratec.osm.result
 
-import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import spock.lang.Specification
+import de.iteratec.osm.barchart.BarchartAggregation
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
+import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDomainTest
+import grails.buildtestdata.mixin.Build
+import grails.testing.web.controllers.ControllerUnitTest
+import spock.lang.Specification
 
-@TestFor(PageAggregationController)
-@Mock([Page])
-@Build([Page])
-class PageAggregationControllerSpec extends Specification {
+@Build([Page, JobGroup, CsiConfiguration])
+class PageAggregationControllerSpec extends Specification implements BuildDomainTest<Page>,
+        ControllerUnitTest<PageAggregationController> {
 
     private PageAggregationController controllerUnderTest
 
@@ -75,5 +79,59 @@ class PageAggregationControllerSpec extends Specification {
 
         then: "result should be expectedResult"
         result == expectedResult
+    }
+
+    def "convert multiple barchart aggregations to DTO"() {
+        given: "two barchart aggregations"
+        JobGroup jobGroup1 = JobGroup.build(name: "job group 1", csiConfiguration: CsiConfiguration.build())
+        JobGroup jobGroup2 = JobGroup.build(name: "job group 2", id: 2)
+        List<BarchartAggregation> barchartAggregations = [
+                new BarchartAggregation(
+                        value: 1.2,
+                        valueComparative: 2.4,
+                        selectedMeasurand: new SelectedMeasurand("DOC_COMPLETE_TIME", CachedView.CACHED),
+                        page: page1,
+                        jobGroup: jobGroup1,
+                        aggregationValue: "foo"
+                ),
+                new BarchartAggregation(
+                        value: 3.2,
+                        valueComparative: null,
+                        selectedMeasurand: new SelectedMeasurand("SPEED_INDEX", CachedView.UNCACHED),
+                        page: page2,
+                        jobGroup: jobGroup2,
+                        aggregationValue: "bar"
+                )
+        ]
+        controllerUnderTest.i18nService = Stub(I18nService){
+            msg(_ as String, _ as String) >> {String key, String defaultValue -> key+";"+defaultValue}
+        }
+
+        when: "being converted to DTO"
+        def seriesDTOs = controllerUnderTest.convertToPageAggregationChartSeriesDTOs(barchartAggregations)
+
+        then: "the resulting list contains DTOs for both aggregations"
+        seriesDTOs == [
+                new PageAggregationChartSeriesDTO(
+                        measurand: "DOC_COMPLETE_TIME",
+                        measurandLabel: "de.iteratec.isr.measurand.DOC_COMPLETE_TIME;DOC_COMPLETE_TIME",
+                        measurandGroup: "LOAD_TIMES",
+                        value: 1.2,
+                        valueComparative: 2.4,
+                        page: "page one",
+                        jobGroup: "job group 1",
+                        unit: "ms",
+                        aggregationValue: "foo"),
+                new PageAggregationChartSeriesDTO(
+                        measurand: "SPEED_INDEX",
+                        measurandLabel: "de.iteratec.isr.measurand.SPEED_INDEX;SPEED_INDEX",
+                        measurandGroup: "LOAD_TIMES",
+                        value: 3.2,
+                        valueComparative: null,
+                        page: "page two",
+                        jobGroup: "job group 2",
+                        unit: "ms",
+                        aggregationValue: "bar")
+        ]
     }
 }

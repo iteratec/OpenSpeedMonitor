@@ -17,16 +17,14 @@
 
 package de.iteratec.osm.result
 
+import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import de.iteratec.osm.csi.Page
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
-@TestFor(PageService)
-@Mock([Page])
 @Build([Page])
-class PageServiceSpec extends Specification {
+class PageServiceSpec extends Specification implements BuildDomainTest<Page>, ServiceUnitTest<PageService> {
 
     PageService serviceUnderTest
 

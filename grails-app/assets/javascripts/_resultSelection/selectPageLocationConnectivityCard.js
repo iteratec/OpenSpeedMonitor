@@ -94,7 +94,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var getConnectivitySelection = function () {
         return {
-            selectedConnectivities: connectivitySelectElement.val() || []
+            selectedConnectivities: connectivitySelectElement.val()
         }
     };
 

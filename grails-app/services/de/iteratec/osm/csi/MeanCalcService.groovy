@@ -18,7 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightedValue
-import grails.transaction.Transactional;
+import grails.gorm.transactions.Transactional;
 
 
 /**

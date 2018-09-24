@@ -21,14 +21,15 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.csi.CsiDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
+
 /**
  * Created by sburnicki on 04.11.16.
  */
@@ -404,9 +405,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     private void createData() {
         Job.withNewTransaction {
-            if (OsmConfiguration.count == 0) {
-                OsmConfiguration.build().save(failOnError: true)
-            }
+            OsmConfiguration.build()
             createAdminUser()
             initCsiData()
             createTestSpecificData()
@@ -427,7 +426,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
         JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
         WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
-        Location location1 = Location.build(uniqueIdentifierForServer: location1Name).save(failOnError: true)
+        Location location1 = Location.build(uniqueIdentifierForServer: location1Name, browser: browser, wptServer: wpt).save(failOnError: true)
         Job job1 = Job.build().save(failOnError: true)
         CsiSystem csiSystem = new CsiSystem([label: "TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
@@ -598,10 +597,13 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
             BrowserConnectivityWeight.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
+            JobResult.list().each {
                 it.delete()
             }
-            JobResult.list().each {
+            Job.list().each {
+                it.delete()
+            }
+            ConnectivityProfile.list().each {
                 it.delete()
             }
             TimeToCsMapping.list().each {
@@ -611,9 +613,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
                 it.delete()
             }
             Page.list().each {
-                it.delete()
-            }
-            Job.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -649,9 +648,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
             CsiSystem.list().each {
                 it.delete()
             }

@@ -7,19 +7,15 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
-@TestFor(CsiApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup])
+
 @Build([CsiConfiguration, Page, JobGroup])
-class CsiApiControllerSpec extends Specification {
+class CsiApiControllerSpec extends Specification implements BuildDataTest, ControllerUnitTest<CsiApiController> {
 
     public static final String CSI_CONFIGURATION_LABEL = "csiConfiguration"
     CsiConfiguration csiConfiguration
@@ -29,6 +25,10 @@ class CsiApiControllerSpec extends Specification {
     def setup() {
         createTestDataCommonToAllTests()
         mockTimeToCsMappingsService()
+    }
+
+    void setupSpec() {
+        mockDomains(CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup)
     }
 
     void "existing csiConfiguration by id as JSON"() {

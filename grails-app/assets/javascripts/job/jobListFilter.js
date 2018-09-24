@@ -19,7 +19,7 @@
 
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-OpenSpeedMonitor.jobListFilter = (function(){
+OpenSpeedMonitor.jobListFilter = (function () {
     var storageUtils = OpenSpeedMonitor.clientSideStorageUtils();
     var filterTextLocalStorage = 'de.iteratec.osm.job.list.filter';
     var filterTextInput = $("#filterInput");
@@ -86,7 +86,7 @@ OpenSpeedMonitor.jobListFilter = (function(){
         }
     };
     $.extend(allFilterCheckboxes, showOnlyCheckboxes);
-    var filterByCheckboxes = [ allFilterCheckboxes.byName, allFilterCheckboxes.byJobGroup, allFilterCheckboxes.byTags,
+    var filterByCheckboxes = [allFilterCheckboxes.byName, allFilterCheckboxes.byJobGroup, allFilterCheckboxes.byTags,
         allFilterCheckboxes.byScript, allFilterCheckboxes.byLocation, allFilterCheckboxes.byBrowser];
 
     var init = function () {
@@ -96,27 +96,53 @@ OpenSpeedMonitor.jobListFilter = (function(){
         filter();
     };
 
+    var getUrlParam = function () {
+        var href = window.location.href;
+        if (href.includes('#')) {
+            href = href.split('#/')[1];
+            return href.split('=')[1];
+        } else {
+            return null;
+        }
+    };
+
     var initFilterInput = function () {
-        var filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
+        var filterText;
+        var urlParam = getUrlParam();
+        if (urlParam) {
+            filterText = urlParam;
+        } else {
+            filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
+        }
         filterTextInput.val(filterText);
-        filterTextInput.change(filter);
-        filterTextInput.keyup(filter);
+        filterTextInput.on('change', filter);
+        filterTextInput.on('keyup', filter);
     };
 
     var initFilterCheckboxes = function () {
-        $.each(allFilterCheckboxes, function(name, checkbox) {
-            var localStorageValue = storageUtils.getFromLocalStorage(checkbox.localStorage);
-            if (localStorageValue !== null) {
-                checkbox.isChecked = OpenSpeedMonitor.stringUtils.stringToBoolean(localStorageValue);
-                checkbox.element.prop("checked", checkbox.isChecked);
-                checkbox.element.parent().toggleClass("active", checkbox.isChecked); // bootstrap button-style
-            }
-            checkbox.element.change(filter);
-        });
+        var urlParam = getUrlParam();
+        if (urlParam) {
+            assignCheckboxValue(allFilterCheckboxes.byJobGroup, true);
+            allFilterCheckboxes.byJobGroup.element.on('change', filter);
+        } else {
+            $.each(allFilterCheckboxes, function (name, checkbox) {
+                var localStorageValue = storageUtils.getFromLocalStorage(checkbox.localStorage);
+                if (localStorageValue !== null) {
+                    assignCheckboxValue(checkbox, OpenSpeedMonitor.stringUtils.stringToBoolean(localStorageValue));
+                }
+                checkbox.element.on('change', filter);
+            });
+        }
+    };
+
+    var assignCheckboxValue = function (checkbox, isChecked) {
+        checkbox.isChecked = isChecked;
+        checkbox.element.prop("checked", checkbox.isChecked);
+        checkbox.element.parent().toggleClass("active", checkbox.isChecked);
     };
 
     var initClearFilterButton = function () {
-        clearFilterButton.click(clearFilter);
+        clearFilterButton.on('click', clearFilter);
     };
 
     var clearFilter = function () {
@@ -128,11 +154,11 @@ OpenSpeedMonitor.jobListFilter = (function(){
         saveState();
         var filterTerms = getFilterTerms();
         clearFilterButton.toggle(filterTerms.length > 0);
-        jobTableRows.each(function(idx, row) {
+        jobTableRows.each(function (idx, row) {
             row = $(row);
             var showRow = filterMatchesRow(filterTerms, row);
             row.toggleClass("hidden", !showRow);
-            if(!showRow) {
+            if (!showRow) {
                 row.find(".jobCheckbox").attr("checked", false)
             }
         });
@@ -141,12 +167,16 @@ OpenSpeedMonitor.jobListFilter = (function(){
     };
 
     var getFilterTerms = function () {
-        return filterTextInput.val().toLowerCase().split(/\s+/).filter(function (val) { return val; });
+        return filterTextInput.val().toLowerCase().split(/\s+/).filter(function (val) {
+            return val;
+        });
     };
 
     var filterMatchesRow = function (filterTerms, row) {
         return showOnlyFiltersMatchRow(row) &&
-               filterTerms.every(function(term) { return filterTermMatchesRow(term, row); });
+            filterTerms.every(function (term) {
+                return filterTermMatchesRow(term, row);
+            });
     };
 
     var showOnlyFiltersMatchRow = function (row) {
@@ -156,12 +186,14 @@ OpenSpeedMonitor.jobListFilter = (function(){
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyRunning.isChecked || row.find(".running").length > 0);
         return isMatch;
     };
-    
+
     var filterTermMatchesRow = function (filterTerm, row) {
-        var checkAll = filterByCheckboxes.every(function(checkbox) { return !checkbox.isChecked; });
+        var checkAll = filterByCheckboxes.every(function (checkbox) {
+            return !checkbox.isChecked;
+        });
         var isMatch = filterByCheckboxes.some(function (checkbox) {
             return (checkAll || checkbox.isChecked) &&
-                   row.find(checkbox.valueClassName).text().toLowerCase().indexOf(filterTerm) >= 0;
+                row.find(checkbox.valueClassName).text().toLowerCase().indexOf(filterTerm) >= 0;
         });
         return isMatch || filterTermMatchesTags(filterTerm, row, checkAll);
     };
@@ -182,7 +214,7 @@ OpenSpeedMonitor.jobListFilter = (function(){
 
     var saveState = function () {
         storageUtils.setToLocalStorage(filterTextLocalStorage, filterTextInput.val());
-        $.each(allFilterCheckboxes, function(name, checkbox) {
+        $.each(allFilterCheckboxes, function (name, checkbox) {
             checkbox.isChecked = checkbox.element.prop('checked');
             storageUtils.setToLocalStorage(checkbox.localStorage, checkbox.isChecked);
         });

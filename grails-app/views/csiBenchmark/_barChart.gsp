@@ -11,14 +11,14 @@
             </li>
             <li>
                 <a id="all-bars-desc" href="#">
-                    <i class="fa fa-check filterActive" aria-hidden="true"></i>
+                    <i class="fas fa-check filterActive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterDesc"
                                default="Descending"/>
                 </a>
             </li>
             <li>
                 <a id="all-bars-asc" href="#">
-                    <i class="fa fa-check filterInactive" aria-hidden="true"></i>
+                    <i class="fas fa-check filterInactive" aria-hidden="true"></i>
                     <g:message code="de.iteratec.osm.barchart.filter.noFilterAsc"
                                default="Ascending"/>
                 </a>
@@ -28,12 +28,12 @@
     <div class="in-chart-buttons hidden">
         <a href="#adjustBarchartModal" id="adjust-barchart-modal" data-toggle="modal" data-target="#adjustBarchartModal"
            onclick="initModalDialogValues()">
-            <i class="fa fa-sliders"></i>
+            <i class="fas fa-sliders-h"></i>
         </a>
         <a href="#downloadAsPngModal" id="download-as-png-button"
            data-toggle="modal" role="button" onclick="initPngDownloadModal()"
            title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
-            <i class="fa fa-download"></i>
+            <i class="fas fa-download"></i>
         </a>
     </div>
 
@@ -43,7 +43,7 @@
 </div>
 <g:render template="adjustBarchartModal"/>
 <asset:script type="text/javascript">
-    $(window).load(function() {
+    $(window).on('load', function() {
       OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/csiBenchmark/csiBenchmarkChart.js" />', 'barchart')
     });
 </asset:script>

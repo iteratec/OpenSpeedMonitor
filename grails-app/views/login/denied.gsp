@@ -18,11 +18,11 @@
 				
 				<div class="actions margin-top-large">
 					<a href="${createLink(uri: '/')}" class="btn btn-lg btn-primary">
-						<i class="fa fa-chevron-left"></i>
+                        <i class="fas fa-chevron-left"></i>
 						<g:message code="error.button.backToHome" locale="${lang}"/>
 					</a>
 					<a href="${createLink(uri: '/login')}" class="btn btn-lg btn-success">
-						<i class="fa fa-user"></i>
+                        <i class="fas fa-user"></i>
 						<g:message code="error.button.login" locale="${lang}"/>
 					</a>					
 				</div>

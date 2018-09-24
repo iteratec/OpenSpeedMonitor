@@ -2,7 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.barchart.BarchartQueryAndCalculationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
@@ -10,15 +9,15 @@ import de.iteratec.osm.distributionData.GetDistributionCommand
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
@@ -29,13 +28,12 @@ class DistributionChartController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
-    BarchartQueryAndCalculationService barchartQueryAndCalculationService
     PerformanceLoggingService performanceLoggingService
 
     def index() {
@@ -60,7 +58,7 @@ class DistributionChartController extends ExceptionHandlerController {
         modelToRender.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put("weekStart", MONDAY_WEEKSTART)
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         return modelToRender
     }
@@ -118,7 +116,7 @@ class DistributionChartController extends ExceptionHandlerController {
             List<List<Page>> testedPagesPerJob = [].withDefault { [] }
 
             jobList.findAll { it.script == currentScript }.each { j ->
-                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables)).getTestedPages().unique()
+                testedPagesPerJob << new ScriptParser(pageService, PlaceholdersUtility.getParsedNavigationScript(currentScript.navigationScript, j.variables), currentScript.label).getTestedPages().unique()
             }
 
             // if all lists are equal take any
@@ -185,18 +183,25 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
-        List<EventResultProjection> aggregations = barchartQueryAndCalculationService.getRawDataFor(allJobGroups, allPages, from, to, selectedMeasurand)
+        List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobResultDateBetween(from,to)
+                .withSelectedMeasurands([selectedMeasurand])
+                .withPageIn(allPages)
+                .withJobGroupIn(allJobGroups)
+                .getRawData(false)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
-                aggregations.each {
-                    if(it."${selectedMeasurand.getDatabaseRelevantName()}"){
-                        String identifier = "${it.page} | ${it.jobGroup}"
+                aggregations.each {EventResultProjection eventResultProjection ->
+                    if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
+                        JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
+                        Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
+                        String identifier = "${page} | ${jobGroup.name}"
                         if (!distributionChartDTO.series.get(identifier)) {
-                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: it.page, jobGroup: it.jobGroup))
+                            distributionChartDTO.series.put(identifier, new DistributionTrace(page: page, jobGroup: jobGroup.name))
                         }
                         def newTrace = distributionChartDTO.series.get(identifier)
-                        newTrace.data.add(selectedMeasurand.normalizeValue(it."${selectedMeasurand.getDatabaseRelevantName()}"))
+                        newTrace.data.add(selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"))
                     }
                 }
             }

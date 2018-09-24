@@ -25,7 +25,7 @@ environments:
     grails:
       serverURL: '{{ default .Env.OSM_URL "http://localhost:8080"}}'
       de.iteratec.osm.detailAnalysis:
-        enablePersistenceOfDetailAnalysisData: {{ default .Env.ENABLE_DETAIL_ANALYSIS false }}
+        enablePersistenceOfDetailAnalysisData: {{ default .Env.ENABLE_DETAIL_ANALYSIS "false" }}
         microserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
         apiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
     dataSource:

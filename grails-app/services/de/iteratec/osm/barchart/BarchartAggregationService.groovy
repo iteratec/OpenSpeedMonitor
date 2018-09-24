@@ -7,15 +7,15 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.I18nService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class BarchartAggregationService {
 
     OsmConfigCacheService osmConfigCacheService
     I18nService i18nService
-    BarchartQueryAndCalculationService barchartQueryAndCalculationService
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
@@ -56,14 +56,27 @@ class BarchartAggregationService {
         }
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
+        EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                .withJobResultDateBetween(from, to)
+                .withSelectedMeasurands(selectedMeasurands)
+                .withJobGroupIn(jobGroups)
+
+        if (pages){
+            queryBuilder = queryBuilder.withPageIn(pages)
+        } else {
+            queryBuilder = queryBuilder.withoutPagesIn([Page.findByName(Page.UNDEFINED)])
+        }
+
+        List<EventResultProjection> eventResultProjections = []
         switch(selectedAggregationValue) {
             case 'avg':
-                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getAveragesFor(jobGroups, pages, from, to, selectedMeasurands)
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+                eventResultProjections = queryBuilder.getAverageData()
+                break
             case 'median':
-                List<EventResultProjection> eventResultProjections = barchartQueryAndCalculationService.getMediansFor(jobGroups, pages, from, to, selectedMeasurands)
-                return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections)
+                eventResultProjections = queryBuilder.getMedianData()
+                break
         }
+        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
     }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
@@ -71,17 +84,17 @@ class BarchartAggregationService {
         List<Page> pages = []
         List<JobGroup> jobGroups = []
         cmd.selectedPageComparisons.each {
-            pages << Page.get(it.pageId1)
-            pages << Page.get(it.pageId2)
-            jobGroups << JobGroup.get(it.jobGroupId1)
-            jobGroups << JobGroup.get(it.jobGroupId2)
+            pages << Page.get(it.firstPageId)
+            pages << Page.get(it.secondPageId)
+            jobGroups << JobGroup.get(it.firstJobGroupId)
+            jobGroups << JobGroup.get(it.secondJobGroupId)
         }
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
         List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue)
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
-            pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId1 as long) && aggr.page.id == (comparison.pageId1 as long) }
-            pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.jobGroupId2 as long) && aggr.page.id == (comparison.pageId2 as long) }
+            pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.firstJobGroupId as long) && aggr.page.id == (comparison.firstPageId as long) }
+            pageComparisonAggregation.comperativeAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.secondJobGroupId as long) && aggr.page.id == (comparison.secondPageId as long) }
             comparisons << pageComparisonAggregation
         }
         return comparisons
@@ -92,21 +105,23 @@ class BarchartAggregationService {
         if (comparativeValues) {
             comparativeValues.each { comparative ->
                 BarchartAggregation matches = values.find { it == comparative }
-                matches.valueComparative = comparative.value
+                if (matches) matches.valueComparative = comparative.value
             }
         }
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
+            JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
+            Page page = pages.find { it.id == aggregation.pageId }
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
-                        jobGroup: aggregation.jobGroup,
-                        page: aggregation.page,
+                        jobGroup: jobGroup,
+                        page: page,
                         aggregationValue: selectedAggregationValue,
                 )
             }

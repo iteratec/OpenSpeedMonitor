@@ -2,21 +2,20 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.plugins.taggable.Tag
 import grails.plugins.taggable.TagLink
 import grails.plugins.taggable.TaggableService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import grails.util.Holders
 import spock.lang.Specification
 
-@TestFor(JobController)
 @Build([Job])
-@Mock([Tag, TagLink])
-class JobControllerSpec extends Specification {
+class JobControllerSpec extends Specification implements BuildDataTest, ControllerUnitTest<JobController> {
 
     def setup() {
         Holders.applicationContext.metaClass.taggableService = new TaggableService()
@@ -26,6 +25,10 @@ class JobControllerSpec extends Specification {
         controller.jobDaoService = Mock(JobDaoService)
         controller.inMemoryConfigService = Mock(InMemoryConfigService)
         controller.jobService = Mock(JobService)
+    }
+
+    void setupSpec() {
+        mockDomains(Tag, TagLink, ConnectivityProfile, Script)
     }
 
     void bindData(Job job) {

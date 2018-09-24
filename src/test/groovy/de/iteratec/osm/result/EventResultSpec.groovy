@@ -17,14 +17,17 @@
 
 package de.iteratec.osm.result
 
-import grails.test.mixin.Mock
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import spock.lang.Specification
 
-
-@Mock([EventResult, JobResult])
 @Build([EventResult, JobResult])
-class EventResultSpec extends Specification {
+class EventResultSpec extends Specification implements BuildDataTest {
+    void setupSpec() {
+        mockDomains(EventResult, JobResult, ConnectivityProfile, Script)
+    }
 
     def "build test details url and validate url"() {
         given: "an Event Result and a Job Result"

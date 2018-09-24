@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.d3Data.ScheduleChartData
 import de.iteratec.osm.d3Data.ScheduleChartJob
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
 import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
@@ -30,7 +30,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.I18nService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.quartz.CronExpression
@@ -262,7 +262,7 @@ class QueueAndJobStatusService {
                 // iterate over jobs
                 jobs.each { job ->
                     if (job.active) {
-                        ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
+                        ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript, job.script.label);
                         int seconds = parser.calculateDurationInSeconds()
 
                         // Add jobs which are going to run in given interval to the list

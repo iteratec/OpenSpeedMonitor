@@ -15,7 +15,7 @@ OpenSpeedMonitor.jobResult = (function (url) {
         spinner = OpenSpeedMonitor.Spinner("#failedMeasurementsOverview");
 
         // add on change listener to select element
-        $("#selectedJob").change(function () {
+        $("#selectedJob").on('change', function () {
             getJobResults($(this).val());
         });
     };

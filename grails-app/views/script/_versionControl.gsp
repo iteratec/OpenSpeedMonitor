@@ -25,8 +25,10 @@
                                             <td><textarea id="versionDescriptionTextArea-${archivedScript.id}" rows='1' class="script-textarea autoExpand form-control" maxlength="255" defaultValue ="${archivedScript.versionDescription}">${archivedScript.versionDescription}</textarea>  </td>
                                             <td>
                                                 <div class="script-save-abort-container">
-                                                    <i id="versionDescriptionSaveButton-${archivedScript.id}" class="fa fa-save script-icon" style="visibility: hidden;"></i>
-                                                    <i id="versionDescriptionAbortButton-${archivedScript.id}" class="fa fa-times script-icon" style="visibility: hidden;"></i>
+                                                    <i id="versionDescriptionSaveButton-${archivedScript.id}"
+                                                       class="fas fa-save script-icon" style="visibility: hidden;"></i>
+                                                    <i id="versionDescriptionAbortButton-${archivedScript.id}"
+                                                       class="fas fa-times script-icon" style="visibility: hidden;"></i>
                                                 </div>
                                             </td>
                                         </tr>

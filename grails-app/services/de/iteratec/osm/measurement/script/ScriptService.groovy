@@ -3,7 +3,7 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 class ScriptService {
@@ -19,5 +19,16 @@ class ScriptService {
                 MeasuredEvent.findOrSaveByNameAndTestedPage(measuredEventName, page)
             }
         }
+    }
+
+    def getMeasuredEventsForScript(Long scriptId) {
+        Script script = Script.get(scriptId)
+        return getMeasuredEventsForScript(script.navigationScript, script.label)
+    }
+
+    List<MeasuredEvent> getMeasuredEventsForScript(String navigationScript, String navigationScriptName) {
+        ScriptParser parser = new ScriptParser(pageService, navigationScript, navigationScriptName)
+
+        return parser.getAllMeasuredEvents(navigationScript).collect()
     }
 }

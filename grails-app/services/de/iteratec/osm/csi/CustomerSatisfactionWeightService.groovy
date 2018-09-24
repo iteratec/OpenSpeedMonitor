@@ -17,13 +17,13 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.util.I18nService
-
-import java.util.regex.Pattern
-
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.util.I18nService
+import grails.gorm.transactions.Transactional
+
+import java.util.regex.Pattern
 
 /**
  * Contains logic for persistence and validation of mappings for {@link WeightFactor}s.
@@ -32,6 +32,7 @@ import de.iteratec.osm.measurement.environment.Browser
  * @author nkuhn
  *
  */
+@Transactional
 class CustomerSatisfactionWeightService {
 
     I18nService i18nService
@@ -88,7 +89,7 @@ class CustomerSatisfactionWeightService {
             ++rowCounter
         }
 
-        if(lines.size() <=0) {
+        if (lines.size() <= 0) {
             errorMessages.add(i18nService.msg("de.iteratec.osm.csi.csvErrors.empty"))
         }
         if (incorrectLine > 0) {
@@ -102,7 +103,7 @@ class CustomerSatisfactionWeightService {
     private boolean lineCorrect(String line, int columnCount, List<Class> classes) {
         boolean correct = true
         List tokenized = line.tokenize(";")
-        if(tokenized.size()!= columnCount) correct = false
+        if (tokenized.size() != columnCount) correct = false
 
         for (int i = 0; i < classes.size(); i++) {
             if (classes[i] == String.class) {
@@ -191,14 +192,16 @@ class CustomerSatisfactionWeightService {
     private persistBrowserConnectivityWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0
         Collection<BrowserConnectivityWeight> existingWeights = changedCsiConfiguration.browserConnectivityWeights
+        Set<Long> visitedIds = []
         csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
                 Browser browser = Browser.findByName(tokenized[0])
                 ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(tokenized[1])
 
-                BrowserConnectivityWeight browserConnectivityWeight = existingWeights.find{it.browser == browser && it.connectivity == connectivityProfile}
-
+                BrowserConnectivityWeight browserConnectivityWeight = existingWeights.find {
+                    it.browser == browser && it.connectivity == connectivityProfile
+                }
                 if (tokenized[2]) {
                     double newWeight = Double.parseDouble(tokenized[2])
                     if (!browserConnectivityWeight) { // It's a new weight
@@ -208,16 +211,12 @@ class CustomerSatisfactionWeightService {
                     } else { // update existing
                         browserConnectivityWeight.weight = Double.valueOf(newWeight)
                     }
-                } else {
-                    if (browserConnectivityWeight) {
-                        changedCsiConfiguration.removeFromBrowserConnectivityWeights(browserConnectivityWeight)
-                        browserConnectivityWeight.delete()
-                    }
+                    visitedIds << browserConnectivityWeight.id
                 }
             }
             lineCounter++
         }
-        changedCsiConfiguration.save(failOnError: true)
+        changedCsiConfiguration.browserConnectivityWeights.removeIf { !visitedIds.contains(it.id) }
     }
 
     private persistPageWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
@@ -227,7 +226,7 @@ class CustomerSatisfactionWeightService {
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
                 Page page = Page.findByName(tokenized[0])
-                if(page) {
+                if (page) {
                     PageWeight pageWeight = PageWeight.findByPageAndWeight(page, Double.valueOf(tokenized[1]))
                     if (!pageWeight) {
                         log.info("save new Page-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
@@ -243,13 +242,13 @@ class CustomerSatisfactionWeightService {
 
     private persistCsiDay(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0
-        Map<String,Double> hourWeights = new HashMap<>()
+        Map<String, Double> hourWeights = new HashMap<>()
         csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
 
                 if (tokenized[0] && tokenized[1]) {
-                    hourWeights.put("hour" + tokenized[0] + "Weight",Double.parseDouble(tokenized[1]))
+                    hourWeights.put("hour" + tokenized[0] + "Weight", Double.parseDouble(tokenized[1]))
                 }
             }
             lineCounter++
@@ -260,14 +259,14 @@ class CustomerSatisfactionWeightService {
 
     void persistNewDefaultMapping(InputStream csv) {
         Integer lineCounter = 0
-        csv.eachLine {line ->
+        csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
                 String name = tokenized[0]
                 int loadTimeInMs = Integer.parseInt(tokenized[1])
                 double customerSatisfation = Double.parseDouble(tokenized[2])
                 DefaultTimeToCsMapping mapping = DefaultTimeToCsMapping.findByNameAndLoadTimeInMilliSecs(name, loadTimeInMs)
-                if(mapping) {
+                if (mapping) {
                     mapping.customerSatisfactionInPercent = customerSatisfation
                     mapping.save(failOnError: true)
                 } else {

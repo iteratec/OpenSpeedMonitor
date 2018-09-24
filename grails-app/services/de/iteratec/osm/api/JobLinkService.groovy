@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.PageService
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 /**
@@ -56,7 +56,7 @@ class JobLinkService {
 
     Map<String,String> getResultVisualizingLinksFor(Job job, DateTime start, DateTime end) {
 
-        ScriptParser parser = new ScriptParser(pageService, job.script.getParsedNavigationScript(job))
+        ScriptParser parser = new ScriptParser(pageService, job.script.getParsedNavigationScript(job), job.script.label)
         List<Long> eventIds = parser.getMeasuredEvents()*.id
         List<Long> pageIds = parser.getTestedPages()*.id
 

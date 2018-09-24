@@ -57,6 +57,8 @@ OpenSpeedMonitor-config.groovy
 node_modules/
 .asscache
 
+grails-app/assets/javascripts/frontend/
+grails-app/assets/stylesheets/frontend/
 grails-app/assets/javascripts/lib/
 grails-app/assets/stylesheets/lib/
 # the bootstrap.js was not created by the plugin
@@ -73,3 +75,28 @@ bower_components/
 
 # local docker tests
 docker/local_*
+
+# frontend compiled output
+frontend/dist
+frontend/tmp
+frontend/out-tsc
+
+# frontend dependencies
+frontend/node_modules
+
+# frontend misc
+frontend/.sass-cache
+frontend/connect.lock
+frontend/coverage
+frontend/libpeerconnection.log
+frontend/npm-debug.log
+frontend/yarn-error.log
+frontend/testem.log
+frontend/typings
+
+# frontend System Files
+frontend/.DS_Store
+frontend/Thumbs.db
+
+# frontends i18n files (get generated automatically)
+src/main/resources/public/i18n/*.json

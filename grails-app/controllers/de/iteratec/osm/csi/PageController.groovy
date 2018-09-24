@@ -18,26 +18,22 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus
-
-import javax.servlet.http.HttpServletResponse
 
 /**
  * PageController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
 class PageController {
-
+    PageService pageService
     I18nService i18nService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index() {
-       
+
     }
 
     def list() {
@@ -111,7 +107,8 @@ class PageController {
         flash.message = message(code: 'default.updated.message', args: [message(code: 'page.label', default: 'Page'), pageInstance.id])
         redirect(action: "show", id: pageInstance.id)
     }
-    def updateTable(){
+
+    def updateTable() {
         params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
         params.max = params.max as Integer
@@ -119,7 +116,7 @@ class PageController {
         List<Page> result
         int count
         result = Page.createCriteria().list(params) {
-            if(params.filter)ilike("name","%"+params.filter+"%")
+            if (params.filter) ilike("name", "%" + params.filter + "%")
         }
         String templateAsPlainText = g.render(
                 template: 'pageTable',
@@ -131,7 +128,7 @@ class PageController {
         ])
     }
 
-    def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command){
+    def getPagesForMeasuredEvents(GetPagesForMeasuredEventsCommand command) {
         render command.measuredEventList*.testedPageId as Set
     }
 }

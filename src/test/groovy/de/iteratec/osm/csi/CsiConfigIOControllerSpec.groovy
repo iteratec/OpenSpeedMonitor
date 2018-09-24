@@ -20,32 +20,34 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.I18nService
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.web.controllers.ControllerUnitTest
 import org.apache.commons.io.FileUtils
 import org.grails.plugins.testing.GrailsMockMultipartFile
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
-@TestFor(CsiConfigIOController)
-@Mock([CsiConfiguration, BrowserConnectivityWeight, ConnectivityProfile, Browser, Page, PageWeight, CsiDay])
 @Build([CsiConfiguration, BrowserConnectivityWeight, PageWeight, Browser, ConnectivityProfile, Page])
-class CsiConfigIOControllerSpec extends Specification{
+class CsiConfigIOControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<CsiConfigIOController> {
 
     CsiConfiguration csiConfigurationFilled
     CsiConfiguration csiConfigurationEmpty
 
-    def doWithSpring = {
-        customerSatisfactionWeightService(CustomerSatisfactionWeightService)
+    Closure doWithSpring() {
+        return {
+            customerSatisfactionWeightService(CustomerSatisfactionWeightService)
+        }
     }
 
     void setup() {
         initializeSpringBeanServices()
         createTestDataCommonToAllTestsViaBuild()
         createMocksCommonToAllTests()
+    }
+
+    void setupSpec() {
+        mockDomains(CsiConfiguration, BrowserConnectivityWeight, ConnectivityProfile, Browser, Page, PageWeight, CsiDay)
     }
 
     //################### EXPORTS ###################

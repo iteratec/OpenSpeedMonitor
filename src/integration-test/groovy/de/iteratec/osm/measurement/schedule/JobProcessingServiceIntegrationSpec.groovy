@@ -23,12 +23,12 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
@@ -40,7 +40,7 @@ import org.quartz.impl.triggers.CronTriggerImpl
  *
  * @author dri
  */
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
     JobProcessingService jobProcessingService
@@ -62,7 +62,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
     def setup() {
 
         // mocks common for all tests
-        jobProcessingService.proxyService = Stub(ProxyService) {
+        jobProcessingService.wptInstructionService = Stub(WptInstructionService) {
             runtest(_, _) >> new XmlSlurper().parseText("""
                     <response>
                         <statusCode>200</statusCode>
@@ -81,7 +81,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
                     </response>
             """)
         }
-        jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
+        jobProcessingService.wptInstructionService.httpRequestService = new HttpRequestServiceMock()
 
         //test data common for all tests
         jobProcessingService.inMemoryConfigService = new InMemoryConfigService()
@@ -118,6 +118,10 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
                 active: true
         ).save(failOnError: true)
         connectivityProfile.connectivityProfileService = new ConnectivityProfileService()
+    }
+
+    def cleanup() {
+        jobProcessingService.wptInstructionService = grailsApplication.mainContext.getBean('wptInstructionService')
     }
 
 
@@ -220,9 +224,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
 
     void "statusOfRepeatedJobExecution test"() {
         given: "an inactive job and a date"
-        Job.withNewTransaction {
-            createJob(false)
-        }
+        createJob(false)
         Job job = jobDaoService.getJobById(1)
         Date now = new Date()
         Date oldestDate = now - 5

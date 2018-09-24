@@ -75,7 +75,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                            <i class="fa fa-undo"></i> Reset
+                            <i class="fas fa-undo"></i> Reset
                         </button>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
 <content tag="include.bottom">
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', "pageAggregation");
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });

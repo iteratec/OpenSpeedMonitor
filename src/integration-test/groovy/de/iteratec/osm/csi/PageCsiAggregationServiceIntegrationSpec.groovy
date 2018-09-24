@@ -26,24 +26,25 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.AggregationType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test-suite of {@link PageCsiAggregationService}.
  */
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
-@ConfineMetaClassChanges([WeightingService])
 class PageCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval

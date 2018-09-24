@@ -8,11 +8,11 @@
     position: relative;
 }
 
-.chart-filter .fa {
+.chart-filter .fas {
     visibility: hidden;
 }
 
-.chart-filter.selected .fa {
+.chart-filter.selected .fas {
     visibility: visible;
 }
 

@@ -1,5 +1,4 @@
 databaseChangeLog = {
-
     include file: '2015-11-18-SCHEME-initial-liquibase.groovy'
     include file: '2015-11-18-DATA-set-initial-csi-transformation.groovy'
     include file: '2015-11-18-DATA-multiply-csi-values-by-100.groovy'
@@ -63,4 +62,5 @@ databaseChangeLog = {
     include file: '2018-01-09-v440-addUseGlobalUASuffixBool.groovy'
     include file: '2018-01-17-v440-addThreshold.groovy'
     include file: '2018-02-20-v450-dropMainUrl.groovy'
+    include file: '2018-06-20-v460-removeScriptPageRelations.groovy'
 }

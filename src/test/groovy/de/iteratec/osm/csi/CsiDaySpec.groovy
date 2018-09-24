@@ -1,14 +1,17 @@
 package de.iteratec.osm.csi
 
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import spock.lang.Specification
 
-@Mock([CsiDay])
 @Build([CsiDay])
-class CsiDaySpec extends Specification {
+class CsiDaySpec extends Specification implements BuildDataTest {
 
     void setup() {
+    }
+
+    void setupSpec() {
+        mockDomain(CsiDay)
     }
 
     void "test set a new weight for hour"() {

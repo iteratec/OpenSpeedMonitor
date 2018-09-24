@@ -21,14 +21,14 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdaterDummy
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
-import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
+import de.iteratec.osm.measurement.environment.wptserver.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserver.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.buildtestdata.BuildDataTest
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.junit.Rule
 import software.betamax.Configuration
@@ -37,14 +37,9 @@ import software.betamax.junit.Betamax
 import software.betamax.junit.RecorderRule
 import spock.lang.Ignore
 import spock.lang.Specification
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-@TestFor(GraphiteEventService)
-@Mock([GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath])
-@Ignore
-class GraphiteEventServiceSpec extends Specification {
 
+@Ignore
+class GraphiteEventServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<GraphiteEventService> {
     //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
 
     public static final DateTime untilDateTime = new DateTime(2015, 5, 29, 5, 0, 0)
@@ -57,21 +52,25 @@ class GraphiteEventServiceSpec extends Specification {
     public static final String jobGroupName = 'associated JobGroup'
     public static String metricName = 'alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")'
 
-    def doWithSpring = {
-        eventDaoService(EventDaoService)
-        csiAggregationUtilService(CsiAggregationUtilService)
-        httpRequestService(HttpRequestService)
+    Closure doWithSpring() {
+        return {
+            eventDaoService(EventDaoService)
+            csiAggregationUtilService(CsiAggregationUtilService)
+            httpRequestService(HttpRequestService)
+        }
     }
 
     def setup() {
-
         serviceUnderTest = service
 
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
         mockBatchActivityService()
         serviceUnderTest.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
         mockCsiAggregationUtilService()
+    }
 
+    void setupSpec() {
+        mockDomains(GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath)
     }
 
     @Betamax(tape = 'GraphiteEventServiceSpec_retrieve_events')

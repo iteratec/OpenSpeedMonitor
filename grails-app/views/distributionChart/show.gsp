@@ -77,7 +77,7 @@
             <div class="row reset-result-selection-button-row">
                 <div class="col-md-12">
                     <button class="reset-result-selection btn btn-default btn-sm" type="button" title="Reset">
-                        <i class="fa fa-undo"></i> Reset
+                        <i class="fas fa-undo"></i> Reset
                     </button>
                 </div>
             </div>
@@ -94,7 +94,7 @@
 
         OpenSpeedMonitor.ChartModules.UrlHandling.DistributionChart().init();
 
-        $(window).load(function() {
+        $(window).on('load', function() {
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" />', 'resultSelection');
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/distributionChart/distributionChart.js" />', 'distributionChart');
             OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch.updateUrls(true);

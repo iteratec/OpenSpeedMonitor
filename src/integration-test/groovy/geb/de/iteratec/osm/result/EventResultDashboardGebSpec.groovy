@@ -15,23 +15,23 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
-import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise
+
 /**
  * Created by marko on 22.06.16.
  */
 @Integration
 @Rollback
 @Stepwise
-class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
+class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
     @Shared
     String location1Name = "TestLocation1-564892#Afef1"
     @Shared
@@ -80,7 +80,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !selectConnectivityProfilesList[0].enabled
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -115,7 +115,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-data").displayed
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -139,7 +139,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-data").displayed
         }
         waitFor {
-            showButton.disabled
+            showButton.@disabled
         }
     }
 
@@ -164,7 +164,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             !$("#warning-no-page").displayed
         }
         waitFor {
-            !showButton.disabled
+            !showButton.@disabled
         }
     }
 
@@ -175,7 +175,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every{ it.displayed } }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
@@ -230,7 +230,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         clickShowButton()
 
         then: "Graphs are displayed"
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every { it.displayed } }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
@@ -808,16 +808,16 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             MeasuredEvent.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
-                it.delete()
-            }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -844,15 +844,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 
     private createData() {
         Job.withNewTransaction {
-            TestDataUtil.createOsmConfig()
+            OsmConfiguration.build()
             TestDataUtil.createAdminUser()
 
             Script script1 = Script.build().save(failOnError: true)
@@ -860,8 +858,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             JobGroup jobGroup1 = JobGroup.build(name: jobGroup1Name)
             WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
             Browser browser = Browser.build().save(failOnError: true)
-            Location location1 = Location.build(uniqueIdentifierForServer: location1Name).save(failOnError: true)
-            Location location2 = Location.build(uniqueIdentifierForServer: location2Name).save(failOnError: true)
+            Location location1 = Location.build(uniqueIdentifierForServer: location1Name, browser: browser, wptServer: wpt).save(failOnError: true)
+            Location location2 = Location.build(uniqueIdentifierForServer: location2Name, browser: browser, wptServer: wpt).save(failOnError: true)
             Job job1 = Job.build().save(failOnError: true)
             Job job2 = Job.build().save(failOnError: true)
             Page page1 = Page.build().save(failOnError: true)

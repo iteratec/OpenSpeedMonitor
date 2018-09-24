@@ -20,7 +20,6 @@
 //= require_tree node_modules/bootstrap-colorpicker/dist/js/
 //= require_tree node_modules/chosen-js
 //= require_tree node_modules/clipboard
-//= require ${grails.util.Environment.currentEnvironment == grails.util.Environment.PRODUCTION ? 'node_modules/vue/dist/vue.min.js' : 'node_modules/vue/dist/vue.js'}
 //= require kickstart/checkboxes
 //= require spinner
 //= require node_modules/bootstrap-validator/js/validator
@@ -42,6 +41,11 @@ OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
  * Map for i18n to use
  */
 OpenSpeedMonitor.i18n = OpenSpeedMonitor.i18n || {};
+
+/**
+ * Map for user to use
+ */
+OpenSpeedMonitor.user = OpenSpeedMonitor.user || {};
 
 
 /**
@@ -328,7 +332,7 @@ OpenSpeedMonitor.domUtils = (function () {
      */
     var deselectAllOptions = function (selectElement, avoidEvent) {
         selectElement = $(selectElement);
-        selectElement.find("option:selected").removeAttr("selected");
+        selectElement.find("option:selected").prop('selected', false);
         if (!avoidEvent) {
             selectElement.trigger("change");
         }
@@ -403,7 +407,7 @@ function fireWindowEvent(eventName) {
     window.dispatchEvent(event);
 }
 
-$("#main-navbar .dropdown-toggle").click(function (event) {
+$("#main-navbar .dropdown-toggle").on('click', function (event) {
     event.preventDefault();
     var parent = $(this).parent();
     var wasOpen = parent.hasClass("open");

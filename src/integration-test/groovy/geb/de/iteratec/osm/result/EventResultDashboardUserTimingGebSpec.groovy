@@ -17,8 +17,8 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.testing.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
@@ -64,7 +64,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
     @Shared
     String userTimingMeasureName = "Measure1-564892#Afef1"
     @Shared
-    int userTimingsSize
+    int userTimingsSize = 2
 
 
     void cleanupSpec() {
@@ -205,7 +205,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
         clickShowButton()
 
         then: "graphs appear with marks, measures and DOC_COMPLETE_TIME"
-        waitFor { graphLines.displayed }
+        waitFor { graphLines.every { it.displayed } }
         graphLines.size() == 9
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 9
@@ -215,31 +215,31 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
-            UserTimingSelectionInformation.list().each {
-                it.delete()
-            }
             ResultSelectionInformation.list().each {
                 it.delete()
             }
-            UserTiming.list().each {
+            UserTimingSelectionInformation.list().each {
                 it.delete()
             }
             EventResult.list().each {
                 it.delete()
             }
-            MeasuredEvent.list().each {
+            UserTiming.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
+            MeasuredEvent.list().each {
                 it.delete()
             }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -266,18 +266,14 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 
 
     private createData() {
         Job.withNewTransaction {
-            if (OsmConfiguration.count == 0) {
-                OsmConfiguration.build().save(failOnError: true)
-            }
+            OsmConfiguration.build()
             createAdminUser()
 
             Script script1 = Script.build(label: script1Name, description: "This is for test purposes", navigationScript: "stuff")
@@ -310,22 +306,6 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
             JobResult jobResultWithUserTimings2 = JobResult.build(testId:"Test2", date: new DateTime(2016, 06, 22, 3, 19, DateTimeZone.UTC).toDate(), job: job1, locationLocation: location1)
 
             ConnectivityProfile connectivityProfile = createConnectivityProfile(connectivityProfileName)
-
-            List<UserTiming> userTimingsForJobResult2 = []
-            userTimingsForJobResult2.add(
-                    new UserTiming(
-                            name: userTimingMarkName,
-                            type: UserTimingType.MARK,
-                            startTime: 123
-                    ))
-            userTimingsForJobResult2.add(
-                    new UserTiming(
-                            name: userTimingMeasureName,
-                            type: UserTimingType.MEASURE,
-                            startTime: 123,
-                            duration: 456
-                    ))
-            userTimingsSize = userTimingsForJobResult2.size()
 
             new EventResult(
                     numberOfWptRun: 1,
@@ -388,7 +368,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -421,7 +401,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -516,7 +496,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -548,7 +528,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -611,7 +591,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -643,7 +623,7 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
                     page: measuredEvent2.testedPage,
                     browser: browser,
                     location: location1,
-                    userTimings: userTimingsForJobResult2
+                    userTimings: createUserTimingsForJobResult()
             ).save()
 
             new EventResult(
@@ -765,4 +745,22 @@ class EventResultDashboardUserTimingGebSpec extends CustomUrlGebReportingSpec im
         datePicker << date
     }
 
+    private List<UserTiming> createUserTimingsForJobResult() {
+        List<UserTiming> userTimingsForJobResult = []
+        userTimingsForJobResult.add(
+                new UserTiming(
+                        name: userTimingMarkName,
+                        type: UserTimingType.MARK,
+                        startTime: 123
+                ))
+        userTimingsForJobResult.add(
+                new UserTiming(
+                        name: userTimingMeasureName,
+                        type: UserTimingType.MEASURE,
+                        startTime: 123,
+                        duration: 456
+                ))
+
+        return userTimingsForJobResult
+    }
 }

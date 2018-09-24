@@ -30,25 +30,38 @@
 <div class="row card-well">
     <div class="col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="de.iteratec.isr.measurementresults" default="Results"/> <i class="fa fa-tachometer"></i></h2>
+            <h2><g:message code="de.iteratec.isr.measurementresults" default="Results"/> <i class="fas fa-tachometer-alt"></i></h2>
             <img src="${resource(dir: 'images', file: 'results.png')}"
                  alt="Page Aggregation Chart" class="intro-img img-rounded"/>
-            <p class="intro-text">
-                <g:message code="landing.results.text"
-                           default="Review and analyze the results of your measurements. Show {0} by page, the {1} or dive into the {2}."
-                           encodeAs="raw" args="[
-                        link(controller: 'pageAggregation', action: 'show') { message(code:'landing.results.link.pageAggregation', default:'aggregated results')},
-                        link(controller: 'eventResultDashboard', action: 'showAll') { message(code:'landing.results.link.timeSeries', default:'development over time')},
-                        (grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true' ?
-                                link(controller: 'detailAnalysis', action: 'show') { message(code:'landing.results.link.detailAnalysis', default:'request details')}
-                                : message(code:'landing.results.link.detailAnalysis', default:'request details'))
-                ]"/>
-            </p>
+
+            <div class="intro-text">
+                <p>
+                    <g:message code="landing.results.text"
+                               default="Review and analyze the results of your measurements. Show {0} by page, the {1} or dive into the {2}."
+                               encodeAs="raw" args="[
+                            link(controller: 'pageAggregation', action: 'show') {
+                                message(code: 'landing.results.link.pageAggregation', default: 'aggregated results')
+                            },
+                            link(controller: 'eventResultDashboard', action: 'showAll') {
+                                message(code: 'landing.results.link.timeSeries', default: 'development over time')
+                            },
+                            (grailsApplication.config.getProperty('grails.de.iteratec.osm.detailAnalysis.enablePersistenceOfDetailAnalysisData') == 'true' ?
+                                    link(controller: 'detailAnalysis', action: 'show') {
+                                        message(code: 'landing.results.link.detailAnalysis', default: 'request details')
+                                    } : message(code: 'landing.results.link.detailAnalysis', default: 'request details'))
+                    ]"/>
+                </p>
+                <a href="/applicationDashboard"
+                   class="btn btn-primary"><g:message code="landing.results.showOverview"
+                                                      default="Create New Measurement"/></a>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
+
+    <div class=" col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="customerSatisfation.label" default="Customer Satisfaction"/> <i class="fa fa-users"></i></h2>
+            <h2><g:message code="customerSatisfation.label" default="Customer Satisfaction"/> <i
+                    class="fas fa-users"></i></h2>
             <img src="${resource(dir: 'images', file: 'csi.png')}"
                  alt="CSI Graph" class="intro-img img-rounded"/>
             <div class="intro-text">
@@ -64,7 +77,8 @@
     </div>
     <div class="col-md-4">
         <div class="card intro-card">
-            <h2><g:message code="de.iteratec.isr.managementDashboard" default="Measurement"/> <i class="fa fa-tasks"></i></h2>
+            <h2><g:message code="de.iteratec.isr.managementDashboard" default="Measurement"/> <i
+                    class="fas fa-tasks"></i></h2>
             <img src="${resource(dir: 'images', file: 'jobs.png')}"
                  alt="Job List" class="intro-img img-rounded"/>
             <div class="intro-text">
@@ -72,7 +86,9 @@
                     <g:message code="landing.measurement.text"
                                default="Set up and control {0}. Configure what, how and when you want to measure your web application."
                                encodeAs="raw" args="[
-                            link(controller: 'job', action: 'index') { message(code:'landing.measurement.linkText', default:'your measurements')}
+                            link(controller: 'job', action: 'index') {
+                                message(code: 'landing.measurement.linkText', default: 'your measurements')
+                            }
                     ]"/>
                 </p>
                     <a <g:if test="${isSetupFinished}">href="/measurementSetup/create"</g:if> <g:if test="${isSetupFinished}">title="<g:message code="de.iteratec.osm.ui.setupwizards.infra.continueInfo" default="continueButton" />"</g:if> class="btn btn-primary <g:if test="${!isSetupFinished}">submit disabled</g:if>">
@@ -81,4 +97,5 @@
         </div>
     </div>
 </div>
+
 </body>

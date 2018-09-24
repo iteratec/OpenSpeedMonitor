@@ -7,7 +7,7 @@ import de.iteratec.osm.barchart.BarchartAggregationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.result.dto.JobGroupAggregationChartDTO
 import de.iteratec.osm.result.dto.JobGroupDTO
 import de.iteratec.osm.util.ControllerUtils
@@ -19,7 +19,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
 
-    JobGroupDaoService jobGroupDaoService
+    JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
     I18nService i18nService
@@ -48,7 +48,7 @@ class JobGroupAggregationController extends ExceptionHandlerController {
 
         modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
-        modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+        modelToRender.put("tagToJobGroupNameMap", jobGroupService.getTagToJobGroupNameMap())
 
         // Done! :)
         return modelToRender

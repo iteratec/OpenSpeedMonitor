@@ -10,6 +10,7 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var svg = null,
         chartData = null,
+        currentSeries = null,
         width = 600,
         height = 600,
         margin = {top: 50, right: 0, bottom: 70, left: 100},
@@ -27,7 +28,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             draw();
         });
 
-        $(window).resize(drawUpdatedSize);
+        $(window).on('resize', drawUpdatedSize);
     };
 
     var drawUpdatedSize = function () {
@@ -55,7 +56,10 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             sortedSeries[trace] = chartData.series[trace];
         });
         chartData.series = sortedSeries;
-
+        currentSeries = [];
+        Object.keys(sortedSeries).forEach(function (key) {
+            currentSeries[key] = sortedSeries[key];
+        });
         initFilterDropdown(chartData.filterRules);
         draw();
     };
@@ -100,7 +104,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var getHeaderTransform = function() {
-        var widthOfAllViolins = Object.keys(chartData.series).length * violinWidth;
+        var widthOfAllViolins = Object.keys(currentSeries).length * violinWidth;
         return "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)";
     };
 
@@ -117,8 +121,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var drawXAxis = function () {
         var x = d3.scale.ordinal()
             .range(xRange())
-            .domain(Object.keys(chartData.series).map(function (seriesKey) {
-                return chartData.series[seriesKey].label;
+            .domain(Object.keys(currentSeries).map(function (seriesKey) {
+                return currentSeries[seriesKey].label;
             }));
 
         var xAxis = d3.svg.axis()
@@ -160,8 +164,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         var violinGroup = svg.append("g");
         createClipPathAroundViolins(violinGroup);
-        Object.keys(chartData.series).forEach(function (trace, i) {
-            var traceData = chartData.series[trace].data;
+        Object.keys(currentSeries).forEach(function (trace, i) {
+            var traceData = currentSeries[trace].data;
 
             var g = violinGroup.append("g")
                 .attr("class", "d3chart-violin")
@@ -185,7 +189,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var sortSeriesDataAscending = function() {
-        Object.keys(chartData.series).forEach( function (trace, i) {
+        Object.keys(chartData.series).forEach(function (trace, i) {
             chartData.series[trace].data.sort(d3.ascending);
         });
     };
@@ -197,7 +201,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var calculateViolinWidth = function () {
         var svgWidth = width - margin.left;
-        var numberOfViolins = Object.keys(chartData.series).length;
+        var numberOfViolins = Object.keys(currentSeries).length;
 
         if (numberOfViolins * maxViolinWidth > svgWidth) {
             return svgWidth / numberOfViolins;
@@ -208,8 +212,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var getDomain = function () {
         var maxValues = [];
-        Object.keys(chartData.series).forEach( function (trace) {
-            maxValues.push(Math.max.apply(null, chartData.series[trace].data));
+        Object.keys(currentSeries).forEach(function (trace) {
+            maxValues.push(Math.max.apply(null, currentSeries[trace].data));
         });
         var maxValue = Math.max.apply(null, maxValues);
         var trimValue = dataTrimValue.value || maxValue;
@@ -220,8 +224,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     var getGreatestDomainTrace = function () {
         var maxDomainSize = -1;
         var greatestTrace = [];
-        Object.keys(chartData.series).forEach( function (trace) {
-            var curTrace = chartData.series[trace].data;
+        Object.keys(currentSeries).forEach(function (trace) {
+            var curTrace = currentSeries[trace].data;
             var domainSize = d3.quantile(curTrace, 0.75) - d3.quantile(curTrace, 0.25);
             if (domainSize > maxDomainSize) {
                 maxDomainSize = domainSize;
@@ -233,7 +237,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
     var xRange = function () {
         var range = [];
-        Object.keys(chartData.series).forEach( function (trace, i) {
+        Object.keys(currentSeries).forEach(function (trace, i) {
             range.push(i * violinWidth + violinWidth/2);
         });
 
@@ -314,17 +318,17 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
     };
 
     var sortByMedian = function () {
-        Object.keys(chartData.series).forEach( function (trace) {
+        Object.keys(chartData.series).forEach(function (trace) {
             chartData.series[trace].median = calculateMedian(chartData.series[trace].data);
         });
 
         chartData.sortingRules = {};
 
-        chartData.sortingRules.desc = Object.keys(chartData.series).sort( function (a, b) {
+        chartData.sortingRules.desc = Object.keys(chartData.series).sort(function (a, b) {
             return chartData.series[b].median - chartData.series[a].median;
         });
 
-        chartData.sortingRules.asc = Object.keys(chartData.series).sort( function (a, b) {
+        chartData.sortingRules.asc = Object.keys(chartData.series).sort(function (a, b) {
             return chartData.series[a].median - chartData.series[b].median;
         });
     };
@@ -350,8 +354,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
 
         for (var filterRuleKey in filterRules) {
             if (filterRules.hasOwnProperty(filterRuleKey)) {
-                var link = $("<li class='filterRule'><a href='#'><i class='fa fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
-                link.click(function (e) {
+                var link = $("<li class='filterRule'><a href='#'><i class='fas fa-check filterInactive' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
+                link.on('click', function (e) {
                     filterCustomerJourney(e.target.innerText);
                     toogleFilterCheckmarks(e.target);
                 });
@@ -359,11 +363,11 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             }
         }
 
-        $filterDropdownGroup.find("#all-violins-desc").click(function (e) {
+        $filterDropdownGroup.find("#all-violins-desc").on('click', function (e) {
             filterCustomerJourney(null, true);
             toogleFilterCheckmarks(e.target);
         });
-        $filterDropdownGroup.find("#all-violins-asc").click(function (e) {
+        $filterDropdownGroup.find("#all-violins-asc").on('click', function (e) {
             filterCustomerJourney(null, false);
             toogleFilterCheckmarks(e.target);
         })
@@ -376,7 +380,8 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             var journey = chartData.filterRules[journeyKey];
 
             journey.forEach( function (trace) {
-                filteredAndSortedSeries[trace] = chartData.series[trace];
+                const series = chartData.series[trace];
+                if (series !== undefined) filteredAndSortedSeries[trace] = series;
             });
         } else {
             var sortingOrder = desc ? "desc" : "asc";
@@ -385,7 +390,7 @@ OpenSpeedMonitor.ChartModules.distributionChart = (function () {
             });
         }
 
-        chartData.series = filteredAndSortedSeries;
+        currentSeries = filteredAndSortedSeries;
         draw();
     };
 

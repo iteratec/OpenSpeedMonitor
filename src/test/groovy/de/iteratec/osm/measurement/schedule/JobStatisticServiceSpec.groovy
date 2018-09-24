@@ -1,17 +1,19 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import spock.lang.Specification
 
-@TestFor(JobStatisticService)
 @Build([Job, JobResult])
-@Mock([Job, JobResult, JobStatistic])
-class JobStatisticServiceSpec extends Specification {
+class JobStatisticServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<JobStatisticService> {
+    void setupSpec() {
+        mockDomains(Job, JobResult, JobStatistic, ConnectivityProfile, Script)
+    }
 
     void "job without tests"() {
         setup: "job gets prepared without any results at all"

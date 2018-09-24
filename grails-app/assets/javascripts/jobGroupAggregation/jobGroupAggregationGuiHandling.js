@@ -11,9 +11,12 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     var jobGroupAggregationChart = OpenSpeedMonitor.ChartModules.JobGroupAggregationHorizontal("#job-group-aggregation-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
+    var avgLoaded = false;
+    var medianLoaded = false;
 
     var init = function () {
-        drawGraphButton.click(function () {
+        drawGraphButton.on('click', function () {
+            $("#chart-card").removeClass("hidden");
             loadData(true);
         });
         $(window).on('historyStateLoaded', function () {
@@ -24,9 +27,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             jobGroupAggregationChart.render();
         });
         $("input[name='aggregationValue']").on("change", function () {
-            renderChart({aggregationValue: getAggregationValue()}, true);
+            spinner.start();
+            renderChart({aggregationValue: getAggregationValue()}, true, true);
         });
-        $(".chart-filter").click(onFilterClick);
+        $(".chart-filter").on('click', onFilterClick);
     };
 
     var getSelectedFilter = function () {
@@ -37,7 +41,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         return $('input[name=aggregationValue]:checked').val()
     };
 
-    var onFilterClick = function () {
+    var onFilterClick = function (event) {
         event.preventDefault();
         $(".chart-filter").toggleClass('selected', false);
         $(this).toggleClass('selected', true);
@@ -45,7 +49,6 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
     };
 
     var handleNewData = function (data, isStateChange) {
-        spinner.stop();
         $("#chart-card").removeClass("hidden");
         $("#error-div").toggleClass("hidden", true);
 
@@ -63,21 +66,30 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
         $("#dia-save-chart-as-png").removeClass("disabled");
     };
 
-    var renderChart = function (data, isStateChange) {
+    var renderChart = function (data, isStateChange, isAggregationValueChange) {
+        if(avgLoaded && getAggregationValue() === "avg") {
+            spinner.stop()
+        }
+        if(medianLoaded && getAggregationValue() === "median"){
+            spinner.stop()
+        }
         if (data) {
             jobGroupAggregationChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.groupData) jobGroupAggregationChart.render();
+        if (!data.groupData) jobGroupAggregationChart.render(isAggregationValueChange);
         if (data.groupData && getAggregationValue() === data.groupData[0].aggregationValue) {
-            jobGroupAggregationChart.render();
+            jobGroupAggregationChart.render(isAggregationValueChange);
         }
     };
 
     var loadData = function (isStateChange) {
         jobGroupAggregationChart.resetData();
+        avgLoaded = false;
+        medianLoaded = false;
+
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
 
@@ -103,11 +115,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.jobGroupAggregation = (function () {
             url: OpenSpeedMonitor.urls.jobGroupAggregationGetData,
             dataType: "json",
             success: function (data) {
+                if (aggregationValue === "avg") {
+                    avgLoaded = true;
+                } else {
+                    medianLoaded = true;
+                }
                 handleNewData(data, isStateChanged);
             },
             error: function (e) {
                 spinner.stop();
-                $("#chart-card").removeClass("hidden")
+                $("#chart-card").removeClass("hidden");
                 if (e.responseText === "no data") {
                     $("#error-div").addClass("hidden");
                     $('#warning-no-data').show();

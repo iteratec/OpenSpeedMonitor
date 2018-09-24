@@ -18,7 +18,7 @@
 package de.iteratec.osm.p13n
 
 import de.iteratec.osm.report.UserspecificEventResultDashboard
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 /**
  * CustomDashboardService

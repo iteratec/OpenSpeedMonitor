@@ -1,5 +1,5 @@
 <%@ defaultCodec="none" %>
-<div id="Content" class="container-fluid">
+<div id="Content" class="content container-fluid">
 
     <h3>${entityName}</h3>
 <!-- print system messages (infos, warnings, etc) - not validation errors -->

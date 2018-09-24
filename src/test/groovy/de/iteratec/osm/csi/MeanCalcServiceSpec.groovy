@@ -17,15 +17,14 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.*
 import de.iteratec.osm.csi.weighting.WeightedValue
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 /**
  * Test-suite of {@link MeanCalcService}.
  */
-@TestFor(MeanCalcService)
-class MeanCalcServiceSpec extends Specification {
+class MeanCalcServiceSpec extends Specification implements ServiceUnitTest<MeanCalcService> {
 
     MeanCalcService serviceUnderTest
     static final double DELTA = 1e-15

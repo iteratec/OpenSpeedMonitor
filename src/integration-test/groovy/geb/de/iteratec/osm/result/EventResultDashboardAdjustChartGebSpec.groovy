@@ -17,13 +17,14 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise
+
 /**
  * Created by marko on 22.06.16.
  */
@@ -172,8 +173,8 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         addAliasButton.click()
 
         when: "User provides graph alias"
-        waitFor { graphNameSelect.displayed }
-        graphNameSelect.click()
+        waitFor { graphNameSelect[0].displayed }
+        graphNameSelect[0].click()
         sleep(200)
         graphNameSelectOptions[1].click()
         aliasInputField << "CustomAlias"
@@ -187,7 +188,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
     void "Change Graph color"() {
         when: "User changes graph color"
         waitFor{ adjustChartButton.click() }
-        waitFor { colorPicker.displayed }
+        waitFor { colorPicker[0].displayed }
         sleep(300)
         setColorPicker("#aaaaaa")
         adjustChartApply.click()
@@ -196,76 +197,6 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         true
 
         waitFor { graphColorField == 'background-color: rgb(170, 170, 170);' }
-    }
-
-    void "Adjust Chart Section"() {
-        given: "User edits chart size"
-        waitFor { adjustChartButton.click() }
-        sleep(200)
-        diaYAxisMinInputField.firstElement().clear()
-        diaYAxisMinInputField << "200"
-        diaYAxisMaxInputField.firstElement().clear()
-        diaYAxisMaxInputField << "600"
-
-        when: "User clicks \"apply\""
-        waitFor { adjustChartApply.displayed }
-        adjustChartApply.click()
-
-        then: "Chart changed"
-        waitFor { graphLines.displayed }
-        sleep(500)
-        graphLines.size() == 1
-
-        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 1
-        graphSeries[0].data.collect {
-            [x: it.x, y: it.y]
-        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
-
-        graphYGridFirstTick == "200"
-        graphYGridLastTick == "600"
-    }
-
-    void "Enable Data-Markers"() {
-        given: "User clicked adjust chart"
-        waitFor { adjustChartButton.click() }
-        sleep(200)
-
-        when: "User clicks \"Show data-marker\""
-        waitFor { showDataMarkersCheckBox.displayed }
-        sleep(200)
-        showDataMarkersCheckBox.click()
-        sleep(200)
-        waitFor { adjustChartApply.displayed }
-        sleep(200)
-        adjustChartApply.click()
-        sleep(200)
-
-        then: "Data-markers show on the graph"
-        waitFor { dataMarker }
-        waitFor { dataMarker.attr("style").contains("top: 543px; left: 216px;") }
-    }
-
-    void "Enable Data-Labels"() {
-        given: "User clicked adjust chart"
-        waitFor { adjustChartButton.click() }
-        sleep(200)
-
-
-        when: "User clicks \"Show data-marker\""
-        waitFor { showDataLabelsCheckBox.displayed }
-        showDataLabelsCheckBox.click()
-        waitFor { adjustChartApply.displayed }
-        sleep(200)
-        adjustChartApply.click()
-        sleep(200)
-
-
-        then: "Data-markers show on the graph"
-        waitFor { dataLabel }
-        waitFor {
-            dataLabel.attr("style").contains('top: 538px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default;')
-        }
     }
 
     void "Save custom dashboard"() {
@@ -309,18 +240,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             [x: it.x, y: it.y]
         } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
 
-        waitFor { dataLabel }
-        waitFor {
-            dataLabel.attr("style").contains('top: 538px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default;')
-        }
-        waitFor { dataMarker }
-        waitFor { dataMarker.attr("style").contains("top: 543px; left: 216px;") }
         chartTitle == "CustomTitle"
 
         chartContainer.width == 600
         chartContainer.height == 650
-        graphYGridFirstTick == "200"
-        graphYGridLastTick == "600"
     }
 
 
@@ -336,16 +259,16 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             MeasuredEvent.list().each {
                 it.delete()
             }
-            ConnectivityProfile.list().each {
-                it.delete()
-            }
             JobResult.list().each {
                 it.delete()
             }
-            Page.list().each {
+            Job.list().each {
                 it.delete()
             }
-            Job.list().each {
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            Page.list().each {
                 it.delete()
             }
             Location.list().each {
@@ -372,16 +295,14 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             Role.list().each {
                 it.delete()
             }
-            OsmConfiguration.list().each {
-                it.delete()
-            }
+            OsmConfiguration.first().delete()
         }
     }
 
 
     private createData() {
         Job.withNewTransaction {
-            if(OsmConfiguration.count()<1) OsmConfiguration.build()
+            OsmConfiguration.build()
             createAdminUser()
 
 

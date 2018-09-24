@@ -24,13 +24,14 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.DetailAnalysisPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.DetailAnalysisPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.LocationPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.GraphiteServer
@@ -43,8 +44,8 @@ import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 class BootStrap {
 
@@ -55,7 +56,7 @@ class BootStrap {
     ResultPersisterService resultPersisterService
     LocationPersisterService locationPersisterService
     DetailAnalysisPersisterService detailAnalysisPersisterService
-    ProxyService proxyService
+    WptInstructionService wptInstructionService
     HealthReportService healthReportService
     InMemoryConfigService inMemoryConfigService
     def grailsApplication
@@ -104,6 +105,7 @@ class BootStrap {
         cancelActiveBatchActivity()
         excludePropertiesInJsonRepresentationsofDomainObjects()
         initHealthReporting()
+        updateScripts()
 
         log.info "initApplicationData() OSM ends"
 
@@ -374,8 +376,8 @@ class BootStrap {
 
     def registerProxyListener = {
         log.info "registerProxyListener OSM ends"
-        proxyService.addLocationListener(locationPersisterService)
-        proxyService.addResultListener(resultPersisterService)
+        wptInstructionService.addLocationListener(locationPersisterService)
+        wptInstructionService.addResultListener(resultPersisterService)
 
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
@@ -387,7 +389,7 @@ class BootStrap {
             }
             microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
             detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)
-            proxyService.addResultListener(detailAnalysisPersisterService)
+            wptInstructionService.addResultListener(detailAnalysisPersisterService)
         }
 
         log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled
@@ -437,7 +439,16 @@ class BootStrap {
     void fetchLocationsOfWebpagetestOnFirstStart() {
         if (initiallyCreatedWptServer) {
             Map retrievsLocationsUsableForPublicApiKeys = [k: "A"]
-            proxyService.fetchLocations(initiallyCreatedWptServer, retrievsLocationsUsableForPublicApiKeys)
+            wptInstructionService.fetchLocations(initiallyCreatedWptServer, retrievsLocationsUsableForPublicApiKeys)
+        }
+    }
+
+    void updateScripts(){
+        def scripts = Script.findAllByTestedPagesIsEmpty()
+        scripts.each { script ->
+            //forces a new parsing of the script
+            script.beforeUpdate()
+            script.save(flush:true)
         }
     }
 

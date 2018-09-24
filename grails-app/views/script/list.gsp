@@ -18,7 +18,7 @@
 		</div>
 		<div class="col-md-4">
 			<a href="<g:createLink action="create" />" class="btn btn-primary pull-right">
-				<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+				<i class="fas fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
 			</a>
 		</div>
 	</div>

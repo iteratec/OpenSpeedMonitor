@@ -20,10 +20,8 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.PageService
+import grails.databinding.BindUsing
 import grails.gorm.annotation.Entity
-import org.grails.databinding.BindUsing
-
-import org.grails.databinding.BindUsing
 
 /**
  * <p>
@@ -59,6 +57,7 @@ class Script {
         sort 'label'
         navigationScript(type: 'text')
         archivedScripts cascade: 'all-delete-orphan'
+        autowire true
     }
 
     static constraints = {
@@ -90,9 +89,13 @@ class Script {
 
     private void parseScript() {
         try{
-			ScriptParser parser = new ScriptParser(pageService, navigationScript)
+            ScriptParser parser = new ScriptParser(pageService, navigationScript, label)
             measuredEventsCount = parser.measuredEventsCount
-			testedPages = parser.getTestedPages()
+
+            this.testedPages.clear()
+            parser.testedPages.each {
+                this.addToTestedPages(it)
+            }
 		} catch (Exception e) {
 			log.error("An error occurred while parsing of script: ${this}", e)
 		}

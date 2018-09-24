@@ -1,23 +1,25 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.d3Data.BarChartData
-import de.iteratec.osm.d3Data.ChartEntry
-import de.iteratec.osm.d3Data.MatrixViewData
-import de.iteratec.osm.d3Data.MatrixViewEntry
-import de.iteratec.osm.d3Data.MultiLineChart
-import de.iteratec.osm.d3Data.TreemapData
+import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.result.ResultSelectionCommand
+import de.iteratec.osm.result.ResultSelectionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import org.hibernate.sql.JoinType
+import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
-import static org.springframework.http.HttpStatus.*
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+import static org.springframework.http.HttpStatus.NOT_FOUND
 
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 //TODO: save, show, update and tags were NOT generated
@@ -29,6 +31,9 @@ class JobGroupController {
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
+    PerformanceLoggingService performanceLoggingService
+    ResultSelectionService resultSelectionService
+    JobGroupService jobGroupService
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
@@ -100,18 +105,21 @@ class JobGroupController {
 
             // arrange page time to cs mapping chart data
             MultiLineChart pageTimeToCsMappingsChart
+            boolean mappingExists = false
             if (config.timeToCsMappings) {
                 pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
+                mappingExists = true
+            } else {
+                pageTimeToCsMappingsChart = [:]
             }
-
-
             modelToRender = [matrixViewData          : matrixViewDataJSON,
                              treemapData             : treemapDataJSON,
                              barchartData            : barChartJSON,
                              defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
                              selectedCsiConfiguration: config,
                              pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
-                             pageMappingsExist       : pageTimeToCsMappingsChart ? true : false]
+                             pageMappingsExist       : mappingExists]
+
         }
 
         modelToRender.put("jobGroup", jobGroup)
@@ -234,5 +242,49 @@ class JobGroupController {
             jobGroup.save(flush: true)
             ControllerUtils.sendObjectAsJSON(response, ['jobGroupName': jobGroup.name, 'jobGroupId': jobGroup.id])
         }
+    }
+
+    def getAllActive() {
+        def activeJobGroups = jobGroupService.getAllActiveJobGroups()
+
+        return ControllerUtils.sendObjectAsJSON(response, activeJobGroups)
+    }
+
+    @RestAction()
+    def getJobGroupsWithPages(JobGroupWithPagesCommand command) {
+        if (command.hasErrors()) {
+            println 'send error'
+            sendError(command)
+            return
+        }
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+            def jobGroupAndPages = resultSelectionService.query(command.toResultSelectionCommand(), null, { existing ->
+                projections {
+                    distinct(['jobGroup','page'])
+                }
+            })
+            Map<Long, Map> map = [:].withDefault {[name:"", pages:[] as Set]}
+            jobGroupAndPages.each {
+                JobGroup jobGroup = it[0] as JobGroup
+                Page page = it[1] as Page
+                Map jobGroupMap = map[jobGroup.id]
+                jobGroupMap.name = jobGroup.name
+                jobGroupMap.id = jobGroup.id
+                jobGroupMap.pages << page
+            }
+            return map.collect{k, v ->
+                [name:v.name, id: v.id, pages: v.pages.collect {[name: it.name, id: it.id]}.sort{it.name}                ]
+            }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+}
+
+class JobGroupWithPagesCommand{
+    DateTime from
+    DateTime to
+
+    ResultSelectionCommand toResultSelectionCommand(){
+        return new ResultSelectionCommand(from: from, to: to)
     }
 }

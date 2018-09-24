@@ -14,9 +14,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobGroupCard = (function () {
 
     var init = function () {
         // set change listeners
-        existingJobGroupSelectBox.change(updateJobGroupNameFromExisting);
-        jobGroupNameInputField.keyup(updateHiddenField);
-        nextButton.click(validateInputs);
+        existingJobGroupSelectBox.on('change', updateJobGroupNameFromExisting);
+        jobGroupNameInputField.on('keyup', updateHiddenField);
+        nextButton.on('click', validateInputs);
 
         // init value
         var initValue = hiddenFieldForJobGroupName.val();

@@ -191,7 +191,7 @@ databaseChangeLog = {
          * the case we can safely execute the rewritten changelog
          **/
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460040092000-3'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460040092000-3'")
         }
         grailsChange{
             change{
@@ -254,42 +254,42 @@ databaseChangeLog = {
         //All changes of id 1460040092001-X rely on 1460040092001-1.
         //So we had to make sure that this changes will be executed only, if the previous changeset was executed
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-9'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-9'")
         }
         dropTable(tableName: "userspecific_csi_dashboard")
     }
 
     changeSet(author: "marcus (generated)", id: "1460040092001-3") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-10'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-10'")
         }
         dropTable(tableName: "userspecific_csi_dashboard_graph_colors")
     }
 
     changeSet(author: "marcus (generated)", id: "1460040092001-4") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-11'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-11'")
         }
         dropTable(tableName: "userspecific_csi_dashboard_graph_name_aliases")
     }
 
     changeSet(author: "marcus (generated)", id: "1460040092001-5") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-12'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-12'")
         }
         dropTable(tableName: "userspecific_event_result_dashboard")
     }
 
     changeSet(author: "marcus (generated)", id: "1460040092001-6") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-13'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-13'")
         }
         dropTable(tableName: "userspecific_event_result_dashboard_graph_colors")
     }
 
     changeSet(author: "marcus (generated)", id: "1460040092001-7") {
         preConditions(onFail: 'MARK_RAN') {
-            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-14'")
+            sqlCheck(expectedResult: '0', "select count(*) from DATABASECHANGELOG where id = '1460099558388-14'")
         }
         dropTable(tableName: "userspecific_event_result_dashboard_graph_name_aliases")
     }

@@ -17,11 +17,10 @@
 
 package de.iteratec.osm.report.chart
 
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.Interval
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -30,8 +29,7 @@ import static de.iteratec.osm.report.chart.CsiAggregationInterval.*
 /**
  * Test-suite of {@link CsiAggregationUtilService}.
  */
-@TestFor(CsiAggregationUtilService)
-class CsiAggregationUtilServiceSpec extends Specification {
+class CsiAggregationUtilServiceSpec extends Specification implements ServiceUnitTest<CsiAggregationUtilService> {
 
     static DateTime midnightLastDayOfSummertime = new DateTime(2013, 10, 27, 0, 0, 0)
     static DateTime twoHoursBeforeEndOfSummertime = midnightLastDayOfSummertime.plusHours(1)
@@ -52,7 +50,6 @@ class CsiAggregationUtilServiceSpec extends Specification {
     def setup() {
         serviceUnderTest = service
     }
-
 
     @Unroll
     void "test reset to start of actual interval with Interval: #interval"() {

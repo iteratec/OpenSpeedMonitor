@@ -18,9 +18,10 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
+import de.iteratec.osm.measurement.script.Script
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
+import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -33,25 +34,30 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 
-
-@TestFor(EventCsiAggregationService)
-@Mock([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult, CsiAggregation])
 @Build([EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location, ConnectivityProfile, JobResult])
-class UpdateEventResultDependentCsiAggregationsSpec extends Specification {
+class UpdateEventResultDependentCsiAggregationsSpec extends Specification implements BuildDataTest,
+        ServiceUnitTest<EventCsiAggregationService> {
 
     static final DateTime eventResultDateTime = new DateTime(DateTimeZone.UTC)
 
     CsiAggregationInterval hourlyCsiAggregationInterval
 
-    def doWithSpring = {
-        performanceLoggingService(PerformanceLoggingService)
-        csiValueService(CsiValueService)
+    Closure doWithSpring() {
+        return {
+            performanceLoggingService(PerformanceLoggingService)
+            csiValueService(CsiValueService)
+        }
     }
 
     def setup() {
         hourlyCsiAggregationInterval = CsiAggregationInterval.build(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY)
 
         mockNonRelevantServices()
+    }
+
+    void setupSpec() {
+        mockDomains(EventResult,  CsiAggregationInterval, JobGroup, MeasuredEvent, Page, Browser, Location,
+                ConnectivityProfile, JobResult, CsiAggregation, Script)
     }
 
     def "calculate CSI aggregations of the first event result"() {

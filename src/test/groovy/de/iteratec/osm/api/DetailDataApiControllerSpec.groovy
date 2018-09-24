@@ -8,26 +8,19 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobDaoService
-import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
+import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.converters.JSON
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
-/**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
- */
-@TestFor(DetailDataApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
 @Build([Page, Browser, CsiConfiguration, JobGroup, MeasuredEvent, Location, WebPageTestServer, Job])
-class DetailDataApiControllerSpec extends Specification {
+class DetailDataApiControllerSpec extends Specification implements BuildDataTest,
+        ControllerUnitTest<DetailDataApiController> {
 
     public static final String LABEL_JOB_1 = "job1"
     public static final String LABEL_JOB_2 = "job2"
@@ -55,16 +48,21 @@ class DetailDataApiControllerSpec extends Specification {
     JobGroup jobGroupWithoutCsiConfiguration1
     JobGroup jobGroupWithoutCsiConfiguration2
 
-    def doWithSpring = {
-        defaultJobGroupDaoService(DefaultJobGroupDaoService)
-        browserService(BrowserService)
+    Closure doWithSpring() {
+        return {
+            jobGroupService(JobGroupService)
+            browserService(BrowserService)
+        }
     }
 
     void setup() {
-
         createTestDataCommonToAllTests()
         initInnerServices()
+    }
 
+    void setupSpec() {
+        mockDomains(CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location,
+                WebPageTestServer, Job, Script, ConnectivityProfile)
     }
 
     void "getting correct mappings for domain classes"() {
@@ -192,7 +190,7 @@ class DetailDataApiControllerSpec extends Specification {
     }
 
     private void initInnerServices() {
-        controller.jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
+        controller.jobGroupService = new JobGroupService()
         controller.jobDaoService = new JobDaoService()
     }
 }

@@ -33,10 +33,9 @@ OpenSpeedMonitor.resultSelection = (function () {
     var ajaxRequests = {};
     var spinnerJobGroup = new OpenSpeedMonitor.Spinner(selectJobGroupCard, "small");
     var spinnerPageLocationConnectivity = new OpenSpeedMonitor.Spinner(selectPageLocationConnectivityCard, "small");
-    var hasJobGroupSelection = selectJobGroupCard.length == 0 || !!$("#folderSelectHtmlId").val();
-    var hasPageSelection = pageTabElement.length == 0 || !!$("#pageSelectHtmlId").val();
+    var hasJobGroupSelection = selectJobGroupCard.length == 0 || ($("#folderSelectHtmlId").val().length != 0);
+    var hasPageSelection = pageTabElement.length == 0 || ($("#pageSelectHtmlId").val().length != 0);
 
-    //Workaround for vue component in page comparison chart [IT-1930]
     var pageSelectionAvailable = $("#pageSelectHtmlId").length;
 
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
@@ -53,7 +52,7 @@ OpenSpeedMonitor.resultSelection = (function () {
 
         // if caller is CsiDashboard there is a need for a changeListener on aggregation card
         if (currentQueryArgs['caller'] == "CsiAggregation") {
-            $("input[name='aggrGroupAndInterval']").change(function () {
+            $("input[name='aggrGroupAndInterval']").on('change', function () {
                 needsNoPageSelectionDueToCsiAggregation = aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
                 csiSystemSelected = $("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system";
                 validateForm();
@@ -61,16 +60,16 @@ OpenSpeedMonitor.resultSelection = (function () {
         }
 
         // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
-        $(".removeMeasurandSeriesButton").click(function () {
+        $(".removeMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
-        $("#addMeasurandSeriesButton").click(function () {
+        $("#addMeasurandSeriesButton").on('click', function () {
             validateForm();
         });
 
         // if the cards are already initialized, we directly update job groups and jobs
         if (OpenSpeedMonitor.selectIntervalTimeframeCard) {
-            setQueryArgsFromTimeFrame(null, OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
+            setQueryArgsFromTimeFrame(OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame());
         }
         if (OpenSpeedMonitor.selectJobGroupCard) {
             setQueryArgsFromJobGroupSelection(null, OpenSpeedMonitor.selectJobGroupCard.getJobGroupSelection());
@@ -88,7 +87,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     };
 
     var registerEvents = function () {
-        selectIntervalTimeframeCard.on("timeFrameChanged", setQueryArgsFromTimeFrame);
+        selectIntervalTimeframeCard.on("timeFrameChanged", setTimeFrameFromEvent);
         selectJobGroupCard.on("jobGroupSelectionChanged", setQueryArgsFromJobGroupSelection);
         selectPageLocationConnectivityCard.on("pageSelectionChanged", setQueryArgsFromPageSelection);
         selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", setQueryArgsFromMeasuredEventSelection);
@@ -97,9 +96,13 @@ OpenSpeedMonitor.resultSelection = (function () {
         selectPageLocationConnectivityCard.on("connectivitySelectionChanged", setQueryArgsFromConnectivitySelection);
     };
 
-    var setQueryArgsFromTimeFrame = function (event, timeFrameSelection) {
-        currentQueryArgs.from = timeFrameSelection[0].toISOString();
-        currentQueryArgs.to = timeFrameSelection[1].toISOString();
+    var setTimeFrameFromEvent = function(event){
+       setQueryArgsFromTimeFrame(event.detail)
+    };
+
+    var setQueryArgsFromTimeFrame = function (time) {
+        currentQueryArgs.from = time[0].toISOString();
+        currentQueryArgs.to = time[1].toISOString();
         updateCards("timeFrame");
     };
 
@@ -189,7 +192,6 @@ OpenSpeedMonitor.resultSelection = (function () {
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
         warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
 
-        //Workaround for vue component in page comparison chart [IT-1930]
         if(pageSelectionAvailable){
             warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         }

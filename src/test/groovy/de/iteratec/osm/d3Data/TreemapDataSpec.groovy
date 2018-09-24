@@ -17,19 +17,10 @@
 
 package de.iteratec.osm.d3Data
 
+import org.grails.testing.GrailsUnitTest
 import spock.lang.Specification
 
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import org.junit.*
-
-/**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
- */
-@TestMixin(GrailsUnitTestMixin)
-class TreemapDataSpec extends Specification {
+class TreemapDataSpec extends Specification implements GrailsUnitTest {
 
     def "initialisation test" () {
         when: "new TreemapData is created"

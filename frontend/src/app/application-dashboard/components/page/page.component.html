@@ -1,0 +1,13 @@
+<h2>{{metricsForPage?.pageName}}</h2>
+<div class="page-metrics">
+  <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [csiDate]="pageCsiDate$ | async"
+                 [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value>
+  <div class="metric-list">
+    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))"
+                     [metric]="metrics.SPEED_INDEX"></osm-page-metric>
+    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.docCompleteTimeInMillisecs))"
+                     [metric]="metrics.DOCUMENT_COMPLETE"></osm-page-metric>
+    <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
+                     [metric]="metrics.BYTES_FULLY_LOADED"></osm-page-metric>
+  </div>
+</div>

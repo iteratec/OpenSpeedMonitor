@@ -19,7 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -27,11 +27,11 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import grails.test.mixin.integration.Integration
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
-import org.springframework.test.annotation.Rollback
 
-@Integration
+@Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
@@ -59,20 +59,17 @@ class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
      */
     def setup() {
         System.out.println('Create some common test-data...')
-        EventResult.withNewSession { session ->
-            OsmConfiguration.build()
+        OsmConfiguration.build()
 
-            createCsiAggregationIntervall()
-            createPages()
-            createCsiConfigurations()
-            createJobGroups()
-            createEventResults()
-            System.out.println('Create some common test-data... DONE')
+        createCsiAggregationIntervall()
+        createPages()
+        createCsiConfigurations()
+        createJobGroups()
+        createEventResults()
+        System.out.println('Create some common test-data... DONE')
 
-            hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-            weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-            session.flush()
-        }
+        hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+        weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
     }
 
     void "test creation and calculation of weekly page CSI values"() {
@@ -80,19 +77,14 @@ class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
         Page testedPage
         Date startDate
         JobGroup csiGroup
-        EventResult.withNewSession { session ->
-            testedPage = Page.findByName(pageName)
-            startDate = startOfWeek.toDate()
-            csiGroup = JobGroup.findByName(jobGroupName)
-        }
+        testedPage = Page.findByName(pageName)
+        startDate = startOfWeek.toDate()
+        csiGroup = JobGroup.findByName(jobGroupName)
         when: "the page CSI aggregation gets calculated"
         List<CsiAggregation> wpmvsOfOneGroupPageCombination
-        EventResult.withNewSession { session ->
-            results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
-            CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-            wpmvsOfOneGroupPageCombination = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup], [testedPage])
-            session.flush()
-        }
+        results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+        wpmvsOfOneGroupPageCombination = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup], [testedPage])
         then: "check if page and jobGroup are correct, assert that expected csi and calculated csi are equal"
         wpmvsOfOneGroupPageCombination.each { CsiAggregation mvWeeklyPage ->
             mvWeeklyPage.jobGroupId == csiGroup.id
