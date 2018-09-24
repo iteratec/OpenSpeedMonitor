@@ -36,6 +36,8 @@ else
 
   echo "git tag 'v${jira_version}'"
   git tag "v${jira_version}"
+  echo "git push origin release"
+  git push origin release
   echo "git push --tags"
   git push --tags
 fi
