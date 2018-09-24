@@ -65,12 +65,12 @@ jobs:
     deploy:
       provider: script
       script:
-          groovy scripts/ci/building/set_new_versionnumber_travis_dev;
-          ./gradlew assemble;
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-          docker build -t iteratec/openspeedmonitor:develop .;
-          docker push iteratec/openspeedmonitor:develop;
-          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS;
+          groovy scripts/ci/building/set_new_versionnumber_travis_dev &&
+          ./gradlew assemble &&
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
+          docker build -t iteratec/openspeedmonitor:develop . &&
+          docker push iteratec/openspeedmonitor:develop &&
+          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS &&
           git stash -u; # in order to prevent double checking of cached resources
       on:
         branch: develop
@@ -80,16 +80,16 @@ jobs:
     deploy:
       provider: script
       script:
-          ./gradlew assemble;
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-          docker build iteratec/openspeedmonitor .;
-          groovy scripts/ci/building/set_new_versionnumber;
-          bash scripts/ci/building/push_and_tag_dockerimage_travis.sh;
-          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS;
+          ./gradlew assemble &&
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
+          docker build -t iteratec/openspeedmonitor . &&
+          groovy scripts/ci/building/set_new_versionnumber &&
+          bash scripts/ci/building/push_and_tag_dockerimage_travis.sh &&
+          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_RELEASE_BUILD_ADDRESS &&
           git stash -u;
       on:
         branch: release
-after_success:
+after_deploy:
   - test $TRAVIS_BRANCH = "release" && bash scripts/ci/building/merge_release_into_dev_and_master.sh;
 
 
