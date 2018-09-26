@@ -77,13 +77,13 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String locationIdentifier = xmlResult.responseNode.data.location.toString()
 
-        Job.build(label: jobLabel)
+        Job job = Job.build(label: jobLabel)
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Page page = Page.build(name: pageName)
 
         when: "services listens to XML result of a single step test with 3 runs"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
 
         then: "it creates the right measured event and event results"
         List<MeasuredEvent> measuredEvents = MeasuredEvent.list()
@@ -116,14 +116,14 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String locationIdentifier = xmlResult.responseNode.data.location.toString()
 
-        Job.build(label: jobLabel)
+        Job job = Job.build(label: jobLabel)
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Page.build(name: "Produkt")
         Page.build(name: "Suche")
 
         when: "service listens to XML of a WPT multistep fork (2.18)"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
 
         then: "the correct measured events and event results are created; pages are associated if provided"
 
@@ -164,13 +164,13 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job.build(label: "FF_Otto_multistep")
+        Job job = Job.build(label: "FF_Otto_multistep")
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
 
         when: "the service creates new event results from the XML result"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
         List<EventResult> eventResults = EventResult.list()
 
         then: "there are 15 EventResults with visually complete and cs values"
@@ -185,13 +185,13 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job.build(label: "ExampleJob Firefox")
+        Job job = Job.build(label: "ExampleJob Firefox")
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
 
         when: "the service creates new event results from the XML result"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
         List<EventResult> eventResults = EventResult.list()
 
         then: "there are 6 EventResults with all kinds of visually complete values"
@@ -209,13 +209,13 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job.build(label: "ExampleJob Firefox")
+        Job job = Job.build(label: "ExampleJob Firefox")
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
 
         when: "the service creates new event results from the XML result"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
         List<EventResult> eventResults = EventResult.list()
 
         then: "there are 6 EventResults with 3 UserTimings each"
@@ -257,13 +257,13 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job.build(label: "ExampleJob Chrome TTI")
+        Job job = Job.build(label: "ExampleJob Chrome TTI")
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
 
         when: "the service creates new event results from the XML result"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
         List<EventResult> eventResults = EventResult.list()
 
         then: "there is one EventResult with both time to interactive values"
@@ -300,10 +300,10 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job.build(label: "FF_Otto_multistep")
+        Job job = Job.build(label: "FF_Otto_multistep")
 
         when: "the service listens to results from a WPT server > 2.19 with multistep"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
 
         then: "all event results are created and the new URL format is used to create the waterfall URL"
         List<EventResult> eventResults = EventResult.list()
@@ -332,10 +332,10 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         File file = new File("src/test/resources/WptResultXmls/MULTISTEP_Error_Failure_In_Step.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString())
-        Job.build(label: "testjob")
+        Job job = Job.build(label: "testjob")
 
         when: "the service tries to persist results for an XML result with failed step"
-        service.persistResultsForAllTeststeps(xmlResult)
+        service.persistResultsForAllTeststeps(xmlResult, job.id)
 
         then: "it throws an exception and doesn't create any measured events"
         MeasuredEvent.list().size() == 0

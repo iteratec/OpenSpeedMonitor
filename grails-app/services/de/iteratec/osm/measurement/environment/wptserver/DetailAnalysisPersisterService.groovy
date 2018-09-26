@@ -67,7 +67,7 @@ class DetailAnalysisPersisterService implements iResultListener {
     public void listenToResult(
             WptResultXml resultXml,
             WebPageTestServer wptserverOfResult,
-            Long jobId) {
+            long jobId) {
 
         try {
             persistDetailAnalysisData(resultXml, wptserverOfResult, jobId)
@@ -87,7 +87,7 @@ class DetailAnalysisPersisterService implements iResultListener {
      * Triggers the persistence the detailAnalysisData for a JobResults if persistence is enabled
      * @param resultXml
      */
-    private void persistDetailAnalysisData(WptResultXml resultXml, WebPageTestServer wptServerOfResult, Long jobId) {
+    private void persistDetailAnalysisData(WptResultXml resultXml, WebPageTestServer wptServerOfResult, long jobId) {
         if (!persistenceOfDetailAnalysisDataEnabled){
             log.debug("Can not send persistDetailAnalysisData since persistenceOfDetailAnalysisData is disabled")
             return

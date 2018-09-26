@@ -58,7 +58,7 @@ class JobProcessingQuartzHandlerJob {
             return
         }
         Job.withNewSession {
-            Long jobId = context.mergedJobDataMap.getLong("jobId")
+            long jobId = context.mergedJobDataMap.getLong("jobId")
             Job job = Job.get(jobId)
 
             if (!job) {

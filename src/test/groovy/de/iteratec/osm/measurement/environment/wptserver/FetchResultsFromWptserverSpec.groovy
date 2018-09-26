@@ -287,7 +287,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         public void listenToResult(
                 WptResultXml xmlResult,
                 WebPageTestServer wptserver,
-                Long jobId
+                long jobId
         ) {
             resultOfLastListening = xmlResult
             wptserverOfLastListening = wptserver

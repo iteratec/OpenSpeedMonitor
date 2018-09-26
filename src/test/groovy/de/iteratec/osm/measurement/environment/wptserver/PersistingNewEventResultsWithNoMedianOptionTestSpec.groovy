@@ -64,10 +64,10 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification 
 
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
-        Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
+        Job job = Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
 
         when: "the services listens to the XML file"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
 
         then: "the correct number of event results are created, with or without median results"
         JobResult.count() == 1

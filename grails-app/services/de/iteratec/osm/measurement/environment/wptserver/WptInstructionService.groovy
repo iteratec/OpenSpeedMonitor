@@ -36,7 +36,7 @@ interface iResultListener {
     public void listenToResult(
             WptResultXml resultXml,
             WebPageTestServer wptserver,
-            Long jobId
+            long jobId
     )
 
     public boolean callListenerAsync()
