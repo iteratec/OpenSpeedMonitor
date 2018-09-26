@@ -1,1 +1,0 @@
-//= require timeago/jquery.timeago.de.js

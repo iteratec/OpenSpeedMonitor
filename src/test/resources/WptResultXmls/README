@@ -1,4 +1,0 @@
-This folder contains xml-files of wpt-results delivered from REST-API of wpt-servers 
-(see https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis).
-
-Prefix of filename defines version of wptserver result comes from respective enum de.iteratec.osm.result.WptXmlResultVersion.
