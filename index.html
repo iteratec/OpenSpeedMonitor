@@ -14,7 +14,7 @@
             padding: 0;
             font-family: 'Source Sans Pro', sans-serif;
             font-size: 16px;
-            color: #333;
+            color: #484848;
             background: #fff;
         }
         * {
@@ -43,6 +43,7 @@
             left: 0;
             right: 0;
             background: #2f323a;
+            height: 4em;
         }
         #main-nav::before {
             content: '';
@@ -58,12 +59,20 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
         }
         #main-nav a {
             padding: 1.5em;
             height: 4em;
             color: #989dad;
             display: block;
+            font-weight: bold;
+        }
+        #main-nav a.iteratec {
+            color: #a02188;
         }
         #main-nav a:hover {
             color: white;
@@ -147,7 +156,7 @@
             padding: 3rem 1.5rem;
         }
         #feature-links a:hover {
-            background: #ededed;
+            background: #d7e1eb;
             color: #008cd2;
         }
 
@@ -181,7 +190,7 @@
             object-fit: contain;
         }
         .feature.alt {
-            background: #ededed;
+            background: #e6ebf5;
         }
         .feature.alt article {
             flex-direction: row-reverse;
@@ -206,6 +215,7 @@
                         <img src="./OpenSpeedMonitor.svg" alt="OpenSpeedMonitor" />
                     </a>
                 </span>
+                <a class="iteratec" href="https://www.iteratec.de/themen/web-performance/">iteratec services</a>
                 <a href="https://demo.openspeedmonitor.org/">Try the demo</a>
                 <a href="https://github.com/iteratec/OpenSpeedMonitor">Github</a>
             </div>
