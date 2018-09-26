@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>OpenSpeedMonitor</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/solid.css" integrity="sha384-VGP9aw4WtGH/uPAOseYxZ+Vz/vaTb1ehm1bwx92Fm8dTrE+3boLfF1SpAtB1z7HW" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/fontawesome.css" integrity="sha384-1rquJLNOM3ijoueaaeS5m+McXPJCGdr5HcA03/VHXxcp2kX2sUrQDmFc3jR5i/C7" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet"> 
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 16px;
+            color: #333;
+            background: #fff;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        img {
+            display: block;
+        }
+        a {
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #6d6d6d;
+        }
+        .fixed-width, .feature article {
+            max-width: 1100px;
+            padding: 0 1.5rem;
+            box-sizing: content-box;
+            margin: 0 auto;
+        }
+        header {
+            padding-top: 4em;
+        }
+        #main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #2f323a;
+        }
+        #main-nav::before {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0px 3px 3px 0px rgba(0,0,0,0.33);
+        }
+        #main-nav > div {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        #main-nav a {
+            padding: 1.5em;
+            height: 4em;
+            color: #989dad;
+            display: block;
+        }
+        #main-nav a:hover {
+            color: white;
+        }
+        #logo {
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-start;
+        }
+        #main-nav #logo a {
+            padding: 0.2em 0;
+        }
+        #logo img {
+            height: 100%;
+        }
+        header mark {
+            background: #008cd2;
+            color: #ededed;
+            display: block;
+            padding: 0.5em;
+            text-align: center;
+            margin: 0;
+        }
+        header main {
+            background: #2f323a;
+            color: #ededed;
+        }
+        header main article {
+            padding-right: 1.5rem;
+            font-size: 1.5rem;
+            flex: 1 1 500px;
+        }
+        header main h1 {
+            font-size: 3rem;
+            font-weight: normal;
+            margin: 0 0 1em 0;
+        }
+        header main img {
+            max-width: 600px;
+            width: 600px;
+            object-fit: contain;
+            object-position: center right;
+            padding-left: 1.5rem;
+            display: block;
+        }
+        header main .action {
+            margin: 3rem 0 0 0;
+        }
+        header main a {
+            display: inline;
+            padding: 0.2em 1em;
+            color: white;
+            background: #008cd2;
+            text-transform: none;
+            border: 1px rgba(0, 0, 0, 0.3) solid;
+            border-radius: 4px;
+            background-clip:border-box;
+        }
+
+        header main a:hover {
+            background: #2ea0da;
+        }
+
+        header main .fixed-width {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 4.5rem 0;
+        }
+        #feature-links > div {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #feature-links a {
+            flex: 1;
+            flex-basis: 0;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            text-transform: none;
+            padding: 3rem 1.5rem;
+        }
+        #feature-links a:hover {
+            background: #ededed;
+            color: #008cd2;
+        }
+
+        #feature-links a .fas {
+            font-size: 3em;
+            padding: 0 0 0.5em 0;
+            display: block;
+        }
+        section.feature {
+            padding: 4.5rem 1.5rem;
+        }
+        .feature article {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .feature article main {
+            padding: 0 3em 0 0;
+            line-height: 1.5em;
+            flex: 1 1 500px;
+        }
+        .feature article main h2 {
+            margin: 0.5em 0 1em 0;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .feature img {
+            width: 400px;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .feature.alt {
+            background: #ededed;
+        }
+        .feature.alt article {
+            flex-direction: row-reverse;
+        }
+        .feature.alt article main {
+            padding: 0 0 0 3rem;
+        }
+
+        footer {
+            padding: 1.5rem 1.5rem;
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="main-nav">
+            <div class="fixed-width">
+                <span id="logo">
+                    <a href="/">
+                        <img src="./OpenSpeedMonitor.svg" alt="OpenSpeedMonitor" />
+                    </a>
+                </span>
+                <a href="https://demo.openspeedmonitor.org/">Try the demo</a>
+                <a href="https://github.com/iteratec/OpenSpeedMonitor">Github</a>
+            </div>
+        </nav>
+        <mark>
+            <div class="fixed-width">
+                OpenSpeedMonitor 5.0 is now available!
+            </div>
+        </mark>
+        <main>
+            <div class="fixed-width">
+                <article>
+                    <h1>Monitor and Analyze your Web Performance</h1>
+                    <p>Free. Open Source. Based on WebPageTest.</p>
+                    <div class="action">
+                        <a href="https://demo.openspeedmonitor.org/">
+                            Try the Demo
+                        </a>
+                    </div>
+                </article>
+                <img src="./screenshot.jpg" alt="Application Dashboard Screenshot">
+            </div>
+        </main>
+        <nav id="feature-links">
+            <div class="fixed-width">
+                <a href="#continuous-measurements">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Continuous Measurements</span>
+                </a>
+                <a href="#continuous-measurements">
+                    <i class="fas fa-microscope"></i>
+                    <span>Analysis</span>
+                </a>
+                <a href="#continuous-measurements">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Customer Satisfaction Index</span>
+                </a>
+                <a href="#continuous-measurements">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Integrations</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    <section class="feature alt" id="continuous-measurements">
+        <article>
+            <main>
+                <h2>Continuously gather realistic data</h2>
+                <p>
+                    Measure your application the way your customers experience it by simulating their journeys.
+                    Schedule and organize your measurements which will be executed by WebpageTest.
+                    Your own performance data repository will grow test by test.
+                </p>
+            </main>
+            <img src="./continuous-measurements.png" alt="Time Series Dashboard">
+        </article>
+    </section>
+    <section class="feature" id="analysis">
+        <article>
+            <main>
+                <h2>Visualize. Analyze. Optimize.</h2>
+                <p>
+                    Get a grip on your web performance. Manage the complexity of your data with aggregations and visualizations.
+                    Analyze your measurements using various charts and tools. Track the performance of your application
+                    over time with a wide variety of metrics. Even single performance breaking requests can be identified
+                    with Detail Analysis.
+                </p>
+            </main>
+            <img src="./analysis.png" alt="WebPageTest Result">
+        </article>
+    </section>
+    <section class="feature alt" id="csi">
+        <article>
+            <main>
+                <h2> Think from your customers' perspective </h2>
+                <p>
+                    Customer Satisfaction Index combines the variety of your measurements into a single expressive KPI.
+                    It simply articulates what's most important: How satisfied your users are with your website's performance.
+                    Configure the calculation of the Customer Satisfaction Index to fit your business by defining the importance
+                    of specific pages in the journey, browsers and more.
+                </p>
+            </main>
+            <img src="./csi.png" alt="Customer Satisfaction Index">
+        </article>
+    </section>
+    <section class="feature" id="integrations">
+        <article>
+            <main>
+                <h2> Enhance your existing toolset </h2>
+                <p>
+                    Raise awareness towards web performance in your organization by integrating into your toolset.
+                    Enrich existing monitoring systems by using Graphite support. CI/CD Integration helps you to find
+                    performance bugs before they hit your customers. Using another tool? The extensive REST API will fit your needs.
+                </p>
+            </main>
+            <img src="./screenshot.jpg">
+        </article>
+    </section>
+    <footer>
+        <p class="fixed-width">© 2018  iteratec GmbH</p>
+    </footer>
+</body>
+</html>
