@@ -127,6 +127,32 @@ class WptResultXml {
         }
     }
 
+    int getResultCodeForStep(int stepZeroBasedIndex) {
+        switch (version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return responseNode.data.median.result.toInteger()
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).results.result.toInteger()
+            case WptXmlResultVersion.MULTISTEP:
+                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex).results.result.toInteger()
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
+        }
+    }
+
+    int getFirstByteForStep(int stepZeroBasedIndex) {
+        switch (version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return responseNode.data.median.TTFB.toInteger()
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).results.TTFB.toInteger()
+            case WptXmlResultVersion.MULTISTEP:
+                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex).results.TTFB.toInteger()
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
+        }
+    }
+
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
         GPathResult runNode = getRunNodes()[runZeroBasedIndex]
         if (cachedView == CachedView.UNCACHED) {
@@ -201,7 +227,6 @@ class WptResultXml {
             default:
                 throw new IllegalArgumentException("Unknown WptXmlResultVersion: ${version}")
         }
-
     }
 
     boolean hasRuns() {

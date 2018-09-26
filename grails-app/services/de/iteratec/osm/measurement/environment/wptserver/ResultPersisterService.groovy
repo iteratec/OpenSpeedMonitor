@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Propagation
 import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 /**
  * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett , nkuhn
@@ -212,7 +213,6 @@ class ResultPersisterService implements iResultListener {
     }
 
     void persistResultsForAllTeststeps(WptResultXml resultXml) {
-
         Integer testStepCount = resultXml.getTestStepCount()
 
         log.debug("starting persistance of ${testStepCount} event results for test steps")
@@ -234,46 +234,50 @@ class ResultPersisterService implements iResultListener {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
-
+        List<EventResult> resultsOfTeststep = []
         String testId = resultXml.getTestId()
         String labelInXml = resultXml.getLabel()
-        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
-        if (jobResult == null) {
-            throw new OsmResultPersistanceException(
-                    "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
-            )
-        }
-        Job job = jobDaoService.getJob(labelInXml)
-        if (job == null) {
-            throw new OsmResultPersistanceException(
-                    "No Job exists with label '${labelInXml}' while persting associated EventResults!"
-            )
-        }
-
-        log.debug('getting event name from xml result ...')
-        String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
-        log.debug('getting event name from xml result ... DONE')
-        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
-        MeasuredEvent event = getMeasuredEvent(measuredEventName);
-        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
-
-        log.debug("persisting result for step=${event}")
-        Integer runCount = resultXml.getRunCount()
-        log.debug("runCount=${runCount}")
-
-        List<EventResult> resultsOfTeststep = []
-        resultXml.getRunCount().times { Integer runNumber ->
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
-                if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
+        if (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex.intValue())) && resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) {
+            JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
+            if (jobResult == null) {
+                throw new OsmResultPersistanceException(
+                        "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
+                )
             }
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
-                if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+            Job job = jobDaoService.getJob(labelInXml)
+            if (job == null) {
+                throw new OsmResultPersistanceException(
+                        "No Job exists with label '${labelInXml}' while persting associated EventResults!"
+                )
             }
+
+            log.debug('getting event name from xml result ...')
+            String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
+            log.debug('getting event name from xml result ... DONE')
+            log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
+            MeasuredEvent event = getMeasuredEvent(measuredEventName);
+            log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
+
+            log.debug("persisting result for step=${event}")
+            Integer runCount = resultXml.getRunCount()
+            log.debug("runCount=${runCount}")
+
+            resultXml.getRunCount().times { Integer runNumber ->
+                if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
+                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
+                    EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
+                    if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
+                }
+                if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
+                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
+                    EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
+                    if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+                }
+            }
+        } else {
+            println("Can't persist EventResult of test:${testId} (Code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex.intValue())}, TFFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)})")
         }
+
         return resultsOfTeststep
     }
 
