@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
@@ -145,11 +146,12 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_11Events_JustFirstView.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
+        Job job = new Job()
 
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_Q1_AR'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, '160421_Q1_AR', job)
 
         then:
         // Verify results
@@ -174,11 +176,12 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
+        Job job = new Job()
 
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_TN_D8'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, '160421_TN_D8', job)
 
         then:
         // Verify results
@@ -204,11 +207,12 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
+        Job job = new Job()
 
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_A9_EF'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, '160421_A9_EF', job)
 
         then:
         // Verify results
@@ -229,11 +233,12 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
+        Job job = new Job()
 
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_VP_ZMG'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, '160421_VP_ZMG', job)
 
         then:
         // Verify results
@@ -254,11 +259,12 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
+        Job job = new Job()
 
         when:
         // Run the test:
         WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, ['resultId': '160421_5E_ZFW'])
+        WptResultXml resultXml = serviceUnderTest.fetchResult(wptserver, '160421_5E_ZFW', job)
 
         then:
         // Verify results
@@ -280,7 +286,8 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         public void listenToResult(
                 WptResultXml xmlResult,
-                WebPageTestServer wptserver
+                WebPageTestServer wptserver,
+                Long jobId
         ) {
             resultOfLastListening = xmlResult
             wptserverOfLastListening = wptserver

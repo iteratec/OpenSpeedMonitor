@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.async.Promise
@@ -34,7 +35,8 @@ interface iResultListener {
 
     public void listenToResult(
             WptResultXml resultXml,
-            WebPageTestServer wptserver
+            WebPageTestServer wptserver,
+            Long jobId
     )
 
     public boolean callListenerAsync()
@@ -145,20 +147,21 @@ class WptInstructionService {
      * Gets result from given wptserver via REST-call.
      * @param wptserverOfResult
      * 			Instance of PHP-application webpagetest (see http://webpagetest.org) from which xml-result should be get.
-     * @param params
-     * 			Must contain resultId.
+     * @param resultId
+     * 			Id of webpagetest result
+     * 	@param job
+     * 	        Job that initiated webpagetest
      * @return
      */
-    WptResultXml fetchResult(WebPageTestServer wptserverOfResult, Map params) {
-        log.info("Start Saving result ${wptserverOfResult.baseUrl}result/${params.resultId}")
+    WptResultXml fetchResult(WebPageTestServer wptserverOfResult, String resultId, Job job) {
+        log.info("Start Saving result ${wptserverOfResult.baseUrl}result/${resultId}")
 
-        GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, params)
+        GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, resultId)
         WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
         Integer statusCode = resultXml.statusCodeOfWholeTest
         def state = [0: 'Failure!', 100: 'Test Pending', 101: 'Test Started', 200: 'Test Finished']
-        log.info("Result-Status of ${params.resultId}: ${statusCode} (${state[statusCode]})")
+        log.info("Result-Status of ${resultId}: ${statusCode} (${state[statusCode]})")
 
-        final String jobLabel = resultXml.getLabel()
         boolean resultXmlHasRuns = resultXml.hasRuns()
         Integer runCount = resultXmlHasRuns ? resultXml.runCount : null
 
@@ -166,27 +169,27 @@ class WptInstructionService {
         log.info("xmlResultResponse.data.runs.sizeRuns=${runCount}")
 
 
-        if (jobLabel.length() > 0 && statusCode >= 200 && resultXmlHasRuns) {
+        if (statusCode >= 200 && resultXmlHasRuns) {
             try {
 
-                lock.lockInterruptibly();
+                lock.lockInterruptibly()
                 this.resultListeners.each { listener ->
-                    log.info("calling listener ${listener.listenerName} for ${jobLabel}")
+                    log.info("calling listener ${listener.listenerName} for job id ${job.id}")
                     if (listener.callListenerAsync()) {
                         Promise p = task {
                             JobResult.withNewSession {
-                                listener.listenToResult(resultXml, wptserverOfResult)
+                                listener.listenToResult(resultXml, wptserverOfResult, job)
                             }
                         }
                         p.onError { Throwable err -> log.error(err) }
                         p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
                     } else {
-                        listener.listenToResult(resultXml, wptserverOfResult)
+                        listener.listenToResult(resultXml, wptserverOfResult, job)
                     }
                 }
 
             } finally {
-                lock.unlock();
+                lock.unlock()
             }
 
         }
@@ -200,11 +203,11 @@ class WptInstructionService {
         return resultXml
     }
 
-    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
+    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, String resultId) {
         return httpRequestService.getWptServerHttpGetResponse(
             wptserverOfResult,
             '/xmlResult.php',
-            ['f': 'xml', 'test': params.resultId, 'r': params.resultId, 'multistepFormat': '1'],
+            ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1'],
                 'application/xml',
             [Accept: 'application/xml']
         )

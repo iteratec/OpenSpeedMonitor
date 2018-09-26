@@ -229,7 +229,7 @@ class JobProcessingService {
         Job job = Job.get(jobId)
         JobResult result
         if (testId) {
-            result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
+            result = JobResult.findByJobAndTestId(job, testId)
         }
 
         if (!result) {
@@ -397,7 +397,7 @@ class JobProcessingService {
             return testId
         } catch (Exception e) {
             statusCode = statusCode? statusCode : 500
-            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
+            persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
@@ -410,10 +410,10 @@ class JobProcessingService {
     WptResultXml pollJobRun(Job job, String testId, String wptStatus = null) {
         WptResultXml resultXml
         try {
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", 1) {
-                resultXml = wptInstructionService.fetchResult(job.location.wptServer, [resultId: testId])
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
+                resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId)
             }
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
                 if (resultXml.statusCodeOfWholeTest < 200) {
                     persistUnfinishedJobResult(job.id, testId, resultXml.statusCodeOfWholeTest, wptStatus)
                 }
@@ -442,7 +442,7 @@ class JobProcessingService {
      */
     public void handleJobRunTimeout(Job job, String testId) {
         // Is there a non-running result? Then done
-        JobResult result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
+        JobResult result = JobResult.findByJobAndTestId(job, testId)
         if (!result)
             return
         if (result.httpStatusCode < WptStatus.COMPLETED.getWptStatusCode()) {
@@ -468,7 +468,7 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, WptStatus.COMPLETED.getWptStatusCode())
+        JobResult result = JobResult.findByJobAndTestIdAndHttpStatusCodeLessThan(job, testId, WptStatus.COMPLETED.getWptStatusCode())
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true, flush: true)
@@ -500,14 +500,14 @@ class JobProcessingService {
         if (quartzScheduler.getTrigger(new TriggerKey(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value()))) {
             if (rescheduleIfAlreadyScheduled) {
                 if (log.infoEnabled) log.info("Rescheduling Job ${job.label} (${job.executionSchedule})")
-                JobProcessingQuartzHandlerJob.reschedule(cronTrigger, [jobId: job.id])
+                JobProcessingQuartzHandlerJob.reschedule(cronTrigger, job.id)
             } else {
                 log.info("Ignoring Job ${job.label} as it is already scheduled.")
             }
         } else {
             try {
                 log.info("Scheduling Job ${job.label} (${job.executionSchedule})")
-                JobProcessingQuartzHandlerJob.schedule(cronTrigger, [jobId: job.id])
+                JobProcessingQuartzHandlerJob.schedule(cronTrigger, job.id)
             } catch (SchedulerException se) {
                 log.info("Job ${job.label} with schedule ${job.executionSchedule} can't be scheduled: ${se.message}", se)
             }

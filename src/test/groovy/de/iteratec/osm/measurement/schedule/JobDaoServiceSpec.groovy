@@ -44,8 +44,8 @@ class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceU
         Job deletedJob = Job.build(deleted: true)
 
         when: "jobs are requested by id"
-        Job normalResult = service.getJobById(normalJob.id)
-        Job resultDeleted = service.getJobById(deletedJob.id)
+        Job normalResult = service.getJob(normalJob.id)
+        Job resultDeleted = service.getJob(deletedJob.id)
 
         then: "result is job or null if job is deleted"
         normalResult == normalJob
@@ -60,8 +60,8 @@ class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceU
 
 
         when: "job requested by label"
-        Job result = service.getJob("job2")
-        Job resultDeleted = service.getJob("deletedJob")
+        Job result = service.getJobByLabel("job2")
+        Job resultDeleted = service.getJobByLabel("deletedJob")
 
         then: "result is job or null if job is deleted"
         result == normalJob

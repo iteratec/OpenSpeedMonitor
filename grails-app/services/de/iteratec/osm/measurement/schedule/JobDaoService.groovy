@@ -15,7 +15,7 @@ class JobDaoService {
         return Job.findAllByDeletedAndIdInList(false, jobIds)
     }
 
-    public Job getJobById(Long jobId) {
+    public Job getJob(Long jobId) {
         Job job = Job.get(jobId)
         if (!job || job.deleted) {
             return null
@@ -23,7 +23,7 @@ class JobDaoService {
         return job
     }
 
-    public Job getJob(String label) {
+    public Job getJobByLabel(String label) {
         Job.findByDeletedAndLabel(false, label)
     }
 

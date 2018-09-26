@@ -66,10 +66,11 @@ class DetailAnalysisPersisterService implements iResultListener {
     @Override
     public void listenToResult(
             WptResultXml resultXml,
-            WebPageTestServer wptserverOfResult) {
+            WebPageTestServer wptserverOfResult,
+            Long jobId) {
 
         try {
-            persistDetailAnalysisData(resultXml, wptserverOfResult)
+            persistDetailAnalysisData(resultXml, wptserverOfResult, jobId)
 
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
@@ -86,18 +87,16 @@ class DetailAnalysisPersisterService implements iResultListener {
      * Triggers the persistence the detailAnalysisData for a JobResults if persistence is enabled
      * @param resultXml
      */
-    private void persistDetailAnalysisData(WptResultXml resultXml, WebPageTestServer wptServerOfResult) {
+    private void persistDetailAnalysisData(WptResultXml resultXml, WebPageTestServer wptServerOfResult, Long jobId) {
         if (!persistenceOfDetailAnalysisDataEnabled){
             log.debug("Can not send persistDetailAnalysisData since persistenceOfDetailAnalysisData is disabled")
             return
         }
-        final String jobLabel = resultXml.getLabel()
-        Job job = jobDaoService.getJob(jobLabel)
+        Job job = jobDaoService.getJob(jobId)
         if (!job) {
-            throw new OsmResultPersistanceException("Can't trigger persistence of detailAnalysisData for TestID: " + resultXml.getTestId() +
-                    "\n Job with name " + jobLabel + "doesn't exist")
+            throw new OsmResultPersistanceException("Can't trigger persistence of detailAnalysisData for TestID: " +
+                    "${resultXml.getTestId()}\n Job with id ${job.id} doesn't exist")
         }
-        Long jobId = job.id
         Long jobGroupId = job.jobGroup.id
 
         // If persisting of detail data is not activated for jobGroup do nothing
