@@ -32,8 +32,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
  */
 class DefaultTimeToCsMappingService {
 
-
-    TimeToCsMappingCacheService timeToCsMappingCacheService
     I18nService i18nService
     PerformanceLoggingService performanceLoggingService
 
