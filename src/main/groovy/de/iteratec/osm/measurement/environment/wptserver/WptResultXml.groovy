@@ -130,9 +130,9 @@ class WptResultXml {
     int getResultCodeForStep(int stepZeroBasedIndex) {
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return responseNode.data.median.result.toInteger()
+                return responseNode.data.median.firstView.result.toInteger()
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).results.result.toInteger()
+                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).result.toInteger()
             case WptXmlResultVersion.MULTISTEP:
                 return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex).results.result.toInteger()
             default:
@@ -143,9 +143,9 @@ class WptResultXml {
     int getFirstByteForStep(int stepZeroBasedIndex) {
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return responseNode.data.median.TTFB.toInteger()
+                return responseNode.data.median.firstView.TTFB.toInteger()
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).results.TTFB.toInteger()
+                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).TTFB.toInteger()
             case WptXmlResultVersion.MULTISTEP:
                 return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex).results.TTFB.toInteger()
             default:
