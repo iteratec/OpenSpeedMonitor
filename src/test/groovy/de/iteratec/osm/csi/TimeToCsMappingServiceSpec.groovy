@@ -65,17 +65,40 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         csCalculated == null
     }
 
-    def "cs calculation is null when no transformation is possible for a page"() {
-        setup:
-        serviceUnderTest = Spy(TimeToCsMappingService)
-        serviceUnderTest.transformationPossibleFor(_, _) >> false
+    def "cs calculation is null when page is null"() {
+        given: "a valid csiConfiguration"
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
 
-        when:
-        Double csCalculatedByMapping = serviceUnderTest.getCustomerSatisfactionInPercent(2000, Page.build())
+        when: "the customer satisfaction should be computed, but the page is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, null, csiConfiguration)
 
-        then:
-        csCalculatedByMapping == null
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
     }
+
+    def "cs calculation is null when the CSI configuration is null"() {
+        given: "a page"
+        Page page = Page.build(name: "HP_entry")
+
+        when: "the cs for a loading time gets calculated, but the mapping is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, page, null)
+
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
+    }
+
+    def "cs calculation is null when the CSI configuration doesn't affect the page"() {
+        given: "a page and a loading time to cs mapping"
+        Page page = Page.build(name: "HP_entry_special")
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
+
+        when: "the cs for a loading time gets calculated, but the mapping is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, page, csiConfiguration)
+
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
+    }
+
 
     def "get customer satisfaction (cs) in percent via mapping"() {
         given: "a page and a loading time to cs mapping"
@@ -83,7 +106,7 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
 
         when: "the cs for a loading time gets calculated via the given mapping"
-        def csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(loadTimeInMillisecs, page, csiConfiguration)
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(loadTimeInMillisecs, page, csiConfiguration)
 
         then: "the cs is close enough to the expected one"
         csCalculated closeTo(expectedCustomerSatisfaction, 1.2)

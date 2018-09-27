@@ -37,28 +37,13 @@ class TimeToCsMappingService {
      * @return Calculated customer-satisfaction or null if page is undefined or no calculation specification exists for it.
      */
     Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null) {
-        if (page.isUndefinedPage() || !transformationPossibleFor(page, csiConfiguration)) {
+        if (!isValid(page) || !csiConfiguration) {
             return null
-        } else {
-            return getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page, csiConfiguration)
         }
-    }
-
-    boolean transformationPossibleFor(Page page, CsiConfiguration csiConfiguration) {
-        return csiConfiguration != null && validMappingsExistFor(page, csiConfiguration)
-    }
-
-    /**
-     * <p>
-     * Approach to translate the load-time of a specific page into a customer satisfaction.
-     * Uses database-table with time to csi mappings
-     * </p>
-     * @param docReadyTimeInMilliSecs
-     * @param page
-     * @return
-     */
-    Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
         List<TimeToCsMapping> mappingsForPage = csiConfiguration.getTimeToCsMappingByPage(page)
+        if (!mappingsForPage) {
+            return null
+        }
 
         Integer loadtimeIncrement = 20
         Integer loadtimeNoUserWouldAccept = 20000
@@ -93,10 +78,6 @@ class TimeToCsMappingService {
             log.info("customerSatisfaction=$customerSatisfaction")
         }
         return customerSatisfaction
-    }
-
-    Boolean validMappingsExistFor(Page page, CsiConfiguration csiConfiguration) {
-        return isValid(page) && !csiConfiguration.getTimeToCsMappingByPage(page).isEmpty()
     }
 
     Boolean isValid(Page page) {
