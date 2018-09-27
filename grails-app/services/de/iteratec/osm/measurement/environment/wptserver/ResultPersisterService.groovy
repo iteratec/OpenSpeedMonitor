@@ -233,11 +233,12 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
+    protected void persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
         List<EventResult> resultsOfTeststep = []
         String testId = resultXml.getTestId()
-        String labelInXml = resultXml.getLabel()
-        if (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex.intValue())) && resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) {
+
+        if (isEventResultValid(resultXml, testStepZeroBasedIndex)) {
+            String labelInXml = resultXml.getLabel()
             JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
             if (jobResult == null) {
                 throw new OsmResultPersistanceException(
@@ -275,10 +276,15 @@ class ResultPersisterService implements iResultListener {
                 }
             }
         } else {
-            println("Can't persist EventResult of test:${testId} (Code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex.intValue())}, TFFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)})")
+            println("Can't persist EventResult of test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
+                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)})")
         }
+    }
 
-        return resultsOfTeststep
+
+    boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
+        return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
+                resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0)
     }
 
     /**
