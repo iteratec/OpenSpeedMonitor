@@ -118,10 +118,9 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         File xmlFile = new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_Error_testCompletedButThereWereNoSuccessfulResults.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlFile))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server1)
-        Job job = Job.build()
 
         when: "ResultListener listens to the result xml"
-        service.listenToResult(xmlResult, server1, job.id)
+        service.listenToResult(xmlResult, server1, 746847897)
 
         then: "Because of invalid xml result no EventResult dependent domains get persisted"
         JobResult.list().size() == 0

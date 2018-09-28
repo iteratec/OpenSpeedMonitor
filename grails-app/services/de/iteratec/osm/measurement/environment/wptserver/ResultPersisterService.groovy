@@ -99,7 +99,7 @@ class ResultPersisterService implements iResultListener {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
             job = jobDaoService.getJob(jobId)
-            if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for id ${job.id} from result xml")
+            if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for id ${jobId} from result xml")
         }
         performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", 4) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
