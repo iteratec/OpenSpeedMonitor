@@ -149,7 +149,7 @@ class WptInstructionService {
      * 			Instance of PHP-application webpagetest (see http://webpagetest.org) from which xml-result should be get.
      * @param resultId
      * 			Id of webpagetest result
-     * 	@param job
+     * @param job
      * 	        Job that initiated webpagetest
      * @return
      */

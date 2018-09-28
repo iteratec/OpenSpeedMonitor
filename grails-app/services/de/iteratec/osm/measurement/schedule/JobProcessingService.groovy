@@ -397,7 +397,7 @@ class JobProcessingService {
             return testId
         } catch (Exception e) {
             statusCode = statusCode? statusCode : 500
-            persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
+            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
@@ -411,7 +411,7 @@ class JobProcessingService {
         WptResultXml resultXml
         try {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
-                resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId)
+                resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId, job)
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
                 if (resultXml.statusCodeOfWholeTest < 200) {
@@ -500,14 +500,14 @@ class JobProcessingService {
         if (quartzScheduler.getTrigger(new TriggerKey(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value()))) {
             if (rescheduleIfAlreadyScheduled) {
                 if (log.infoEnabled) log.info("Rescheduling Job ${job.label} (${job.executionSchedule})")
-                JobProcessingQuartzHandlerJob.reschedule(cronTrigger, job.id)
+                JobProcessingQuartzHandlerJob.reschedule(cronTrigger, [jobId: job.id])
             } else {
                 log.info("Ignoring Job ${job.label} as it is already scheduled.")
             }
         } else {
             try {
                 log.info("Scheduling Job ${job.label} (${job.executionSchedule})")
-                JobProcessingQuartzHandlerJob.schedule(cronTrigger, job.id)
+                JobProcessingQuartzHandlerJob.schedule(cronTrigger, [jobId: job.id])
             } catch (SchedulerException se) {
                 log.info("Job ${job.label} with schedule ${job.executionSchedule} can't be scheduled: ${se.message}", se)
             }
