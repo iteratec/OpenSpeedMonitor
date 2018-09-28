@@ -38,7 +38,7 @@ class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceU
         result == [normalJob]
     }
 
-    void "getJobById returns null for deleted jobs"() {
+    void "getJob returns null for deleted jobs"() {
         given: "a normal job and a deleted"
         Job normalJob = Job.build()
         Job deletedJob = Job.build(deleted: true)

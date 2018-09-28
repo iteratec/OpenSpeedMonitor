@@ -45,6 +45,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     WebPageTestServer server
+    Job job
 
     def setup() {
         OsmConfiguration.build()
@@ -62,7 +63,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
         when: ""
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
         List<EventResult> eventResults = EventResult.list()
 
         then: ""
@@ -92,7 +93,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         )
         CsiConfiguration csiConf = CsiConfiguration.build()
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConf)
-        Job.build(
+        job = Job.build(
                 label: 'CH_OTTO_ADS_hetzner',
                 location: loc,
                 jobGroup: jobGroup

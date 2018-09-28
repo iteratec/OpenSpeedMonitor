@@ -40,6 +40,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     WebPageTestServer server
+    Job job
 
     def setupData() {
         OsmConfiguration.build()
@@ -64,7 +65,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockCsiAggregationUpdateService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -79,7 +80,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockMetricReportingService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -94,7 +95,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         xmlResult.getTestId() >> null
 
         when: "the service tries to persist the results an exception gets thrown"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "nothing should be persisted"
         JobResult.list().size() == 0
@@ -109,7 +110,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         xmlResult.getStepNode(0) >> null
 
         when: "the results get persisted but the first step throws an exception"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
@@ -127,7 +128,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
                 browser: browser
         )
-        Job.build(
+        job = Job.build(
                 label: 'FF_BV1_Multistep_2',
                 location: loc
         )
