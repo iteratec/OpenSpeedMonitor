@@ -33,7 +33,8 @@
             "lazyModules": [
               "src/app/page-comparison/page-comparison.module",
               "src/app/application-dashboard/application-dashboard.module",
-              "src/app/job-threshold/job-threshold.module"
+              "src/app/job-threshold/job-threshold.module",
+              "src/app/landing/landing.module"
             ],
             "vendorChunk": false,
             "extractCss": true
