@@ -61,25 +61,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         validateCronExpression();
     }
 
-    var validateJobNameInput = function () {
-        var currentJobName = jobNameInput.val();
-        var isDuplicateName = isExistingJobName(currentJobName);
-
-        $("#jobNameFormGroup").toggleClass("has-error", !currentJobName);
-        jobNameHelpBlock.toggleClass("hidden", !isDuplicateName);
-
-        return currentJobName && !isDuplicateName;
-    }
-
-    var isExistingJobName = function (jobName) {
-        return existingJobNames.indexOf(jobName) >= 0;
-    }
-
     var validateInputs = function () {
-        inputsValid = cronInputValid && validateJobNameInput();
         var cardWasActive = createJobNavPill.parent().hasClass("wasActive");
 
-        createJobNavPill.toggleClass("failureText", !inputsValid && cardWasActive);
+        createJobNavPill.toggleClass("failureText", !cronInputValid && cardWasActive);
 
         informListeners();
     }
