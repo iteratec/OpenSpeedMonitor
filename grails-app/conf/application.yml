@@ -351,6 +351,7 @@ grails:
             - 'openspeedmonitor.less'
         minifyJs: true
         minifyCss: true
+        includes: ["frontend/**"]
     i18n:
         locales:
             - en

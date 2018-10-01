@@ -4,7 +4,6 @@ import grails.boot.GrailsApp
 import grails.util.Environment
 import groovy.transform.CompileDynamic
 import org.grails.io.watch.DirectoryWatcher
-import org.grails.io.watch.FileExtensionFileChangeListener
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -43,26 +42,27 @@ class FrontendWatcher {
 
             Queue<File> changedFiles = new ConcurrentLinkedQueue<>()
 
-            directoryWatcher.addListener(new FileExtensionFileChangeListener(['css', 'js']) {
+            directoryWatcher.addListener(new DirectoryWatcher.FileChangeListener() {
                 @Override
-                void onChange(File file, List<String> extensions) {
+                void onChange(File file) {
                     changedFiles << file.canonicalFile
                 }
-
                 @Override
-                void onNew(File file, List<String> extensions) {
+                void onNew(File file) {
                     changedFiles << file.canonicalFile
                 }
             })
 
-            directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['css', 'js'])
+            directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['js', 'css', 'svg', 'png', 'jpg'])
             String frontendJavascriptsFolder = Paths.get("${location}/grails-app/assets/javascripts/frontend")
             String frontendStylesheetsFolder = Paths.get("${location}/grails-app/assets/stylesheets/frontend")
+            String frontendAssetsFolder = Paths.get("${location}/grails-app/assets/frontend")
 
             Thread.start {
 
                 new File(frontendJavascriptsFolder).mkdirs()
                 new File(frontendStylesheetsFolder).mkdirs()
+                new File(frontendAssetsFolder).mkdirs()
 
                 while (GrailsApp.developmentModeActive) {
 
@@ -81,8 +81,10 @@ class FrontendWatcher {
 
                                 if (src.toString().endsWith('.css')) {
                                     dst = Paths.get("${frontendStylesheetsFolder}/${file.getName()}")
-                                } else {
+                                } else if (src.toString().endsWith(".js")) {
                                     dst = Paths.get("${frontendJavascriptsFolder}/${file.getName()}")
+                                } else {
+                                    dst = Paths.get("${frontendAssetsFolder}/${file.getName()}")
                                 }
                                 Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING)
                             }
