@@ -1,3 +1,16 @@
-<p>
-  landing works!
-</p>
+<img class="logo" src="/assets/OpenSpeedMonitor_dark.svg" alt="OpenSpeedMonitor" />
+
+<main>
+  <section class="card applications">
+    <h2>{{ 'frontend.de.iteratec.osm.landing.yourApplications' | translate }}</h2>
+    <figure class="status">
+      <img src="/assets/undraw_fast_loading.svg" [alt]="'frontend.de.iteratec.osm.landing.nothingSetUp' | translate" />
+      <figcaption>{{ 'frontend.de.iteratec.osm.landing.nothingSetUp' | translate }}</figcaption>
+    </figure>
+    <button type="button" class="btn btn-primary">
+      <i class="fas fa-plus"></i>
+      {{ 'frontend.de.iteratec.osm.landing.setupNewMeasurement' | translate}}
+    </button>
+  </section>
+
+</main>
