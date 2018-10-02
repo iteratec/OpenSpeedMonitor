@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
-import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -60,6 +60,7 @@ class ResultPersisterService implements iResultListener {
     CsiValueService csiValueService
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
+    OsmConfigCacheService osmConfigCacheService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -284,8 +285,8 @@ class ResultPersisterService implements iResultListener {
 
 
     boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
-        int minValidLoadTime = OsmConfiguration.first().minValidLoadtime
-        int maxValidLoadTime = OsmConfiguration.first().maxValidLoadtime
+        int minValidLoadTime = osmConfigCacheService.getMinValidLoadtime()
+        int maxValidLoadTime = osmConfigCacheService.getMaxValidLoadtime()
         int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
 
         return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
