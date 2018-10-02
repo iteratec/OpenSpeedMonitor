@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -224,6 +225,11 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
             getMinValidLoadtime(_) >> DEFAULT_MIN_VALID_LOADTIME
             getMaxValidLoadtime(_) >> DEFAULT_MAX_VALID_LOADTIME
+        }
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }
     }
 
