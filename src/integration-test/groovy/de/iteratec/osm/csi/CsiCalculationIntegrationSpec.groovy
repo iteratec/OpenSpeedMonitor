@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -28,6 +29,9 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -117,5 +121,9 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
         resultPersisterService.timeToCsMappingService = service
+        resultPersisterService.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 }
