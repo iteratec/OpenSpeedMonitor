@@ -13,8 +13,10 @@
     <ul class="clickable-list" *ngIf="applications$ | async; let applications">
       <li *ngFor="let application of applications">
         <a href="/applicationDashboard/{{application.id}}">
-          <span class="title">{{application.name}}</span>
-          <span class="detail">{{application.numPages}} Pages</span>
+          <aside>{{application.csi.toFixed(0)}}%</aside>
+          <span class="title">{{application.name}}
+            <span class="detail">{{application.numPages}} Pages</span>
+          </span>
         </a>
       </li>
     </ul>
