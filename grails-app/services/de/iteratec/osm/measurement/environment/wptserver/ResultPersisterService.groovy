@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -276,15 +277,21 @@ class ResultPersisterService implements iResultListener {
                 }
             }
         } else {
-            println("Can't persist EventResult of test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
-                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)})")
+            println("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
+                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
         }
     }
 
 
     boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
+        int minValidLoadTime = OsmConfiguration.first().minValidLoadtime
+        int maxValidLoadTime = OsmConfiguration.first().maxValidLoadtime
+        int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
+
         return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
-                resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0)
+                (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
+                (loadTime >= minValidLoadTime) &&
+                (loadTime <= maxValidLoadTime))
     }
 
     /**

@@ -153,6 +153,19 @@ class WptResultXml {
         }
     }
 
+    int getLoadTimeForStep(int stepZeroBasedIndex) {
+        switch (version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return responseNode.data.median.firstView.loadTime.toInteger()
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex).loadTime.toInteger()
+            case WptXmlResultVersion.MULTISTEP:
+                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex).results.loadTime.toInteger()
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
+        }
+    }
+
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
         GPathResult runNode = getRunNodes()[runZeroBasedIndex]
         if (cachedView == CachedView.UNCACHED) {
