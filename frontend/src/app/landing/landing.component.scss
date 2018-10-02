@@ -11,7 +11,13 @@ main {
   display: flex;
 }
 
-figure {
+.loading {
+  display: block;
+  text-align: center;
+  margin: 5em 0;
+}
+
+figure.status {
   margin-bottom: $default-padding;
   padding: $default-padding;
   display: flex;

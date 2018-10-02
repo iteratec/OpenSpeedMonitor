@@ -1,12 +1,23 @@
-<img class="logo" src="/assets/OpenSpeedMonitor_dark.svg" alt="OpenSpeedMonitor" />
+<img class="logo" src="/assets/OpenSpeedMonitor_dark.svg" alt="OpenSpeedMonitor"/>
 
 <main>
   <section class="card applications">
     <h2>{{ 'frontend.de.iteratec.osm.landing.yourApplications' | translate }}</h2>
-    <figure class="status">
-      <img src="/assets/undraw_fast_loading.svg" [alt]="'frontend.de.iteratec.osm.landing.nothingSetUp' | translate" />
+    <span class="loading" *ngIf="showApplicationLoading$ | async">
+      Loading...
+    </span>
+    <figure class="status" *ngIf="showApplicationEmptyState$ | async">
+      <img src="/assets/undraw_fast_loading.svg" [alt]="'frontend.de.iteratec.osm.landing.nothingSetUp' | translate"/>
       <figcaption>{{ 'frontend.de.iteratec.osm.landing.nothingSetUp' | translate }}</figcaption>
     </figure>
+    <ul class="clickable-list" *ngIf="applications$ | async; let applications">
+      <li *ngFor="let application of applications">
+        <a href="/applicationDashboard/{{application.id}}">
+          <span class="title">{{application.name}}</span>
+          <span class="detail">{{application.numPages}} Pages</span>
+        </a>
+      </li>
+    </ul>
     <button type="button" class="btn btn-primary">
       <i class="fas fa-plus"></i>
       {{ 'frontend.de.iteratec.osm.landing.setupNewMeasurement' | translate}}
