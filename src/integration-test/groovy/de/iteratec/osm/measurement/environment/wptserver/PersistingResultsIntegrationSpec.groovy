@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
@@ -31,6 +32,9 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
 
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
@@ -137,6 +141,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         TimeToCsMappingService timeToCsMappingService = Stub(TimeToCsMappingService)
         timeToCsMappingService.getCustomerSatisfactionInPercent(_, _, _) >> 42
         resultPersisterService.timeToCsMappingService = timeToCsMappingService
+
+        resultPersisterService.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
     void mockCsiAggregationUpdateService() {
