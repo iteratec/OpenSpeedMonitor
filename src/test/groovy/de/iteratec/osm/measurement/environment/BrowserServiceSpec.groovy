@@ -19,7 +19,6 @@ package de.iteratec.osm.measurement.environment
 
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
@@ -43,7 +42,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         when: "a browser should be found by name or alias"
         def browser = service.findByNameOrAlias(nameOrAlias)
 
-        then: "the corresponding browser or the undefined one is found"
+        then: "the corresponding browser is found, the browser that was not defined is created"
         browser.name == expectedBrowserName
 
         where:
@@ -53,7 +52,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         "Firefox"           | "Firefox"
         "FF"                | "Firefox"
         "Firefox7"          | "Firefox"
-        "Chrome"            | Browser.UNDEFINED
+        "Chrome"            | "Chrome"
     }
 
     void "findAll by name or alias returns correct browsers"() {
@@ -65,10 +64,10 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Browser.build(name: "Edge")
 
         when: "all browsers should be found by name or alias"
-        def browser = service.findAllByNameOrAlias(["FF", "IE", "Chrome"])
+        def browser = service.findAllByNameOrCreate(["FF", "IE", "Chrome"])
 
-        then: "the corresponding browser or the undefined one is found"
-        browser*.name == ["Firefox", "IE", Browser.UNDEFINED]
+        then: "the corresponding browsers are found"
+        browser*.name == ["Firefox", "IE", "Chrome"]
     }
 
     void "find all returns all browsers"() {

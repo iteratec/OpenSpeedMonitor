@@ -16,6 +16,7 @@
 */
 
 package de.iteratec.osm.measurement.environment
+
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -27,33 +28,33 @@ class BrowserService {
         return Collections.unmodifiableSet(result)
     }
 
-    List<Browser> findAllByNameOrAlias(List<String> browserNameOrAlias) {
+    List<Browser> findAllByNameOrCreate(List<String> browserNames) {
         List<Browser> result = []
-        browserNameOrAlias.each {
+        browserNames.each {
             result << findByNameOrAlias(it)
         }
         return result
     }
 
-    Browser findByNameOrAlias(String browserNameOrAlias) {
-        Browser ret = Browser.findByName(browserNameOrAlias)
-        if (ret == null) {
-            return findByAlias(browserNameOrAlias)
+    Browser findByNameOrAlias(String browserName) {
+        Browser browser = Browser.findByName(browserName)
+        if (browser == null) {
+            return findByAliasOrCreate(browserName)
         } else {
-            return ret
+            return browser
         }
     }
 
-    private Browser findByAlias(browserNameOrAlias) {
-        Browser ret = Browser.findByName('undefined') ?: new Browser(name: 'undefined').save(failOnError: true)
-        Browser.list().each { currBrowser ->
-            def query = BrowserAlias.where {
-                browser == currBrowser
-            }
-            query.findAll { it.alias.equals(browserNameOrAlias) }.each {
-                ret = currBrowser
-            }
+    private Browser findByAliasOrCreate(String browserName) {
+        Browser retBrowser
+
+        Browser.list().each { currentBrowser ->
+            List<BrowserAlias> browserAliasesForCurrentBrowser = BrowserAlias.findAllByBrowser(currentBrowser)
+            browserAliasesForCurrentBrowser.find { it.alias.equals(browserName) }.each { retBrowser = currentBrowser }
         }
-        return ret
+        if (!retBrowser) {
+            retBrowser = new Browser(name: browserName).save(failOnError: true)
+        }
+        return retBrowser
     }
 }

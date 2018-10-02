@@ -54,7 +54,7 @@ class LocationPersisterService implements iLocationListener {
             List<Location> locations
             // for wpt versions above 2.18 there is a Browsers-Attribute
             List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
-            List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
+            List<Browser> browsersForLocation = browserService.findAllByNameOrCreate(browserNames)
             browsersForLocation.each { currentBrowser ->
                 String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
                 locationIdentifiersForWptServer << uniqueIdentfierForServer
@@ -69,7 +69,7 @@ class LocationPersisterService implements iLocationListener {
                             wptServer: wptserverForLocation,
                             dateCreated: new Date(),
                             lastUpdated: new Date()
-                    ).save(failOnError: true);
+                    ).save(failOnError: true)
                     addedLocations << newLocation
                     log.info("new location written while fetching locations: ${newLocation}")
                 } else if (locationsForCurrentBrowserAndWptServer.size() > 1) {
