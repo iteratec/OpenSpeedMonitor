@@ -18,6 +18,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         chartContainer,
         svg,
         xScale,
+        yScale,
         barSelected;
 
     var init = function (data) {
@@ -32,11 +33,11 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         $("#all-bars-desc").on('click', function (e) {
-            sortBars(data, "desc");
+            drawChart(data, 'desc');
             toogleFilterCheckmarks(e.target)
         });
         $("#all-bars-asc").on('click', function (e) {
-            sortBars(data, "asc");
+            drawChart(data, 'asc');
             toogleFilterCheckmarks(e.target)
         })
     };
@@ -53,7 +54,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         })
     };
 
-    var drawChart = function (data) {
+    var drawChart = function (data, sortOrder) {
         if (svg === undefined) {
             init(data);
         }
@@ -73,7 +74,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
                 return d.name;
             }));
 
-        var yScale = d3.scale.linear()
+        yScale = d3.scale.linear()
             .range([height, 0])
             .domain([0, d3.max(data, function (d) {
                 return d.value;
@@ -85,10 +86,8 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             });
 
         // enter
-        var barContainer = bars.enter().append("g")
-            .attr("transform", function (d) {
-                return "translate(" + xScale(d.name) + "," + yScale(d.value) + ")";
-            })
+        var barContainer = bars.enter()
+            .append("g")
             .attr("class", "d3chart-bar-container");
         barContainer.append("rect")
             .attr("class", "d3chart-bar")
@@ -96,6 +95,9 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
                 return height - yScale(d.value);
             })
             .attr("width", barWidth)
+            .attr("transform", function (d) {
+                return "translate(" + 0 +  "," + (yScale(d.value)) + ")"
+            })
             .on("click", highlightClickedBar);
         barContainer.append("text")
             .text(function (d) {
@@ -104,7 +106,10 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("class", "d3chart-barLabel")
             .style("text-anchor", "middle")
             .attr("x", barWidth / 2)
-            .attr("y", "1.2em");
+            .attr("y", "1.2em")
+            .attr("transform", function (d) {
+                return "translate(" + 0 + "," + yScale(d.value) + ")";
+            });
         barContainer.append("text")
             .attr("class", "d3chart-xAxisText")
             .text(function (d) {
@@ -113,7 +118,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .style("text-anchor", "end")
             .attr("dy", "2em")
             .attr("transform", function (d) {
-                return "translate(" + barWidth / 2 + "," + (height - yScale(d.value)) + ") rotate(-45)"
+                return "translate(" + barWidth / 2 + "," + (height) + ") rotate(-45)"
             });
 
         // exit
@@ -121,24 +126,24 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .remove();
 
         // sort bars descending by default
-        sortBars(data, "desc");
+        if (!sortOrder) {
+            sortOrder = "desc";
+        }
+        sortBars(data, sortOrder);
         toogleFilterCheckmarks();
     };
 
     var sortBars = function (data, order) {
         xScale.domain(data.sort(function (a, b) {
-            return (order == "asc") ? a.value - b.value : b.value - a.value;
+            return (order === "asc") ? a.value - b.value : b.value - a.value;
         })
-            .map(function (datum) {
-                return datum.name
+            .map(function (jobGroup) {
+                return jobGroup.name
             }));
 
         svg.selectAll(".d3chart-bar-container")
-            .attr("transform", function (datum) {
-                var t = d3.transform(d3.select(this).attr("transform"));
-                var translateY = t.translate[1];
-
-                return "translate(" + xScale(datum.name) + ", " + translateY + ")";
+            .attr("transform", function (jobGroup) {
+                return "translate(" + xScale(jobGroup.name) + ", 0)";
             });
     };
 
