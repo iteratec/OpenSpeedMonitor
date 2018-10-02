@@ -9,7 +9,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var cronStringInputField = $("#executionSchedule");
     var cronInputValid = true;
     var jobNameInput = $("#inputJobName");
-    var existingJobNames = [];
     var inputsValid = false;
     var jobDiv = $("#createJob");
     var defaultJobName = "";
@@ -42,8 +41,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
             predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
             updateCronStringFromPredefined();
         }
-
-        getExistingJobNames();
     }
 
     var isPredefinedCronString = function (cronString) {
@@ -62,9 +59,10 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     }
 
     var validateInputs = function () {
+        inputsValid = cronInputValid;
         var cardWasActive = createJobNavPill.parent().hasClass("wasActive");
 
-        createJobNavPill.toggleClass("failureText", !cronInputValid && cardWasActive);
+        createJobNavPill.toggleClass("failureText", !inputsValid && cardWasActive);
 
         informListeners();
     }
@@ -93,23 +91,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         executionScheduleFormGroup.toggleClass("has-error", !isValid);
         cronInputHelpBlock.text(helpText);
         validateInputs();
-    }
-
-    var getExistingJobNames = function () {
-        var url = OpenSpeedMonitor.urls.getJobNames;
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: "json",
-            success: function (data) {
-                existingJobNames = data;
-            },
-            error: function (e) {
-                throw e;
-            },
-            traditional: true // grails compatible parameter array encoding
-        });
     }
 
     var informListeners = function () {

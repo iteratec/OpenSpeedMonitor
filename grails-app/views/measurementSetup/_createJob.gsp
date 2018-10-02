@@ -6,7 +6,7 @@
             </label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputJobName" name="job.label" required>
+                <input type="text" class="form-control" id="inputJobName" name="job.label">
                 <span id="jobNameHelpBlock" class="help-block hidden"><g:message code="de.iteratec.osm.measurement.schedule.Job.label.unique" default="Already Exists"/></span>
             </div>
         </div>
