@@ -178,7 +178,7 @@ class WptInstructionService {
                                 listener.listenToResult(resultXml, wptserverOfResult)
                             }
                         }
-                        p.onError { Throwable err -> log.error(err) }
+                        p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
                         p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
                     } else {
                         listener.listenToResult(resultXml, wptserverOfResult)

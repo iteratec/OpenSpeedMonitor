@@ -133,7 +133,7 @@ class MetricReportingService {
                         } catch (NullPointerException npe) {
                             log.error("Couldn't write result to graphite due to invalid path: ${pathElements}", npe)
                         } catch (GraphiteComunicationFailureException e) {
-                            log.error(e)
+                            log.error(e.message, e)
                         }
 
                         log.debug("Sent date to graphite: path=${finalPathName}, value=${value} time=${result.getJobResultDate().getTime()}")
