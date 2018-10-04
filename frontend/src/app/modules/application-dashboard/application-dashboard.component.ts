@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {ApplicationService} from '../../services/application.service';
-import {ApplicationDTO} from './models/application.model';
+import {Application} from '../../models/application.model';
 import {PageMetricsDto} from "./models/page-metrics.model";
 import {ResponseWithLoadingState} from "./models/response-with-loading-state.model";
 import {ApplicationCsiListDTO} from "./models/csi-list.model";
@@ -15,8 +15,8 @@ import {CsiDTO} from "./models/csi.model";
   styleUrls: ['./application-dashboard.component.scss']
 })
 export class ApplicationDashboardComponent implements OnDestroy {
-  applications$: Observable<ApplicationDTO[]>;
-  selectedApplication: ApplicationDTO;
+  applications$: Observable<Application[]>;
+  selectedApplication: Application;
   destroyed$ = new Subject<void>();
   pages$: Observable<PageMetricsDto[]>;
   csiValues$: Observable<ApplicationCsiListDTO>;
@@ -31,9 +31,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     private dashboardService: ApplicationService
   ) {
     this.pages$ = this.dashboardService.metrics$;
-    this.applications$ = dashboardService.activeOrRecentlyMeasured$.pipe(
-      map((applications: ApplicationDTO[]) => this.sortApplicationsByName(applications))
-    );
+    this.applications$ = dashboardService.applications$;
 
     this.csiValues$ = this.dashboardService.csiValues$.pipe(
       map((res: ResponseWithLoadingState<ApplicationCsiListDTO>) => {
@@ -50,7 +48,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     this.recentCsiDate$ = this.dashboardService.csiValues$.pipe(
       map((res: ResponseWithLoadingState<ApplicationCsiListDTO>) => {
         const csiDto: CsiDTO = res.data.csiDtoList.slice(-1)[0];
-        return csiDto ? csiDto.date : null;
+        return csiDto ? csiDto.date.toString() : null;
       }));
 
     this.hasConfiguration$ = this.dashboardService.csiValues$.pipe(
@@ -61,7 +59,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
   }
 
-  private handleNavigation(applicationId: string, applications: ApplicationDTO[]) {
+  private handleNavigation(applicationId: string, applications: Application[]) {
     if (!applicationId) {
       this.updateApplication(applications[0]);
       return;
@@ -77,15 +75,12 @@ export class ApplicationDashboardComponent implements OnDestroy {
     this.destroyed$.complete();
   }
 
-  updateApplication(application: ApplicationDTO) {
+  updateApplication(application: Application) {
     this.router.navigate(['/applicationDashboard', application.id]);
   }
 
-  private findApplicationById(applications: ApplicationDTO[], applicationId: string) {
+  private findApplicationById(applications: Application[], applicationId: string): Application {
     return applications.find(application => application.id == Number(applicationId));
   }
 
-  private sortApplicationsByName(applications: ApplicationDTO[]) {
-    return applications.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: 'base'}));
-  }
 }

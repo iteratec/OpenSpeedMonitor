@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
-import {ApplicationDTO} from "../../models/application.model";
+import {ApplicationDTO} from "../../../../models/application.model";
 import {ApplicationService} from "../../../../services/application.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 

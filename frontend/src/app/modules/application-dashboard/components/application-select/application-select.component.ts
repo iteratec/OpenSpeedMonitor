@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {ApplicationDTO} from "../../models/application.model";
+import {Application, ApplicationDTO} from "../../../../models/application.model";
 
 @Component({
   selector: 'osm-application-select',
@@ -7,14 +7,14 @@ import {ApplicationDTO} from "../../models/application.model";
   styleUrls: ['./application-select.component.scss']
 })
 export class ApplicationSelectComponent {
-  @Output() selectedApplicationChange: EventEmitter<ApplicationDTO> = new EventEmitter();
-  @Input() applications: ApplicationDTO[];
-  @Input() selectedApplication: ApplicationDTO;
+  @Output() selectedApplicationChange: EventEmitter<Application> = new EventEmitter();
+  @Input() applications: Application[];
+  @Input() selectedApplication: Application;
 
   constructor() {
   }
 
-  setApplication(application: ApplicationDTO) {
+  setApplication(application: Application) {
     this.selectedApplicationChange.emit(application)
   }
 }

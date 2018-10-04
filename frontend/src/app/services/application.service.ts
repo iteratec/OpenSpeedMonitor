@@ -1,19 +1,20 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {EMPTY, Observable, ReplaySubject, Subject} from "rxjs/index";
+import {EMPTY, Observable, OperatorFunction, ReplaySubject, Subject} from "rxjs/index";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
 import {ApplicationCsiListDTO} from "../modules/application-dashboard/models/csi-list.model";
-import {ApplicationDTO} from "../modules/application-dashboard/models/application.model";
+import {Application, ApplicationDTO} from "../models/application.model";
 import {catchError, map, switchMap} from "rxjs/internal/operators";
 import {ResponseWithLoadingState} from "../modules/application-dashboard/models/response-with-loading-state.model";
+
 
 @Injectable()
 export class ApplicationService {
   metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
   csiValues$: ReplaySubject<ResponseWithLoadingState<ApplicationCsiListDTO>> = new ReplaySubject(1);
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
-  activeOrRecentlyMeasured$ = new ReplaySubject<ApplicationDTO[]>(1);
+  applications$ = new ReplaySubject<Application[]>(1);
 
   selectedApplication$ = new Subject<ApplicationDTO>();
 
@@ -33,8 +34,11 @@ export class ApplicationService {
   }
 
   updateActiveOrRecentlyMeasured() {
-    this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getAllActiveAndAllRecent")
-      .subscribe(next => this.activeOrRecentlyMeasured$.next(next), error => this.handleError(error));
+    this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getAllActiveAndAllRecent").pipe(
+      map(dtos => dtos.map(dto => new Application(dto))),
+      map(applications => this.sortApplicationsByName(applications)),
+      handleError()
+    ).subscribe(next => this.applications$.next(next));
   }
 
   updateApplicationData(application: ApplicationDTO) {
@@ -45,10 +49,7 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     this.metrics$.next(null);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
-      catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      })
+      handleError()
     );
   }
 
@@ -65,10 +66,7 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiListDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
       map(dto => <ResponseWithLoadingState<ApplicationCsiListDTO>>{isLoading: false, data: dto}),
-      catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      })
+      handleError()
     );
   }
 
@@ -77,15 +75,8 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
       map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
-      catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      })
+      handleError()
     );
-  }
-
-  private handleError(error: any) {
-    console.log(error);
   }
 
   private createParams(applicationId: number) {
@@ -96,12 +87,21 @@ export class ApplicationService {
 
   createCsiConfiguration(applicationDto: ApplicationDTO) {
     return this.http.post('/applicationDashboard/rest/createCsiConfiguration', {applicationId: applicationDto.id})
+      .pipe(handleError())
       .subscribe((res: any) => {
         window.location.href = '/csiConfiguration/configurations/' + res.csiConfigurationId
-      }, catchError((error) => {
-        this.handleError(error);
-        return EMPTY;
-      }));
+      });
   }
 
+  private sortApplicationsByName(applications: Application[]): Application[] {
+    return applications.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: 'base'}));
+  }
+
+}
+
+function handleError(): OperatorFunction<any, any> {
+  return catchError((error) => {
+    console.log(error);
+    return EMPTY;
+  });
 }
