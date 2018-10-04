@@ -62,42 +62,42 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     void "Results don't get persisted if the TTFB of first result is 0."() {
 
-        given: "a wpt result and a failing CsiAggregationUpdateService"
+        given: "a wpt result and a faulty result (TTFB is 0)"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
         when: "the results get persisted"
         resultPersisterService.listenToResult(xmlResult, server)
 
-        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
         EventResult.list().size() == 0
     }
 
     void "Results don't get persisted if the LoadTime is larger than max threshold."() {
 
-        given: "a wpt result and a failing CsiAggregationUpdateService"
+        given: "a wpt result and a faulty result (LoadTime is larger than the allowed max value)"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
 
         when: "the results get persisted"
         resultPersisterService.listenToResult(xmlResult, server)
 
-        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
         EventResult.list().size() == 0
     }
 
     void "Results don't get persisted if the result was not successfully."() {
 
-        given: "a wpt result and a failing CsiAggregationUpdateService"
+        given: "a wpt result and a faulty result (Result Code is 404)"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
 
         when: "the results get persisted"
         resultPersisterService.listenToResult(xmlResult, server)
 
-        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
         EventResult.list().size() == 0
     }
