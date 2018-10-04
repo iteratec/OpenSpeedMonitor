@@ -3,6 +3,7 @@ import {Observable} from "rxjs/internal/Observable";
 import {Application} from "./models/application.model";
 import {LandingService} from "./services/landing.service";
 import {map} from "rxjs/operators";
+import {ApplicationWithCsi} from "./models/application-list.model";
 
 @Component({
   selector: 'osm-landing',
@@ -13,7 +14,7 @@ export class LandingComponent {
 
   showApplicationEmptyState$: Observable<boolean>;
   showApplicationLoading$: Observable<boolean>;
-  applications$: Observable<Application[]>;
+  applications$: Observable<ApplicationWithCsi[]>;
 
   constructor(private landingService: LandingService) {
     this.showApplicationEmptyState$ = this.landingService.applicationList$

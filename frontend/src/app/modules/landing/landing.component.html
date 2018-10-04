@@ -15,7 +15,7 @@
         <a [routerLink]="['/applicationDashboard', application.id]">
           <aside>{{application.csi.toFixed(0)}}%</aside>
           <span class="title">{{application.name}}
-            <span class="detail">{{application.numPages}} Pages</span>
+            <span class="detail" *ngIf="application.numPages">{{application.numPages}} Pages</span>
           </span>
         </a>
       </li>
