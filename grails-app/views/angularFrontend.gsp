@@ -7,10 +7,7 @@
 
 <body>
 <osm-app></osm-app>
-<asset:javascript src="frontend/runtime.js"/>
-<asset:javascript src="frontend/polyfills.js"/>
-<asset:javascript src="frontend/main.js"/>
-
+<sitemesh:parameter name="needsAngular" value="true"/>
 </body>
 
 </html>

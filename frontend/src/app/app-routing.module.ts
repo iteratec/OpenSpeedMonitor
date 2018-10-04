@@ -6,11 +6,11 @@ import {NotFoundComponent} from './not-found.component';
 const appRoutes: Routes = [
   {
     path: 'applicationDashboard',
-    loadChildren: './application-dashboard/application-dashboard.module#ApplicationDashboardModule'
+    loadChildren: './modules/application-dashboard/application-dashboard.module#ApplicationDashboardModule'
   },
   {
     path: '',
-    loadChildren: './landing/landing.module#LandingModule'
+    loadChildren: './modules/landing/landing.module#LandingModule'
   },
   {path: '**', component: NotFoundComponent}];
 
