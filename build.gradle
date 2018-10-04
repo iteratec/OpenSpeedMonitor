@@ -206,6 +206,14 @@ task syncFrontendStylesheets(type: Sync, dependsOn: compileFrontend) {
     rename('(styles)\\..*\\.css', '$1.css')
 }
 
+task syncFrontendAssets(type: Sync, dependsOn: compileFrontend) {
+    group "frontend build"
+    description = "Syncs frontend asset files"
+    from 'frontend/dist/frontend/assets'
+    include '*'
+    into 'grails-app/assets/other/frontend'
+}
+
 task generateFrontendI18nFiles(type: Grails2FrontendI18nTask) {
     group "frontend build"
     description "Generate i18n files for angular frontend from grails msg bundles."
@@ -292,13 +300,13 @@ task nodeSyncStylesheets(type: Sync) {
 }
 
 processResources.dependsOn nodeSyncJavascript, nodeSyncStylesheets, installFrontendDependencies, generateFrontendI18nFiles
-assetCompile.dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendJavascripts, syncFrontendStylesheets, generateFrontendI18nFiles
+assetCompile.dependsOn nodeSyncJavascript, nodeSyncStylesheets, syncFrontendAssets, syncFrontendJavascripts, syncFrontendStylesheets, generateFrontendI18nFiles
 
 clean.delete << file('grails-app/assets/javascripts/node_modules')
 clean.delete << file('grails-app/assets/javascripts/frontend')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
 clean.delete << file('grails-app/assets/stylesheets/frontend')
-clean.delete << file('grails-app/assets/frontend')
+clean.delete << file('grails-app/assets/other/fronted')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')

@@ -47,16 +47,17 @@ class FrontendWatcher {
                 void onChange(File file) {
                     changedFiles << file.canonicalFile
                 }
+
                 @Override
                 void onNew(File file) {
                     changedFiles << file.canonicalFile
                 }
             })
 
-            directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['js', 'css', 'svg', 'png', 'jpg'])
+            directoryWatcher.addWatchDirectory(new File(location, "frontend/dist"), ['js', 'css', 'svg', 'png', 'jpg', 'map'])
             String frontendJavascriptsFolder = Paths.get("${location}/grails-app/assets/javascripts/frontend")
             String frontendStylesheetsFolder = Paths.get("${location}/grails-app/assets/stylesheets/frontend")
-            String frontendAssetsFolder = Paths.get("${location}/grails-app/assets/frontend")
+            String frontendAssetsFolder = Paths.get("${location}/grails-app/assets/other/frontend")
 
             Thread.start {
 
