@@ -153,8 +153,7 @@
                                                 <span class="input-group-btn">
                                                     <a class="btn btn-default"
                                                        onclick="$('input[id=defaultTimeToCsMappingCsvFile]').trigger('click');">
-                                                        <i class="fas fa-folderpen-o"
-                                                           aria-hidden="true"></i>
+                                                        <i class="fas fa-folder-open" aria-hidden="true"></i>
                                                     </a>
                                                 </span>
                                                 <input id="defaultTimeToCsMappingCsvFileVisible"
@@ -164,8 +163,7 @@
                                                             id="defaultMappingUploadButton"
                                                             onclick="showSpinnerAtDefaultMappingUpload()"
                                                             disabled="true">
-                                                        <g:message code="de.iteratec.isocsi.upload_file"
-                                                                   default="Upload"/>
+                                                        <i class="fas fa-upload" aria-hidden="true"></i>
                                                     </button>
                                                 </span>
                                             </div>
@@ -245,14 +243,14 @@
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
                                        onclick="$('input[id=theBrowserConnectivityCsvFile]').trigger('click');">
-                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folder-open" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text"
                                        readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
-                                        <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
+                                        <i class="fas fa-upload" aria-hidden="true"></i>
                                     </button>
                                 </span>
                             </div>
@@ -299,13 +297,13 @@
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
                                        onclick="$('input[id=thePageCsvFile]').trigger('click');">
-                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folder-open" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="thePageCsvFileTwitter" class="form-control" type="text" readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
-                                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
+                                        <i class="fas fa-upload" aria-hidden="true"></i>
                                     </button>
                                 </span>
                             </div>
@@ -351,13 +349,13 @@
                                 <span class="input-group-btn">
                                     <a class="btn btn-default"
                                        onclick="$('input[id=theHourOfDayCsvFile]').trigger('click');">
-                                        <i class="fas fa-folderpen-o" aria-hidden="true"></i>
+                                        <i class="fas fa-folder-open" aria-hidden="true"></i>
                                     </a>
                                 </span>
                                 <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text" readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
-                                        <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
+                                        <i class="fas fa-upload" aria-hidden="true"></i>
                                     </button>
                                 </span>
                             </div>
