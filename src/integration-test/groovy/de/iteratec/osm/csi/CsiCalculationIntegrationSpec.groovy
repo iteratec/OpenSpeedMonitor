@@ -55,6 +55,7 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     def cleanup() {
         resultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
+        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "csi won't be calculated without csi-configuration"() {

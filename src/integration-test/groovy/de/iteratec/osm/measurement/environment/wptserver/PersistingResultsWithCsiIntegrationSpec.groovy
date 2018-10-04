@@ -56,6 +56,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     def cleanup() {
         resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
+        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
@@ -136,7 +137,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
                 }
                 lineCounter++
             }
-            csvFileReader.close();
+            csvFileReader.close()
         }
 
     }
@@ -144,6 +145,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     void mockMetricReportingService() {
         MetricReportingService metricReportingService = Stub(MetricReportingService)
         resultPersisterService.metricReportingService = metricReportingService
+
         resultPersisterService.configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
