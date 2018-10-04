@@ -1,7 +1,7 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ApplicationCsiListDTO} from "../../models/csi-list.model";
 import {ApplicationDTO} from "../../models/application.model";
-import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {ApplicationService} from "../../../../services/application.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
 @Component({
@@ -18,7 +18,7 @@ export class CsiInfoComponent implements OnChanges {
   infoText: string;
   iconClass: string;
 
-  constructor(private applicationDashboardService: ApplicationDashboardService, private grailsBridgeService: GrailsBridgeService) {
+  constructor(private applicationDashboardService: ApplicationService, private grailsBridgeService: GrailsBridgeService) {
   }
 
   ngOnChanges(changes: SimpleChanges): void {

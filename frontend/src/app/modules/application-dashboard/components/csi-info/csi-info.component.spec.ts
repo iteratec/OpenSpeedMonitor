@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {CsiInfoComponent} from './csi-info.component';
-import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {ApplicationService} from "../../../../services/application.service";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model";
@@ -9,7 +9,7 @@ import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model"
 describe('CsiInfoComponent', () => {
   let component: CsiInfoComponent;
   let fixture: ComponentFixture<CsiInfoComponent>;
-  let applicationDashboardService: ApplicationDashboardService;
+  let applicationDashboardService: ApplicationService;
   let grailsBridgeService: GrailsBridgeService;
 
   const caseOneText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.notMeasured';
@@ -31,7 +31,7 @@ describe('CsiInfoComponent', () => {
         SharedMocksModule
       ],
       providers: [
-        ApplicationDashboardService,
+        ApplicationService,
         {provide: GrailsBridgeService, useClass: MockGrailsBridgeService}
       ]
     })
@@ -55,7 +55,7 @@ describe('CsiInfoComponent', () => {
   });
 
   it('should be able to call the createCsiConfiguration method from the ApplicationDashboardService if the user is logged in', () => {
-    applicationDashboardService = TestBed.get(ApplicationDashboardService);
+    applicationDashboardService = TestBed.get(ApplicationService);
     spyOn(applicationDashboardService, "createCsiConfiguration");
     component.createCsiConfiguration();
     expect(applicationDashboardService.createCsiConfiguration).toHaveBeenCalledWith(component.selectedApplication);

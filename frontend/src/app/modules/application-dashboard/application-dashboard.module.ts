@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {ApplicationDashboardComponent} from './application-dashboard.component';
 import {ApplicationSelectComponent} from './components/application-select/application-select.component';
-import {ApplicationDashboardService} from "./services/application-dashboard.service";
 import {PageComponent} from './components/page/page.component';
 import {RouterModule, Routes} from "@angular/router";
 import {CsiValueComponent} from "./components/csi-value/csi-value.component";
@@ -33,9 +32,6 @@ const DashboardRoutes: Routes = [
   ],
   exports: [
     RouterModule
-  ],
-  providers: [
-    ApplicationDashboardService
   ]
 })
 export class ApplicationDashboardModule {

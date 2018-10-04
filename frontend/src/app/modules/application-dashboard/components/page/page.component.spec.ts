@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PageComponent} from './page.component';
 import {CsiValueComponent} from '../csi-value/csi-value.component';
-import {ApplicationDashboardService} from '../../services/application-dashboard.service';
+import {ApplicationService} from '../../../../services/application.service';
 import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
 import {PageMetricComponent} from "../page-metric/page-metric.component";
 
@@ -21,7 +21,7 @@ describe('PageComponent', () => {
         SharedMocksModule
       ],
       providers: [
-        ApplicationDashboardService
+        ApplicationService
       ]
     })
       .compileComponents();

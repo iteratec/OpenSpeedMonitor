@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PageMetricComponent} from './page-metric.component';
-import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {ApplicationService} from "../../../../services/application.service";
 import {By} from "@angular/platform-browser";
 import {Unit} from "../../../../enums/unit.enum";
 import {DebugElement} from "@angular/core";
@@ -21,7 +21,7 @@ describe('PageMetricComponent', () => {
         PageMetricComponent
       ],
       providers: [
-        ApplicationDashboardService
+        ApplicationService
       ]
     })
       .compileComponents();

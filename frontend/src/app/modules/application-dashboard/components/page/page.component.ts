@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
 import {PageMetricsDto} from "../../models/page-metrics.model";
-import {ApplicationDashboardService} from "../../services/application-dashboard.service";
+import {ApplicationService} from "../../../../services/application.service";
 import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
@@ -22,7 +22,7 @@ export class PageComponent {
   metrics = Metrics;
 
 
-  constructor(private applicationDashboardService: ApplicationDashboardService) {
+  constructor(private applicationDashboardService: ApplicationService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;

@@ -1,16 +1,15 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EMPTY, Observable, ReplaySubject, Subject} from "rxjs/index";
-import {PageMetricsDto} from "../models/page-metrics.model";
-import {PageCsiDto} from "../models/page-csi.model";
-import {ApplicationCsiListDTO} from "../models/csi-list.model";
-import {ApplicationDTO} from "../models/application.model";
+import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
+import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
+import {ApplicationCsiListDTO} from "../modules/application-dashboard/models/csi-list.model";
+import {ApplicationDTO} from "../modules/application-dashboard/models/application.model";
 import {catchError, map, switchMap} from "rxjs/internal/operators";
-import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
-import {error} from "util";
+import {ResponseWithLoadingState} from "../modules/application-dashboard/models/response-with-loading-state.model";
 
 @Injectable()
-export class ApplicationDashboardService {
+export class ApplicationService {
   metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
   csiValues$: ReplaySubject<ResponseWithLoadingState<ApplicationCsiListDTO>> = new ReplaySubject(1);
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);

@@ -2,7 +2,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
-import {ApplicationDashboardService} from './services/application-dashboard.service';
+import {ApplicationService} from '../../services/application.service';
 import {ApplicationDTO} from './models/application.model';
 import {PageMetricsDto} from "./models/page-metrics.model";
 import {ResponseWithLoadingState} from "./models/response-with-loading-state.model";
@@ -28,7 +28,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dashboardService: ApplicationDashboardService
+    private dashboardService: ApplicationService
   ) {
     this.pages$ = this.dashboardService.metrics$;
     this.applications$ = dashboardService.activeOrRecentlyMeasured$.pipe(
