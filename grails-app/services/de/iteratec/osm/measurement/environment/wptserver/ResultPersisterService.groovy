@@ -223,7 +223,9 @@ class ResultPersisterService implements iResultListener {
         for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
             if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
                 try {
-                    persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)
+                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)) {
+                        break
+                    }
                 } catch (Exception e) {
                     log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
                 }
@@ -235,7 +237,7 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
+    protected boolean persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
         List<EventResult> resultsOfTeststep = []
         String testId = resultXml.getTestId()
 
@@ -278,9 +280,12 @@ class ResultPersisterService implements iResultListener {
                 }
             }
         } else {
-            println("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
+            log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
                     "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
+            return false
         }
+
+        return true
     }
 
 
