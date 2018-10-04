@@ -26,12 +26,13 @@ class UrlMappings {
 
     static mappings = {
 
-        '/'(view: "/angularFrontend")
+        '/'(controller: "landing")
         "/releasenotes"(view: "/siteinfo/releasenotes")
         "/about"(view: "/siteinfo/about")
         "/systeminfo"(view: "/siteinfo/systeminfo")
-        "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
         "/applicationDashboard/**?"(view: "/angularFrontend")
+
+        "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
