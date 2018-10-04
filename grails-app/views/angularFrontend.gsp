@@ -6,9 +6,7 @@
 </head>
 
 <body>
-<osm-application-dashboard-entry
-        data-module-path="src/app/application-dashboard/application-dashboard.module#ApplicationDashboardModule"></osm-application-dashboard-entry>
-
+<osm-app></osm-app>
 <asset:javascript src="frontend/runtime.js"/>
 <asset:javascript src="frontend/polyfills.js"/>
 <asset:javascript src="frontend/main.js"/>

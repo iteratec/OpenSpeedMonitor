@@ -4,7 +4,6 @@ import {ApplicationSelectComponent} from './components/application-select/applic
 import {SharedModule} from "../shared/shared.module";
 import {ApplicationDashboardService} from "./services/application-dashboard.service";
 import {PageComponent} from './components/page/page.component';
-import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-component'
 import {RouterModule, Routes} from "@angular/router";
 import {CsiValueComponent} from "./components/csi-value/csi-value.component";
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
@@ -22,7 +21,6 @@ const DashboardRoutes: Routes = [
     RouterModule.forChild(DashboardRoutes)
   ],
   declarations: [
-    ApplicationDashboardEntryComponent,
     ApplicationDashboardComponent,
     ApplicationSelectComponent,
     PageComponent,
@@ -35,14 +33,8 @@ const DashboardRoutes: Routes = [
     RouterModule
   ],
   providers: [
-    {
-      provide: 'components',
-      useValue: [ApplicationDashboardEntryComponent],
-      multi: true
-    },
     ApplicationDashboardService
-  ],
-  entryComponents: [ApplicationDashboardEntryComponent]
+  ]
 })
 export class ApplicationDashboardModule {
 }
