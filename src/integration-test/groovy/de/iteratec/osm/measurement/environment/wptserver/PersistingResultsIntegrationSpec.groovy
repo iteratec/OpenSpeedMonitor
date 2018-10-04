@@ -58,7 +58,48 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 grailsApplication.mainContext.getBean('csiAggregationUpdateService')
         resultPersisterService.metricReportingService =
                 grailsApplication.mainContext.getBean('metricReportingService')
-        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
+    }
+
+    void "Results don't get persisted if the TTFB of first result is 0."() {
+
+        given: "a wpt result and a failing CsiAggregationUpdateService"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server)
+
+        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
+    }
+
+    void "Results don't get persisted if the LoadTime is larger than max threshold."() {
+
+        given: "a wpt result and a failing CsiAggregationUpdateService"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server)
+
+        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
+    }
+
+    void "Results don't get persisted if the result was not successfully."() {
+
+        given: "a wpt result and a failing CsiAggregationUpdateService"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server)
+
+        then: "1 run, 2 successful events + 2 cached views should be persisted"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
     }
 
     void "Results get persisted even after failed csi aggregation."() {
@@ -122,7 +163,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     private createTestDataCommonToAllTests() {
-        ['HP', 'MES', Page.UNDEFINED].each { pageName ->
+        ['HP', 'MES', 'ADS', 'SE', Page.UNDEFINED].each { pageName ->
             Page.build(name: pageName)
         }
         server = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
@@ -134,6 +175,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         )
         Job.build(
                 label: 'FF_BV1_Multistep_2',
+                location: loc
+        )
+
+        Job.build(
+                label: '1Run_11events_4Faulty',
                 location: loc
         )
     }

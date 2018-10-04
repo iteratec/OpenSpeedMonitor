@@ -133,7 +133,6 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
                                 customerSatisfactionInPercent: tokenized[defaultMappingindex + 1]
                         ).save(failOnError: true, flush: true)
                     }
-
                 }
                 lineCounter++
             }
