@@ -40,11 +40,10 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
 
         when: "a browser should be found by name or alias"
-        def browser = service.findByNameOrAlias(nameOrAlias)
+        def browser = service.findByNameOrAlias(nameOrAlias, false)
 
         then: "the corresponding browser is found, the browser that was not defined is created"
         browser.name == expectedBrowserName
-
         where:
         nameOrAlias         | expectedBrowserName
         "Internet Explorer" | "IE"
@@ -64,7 +63,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Browser.build(name: "Edge")
 
         when: "all browsers should be found by name or alias"
-        def browser = service.findAllByNameOrCreate(["FF", "IE", "Chrome"])
+        def browser = service.findAllByNameOrCreate(["FF", "IE", "Chrome"], false)
 
         then: "the corresponding browsers are found"
         browser*.name == ["Firefox", "IE", "Chrome"]
@@ -82,5 +81,22 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
 
         then: "all browsers are returned, including the undefined"
         browsers*.name as Set == ["Firefox", "IE", "Edge", Browser.UNDEFINED] as Set
+    }
+
+    void "only create new browsers if not a health check"() {
+        given: ""
+        Browser.build(name: "Firefox")
+                .addToBrowserAliases(alias: "FF")
+                .addToBrowserAliases(alias: "Firefox7").save()
+
+        when: "the health check call should not create a new browser"
+        def noHealthCheck = service.findAllByNameOrCreate(["Firefox7", "IE", "Netscape"], false)
+        def healthCheck = service.findAllByNameOrCreate(["FF", "IE", "Chrome"])
+
+        then: "browsers are created depending on health check"
+        noHealthCheck*.name == ["Firefox", "IE", "Netscape"]
+        println noHealthCheck
+        healthCheck*.name == ["Firefox", "IE", null]
+        println healthCheck
     }
 }

@@ -28,31 +28,30 @@ class BrowserService {
         return Collections.unmodifiableSet(result)
     }
 
-    List<Browser> findAllByNameOrCreate(List<String> browserNames) {
+    List<Browser> findAllByNameOrCreate(List<String> browserNames, boolean isHealthCheck = true) {
         List<Browser> result = []
         browserNames.each {
-            result << findByNameOrAlias(it)
+            result << findByNameOrAlias(it, isHealthCheck)
         }
         return result
     }
 
-    Browser findByNameOrAlias(String browserName) {
+    Browser findByNameOrAlias(String browserName, boolean isHealthCheck) {
         Browser browser = Browser.findByName(browserName)
         if (browser == null) {
-            return findByAliasOrCreate(browserName)
+            return findByAliasOrCreate(browserName, isHealthCheck)
         } else {
             return browser
         }
     }
 
-    private Browser findByAliasOrCreate(String browserName) {
+    private Browser findByAliasOrCreate(String browserName, boolean isHealthCheck) {
         Browser retBrowser
-
         Browser.list().each { currentBrowser ->
             List<BrowserAlias> browserAliasesForCurrentBrowser = BrowserAlias.findAllByBrowser(currentBrowser)
             browserAliasesForCurrentBrowser.find { it.alias.equals(browserName) }.each { retBrowser = currentBrowser }
         }
-        if (!retBrowser) {
+        if (!retBrowser && !isHealthCheck) {
             retBrowser = new Browser(name: browserName).save(failOnError: true)
         }
         return retBrowser
