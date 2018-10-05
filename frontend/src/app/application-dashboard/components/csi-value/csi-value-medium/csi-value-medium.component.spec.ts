@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CsiValueMediumComponent } from './csi-value-medium.component';
+import {CsiValueMediumComponent} from './csi-value-medium.component';
+import {CsiValueBaseComponent} from "../csi-value-base.component";
+import {TranslateModule} from "@ngx-translate/core";
 
 describe('CsiValueMediumComponent', () => {
   let component: CsiValueMediumComponent;
@@ -8,7 +10,10 @@ describe('CsiValueMediumComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CsiValueMediumComponent ]
+      declarations: [CsiValueMediumComponent, CsiValueBaseComponent],
+      imports: [
+        TranslateModule.forRoot()
+      ]
     })
     .compileComponents();
   }));

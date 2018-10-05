@@ -9,6 +9,9 @@ import {ApplicationDashboardService} from './services/application-dashboard.serv
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
 import {PageMetricComponent} from "./components/page-metric/page-metric.component";
 import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
+import {CsiValueBigComponent} from "./components/csi-value/csi-value-big/csi-value-big.component";
+import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/csi-value-medium.component";
+import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -20,6 +23,9 @@ describe('ApplicationDashboardComponent', () => {
         ApplicationDashboardComponent,
         PageComponent,
         CsiValueBaseComponent,
+        CsiValueBigComponent,
+        CsiValueMediumComponent,
+        CsiValueSmallComponent,
         CsiGraphComponent,
         CsiInfoComponent,
         ApplicationSelectComponent,
