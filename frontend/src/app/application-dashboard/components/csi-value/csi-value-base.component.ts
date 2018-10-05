@@ -21,7 +21,7 @@ import {CsiValueSvgRenderer} from "./csi-value-svg.renderer";
   encapsulation: ViewEncapsulation.None
 })
 export class CsiValueBaseComponent implements OnInit, OnChanges {
-  @Input() desiredSize: number;
+  @Input() circleDiameter: number;
   @Input() withHint: boolean;
   @Input() csiValue: number;
   @Input() csiDate: string;
@@ -61,8 +61,8 @@ export class CsiValueBaseComponent implements OnInit, OnChanges {
   }
 
   private initByInputs() {
-    this.size = this.desiredSize + 2 * this.padding;
-    this.csiValueRenderer = new CsiValueSvgRenderer(this.svgElement, this.desiredSize, this.padding);
+    this.size = this.circleDiameter + 2 * this.padding;
+    this.csiValueRenderer = new CsiValueSvgRenderer(this.svgElement, this.circleDiameter, this.padding);
   }
 
 
