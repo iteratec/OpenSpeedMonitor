@@ -24,7 +24,6 @@ osm-csi-value {
   .csi-value-text {
     font-weight: bold;
     color: $color-text-normal;
-    font-size: 18px;
     line-height: 0;
     bottom: 50%;
 
@@ -36,29 +35,8 @@ osm-csi-value {
   }
   .csi-value-description {
     color: $color-text-medium;
-    font-size: 12px;
     top: 50%;
     line-height: 1em;
-    margin-top: 4px;
-  }
-
-  .big {
-    .csi-value-text {
-      font-size: 34px;
-    }
-    .csi-value-description {
-      font-size: 14px;
-      margin-top: 8px;
-    }
-  }
-
-  .loading {
-    .csi-value-text {
-      font-size: 10px;
-    }
-    &.big .csi-value-text {
-      font-size: 24px;
-    }
   }
 
   .hint {

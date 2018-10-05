@@ -1,7 +1,6 @@
-<div class="csi-value-container" [ngClass]="{big: isBig, loading: showLoading, hint: !!hint}">
+<div class="csi-value-container" [ngClass]="{ hint: !!hint}">
   <div class="csi-value">
-    <span class="csi-value-text">{{this.formattedCsiValue}}</span>
-    <span class="csi-value-description">{{this.description}}</span>
+    <ng-content></ng-content>
   </div>
   <div class="hint-container" [title]="hint">
     <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass"></svg>

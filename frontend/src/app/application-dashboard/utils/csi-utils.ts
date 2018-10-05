@@ -18,4 +18,8 @@ export class CsiUtils {
   static isCsiOutdated(csiDate: string, jobDate: string): boolean {
     return csiDate < jobDate;
   }
+
+  static isCsiNA(csiValue: Number) {
+    return !csiValue && csiValue !== 0;
+  }
 }
