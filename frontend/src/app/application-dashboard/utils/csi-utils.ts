@@ -23,9 +23,9 @@ export class CsiUtils {
     return !csiValue && csiValue !== 0;
   }
 
-  static formatAsText(csiValue: number, showLoading: boolean, digits: number = 1): string {
+  static formatAsText(csiValue: number, showLoading: boolean, small: boolean = false): string {
     if (showLoading) {
-      return "loading...";
+      return small ? "..." : "loading..."
     }
     if (CsiUtils.isCsiNA(csiValue)) {
       return "n/a";
@@ -33,6 +33,6 @@ export class CsiUtils {
     if (csiValue >= 100) {
       return "100%";
     }
-    return csiValue.toFixed(digits) + "%";
+    return csiValue.toFixed(small ? 0 : 1) + "%";
   }
 }

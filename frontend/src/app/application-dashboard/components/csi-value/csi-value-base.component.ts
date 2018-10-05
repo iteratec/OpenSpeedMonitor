@@ -15,12 +15,12 @@ import {TranslateService} from '@ngx-translate/core';
 import {CsiValueSvgRenderer} from "./csi-value-svg.renderer";
 
 @Component({
-  selector: 'osm-csi-value',
-  templateUrl: './csi-value.component.html',
-  styleUrls: ['./csi-value.component.scss'],
+  selector: 'osm-base-csi-value',
+  templateUrl: './csi-value-base.component.html',
+  styleUrls: ['./csi-value-base.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CsiValueComponent implements OnInit, OnChanges {
+export class CsiValueBaseComponent implements OnInit, OnChanges {
   @Input() desiredSize: number;
   @Input() withHint: boolean;
   @Input() csiValue: number;

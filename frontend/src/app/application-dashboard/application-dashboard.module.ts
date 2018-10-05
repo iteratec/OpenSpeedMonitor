@@ -6,13 +6,13 @@ import {ApplicationDashboardService} from "./services/application-dashboard.serv
 import {PageComponent} from './components/page/page.component';
 import {ApplicationDashboardEntryComponent} from './application-dashboard.entry-component'
 import {RouterModule, Routes} from "@angular/router";
-import {CsiValueComponent} from "./components/csi-value/csi-value.component";
+import {CsiValueBaseComponent} from "./components/csi-value/csi-value-base.component";
 import {CsiGraphComponent} from './components/csi-graph/csi-graph.component';
 import {PageMetricComponent} from './components/page-metric/page-metric.component';
 import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
-import { CsiValueBigComponent } from './components/csi-value/csi-value-big/csi-value-big.component';
-import { CsiValueMediumComponent } from './components/csi-value/csi-value-medium/csi-value-medium.component';
-import { CsiValueSmallComponent } from './components/csi-value/csi-value-small/csi-value-small.component';
+import {CsiValueBigComponent} from './components/csi-value/csi-value-big/csi-value-big.component';
+import {CsiValueMediumComponent} from './components/csi-value/csi-value-medium/csi-value-medium.component';
+import {CsiValueSmallComponent} from './components/csi-value/csi-value-small/csi-value-small.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -29,7 +29,7 @@ const DashboardRoutes: Routes = [
     ApplicationDashboardComponent,
     ApplicationSelectComponent,
     PageComponent,
-    CsiValueComponent,
+    CsiValueBaseComponent,
     CsiGraphComponent,
     CsiInfoComponent,
     PageMetricComponent,

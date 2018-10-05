@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ApplicationDashboardComponent} from './application-dashboard.component';
 import {PageComponent} from './components/page/page.component';
-import {CsiValueComponent} from './components/csi-value/csi-value.component';
+import {CsiValueBaseComponent} from './components/csi-value/csi-value-base.component';
 import {ApplicationSelectComponent} from './components/application-select/application-select.component';
 import {SharedMocksModule} from '../testing/shared-mocks.module';
 import {ApplicationDashboardService} from './services/application-dashboard.service';
@@ -19,7 +19,7 @@ describe('ApplicationDashboardComponent', () => {
       declarations: [
         ApplicationDashboardComponent,
         PageComponent,
-        CsiValueComponent,
+        CsiValueBaseComponent,
         CsiGraphComponent,
         CsiInfoComponent,
         ApplicationSelectComponent,

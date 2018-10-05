@@ -1,18 +1,18 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {CsiValueComponent} from './csi-value.component';
+import {CsiValueBaseComponent} from './csi-value-base.component';
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {TranslateModule} from '@ngx-translate/core';
 import {CalculationUtil} from '../../../shared/utils/calculation.util';
 
-describe('CsiValueComponent', () => {
-  let component: CsiValueComponent;
-  let fixture: ComponentFixture<CsiValueComponent>;
+describe('CsiValueBaseComponent', () => {
+  let component: CsiValueBaseComponent;
+  let fixture: ComponentFixture<CsiValueBaseComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [CsiValueComponent],
+      declarations: [CsiValueBaseComponent],
       imports: [
         TranslateModule.forRoot()
       ]
@@ -21,7 +21,7 @@ describe('CsiValueComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CsiValueComponent);
+    fixture = TestBed.createComponent(CsiValueBaseComponent);
     component = fixture.componentInstance;
     component.csiValue = 0;
     component.ngOnInit();

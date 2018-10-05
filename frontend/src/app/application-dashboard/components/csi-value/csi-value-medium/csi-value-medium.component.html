@@ -1,5 +1,6 @@
-<osm-csi-value [csiValue]="csiValue" [csiDate]="csiDate" [showLoading]="showLoading" [lastResultDate]="lastResultDate"
-               [withHint]="true" [desiredSize]="76">
+<osm-base-csi-value [csiValue]="csiValue" [csiDate]="csiDate" [showLoading]="showLoading"
+                    [lastResultDate]="lastResultDate"
+                    [withHint]="true" [desiredSize]="76">
   <span class="csi-value-text" [ngClass]="{loading: showLoading}">{{this.formattedCsiValue}}</span>
   <span class="csi-value-description">CSI</span>
-</osm-csi-value>
+</osm-base-csi-value>

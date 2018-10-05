@@ -1,6 +1,6 @@
 @import "../../../../styles/colors";
 
-osm-csi-value {
+osm-base-csi-value {
   .csi-value-container {
     display: flex;
     justify-content: center;
@@ -13,7 +13,7 @@ osm-csi-value {
     }
   }
 
-  .csi-value-text, .csi-value-description {
+  .csi-value-text, .csi-value-description, .csi-value-small {
     position: absolute;
     left: 0;
     right: 0;
@@ -21,11 +21,10 @@ osm-csi-value {
     z-index: 5;
   }
 
-  .csi-value-text {
+  .csi-value-text, .csi-value-small {
     font-weight: bold;
     color: $color-text-normal;
     line-height: 0;
-    bottom: 50%;
 
     &::after {
       // this way the text is positioned by its baseline
@@ -33,6 +32,11 @@ osm-csi-value {
       display: inline-block;
     }
   }
+
+  .csi-value-text {
+    bottom: 50%;
+  }
+
   .csi-value-description {
     color: $color-text-medium;
     top: 50%;
