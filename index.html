@@ -210,35 +210,20 @@
             font-weight: bold;
         }
 
-        #main-nav img-logo{
-            padding: 0.2em;
-            height: 4em;
-        }
-
         .nav-entry-container{
             display: flex;
             flex-grow: 1;
             justify-content: flex-end;
-            resize: vertical;
             height: 4em;
         }
 
         @media only screen and (max-width: 560px) {
             #main-nav {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: #2f323a;
                 height: 7em;
             }
             #main-nav > div {
                 display: block;
                 text-align: center;
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 0;
             }
             header {
                 padding-top: 7em;
@@ -246,59 +231,25 @@
             header main img {
                 max-width: none;
                 width: 100%;
-                object-fit: contain;
                 object-position: center;
-                padding-left: 1.5rem;
-                padding-right: 1.5rem;
-                margin-top: 2rem;
-                display: block;
             }
-            #main-nav img-logo{
-                padding: 0.2em;
+            #main-nav #logo a{
                 height: 3em;
             }
             .fixed-width, .feature article {
                 padding: 0 0.5rem;
-                box-sizing: content-box;
-                margin: 0 auto;
             }
-            .feature.alt article main {
+            .feature.alt article main, .feature article main{
                 padding: 0 0 0 0;
-            }
-            .feature article main {
-                padding: 0 0 0 0;
-            }
-            #continuous-measurements p{
-                text-align: justify;
-            }
-            #analysis p{
-                text-align: justify;
-            }
-            #csi p{
-                text-align: justify;
-            }
-            #integrations p{
-                text-align: justify;
             }
             header main .fixed-width {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
                 padding: 2.5rem 0;
             }
             .feature img {
                 width: 100%;
-                height: auto;
-                object-fit: contain;
             }
-            #logo {
-                flex-grow: 1;
-                display: flex;
+            #logo, .nav-entry-container{
                 justify-content: center;
-            }
-            .nav-entry-container{
-                justify-content: center;
-                vertical-align: middle;
             }
             #main-nav a {
                 padding: 0 1.0em;
@@ -313,9 +264,9 @@
         <nav id="main-nav">
             <div class="fixed-width">
                 <span id="logo">
-                    <img-logo href="https://iteratec.github.io/OpenSpeedMonitor">
+                    <a href="https://iteratec.github.io/OpenSpeedMonitor">
                         <img src="./OpenSpeedMonitor.svg" alt="OpenSpeedMonitor" />
-                    </img-logo>
+                    </a>
                 </span>
 
                 <span class="nav-entry-container">
