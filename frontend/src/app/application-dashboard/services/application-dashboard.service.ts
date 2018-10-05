@@ -5,9 +5,8 @@ import {PageMetricsDto} from "../models/page-metrics.model";
 import {PageCsiDto} from "../models/page-csi.model";
 import {ApplicationCsiListDTO} from "../models/csi-list.model";
 import {ApplicationDTO} from "../models/application.model";
-import {catchError, map, switchMap} from "rxjs/internal/operators";
+import {catchError, distinctUntilKeyChanged, filter, map, switchMap, withLatestFrom} from "rxjs/internal/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
-import {error} from "util";
 
 @Injectable()
 export class ApplicationDashboardService {
@@ -28,7 +27,10 @@ export class ApplicationDashboardService {
       switchMap((application: ApplicationDTO) => this.updateCsiForApplication(application))
     ).subscribe(this.csiValues$);
 
-    this.selectedApplication$.pipe(
+    this.csiValues$.pipe(
+      filter(csiValues => !csiValues.isLoading),
+      withLatestFrom(this.selectedApplication$, (_, application) => application),
+      distinctUntilKeyChanged("id"),
       switchMap((application: ApplicationDTO) => this.updateCsiForPages(application))
     ).subscribe(this.pageCsis$);
   }
@@ -43,6 +45,7 @@ export class ApplicationDashboardService {
   }
 
   private updateMetricsForPages(applicationDto: ApplicationDTO): Observable<PageMetricsDto[]> {
+    this.pageCsis$.next({data: [], isLoading: true});
     const params = this.createParams(applicationDto.id);
     this.metrics$.next(null);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
@@ -74,7 +77,6 @@ export class ApplicationDashboardService {
   }
 
   private updateCsiForPages(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<PageCsiDto[]>> {
-    this.pageCsis$.next({data: [], isLoading: true});
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
       map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
