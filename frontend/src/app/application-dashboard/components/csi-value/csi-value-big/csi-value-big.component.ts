@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {CsiValueFormatter} from "../csi-value.formatter";
 import {CalculationUtil} from "../../../../shared/utils/calculation.util";
+import {CsiUtils} from "../../../utils/csi-utils";
 
 @Component({
   selector: 'osm-csi-value-big',
@@ -12,12 +12,10 @@ export class CsiValueBigComponent implements OnInit, OnChanges {
   @Input() csiDate: string;
   @Input() lastResultDate: string;
   @Input() showLoading: boolean;
-  csiValueFormatter: CsiValueFormatter;
   description: string;
   formattedCsiValue: string;
 
   constructor() {
-    this.csiValueFormatter = new CsiValueFormatter(1);
   }
 
   private getDescription(): string {
@@ -28,10 +26,9 @@ export class CsiValueBigComponent implements OnInit, OnChanges {
   }
 
   setValues() {
-    this.formattedCsiValue = this.csiValueFormatter.formatAsText(this.csiValue, this.showLoading);
+    this.formattedCsiValue = CsiUtils.formatAsText(this.csiValue, this.showLoading);
     this.description = this.getDescription();
   }
-
 
   ngOnInit() {
     this.setValues();
@@ -40,5 +37,4 @@ export class CsiValueBigComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.setValues();
   }
-
 }

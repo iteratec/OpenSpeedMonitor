@@ -22,4 +22,17 @@ export class CsiUtils {
   static isCsiNA(csiValue: Number) {
     return !csiValue && csiValue !== 0;
   }
+
+  static formatAsText(csiValue: number, showLoading: boolean, digits: number = 1): string {
+    if (showLoading) {
+      return "loading...";
+    }
+    if (CsiUtils.isCsiNA(csiValue)) {
+      return "n/a";
+    }
+    if (csiValue >= 100) {
+      return "100%";
+    }
+    return csiValue.toFixed(digits) + "%";
+  }
 }
