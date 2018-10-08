@@ -1,7 +1,7 @@
 <h2>{{metricsForPage?.pageName}}</h2>
 <div class="page-metrics">
-  <osm-csi-value [csiValue]="pageCsi$ | async" [isBig]="false" [csiDate]="pageCsiDate$ | async"
-                 [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value>
+  <osm-csi-value-medium [csiValue]="pageCsi$ | async" [csiDate]="pageCsiDate$ | async"
+                        [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value-medium>
   <div class="metric-list">
     <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))"
                      [metric]="metrics.SPEED_INDEX"></osm-page-metric>
