@@ -95,11 +95,10 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult, long jobId) throws OsmResultPersistanceException {
+    void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult, long jobId) {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
             job = jobDaoService.getJob(jobId)
-            if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for id ${jobId} from result xml")
         }
         performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", 4) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
@@ -126,7 +125,6 @@ class ResultPersisterService implements iResultListener {
 
     private void removePendingAndCreateFinishedJobResult(resultXml, String testId, long jobId) {
         Job job = jobDaoService.getJob(jobId)
-        if (job == null) throw new RuntimeException("No measurement job could be found for id from result xml: ${jobid}")
         deleteResultsMarkedAsPendingAndRunning(job, testId)
 
         JobResult jobResult = JobResult.findByJobAndTestId(job, testId)

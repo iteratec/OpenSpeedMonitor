@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.wptserver.OsmResultPersistanceException
 
 /**
  * A DaoService for Jobs.
@@ -17,7 +18,9 @@ class JobDaoService {
 
     public Job getJob(Long jobId) {
         Job job = Job.get(jobId)
-        if (!job || job.deleted) {
+        if(!job) {
+            throw new OsmResultPersistanceException("No measurement job could be found for id ${jobId} from result xml")
+        } else if (job.deleted) {
             return null
         }
         return job
