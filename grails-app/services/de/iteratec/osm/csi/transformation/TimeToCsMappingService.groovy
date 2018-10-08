@@ -18,16 +18,15 @@
 package de.iteratec.osm.csi.transformation
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.*
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.MultiLineChartLineData
 import de.iteratec.osm.util.I18nService
-import grails.gorm.transactions.Transactional
 
 class TimeToCsMappingService {
 
-
-    TimeToCsMappingCacheService timeToCsMappingCacheService
     ConfigService configService
     I18nService i18nService
 
@@ -38,48 +37,13 @@ class TimeToCsMappingService {
      * @return Calculated customer-satisfaction or null if page is undefined or no calculation specification exists for it.
      */
     Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null) {
-        if (page.isUndefinedPage() || noTransformationPossibleFor(page, csiConfiguration)) {
+        if (!isValid(page) || !csiConfiguration) {
             return null
-        } else {
-            return transformLoadTime(docReadyTimeInMilliSecs, page, csiConfiguration)
         }
-    }
-
-    private double transformLoadTime(int docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
-        Double cs
-        CsiTransformation csiTransformation = configService.getCsiTransformation()
-        if (csiTransformation == CsiTransformation.BY_MAPPING) {
-            cs = getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page, csiConfiguration)
-        } else if (csiTransformation == CsiTransformation.BY_RANK) {
-            cs = getCustomerSatisfactionPercentRank(docReadyTimeInMilliSecs, page)
-        } else {
-            throw new IllegalStateException("No valid Csi transformation configured in OSM Configuration: ${csiTransformation}")
-        }
-        return cs
-    }
-
-    boolean noTransformationPossibleFor(Page page, CsiConfiguration csiConfiguration) {
-        Boolean notPossible = true
-        CsiTransformation csiTransformation = configService.getCsiTransformation()
-        if (csiTransformation == CsiTransformation.BY_RANK && validFrustrationsExistFor(page)) {
-            notPossible = false
-        } else if (csiTransformation == CsiTransformation.BY_MAPPING && csiConfiguration != null && validMappingsExistFor(page, csiConfiguration)) {
-            notPossible = false
-        }
-        return notPossible
-    }
-
-    /**
-     * <p>
-     * Alternative approach to translate the load-time of a specific page into a customer satisfaction.
-     * Uses database-table with time to csi mappings
-     * </p>
-     * @param docReadyTimeInMilliSecs
-     * @param page
-     * @return
-     */
-    Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
         List<TimeToCsMapping> mappingsForPage = csiConfiguration.getTimeToCsMappingByPage(page)
+        if (!mappingsForPage) {
+            return null
+        }
 
         Integer loadtimeIncrement = 20
         Integer loadtimeNoUserWouldAccept = 20000
@@ -114,56 +78,6 @@ class TimeToCsMappingService {
             log.info("customerSatisfaction=$customerSatisfaction")
         }
         return customerSatisfaction
-    }
-
-    /**
-     * Uses database-table with frustrating load times of user-investigation to calculate customer satisfaction of given load time for given page.
-     * @param docReadyTimeInMilliSecs
-     * @param Page page
-     * @return Calculated customer-satisfaction.
-     */
-    Double getCustomerSatisfactionPercentRank(Integer docReadyTimeInMilliSecs, Page page) {
-        List<Integer> frustrationLoadtimesForPage = timeToCsMappingCacheService.getCustomerFrustrations(page)
-        Double rank
-        Integer smaller
-        Integer bigger
-        if (frustrationLoadtimesForPage) {
-            log.debug("getCustomerSatisfactionPercentRank: page=${page}")
-            log.debug("getCustomerSatisfactionPercentRank: class of frustration load times=${frustrationLoadtimesForPage.getClass()}")
-            log.debug("getCustomerSatisfactionPercentRank: count of frustration load times=${frustrationLoadtimesForPage.size()}")
-            smaller = frustrationLoadtimesForPage.findAll { it < docReadyTimeInMilliSecs }.size()
-            bigger = frustrationLoadtimesForPage.findAll { it > docReadyTimeInMilliSecs }.size()
-            if (smaller + bigger == 0) {
-                throw new IllegalArgumentException("Percentrank couldn't be calculated for Page '${page.name}'")
-            }
-            rank = smaller / (smaller + bigger)
-            return (1 - rank) * 100
-        } else {
-            throw new IllegalArgumentException("No customerFrustrationLoadtimes found for Page '${page.name}'")
-        }
-    }
-
-    /**
-     * Reads frustration load times from db/cache for given page.
-     * @param page
-     * {@link Page} frustration load times should be read for.
-     * @return Frustration load times from db/cache for given page.
-     */
-    List<Integer> getCachedFrustrations(Page page) {
-        return timeToCsMappingCacheService.getCustomerFrustrations(page)
-    }
-
-    /**
-     * Checks whether more than one different frustration timings exist for given {@link Page} page.
-     * @param page
-     * @return true if more than one different frustration timings exist for given {@link Page} page. false otherwise. false if page is null or undefinde page, too.
-     */
-    Boolean validFrustrationsExistFor(Page page) {
-        return isValid(page) && getCachedFrustrations(page).unique(false).size() > 1
-    }
-
-    Boolean validMappingsExistFor(Page page, CsiConfiguration csiConfiguration) {
-        return isValid(page) && !csiConfiguration.getTimeToCsMappingByPage(page).isEmpty()
     }
 
     Boolean isValid(Page page) {

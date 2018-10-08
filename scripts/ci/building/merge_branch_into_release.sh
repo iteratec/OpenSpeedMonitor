@@ -1,8 +1,9 @@
 #!/bin/bash
 
 echo "prepare some variables"
+echo "bamboo_planRepository_branchName=$bamboo_planRepository_branchName"
 echo "########################################'"
-echo "start bamboo job to merge develop into release"
+echo "start bamboo job to merge $bamboo_planRepository_branchName into release"
 echo "########################################'"
 remote=origin
 
@@ -23,5 +24,5 @@ git tag -d $(git tag -l)
 git fetch --all
 echo "git checkout release"
 git checkout release
-echo "git merge develop"
-git merge develop
+echo "git merge $bamboo_planRepository_branchName"
+git merge $bamboo_planRepository_branchName
