@@ -1,15 +1,9 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.ApplicationCsiDto
-import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
-import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
 import org.joda.time.DateTime
@@ -53,10 +47,15 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
     }
 
-    def getAllActiveAndAllRecent() {
-        def allActiveAndRecent = jobGroupService.getAllActiveAndAllRecent()
-
+    def getApplications() {
+        def allActiveAndRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
+    }
+
+    def getCsiValuesForApplications() {
+        Set<JobGroup> jobGroups = jobGroupService.getAllActiveAndRecent()
+        def csiVales = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups.asList())
+        return ControllerUtils.sendObjectAsJSON(response, csiVales)
     }
 
     def createCsiConfiguration(DefaultApplicationCommand command) {

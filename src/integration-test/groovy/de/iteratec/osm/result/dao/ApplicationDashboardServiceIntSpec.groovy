@@ -242,7 +242,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
 
         then: "the JobGroup without config should return false, the other true"
         applicationCsiDto1.hasCsiConfiguration == false
-        applicationCsiDto1.csiDtoList.length == 0
+        applicationCsiDto1.csiValues.length == 0
         applicationCsiDto2.hasCsiConfiguration == true
     }
 

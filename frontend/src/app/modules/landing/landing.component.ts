@@ -27,7 +27,8 @@ export class LandingComponent {
     );
     this.applications$ = combineLatest(this.applicationService.applications$, this.applicationService.applicationCsiById$).pipe(
       map(([applications, csiById]) => applications.map(app => new ApplicationWithCsi(app, csiById[app.id])))
-    )
+    );
+    this.applicationService.loadRecentCsiForApplications();
   }
 
 }

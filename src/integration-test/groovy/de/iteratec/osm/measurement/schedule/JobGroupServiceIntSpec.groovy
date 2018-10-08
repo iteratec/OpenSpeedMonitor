@@ -35,7 +35,7 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
         JobResult notActiveButMeasuredJobResult = JobResult.build(jobGroupName: notActiveButMeasured.name, date: new Date())
 
         when: "service is asked for active or recently measured"
-        List activeOrRecent = jobGroupService.getAllActiveAndAllRecent()
+        List activeOrRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
 
         then: "only active or recently measured are returned"
         activeOrRecent.size() == 2

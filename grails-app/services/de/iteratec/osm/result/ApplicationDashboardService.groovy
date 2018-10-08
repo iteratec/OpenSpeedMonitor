@@ -6,12 +6,13 @@ import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.JobGroupCsiAggregationService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -25,6 +26,7 @@ class ApplicationDashboardService {
     ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
+    JobDaoService jobDaoService
 
 
     def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
@@ -180,45 +182,71 @@ class ApplicationDashboardService {
     }
 
     ApplicationCsiDto getCsiValuesAndErrorsForJobGroup(JobGroup jobGroup) {
-        ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
+        Date fourWeeksAgo = new DateTime().withTimeAtStartOfDay().minusWeeks(4).toDate()
+        Map<Long, ApplicationCsiDto> csiValuesForJobGroups = getCsiValuesForJobGroupsSince([jobGroup], fourWeeksAgo)
+        return csiValuesForJobGroups.get(jobGroup.id)
+    }
 
-        if (!jobGroup.hasCsiConfiguration()) {
-            applicationCsiListDto.hasCsiConfiguration = false
-            applicationCsiListDto.csiDtoList = []
-            return applicationCsiListDto
-        }
+    Map<Long, ApplicationCsiDto> getTodaysCsiValueForJobGroups(List<JobGroup> jobGroups) {
+        Date today = new DateTime().withTimeAtStartOfDay().toDate()
+        return getCsiValuesForJobGroupsSince(jobGroups, today)
+    }
 
-        applicationCsiListDto.hasCsiConfiguration = true
+    private Map<Long, ApplicationCsiDto> getCsiValuesForJobGroupsSince(List<JobGroup> jobGroups, Date startDate) {
+
         DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
         Date today = todayDateTime.toDate()
-        Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
 
-        List<JobGroup> csiGroups = [jobGroup]
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-        List<CsiDto> csiDtoList = []
+        Map<Boolean, JobGroup[]> jobGroupsByExistingCsiConfiguration = jobGroups.groupBy { jobGroup ->
+            new Boolean(jobGroup.hasCsiConfiguration())
+        } as Map<Boolean, JobGroup[]>
 
-        jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups).each {
-            CsiDto applicationCsiDto = new CsiDto()
-            if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                applicationCsiDto.date = it.started.format("yyyy-MM-dd")
-                applicationCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                applicationCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                csiDtoList << applicationCsiDto
-            }
+        Map<Long, ApplicationCsiDto> dtosById = [:]
+        if (jobGroupsByExistingCsiConfiguration[false]) {
+            dtosById.putAll(jobGroupsByExistingCsiConfiguration[false].collectEntries { jobGroup ->
+                [(jobGroup.id): ApplicationCsiDto.createWithoutConfiguration()]
+            })
         }
 
-        if (!csiDtoList) {
-            List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(jobGroup), fourWeeksAgo)
+        List<JobGroup> csiGroups = jobGroupsByExistingCsiConfiguration[true]
+        if (csiGroups) {
+            Map<Long, ApplicationCsiDto> dtosByIdWithValues = jobGroupCsiAggregationService
+                    .getOrCalculateShopCsiAggregations(startDate, today, dailyInterval, csiGroups)
+                    .groupBy { csiAggregation -> csiAggregation.jobGroup.id }
+                    .collectEntries { jobGroupId, csiAggregations ->
+                [(jobGroupId): csiAggregationsToDto(jobGroupId, csiAggregations, startDate)]
+            } as Map<Long, ApplicationCsiDto>
+            dtosById.putAll(dtosByIdWithValues)
+        }
+        return dtosById
+    }
+
+    private ApplicationCsiDto csiAggregationsToDto(Long jobGroupId, List<CsiAggregation> csiAggregations, Date startDate) {
+        ApplicationCsiDto dto = new ApplicationCsiDto()
+        ArrayList<CsiDto> csiDtoList = new ArrayList<CsiDto>()
+        if (csiAggregations) {
+            csiAggregations.each {
+                CsiDto csiDto = new CsiDto()
+                if (it.csByWptDocCompleteInPercent) {
+                    csiDto.date = it.started.format("yyyy-MM-dd")
+                    csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                    csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                    csiDtoList << csiDto
+                }
+            }
+        } else {
+            List<Job> jobs = jobDaoService.getJobs(JobGroup.findById(jobGroupId))
+            List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)
             if (jobResults) {
-                applicationCsiListDto.hasJobResults = true
-                applicationCsiListDto.hasInvalidJobResults = jobResults.every { WptStatus.isFailed(it.httpStatusCode) }
+                dto.hasJobResults = true
+                dto.hasInvalidJobResults = jobResults.every { WptStatus.isFailed(it.httpStatusCode) }
             } else {
-                applicationCsiListDto.hasJobResults = false
+                dto.hasJobResults = false
             }
         }
-
-        applicationCsiListDto.csiDtoList = csiDtoList
-        return applicationCsiListDto
+        dto.csiValues = csiDtoList
+        return dto
     }
 }

@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, concat, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
-import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO} from "../models/csi-list.model";
+import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/csi-list.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, filter, map, startWith, switchMap} from "rxjs/operators";
+import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
-import {distinctUntilKeyChanged, withLatestFrom} from "rxjs/internal/operators";
+import {Csi, CsiDTO} from "../models/csi.model";
 
 
 @Injectable()
@@ -38,11 +38,24 @@ export class ApplicationService {
   }
 
   loadApplications() {
-    this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getAllActiveAndAllRecent").pipe(
+    this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getApplications").pipe(
       map(dtos => dtos.map(dto => new Application(dto))),
       map(applications => this.sortApplicationsByName(applications)),
       handleError()
     ).subscribe(next => this.applications$.next(next));
+  }
+
+  loadRecentCsiForApplications() {
+    const loadedApplicationCsiById =
+      this.http.get<ApplicationCsiDTOById>("/applicationDashboard/rest/getCsiValuesForApplications").pipe(
+        map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), dto)),
+        handleError()
+      );
+    const loadingState = this.applications$.pipe(
+      take(1),
+      map(applications => this.setLoadingStateForApplicationCsi(this.applicationCsiById$.getValue(), applications))
+    );
+    concat(loadingState, loadedApplicationCsiById).subscribe(next => this.applicationCsiById$.next(next));
   }
 
   updateSelectedApplication(application: Application) {
@@ -107,6 +120,34 @@ export class ApplicationService {
     return applications.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: 'base'}));
   }
 
+  private mergeApplicationCsiById(state: ApplicationCsiById, updates: ApplicationCsiDTOById): ApplicationCsiById {
+    return Object.keys(updates).reduce((newState, applicationId) => {
+      const applicationCsi = state[applicationId] || {};
+      newState[applicationId] = new ApplicationCsi({
+        ...applicationCsi,
+        ...updates[applicationId],
+        csiValues: this.mergeCsiList(applicationCsi.csiValues, updates[applicationId].csiValues || []),
+        isLoading: false
+      });
+      return newState;
+    }, {...state});
+  }
+
+  private setLoadingStateForApplicationCsi(state: ApplicationCsiById, applications: Application[]) {
+    return applications.reduce((newState, application) => {
+      const applicationCsi = state[application.id] || {};
+      newState[application.id] = new ApplicationCsi({...applicationCsi, isLoading: true});
+      return newState;
+    }, {...state});
+  }
+
+  private mergeCsiList(csiValues: Csi[], updateDtos: CsiDTO[]): Csi[] {
+    const updates = updateDtos.map(dto => new Csi(dto));
+    return [
+      ...csiValues.filter(value => updates.find(update => update.date.getTime() == value.date.getTime())),
+      ...updates
+    ].sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
 }
 
 function handleError(): OperatorFunction<any, any> {

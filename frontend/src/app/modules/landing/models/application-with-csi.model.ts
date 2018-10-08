@@ -8,7 +8,8 @@ export class ApplicationWithCsi extends Application {
 
   constructor(application: Application, applicationCsi: ApplicationCsi) {
     super(application);
-    this.recentCsi = new Csi(applicationCsi ? applicationCsi.recentCsi() : {});
+    const recentCsi = applicationCsi ? applicationCsi.recentCsi() : null;
+    this.recentCsi = new Csi(recentCsi || {});
     this.csiIsLoading = applicationCsi ? applicationCsi.isLoading : false;
   }
 }

@@ -5,7 +5,6 @@ import de.iteratec.osm.result.ResultSelectionCommand
 import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
 import grails.gorm.transactions.Transactional
-import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
 
 @Transactional
@@ -42,18 +41,39 @@ class JobGroupService {
     List<JobGroup> getAllActiveJobGroups() {
         return Job.createCriteria().list {
             eq('active', true)
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
-                jobGroup {
-                    distinct('id')
-                    property('id', 'id')
-                    property('name', 'name')
-                }
+                distinct('jobGroup')
             }
         }
     }
 
-    def getAllActiveAndAllRecent() {
+    def getAllActiveAndRecentWithResultInformation() {
+        Set<JobGroup> allActiveAndRecent = getAllActiveAndRecent()
+        List allActiveAndRecentFormattedJobGroups = new ArrayList()
+        allActiveAndRecent.each {
+            def name = it.name
+            JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
+                eq("jobGroupName", name)
+                order("date", "desc")
+            }[0]
+
+            def formattedLastDateOfResult = lastDateOfResult?.date?.format("yyyy-MM-dd")
+            if (!allActiveAndRecentFormattedJobGroups.find { jobGroup -> jobGroup.id == it.id }) {
+                allActiveAndRecentFormattedJobGroups.add(
+                        [
+                                id                : it.id,
+                                name              : it.name,
+                                dateOfLastResults : formattedLastDateOfResult,
+                                csiConfigurationId: it.csiConfigurationId
+                        ]
+                )
+            }
+        }
+
+        return allActiveAndRecentFormattedJobGroups
+    }
+
+    Set<JobGroup> getAllActiveAndRecent() {
         Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
 
         DateTime today = new DateTime()
@@ -69,32 +89,6 @@ class JobGroupService {
             }
         })
         allActiveAndRecent.addAll(recentJobGroups)
-
-        List allActiveAndRecentFormattedJobGroups = new ArrayList()
-        allActiveAndRecent.each {
-            def name = it.name
-            JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
-                eq("jobGroupName", name)
-                order("date", "desc")
-            }[0]
-
-            def formattedLastDateOfResult
-            if (lastDateOfResult) {
-                formattedLastDateOfResult = lastDateOfResult.date?.format("yyyy-MM-dd")
-            }
-
-            if (!allActiveAndRecentFormattedJobGroups.find { jobGroup -> jobGroup.id == it.id }) {
-                allActiveAndRecentFormattedJobGroups.add(
-                        [
-                                id                : it.id,
-                                name              : it.name,
-                                dateOfLastResults : formattedLastDateOfResult,
-                                csiConfigurationId: it.csiConfigurationId
-                        ]
-                )
-            }
-        }
-
-        return allActiveAndRecentFormattedJobGroups
+        return allActiveAndRecent
     }
 }

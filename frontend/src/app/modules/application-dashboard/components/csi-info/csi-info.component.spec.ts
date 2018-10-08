@@ -65,7 +65,7 @@ describe('CsiInfoComponent', () => {
 
   it('should show message that application has not been measured yet (case 1)', () => {
     component.csiData = new ApplicationCsi({
-      csiDtoList: [],
+      csiValues: [],
       hasCsiConfiguration: true,
       hasInvalidJobResults: false,
       hasJobResults: false
@@ -89,7 +89,7 @@ describe('CsiInfoComponent', () => {
 
   it('should show message that csi is not configured and an option to create one (case 2)', () => {
     component.csiData = new ApplicationCsi({
-      csiDtoList: [],
+      csiValues: [],
       hasCsiConfiguration: false,
       hasInvalidJobResults: false,
       hasJobResults: false
@@ -113,7 +113,7 @@ describe('CsiInfoComponent', () => {
 
   it('should show message that no csi results exist and an option to go to related configuration (case 3)', () => {
     component.csiData = new ApplicationCsi({
-      csiDtoList: [],
+      csiValues: [],
       hasCsiConfiguration: true,
       hasInvalidJobResults: false,
       hasJobResults: true
@@ -139,7 +139,7 @@ describe('CsiInfoComponent', () => {
 
   it('should show message that measurements are faulty and an option to view filtered job overview (case 4)', () => {
     component.csiData = new ApplicationCsi({
-      csiDtoList: [],
+      csiValues: [],
       hasCsiConfiguration: true,
       hasInvalidJobResults: true,
       hasJobResults: true
