@@ -1,7 +1,7 @@
 import {Component, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {combineLatest, Observable, Subject} from 'rxjs';
-import {map, share, takeUntil} from 'rxjs/operators';
+import {map, takeUntil} from 'rxjs/operators';
 import {ApplicationService} from '../../services/application.service';
 import {Application} from '../../models/application.model';
 import {PageMetricsDto} from "./models/page-metrics.model";
@@ -30,7 +30,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
   ) {
     this.pages$ = this.applicationService.metrics$;
     this.applications$ = applicationService.applications$;
-    this.applicationCsi$ = applicationService.selectSelectedApplicationCsi().pipe(share());
+    this.applicationCsi$ = applicationService.selectSelectedApplicationCsi();
     this.isLoading$ = this.applicationCsi$
       .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.isLoading));
     this.recentCsiValue$ = this.applicationCsi$

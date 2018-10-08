@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, EMPTY, Observable, OperatorFunction, ReplaySubject, Subject} from "rxjs/index";
+import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
 import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO} from "../models/csi-list.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, map, switchMap} from "rxjs/internal/operators";
+import {catchError, filter, map, startWith, switchMap} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 
 
@@ -16,7 +16,7 @@ export class ApplicationService {
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new ReplaySubject<Application[]>(1);
 
-  selectedApplication$ = new Subject<Application>();
+  selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient) {
     this.loadApplications();
@@ -45,15 +45,10 @@ export class ApplicationService {
     this.selectedApplication$.next(application);
   }
 
-  selectApplicationCsi(applicationId: number) {
-    return this.applicationCsiById$.pipe(
-      map(state => state[applicationId]),
-    );
-  }
-
-  selectSelectedApplicationCsi() {
-    return this.selectedApplication$.pipe(
-      switchMap(selectedApplication => this.selectApplicationCsi(selectedApplication.id))
+  selectSelectedApplicationCsi(): Observable<ApplicationCsi> {
+    return combineLatest(this.selectedApplication$, this.applicationCsiById$).pipe(
+      map(([application, csiById]) => csiById[application.id]),
+      filter(applicationCsi => !!applicationCsi)
     );
   }
 
@@ -66,14 +61,17 @@ export class ApplicationService {
   }
 
   private updateCsiForApplication(applicationDto: Application): Observable<ApplicationCsiById> {
-    this.applicationCsiById$.next({
-      ...this.applicationCsiById$.getValue(),
-      [applicationDto.id]: new ApplicationCsi({isLoading: true})
-    });
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
-      map(dto => new ApplicationCsi(dto)),
-      handleError()
+      map(dto => ({
+        ...this.applicationCsiById$.getValue(),
+        [applicationDto.id]: new ApplicationCsi(dto)
+      })),
+      handleError(),
+      startWith({
+        ...this.applicationCsiById$.getValue(),
+        [applicationDto.id]: new ApplicationCsi({isLoading: true})
+      })
     );
   }
 

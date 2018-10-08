@@ -26,13 +26,13 @@ export class CsiInfoComponent implements OnChanges {
   }
 
   private setInformation(): void {
-    if (!this.csiData.hasCsiConfiguration) {
+    if (this.csiData && !this.csiData.hasCsiConfiguration) {
       this.errorCase = 'noCsiConfig';
       this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.noCsiConfig';
       this.iconClass = 'icon-info fas fa-info-circle';
       return
     }
-    if (this.csiData.hasJobResults) {
+    if (this.csiData && this.csiData.hasJobResults) {
       if (this.csiData.hasInvalidJobResults) {
         this.errorCase = 'invalidMeasurement';
         this.infoText = 'frontend.de.iteratec.osm.applicationDashboard.csiInfo.invalidMeasurement';
