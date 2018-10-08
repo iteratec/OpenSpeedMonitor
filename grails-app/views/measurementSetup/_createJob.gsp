@@ -4,6 +4,9 @@
             <label for="inputJobName" class="col-sm-2 control-label">
                 <g:message code="de.iteratec.osm.setupMeasurementWizard.inputJobLabel" default="Job Name"/>
             </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputJobName" name="job.label" required>
+            </div>
         </div>
 
         <div class="form-group" id="executionScheduleFormGroup">
