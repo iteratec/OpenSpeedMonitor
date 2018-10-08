@@ -52,22 +52,6 @@ class JobDaoServiceSpec extends Specification implements BuildDataTest, ServiceU
         resultDeleted == null
     }
 
-    void "getJobByLabel returns a job by label, if it's not deleted"() {
-        given: "two normal jobs and a deleted"
-        Job.build(label: "job1")
-        Job normalJob = Job.build(label: "job2")
-        Job.build(label: "deletedJob", deleted: true)
-
-
-        when: "job requested by label"
-        Job result = service.getJobByLabel("job2")
-        Job resultDeleted = service.getJobByLabel("deletedJob")
-
-        then: "result is job or null if job is deleted"
-        result == normalJob
-        resultDeleted == null
-    }
-
     void "test get active jobs"() {
         given: "an active job, an inactive, and a deleted"
         Job activeJob = Job.build(active: true, executionSchedule: '0 */15 * * * ? 2015')
