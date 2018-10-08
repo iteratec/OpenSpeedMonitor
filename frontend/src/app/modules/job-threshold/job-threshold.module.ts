@@ -7,7 +7,7 @@ import {MeasurandService} from './services/measurand.service';
 import {MeasuredEventService} from './services/measured-event.service';
 import {ThresholdService} from './services/threshold.service';
 import {ThresholdRestService} from './services/threshold-rest.service';
-import {SharedModule} from "../shared.module";
+import {SharedModule} from "../shared/shared.module";
 import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 

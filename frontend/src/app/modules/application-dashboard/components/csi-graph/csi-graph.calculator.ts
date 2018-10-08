@@ -1,7 +1,7 @@
 import {scaleLinear, ScaleLinear, scaleTime, ScaleTime} from 'd3-scale';
 import {area, Area, curveCatmullRom, line, Line} from 'd3-shape';
 import {CsiDTO} from '../../../../models/csi.model';
-import {CSI_MAX, CSI_MIN} from '../../utils/csi-utils';
+import {CSI_MAX, CSI_MIN} from '../../../../utils/csi-utils';
 import {parseDate} from "../../../../utils/date.util";
 
 const DATE_RANGE = (24 * 60 * 60 * 1000) * 7 * 4; //4 Weeks

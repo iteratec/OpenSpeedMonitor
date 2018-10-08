@@ -4,7 +4,7 @@ import {ThresholdComponent} from './threshold.component';
 import {ThresholdRowComponent} from '../threshold-row/threshold-row.component';
 import {ThresholdRestService} from '../../services/threshold-rest.service';
 import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
-import {SharedModule} from '../../../shared.module';
+import {SharedModule} from '../../../shared/shared.module';
 import {ThresholdService} from '../../services/threshold.service';
 
 describe('ThresholdComponent', () => {

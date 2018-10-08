@@ -6,7 +6,6 @@ import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {OsmLangService} from "./services/osm-lang.service";
 import {ApplicationService} from "./services/application.service";
 
-
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/static/i18n/', `.json`);
@@ -23,7 +22,6 @@ export function createTranslateLoader(http: HttpClient) {
       }
     })
   ],
-  declarations: [],
   providers: [
     GrailsBridgeService,
     OsmLangService,

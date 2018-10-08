@@ -14,7 +14,7 @@ import {CsiDTO} from '../../../../models/csi.model';
 import {timeDay} from 'd3-time';
 import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
-import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../utils/csi-utils';
+import {CSI_MAX, CSI_THRESHOLD_GOOD, CSI_THRESHOLD_OKAY, CsiUtils} from '../../../../utils/csi-utils';
 import {select} from "d3-selection";
 import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
