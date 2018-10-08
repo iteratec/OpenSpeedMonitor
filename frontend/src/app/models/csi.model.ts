@@ -1,9 +1,9 @@
-import {parseDate} from "../../../utils/date.util";
+import {parseDate} from "../utils/date.util";
 
 export interface CsiDTO {
-  date: string | Date,
-  csiDocComplete: number,
-  csiVisComplete: number
+  date?: string | Date,
+  csiDocComplete?: number,
+  csiVisComplete?: number
 }
 
 export class Csi implements CsiDTO {
@@ -12,7 +12,7 @@ export class Csi implements CsiDTO {
   csiVisComplete: number;
 
   constructor(dto: CsiDTO) {
-    this.date = parseDate(dto.date);
+    this.date = parseDate(dto.date || new Date(0));
     this.csiDocComplete = dto.csiDocComplete;
     this.csiVisComplete = dto.csiVisComplete;
   }

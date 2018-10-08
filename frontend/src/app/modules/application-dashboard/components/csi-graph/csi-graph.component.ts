@@ -8,9 +8,9 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {ApplicationCsiListDTO} from '../../models/csi-list.model';
+import {ApplicationCsi} from '../../../../models/csi-list.model';
 import {axisBottom, axisLeft} from 'd3-axis';
-import {CsiDTO} from '../../models/csi.model';
+import {CsiDTO} from '../../../../models/csi.model';
 import {timeDay} from 'd3-time';
 import {timeFormat} from 'd3-time-format';
 import {CsiGraphCalculator} from './csi-graph.calculator';
@@ -27,7 +27,7 @@ import {take} from "rxjs/operators";
   encapsulation: ViewEncapsulation.None
 })
 export class CsiGraphComponent implements AfterContentInit, OnChanges {
-  @Input() csiData: ApplicationCsiListDTO;
+  @Input() csiData: ApplicationCsi;
   @Input() recentCsiData: CsiDTO;
   @ViewChild("svg") svgElement: ElementRef;
 
@@ -51,7 +51,7 @@ export class CsiGraphComponent implements AfterContentInit, OnChanges {
 
   private drawGraph() {
     if (this.csiGraphCalculator.isValid() && this.csiData) {
-      const selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiDtoList]);
+      const selection = select(this.svgElement.nativeElement).selectAll("g.csi-graph").data<CsiDTO[]>([this.csiData.csiValues]);
 
       this.enter(selection.enter());
       this.update(selection.merge(selection.enter()));

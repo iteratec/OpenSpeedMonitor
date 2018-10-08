@@ -5,7 +5,7 @@ import {ApplicationService} from "../../../../services/application.service";
 import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
-import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
+import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {Metrics} from "../../../../enums/metric.enum";
 
 @Component({

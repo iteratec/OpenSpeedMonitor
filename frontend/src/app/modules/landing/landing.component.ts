@@ -1,9 +1,8 @@
 import {Component} from '@angular/core';
-import {Observable} from "rxjs/internal/Observable";
-import {Application} from "./models/application.model";
-import {LandingService} from "./services/landing.service";
-import {map} from "rxjs/operators";
-import {ApplicationWithCsi} from "./models/application-list.model";
+import {map, startWith, take} from "rxjs/operators";
+import {ApplicationService} from "../../services/application.service";
+import {combineLatest, Observable} from "rxjs";
+import {ApplicationWithCsi} from "./models/application-with-csi.model";
 
 @Component({
   selector: 'osm-landing',
@@ -16,13 +15,19 @@ export class LandingComponent {
   showApplicationLoading$: Observable<boolean>;
   applications$: Observable<ApplicationWithCsi[]>;
 
-  constructor(private landingService: LandingService) {
-    this.showApplicationEmptyState$ = this.landingService.applicationList$
-      .pipe(map(state => !state.isLoading && !state.applications.length));
-    this.showApplicationLoading$ = this.landingService.applicationList$
-      .pipe(map(state => state.isLoading));
-    this.applications$ = this.landingService.applicationList$
-      .pipe(map(state => state.applications));
+  constructor(private applicationService: ApplicationService) {
+    this.showApplicationLoading$ = this.applicationService.applications$.pipe(
+      take(1),
+      map(_ => false),
+      startWith(true)
+    );
+    this.showApplicationEmptyState$ = this.applicationService.applications$.pipe(
+      map(applications => !applications.length),
+      startWith(false)
+    );
+    this.applications$ = combineLatest(this.applicationService.applications$, this.applicationService.applicationCsiById$).pipe(
+      map(([applications, csiById]) => applications.map(app => new ApplicationWithCsi(app, csiById[app.id])))
+    )
   }
 
 }

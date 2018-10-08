@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {LandingComponent} from './landing.component';
-import {LandingService} from "./services/landing.service";
 import {RouterModule} from "@angular/router";
 import {SharedModule} from "../shared.module";
 
@@ -10,9 +9,6 @@ import {SharedModule} from "../shared.module";
     SharedModule
   ],
   declarations: [LandingComponent],
-  providers: [
-    LandingService
-  ],
 })
 export class LandingModule {
 }

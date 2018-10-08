@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {ApplicationCsiListDTO} from "../../models/csi-list.model";
-import {ApplicationDTO} from "../../../../models/application.model";
+import {ApplicationCsi} from "../../../../models/csi-list.model";
+import {Application} from "../../../../models/application.model";
 import {ApplicationService} from "../../../../services/application.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
@@ -11,8 +11,8 @@ import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 })
 export class CsiInfoComponent implements OnChanges {
 
-  @Input() csiData: ApplicationCsiListDTO;
-  @Input() selectedApplication: ApplicationDTO;
+  @Input() csiData: ApplicationCsi;
+  @Input() selectedApplication: Application;
 
   errorCase: string;
   infoText: string;
