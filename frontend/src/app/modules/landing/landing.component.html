@@ -13,7 +13,11 @@
     <ul class="clickable-list" *ngIf="applications$ | async as applications">
       <li *ngFor="let application of applications">
         <a [routerLink]="['/applicationDashboard', application.id]">
-          <aside>{{application?.recentCsi?.csiDocComplete?.toFixed(0)}}%</aside>
+          <aside>
+            <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete" [csiDate]="application.recentCsi?.date"
+                                 [lastResultDate]="application.lastResultDate" [showLoading]="application.csiIsLoading">
+            </osm-csi-value-small>
+          </aside>
           <span class="title">{{application.name}}
             <span class="detail" *ngIf="application.numPages">{{application.numPages}} Pages</span>
           </span>
