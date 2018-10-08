@@ -12,7 +12,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var inputsValid = false;
     var jobDiv = $("#createJob");
     var defaultJobName = "";
-    var jobNameHelpBlock = $("#jobNameHelpBlock");
     var executionScheduleFormGroup = $("#executionScheduleFormGroup");
     var cronInputHelpBlock = $("#cronInputHelpBlock");
     var createJobNavPill = $('#createJobTab');

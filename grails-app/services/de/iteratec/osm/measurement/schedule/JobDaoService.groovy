@@ -23,10 +23,6 @@ class JobDaoService {
         return job
     }
 
-    public Job getJobByLabel(String label) {
-        Job.findByDeletedAndLabel(false, label)
-    }
-
     public List<Job> getJobs(boolean active) {
         return Job.findAllByDeletedAndActive(false, active)
     }
@@ -40,7 +36,7 @@ class JobDaoService {
     }
 
     public List<Job> getJobs(Map listParams) {
-        return Job.list(listParams).findAll { it.deleted == false }
+        return Job.list(listParams).findAll { (!it.deleted) }
     }
 
     public List<Job> getJobs(JobGroup jobGroup) {
