@@ -21,7 +21,7 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         yScale,
         barSelected;
 
-    var init = function (data) {
+    var init = function () {
         // make card and buttons visible
         $("#chart-card").removeClass("hidden");
         $(".in-chart-buttons").removeClass("hidden");
@@ -31,15 +31,6 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("height", height + margin.top + margin.bottom);
         chartContainer = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        $("#all-bars-desc").on('click', function (e) {
-            drawChart(data, 'desc');
-            toogleFilterCheckmarks(e.target)
-        });
-        $("#all-bars-asc").on('click', function (e) {
-            drawChart(data, 'asc');
-            toogleFilterCheckmarks(e.target)
-        })
     };
 
     var getLabelMappings = function () {
@@ -55,8 +46,17 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
     };
 
     var drawChart = function (data, sortOrder) {
+        $("#all-bars-desc").on('click', function (e) {
+            drawChart(data, 'desc');
+            toogleFilterCheckmarks(e.target)
+        });
+        $("#all-bars-asc").on('click', function (e) {
+            drawChart(data, 'asc');
+            toogleFilterCheckmarks(e.target)
+        });
+
         if (svg === undefined) {
-            init(data);
+            init();
         }
 
         // init labelMapping on startup
