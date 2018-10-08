@@ -7,6 +7,7 @@ import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO} from "../models/c
 import {Application, ApplicationDTO} from "../models/application.model";
 import {catchError, filter, map, startWith, switchMap} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
+import {distinctUntilKeyChanged, withLatestFrom} from "rxjs/internal/operators";
 
 
 @Injectable()
@@ -28,7 +29,10 @@ export class ApplicationService {
       switchMap((application: Application) => this.updateCsiForApplication(application))
     ).subscribe(this.applicationCsiById$);
 
-    this.selectedApplication$.pipe(
+    this.selectSelectedApplicationCsi().pipe(
+      filter(applicationCsi => !applicationCsi.isLoading),
+      withLatestFrom(this.selectedApplication$, (_, application) => application),
+      distinctUntilKeyChanged("id"),
       switchMap((application: Application) => this.updateCsiForPages(application))
     ).subscribe(this.pageCsis$);
   }
@@ -53,8 +57,9 @@ export class ApplicationService {
   }
 
   private updateMetricsForPages(applicationDto: Application): Observable<PageMetricsDto[]> {
-    const params = this.createParams(applicationDto.id);
+    this.pageCsis$.next({data: [], isLoading: true});
     this.metrics$.next(null);
+    const params = this.createParams(applicationDto.id);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
       handleError()
     );
