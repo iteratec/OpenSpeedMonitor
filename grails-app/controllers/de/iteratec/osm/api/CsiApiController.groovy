@@ -174,7 +174,6 @@ class CsiApiController {
 
     /**
      * Calculates loadTimeInMillisecs to customer satisfaction. Assumption is that doc complete time is for {@link de.iteratec.osm.csi.Page} with name pageName.
-     * For the calculation most recent csi-mapping is used (see {@link CustomerFrustration}).
      * @param loadTimeInMillisecs
      * 	Doc complete time to translate.
      * @param pageName

@@ -142,7 +142,6 @@ class BootStrap {
                 minValidLoadtime: DEFAULT_MIN_VALID_LOADTIME,
                 maxValidLoadtime: DEFAULT_MAX_VALID_LOADTIME,
                 maxDataStorageTimeInMonths: 13,
-                csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
     }
 
