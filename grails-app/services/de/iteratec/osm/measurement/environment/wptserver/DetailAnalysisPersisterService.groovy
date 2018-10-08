@@ -117,13 +117,13 @@ class DetailAnalysisPersisterService implements iResultListener {
         String wptVersion = getWptVersion(resultXml)
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
-        def resp
+        boolean success = false
         int attempts = 0
 
-        while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
+        while (!success && attempts < MAX_ATTEMPTS) {
             attempts++
             try {
-                resp = client.post {
+                success = client.post {
                     request.uri.path = '/restApi/persistAssetsForWptResult'
                     request.body = [
                         osmUrl: osmUrl,
@@ -135,6 +135,9 @@ class DetailAnalysisPersisterService implements iResultListener {
                         apiKey: apiKey
                     ]
                     request.contentType = 'application/x-www-form-urlencoded'
+                    response.success {
+                        true
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Couldn't queue persistDetailAnalysisData", ex)
@@ -143,7 +146,7 @@ class DetailAnalysisPersisterService implements iResultListener {
 
         }
 
-        if (!resp || resp.status != 200)
+        if (!success)
             throw new OsmResultPersistanceException("Can't trigger persistence of detailAnalysisData for TestID: " + resultXml.getTestId())
     }
 

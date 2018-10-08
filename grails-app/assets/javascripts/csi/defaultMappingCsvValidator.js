@@ -31,7 +31,7 @@ function validate(csv) {
     // Get I18N error messages
     var formatError = OpenSpeedMonitor.i18n.defaultMappingFormatError;
     var intError = OpenSpeedMonitor.i18n.loadTimeIntegerError;
-    var doubleError = OpenSpeedMonitor.i18n.customerFrustrationDoubleError;
+    var doubleError = OpenSpeedMonitor.i18n.csiDoubleError;
     var notEveryValueError = OpenSpeedMonitor.i18n.defaultMappingNotAllvaluesError;
     var customerSatisfactionNotInPercentError = OpenSpeedMonitor.i18n.customerSatisfactionNotInPercentError;
     var percentagesBetween0And1Error = OpenSpeedMonitor.i18n.percentagesBetween0And1Error;
