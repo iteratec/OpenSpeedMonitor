@@ -26,14 +26,17 @@ export class ApplicationDashboardComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dashboardService: ApplicationService
+    private applicationService: ApplicationService
   ) {
-    this.pages$ = this.dashboardService.metrics$;
-    this.applications$ = dashboardService.applications$;
-    this.applicationCsi$ = dashboardService.selectSelectedApplicationCsi().pipe(share());
-    this.isLoading$ = this.applicationCsi$.pipe(map(csi => csi.isLoading));
-    this.recentCsiValue$ = this.applicationCsi$.pipe(map(csi => csi.recentCsi()));
-    this.hasConfiguration$ = this.applicationCsi$.pipe(map(csi => csi.hasCsiConfiguration));
+    this.pages$ = this.applicationService.metrics$;
+    this.applications$ = applicationService.applications$;
+    this.applicationCsi$ = applicationService.selectSelectedApplicationCsi().pipe(share());
+    this.isLoading$ = this.applicationCsi$
+      .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.isLoading));
+    this.recentCsiValue$ = this.applicationCsi$
+      .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.recentCsi()));
+    this.hasConfiguration$ = this.applicationCsi$
+      .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.hasCsiConfiguration));
     combineLatest(this.route.paramMap, this.applications$)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
@@ -46,7 +49,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     }
     this.selectedApplication = this.findApplicationById(applications, applicationId);
     if (this.selectedApplication) {
-      this.dashboardService.updateApplicationData(this.selectedApplication);
+      this.applicationService.updateSelectedApplication(this.selectedApplication);
     }
   }
 

@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {BehaviorSubject, EMPTY, Observable, OperatorFunction, ReplaySubject, Subject} from "rxjs/index";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
-import {ApplicationCsi, ApplicationCsiDTO, ApplicationCsiById} from "../models/csi-list.model";
+import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO} from "../models/csi-list.model";
 import {Application, ApplicationDTO} from "../models/application.model";
 import {catchError, map, switchMap} from "rxjs/internal/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
@@ -16,24 +16,24 @@ export class ApplicationService {
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new ReplaySubject<Application[]>(1);
 
-  selectedApplication$ = new Subject<ApplicationDTO>();
+  selectedApplication$ = new Subject<Application>();
 
   constructor(private http: HttpClient) {
-    this.updateActiveOrRecentlyMeasured();
+    this.loadApplications();
     this.selectedApplication$.pipe(
-      switchMap((application: ApplicationDTO) => this.updateMetricsForPages(application))
+      switchMap((application: Application) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
 
     this.selectedApplication$.pipe(
-      switchMap((application: ApplicationDTO) => this.updateCsiForApplication(application))
+      switchMap((application: Application) => this.updateCsiForApplication(application))
     ).subscribe(this.applicationCsiById$);
 
     this.selectedApplication$.pipe(
-      switchMap((application: ApplicationDTO) => this.updateCsiForPages(application))
+      switchMap((application: Application) => this.updateCsiForPages(application))
     ).subscribe(this.pageCsis$);
   }
 
-  updateActiveOrRecentlyMeasured() {
+  loadApplications() {
     this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getAllActiveAndAllRecent").pipe(
       map(dtos => dtos.map(dto => new Application(dto))),
       map(applications => this.sortApplicationsByName(applications)),
@@ -41,7 +41,7 @@ export class ApplicationService {
     ).subscribe(next => this.applications$.next(next));
   }
 
-  updateApplicationData(application: ApplicationDTO) {
+  updateSelectedApplication(application: Application) {
     this.selectedApplication$.next(application);
   }
 
@@ -57,7 +57,7 @@ export class ApplicationService {
     );
   }
 
-  private updateMetricsForPages(applicationDto: ApplicationDTO): Observable<PageMetricsDto[]> {
+  private updateMetricsForPages(applicationDto: Application): Observable<PageMetricsDto[]> {
     const params = this.createParams(applicationDto.id);
     this.metrics$.next(null);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
@@ -65,7 +65,7 @@ export class ApplicationService {
     );
   }
 
-  private updateCsiForApplication(applicationDto: ApplicationDTO): Observable<ApplicationCsiById> {
+  private updateCsiForApplication(applicationDto: Application): Observable<ApplicationCsiById> {
     this.applicationCsiById$.next({
       ...this.applicationCsiById$.getValue(),
       [applicationDto.id]: new ApplicationCsi({isLoading: true})
@@ -77,7 +77,7 @@ export class ApplicationService {
     );
   }
 
-  private updateCsiForPages(applicationDto: ApplicationDTO): Observable<ResponseWithLoadingState<PageCsiDto[]>> {
+  private updateCsiForPages(applicationDto: Application): Observable<ResponseWithLoadingState<PageCsiDto[]>> {
     this.pageCsis$.next({data: [], isLoading: true});
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
