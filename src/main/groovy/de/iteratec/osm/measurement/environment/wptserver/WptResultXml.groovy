@@ -128,15 +128,15 @@ class WptResultXml {
     }
 
     int getResultCodeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).result.toInteger()
+        return getStepNode(stepZeroBasedIndex).result?.toInteger()
     }
 
     int getFirstByteForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).TTFB.toInteger()
+        return getStepNode(stepZeroBasedIndex).TTFB?.toInteger()
     }
 
     int getLoadTimeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).loadTime.toInteger()
+        return getStepNode(stepZeroBasedIndex).loadTime?.toInteger()
     }
 
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
