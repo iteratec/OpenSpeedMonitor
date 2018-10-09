@@ -58,6 +58,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 grailsApplication.mainContext.getBean('csiAggregationUpdateService')
         resultPersisterService.metricReportingService =
                 grailsApplication.mainContext.getBean('metricReportingService')
+        resultPersisterService.configService =
+                grailsApplication.mainContext.getBean('configService')
     }
 
     void "Results don't get persisted if the TTFB of first result is 0."() {

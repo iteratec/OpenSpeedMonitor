@@ -241,48 +241,49 @@ class ResultPersisterService implements iResultListener {
         List<EventResult> resultsOfTeststep = []
         String testId = resultXml.getTestId()
 
-        if (isEventResultValid(resultXml, testStepZeroBasedIndex)) {
-            String labelInXml = resultXml.getLabel()
-            JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
-            if (jobResult == null) {
-                throw new OsmResultPersistanceException(
-                        "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
-                )
-            }
-            Job job = jobDaoService.getJob(labelInXml)
-            if (job == null) {
-                throw new OsmResultPersistanceException(
-                        "No Job exists with label '${labelInXml}' while persting associated EventResults!"
-                )
-            }
-
-            log.debug('getting event name from xml result ...')
-            String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
-            log.debug('getting event name from xml result ... DONE')
-            log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
-            MeasuredEvent event = getMeasuredEvent(measuredEventName);
-            log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
-
-            log.debug("persisting result for step=${event}")
-            Integer runCount = resultXml.getRunCount()
-            log.debug("runCount=${runCount}")
-
-            resultXml.getRunCount().times { Integer runNumber ->
-                if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
-                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
-                    EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
-                    if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-                }
-                if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
-                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
-                    EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
-                    if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
-                }
-            }
-        } else {
+        if (!isEventResultValid(resultXml, testStepZeroBasedIndex)) {
             log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
                     "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
             return false
+        }
+
+        String labelInXml = resultXml.getLabel()
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
+
+        if (jobResult == null) {
+            throw new OsmResultPersistanceException(
+                    "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
+            )
+        }
+        Job job = jobDaoService.getJob(labelInXml)
+        if (job == null) {
+            throw new OsmResultPersistanceException(
+                    "No Job exists with label '${labelInXml}' while persting associated EventResults!"
+            )
+        }
+
+        log.debug('getting event name from xml result ...')
+        String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
+        log.debug('getting event name from xml result ... DONE')
+        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
+        MeasuredEvent event = getMeasuredEvent(measuredEventName);
+        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
+
+        log.debug("persisting result for step=${event}")
+        Integer runCount = resultXml.getRunCount()
+        log.debug("runCount=${runCount}")
+
+        resultXml.getRunCount().times { Integer runNumber ->
+            if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
+                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
+                if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
+            }
+            if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
+                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
+                if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+            }
         }
 
         return true

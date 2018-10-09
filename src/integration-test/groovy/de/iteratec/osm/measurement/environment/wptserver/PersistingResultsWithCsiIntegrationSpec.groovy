@@ -74,7 +74,6 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         JobResult.list().size() == 1
         eventResults.size() == 5
         eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3
-
     }
 
     private createTestDataCommonToAllTests() {
