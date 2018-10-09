@@ -70,7 +70,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
@@ -84,7 +84,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
@@ -98,7 +98,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
