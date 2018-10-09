@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
@@ -34,6 +35,9 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
 
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
@@ -53,6 +57,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     def cleanup() {
         resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
+        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
@@ -70,7 +75,6 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         JobResult.list().size() == 1
         eventResults.size() == 5
         eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3
-
     }
 
     private createTestDataCommonToAllTests() {
@@ -129,11 +133,10 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
                                 customerSatisfactionInPercent: tokenized[defaultMappingindex + 1]
                         ).save(failOnError: true, flush: true)
                     }
-
                 }
                 lineCounter++
             }
-            csvFileReader.close();
+            csvFileReader.close()
         }
 
     }
@@ -141,5 +144,10 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     void mockMetricReportingService() {
         MetricReportingService metricReportingService = Stub(MetricReportingService)
         resultPersisterService.metricReportingService = metricReportingService
+
+        resultPersisterService.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 }

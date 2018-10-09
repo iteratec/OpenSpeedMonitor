@@ -117,14 +117,26 @@ class WptResultXml {
     def getStepNode(int stepZeroBasedIndex) {
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return responseNode.data.median
+                return responseNode.data.median?.firstView
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
                 return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex)
             case WptXmlResultVersion.MULTISTEP:
-                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex)
+                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex)?.results
             default:
                 throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
         }
+    }
+
+    int getResultCodeForStep(int stepZeroBasedIndex) {
+        return getStepNode(stepZeroBasedIndex).result?.toInteger()
+    }
+
+    int getFirstByteForStep(int stepZeroBasedIndex) {
+        return getStepNode(stepZeroBasedIndex).TTFB?.toInteger()
+    }
+
+    int getLoadTimeForStep(int stepZeroBasedIndex) {
+        return getStepNode(stepZeroBasedIndex).loadTime?.toInteger()
     }
 
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
@@ -201,7 +213,6 @@ class WptResultXml {
             default:
                 throw new IllegalArgumentException("Unknown WptXmlResultVersion: ${version}")
         }
-
     }
 
     boolean hasRuns() {

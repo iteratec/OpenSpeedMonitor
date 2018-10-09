@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -36,6 +37,8 @@ import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.result.CachedView.CACHED
 import static de.iteratec.osm.result.CachedView.UNCACHED
 
@@ -234,6 +237,11 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         service.wptInstructionService = Mock(WptInstructionService)
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
 }

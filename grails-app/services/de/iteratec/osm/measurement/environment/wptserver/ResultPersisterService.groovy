@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Propagation
 import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 /**
  * Persists locations and results. Observer of WptInstructionService.
  * @author rschuett , nkuhn
@@ -58,6 +60,7 @@ class ResultPersisterService implements iResultListener {
     CsiValueService csiValueService
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
+    ConfigService configService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -207,7 +210,6 @@ class ResultPersisterService implements iResultListener {
     }
 
     void persistResultsForAllTeststeps(WptResultXml resultXml, long jobId) {
-
         Integer testStepCount = resultXml.getTestStepCount()
 
         log.debug("starting persistance of ${testStepCount} event results for test steps")
@@ -216,7 +218,9 @@ class ResultPersisterService implements iResultListener {
         for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
             if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
                 try {
-                    persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)
+                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
+                        break
+                    }
                 } catch (Exception e) {
                     log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
                 }
@@ -229,10 +233,16 @@ class ResultPersisterService implements iResultListener {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
-
-        String testId = resultXml.getTestId()
+        if (!isEventResultValid(resultXml, testStepZeroBasedIndex)) {
+            log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
+                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
+            return false
+        }
+      
+        String testId = resultXml.getTestId()      
         Job job = jobDaoService.getJob(jobId)
         JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
+
         if (jobResult == null) {
             throw new OsmResultPersistanceException(
                     "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
@@ -250,7 +260,6 @@ class ResultPersisterService implements iResultListener {
         Integer runCount = resultXml.getRunCount()
         log.debug("runCount=${runCount}")
 
-        List<EventResult> resultsOfTeststep = []
         resultXml.getRunCount().times { Integer runNumber ->
             if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
@@ -263,7 +272,20 @@ class ResultPersisterService implements iResultListener {
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
         }
-        return resultsOfTeststep
+
+        return true
+    }
+
+
+    boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
+        int minValidLoadTime = configService.getMinValidLoadtime()
+        int maxValidLoadTime = configService.getMaxValidLoadtime()
+        int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
+
+        return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
+                (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
+                (loadTime >= minValidLoadTime) &&
+                (loadTime <= maxValidLoadTime))
     }
 
     /**
