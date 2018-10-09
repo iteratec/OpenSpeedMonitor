@@ -17,15 +17,13 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
 
 import static spock.util.matcher.HamcrestMatchers.closeTo
-
 /**
  * Helper classes for these tests.
  */
@@ -40,7 +38,6 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
 
     TimeToCsMappingService serviceUnderTest
 
-    static Map<String, List<Double>> frustrations
     static Map<String, List<ExpectedCustomerSatisfaction>> expectedCustomerSatisfactions
 
     Collection<TimeToCsMapping> mappings
@@ -50,7 +47,6 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         serviceUnderTest = service
 
         csiConfigurationSetup()
-        frustrationsSetup()
         parseExpectedValues()
     }
 
@@ -69,17 +65,40 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         csCalculated == null
     }
 
-    def "cs calculation is null when no transformation is possible for a page"() {
-        setup:
-        serviceUnderTest = Spy(TimeToCsMappingService)
-        serviceUnderTest.noTransformationPossibleFor(_, _) >> true
+    def "cs calculation is null when page is null"() {
+        given: "a valid csiConfiguration"
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
 
-        when:
-        Double csCalculatedByMapping = serviceUnderTest.getCustomerSatisfactionInPercent(2000, Page.build())
+        when: "the customer satisfaction should be computed, but the page is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, null, csiConfiguration)
 
-        then:
-        csCalculatedByMapping == null
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
     }
+
+    def "cs calculation is null when the CSI configuration is null"() {
+        given: "a page"
+        Page page = Page.build(name: "HP_entry")
+
+        when: "the cs for a loading time gets calculated, but the mapping is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, page, null)
+
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
+    }
+
+    def "cs calculation is null when the CSI configuration doesn't affect the page"() {
+        given: "a page and a loading time to cs mapping"
+        Page page = Page.build(name: "HP_entry_special")
+        CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
+
+        when: "the cs for a loading time gets calculated, but the mapping is null"
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, page, csiConfiguration)
+
+        then: "the calculated customer satisfaction is null"
+        csCalculated == null
+    }
+
 
     def "get customer satisfaction (cs) in percent via mapping"() {
         given: "a page and a loading time to cs mapping"
@@ -87,37 +106,10 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         CsiConfiguration csiConfiguration = CsiConfiguration.build(timeToCsMappings: mappings)
 
         when: "the cs for a loading time gets calculated via the given mapping"
-        def csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(loadTimeInMillisecs, page, csiConfiguration)
+        Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(loadTimeInMillisecs, page, csiConfiguration)
 
         then: "the cs is close enough to the expected one"
         csCalculated closeTo(expectedCustomerSatisfaction, 1.2)
-
-        where:
-        loadTimeInMillisecs | expectedCustomerSatisfaction
-        4036                | 50d
-        1980                | 73.5d
-        3793                | 50d
-        6675                | 15.5d
-        2541                | 66.33165829000001d
-        2173                | 73.5d
-        2178                | 73.5d
-        2047                | 73.5d
-        2272                | 73d
-        6630                | 17d
-    }
-
-    def "get customer satisfaction (cs) in percent via the rank"() {
-        given: "a page and loading times"
-        Page page = Page.build(name: "HP_entry")
-        serviceUnderTest.timeToCsMappingCacheService = Stub(TimeToCsMappingCacheService) {
-            getCustomerFrustrations(_) >> frustrations.get("HP_entry")
-        }
-
-        when: "the cs for a loading time gets calculated via the ranking in the loading times"
-        def csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(loadTimeInMillisecs, page)
-
-        then: "the cs is close enough to the expected one"
-        csCalculated closeTo(expectedCustomerSatisfaction, 0.000001)
 
         where:
         loadTimeInMillisecs | expectedCustomerSatisfaction
@@ -150,33 +142,6 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         null            | false
     }
 
-    def "valid frustrations exist for a page"() {
-        given: "a page"
-        Page page = Page.build(name: pageName)
-        serviceUnderTest.timeToCsMappingCacheService = Stub(TimeToCsMappingCacheService) {
-            getCustomerFrustrations(_) >> frustrationList
-        }
-
-        when: "the page gets validated and checked for a valid frustrations list"
-        def validFrustrationsExists = serviceUnderTest.validFrustrationsExistFor(page)
-
-        then: "the expected result should be obtained"
-        validFrustrationsExists == expectedValidation
-
-        where: "valid/invalid pages and valid/invalid frustration lists are used"
-        expectedValidation  | pageName          | frustrationList
-        true                | "Page"            | [1000, 2000]
-        true                | "Page"            | [1000, 1000, 2000]
-        false               | "Page"            | [1000, 1000]
-        false               | "Page"            | [1000]
-        false               | "Page"            | []
-        false               | Page.UNDEFINED    | [1000, 2000]
-        false               | Page.UNDEFINED    | [1000, 1000, 2000]
-        false               | Page.UNDEFINED    | [1000, 1000]
-        false               | Page.UNDEFINED    | [1000]
-        false               | Page.UNDEFINED    | []
-    }
-
     def csiConfigurationSetup() {
         File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/timeToCsMappings.csv")
         mappings = []
@@ -202,23 +167,6 @@ class TimeToCsMappingServiceTests extends Specification implements BuildDataTest
         csiConfiguration = new CsiConfiguration(label: "TestCsi",
                 description: "For Testing",
                 timeToCsMappings: mappings)
-    }
-
-    def frustrationsSetup() {
-        File csvFile = new File("src/test/resources/CsiData/TimeToCsMapping/customerFrustrations.csv")
-        frustrations = [:].withDefault { [] }
-
-        int lineCounter = 0
-        new FileInputStream(csvFile).eachLine { line ->
-            if (lineCounter >= 1) {
-                def tokenized = line.tokenize(';')
-                String pageName = tokenized[0]
-                Integer customerFrustration = Integer.parseInt(tokenized[1])
-
-                frustrations[pageName].add(customerFrustration)
-            }
-            lineCounter++
-        }
     }
 
     def parseExpectedValues() {

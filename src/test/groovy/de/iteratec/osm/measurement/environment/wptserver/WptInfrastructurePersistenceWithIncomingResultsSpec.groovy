@@ -220,7 +220,6 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         service.csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
         service.timeToCsMappingService = Stub(TimeToCsMappingService){
             getCustomerSatisfactionInPercent(_, _, _) >> 1
-            validFrustrationsExistFor(_) >> true
         }
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
             getMinValidLoadtime(_) >> DEFAULT_MIN_VALID_LOADTIME

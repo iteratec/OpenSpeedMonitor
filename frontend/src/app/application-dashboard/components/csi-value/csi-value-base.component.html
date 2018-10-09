@@ -1,0 +1,8 @@
+<div class="csi-value-container" [ngClass]="{ hint: !!hint}">
+  <div class="csi-value">
+    <ng-content></ng-content>
+  </div>
+  <div class="hint-container" [title]="hint">
+    <svg [style.width.px]="size" [style.height.px]="size" #svg [ngClass]="csiValueClass"></svg>
+  </div>
+</div>

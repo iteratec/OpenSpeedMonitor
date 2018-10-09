@@ -18,4 +18,21 @@ export class CsiUtils {
   static isCsiOutdated(csiDate: string, jobDate: string): boolean {
     return csiDate < jobDate;
   }
+
+  static isCsiNA(csiValue: Number) {
+    return !csiValue && csiValue !== 0;
+  }
+
+  static formatAsText(csiValue: number, showLoading: boolean, small: boolean = false): string {
+    if (showLoading) {
+      return small ? "..." : "loading..."
+    }
+    if (CsiUtils.isCsiNA(csiValue)) {
+      return "n/a";
+    }
+    if (csiValue >= 100) {
+      return "100%";
+    }
+    return csiValue.toFixed(small ? 0 : 1) + "%";
+  }
 }
