@@ -64,4 +64,5 @@ databaseChangeLog = {
     include file: '2018-02-20-v450-dropMainUrl.groovy'
     include file: '2018-06-20-v460-removeScriptPageRelations.groovy'
     include file: '2018-09-27-SCHEME-v510-remove-csi-by-rank.groovy'
+    include file: '2018-10-01-v500-job-label-optional.groovy'
 }

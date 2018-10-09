@@ -95,7 +95,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -116,7 +116,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -137,7 +137,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -158,7 +158,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -179,7 +179,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -200,7 +200,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()

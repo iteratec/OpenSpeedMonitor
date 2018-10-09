@@ -60,10 +60,10 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
-        Job.build(label: jobLabelFromXML)
+        Job job = Job.build(label: jobLabelFromXML)
 
         when: "larpService listens to result of JobGroup without csi configuration"
-        resultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1, job.id)
         Collection<EventResult> resultsWithCsiCalculated = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has no csi value"
@@ -73,10 +73,10 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     void "csi must be calculated with csi-configuration, all values are 100%"() {
         setup: "prepare Job and JobGroup"
         JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
-        Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf)
+        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
-        resultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1, job.id)
         List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has csi value of 100%"
@@ -87,10 +87,10 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     void "csi must be calculated with csi-configuration, all values are 50%"() {
         setup: "prepare Job and JobGroup"
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
-        Job.build(label: jobLabelFromXML, jobGroup: jobGroup)
+        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroup)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
-        resultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1, job.id)
         List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has csi value of 50%"

@@ -147,11 +147,11 @@ class MeasurementSetupGebSpec extends CustomUrlGebReportingSpec{
         msPage.canClickCreateButton()
     }
 
-    void "can't continue with empty jobName"(){
+    void "can continue with empty jobName"(){
         when: "we delete the job name"
         msPage.jobNameInput.firstElement().clear()
-        then: "the setup can't be finished"
-        !msPage.canClickCreateButton()
+        then: "the setup can be finished"
+        msPage.canClickCreateButton()
     }
 
     void "check every execution schedule to be valid"(){

@@ -77,13 +77,14 @@ class ResultPersisterService implements iResultListener {
     @Override
     public void listenToResult(
             WptResultXml resultXml,
-            WebPageTestServer wptserverOfResult) {
+            WebPageTestServer wptserverOfResult,
+            long jobId) {
 
         try {
-            checkJobAndLocation(resultXml, wptserverOfResult)
-            persistJobResult(resultXml)
-            persistResultsForAllTeststeps(resultXml)
-            informDependents(resultXml)
+            checkJobAndLocation(resultXml, wptserverOfResult, jobId)
+            persistJobResult(resultXml, jobId)
+            persistResultsForAllTeststeps(resultXml, jobId)
+            informDependents(resultXml, jobId)
 
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
@@ -97,12 +98,10 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult) throws OsmResultPersistanceException {
+    void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult, long jobId) {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
-            String jobLabel = resultXml.getLabel()
-            job = jobDaoService.getJob(jobLabel)
-            if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for label from result xml: ${jobLabel}")
+            job = jobDaoService.getJob(jobId)
         }
         performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", 4) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
@@ -110,7 +109,7 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void persistJobResult(WptResultXml resultXml) throws OsmResultPersistanceException {
+    void persistJobResult(WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
 
         performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
             String testId = resultXml.getTestId()
@@ -121,21 +120,17 @@ class ResultPersisterService implements iResultListener {
             }
 
             log.debug("Deleting pending JobResults and create finished ...")
-            removePendingAndCreateFinishedJobResult(resultXml, testId)
+            removePendingAndCreateFinishedJobResult(resultXml, testId, jobId)
             log.debug("Deleting pending JobResults and create finished ... DONE")
         }
 
     }
 
-    private void removePendingAndCreateFinishedJobResult(resultXml, String testId) {
+    private void removePendingAndCreateFinishedJobResult(resultXml, String testId, long jobId) {
+        Job job = jobDaoService.getJob(jobId)
+        deleteResultsMarkedAsPendingAndRunning(job, testId)
 
-        String jobLabel = resultXml.getLabel()
-        Job job = jobDaoService.getJob(jobLabel)
-        if (job == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
-
-        deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
-
-        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)
+        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
         if (!jobResult) {
             persistNewJobRun(job, resultXml)
         } else {
@@ -214,7 +209,7 @@ class ResultPersisterService implements iResultListener {
         result.save(failOnError: true, flush: true)
     }
 
-    void persistResultsForAllTeststeps(WptResultXml resultXml) {
+    void persistResultsForAllTeststeps(WptResultXml resultXml, long jobId) {
         Integer testStepCount = resultXml.getTestStepCount()
 
         log.debug("starting persistance of ${testStepCount} event results for test steps")
@@ -223,7 +218,7 @@ class ResultPersisterService implements iResultListener {
         for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
             if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
                 try {
-                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)) {
+                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
                         break
                     }
                 } catch (Exception e) {
@@ -237,9 +232,11 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected boolean persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException {
+    protected boolean persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
         List<EventResult> resultsOfTeststep = []
-        String testId = resultXml.getTestId()
+        String testId = resultXml.getTestId()      
+        Job job = jobDaoService.getJob(jobId)
+        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
 
         if (!isEventResultValid(resultXml, testStepZeroBasedIndex)) {
             log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
@@ -247,18 +244,9 @@ class ResultPersisterService implements iResultListener {
             return false
         }
 
-        String labelInXml = resultXml.getLabel()
-        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
-
         if (jobResult == null) {
             throw new OsmResultPersistanceException(
                     "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
-            )
-        }
-        Job job = jobDaoService.getJob(labelInXml)
-        if (job == null) {
-            throw new OsmResultPersistanceException(
-                    "No Job exists with label '${labelInXml}' while persting associated EventResults!"
             )
         }
 
@@ -514,13 +502,13 @@ class ResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void informDependents(WptResultXml resultXml) {
-
-        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), resultXml.getTestId())
+    private void informDependents(WptResultXml resultXml, long jobId) {
+        Job job = jobDaoService.getJob(jobId)
+        JobResult jobResult = JobResult.findByJobAndTestId(job, resultXml.getTestId())
         if (jobResult == null) {
             throw new OsmResultPersistanceException(
                     "JobResult couldn't be read from db while informing dependents " +
-                            "(testId='${resultXml.getTestId()}', jobConfigLabel='${resultXml.getLabel()}')!"
+                            "(testId='${resultXml.getTestId()}', jobId='${jobId}')!"
             )
         }
         List<EventResult> results = jobResult.getEventResults()
@@ -638,7 +626,7 @@ class ResultPersisterService implements iResultListener {
      * @param jobLabel
      * @param testId
      */
-    void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId) {
-        JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true, flush: true)
+    void deleteResultsMarkedAsPendingAndRunning(Job job, String testId) {
+        JobResult.findByJobAndTestIdAndHttpStatusCodeLessThan(job, testId, 200)?.delete(failOnError: true, flush: true)
     }
 }
