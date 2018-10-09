@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
@@ -39,6 +40,8 @@ import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.result.CachedView.CACHED
 import static de.iteratec.osm.result.CachedView.UNCACHED
 
@@ -58,12 +61,18 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
             performanceLoggingService(PerformanceLoggingService)
             pageService(PageService)
             jobDaoService(JobDaoService)
+            configService(ConfigService)
         }
     }
 
     void "setup"() {
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
     void setupSpec() {
