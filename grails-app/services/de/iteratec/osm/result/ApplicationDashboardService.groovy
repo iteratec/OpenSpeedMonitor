@@ -5,10 +5,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageCsiAggregationService
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -225,18 +222,18 @@ class ApplicationDashboardService {
 
     private ApplicationCsiDto csiAggregationsToDto(Long jobGroupId, List<CsiAggregation> csiAggregations, Date startDate) {
         ApplicationCsiDto dto = new ApplicationCsiDto()
-        ArrayList<CsiDto> csiDtoList = new ArrayList<CsiDto>()
-        if (csiAggregations) {
-            csiAggregations.each {
-                CsiDto csiDto = new CsiDto()
-                if (it.csByWptDocCompleteInPercent) {
-                    csiDto.date = it.started.format("yyyy-MM-dd")
-                    csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                    csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                    csiDtoList << csiDto
-                }
+        dto.hasCsiConfiguration = true
+        dto.csiValues = new ArrayList<CsiDto>()
+        csiAggregations.each {
+            CsiDto csiDto = new CsiDto()
+            if (it.csByWptDocCompleteInPercent) {
+                csiDto.date = it.started.format("yyyy-MM-dd")
+                csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                dto.csiValues << csiDto
             }
-        } else {
+        }
+        if (!dto.csiValues.length) {
             List<Job> jobs = jobDaoService.getJobs(JobGroup.findById(jobGroupId))
             List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)
             if (jobResults) {
@@ -246,7 +243,6 @@ class ApplicationDashboardService {
                 dto.hasJobResults = false
             }
         }
-        dto.csiValues = csiDtoList
         return dto
     }
 }
