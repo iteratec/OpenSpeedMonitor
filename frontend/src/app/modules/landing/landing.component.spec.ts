@@ -3,6 +3,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {LandingComponent} from './landing.component';
 import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ApplicationService} from "../../services/application.service";
+import {SharedModule} from "../shared/shared.module";
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -15,7 +16,8 @@ describe('LandingComponent', () => {
         ApplicationService,
       ],
       imports: [
-        SharedMocksModule
+        SharedMocksModule,
+        SharedModule
       ]
     })
       .compileComponents();
