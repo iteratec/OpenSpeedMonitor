@@ -344,7 +344,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         Job job = Job.build(label: "testjob")
 
         when: "the service tries to persist results for an XML result with failed step"
-        service.persistResultsForAllTeststeps(xmlResult, job.id)
+        service.persistResultsForAllTeststeps(xmlResult, job)
 
         then: "it throws an exception and doesn't create any measured events"
         MeasuredEvent.list().size() == 0
