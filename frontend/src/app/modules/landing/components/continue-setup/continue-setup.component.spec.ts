@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ContinueSetupComponent } from './continue-setup.component';
+import {ContinueSetupComponent} from './continue-setup.component';
+import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
+import {SharedModule} from "../../../shared/shared.module";
 
 describe('ContinueSetupComponent', () => {
   let component: ContinueSetupComponent;
@@ -8,9 +10,13 @@ describe('ContinueSetupComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ContinueSetupComponent ]
+      declarations: [ContinueSetupComponent],
+      imports: [
+        SharedMocksModule,
+        SharedModule
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
