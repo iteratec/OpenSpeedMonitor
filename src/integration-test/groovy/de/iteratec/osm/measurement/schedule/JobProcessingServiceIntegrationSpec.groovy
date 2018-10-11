@@ -225,7 +225,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
     void "statusOfRepeatedJobExecution test"() {
         given: "an inactive job and a date"
         createJob(false)
-        Job job = jobDaoService.getJobById(1)
+        Job job = jobDaoService.getJob(1)
         Date now = new Date()
         Date oldestDate = now - 5
 

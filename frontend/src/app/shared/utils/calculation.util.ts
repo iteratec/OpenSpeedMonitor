@@ -24,4 +24,8 @@ export class CalculationUtil {
 
     return dayString + "." + monthString + "." + currentDate.getFullYear();
   }
+
+  static isBeforeToday(isoDate: string): boolean {
+    return new Date().toISOString().substring(0, 10) > isoDate;
+  }
 }

@@ -21,7 +21,8 @@
 
             <div class="jobNameContainer"><a
                     href="${createLink(action: 'edit', id: job.id)}"
-                    class="jobName ${job.active == false ? 'inactiveJob' : ''}">${job.label}
+                    class="jobName ${job.active == false ? 'inactiveJob' : ''}">
+                ${job.label ?: job.script.label + ' ' + job.location.browser.name}
             </a></div>
             <g:if test="${job.script}">
                 <a
