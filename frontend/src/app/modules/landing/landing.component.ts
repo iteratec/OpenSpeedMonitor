@@ -12,14 +12,14 @@ import {ApplicationWithCsi} from "./models/application-with-csi.model";
 export class LandingComponent {
 
   showApplicationEmptyState$: Observable<boolean>;
-  showApplicationLoading$: Observable<boolean>;
+  hasData$: Observable<boolean>;
   applications$: Observable<ApplicationWithCsi[]>;
 
   constructor(private applicationService: ApplicationService) {
-    this.showApplicationLoading$ = this.applicationService.applications$.pipe(
+    this.hasData$ = this.applicationService.applications$.pipe(
       take(1),
-      map(_ => false),
-      startWith(true)
+      map(_ => true),
+      startWith(false)
     );
     this.showApplicationEmptyState$ = this.applicationService.applications$.pipe(
       map(applications => !applications.length),

@@ -6,20 +6,28 @@ class LandingController {
     OsmStateService osmStateService
 
     def index() {
-        if (shouldRedirectToSetup()) {
-            forward(controller: 'InfrastructureSetup', action: 'index')
-        } else {
+        if (isSetupFinished()) {
             render(view: "/angularFrontend")
+        } else if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.ABORTED) {
+            redirect(action: "continueSetup")
+        } else {
+            redirect(controller: 'InfrastructureSetup', action: 'index')
         }
     }
 
-    private boolean shouldRedirectToSetup() {
+    def continueSetup() {
+        // used for angular routing
+        render(view: "/angularFrontend")
+    }
+
+    private boolean isSetupFinished() {
         if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
-            return false
+            return true
         }
         if (!osmStateService.untouched()) {
             configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.FINISHED)
+            return true
         }
-        return configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED
+        return false
     }
 }

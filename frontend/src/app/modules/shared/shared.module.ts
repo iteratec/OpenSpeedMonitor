@@ -5,6 +5,7 @@ import {CsiValueBaseComponent} from "./components/csi-value/csi-value-base.compo
 import {CsiValueBigComponent} from "./components/csi-value/csi-value-big/csi-value-big.component";
 import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/csi-value-medium.component";
 import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
+import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 
 @NgModule({
   imports: [
@@ -15,14 +16,16 @@ import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi
     CsiValueBaseComponent,
     CsiValueBigComponent,
     CsiValueMediumComponent,
-    CsiValueSmallComponent
+    CsiValueSmallComponent,
+    EmptyStateComponent
   ],
   exports: [
     CommonModule,
     TranslateModule,
     CsiValueBigComponent,
     CsiValueMediumComponent,
-    CsiValueSmallComponent
+    CsiValueSmallComponent,
+    EmptyStateComponent
   ]
 })
 export class SharedModule {

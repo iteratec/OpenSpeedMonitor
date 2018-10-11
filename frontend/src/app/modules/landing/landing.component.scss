@@ -9,27 +9,10 @@
 
 main {
   display: flex;
-}
+  width: 100%;
 
-.loading {
-  display: block;
-  text-align: center;
-  margin: 5em 0;
-}
-
-figure.status {
-  margin-bottom: $default-padding;
-  padding: $default-padding;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  img {
-    max-width: 250px;
-  }
-  figcaption {
-    text-align: center;
-    color: $color-text-light;
+  &.center {
+    justify-content: center;
   }
 }
 

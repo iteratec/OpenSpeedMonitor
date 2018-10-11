@@ -9,8 +9,13 @@ const appRoutes: Routes = [
     loadChildren: './modules/application-dashboard/application-dashboard.module#ApplicationDashboardModule'
   },
   {
-    path: '',
+    path: 'landing',
     loadChildren: './modules/landing/landing.module#LandingModule'
+  },
+  {
+    path: '',
+    loadChildren: './modules/landing/landing.module#LandingModule',
+    pathMatch: 'full'
   },
   {path: '**', component: NotFoundComponent}];
 

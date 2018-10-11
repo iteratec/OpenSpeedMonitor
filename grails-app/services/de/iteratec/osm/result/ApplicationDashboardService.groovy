@@ -225,8 +225,8 @@ class ApplicationDashboardService {
         dto.hasCsiConfiguration = true
         dto.csiValues = new ArrayList<CsiDto>()
         csiAggregations.each {
-            CsiDto csiDto = new CsiDto()
             if (it.csByWptDocCompleteInPercent) {
+                CsiDto csiDto = new CsiDto()
                 csiDto.date = it.started.format("yyyy-MM-dd")
                 csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
                 csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
