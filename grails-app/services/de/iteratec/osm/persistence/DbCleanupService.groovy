@@ -25,11 +25,13 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.result.ResultSelectionInformation
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
-//import org.springframework.transaction.TransactionDefinition
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
+
 /**
  * Provides methods for cleanup db. Can be used by quartz-jobs.
  */
@@ -37,8 +39,10 @@ class DbCleanupService {
 
 
     BatchActivityService batchActivityService
-	EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService
+
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s before date toDeleteBefore.
@@ -51,7 +55,17 @@ class DbCleanupService {
         def dc = new DetachedCriteria(JobResult).build {
             lt 'date', toDeleteBefore
         }
-        int count = dc.count()
+
+        def dc2 = new DetachedCriteria(ResultSelectionInformation).build {
+            lt 'jobResultDate', toDeleteBefore
+        }
+
+        def dc3 = new DetachedCriteria(EventResult).build {
+            lt 'dateCreated', toDeleteBefore
+        }
+
+        int count = dc.count().toInteger()
+
         String jobName = "Nightly cleanup of JobResults with dependents objects"
         //TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown, but the activity is in database
         if(count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
@@ -59,22 +73,22 @@ class DbCleanupService {
             batchActivity.beginNewStage("Delete JobResults", count)
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
-            0.step(count, batchSize) { int offset ->
-                JobResult.withNewTransaction {
-                    def list = dc.list(max: batchSize)
-                    list.each { JobResult jobResult ->
-                        try {
-                            jobResult.getEventResults().each { EventResult eventResult ->
-                                eventResult.delete()
-                            }
-                            jobResult.delete()
-                        } catch (Exception e) {
-                        }
-                    }
-                    batchActivity.addProgressToStage(list.size())
-                }
+            0.step(count, batchSize) {
+                def jobResultList = dc.list(max: batchSize)
+                JobResult.deleteAll(jobResultList)
+
+                def resultSelectionInformationList = dc2.list(max: batchSize)
+                ResultSelectionInformation.deleteAll(resultSelectionInformationList)
+
+                def eventResultList = dc3.list(max: batchSize)
+                EventResult.deleteAll(eventResultList)
+
+                batchActivity.addProgressToStage(
+                        jobResultList.size() + resultSelectionInformationList.size() + eventResultList.size()
+                )
+
                 //clear hibernate session first-level cache
-                JobResult.withSession { session -> session.clear() }
+                JobResult.withSession { it.clear() }
             }
             batchActivity.done()
         }
