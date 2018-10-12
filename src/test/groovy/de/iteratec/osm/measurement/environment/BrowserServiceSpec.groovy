@@ -40,7 +40,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
 
         when: "a browser should be found by name or alias"
-        def browser = service.findByNameOrAlias(nameOrAlias, false)
+        def browser = service.findByNameOrAlias(nameOrAlias)
 
         then: "the corresponding browser is found, the browser that was not defined is created"
         browser.name == expectedBrowserName
@@ -51,10 +51,9 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         "Firefox"           | "Firefox"
         "FF"                | "Firefox"
         "Firefox7"          | "Firefox"
-        "Chrome"            | "Chrome"
     }
 
-    void "findAll by name or alias returns correct browsers"() {
+    void "findAll by name returns correct browsers"() {
         given: "Three browsers and aliases"
         Browser.build(name: "Firefox")
                 .addToBrowserAliases(alias: "FF")
@@ -63,10 +62,10 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Browser.build(name: "Edge")
 
         when: "all browsers should be found by name or alias"
-        def browser = service.findAllByNameOrCreate(["FF", "IE", "Chrome"], false)
+        def browser = service.findAllByName(["FF", "IE", "Chrome", "Firefox7", "Edge"])
 
         then: "the corresponding browsers are found"
-        browser*.name == ["Firefox", "IE", "Chrome"]
+        browser*.name == ["Firefox", "IE", null, "Firefox", "Edge"]
     }
 
     void "find all returns all browsers"() {
@@ -83,20 +82,18 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         browsers*.name as Set == ["Firefox", "IE", "Edge", Browser.UNDEFINED] as Set
     }
 
-    void "only create new browsers if not a health check"() {
-        given: ""
+    void "findOrCreateByNameOrAlias creates non-existing browsers"() {
+        given: "one browser with aliases"
         Browser.build(name: "Firefox")
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "Firefox7").save()
 
-        when: "the health check call should not create a new browser"
-        def noHealthCheck = service.findAllByNameOrCreate(["Firefox7", "IE", "Netscape"], false)
-        def healthCheck = service.findAllByNameOrCreate(["FF", "IE", "Chrome"])
+        when: "browsers are searched"
+        def shouldCreate = service.findOrCreateByNameOrAlias("Chrome")
+        def shouldnCreate = service.findOrCreateByNameOrAlias("FF")
 
-        then: "browsers are created depending on health check"
-        noHealthCheck*.name == ["Firefox", "IE", "Netscape"]
-        println noHealthCheck
-        healthCheck*.name == ["Firefox", "IE", null]
-        println healthCheck
+        then: "browsers are created if they don't exist"
+        shouldCreate.name == "Chrome"
+        shouldnCreate.name == "Firefox"
     }
 }
