@@ -1,5 +1,6 @@
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
@@ -24,6 +25,11 @@ class FilterResultsToReportSpec extends Specification implements BuildDataTest,
         Page.build(name: PAGE_NAME_HOMEPAGE)
         Page.build(name: Page.UNDEFINED)
         service.csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> 1800
+            getMinValidLoadtime() >> 100
+        }
     }
 
     void setupSpec() {

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -37,6 +38,10 @@ import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+
 
 @Build([WebPageTestServer, Location, Job])
 class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification implements BuildDataTest,
@@ -61,13 +66,17 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification 
         File file = new File("src/test/resources/WptResultXmls/" + fileName)
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String locationIdentifier = xmlResult.responseNode.data.location.toString()
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
 
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
-        Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
+        Job job = Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
 
         when: "the services listens to the XML file"
-        service.listenToResult(xmlResult, wptServer)
+        service.listenToResult(xmlResult, wptServer, job.id)
 
         then: "the correct number of event results are created, with or without median results"
         JobResult.count() == 1

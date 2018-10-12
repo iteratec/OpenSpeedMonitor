@@ -20,17 +20,15 @@
         </div>
 
 
-        <div class="form-group" id="nameFormGroup" ${hasErrors(bean: job, field: 'label', 'has-error')} required">
-            <label for="label" class="col-md-3 control-label">
+        <div class="form-group" id="nameFormGroup" ${hasErrors(bean: job, field: 'label', 'has-error')}">
+            <label for="inputField-JobLabel" class="col-md-3 control-label">
                 <g:message code="job.label.label" default="Name"/>
-                <span class="required-indicator">*</span>
             </label>
 
             <div class="col-md-7">
                 <input type="text" class="form-control job-label" id="inputField-JobLabel" name="label"
                        value="${job?.label}"
-                       placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}"
-                       required >
+                       placeholder="${g.message(code: 'job.label.placeholder', 'default': 'New Job')}">
             </div>
         </div>
 

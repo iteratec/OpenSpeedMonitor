@@ -72,7 +72,6 @@
         pageComparisonGetPages: "${createLink(controller: 'resultSelection', action: 'getPages')}",
         pageComparisonGetJobGroupToPagesMap: "${createLink(controller: 'resultSelection', action: 'getJobGroupToPagesMap')}",
         getScriptNames: "${createLink(controller: 'measurementSetup', action: 'getScriptNames')}",
-        getJobNames: "${createLink(controller: 'measurementSetup', action: 'getJobNames')}",
         cronExpressionNextExecution: "${createLink(controller: 'cronExpression', action: 'nextExecutionTime')}"
     };
     OpenSpeedMonitor.i18n.measurandLabels = {
