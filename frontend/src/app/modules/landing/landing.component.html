@@ -6,12 +6,12 @@
     <osm-empty-state *ngIf="showApplicationEmptyState$ | async" image="undraw_fast_loading.svg"
                      messageKey="frontend.de.iteratec.osm.landing.nothingSetUp"></osm-empty-state>
 
-    <ul class="clickable-list" *ngIf="applications$ | async as applications">
-      <li *ngFor="let application of applications">
+    <ul class="clickable-list" *ngIf="(applications$ | async)?.length">
+      <li *ngFor="let application of applications$ | async">
         <a [routerLink]="['/applicationDashboard', application.id]">
           <aside>
             <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete" [csiDate]="application.recentCsi?.date"
-                                 [lastResultDate]="application.lastResultDate" [showLoading]="application.csiIsLoading">
+                                 [lastResultDate]="application.dateOfLastResults" [showLoading]="application.csiIsLoading">
             </osm-csi-value-small>
           </aside>
           <span class="title">{{application.name}}
@@ -20,7 +20,7 @@
         </a>
       </li>
     </ul>
-    <a href="/measurementSetup/create" class="btn btn-primary" id="continue-setup">
+    <a href="/measurementSetup/create" class="btn btn-primary" id="create-measurement">
       <i class="fas fa-plus"></i>
       {{ 'frontend.de.iteratec.osm.landing.setupNewMeasurement' | translate}}
     </a>
