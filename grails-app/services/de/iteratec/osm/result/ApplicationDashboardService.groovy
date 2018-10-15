@@ -223,16 +223,18 @@ class ApplicationDashboardService {
     private ApplicationCsiDto csiAggregationsToDto(Long jobGroupId, List<CsiAggregation> csiAggregations, Date startDate) {
         ApplicationCsiDto dto = new ApplicationCsiDto()
         dto.hasCsiConfiguration = true
-        dto.csiValues = new ArrayList<CsiDto>()
+        dto.hasJobResults = true
+        ArrayList<CsiDto> csiDtos = new ArrayList<CsiDto>()
         csiAggregations.each {
             if (it.csByWptDocCompleteInPercent) {
                 CsiDto csiDto = new CsiDto()
                 csiDto.date = it.started.format("yyyy-MM-dd")
                 csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
                 csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                dto.csiValues << csiDto
+                csiDtos << csiDto
             }
         }
+        dto.csiValues = csiDtos
         if (!dto.csiValues.length) {
             List<Job> jobs = jobDaoService.getJobs(JobGroup.findById(jobGroupId))
             List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)

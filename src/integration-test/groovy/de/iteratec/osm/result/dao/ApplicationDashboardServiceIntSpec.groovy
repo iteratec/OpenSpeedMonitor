@@ -8,6 +8,8 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregationType
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.ApplicationDashboardService
 import de.iteratec.osm.result.EventResult
@@ -15,6 +17,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
+import org.joda.time.DateTime
 
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
@@ -197,6 +200,44 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         jobGroup1.csiConfiguration.id == csiConfigurationId1
         JobGroup jobGroupWithCreatedCsiConfiguration = JobGroup.findById(jobGroup2.id)
         jobGroupWithCreatedCsiConfiguration.csiConfiguration.id == csiConfigurationId2
+    }
+
+    void "return CSI from today for two job groups"() {
+        given: "two CSI Aggregations from today"
+        existingCsiConfiguration = CsiConfiguration.build()
+        def interval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
+        jobGroup1.csiConfiguration = existingCsiConfiguration
+        jobGroup2.csiConfiguration = existingCsiConfiguration
+        def today = new DateTime().withTimeAtStartOfDay().toDate()
+        def yesterday = new DateTime().withTimeAtStartOfDay().minusDays(1).toDate()
+        CsiAggregation.build(jobGroup: jobGroup1, started: yesterday, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 20.0d, csByWptVisuallyCompleteInPercent: 20.0d)
+        CsiAggregation.build(jobGroup: jobGroup1, started: today, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 50.0d, csByWptVisuallyCompleteInPercent: 60.0d)
+        CsiAggregation.build(jobGroup: jobGroup2, started: today, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 70.0d, csByWptVisuallyCompleteInPercent: 80.0d)
+
+
+        when: "the application service tests for errors"
+        Map<Long, ApplicationCsiDto> applicationCsiDtos = applicationDashboardService.getTodaysCsiValueForJobGroups([jobGroup1, jobGroup2])
+
+        then: "an error is returned, all JobResults are invalid"
+        applicationCsiDtos[jobGroup1.id].hasCsiConfiguration == true
+        applicationCsiDtos[jobGroup1.id].hasJobResults == true
+        applicationCsiDtos[jobGroup1.id].hasInvalidJobResults == false
+        applicationCsiDtos[jobGroup1.id].csiValues.length == 1
+        applicationCsiDtos[jobGroup1.id].csiValues[0].date == today.format("yyyy-MM-dd")
+        applicationCsiDtos[jobGroup1.id].csiValues[0].csiDocComplete == 50.0d
+        applicationCsiDtos[jobGroup1.id].csiValues[0].csiVisComplete == 60.0d
+
+        applicationCsiDtos[jobGroup2.id].hasCsiConfiguration == true
+        applicationCsiDtos[jobGroup2.id].hasJobResults == true
+        applicationCsiDtos[jobGroup2.id].hasInvalidJobResults == false
+        applicationCsiDtos[jobGroup2.id].csiValues.length == 1
+        applicationCsiDtos[jobGroup2.id].csiValues[0].date == today.format("yyyy-MM-dd")
+        applicationCsiDtos[jobGroup2.id].csiValues[0].csiDocComplete == 70.0d
+        applicationCsiDtos[jobGroup2.id].csiValues[0].csiVisComplete == 80.0d
+
     }
 
     void "return error for invalid JobResults if all JobResults are invalid"() {
