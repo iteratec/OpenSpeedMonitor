@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {filter, map} from "rxjs/operators";
+import {filter, map, tap} from "rxjs/operators";
 import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";

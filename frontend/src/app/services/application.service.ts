@@ -37,9 +37,12 @@ export class ApplicationService {
 
   loadApplications() {
     this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getApplications").pipe(
-      map(dtos => dtos.map(dto => new Application(dto))),
-      map(applications => this.sortApplicationsByName(applications)),
       handleError(),
+      map(dtos => dtos.map(dto => new Application(dto))),
+      map(applications => ({
+        isLoading: false,
+        data: this.sortApplicationsByName(applications)
+      })),
       startWith({
         ...this.applications$.getValue(),
         isLoading: true

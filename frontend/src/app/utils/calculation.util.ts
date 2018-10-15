@@ -1,3 +1,5 @@
+import {parseDate} from "./date.util";
+
 export class CalculationUtil {
 
   static round(input: number): number {
@@ -25,7 +27,11 @@ export class CalculationUtil {
     return dayString + "." + monthString + "." + currentDate.getFullYear();
   }
 
-  static isBeforeToday(isoDate: string): boolean {
-    return new Date().toISOString().substring(0, 10) > isoDate;
+  static isBeforeToday(datelike: string | Date): boolean {
+    const today = new Date();
+    const target = parseDate(datelike);
+    return today.getFullYear() > target.getFullYear() ||
+      today.getMonth() > target.getMonth() ||
+      today.getDate() > target.getDate();
   }
 }
