@@ -30,7 +30,7 @@ class JobResultController {
             List<JobResult> jobResultsForJob = jobStatisticService.getLast150CompletedJobResultsFor(job)
 
             jobResultsWithStatusGreater200 = jobResultsForJob.findAll {
-                it.httpStatusCode > 200
+                it.jobResultStatus > JobResultStatus.SUCCESS
             }
         }
 

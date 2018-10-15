@@ -25,15 +25,13 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.I18nService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.quartz.CronExpression
+
 /**
  * QueueAndJobStatusService returns various figures regarding Jobs, Queues and EventResults.
  *
@@ -105,25 +103,25 @@ class QueueAndJobStatusService {
     }
 
     /**
-     * Get number of successfully finished Jobs (i.e. JobResults with httpStatusCode 200)
+     * Get number of successfully finished Jobs (i.e. JobResults with jobResultStatus 200)
      * from sinceWhen until now for the specified location
      * @return
      */
     int getFinishedJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode == WptStatus.COMPLETED.getWptStatusCode() && job.location == location
+            date >= sinceWhen && jobResultStatus == JobResultStatus.SUCCESS && job.location == location
         }
         return query.list().size()
     }
 
     /**
-     * Get number of successfully finished Jobs (i.e. JobResults with httpStatusCode 200)
+     * Get number of unsuccessfully finished Jobs (i.e. JobResults with jobResultStatus 500 or above)
      * from sinceWhen until now for the specified location
      * @return
      */
     int getErroneousJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode >= WptStatus.INVALID_TEST_ID.getWptStatusCode() && job.location == location
+            date >= sinceWhen && jobResultStatus >= JobResultStatus.LAUNCH_ERROR && job.location == location
         }
         return query.list().size()
     }
@@ -134,7 +132,7 @@ class QueueAndJobStatusService {
      */
     List<JobResult> getExecutingJobResults(Location location) {
         def query = JobResult.where {
-            (httpStatusCode == WptStatus.PENDING.getWptStatusCode() || httpStatusCode == WptStatus.RUNNING.getWptStatusCode()) && job.location == location
+            (jobResultStatus == JobResultStatus.WAITING || jobResultStatus == JobResultStatus.RUNNING) && job.location == location
         }
         return query.list(sort: 'date', order: 'desc')
     }

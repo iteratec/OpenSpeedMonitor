@@ -56,10 +56,10 @@ class JobResult {
     /** tester from result xml */
     String testAgent
 
-    /** An optional String containing error messages from WPT server **/
-    String wptStatus
-    /** status code returned by WPT server (such as 200, 101, ...) **/
-    Integer httpStatusCode
+    /** Status of the wpt result **/
+    WptStatus wptStatus
+    /** Status of the osm JobResult **/
+    JobResultStatus jobResultStatus
     @BindUsing({ obj, source -> source['description'] })
     String description
 
@@ -108,7 +108,6 @@ class JobResult {
         testAgent(nullable: true)
         date(nullable: false)
         wptStatus(nullable: true)
-        httpStatusCode(nullable: false)
         job(nullable: false)
         description(widget: 'textarea')
 
@@ -241,22 +240,12 @@ class JobResult {
     }
 
     /**
-     * Returns a status message matching the integer value stored in statusCode
-     * such as 'Pending' for statusCode 100 and so forth
-     */
-     String getStatusCodeMessage() {
-        def state = [0: 'Failure', 100: 'Pending', 101: 'Running', 200: 'Finished', 400: 'Error', 404: 'Not found', 504: 'Timeout']
-        def str = state[httpStatusCode]
-        return str ?: 'Unknown'
-    }
-
-    /**
-     * If {@link httpStatusCode} will change {@link JobStatistic}s of {@link Job} has to be updated.
+     * If {@link jobResultStatus} will change {@link JobStatistic}s of {@link Job} has to be updated.
      */
     def beforeUpdate() {
         try {
             boolean noTest = Environment.getCurrent() != Environment.TEST
-            if (noTest && isDirty('httpStatusCode')) {
+            if (noTest && isDirty('jobResultStatus')) {
                 jobStatisticService.updateStatsFor(job)
             }
         } catch (Exception e) {

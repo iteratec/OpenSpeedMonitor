@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.NotTransactional
@@ -445,13 +446,13 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobAndTestId(job, testId)
         if (!result)
             return
-        if (result.httpStatusCode < WptStatus.COMPLETED.getWptStatusCode()) {
+        if (result.jobResultStatus < JobResultStatus.SUCCESS) {
             // poll a last time
             WptResultXml lastResult = pollJobRun(job, testId)
-            if (lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() || (lastResult.statusCodeOfWholeTest >= WptStatus.COMPLETED.getWptStatusCode() && !lastResult.hasRuns())) {
+            if (lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS || (lastResult.statusCodeOfWholeTest >= JobResultStatus.SUCCESS && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                persistUnfinishedJobResult(job.id, testId, WptStatus.TIME_OUT.getWptStatusCode(), '', description)
+                String description = lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
+                persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, '', description)
                 wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             }
         }
@@ -468,7 +469,7 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobAndTestIdAndHttpStatusCodeLessThan(job, testId, WptStatus.COMPLETED.getWptStatusCode())
+        JobResult result = JobResult.findByJobAndTestIdAndJobResultStatusLessThan(job, testId, JobResultStatus.SUCCESS)
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true, flush: true)
@@ -534,10 +535,10 @@ class JobProcessingService {
     public Map<String, Integer> handleOldJobResults() {
         log.info("handleOldJobResults() OSM starts")
 
-        def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200, new DateTime().minusHours(2))
+        def jobResultsToDelete = JobResult.findAllByJobResultStatusLessThanAndDateLessThan(200, new DateTime().minusHours(2))
         def jobResultsToDeleteCount = jobResultsToDelete.size()
         if (!jobResultsToDelete.isEmpty()) {
-            log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
+            log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with JobResultStatus < 200 that are to old. Start deleting...")
             jobResultsToDelete.each { JobResult jobResult ->
                 try {
                     jobResult.delete()
@@ -548,10 +549,10 @@ class JobProcessingService {
             log.debug("Deleting done.")
         }
 
-        def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200, new DateTime().minusHours(2))
+        def jobResultsToReschedule = JobResult.findAllByJobResultStatusLessThanAndDateGreaterThan(200, new DateTime().minusHours(2))
         def jobResultsToRescheduleCount = jobResultsToReschedule.size()
         if (!jobResultsToReschedule.isEmpty()) {
-            log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for rescheduling. Start rescheduling ...")
+            log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with JobResultStatus < 200 fresh enough for rescheduling. Start rescheduling ...")
             jobResultsToReschedule.each { JobResult jobResult ->
                 Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
                 Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
@@ -583,14 +584,14 @@ class JobProcessingService {
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(WptStatus.COMPLETED.getWptStatusCode())
+        List<JobResult> jobResults = JobResult.findAllByJobResultStatusLessThan(WptStatus.SUCCESSFUL)
         jobResults = jobResults.findAll {
             // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
         }
         if (jobResults) {
             jobResults.each {
-                it.httpStatusCode = WptStatus.OUTDATED_JOB.getWptStatusCode()
+                it.jobResultStatus = JobResultStatus.ORPHANED
                 it.description = "closed due to nightly cleanup of job results"
                 it.save(failOnError: true)
             }
