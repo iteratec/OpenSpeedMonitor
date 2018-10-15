@@ -44,7 +44,10 @@ describe('LandingComponent', () => {
   });
 
   it('should have a button to create a measurement', () => {
-    applicationService.applications$.next([]);
+    applicationService.applications$.next({
+      isLoading: false,
+      data: []
+    });
     fixture.detectChanges();
     const button = fixture.debugElement.query(By.css("main #create-measurement"));
     expect(button.nativeElement).toBeTruthy();
@@ -52,18 +55,24 @@ describe('LandingComponent', () => {
   });
 
   it('should show the centered empty state without applications', () => {
-    applicationService.applications$.next([]);
+    applicationService.applications$.next({
+      isLoading: false,
+      data: []
+    });
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css("main")).classes.center).toBeTruthy();
     expect(fixture.debugElement.query(By.css("osm-empty-state"))).toBeTruthy();
     expect(fixture.debugElement.query(By.css(".clickable-list"))).toBeFalsy();
   });
 
-  it('should show a list of applications if existing', () => {
-    applicationService.applications$.next([
-      new Application({id: 1, name: "TestOne"}),
-      new Application({id: 2, name: "TestTwo"})
-    ]);
+  it('should show a list of applications if existing, with loading CSI', () => {
+    applicationService.applications$.next({
+      isLoading: false,
+      data: [
+        new Application({id: 1, name: "TestOne"}),
+        new Application({id: 2, name: "TestTwo"})
+      ]
+    });
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css("main")).classes.center).toBeFalsy();
     expect(fixture.debugElement.query(By.css(".clickable-list"))).toBeTruthy();
@@ -77,12 +86,16 @@ describe('LandingComponent', () => {
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeTruthy();
   });
 
-  it('should show a list of applications if existing', () => {
-    applicationService.applications$.next([
-      new Application({id: 1, name: "TestOne"}),
-      new Application({id: 2, name: "TestTwo"})
-    ]);
+  it('should show a list of applications if existing, with CSI values', () => {
+    applicationService.applications$.next({
+      isLoading: false,
+      data: [
+        new Application({id: 1, name: "TestOne"}),
+        new Application({id: 2, name: "TestTwo"})
+      ]
+    });
     applicationService.applicationCsiById$.next({
+      isLoading: false,
       1: new ApplicationCsi({csiValues: [{csiDocComplete: 50}, {csiDocComplete: 60}]}),
       2: new ApplicationCsi({csiValues: [{csiDocComplete: 60}, {csiDocComplete: 70}]})
     });

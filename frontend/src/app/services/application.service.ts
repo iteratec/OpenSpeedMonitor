@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, combineLatest, concat, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
 import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/csi-list.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, take, withLatestFrom} from "rxjs/operators";
+import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
 
@@ -13,24 +13,22 @@ import {Csi, CsiDTO} from "../models/csi.model";
 @Injectable()
 export class ApplicationService {
   metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
-  applicationCsiById$: BehaviorSubject<ApplicationCsiById> = new BehaviorSubject({});
+  applicationCsiById$: BehaviorSubject<ApplicationCsiById> = new BehaviorSubject({isLoading: false});
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
-  applications$ = new ReplaySubject<Application[]>(1);
+  applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient) {
-    this.loadApplications();
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
 
     this.selectedApplication$.pipe(
-      switchMap((application: Application) => this.updateCsiForApplication(application))
+      switchMap((application: Application) => this.updateCsiForApplication(application)),
     ).subscribe(this.applicationCsiById$);
 
     this.selectSelectedApplicationCsi().pipe(
-      filter(applicationCsi => !applicationCsi.isLoading),
       withLatestFrom(this.selectedApplication$, (_, application) => application),
       distinctUntilKeyChanged("id"),
       switchMap((application: Application) => this.updateCsiForPages(application))
@@ -41,21 +39,20 @@ export class ApplicationService {
     this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getApplications").pipe(
       map(dtos => dtos.map(dto => new Application(dto))),
       map(applications => this.sortApplicationsByName(applications)),
-      handleError()
+      handleError(),
+      startWith({
+        ...this.applications$.getValue(),
+        isLoading: true
+      })
     ).subscribe(next => this.applications$.next(next));
   }
 
   loadRecentCsiForApplications() {
-    const loadedApplicationCsiById =
-      this.http.get<ApplicationCsiDTOById>("/applicationDashboard/rest/getCsiValuesForApplications").pipe(
-        map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), dto)),
-        handleError()
-      );
-    const loadingState = this.applications$.pipe(
-      take(1),
-      map(applications => this.setLoadingStateForApplicationCsi(this.applicationCsiById$.getValue(), applications))
-    );
-    concat(loadingState, loadedApplicationCsiById).subscribe(next => this.applicationCsiById$.next(next));
+    this.http.get<ApplicationCsiDTOById>("/applicationDashboard/rest/getCsiValuesForApplications").pipe(
+      map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), dto)),
+      handleError(),
+      startWith({...this.applicationCsiById$.getValue(), isLoading: true})
+    ).subscribe(next => this.applicationCsiById$.next(next));
   }
 
   updateSelectedApplication(application: Application) {
@@ -81,14 +78,11 @@ export class ApplicationService {
   private updateCsiForApplication(applicationDto: Application): Observable<ApplicationCsiById> {
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
-      map(dto => ({
-        ...this.applicationCsiById$.getValue(),
-        [applicationDto.id]: new ApplicationCsi(dto)
-      })),
+      map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), {[applicationDto.id]: dto})),
       handleError(),
       startWith({
         ...this.applicationCsiById$.getValue(),
-        [applicationDto.id]: new ApplicationCsi({isLoading: true})
+        isLoading: true
       })
     );
   }
@@ -126,19 +120,10 @@ export class ApplicationService {
       newState[applicationId] = new ApplicationCsi({
         ...applicationCsi,
         ...updates[applicationId],
-        csiValues: this.mergeCsiList(applicationCsi.csiValues, updates[applicationId].csiValues || []),
-        isLoading: false
+        csiValues: this.mergeCsiList(applicationCsi.csiValues || [], updates[applicationId].csiValues || []),
       });
       return newState;
-    }, {...state});
-  }
-
-  private setLoadingStateForApplicationCsi(state: ApplicationCsiById, applications: Application[]) {
-    return applications.reduce((newState, application) => {
-      const applicationCsi = state[application.id] || {};
-      newState[application.id] = new ApplicationCsi({...applicationCsi, isLoading: true});
-      return newState;
-    }, {...state});
+    }, {...state, isLoading: false});
   }
 
   private mergeCsiList(csiValues: Csi[], updateDtos: CsiDTO[]): Csi[] {

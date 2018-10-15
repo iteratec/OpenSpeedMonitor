@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {map, startWith, take} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
@@ -16,18 +16,15 @@ export class LandingComponent {
   applications$: Observable<ApplicationWithCsi[]>;
 
   constructor(private applicationService: ApplicationService) {
-    this.hasData$ = this.applicationService.applications$.pipe(
-      take(1),
-      map(_ => true),
-      startWith(false)
-    );
+    this.hasData$ = this.applicationService.applications$.pipe(map(response => !response.isLoading && !!response.data));
     this.showApplicationEmptyState$ = this.applicationService.applications$.pipe(
-      map(applications => !applications.length),
-      startWith(false)
+      map(response => !response.isLoading && response.data && !response.data.length),
     );
     this.applications$ = combineLatest(this.applicationService.applications$, this.applicationService.applicationCsiById$).pipe(
-      map(([applications, csiById]) => applications.map(app => new ApplicationWithCsi(app, csiById[app.id])))
+      filter(([applications]) => !applications.isLoading && !!applications.data),
+      map(([applications, csiById]) => applications.data.map(app => new ApplicationWithCsi(app, csiById[app.id], csiById.isLoading)))
     );
+    this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
   }
 

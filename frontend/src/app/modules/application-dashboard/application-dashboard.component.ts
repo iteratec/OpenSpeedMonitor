@@ -5,7 +5,7 @@ import {map, takeUntil} from 'rxjs/operators';
 import {ApplicationService} from '../../services/application.service';
 import {Application} from '../../models/application.model';
 import {PageMetricsDto} from "./models/page-metrics.model";
-import {ApplicationCsi} from "../../models/csi-list.model";
+import {ApplicationCsi, ApplicationCsiById} from "../../models/csi-list.model";
 import {Csi} from "../../models/csi.model";
 
 @Component({
@@ -29,10 +29,10 @@ export class ApplicationDashboardComponent implements OnDestroy {
     private applicationService: ApplicationService
   ) {
     this.pages$ = this.applicationService.metrics$;
-    this.applications$ = applicationService.applications$;
+    this.applications$ = applicationService.applications$.pipe(map(response => response.data));
     this.applicationCsi$ = applicationService.selectSelectedApplicationCsi();
-    this.isLoading$ = this.applicationCsi$
-      .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.isLoading));
+    this.isLoading$ = applicationService.applicationCsiById$
+      .pipe(map((applicationCsiById: ApplicationCsiById) => applicationCsiById.isLoading));
     this.recentCsiValue$ = this.applicationCsi$
       .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.recentCsi()));
     this.hasConfiguration$ = this.applicationCsi$
@@ -40,6 +40,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     combineLatest(this.route.paramMap, this.applications$)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
+    this.applicationService.loadApplications();
   }
 
   private handleNavigation(applicationId: string, applications: Application[]) {

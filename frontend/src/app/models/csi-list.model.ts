@@ -5,12 +5,10 @@ export interface ApplicationCsiDTO {
   hasCsiConfiguration?: boolean;
   hasJobResults?: boolean;
   hasInvalidJobResults?: boolean;
-  isLoading?: boolean;
 }
 
-export class ApplicationCsi implements ApplicationCsiDTO{
+export class ApplicationCsi implements ApplicationCsiDTO {
   csiValues: Csi[];
-  isLoading: boolean;
   hasCsiConfiguration: boolean;
   hasJobResults: boolean;
   hasInvalidJobResults: boolean;
@@ -20,7 +18,6 @@ export class ApplicationCsi implements ApplicationCsiDTO{
     this.hasCsiConfiguration = !!dto.hasCsiConfiguration;
     this.hasJobResults = !!dto.hasJobResults;
     this.hasInvalidJobResults = !!dto.hasInvalidJobResults;
-    this.isLoading = !!dto.isLoading;
   }
 
   recentCsi(): Csi {
@@ -34,4 +31,6 @@ export interface ApplicationCsiDTOById {
 
 export interface ApplicationCsiById {
   [applicationId: number]: ApplicationCsi;
+
+  isLoading: boolean;
 }

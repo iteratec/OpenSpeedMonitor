@@ -6,10 +6,10 @@ export class ApplicationWithCsi extends Application {
   recentCsi: Csi;
   csiIsLoading: boolean;
 
-  constructor(application: Application, applicationCsi: ApplicationCsi) {
+  constructor(application: Application, applicationCsi: ApplicationCsi, isLoading: boolean) {
     super(application);
     const recentCsi = applicationCsi ? applicationCsi.recentCsi() : null;
     this.recentCsi = new Csi(recentCsi || {});
-    this.csiIsLoading = applicationCsi ? applicationCsi.isLoading : false;
+    this.csiIsLoading = isLoading;
   }
 }
