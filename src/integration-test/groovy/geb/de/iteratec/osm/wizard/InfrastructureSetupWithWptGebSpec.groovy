@@ -30,17 +30,7 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
 
         then:
         at LandingPage
-    }
-
-    void "The setup can be resumed"() {
-        when: "the resume button was clicked"
-        waitFor {
-            $("#continue-setup")
-        }
-        $("#continue-setup").click()
-
-        then: "the setup page should appear"
-        at InfrastructureSetupPage
+        driver.currentUrl.endsWith("/landing/continueSetup")
     }
 
 
@@ -87,9 +77,8 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
         when: "the submit button was clicked"
         currentPage.submit.click()
 
-        then: "the landingpage should load and show how many locations where imported"
+        then: "the landingpage should load"
         at LandingPage
-        $(".alert").text() == currentPage.getI18nMessage("de.iteratec.osm.ui.setupwizards.infra.success", [1])
     }
 
     void cleanupSpec() {
