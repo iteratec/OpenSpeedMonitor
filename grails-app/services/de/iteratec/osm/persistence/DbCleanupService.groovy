@@ -42,7 +42,7 @@ class DbCleanupService {
     PerformanceLoggingService performanceLoggingService
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager em
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s before date toDeleteBefore.
@@ -52,50 +52,52 @@ class DbCleanupService {
         log.info "begin with deleteResultsDataBefore"
 
         // use gorm-batching
-        def dc = new DetachedCriteria(JobResult).build {
+        def jobResultCriteria = new DetachedCriteria(JobResult).build {
             lt 'date', toDeleteBefore
         }
 
-        def dc2 = new DetachedCriteria(ResultSelectionInformation).build {
-            lt 'jobResultDate', toDeleteBefore
-        }
-
-        def dc3 = new DetachedCriteria(EventResult).build {
+        def eventResultCriteria = new DetachedCriteria(EventResult).build {
             lt 'dateCreated', toDeleteBefore
         }
 
-        int count = dc.count().toInteger()
+        def resultSelectionInformationCriteria = new DetachedCriteria(ResultSelectionInformation).build {
+            lt 'jobResultDate', toDeleteBefore
+        }
 
+        List fullList = jobResultCriteria.list()
+        fullList.addAll(eventResultCriteria.list())
+        fullList.addAll(resultSelectionInformationCriteria.list())
+
+        int count = Math.max(jobResultCriteria.count().toInteger(), eventResultCriteria.count().toInteger())
+        count = Math.max(count, resultSelectionInformationCriteria.count().toInteger())
         String jobName = "Nightly cleanup of JobResults with dependents objects"
         //TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown, but the activity is in database
         if(count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
             BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
             batchActivity.beginNewStage("Delete JobResults", count)
             //batch size -> hibernate doc recommends 10..50
-            int batchSize = 50
-            0.step(count, batchSize) {
-                def jobResultList = dc.list(max: batchSize)
-                JobResult.deleteAll(jobResultList)
-
-                def resultSelectionInformationList = dc2.list(max: batchSize)
-                ResultSelectionInformation.deleteAll(resultSelectionInformationList)
-
-                def eventResultList = dc3.list(max: batchSize)
-                EventResult.deleteAll(eventResultList)
-
-                batchActivity.addProgressToStage(
-                        jobResultList.size() + resultSelectionInformationList.size() + eventResultList.size()
-                )
-
+            int batchSize = 15
+            0.step(count, batchSize) { int offset ->
+                JobResult.withNewTransaction {
+                    List list = jobResultCriteria.list(max: batchSize)
+                    list.addAll(eventResultCriteria.list(max: batchSize))
+                    list.addAll(resultSelectionInformationCriteria.list(max: batchSize))
+                    list.each { Object object ->
+                        try {
+                            object.delete()
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    batchActivity.addProgressToStage(list.size())
+                }
                 //clear hibernate session first-level cache
-                JobResult.withSession { it.clear() }
+                JobResult.withSession { session -> session.clear() }
             }
             batchActivity.done()
         }
 
         log.info "end with deleteResultsDataBefore"
     }
-
 
     /**
      * Deletes all {@link CsiAggregation}s {@link CsiAggregationUpdateEvent}s before date toDeleteBefore.
