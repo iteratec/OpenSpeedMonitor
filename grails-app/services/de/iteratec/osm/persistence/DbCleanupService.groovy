@@ -26,7 +26,6 @@ import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.dao.EventResultDaoService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
@@ -54,7 +53,7 @@ class DbCleanupService {
         }
         int count = dc.count()
         String jobName = "Nightly cleanup of JobResults with dependents objects"
-        //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
+        //TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown, but the activity is in database
         if(count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
             BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
             batchActivity.beginNewStage("Delete JobResults", count)
@@ -65,11 +64,9 @@ class DbCleanupService {
                     def list = dc.list(max: batchSize)
                     list.each { JobResult jobResult ->
                         try {
-
                             jobResult.getEventResults().each { EventResult eventResult ->
                                 eventResult.delete()
                             }
-
                             jobResult.delete()
                         } catch (Exception e) {
                         }
@@ -107,7 +104,7 @@ class DbCleanupService {
 
         int globalCount = csiAggregationCount + csiAggregationUpdateEventsCount
         String jobName = "Nightly cleanup of CsiAggregations and CsiAggregationUpdateEvents"
-        //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
+        //TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown, but the activity is in database
         if(csiAggregationCount > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
             BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName,2, createBatchActivity)
             //batch size -> hibernate doc recommends 10..50

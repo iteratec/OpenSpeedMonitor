@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -36,6 +37,8 @@ import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 import static de.iteratec.osm.result.CachedView.CACHED
 import static de.iteratec.osm.result.CachedView.UNCACHED
 
@@ -75,9 +78,10 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_1)
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
+        Job job = Job.build()
 
         when: "ResultPersisterService listens to result."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly."
         List<EventResult> allResults = EventResult.getAll()
@@ -102,9 +106,10 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_1)
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
+        Job job = Job.build()
 
         when: "ResultPersisterService listens to result."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands are missing on written EventResults."
         List<EventResult> allResults = EventResult.getAll()
@@ -122,9 +127,10 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_1)
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
+        Job job = Job.build()
 
         when: "ResultPersisterService listens to result."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for each step in each run."
         int numberOfRuns = 5
@@ -165,9 +171,10 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         File xmlResultFile = new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         MeasuredEvent.build(name: 'IE_otto_hp_singlestep')
+        Job job = Job.build()
 
         when: "ResultPersisterService listens to result."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for first and repeated view."
         List<EventResult> allResults = EventResult.list()
@@ -188,9 +195,10 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         File xmlResultFile = new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         MeasuredEvent.build(name: 'IE_otto_hp_singlestep')
+        Job job = Job.build()
 
         when: "ResultPersisterService listens to result."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for first and repeated view of all runs."
         List<EventResult> allResults = EventResult.getAll()
@@ -229,6 +237,11 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         service.wptInstructionService = Mock(WptInstructionService)
         service.metricReportingService = Mock(MetricReportingService)
         service.csiValueService = Mock(CsiValueService)
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
 }

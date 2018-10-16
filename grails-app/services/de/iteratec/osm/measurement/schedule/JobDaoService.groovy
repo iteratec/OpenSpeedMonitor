@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.wptserver.OsmResultPersistanceException
 
 /**
  * A DaoService for Jobs.
@@ -15,16 +16,14 @@ class JobDaoService {
         return Job.findAllByDeletedAndIdInList(false, jobIds)
     }
 
-    public Job getJobById(Long jobId) {
+    public Job getJob(Long jobId) {
         Job job = Job.get(jobId)
-        if (!job || job.deleted) {
+        if(!job) {
+            throw new OsmResultPersistanceException("No measurement job could be found for id ${jobId} from result xml")
+        } else if (job.deleted) {
             return null
         }
         return job
-    }
-
-    public Job getJob(String label) {
-        Job.findByDeletedAndLabel(false, label)
     }
 
     public List<Job> getJobs(boolean active) {
@@ -40,7 +39,7 @@ class JobDaoService {
     }
 
     public List<Job> getJobs(Map listParams) {
-        return Job.list(listParams).findAll { it.deleted == false }
+        return Job.list(listParams).findAll { (!it.deleted) }
     }
 
     public List<Job> getJobs(JobGroup jobGroup) {

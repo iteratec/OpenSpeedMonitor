@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
@@ -32,6 +33,9 @@ import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
+
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
@@ -40,6 +44,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     WebPageTestServer server
+    Job job
 
     def setupData() {
         OsmConfiguration.build()
@@ -54,6 +59,50 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 grailsApplication.mainContext.getBean('csiAggregationUpdateService')
         resultPersisterService.metricReportingService =
                 grailsApplication.mainContext.getBean('metricReportingService')
+        resultPersisterService.configService =
+                grailsApplication.mainContext.getBean('configService')
+    }
+
+    void "Results don't get persisted if the TTFB of first result is 0."() {
+
+        given: "a wpt result and a faulty result (TTFB is 0)"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
+
+        then: "1 run, 1 successful events, but first result is faulty"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
+    }
+
+    void "Results don't get persisted if the LoadTime is larger than max threshold."() {
+
+        given: "a wpt result and a faulty result (LoadTime is larger than the allowed max value)"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
+
+        then: "1 run, 1 successful events, but first result is faulty"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
+    }
+
+    void "Results don't get persisted if the result was not successfully."() {
+
+        given: "a wpt result and a faulty result (Result Code is 404)"
+        setupData()
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
+
+        when: "the results get persisted"
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
+
+        then: "1 run, 1 successful events, but first result is faulty"
+        JobResult.list().size() == 1
+        EventResult.list().size() == 0
     }
 
     void "Results get persisted even after failed csi aggregation."() {
@@ -64,7 +113,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockCsiAggregationUpdateService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -79,7 +128,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockMetricReportingService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -94,7 +143,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         xmlResult.getTestId() >> null
 
         when: "the service tries to persist the results an exception gets thrown"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "nothing should be persisted"
         JobResult.list().size() == 0
@@ -109,7 +158,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         xmlResult.getStepNode(0) >> null
 
         when: "the results get persisted but the first step throws an exception"
-        resultPersisterService.listenToResult(xmlResult, server)
+        resultPersisterService.listenToResult(xmlResult, server, job.id)
 
         then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
@@ -117,7 +166,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     private createTestDataCommonToAllTests() {
-        ['HP', 'MES', Page.UNDEFINED].each { pageName ->
+        ['HP', 'MES', 'ADS', 'SE', Page.UNDEFINED].each { pageName ->
             Page.build(name: pageName)
         }
         server = WebPageTestServer.build(baseUrl: "http://osm.intgerationtest.org")
@@ -127,8 +176,13 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
                 browser: browser
         )
-        Job.build(
+        job = Job.build(
                 label: 'FF_BV1_Multistep_2',
+                location: loc
+        )
+
+        Job.build(
+                label: '1Run_11events_4Faulty',
                 location: loc
         )
     }
@@ -137,6 +191,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         TimeToCsMappingService timeToCsMappingService = Stub(TimeToCsMappingService)
         timeToCsMappingService.getCustomerSatisfactionInPercent(_, _, _) >> 42
         resultPersisterService.timeToCsMappingService = timeToCsMappingService
+
+        resultPersisterService.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
     void mockCsiAggregationUpdateService() {
