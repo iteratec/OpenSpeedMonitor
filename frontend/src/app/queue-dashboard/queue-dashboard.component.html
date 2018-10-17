@@ -1,0 +1,28 @@
+<div class="card" *ngFor="let wptserver of wptServer$ | async">
+
+  <div>
+    <span>
+      <h2>{{wptserver.label}}</h2>
+      <span #arrow_icon
+         class="fas fa-chevron-up chevron-large"
+         (click)="toggleTableVisibility(wptserver.id, arrow_icon, data_table)"></span>
+    </span>
+  </div>
+
+  <div>
+    <button id="load-data-button"
+            #load_data_button
+            class="btn btn-primary pull-right"
+            (click)="loadQueueContent(wptserver.id, load_data_button, arrow_icon, data_table)">
+      {{button_label}}
+    </button>
+  </div>
+
+  <div id="data-table-id" #data_table style="display: none">
+    <osm-queue-list
+      [serverInfo]="serverInfo$ | async"
+      [wptServerID]="wptserver.id">
+    </osm-queue-list>
+  </div>
+
+</div>
