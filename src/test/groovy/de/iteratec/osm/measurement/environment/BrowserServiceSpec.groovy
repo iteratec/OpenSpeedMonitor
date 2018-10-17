@@ -53,21 +53,6 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         "Firefox7"          | "Firefox"
     }
 
-    void "findAll by name returns correct browsers"() {
-        given: "Three browsers and aliases"
-        Browser.build(name: "Firefox")
-                .addToBrowserAliases(alias: "FF")
-                .addToBrowserAliases(alias: "Firefox7").save()
-        Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
-        Browser.build(name: "Edge")
-
-        when: "all browsers should be found by name or alias"
-        def browser = service.findAllByName(["FF", "IE", "Chrome", "Firefox7", "Edge"])
-
-        then: "the corresponding browsers are found"
-        browser*.name == ["Firefox", "IE", null, "Firefox", "Edge"]
-    }
-
     void "find all returns all browsers"() {
         given: "three browsers and the undefined"
         Browser.build(name: "Firefox")

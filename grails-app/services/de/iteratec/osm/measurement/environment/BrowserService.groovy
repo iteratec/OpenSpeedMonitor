@@ -28,17 +28,9 @@ class BrowserService {
         return Collections.unmodifiableSet(result)
     }
 
-    List<Browser> findAllByName(List<String> browserNames) {
-        List<Browser> result = []
-        browserNames.each {
-            result << findByNameOrAlias(it)
-        }
-        return result
-    }
-
     Browser findByNameOrAlias(String browserName) {
         Browser browser = Browser.findByName(browserName)
-        if (browser == null) {
+        if (!browser) {
             return findByAlias(browserName)
         } else {
             return browser
@@ -46,12 +38,7 @@ class BrowserService {
     }
 
     private Browser findByAlias(String browserName) {
-        Browser browser
-        Browser.list().each { currentBrowser ->
-            List<BrowserAlias> browserAliasesForCurrentBrowser = BrowserAlias.findAllByBrowser(currentBrowser)
-            browserAliasesForCurrentBrowser.find { it.alias.equals(browserName) }.each { browser = currentBrowser }
-        }
-        return browser
+        return BrowserAlias.findByAlias(browserName)?.browser
     }
 
     Browser findOrCreateByNameOrAlias(String browserName) {
