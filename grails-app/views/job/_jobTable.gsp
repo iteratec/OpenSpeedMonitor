@@ -20,17 +20,13 @@
             </div>
             <div class="jobNameContainer"><a
                     href="${createLink(action: 'edit', id: job.id)}"
-                    class="jobName ${job.active == false ? 'inactiveJob' : ''} ${(job.jobStatistic == null ? '' :
-                            (job.jobStatistic.getJobStatusLast5CssClass() == 'job-status-error' ? 'jobName-status-error' : (job.jobStatistic.getJobStatusLast5CssClass() == 'job-status-warn' ? 'jobName-status-warn' : ''))
-                    )}">
+                    class="jobName ${job.active == false ? 'inactiveJob' : ''} ${(job.jobStatistic == null ? '' : job.jobStatistic.getJobStatusLast5CssClass())}">
                 ${job.label ?: job.script.label + ' ' + job.location.browser.name}
             </a></div>
             <g:if test="${job.script}">
                 <a
                         href="${createLink(controller: 'script', action: 'edit', id: job.script.id)}"
-                        class="script ${(job.jobStatistic == null ? '' :
-                                (job.jobStatistic.getJobStatusLast5CssClass() == 'job-status-error' ? 'jobName-status-error' : (job.jobStatistic.getJobStatusLast5CssClass() == 'job-status-warn' ? 'jobName-status-warn' : ''))
-                        )}">
+                        class="script ${(job.jobStatistic == null ? '' : job.jobStatistic.getJobStatusLast5CssClass())}">
                     ${job.script.label}
                 </a>
                 <span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>

@@ -225,20 +225,22 @@ ul.tags li {
   background-color: @brand-warning;
 }
 
-.jobName-status-warn {
-  color: @brand-warning;
-}
-
 .job-status-error {
   background-color: @brand-danger;
 }
 
-.jobName-status-error {
-  color: @brand-danger;
-}
-
 .job-status-nodata {
   background-color: @gray-light;
+}
+
+.jobName, .script {
+  background-color: transparent;
+  &.job-status-error {
+    color: @brand-danger;
+  }
+  &.job-status-warn {
+    color: @brand-warning;
+  }
 }
 
 .dropdown-submenu {
