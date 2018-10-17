@@ -39,6 +39,8 @@ class UrlMappings {
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
         "/applicationDashboard/**?"(view: "/applicationDashboard/index")
+        "/queueDashboard/rest/$action"(controller: "queueDashboard")
+        "/queueDashboard"(view: "/queueDashboard/index")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller

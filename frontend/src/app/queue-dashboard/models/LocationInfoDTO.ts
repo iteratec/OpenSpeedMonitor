@@ -1,8 +1,8 @@
 export interface LocationInfoDTO {
   id: string
   lastHealthCheckDate: string
-  agents: number
   label: string
+  agents: number
   jobs: number
 
   eventResultLastHour: number
@@ -12,6 +12,7 @@ export interface LocationInfoDTO {
   jobsNextHour: number
   eventsNextHour: number
 
+  executingJobs: Array<Array<any>>
   pendingJobs: number
   runningJobs: number
 }

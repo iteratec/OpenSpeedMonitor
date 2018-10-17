@@ -1,3 +1,108 @@
-<div>
-  Row
-</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th rowspan="2">{{label_id}}</th>
+      <th rowspan="2">{{label_agents}}</th>
+      <th rowspan="2">{{label_job_queue}}</th>
+      <th rowspan="2"></th>
+      <th colspan="2">{{label_osm_jobs}}</th>
+
+      <th colspan="3" class="new-col-sec">{{label_last_hour}}</th>
+      <th colspan="2" class="new-col-sec">{{label_next_hour}}</th>
+    </tr>
+    <tr>
+      <th>{{label_pending}}</th>
+      <th>{{label_running}}</th>
+
+      <th class="new-col-sec">{{label_errors}}</th>
+      <th>{{label_jobs}}</th>
+      <th>{{label_events}}</th>
+
+      <th class="new-col-sec">{{label_jobs}}</th>
+      <th>{{label_events}}</th>
+    </tr>
+  </thead>
+
+  <tbody class="datarows">
+
+    <ng-container *ngFor="let location of locationInfo$ | async">
+
+      <tr class="queueRow" #queue_row>
+        <td>
+          <strong title="{{location.label}} | {{label_last_date}}: {{parseDate(location.lastHealthCheckDate) | date:'short'}}">{{location.id}}</strong>
+        </td>
+        <td>
+          {{location.agents}}
+        </td>
+        <td>
+          {{location.jobs}}
+        </td>
+
+        <td>
+          <a *ngIf="location.pendingJobs > 0 || location.runningJobs > 0"  class="jobDetail">
+            <span class="arrow fas fa-chevron-down chevron-large"
+                  #arrow_icon
+                  (click)="togglePendingRunningJobs(arrow_icon, queue_row)">
+            </span>
+          </a>
+        </td>
+        <td>
+          {{location.pendingJobs}}
+        </td>
+        <td>
+          {{location.runningJobs}}
+        </td>
+
+
+        <td class="new-col-sec">
+          {{location.errorsLastHour}}
+        </td>
+        <td>
+          {{location.jobResultsLastHour}}
+        </td>
+        <td>
+          {{location.eventResultsLastHour}}
+        </td>
+        <td class="new-col-sec">
+          {{location.jobsNextHour}}
+        </td>
+        <td>
+          {{location.eventsNextHour}}
+        </td>
+      </tr>
+
+      <tr class="jobRow" *ngIf="location.pendingJobs > 0 || location.runningJobs > 0" style="display:none">
+        <td colspan="11" >
+          <table>
+            <ng-container *ngFor="let jobResults of location.executingJobs">
+
+              <tr >
+                <td class="one-indent">
+                  <strong>Job: </strong>
+                  {{jobResults[0].jobConfigLabel}}
+                </td>
+                <td class="one-indent">
+                  <strong>{{label_status}}: </strong>
+                  {{label_started}}
+                </td>
+              </tr>
+
+              <tr *ngFor="let jobResult of jobResults">
+                <td class="two-indent">
+                  <a href="{{jobResult.wptServerBaseurl}}result/{{jobResult.testId}}">
+                    {{jobResult.statusCodeMessage}}
+                  </a>
+                  <i title="{{jobResult.date}}">Seit {{parseDate(jobResult.date) | date:"short"}}</i>
+                </td>
+              </tr>
+
+            </ng-container>
+          </table>
+        </td>
+      </tr>
+
+    </ng-container>
+  </tbody>
+
+</table>
+
