@@ -14,20 +14,20 @@ export class LocationInfoListComponent {
 
   locationInfo$ : ReplaySubject<LocationInfoDTO[]> = new ReplaySubject(1);
 
-  label_id = "ID";
-  label_agents = "Agenten";
-  label_job_queue = "Job-Queue (WPT-Server)";
-  label_osm_jobs = "OSM-Jobs";
-  label_pending = "Pending";
-  label_running = "Running";
-  label_last_hour = "Letzte Stunde";
-  label_next_hour = "Nächste Stunde";
-  label_errors = "Fehler";
-  label_jobs = "Jobs";
-  label_events = "Messschritte";
-  label_last_date = "Stand";
-  label_status = "Status";
-  label_started = "Gestartet";
+  label_id = "frontend.de.iteratec.osm.queueDashboard.location-info-list.ID.label";
+  label_agents = "frontend.de.iteratec.osm.queueDashboard.location-info-list.agents.label";
+  label_job_queue = "frontend.de.iteratec.osm.queueDashboard.location-info-list.jobQueue.label";
+  label_osm_jobs = "frontend.de.iteratec.osm.queueDashboard.location-info-list.osmJobs.label";
+  label_pending = "frontend.de.iteratec.osm.queueDashboard.location-info-list.pending.label";
+  label_running = "frontend.de.iteratec.osm.queueDashboard.location-info-list.running.label";
+  label_last_hour = "frontend.de.iteratec.osm.queueDashboard.location-info-list.lastHour.label";
+  label_next_hour = "frontend.de.iteratec.osm.queueDashboard.location-info-list.nextHour.label";
+  label_errors = "frontend.de.iteratec.osm.queueDashboard.location-info-list.errors.label";
+  label_jobs = "frontend.de.iteratec.osm.queueDashboard.location-info-list.jobs.label";
+  label_events = "frontend.de.iteratec.osm.queueDashboard.location-info-list.events.label";
+  label_last_date = "frontend.de.iteratec.osm.queueDashboard.location-info-list.lastDate.label";
+  label_status = "frontend.de.iteratec.osm.queueDashboard.location-info-list.status.label";
+  label_started = "frontend.de.iteratec.osm.queueDashboard.location-info-list.started.label";
 
   @Input()
   set serverInfo(value: ServerInfo )

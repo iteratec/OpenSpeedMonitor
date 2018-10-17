@@ -13,9 +13,10 @@
                     code="de.iteratec.iss.scripts" default="Skripte"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="queueStatus" action="list"><i class="fas fa-inbox"></i> <g:message
-                    code="queue.status.label"/></g:link>
+            <g:link controller="queueDashboard" action="showAll"><i class="fas fa-inbox"></i> <g:message
+                    code="queueDashboard.label"/></g:link>
         </li>
+
         <li class="controller">
             <g:link controller="jobSchedule" action="schedules"><i class="fas fa-clock"></i> <g:message
                     code="job.Schedule.label"/></g:link>

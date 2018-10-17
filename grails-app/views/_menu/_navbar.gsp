@@ -7,7 +7,7 @@
 <g:elseif test="${controllerName.equals('csiBenchmark')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
-<g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
+<g:elseif test="${request.forwardURI.equals('/queueDashboard')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('jobResult')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -143,11 +143,11 @@
                             <g:message code="de.iteratec.iss.scripts" default="Skripte"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('queueStatus') ? 'active' : ''}">
-                        <g:link controller="queueStatus" action="list">
+                    <li class="${request.forwardURI.equals('/queueDashboard') ? 'active' : ''}">
+                        <a href="${createLink(uri: '/queueDashboard')}">
                             <i class="fas fa-inbox"></i>
-                            <g:message code="queue.status.label"/>
-                        </g:link>
+                            <g:message message="frontend.de.iteratec.osm.queueDashboard.title"/>
+                        </a>
                     </li>
                     <li class="${controllerName.equals('jobSchedule') ? 'active' : ''}">
                         <g:link controller="jobSchedule" action="schedules">

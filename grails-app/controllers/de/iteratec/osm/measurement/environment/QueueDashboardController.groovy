@@ -1,12 +1,12 @@
-package de.iteratec.osm.result
+package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
-import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.system.LocationHealthCheck
 import de.iteratec.osm.system.LocationHealthCheckDaoService
 import de.iteratec.osm.util.ControllerUtils
+import grails.validation.Validateable
 
 class QueueDashboardController {
 
@@ -47,15 +47,18 @@ class QueueDashboardController {
 
                     List<JobResult> executingJobResults
                     executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
-                    println( executingJobResults )
 
                     Map<Job, List<JobResult>> executingJobs
                     executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
-                    println( executingJobs )
 
                     LocationHealthCheck healthCheck = healthChecks.findAll{ it.location == location }[0]
 
-                    Map map = buildMap(location, healthCheck, executingJobResults, executingJobs)
+                    DefaultQueueDashboardCommand command = new DefaultQueueDashboardCommand()
+                    command.location = location
+                    command.healthCheck = healthCheck
+                    command.executingJobResults = executingJobResults
+                    command.executingJobs = executingJobs
+                    Map map = buildMap(command)
                     listLocationInfo.add(map)
                 } )
                 return ControllerUtils.sendObjectAsJSON(response, listLocationInfo)
@@ -68,30 +71,22 @@ class QueueDashboardController {
         return emptyResponse()
     }
 
-    Map buildMap(Location location,
-                         LocationHealthCheck healthCheck,
-                         List<JobResult> executingJobResults,
-                         Map<Job, List<JobResult>> executingJobs){
+    Map buildMap(DefaultQueueDashboardCommand command){
         return [
-            id                  : location ? location.uniqueIdentifierForServer : "",
-            lastHealthCheckDate : healthCheck ? healthCheck.date.toString() : "",
-            label               : location ? location.location : "",
-            agents              : healthCheck ? healthCheck.numberOfAgents : -1,
-            jobs                : healthCheck ? healthCheck.numberOfPendingJobsInWpt : -1,
-
-            eventResultsLastHour: healthCheck ? healthCheck.numberOfEventResultsLastHour : -1,
-            jobResultsLastHour  : healthCheck ? healthCheck.numberOfJobResultsLastHour : -1,
-            errorsLastHour      : healthCheck ? healthCheck.numberOfErrorsLastHour : -1,
-
-            jobsNextHour        : healthCheck ? healthCheck.numberOfJobResultsNextHour : -1,
-            eventsNextHour      : healthCheck ? healthCheck.numberOfEventResultsNextHour : -1,
-
-            executingJobs       : executingJobs ? executingJobs.values() : [],
-
-            pendingJobs         : executingJobResults ? executingJobResults.findAll {
+                id                  : command.location ? command.location.uniqueIdentifierForServer : "",
+                lastHealthCheckDate : command.healthCheck ? command.healthCheck.date.toString() : "",
+                label               : command.location ? command.location.location : "",
+                agents              : command.healthCheck ? command.healthCheck.numberOfAgents : -1,
+                jobs                : command.healthCheck ? command.healthCheck.numberOfPendingJobsInWpt : -1,
+                eventResultsLastHour: command.healthCheck ? command.healthCheck.numberOfEventResultsLastHour : -1,
+                jobResultsLastHour  : command.healthCheck ? command.healthCheck.numberOfJobResultsLastHour : -1,
+            errorsLastHour      : command.healthCheck ? command.healthCheck.numberOfErrorsLastHour : -1,
+            jobsNextHour        : command.healthCheck ? command.healthCheck.numberOfJobResultsNextHour : -1,
+            eventsNextHour      : command.healthCheck ? command.healthCheck.numberOfEventResultsNextHour : -1,
+            executingJobs       : command.executingJobs ? command.executingJobs.values() : [],
+            pendingJobs         : command.executingJobResults ? command.executingJobResults.findAll {
                 it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size() : 0,
-
-            runningJobs         : executingJobResults ? executingJobResults.findAll {
+            runningJobs         : command.executingJobResults ? command.executingJobResults.findAll {
                 it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size() : 0
         ]
     }
@@ -99,5 +94,19 @@ class QueueDashboardController {
     def emptyResponse()
     {
         return ControllerUtils.sendObjectAsJSON(response, [])
+    }
+}
+
+class DefaultQueueDashboardCommand implements Validateable {
+    Location location
+    LocationHealthCheck healthCheck
+    List<JobResult> executingJobResults
+    Map<Job, List<JobResult>> executingJobs
+
+    static constrains = {
+        location(nullable: true)
+        healthCheck(nullable: true)
+        executingJobResults(nullable: true)
+        executingJobs(nullable: true)
     }
 }

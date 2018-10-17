@@ -17,7 +17,8 @@ export class QueueDashboardComponent {
   wptServer$: Observable<Array<WptServerDTO>>;
   serverInfo$: Observable<ServerInfo>;
 
-  button_label = "Informationen Laden"
+  title_label = 'frontend.de.iteratec.osm.queueDashboard.title'
+  button_label = 'frontend.de.iteratec.osm.queueDashboard.load-information.label';
 
   constructor( queueService: QueueDashboardService) {
     this.queueService = queueService;

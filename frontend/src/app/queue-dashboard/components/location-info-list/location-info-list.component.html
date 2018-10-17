@@ -1,25 +1,25 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th rowspan="2">{{label_id}}</th>
-      <th rowspan="2">{{label_agents}}</th>
-      <th rowspan="2">{{label_job_queue}}</th>
+      <th rowspan="2">{{label_id | translate}}</th>
+      <th rowspan="2">{{label_agents | translate}}</th>
+      <th rowspan="2">{{label_job_queue | translate}}</th>
       <th rowspan="2"></th>
-      <th colspan="2">{{label_osm_jobs}}</th>
+      <th colspan="2">{{label_osm_jobs | translate}}</th>
 
-      <th colspan="3" class="new-col-sec">{{label_last_hour}}</th>
-      <th colspan="2" class="new-col-sec">{{label_next_hour}}</th>
+      <th colspan="3" class="new-col-sec">{{label_last_hour | translate}}</th>
+      <th colspan="2" class="new-col-sec">{{label_next_hour | translate}}</th>
     </tr>
     <tr>
-      <th>{{label_pending}}</th>
-      <th>{{label_running}}</th>
+      <th>{{label_pending | translate}}</th>
+      <th>{{label_running | translate}}</th>
 
-      <th class="new-col-sec">{{label_errors}}</th>
-      <th>{{label_jobs}}</th>
-      <th>{{label_events}}</th>
+      <th class="new-col-sec">{{label_errors | translate}}</th>
+      <th>{{label_jobs | translate}}</th>
+      <th>{{label_events | translate}}</th>
 
-      <th class="new-col-sec">{{label_jobs}}</th>
-      <th>{{label_events}}</th>
+      <th class="new-col-sec">{{label_jobs | translate}}</th>
+      <th>{{label_events | translate}}</th>
     </tr>
   </thead>
 
@@ -29,7 +29,7 @@
 
       <tr class="queueRow" #queue_row>
         <td>
-          <strong title="{{location.label}} | {{label_last_date}}: {{parseDate(location.lastHealthCheckDate) | date:'short'}}">{{location.id}}</strong>
+          <strong title="{{location.label}} | {{label_last_date | translate}}: {{parseDate(location.lastHealthCheckDate) | date:'short'}}">{{location.id}}</strong>
         </td>
         <td>
           {{location.agents}}
@@ -82,8 +82,8 @@
                   {{jobResults[0].jobConfigLabel}}
                 </td>
                 <td class="one-indent">
-                  <strong>{{label_status}}: </strong>
-                  {{label_started}}
+                  <strong>{{label_status  | translate}}: </strong>
+                  {{label_started | translate}}
                 </td>
               </tr>
 
