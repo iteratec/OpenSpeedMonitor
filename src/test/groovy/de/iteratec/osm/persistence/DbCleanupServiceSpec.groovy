@@ -27,6 +27,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.ResultSelectionInformation
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
@@ -53,8 +54,22 @@ class DbCleanupServiceSpec extends Specification implements BuildDataTest, Servi
                 ConnectivityProfile, Script)
     }
 
-    void "JobResults and EventResults before given Date get deleted correctly"() {
+    void "JobResults before given Date get deleted correctly"() {
+        given: "JobResults older and newer 12 months ago exist."
+        EventResult.build(jobResult: JobResult.build(date: OLDER_12_MONTHS), jobResultDate: OLDER_12_MONTHS)
+        EventResult.build(jobResult: JobResult.build(date: NEWER_12_MONTHS), jobResultDate: NEWER_12_MONTHS)
 
+        when: "deleteResultsDataBefore is called with toDeleteBefore 12 months ago."
+        Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
+        service.deleteResultsDataBefore(twelveMonthsAgo)
+
+        then: "JobResults older 12 months got deleted, the rest still exists."
+        JobResult.list().size() == 1
+        !JobResult.findByDate(OLDER_12_MONTHS)
+        JobResult.findByDate(NEWER_12_MONTHS)
+    }
+
+    void "EventResults before given Date get deleted correctly"() {
         given: "JobResults/EventResults older and newer 12 months ago exist."
         EventResult.build(jobResult: JobResult.build(date: OLDER_12_MONTHS), jobResultDate: OLDER_12_MONTHS)
         EventResult.build(jobResult: JobResult.build(date: NEWER_12_MONTHS), jobResultDate: NEWER_12_MONTHS)
@@ -63,15 +78,25 @@ class DbCleanupServiceSpec extends Specification implements BuildDataTest, Servi
         Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
         service.deleteResultsDataBefore(twelveMonthsAgo)
 
-        then: "JobResults/EventResults older 12 months got deleted, the rest still exists."
+        then: "EventResults older 12 months got deleted, the rest still exists."
         EventResult.list().size() == 1
         !EventResult.findByJobResultDate(OLDER_12_MONTHS)
         EventResult.findByJobResultDate(NEWER_12_MONTHS)
+    }
 
-        JobResult.list().size() == 1
-        !JobResult.findByDate(OLDER_12_MONTHS)
-        JobResult.findByDate(NEWER_12_MONTHS)
+    void "ResultSelectionInformation before given Date get deleted correctly"() {
+        given: "JobResults/EventResults older and newer 12 months ago exist."
+        ResultSelectionInformation.build(jobResultDate: NEWER_12_MONTHS)
+        ResultSelectionInformation.build(jobResultDate: OLDER_12_MONTHS)
 
+        when: "deleteResultsDataBefore is called with toDeleteBefore 12 months ago."
+        Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
+        service.deleteResultsDataBefore(twelveMonthsAgo)
+
+        then: "ResultSelectionInformation older 12 months got deleted, the rest still exists."
+        ResultSelectionInformation.list().size() == 1
+        !ResultSelectionInformation.findByJobResultDate(OLDER_12_MONTHS)
+        ResultSelectionInformation.findByJobResultDate(NEWER_12_MONTHS)
     }
 
     void "CsiAggregations and corresponding CsiAggregationUpdateEvents before given Date get deleted correctly"() {

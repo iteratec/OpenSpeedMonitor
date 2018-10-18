@@ -25,7 +25,6 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.ResultSelectionInformation
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
@@ -45,49 +44,27 @@ class DbCleanupService {
         log.info "begin with deleteResultsDataBefore"
 
         // use gorm-batching
-        def jobResultCriteria = new DetachedCriteria(JobResult).build {
+        def dc = new DetachedCriteria<JobResult>(JobResult).build {
             lt 'date', toDeleteBefore
         }
 
-        def eventResultCriteria = new DetachedCriteria(EventResult).build {
-            lt 'dateCreated', toDeleteBefore
-        }
-
-        def resultSelectionInformationCriteria = new DetachedCriteria(ResultSelectionInformation).build {
-            lt 'jobResultDate', toDeleteBefore
-        }
-
-        def criteriaList = [jobResultCriteria, eventResultCriteria, resultSelectionInformationCriteria]
-        criteriaList.forEach({ DetachedCriteria criteria ->
-            batchDeleteCriteria(criteria, "Nightly cleanup of JobResults with dependents objects", createBatchActivity)
-        })
-
-        log.info "end with deleteResultsDataBefore"
-    }
-
-    void batchDeleteCriteria(DetachedCriteria criteria, String jobName, boolean createBatchActivity) {
-        int count = criteria.count().toInteger()
-        /*
-        TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown,
-        but the activity is in database
-        */
+        int count = dc.count().toInteger()
+        String jobName = "Nightly cleanup of JobResults with dependents objects"
+        //TODO: check if the QuartzJob is available... after app restart, the QuartzJob is shutdown, but the activity is in database
         if (count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
-            BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(
-                    this.class,
-                    Activity.DELETE,
-                    jobName,
-                    1,
-                    createBatchActivity
-            )
-            batchActivity.beginNewStage(jobName, count)
+            BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
+            batchActivity.beginNewStage("Delete JobResults", count)
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             0.step(count, batchSize) { int offset ->
                 JobResult.withNewTransaction {
-                    List list = criteria.list(max: batchSize)
-                    list.each {
+                    def list = dc.list(max: batchSize)
+                    list.each { JobResult jobResult ->
                         try {
-                            it.delete()
+                            jobResult.getEventResults().each { EventResult eventResult ->
+                                eventResult.delete()
+                            }
+                            jobResult.delete()
                         } catch (Exception ignored) {
                         }
                     }
@@ -98,6 +75,8 @@ class DbCleanupService {
             }
             batchActivity.done()
         }
+
+        log.info "end with deleteResultsDataBefore"
     }
 
     /**
