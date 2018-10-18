@@ -25,15 +25,27 @@ class FrontendWatcher {
     protected void startFrontendWatcher(Environment environment) {
 
         String location = environment.getReloadLocation()
-        def nodeLocation = new File(new FileNameByRegexFinder().getFileNames(location, "/build/nodejs/([^\\\\/]*)/bin/node")[0]).getParent()
+        //def nodeLocation = new File(new FileNameByRegexFinder().getFileNames(location, "/build/nodejs/([^\\\\/]*)/bin/node")[0]).getParent()
+        //def nodeExecLocation = new FileNameByRegexFinder().getFileNames( location, "build[\\\\/]nodejs[\\\\/]([^\\\\/]*)[\\\\/]((node\\.exe+)|(bin/node))")[0]
+        def nodeExecLocation = new FileNameByRegexFinder().getFileNames( Paths.get(location, "build", "nodejs").toString(), "[\\\\/]([^\\\\/]*)[\\\\/]((node\\.exe+)|(bin/node))")[0]
+        def nodeLocation = new File( nodeExecLocation ).getParent()
 
         if (location && nodeLocation) {
 
             Thread.start {
-                def nodeModulesBin = "${location}/frontend/node_modules/.bin"
-                ProcessBuilder watchBuilder = new ProcessBuilder(['sh', '-c', 'ng build --watch'])
-                        .redirectErrorStream(true).directory(new File(location, "frontend"))
-                watchBuilder.environment().put("PATH", "${nodeModulesBin}:${nodeLocation}")
+                def nodeModulesBin = Paths.get("${location}", "frontend", "node_modules", ".bin").toString()
+
+                ProcessBuilder watchBuilder
+                if( nodeExecLocation.endsWith(".exe") ) { // running on windows?
+                    watchBuilder = new ProcessBuilder(["cmd", "/C", "ng build --watch"])
+                            .redirectErrorStream(true).directory(new File(location, "frontend"))
+                    watchBuilder.environment().put("PATH", "${nodeModulesBin};${nodeLocation};")
+                }
+                else {
+                    watchBuilder = new ProcessBuilder(['sh', '-c', 'ng build --watch'])
+                            .redirectErrorStream(true).directory(new File(location, "frontend"))
+                    watchBuilder.environment().put("PATH", "${nodeModulesBin}:${nodeLocation}")
+                }
 
                 Process recompileFrontend = watchBuilder.start()
                 recompileFrontend.in.eachLine { line -> println line }
