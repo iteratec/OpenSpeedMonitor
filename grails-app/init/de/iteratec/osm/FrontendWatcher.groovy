@@ -25,8 +25,7 @@ class FrontendWatcher {
     protected void startFrontendWatcher(Environment environment) {
 
         String location = environment.getReloadLocation()
-        //def nodeLocation = new File(new FileNameByRegexFinder().getFileNames(location, "/build/nodejs/([^\\\\/]*)/bin/node")[0]).getParent()
-        //def nodeExecLocation = new FileNameByRegexFinder().getFileNames( location, "build[\\\\/]nodejs[\\\\/]([^\\\\/]*)[\\\\/]((node\\.exe+)|(bin/node))")[0]
+
         def nodeExecLocation = new FileNameByRegexFinder().getFileNames( Paths.get(location, "build", "nodejs").toString(), "[\\\\/]([^\\\\/]*)[\\\\/]((node\\.exe+)|(bin/node))")[0]
         def nodeLocation = new File( nodeExecLocation ).getParent()
 
