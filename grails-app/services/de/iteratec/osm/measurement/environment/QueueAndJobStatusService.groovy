@@ -25,7 +25,10 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.I18nService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -205,20 +208,20 @@ class QueueAndJobStatusService {
         JobResult.findAllByDateGreaterThanEquals(oldestDate, [sort: 'date']).each { JobResult result ->
             jobResults[result.job.id] << [
                     testId    : result.testId,
-                    status    : result.httpStatusCode,
+                    status    : result.jobResultStatus,
                     date      : result.date,
-                    terminated: result.httpStatusCode >= 200,
-                    message   : result.getStatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
+                    terminated: result.jobResultStatus >= JobResultStatus.SUCCESS,
+                    message   : 'JobStatus: ' + result.jobResultStatus + ' wptStatus:' + result.wptStatus,
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
         }
 
-        // keep only the newest erroneous (httpStatusCode >= 400) result and delete all erroneous results
+        // keep only the newest erroneous (JobResultStatus >= 400) result and delete all erroneous results
         // succeeded by successful/currently running results
         Map filteredJobResults = jobResults.each {
             it.value = it.value
-                    .findAll { result -> result['status'] < WptStatus.INVALID_TEST_ID.getWptStatusCode() || result == it.value.last() }
-                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == WptStatus.PENDING.getWptStatusCode() || result['status'] == WptStatus.RUNNING.getWptStatusCode())) || (result['date'] >= successfulSinceWhen && result['status'] == WptStatus.COMPLETED.getWptStatusCode()) || (result['date'] >= errorSinceWhen && result['status'] >= WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
+                    .findAll { result -> result['status'] < JobResultStatus.LAUNCH_ERROR || result == it.value.last() }
+                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == JobResultStatus.WAITING || result['status'] == JobResultStatus.RUNNING)) || (result['date'] >= successfulSinceWhen && result['status'] == JobResultStatus.SUCCESS) || (result['date'] >= errorSinceWhen && result['status'] >= JobResultStatus.LAUNCH_ERROR) }
         }
         return filteredJobResults
     }

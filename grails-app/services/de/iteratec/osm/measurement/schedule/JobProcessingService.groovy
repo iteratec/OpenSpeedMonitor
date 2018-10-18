@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandle
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.WptStatusFactory
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
@@ -84,6 +85,7 @@ class JobProcessingService {
     InMemoryConfigService inMemoryConfigService
     PerformanceLoggingService performanceLoggingService
     JobDaoService jobDaoService
+    WptStatusFactory wptStatusFactory = new WptStatusFactory()
 
     /**
      * Time to wait during Job processing before each check if results are available
@@ -225,7 +227,7 @@ class JobProcessingService {
      * test execution.
      */
     @Transactional
-    private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null, String description = '') {
+    private JobResult persistUnfinishedJobResult(long jobId, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         // If no testId was provided some error occurred and needs to be logged
         Job job = Job.get(jobId)
         JobResult result
@@ -234,27 +236,27 @@ class JobProcessingService {
         }
 
         if (!result) {
-            return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus, description)
+            return persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
         } else {
-            updateStatusAndPersist(result, job, testId, statusCode, wptStatus, description)
+            updateStatusAndPersist(result, job, testId, jobResultStatus, wptStatus, description)
             return result
         }
 
     }
 
     @Transactional
-    private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus, String description) {
+    private void updateStatusAndPersist(JobResult result, Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-        if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)) {
+        if (result.jobResultStatus != jobResultStatus || (wptStatus != null && result.wptStatus != wptStatus)) {
 
-            updateStatus(result, statusCode, wptStatus, description)
+            updateStatus(result, jobResultStatus, wptStatus, description)
 
             try {
                 result.save(failOnError: true, flush: true)
 
             } catch (StaleObjectStateException staleObjectStateException) {
                 String logMessage = "Updating status of existing JobResult: Job ${job.label}, test-id=${testId}" +
-                        "\n\t-> httpStatusCode of result couldn't get updated from ${result.httpStatusCode}->${statusCode}"
+                        "\n\t-> jobResultStatus of result couldn't get updated from ${result.jobResultStatus}->${jobResultStatus}"
                 if (wptStatus != null) logMessage += "\n\twptStatus of result couldn't get updated from ${result.wptStatus}->${wptStatus}"
                 log.error(logMessage, staleObjectStateException)
             }
@@ -262,9 +264,9 @@ class JobProcessingService {
         }
     }
 
-    private void updateStatus(JobResult result, int statusCode, String wptStatus, String description) {
-        log.debug("Updating status of existing JobResult: httpStatusCode: ${result.httpStatusCode}->${statusCode}")
-        result.httpStatusCode = statusCode
+    private void updateStatus(JobResult result, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
+        log.debug("Updating status of existing JobResult: jobResultStatus: ${result.jobResultStatus}->${jobResultStatus}")
+        result.jobResultStatus = jobResultStatus
         result.description = description
         if (wptStatus != null) {
             log.debug("Updating status of existing JobResult: wptStatus: ${result.wptStatus}->${wptStatus}")
@@ -272,7 +274,7 @@ class JobProcessingService {
         }
     }
 
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus, String description) {
+    private JobResult persistNewUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
         JobResult result = new JobResult(
                 job: job,
                 date: new Date(),
@@ -288,7 +290,7 @@ class JobProcessingService {
                 locationBrowser: job.location.browser.name,
                 locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
                 jobGroupName: job.jobGroup.name,
-                httpStatusCode: statusCode)
+                jobResultStatus: jobResultStatus)
         if (wptStatus != null) result.wptStatus = wptStatus
         log.debug("Persisting of unfinished result: Job ${job.label}, test-id=${testId} -> persisting new JobResult=${result}")
         return result.save(failOnError: true, flush: true)
@@ -351,7 +353,7 @@ class JobProcessingService {
             throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
-        int statusCode
+        WptStatus wptStatus
         String testId
         try {
             def parameters = fillRequestParameters(job)
@@ -369,10 +371,10 @@ class JobProcessingService {
             }
 
             NodeChild runtestResponseXml = parseResponse(result, wptserver)
-            statusCode = runtestResponseXml?.statusCode?.toInteger()
+            wptStatus = wptStatusFactory.buildWptStatus(runtestResponseXml?.statusCode?.toInteger())
             testId = runtestResponseXml?.data?.testId
-            if(statusCode != 200){
-                throw new JobExecutionException("Got status code ${statusCode} from wptserver ${wptserver}")
+            if (wptStatus != WptStatus.OK) {
+                throw new JobExecutionException("Got status code ${wptStatus} from wptserver ${wptserver}")
             }
             if(!testId){
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
@@ -397,8 +399,8 @@ class JobProcessingService {
 
             return testId
         } catch (Exception e) {
-            statusCode = statusCode? statusCode : 500
-            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
+            wptStatus = wptStatus ? wptStatus : WptStatus.TEST_DID_NOT_START
+            persistUnfinishedJobResult(job.id, testId, wptStatus, JobResultStatus.LAUNCH_ERROR, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
@@ -408,7 +410,7 @@ class JobProcessingService {
      * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
      * every pollDelaySeconds seconds is removed
      */
-    WptResultXml pollJobRun(Job job, String testId, String wptStatus = null) {
+    WptResultXml pollJobRun(Job job, String testId) {
         WptResultXml resultXml
         try {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
@@ -416,12 +418,12 @@ class JobProcessingService {
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
                 if (resultXml.statusCodeOfWholeTest < 200) {
-                    persistUnfinishedJobResult(job.id, testId, resultXml.statusCodeOfWholeTest, wptStatus)
+                    persistUnfinishedJobResult(job.id, testId, JobResultStatus.RUNNING, wptStatusFactory.buildWptStatus(resultXml.statusCodeOfWholeTest), "polling jobrun")
                 }
             }
         } catch (Exception e) {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-            persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
+            persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
         } finally {
             if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
                 unscheduleTest(job, testId)
@@ -438,7 +440,7 @@ class JobProcessingService {
 
     /**
      * Checks if this job instance is still unfinished. If so, the corresponding WPT Server is polled one last time
-     * and if job is still reported as running, it's temporary JobResult is set to httpStatusCode 504 (timeout)
+     * and if job is still reported as running, it's temporary JobResult is set to jobResultStatus 504 (timeout)
      * in the database. In addition, a request to cancelTest.php is made.
      */
     public void handleJobRunTimeout(Job job, String testId) {
@@ -451,8 +453,8 @@ class JobProcessingService {
             WptResultXml lastResult = pollJobRun(job, testId)
             if (lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS || (lastResult.statusCodeOfWholeTest >= JobResultStatus.SUCCESS && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, '', description)
+                String description = lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs. Test exceeded maximum polling time"
+                persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, result.wptStatus, description)
                 wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             }
         }

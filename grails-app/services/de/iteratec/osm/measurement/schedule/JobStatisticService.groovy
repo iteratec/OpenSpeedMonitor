@@ -20,13 +20,13 @@ class JobStatisticService {
 
         JobStatistic stat = getStatOf(job)
         stat.percentageSuccessfulTestsOfLast150 = results.size() == 150 ?
-            (results.count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/150)*100 :
+                (results.count { it.wptStatus == WptStatus.SUCCESSFUL } / 150) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast25 = results.size() >= 25 ?
-            (results.take(25).count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/25)*100 :
+                (results.take(25).count { it.wptStatus == WptStatus.SUCCESSFUL } / 25) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast5 = results.size() >= 5 ?
-            (results.take(5).count{it.httpStatusCode==WptStatus.COMPLETED.getWptStatusCode()}/5)*100 :
+                (results.take(5).count { it.wptStatus == WptStatus.SUCCESSFUL } / 5) * 100 :
                 null
         try {
             stat.save(failOnError: true)
@@ -47,11 +47,11 @@ class JobStatisticService {
         return jobStatistic
     }
 
-    List<JobResult> getLast150CompletedJobResultsFor(Job job){
+    List<JobResult> getLast150CompletedJobResultsFor(Job job) {
         return  JobResult.createCriteria().list{
             eq("job", job)
             order("date", "desc")
-            ge("httpStatusCode"	, 200)
+            ge("jobResultStatus", 200)
             maxResults(150)
         }
     }

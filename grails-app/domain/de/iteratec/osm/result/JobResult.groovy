@@ -152,7 +152,6 @@ class JobResult {
         date(index: 'date_idx')
         testId(index: 'testId_and_jobConfigLabel_idx')
         jobConfigLabel(index: 'testId_and_jobConfigLabel_idx')
-        wptStatus(type: 'text')
         autowire true
     }
 
