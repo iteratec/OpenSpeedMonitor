@@ -90,7 +90,7 @@ class DbCleanupServiceSpec extends Specification implements BuildDataTest, Servi
 
         when: "deleteResultsDataBefore is called with toDeleteBefore 12 months ago."
         Date twelveMonthsAgo = new DateTime().minusMonths(12).toDate()
-        service.deleteResultsDataBefore(twelveMonthsAgo)
+        service.deleteResultSelectionInformationBefore(twelveMonthsAgo)
 
         then: "ResultSelectionInformation older 12 months got deleted, the rest still exists."
         ResultSelectionInformation.list().size() == 1

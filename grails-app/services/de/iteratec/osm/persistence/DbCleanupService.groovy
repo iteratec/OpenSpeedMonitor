@@ -25,6 +25,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.ResultSelectionInformation
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
@@ -77,6 +78,41 @@ class DbCleanupService {
         }
 
         log.info "end with deleteResultsDataBefore"
+    }
+
+    void deleteResultSelectionInformationBefore(Date toDeleteBefore, boolean createBatchActivity = true) {
+        log.info "begin with deleteResultSelectionInformationBefore"
+
+        def criteria = new DetachedCriteria<ResultSelectionInformation>(ResultSelectionInformation).build {
+            lt 'jobResultDate', toDeleteBefore
+        }
+
+        int count = criteria.count().toInteger()
+        String jobName = "Nightly cleanup of ResultSelectionInformation"
+
+        if (count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
+            BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
+            batchActivity.beginNewStage("Delete ResultSelectionInformation", count)
+            int batchSize = 50
+
+            0.step(count, batchSize) {
+                ResultSelectionInformation.withNewTransaction {
+                    def list = criteria.list(max: batchSize)
+                    list.each { ResultSelectionInformation resultSelectionInformation ->
+                        try {
+                            resultSelectionInformation.delete()
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    batchActivity.addProgressToStage(list.size())
+                }
+                ResultSelectionInformation.withSession { session -> session.clear() }
+
+                batchActivity.done()
+            }
+
+            log.info "end with deleteResultSelectionInformationBefore"
+        }
     }
 
     /**
