@@ -34,28 +34,4 @@ databaseChangeLog = {
             WHERE wpt_status = 'INVALID_TEST_ID';
         ''')
     }
-
-    changeSet(author: "pal", id: "Task-2_update_wpt_status") {
-        sql('''
-            UPDATE job_result
-            SET wpt_status = 'UNKNOWN'
-            WHERE wpt_status = 'INVALID_TEST_ID';
-        ''')
-    }
-
-    changeSet(author: "pal", id: "Task-2_update_wpt_status") {
-        sql('''
-            UPDATE job_result
-            SET wpt_status = 'UNKNOWN'
-            WHERE wpt_status = 'INVALID_TEST_ID';
-        ''')
-    }
-
-    changeSet(author: "pal", id: "Task-2_update_wpt_status") {
-        sql('''
-            UPDATE job_result
-            SET wpt_status = 'UNKNOWN'
-            WHERE wpt_status = 'INVALID_TEST_ID';
-        ''')
-    }
 }
