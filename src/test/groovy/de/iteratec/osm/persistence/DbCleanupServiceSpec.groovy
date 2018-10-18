@@ -27,7 +27,6 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.ResultSelectionInformation
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
