@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
 import grails.gorm.transactions.Transactional
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
@@ -51,7 +52,8 @@ class JobStatisticService {
         return  JobResult.createCriteria().list{
             eq("job", job)
             order("date", "desc")
-            ge("jobResultStatus", 200)
+            ne("jobResultStatus", JobResultStatus.WAITING)
+            ne("jobResultStatus", JobResultStatus.RUNNING)
             maxResults(150)
         }
     }

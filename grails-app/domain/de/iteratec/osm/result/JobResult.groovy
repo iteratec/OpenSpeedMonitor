@@ -107,7 +107,8 @@ class JobResult {
         testId(nullable: false)
         testAgent(nullable: true)
         date(nullable: false)
-        wptStatus(nullable: true)
+        wptStatus(nullable: false)
+        jobResultStatus(nullable: false)
         job(nullable: false)
         description(widget: 'textarea')
 
@@ -148,6 +149,7 @@ class JobResult {
 
     static mapping = {
         scriptUrl(type: 'text')
+        description(type: 'text')
         scriptNavigationscript(type: 'text')
         date(index: 'date_idx')
         testId(index: 'testId_and_jobConfigLabel_idx')

@@ -3,10 +3,13 @@ package de.iteratec.osm.result
 class WptStatusFactory {
     def buildWptStatus(int wptStatusCode) {
         switch (wptStatusCode) {
-            case (wptStatusCode >= 100 || wptStatusCode < 200):
+
+            case (wptStatusCode == 100 || (wptStatusCode >= 102 && wptStatusCode < 200)):
                 return WptStatus.IN_PROGRESS
+            case 101:
+                return WptStatus.WAITING
             case 200:
-                return WptStatus.OK
+                return WptStatus.COMPLETED
             case (wptStatusCode >= 400 || wptStatusCode < 500):
                 return WptStatus.TESTED_APPLICATION_CLIENTERROR
             case (wptStatusCode >= 500 || wptStatusCode < 600):

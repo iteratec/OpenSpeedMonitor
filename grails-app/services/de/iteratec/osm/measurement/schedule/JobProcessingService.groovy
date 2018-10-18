@@ -373,7 +373,7 @@ class JobProcessingService {
             NodeChild runtestResponseXml = parseResponse(result, wptserver)
             wptStatus = wptStatusFactory.buildWptStatus(runtestResponseXml?.statusCode?.toInteger())
             testId = runtestResponseXml?.data?.testId
-            if (wptStatus != WptStatus.OK) {
+            if (wptStatus != WptStatus.COMPLETED) {
                 throw new JobExecutionException("Got status code ${wptStatus} from wptserver ${wptserver}")
             }
             if(!testId){
@@ -451,6 +451,7 @@ class JobProcessingService {
         if (result.jobResultStatus < JobResultStatus.SUCCESS) {
             // poll a last time
             WptResultXml lastResult = pollJobRun(job, testId)
+            //TODO das wird so nicht funktionieren
             if (lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS || (lastResult.statusCodeOfWholeTest >= JobResultStatus.SUCCESS && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
                 String description = lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs. Test exceeded maximum polling time"
