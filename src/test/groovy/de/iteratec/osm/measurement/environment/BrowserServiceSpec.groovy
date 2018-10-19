@@ -19,7 +19,6 @@ package de.iteratec.osm.measurement.environment
 
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
-import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
@@ -43,9 +42,8 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         when: "a browser should be found by name or alias"
         def browser = service.findByNameOrAlias(nameOrAlias)
 
-        then: "the corresponding browser or the undefined one is found"
+        then: "the corresponding browser is found, the browser that was not defined is created"
         browser.name == expectedBrowserName
-
         where:
         nameOrAlias         | expectedBrowserName
         "Internet Explorer" | "IE"
@@ -53,22 +51,6 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         "Firefox"           | "Firefox"
         "FF"                | "Firefox"
         "Firefox7"          | "Firefox"
-        "Chrome"            | Browser.UNDEFINED
-    }
-
-    void "findAll by name or alias returns correct browsers"() {
-        given: "Three browsers and aliases"
-        Browser.build(name: "Firefox")
-                .addToBrowserAliases(alias: "FF")
-                .addToBrowserAliases(alias: "Firefox7").save()
-        Browser.build(name: "IE").addToBrowserAliases(alias:  "Internet Explorer").save()
-        Browser.build(name: "Edge")
-
-        when: "all browsers should be found by name or alias"
-        def browser = service.findAllByNameOrAlias(["FF", "IE", "Chrome"])
-
-        then: "the corresponding browser or the undefined one is found"
-        browser*.name == ["Firefox", "IE", Browser.UNDEFINED]
     }
 
     void "find all returns all browsers"() {
@@ -83,5 +65,20 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
 
         then: "all browsers are returned, including the undefined"
         browsers*.name as Set == ["Firefox", "IE", "Edge", Browser.UNDEFINED] as Set
+    }
+
+    void "findOrCreateByNameOrAlias creates non-existing browsers"() {
+        given: "one browser with aliases"
+        Browser.build(name: "Firefox")
+                .addToBrowserAliases(alias: "FF")
+                .addToBrowserAliases(alias: "Firefox7").save()
+
+        when: "browsers are searched"
+        def shouldCreate = service.findOrCreateByNameOrAlias("Chrome")
+        def shouldnCreate = service.findOrCreateByNameOrAlias("FF")
+
+        then: "browsers are created if they don't exist"
+        shouldCreate.name == "Chrome"
+        shouldnCreate.name == "Firefox"
     }
 }
