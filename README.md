@@ -13,7 +13,7 @@ Summary
 =====================
 OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1]. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.
 
-_The timings you have to keep track of - always on expressive, well arranged dashboards. Without loosing all the details of the single WebPagetests if needed!_
+_The timings you have to keep track of - always on expressive, well arranged dashboards. Without losing all the details of the single WebPagetests if needed!_
 
 You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][17].
 
@@ -23,7 +23,7 @@ OpenSpeedMonitor is published under [Apache License 2.0][12], so feel free to us
 
 Usage
 =====================
-In the following explanations all references to gui elements of OpenSpeedMonitor are given in english, also gui is internationalized and comes with german as additional language.
+In the following explanations all references to gui elements of OpenSpeedMonitor are given in English, also gui is internationalized and comes with German as additional language.
 
 Construct measurement environment
 ---------------------
@@ -31,7 +31,7 @@ OpenSpeedMonitor is great for automation of web performance measurements as well
 
 OpenSpeedMonitor uses the [RESTful API][6] of WebPagetest for automation of performance measurements and getting the result's raw data. If you look at the [system overview][5] of webpagetest OpenSpeedMonitor uses Automation API to run scheduled tests and get back results from wpt server like other external tools.
 
-First thing you have to do after installation is to configure the components of your private WebPagetest instance. All you need is a running WebPagetest server which is available via HTTP(S) from your OpenSpeedMonitor instance. After a log in you can reach the gui to create a new wpt server object via menu entry `Administration >> All Controllers >> WebPageTestServerController`. You have to set correct _Base Url_ of the wpt server in order to automate tests on that server. After creation of the server object you can use the _Fetch locations_ button in order to get locations configured on that wpt server into OpenSpeedMonitor. That function uses `[wpt server BaseUrl]/getLocations.php` api function of wpt server to request its locations.
+First thing you have to do after installation is to configure the components of your private WebPagetest instance. All you need is a running WebPagetest server which is available via HTTP(S) from your OpenSpeedMonitor instance. After a login you can reach the gui to create a new wpt server object via menu entry `Administration >> All Controllers >> WebPageTestServerController`. You have to set correct _Base Url_ of the wpt server in order to automate tests on that server. After creation of the server object you can use the _Fetch locations_ button in order to get locations configured on that wpt server into OpenSpeedMonitor. That function uses `[wpt server BaseUrl]/getLocations.php` api function of wpt server to request its locations.
 
 For the following environment components objects get created in database of OpenSpeedMonitor (if they don't already exist) while start of OpenSpeedMonitor:
 
@@ -68,7 +68,7 @@ After wpt server(s), locations and browsers of your measurement environment are 
 
     > Within a job you configure when to run the measurement and on which wpt location and browser to run it. Also you can set all the advanced settings you can set for an ad hoc measurement via web gui of wpt server (like internet connectivity, whether or not to create a video, whether or not to create a tcp dump of the measurement, et cetera).
 
-Views for managing scripts and jobs are available in _Measurement_ section of OpenSpeedMonitor gui. The list views can be filtered. Filters get persisted in local storage of your browser so you don't loose your settings while navigating through application.
+Views for managing scripts and jobs are available in _Measurement_ section of OpenSpeedMonitor gui. The list views can be filtered. Filters get persisted in local storage of your browser so you don't lose your settings while navigating through application.
 
 After each start of OpenSpeedMonitor application, measurements are disabled generally. So even if you set up measurements as described in previous section none of your measurement jobs will start any measurements at all. You will have to activate measurements once, initially on job list view (requires login with admin rights).
 
@@ -85,7 +85,7 @@ Measurement data to show in diagrams can be chosen by three categories which are
 
 * _Aggregation and timeframe_
 
-    One can select the timeframe to be shown. Averages per timeframe can be build if necessary.
+    One can select the timeframe to be shown. Averages per timeframe can be built if necessary.
 
 * _Filter jobs_
 
@@ -130,7 +130,7 @@ Detail Analysis
 
 ![OsmDetailAnalysis](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_detailanalysis.jpg)
 
-These sort of analysis can be of great benefit detecting thirdparty libraries that slow down your site!
+These sort of analysis can be of great benefit detecting third party libraries that slow down your site!
 
 OsmDetailAnalysis is open source and licensed under same licence as OpenSpeedMonitor.
 
@@ -171,7 +171,7 @@ Prerequisites
 
     Mainly tested with Apache Tomcat. Should run on most servlet containers. See [full list of supported Java EE containers][11] in grails documentation for further details.
 
-* [optional, but recommended] Relational data base managing system (DBMS).
+* [optional, but recommended] Relational database management system (DBMS).
 
     Tested with MySQL. Should run with Oracle out of the box.
 
@@ -241,9 +241,9 @@ Development
 =====================
 To contribute to the code base or develop your own features you should be familiar with [grails][3]. Groovy and Javascript skills would be an asset, too.
 
-OpenSpeedMonitor is a monolithic web application. Respective grails plugin structure several external plugins are integrated. Before publishing under [Apache License][12] we developed the tool under version control in an own git server. So older history can't be found on github.
+OpenSpeedMonitor is a monolithic web application. Respective grails plugin structure several external plugins are integrated. Before publishing under [Apache License][12] we developed the tool under version control in an own git server. So older history can't be found on GitHub.
 
-As IDE you can use [Groovy/Grails Tool Suite][16] from SpringSource, which is an eclipse bundle optimized for groovy and grails development. IntelliJIdea has excellent groovy/grails support within its ultimate edition.
+As IDE you can use [Groovy/Grails Tool Suite][16] from SpringSource, which is an eclipse bundle optimized for groovy and grails development. IntelliJ Idea has excellent groovy/grails support within its ultimate edition.
 
 Although it works with an H2 in memory database out of the box it's highly recommended to develop and test with a relational database server like MySQL.
 
