@@ -471,7 +471,10 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobAndTestIdAndJobResultStatusLessThan(job, testId, JobResultStatus.SUCCESS)
+        JobResult result = JobResult.findByJobAndTestIdAndJobResultStatus(job, testId, JobResultStatus.WAITING)
+        if (!result) {
+            result = JobResult.findByJobAndTestIdAndJobResultStatus(job, testId, JobResultStatus.RUNNING)
+        }
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true, flush: true)
@@ -537,7 +540,8 @@ class JobProcessingService {
     public Map<String, Integer> handleOldJobResults() {
         log.info("handleOldJobResults() OSM starts")
 
-        def jobResultsToDelete = JobResult.findAllByJobResultStatusLessThanAndDateLessThan(200, new DateTime().minusHours(2))
+        def jobResultsToDelete = JobResult.findAllByJobResultStatusAndDateLessThan(JobResultStatus.WAITING, new DateTime().minusHours(2))
+        jobResultsToDelete.add(JobResult.findAllByJobResultStatusAndDateLessThan(JobResultStatus.RUNNING, new DateTime().minusHours(2)))
         def jobResultsToDeleteCount = jobResultsToDelete.size()
         if (!jobResultsToDelete.isEmpty()) {
             log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with JobResultStatus < 200 that are to old. Start deleting...")
@@ -551,7 +555,8 @@ class JobProcessingService {
             log.debug("Deleting done.")
         }
 
-        def jobResultsToReschedule = JobResult.findAllByJobResultStatusLessThanAndDateGreaterThan(200, new DateTime().minusHours(2))
+        def jobResultsToReschedule = JobResult.findAllByJobResultStatusAndDateGreaterThan(JobResultStatus.WAITING, new DateTime().minusHours(2))
+        jobResultsToReschedule.add(JobResult.findAllByJobResultStatusAndDateGreaterThan(JobResultStatus.RUNNING, new DateTime().minusHours(2)))
         def jobResultsToRescheduleCount = jobResultsToReschedule.size()
         if (!jobResultsToReschedule.isEmpty()) {
             log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with JobResultStatus < 200 fresh enough for rescheduling. Start rescheduling ...")
@@ -582,11 +587,12 @@ class JobProcessingService {
     }
 
     /**
-     * Setting the http status code of running and pending jobResults older than maxDate
+     * Setting the job result status of running and pending jobResults older than maxDate
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByJobResultStatusLessThan(WptStatus.SUCCESSFUL)
+        List<JobResult> jobResults = JobResult.findAllByJobResultStatus(JobResultStatus.WAITING)
+        jobResults.add(JobResult.findAllByJobResultStatus(JobResultStatus.RUNNING))
         jobResults = jobResults.findAll {
             // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
