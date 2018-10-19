@@ -448,13 +448,12 @@ class JobProcessingService {
         JobResult result = JobResult.findByJobAndTestId(job, testId)
         if (!result)
             return
-        if (result.jobResultStatus < JobResultStatus.SUCCESS) {
+        if (result.wptStatus < WptStatus.COMPLETED) {
             // poll a last time
             WptResultXml lastResult = pollJobRun(job, testId)
-            //TODO das wird so nicht funktionieren
-            if (lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS || (lastResult.statusCodeOfWholeTest >= JobResultStatus.SUCCESS && !lastResult.hasRuns())) {
+            if (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) < WptStatus.COMPLETED || (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) >= WptStatus.COMPLETED && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < JobResultStatus.SUCCESS ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs. Test exceeded maximum polling time"
+                String description = wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) < WptStatus.COMPLETED ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs. Test exceeded maximum polling time"
                 persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, result.wptStatus, description)
                 wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             }

@@ -21,13 +21,13 @@ class JobStatisticService {
 
         JobStatistic stat = getStatOf(job)
         stat.percentageSuccessfulTestsOfLast150 = results.size() == 150 ?
-                (results.count { it.wptStatus == WptStatus.SUCCESSFUL } / 150) * 100 :
+                (results.count { it.wptStatus == WptStatus.COMPLETED } / 150) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast25 = results.size() >= 25 ?
-                (results.take(25).count { it.wptStatus == WptStatus.SUCCESSFUL } / 25) * 100 :
+                (results.take(25).count { it.wptStatus == WptStatus.COMPLETED } / 25) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast5 = results.size() >= 5 ?
-                (results.take(5).count { it.wptStatus == WptStatus.SUCCESSFUL } / 5) * 100 :
+                (results.take(5).count { it.wptStatus == WptStatus.COMPLETED } / 5) * 100 :
                 null
         try {
             stat.save(failOnError: true)
