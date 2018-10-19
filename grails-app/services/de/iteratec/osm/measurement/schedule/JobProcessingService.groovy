@@ -417,7 +417,10 @@ class JobProcessingService {
                 resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId, job)
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                if (resultXml.statusCodeOfWholeTest < 200) {
+                if (resultXml.statusCodeOfWholeTest == 100) {
+                    persistUnfinishedJobResult(job.id, testId, JobResultStatus.WAITING, wptStatusFactory.buildWptStatus(resultXml.statusCodeOfWholeTest), "polling jobrun")
+                }
+                if (resultXml.statusCodeOfWholeTest == 101) {
                     persistUnfinishedJobResult(job.id, testId, JobResultStatus.RUNNING, wptStatusFactory.buildWptStatus(resultXml.statusCodeOfWholeTest), "polling jobrun")
                 }
             }
