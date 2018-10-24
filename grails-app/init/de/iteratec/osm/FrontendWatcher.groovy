@@ -23,14 +23,12 @@ class FrontendWatcher {
 
     @CompileDynamic
     protected void startFrontendWatcher(Environment environment) {
-
         String location = environment.getReloadLocation()
 
-        def nodeExecLocation = new FileNameByRegexFinder().getFileNames( Paths.get(location, "build", "nodejs").toString(), "[\\\\/]([^\\\\/]*)[\\\\/]((node\\.exe+)|(bin/node))")[0]
-        def nodeLocation = new File( nodeExecLocation ).getParent()
+        String nodeExecLocation = new FileNameByRegexFinder().getFileNames(Paths.get(location, "build", "nodejs").toString(), "([^\\/]*)((node\\.exe+)|(/bin/node(?!.)))")[0]
+        def nodeLocation = new File(nodeExecLocation).getParent()
 
         if (location && nodeLocation) {
-
             Thread.start {
                 def nodeModulesBin = Paths.get("${location}", "frontend", "node_modules", ".bin").toString()
 
@@ -38,7 +36,7 @@ class FrontendWatcher {
                 if( nodeExecLocation.endsWith(".exe") ) { // running on windows?
                     watchBuilder = new ProcessBuilder(["cmd", "/C", "ng build --watch"])
                             .redirectErrorStream(true).directory(new File(location, "frontend"))
-                    watchBuilder.environment().put("PATH", "${nodeModulesBin};${nodeLocation};")
+                    watchBuilder.environment().put("PATH", "${nodeModulesBin};${nodeLocation}")
                 }
                 else {
                     watchBuilder = new ProcessBuilder(['sh', '-c', 'ng build --watch'])
