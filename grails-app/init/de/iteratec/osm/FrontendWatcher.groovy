@@ -26,11 +26,11 @@ class FrontendWatcher {
         String location = environment.getReloadLocation()
 
         String nodeExecLocation = new FileNameByRegexFinder().getFileNames(Paths.get(location, "build", "nodejs").toString(), "([^\\/]*)((node\\.exe+)|(/bin/node(?!.)))")[0]
-        def nodeLocation = new File(nodeExecLocation).getParent()
+        String nodeLocation = new File(nodeExecLocation).getParent()
 
         if (location && nodeLocation) {
             Thread.start {
-                def nodeModulesBin = Paths.get("${location}", "frontend", "node_modules", ".bin").toString()
+                String nodeModulesBin = Paths.get("${location}", "frontend", "node_modules", ".bin").toString()
 
                 ProcessBuilder watchBuilder
                 if( nodeExecLocation.endsWith(".exe") ) { // running on windows?
@@ -76,7 +76,7 @@ class FrontendWatcher {
                 while (GrailsApp.developmentModeActive) {
 
                     def uniqueChangedFiles = changedFiles as Set
-                    def uniqueChangedFilesSize = uniqueChangedFiles.size()
+                    int uniqueChangedFilesSize = uniqueChangedFiles.size()
 
                     try {
                         if (uniqueChangedFilesSize >= 1) {
