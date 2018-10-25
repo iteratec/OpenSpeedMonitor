@@ -9,6 +9,7 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
@@ -20,58 +21,10 @@ import org.joda.time.DateTime
 class ApplicationDashboardService {
     ConfigService configService
     OsmConfigCacheService osmConfigCacheService
-    ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
     JobDaoService jobDaoService
-
-
-    def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
-        def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
-        def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
-
-        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
-        pages.unique()
-        return pages
-
-    }
-
-    def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
-
-        ResultSelectionCommand pagesForGivenJobGroup = new ResultSelectionCommand(
-                jobGroupIds: [jobGroupId],
-                from: from,
-                to: to
-        )
-
-        def pages = resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
-            if (existing) {
-                not { 'in'('page', existing) }
-            }
-            projections {
-                distinct('page')
-            }
-        })
-
-        return pages
-    }
-
-    def getPagesOfActiveJobs(Long jobGroupId) {
-        def scriptsForJobGroup = Job.createCriteria().list {
-            eq('jobGroup.id', jobGroupId)
-            eq('active', true)
-            isNotNull('script')
-            projections {
-                property('script')
-            }
-        }
-
-        def pages = scriptsForJobGroup.collect {
-            it.testedPages
-        }.flatten()
-
-        return pages
-    }
+    JobGroupService jobGroupService
 
     List<EventResultProjection> getRecentMetricsForJobGroup(Long jobGroupId) {
         SelectedMeasurand bytesFullyLoaded = new SelectedMeasurand(Measurand.FULLY_LOADED_INCOMING_BYTES.toString(), CachedView.UNCACHED)
@@ -90,23 +43,15 @@ class ApplicationDashboardService {
                 .getAverageData()
     }
 
-    List<Page> getRecentPagesForJobGroup(Long jobGroupId) {
-        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
-        DateTime to = new DateTime()
-
-        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
-        return pages
-    }
-
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
 
         List<PageCsiDto> pageCsiDtos = []
         List<JobGroup> csiGroup = [jobGroup]
-        DateTime to = new DateTime().withTimeAtStartOfDay()
-        DateTime from = to.minusWeeks(4)
+        DateTime to = new DateTime()
+        DateTime from = configService.getStartDateForRecentMeasurements()
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroup.id)
+        List<Page> pages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup.id)
 
         pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
                 csiGroup, pages).each {
@@ -137,7 +82,7 @@ class ApplicationDashboardService {
             return it.projectedProperties
         }
 
-        getPagesOfActiveJobs(jobGroupId)
+        jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
                 .findAll { Page page -> page.name != Page.UNDEFINED }
                 .each { Page page ->
             Map entry = recentMetrics.find {
@@ -179,7 +124,7 @@ class ApplicationDashboardService {
     }
 
     ApplicationCsiDto getCsiValuesAndErrorsForJobGroup(JobGroup jobGroup) {
-        Date fourWeeksAgo = new DateTime().withTimeAtStartOfDay().minusWeeks(4).toDate()
+        Date fourWeeksAgo = configService.getStartDateForRecentMeasurements().toDate()
         Map<Long, ApplicationCsiDto> csiValuesForJobGroups = getCsiValuesForJobGroupsSince([jobGroup], fourWeeksAgo)
         return csiValuesForJobGroups.get(jobGroup.id)
     }

@@ -6,20 +6,16 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
-import org.joda.time.DateTime
 
 class ApplicationDashboardController {
-    final static FOUR_WEEKS = 4
 
     ApplicationDashboardService applicationDashboardService
     JobGroupService jobGroupService
 
     def getPagesForApplication(DefaultApplicationCommand command) {
 
-        DateTime from = new DateTime().minusWeeks(FOUR_WEEKS)
-        DateTime to = new DateTime()
         Long jobGroupId = command.applicationId
-        def pages = applicationDashboardService.getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
+        def pages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, pages)
     }

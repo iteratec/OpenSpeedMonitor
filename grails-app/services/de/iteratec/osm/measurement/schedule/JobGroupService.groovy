@@ -1,5 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.ResultSelectionCommand
 import de.iteratec.osm.result.ResultSelectionController
@@ -10,6 +12,7 @@ import org.joda.time.DateTime
 @Transactional
 class JobGroupService {
     ResultSelectionService resultSelectionService
+    ConfigService configService
 
     Set<JobGroup> findAll() {
         Set<JobGroup> result = Collections.checkedSet(new HashSet<JobGroup>(), JobGroup.class);
@@ -77,7 +80,7 @@ class JobGroupService {
         Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
 
         DateTime today = new DateTime()
-        DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
+        DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
         List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
@@ -89,6 +92,50 @@ class JobGroupService {
             }
         })
         allActiveAndRecent.addAll(recentJobGroups)
-        return allActiveAndRecent
+        return allActiveAndRecent.unique { a, b -> a.id <=> b.id }
+    }
+
+    def getPagesWithResultsOrActiveJobsForJobGroup(Long jobGroupId) {
+        DateTime today = new DateTime()
+        DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
+        def pagesWithResults = getPagesWithExistingEventResults(fourWeeksAgo, today, jobGroupId)
+        def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
+
+        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
+        pages.unique()
+        return pages
+
+    }
+
+    private List<Page> getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
+
+        ResultSelectionCommand pagesForGivenJobGroup = new ResultSelectionCommand(
+                jobGroupIds: [jobGroupId],
+                from: from,
+                to: to
+        )
+
+        return resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
+            if (existing) {
+                not { 'in'('page', existing) }
+            }
+            projections {
+                distinct('page')
+            }
+        }) as List<Page>
+    }
+
+    private List<Page> getPagesOfActiveJobs(Long jobGroupId) {
+        return Job.createCriteria().list {
+            eq('jobGroup.id', jobGroupId)
+            eq('active', true)
+            isNotNull('script')
+
+            projections {
+                script {
+                    distinct('testedPages')
+                }
+            }
+        } as List<Page>
     }
 }
