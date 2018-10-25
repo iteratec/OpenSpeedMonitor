@@ -101,7 +101,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         if (aggregationValue === 'avg') {
             return 'Average'
         } else {
-            return 'Median'
+            return 'Percentile'
         }
     };
 

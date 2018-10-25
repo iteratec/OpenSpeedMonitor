@@ -95,7 +95,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         if (aggregationValue === 'avg') {
             return 'Average'
         } else {
-            return 'Median'
+            return 'Percentile'
         }
     };
 
