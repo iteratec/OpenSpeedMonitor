@@ -63,7 +63,7 @@ class JobGroupService {
                     name              : it.name,
                     dateOfLastResults : formattedLastDateOfResult,
                     csiConfigurationId: it.csiConfigurationId,
-                    numPages          : getPagesWithResultsOrActiveJobsForJobGroup(it.id)
+                    numPages          : getPagesWithResultsOrActiveJobsForJobGroup(it.id)?.size()
             ]
         }
     }
@@ -117,16 +117,16 @@ class JobGroupService {
     }
 
     private List<Page> getPagesOfActiveJobs(Long jobGroupId) {
-        return Job.createCriteria().list {
+        List<Script> scripts = Job.createCriteria().list {
             eq('jobGroup.id', jobGroupId)
             eq('active', true)
             isNotNull('script')
 
             projections {
-                script {
-                    distinct('testedPages')
-                }
+                property('script')
             }
-        } as List<Page>
+        } as List<Script>
+
+        return scripts.collect { it.testedPages }.flatten() as List<Page>
     }
 }
