@@ -51,34 +51,25 @@ class JobGroupService {
     }
 
     def getAllActiveAndRecentWithResultInformation() {
-        Set<JobGroup> allActiveAndRecent = getAllActiveAndRecent()
-        List allActiveAndRecentFormattedJobGroups = new ArrayList()
-        allActiveAndRecent.each {
+        return getAllActiveAndRecent().collect {
             def name = it.name
             JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
                 eq("jobGroupName", name)
                 order("date", "desc")
             }[0]
-
             def formattedLastDateOfResult = lastDateOfResult?.date?.format("yyyy-MM-dd")
-            if (!allActiveAndRecentFormattedJobGroups.find { jobGroup -> jobGroup.id == it.id }) {
-                allActiveAndRecentFormattedJobGroups.add(
-                        [
-                                id                : it.id,
-                                name              : it.name,
-                                dateOfLastResults : formattedLastDateOfResult,
-                                csiConfigurationId: it.csiConfigurationId
-                        ]
-                )
-            }
+            return [
+                    id                : it.id,
+                    name              : it.name,
+                    dateOfLastResults : formattedLastDateOfResult,
+                    csiConfigurationId: it.csiConfigurationId,
+                    numPages          : getPagesWithResultsOrActiveJobsForJobGroup(it.id)
+            ]
         }
-
-        return allActiveAndRecentFormattedJobGroups
     }
 
-    Set<JobGroup> getAllActiveAndRecent() {
-        Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
-
+    List<JobGroup> getAllActiveAndRecent() {
+        List<JobGroup> allActiveAndRecent = getAllActiveJobGroups()
         DateTime today = new DateTime()
         DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
 
