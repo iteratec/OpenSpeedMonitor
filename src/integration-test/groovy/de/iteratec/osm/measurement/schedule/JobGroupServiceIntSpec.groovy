@@ -6,9 +6,9 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.ResultSelectionService
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import org.joda.time.DateTime
 
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
@@ -24,30 +24,15 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                     "setEventName\tDetail:::Branchen\n" +
                     "navigate\thttps://www.iteratec.de/branch"
 
-    def setup() {
-        jobGroupService.resultSelectionService = Stub(ResultSelectionService) {
-            query(_, _, _) >> {
-                List result = new ArrayList<>()
-                result.add(notActiveButMeasured)
-                return result
-            }
-        }
-        createTestDataCommonForAllTests()
-    }
-
-    def cleanup() {
-        jobGroupService.resultSelectionService = grailsApplication.mainContext.getBean('resultSelectionService') as ResultSelectionService
-    }
-
-
     void "get pages by event results and active jobs"() {
         given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
+        createCommonTestData()
         EventResult.build(
                 page: page1,
                 jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
@@ -56,7 +41,7 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
@@ -65,12 +50,12 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(jobGroup1.id)
+        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(new DateTime().minusWeeks(4), new DateTime(), jobGroup1.id)
         def activePages = jobGroupService.getPagesOfActiveJobs(jobGroup1.id)
         def allActiveOrMeasuredPages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup1.id)
 
@@ -82,12 +67,13 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
 
     void "get pages only by an active job without results"() {
         given: "one 'undefined' matching and one other EventResult"
+        createCommonTestData()
         EventResult.build(
                 page: page3,
                 jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
         EventResult.build(
@@ -95,12 +81,12 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(jobGroup1.id)
+        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(new DateTime().minusWeeks(4), new DateTime(), jobGroup1.id)
         def activePages = jobGroupService.getPagesOfActiveJobs(jobGroup1.id)
         def allActiveOrMeasuredPages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup1.id)
 
@@ -112,12 +98,13 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
 
     void "get pages only by event results"() {
         given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
+        createCommonTestData()
         EventResult.build(
                 page: page3,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
@@ -126,7 +113,7 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
@@ -135,12 +122,12 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
         when: "the application service determines the recent measured or/and active pages without undefined"
-        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(jobGroup2.id)
+        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(new DateTime().minusWeeks(4), new DateTime(), jobGroup2.id)
         def activePages = jobGroupService.getPagesOfActiveJobs(jobGroup2.id)
         def allActiveOrMeasuredPages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup2.id)
 
@@ -152,12 +139,13 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
 
     void "get no page by EventResults or active jobs"() {
         given: "one 'undefined' matching EventResult and one other Result"
+        createCommonTestData()
         EventResult.build(
                 page: page3,
                 jobGroup: jobGroup1,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
@@ -166,12 +154,12 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
                 jobGroup: jobGroup2,
                 fullyLoadedTimeInMillisecs: 100,
                 medianValue: true,
-                dateCreated: new Date(),
+                jobResultDate: new DateTime().minusMinutes(2).toDate(),
                 flush: true
         )
 
         when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(jobGroup2.id)
+        def recentMeasuredPages = jobGroupService.getPagesWithExistingEventResults(new DateTime().minusWeeks(4), new DateTime(), jobGroup2.id)
         def activePages = jobGroupService.getPagesOfActiveJobs(jobGroup2.id)
         def allActiveOrMeasuredPages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup2.id)
 
@@ -187,10 +175,18 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
         notActiveButMeasured = JobGroup.build(name: "notActiveButMeasured")
         JobGroup notActiveNotMeasured = JobGroup.build(name: "notActiveNotMeasured")
 
-        Job activeNotMeasuredJob = Job.build(jobGroup: activeNotMeasured, active: true, executionSchedule: "1/1 * * ? * *")
-        Job notActiveButMeasuredJob = Job.build(jobGroup: notActiveButMeasured, active: false)
-
-        JobResult notActiveButMeasuredJobResult = JobResult.build(jobGroupName: notActiveButMeasured.name, date: new Date())
+        Job.build(jobGroup: activeNotMeasured, active: true, executionSchedule: "1/1 * * ? * *")
+        Job.build(jobGroup: notActiveButMeasured, active: false)
+        Date jobResultDate = new DateTime().minusMinutes(2).toDate()
+        JobResult notActiveButMeasuredJobResult = JobResult.build(jobGroupName: notActiveButMeasured.name, date: jobResultDate)
+        EventResult.build(
+                page: Page.build(),
+                jobGroup: notActiveButMeasured,
+                fullyLoadedTimeInMillisecs: 100,
+                medianValue: true,
+                jobResultDate: jobResultDate,
+                flush: true
+        )
 
         when: "service is asked for active or recently measured"
         List activeOrRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
@@ -208,7 +204,7 @@ class JobGroupServiceIntSpec extends NonTransactionalIntegrationSpec {
         }.name
     }
 
-    private void createTestDataCommonForAllTests() {
+    private void createCommonTestData() {
         OsmConfiguration.build()
 
         page1 = Page.build(name: "Homepage")

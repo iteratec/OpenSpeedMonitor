@@ -106,10 +106,16 @@ class JobGroupService {
                 to: to
         )
 
+        Page undefinedPage = Page.findByName(Page.UNDEFINED)
+
         return resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
-            if (existing) {
-                not { 'in'('page', existing) }
+            and {
+                ne('page', undefinedPage)
+                if (existing) {
+                    not { 'in'('page', existing) }
+                }
             }
+
             projections {
                 distinct('page')
             }
