@@ -15,7 +15,9 @@
             </osm-csi-value-small>
           </aside>
           <span class="title">{{application.name}}
-            <span class="detail" *ngIf="application.numPages">{{application.numPages}} Pages</span>
+            <span *ngIf="application.pageCount" class="detail">
+              {{ 'frontend.de.iteratec.osm.landing.page-count' | translate:{pageCount: application.pageCount} }}
+            </span>
           </span>
         </a>
       </li>

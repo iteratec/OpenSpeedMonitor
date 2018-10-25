@@ -63,7 +63,7 @@ class JobGroupService {
                     name              : it.name,
                     dateOfLastResults : formattedLastDateOfResult,
                     csiConfigurationId: it.csiConfigurationId,
-                    numPages          : getPagesWithResultsOrActiveJobsForJobGroup(it.id)?.size()
+                    pageCount         : getPagesWithResultsOrActiveJobsForJobGroup(it.id)?.size()
             ]
         }
     }
