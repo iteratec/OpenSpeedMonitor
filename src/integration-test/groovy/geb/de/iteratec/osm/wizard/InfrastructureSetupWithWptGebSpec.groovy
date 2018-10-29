@@ -3,15 +3,13 @@ package geb.de.iteratec.osm.wizard
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.WptServerService
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LandingPage
 import geb.pages.de.iteratec.osm.wizards.InfrastructureSetupPage
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import grails.util.Holders
-import spock.lang.Shared
 import spock.lang.Stepwise
 
 @Integration
@@ -19,7 +17,7 @@ import spock.lang.Stepwise
 @Stepwise
 class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
 
-    void "The Setup can be cancelled"(){
+    void "The Setup can be cancelled"() {
         given:
         User.withNewTransaction {
             OsmConfiguration.build()
@@ -32,14 +30,7 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
 
         then:
         at LandingPage
-    }
-
-    void "The setup can be resumed"(){
-        when: "the resume button was clicked"
-        $("#setup-wpt-server-button").click()
-
-        then: "the setup page should appear"
-        at InfrastructureSetupPage
+        driver.currentUrl.endsWith("/landing/continueSetup")
     }
 
 
@@ -61,7 +52,7 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
         currentPage.hasError(currentPage.serverApiKey)
     }
 
-    void "Entering an API-Key should enable the submit button"(){
+    void "Entering an API-Key should enable the submit button"() {
         given:
         InfrastructureSetupPage currentPage = page as InfrastructureSetupPage
 
@@ -74,7 +65,7 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
     }
 
 
-    void "Hitting submit should redirect to the landing page"(){
+    void "Hitting submit should redirect to the landing page"() {
         given: "a mocked wptServerService so we don't actually call webpagetest.org"
         InfrastructureSetupPage currentPage = page as InfrastructureSetupPage
         def wptServerService = Holders.applicationContext.getBean("wptServerService")
@@ -86,9 +77,8 @@ class InfrastructureSetupWithWptGebSpec extends CustomUrlGebReportingSpec {
         when: "the submit button was clicked"
         currentPage.submit.click()
 
-        then: "the landingpage should load and show how many locations where imported"
+        then: "the landingpage should load"
         at LandingPage
-        $(".alert").text() == currentPage.getI18nMessage("de.iteratec.osm.ui.setupwizards.infra.success",[1])
     }
 
     void cleanupSpec() {
