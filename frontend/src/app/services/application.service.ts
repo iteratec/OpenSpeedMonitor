@@ -5,9 +5,21 @@ import {PageMetricsDto} from "../modules/application-dashboard/models/page-metri
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
 import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/csi-list.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  distinctUntilKeyChanged,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom
+} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
+import {
+  FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
+import {error} from "util";
 
 
 @Injectable()
@@ -16,6 +28,7 @@ export class ApplicationService {
   applicationCsiById$: BehaviorSubject<ApplicationCsiById> = new BehaviorSubject({isLoading: false});
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
+  failingJobStatistics$: ReplaySubject<FailingJobStatistic> = new ReplaySubject<FailingJobStatistic>(1);
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
@@ -27,6 +40,10 @@ export class ApplicationService {
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateCsiForApplication(application)),
     ).subscribe(this.applicationCsiById$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: Application) => this.loadFailingJobStatistics(application))
+    ).subscribe(this.failingJobStatistics$);
 
     this.selectSelectedApplicationCsi().pipe(
       withLatestFrom(this.selectedApplication$, (_, application) => application),
@@ -135,6 +152,14 @@ export class ApplicationService {
       ...csiValues.filter(value => updates.find(update => update.date.getTime() == value.date.getTime())),
       ...updates
     ].sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
+
+  loadFailingJobStatistics(application: Application): Observable<FailingJobStatistic> {
+    const params = this.createParams(application.id);
+    return this.http.get<FailingJobStatistic>('/applicationDashboard/rest/getFailingJobStatistics', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
   }
 }
 
