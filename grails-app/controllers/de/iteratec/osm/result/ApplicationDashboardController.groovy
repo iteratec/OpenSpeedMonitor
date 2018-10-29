@@ -60,6 +60,13 @@ class ApplicationDashboardController {
 
         return ControllerUtils.sendObjectAsJSON(response, [csiConfigurationId: csiConfigurationId])
     }
+
+    def getFailingJobStatistics(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        def jobsWithErrors = applicationDashboardService.getFailingJobStatistics(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
+    }
 }
 
 class DefaultApplicationCommand implements Validateable {
