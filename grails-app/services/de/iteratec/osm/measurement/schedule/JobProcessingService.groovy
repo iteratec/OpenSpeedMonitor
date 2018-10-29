@@ -455,7 +455,10 @@ class JobProcessingService {
             WptResultXml lastResult = pollJobRun(job, testId)
             if (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) < WptStatus.COMPLETED || (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) >= WptStatus.COMPLETED && !lastResult.hasRuns())) {
                 unscheduleTest(job, testId)
-                String description = wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) < WptStatus.COMPLETED ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs. Test exceeded maximum polling time"
+                String description = "Test exceeded maximum polling time"
+                if (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) >= WptStatus.COMPLETED) {
+                    description += ". Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
+                }
                 persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, result.wptStatus, description)
                 wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
             }
