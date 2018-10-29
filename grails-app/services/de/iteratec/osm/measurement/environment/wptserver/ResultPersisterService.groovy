@@ -629,7 +629,7 @@ class ResultPersisterService implements iResultListener {
      * @param testId
      */
     void deleteResultsMarkedAsPendingAndRunning(Job job, String testId) {
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.WAITING)?.delete(failOnError: true, flush: true)
         JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
+        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
     }
 }

@@ -1,9 +1,9 @@
 package de.iteratec.osm.result
 
-enum WptStatus{
+enum WptStatus {
     SUCCESSFUL(0),
-    IN_PROGRESS(100),
-    WAITING(101),
+    PENDING(100),
+    IN_PROGRESS(101),
     COMPLETED(200),
     TESTED_APPLICATION_CLIENTERROR(400),
     TESTED_APPLICATION_INTERNALSERVERERROR(500),
