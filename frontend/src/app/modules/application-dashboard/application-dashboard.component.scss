@@ -5,7 +5,7 @@
   margin-left: -20px;
 
   h2 {
-    grid-column: 1 / -1;
+    grid-column: 1 / -2;
     margin: 0 0 0 20px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
@@ -22,12 +22,23 @@
 
   osm-csi-graph, osm-csi-info {
     z-index: 2;
-    grid-column: 2 / -1;
+    grid-column: 2 / -2;
     margin-bottom: 30px;
     padding-left: 40px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  osm-application-job-status {
+    z-index: 2;
+    grid-column: -2 / -1;
+    margin: 0 0 30px 20px;
+  }
+
+  h2.application-job-status {
+    grid-column: -2 / -1;
+    font-weight: normal;
   }
 
   osm-page {
