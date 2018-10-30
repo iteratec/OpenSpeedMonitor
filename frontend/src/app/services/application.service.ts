@@ -3,7 +3,12 @@ import {HttpClient} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
-import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/csi-list.model";
+import {
+  ApplicationCsi,
+  ApplicationCsiById,
+  ApplicationCsiDTO,
+  ApplicationCsiDTOById
+} from "../models/application-csi.model";
 import {Application, ApplicationDTO} from "../models/application.model";
 import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";

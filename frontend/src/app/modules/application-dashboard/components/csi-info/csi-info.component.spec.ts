@@ -6,7 +6,7 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model";
 import {Application} from "../../../../models/application.model";
-import {ApplicationCsi} from "../../../../models/csi-list.model";
+import {ApplicationCsi} from "../../../../models/application-csi.model";
 
 describe('CsiInfoComponent', () => {
   let component: CsiInfoComponent;

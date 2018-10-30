@@ -5,7 +5,7 @@ import {filter, map, takeUntil} from 'rxjs/operators';
 import {ApplicationService} from '../../services/application.service';
 import {Application} from '../../models/application.model';
 import {PageMetricsDto} from "./models/page-metrics.model";
-import {ApplicationCsi, ApplicationCsiById} from "../../models/csi-list.model";
+import {ApplicationCsi, ApplicationCsiById} from "../../models/application-csi.model";
 import {Csi} from "../../models/csi.model";
 
 @Component({

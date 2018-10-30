@@ -1,8 +1,9 @@
 import {Component} from '@angular/core';
-import {filter, map, tap} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
+import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-landing',

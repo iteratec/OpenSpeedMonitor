@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {ApplicationCsi} from "../../../../models/csi-list.model";
+import {ApplicationCsi} from "../../../../models/application-csi.model";
 import {Application} from "../../../../models/application.model";
 import {ApplicationService} from "../../../../services/application.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
