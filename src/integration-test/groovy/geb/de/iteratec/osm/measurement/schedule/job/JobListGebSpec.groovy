@@ -109,7 +109,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         when: "The user clicks the show only active button"
         page.enableShowOnlyActiveJobs(true)
 
-        then: "There should be no jobs visible since all are inacrive"
+        then: "There should be no jobs visible since all are inactive"
         $("tr").findAll { it.displayed }.find(".jobName").size() == 0
     }
 

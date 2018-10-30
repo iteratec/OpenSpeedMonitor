@@ -9,11 +9,9 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
     var cronStringInputField = $("#executionSchedule");
     var cronInputValid = true;
     var jobNameInput = $("#inputJobName");
-    var existingJobNames = [];
     var inputsValid = false;
     var jobDiv = $("#createJob");
     var defaultJobName = "";
-    var jobNameHelpBlock = $("#jobNameHelpBlock");
     var executionScheduleFormGroup = $("#executionScheduleFormGroup");
     var cronInputHelpBlock = $("#cronInputHelpBlock");
     var createJobNavPill = $('#createJobTab');
@@ -42,8 +40,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
             predefinedCronSelectBox.val(predefinedCronSelectBox.find("option:eq(1)").val());
             updateCronStringFromPredefined();
         }
-
-        getExistingJobNames();
     }
 
     var isPredefinedCronString = function (cronString) {
@@ -61,22 +57,8 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         validateCronExpression();
     }
 
-    var validateJobNameInput = function () {
-        var currentJobName = jobNameInput.val();
-        var isDuplicateName = isExistingJobName(currentJobName);
-
-        $("#jobNameFormGroup").toggleClass("has-error", !currentJobName);
-        jobNameHelpBlock.toggleClass("hidden", !isDuplicateName);
-
-        return currentJobName && !isDuplicateName;
-    }
-
-    var isExistingJobName = function (jobName) {
-        return existingJobNames.indexOf(jobName) >= 0;
-    }
-
     var validateInputs = function () {
-        inputsValid = cronInputValid && validateJobNameInput();
+        inputsValid = cronInputValid;
         var cardWasActive = createJobNavPill.parent().hasClass("wasActive");
 
         createJobNavPill.toggleClass("failureText", !inputsValid && cardWasActive);
@@ -108,23 +90,6 @@ OpenSpeedMonitor.MeasurementSetupWizard.CreateJobCard = (function () {
         executionScheduleFormGroup.toggleClass("has-error", !isValid);
         cronInputHelpBlock.text(helpText);
         validateInputs();
-    }
-
-    var getExistingJobNames = function () {
-        var url = OpenSpeedMonitor.urls.getJobNames;
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: "json",
-            success: function (data) {
-                existingJobNames = data;
-            },
-            error: function (e) {
-                throw e;
-            },
-            traditional: true // grails compatible parameter array encoding
-        });
     }
 
     var informListeners = function () {

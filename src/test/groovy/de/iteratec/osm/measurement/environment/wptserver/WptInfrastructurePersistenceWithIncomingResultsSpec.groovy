@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -63,16 +64,16 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         File xmlFile = new File("src/test/resources/WptResultXmls/${xml}.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlFile))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server1)
+        Job job = Job.findByLabel(jobLabel)
 
         when: "ResultPersister listens to xml result files"
-        service.listenToResult(xmlResult, server1)
+        service.listenToResult(xmlResult, server1, job.id)
 
         then: "all EventResult dependent Domains got persisted as expected"
         //check for job-runs
         Collection<JobResult> jobRuns = JobResult.list()
         jobRuns.size() == 1
         //check dates of job and job_results
-        Job job = Job.findByLabel(jobLabel)
         new DateTime(job.lastRun) == new DateTime(new Date(execTime))
         new DateTime(jobRuns[0].date) == new DateTime(new Date(execTime))
         //check for steps
@@ -120,7 +121,7 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server1)
 
         when: "ResultListener listens to the result xml"
-        service.listenToResult(xmlResult, server1)
+        service.listenToResult(xmlResult, server1, 746847897)
 
         then: "Because of invalid xml result no EventResult dependent domains get persisted"
         JobResult.list().size() == 0
@@ -140,11 +141,11 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         int numberOfLocationsFromCommonTestData = Location.count()
 
         when: "ResultPersister listens to result xml"
-        service.listenToResult(xmlResult, server1)
+        Job job = Job.findByLabel('testjob')
+        service.listenToResult(xmlResult, server1, job.id)
 
         then: "Missing Location got persisted and correctly assigned to Job"
         Location.count() == numberOfLocationsFromCommonTestData + 1
-        Job job = Job.findByLabel('testjob')
         job.location.uniqueIdentifierForServer == locationFromResultXml
         job.location.wptServer == server1
 
@@ -163,12 +164,12 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         String testId_1 = xmlResult.responseNode.data.testId
 
         when: "ResultPersisterService listens to 2 results for the same Job but for different WebPageTestServers"
-        service.listenToResult(xmlResult, server1)
+        Job job = Job.findByLabel('testjob')
+        service.listenToResult(xmlResult, server1, job.id)
         xmlResult.responseNode.data.testId = testId_2
-        service.listenToResult(xmlResult, server2)
+        service.listenToResult(xmlResult, server2, job.id)
 
         then: "Job is associated to WebPageTestServer of last result and JobResults got persisted correctly"
-        Job job = Job.findByLabel('testjob')
         job.location.wptServer == server2
 
         JobResult.list().size() == 2
@@ -223,6 +224,11 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         service.csiValueService.osmConfigCacheService = Stub(OsmConfigCacheService) {
             getMinValidLoadtime(_) >> DEFAULT_MIN_VALID_LOADTIME
             getMaxValidLoadtime(_) >> DEFAULT_MAX_VALID_LOADTIME
+        }
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }
     }
 

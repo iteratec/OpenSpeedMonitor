@@ -219,7 +219,7 @@ class Job implements Taggable {
     static transients = ['nextExecutionTime']
 
     static constraints = {
-        label(maxSize: 255, blank: false, unique: true)
+        label(maxSize: 255, nullable: true)
         location(nullable: false)
         lastRun(nullable: true)
         jobGroup(nullable: false)

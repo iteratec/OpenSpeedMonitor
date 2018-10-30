@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -34,6 +35,10 @@ import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
+
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+
 
 /**
  * These Tests check that EventResults written when new result xml arrives get same Internet Connectivity as
@@ -68,6 +73,11 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
     void setup() {
         createTestDataCommonForAllTests()
         createMocksCommonForAllTests()
+
+        service.configService = Stub(ConfigService) {
+            getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
+            getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
+        }
     }
 
     void setupSpec() {
@@ -85,7 +95,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -106,7 +116,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -127,7 +137,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 3
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -148,7 +158,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -169,7 +179,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()
@@ -190,7 +200,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         int numberSteps = 2
 
         when: "ResultPersisterService listens to result xml."
-        service.listenToResult(xmlResult, WPT_SERVER)
+        service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."
         List<EventResult> allResults = EventResult.getAll()

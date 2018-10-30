@@ -72,9 +72,8 @@ class QueueAndJobStatusService {
         if (locationsResponse != null) {
             locationsResponse.data.location.each { locationTagInXml ->
                 List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
-                List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
-                browsersForLocation.each { Browser currentBrowser ->
-                    String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
+                browserNames.each { browserName ->
+                    String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${browserName}") ?: locationTagInXml.id.toString() + ":${browserName}"
                     Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, uniqueIdentfierForServer)
                     if (location && location.active)
                         locations << new LocationWithXmlNode(
@@ -83,7 +82,6 @@ class QueueAndJobStatusService {
                         )
                 }
             }
-
         }
         return locations
     }
