@@ -78,6 +78,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         });
         $(window).on('historyStateLoaded', function () {
             loadData(false);
+            togglePercentileOptionsVisibility();
         });
         $(window).on('resize', function () {
             renderChart({}, false);
