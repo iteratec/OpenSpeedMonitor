@@ -5,7 +5,7 @@ OpenSpeedMonitor
 ================
 Open Source Web Performance Monitoring.
 
-Run it with [docker-compose][20]:
+Run it with [docker-compose][17]:
 
     wget https://raw.githubusercontent.com/iteratec/OpenSpeedMonitor/master/docker/docker-compose.yml && docker-compose up
 
@@ -15,11 +15,11 @@ OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1
 
 _The timings you have to keep track of - always on expressive, well arranged dashboards. Without losing all the details of the single WebPageTests if needed!_
 
-You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][17].
+You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][14].
 
 ![Einstieg OSM](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_result_dashboard.jpg)
 
-OpenSpeedMonitor is published under [Apache License 2.0][12], so feel free to use, adapt and do whatever you want with the code. If you extend functionality we would appreciate contributions. Technically, OpenSpeedMonitor is based on [grails][3], a JVM based web framework leveraged by the programming language [groovy][2].
+OpenSpeedMonitor is published under [Apache License 2.0][10], so feel free to use, adapt and do whatever you want with the code. If you extend functionality we would appreciate contributions. Technically, OpenSpeedMonitor is based on [grails][3], a JVM based web framework leveraged by the programming language [groovy][2].
 
 Usage
 =====================
@@ -62,7 +62,7 @@ After WPT server(s), locations and browsers of your measurement environment are 
     > Example surfing through an online shop to a product page:
     > ![Script of multiple steps](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_scriptMultistep.png)
     >
-    > If you have any further questions, please do not hesitate to [contact us][15]
+    > If you have any further questions, please do not hesitate to [contact us][12]
 
 * A measurement job
 
@@ -126,7 +126,7 @@ All the raw data measured with WebPageTest can be aggregated by page. These aggr
 Detail Analysis
 ---------------------
 
-[OsmDetailAnalysis][18] is a microservice that provides functionality to persist and analyze web performance waterfall data. It can be integrated with OpenSpeedMonitor in that it collects and stores the detailed waterfall data of all the measured pages within OpenSpeedMonitor jobs. The timings and sizes of all the single waterfall resources can be filtered and analyzed interactively in a dashboard based on [dc.js][19].
+[OsmDetailAnalysis][15] is a microservice that provides functionality to persist and analyze web performance waterfall data. It can be integrated with OpenSpeedMonitor in that it collects and stores the detailed waterfall data of all the measured pages within OpenSpeedMonitor jobs. The timings and sizes of all the single waterfall resources can be filtered and analyzed interactively in a dashboard based on [dc.js][16].
 
 ![OsmDetailAnalysis](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_detailanalysis.jpg)
 
@@ -169,7 +169,7 @@ Prerequisites
 
 * [optional] Dedicated servlet container.
 
-    Mainly tested with Apache Tomcat. Should run on most servlet containers. See [full list of supported Java EE containers][11] in grails documentation for further details.
+    Mainly tested with Apache Tomcat. Should run on most servlet containers. See [full list of supported Java EE containers][9] in grails documentation for further details.
 
 * [optional, but recommended] Relational database management system (DBMS).
 
@@ -177,7 +177,7 @@ Prerequisites
 
 * Operating system (OS) to run OpenSpeedMonitor can be any server OS for which JRE 8 and the servlet container and dbms of choice are available.
 
-    Mainly tested on [debian][13].
+    Mainly tested on [debian][11].
 
 * Alternatively to run OpenSpeedMonitor directly on a server one can use docker-compose file in _docker/_ folder to run OpenSpeedMonitor in docker containers. All you need is the docker daemon on the target host in order to run OpenSpeedMonitor in docker.  All the other prerequisites defined in this section aren't necessary because these already exist inside the containers.
 
@@ -196,7 +196,7 @@ or on Windows:
     ./gradlew.bat assemble
 
 Created WAR file can be deployed to servlet container of choice.
-See [grails build documentation][10] for details.
+See [grails build documentation][8] for details.
 
 Since version 3 Grails is based on Spring Boot and so can be run easily **in embedded tomcat container**.
 
@@ -209,7 +209,7 @@ or on Windows:
     ./gradlew.bat -Dgrails.env=prod bootRun
 
 Created WAR file can be deployed to servlet container of choice.
-See [grails build documentation][10] for details.
+See [grails build documentation][8] for details.
 
 Like described in previous prerequisites section OpenSpeedMonitor can be deployed and run in docker containers. One can use docker-compose file _docker/docker-compose.yml_  to start multiple containers via this simple call:
 
@@ -235,35 +235,32 @@ If you're going to run OpenSpeedMonitor in prod-mode, you have to declare your a
 
 License
 =====================
-Code of OpenSpeedMonitor is licensed under [Apache License 2.0][12].
+Code of OpenSpeedMonitor is licensed under [Apache License 2.0][10].
 
 Development
 =====================
 To contribute to the code base or develop your own features you should be familiar with [grails][3]. Groovy and Javascript skills would be an asset, too.
 
-OpenSpeedMonitor is a monolithic web application. Respective grails plugin structure several external plugins are integrated. Before publishing under [Apache License][12] we developed the tool under version control in an own git server. So older history can't be found on GitHub.
+OpenSpeedMonitor is a monolithic web application. Respective grails plugin structure several external plugins are integrated. Before publishing under [Apache License][10] we developed the tool under version control in an own git server. So older history can't be found on GitHub.
 
-As IDE you can use [Groovy/Grails Tool Suite][16] from SpringSource, which is an eclipse bundle optimized for groovy and grails development. IntelliJ Idea has excellent groovy/grails support within its ultimate edition.
+As IDE you can use [Groovy/Grails Tool Suite][13] from SpringSource, which is an eclipse bundle optimized for groovy and grails development. IntelliJ Idea has excellent groovy/grails support within its ultimate edition.
 
 Although it works with an H2 in memory database out of the box it's highly recommended to develop and test with a relational database server like MySQL.
 
-[1]: http://webpagetest.org/    "WebPagetest"
-[2]: http://groovy.codehaus.org/    "groovy programming language"
+[1]: http://webpagetest.org/ "WebPagetest"
+[2]: http://groovy.codehaus.org/ "groovy programming language"
 [3]: http://grails.org/ "grails"
-[4]: https://sites.google.com/a/webpagetest.org/docs/private-instances "WebPagetest's installation guide for private instances"
+[4]: https://github.com/WPO-Foundation/webpagetest-docs/blob/master/user/Private%20Instances/README.md "WebPagetest's installation guide for private instances"
 [5]: https://sites.google.com/a/webpagetest.org/docs/system-design/overview "system overview WebPagetest"
 [6]: https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis "rest api WebPagetest"
 [7]: https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting "Scripting DSL WebPagetest"
-[8]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-app.html "grails documentation: run-app"
-[9]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-war.html "grails documentation: run-war"
-[10]: http://docs.grails.org/3.1.5/guide/commandLine.html#gradleBuild "grails buld documentation"
-[11]: http://grails.org/doc/2.5.0/guide/gettingStarted.html#supportedJavaEEContainers "grails: supported servlet containers"
-[12]: http://www.apache.org/licenses/LICENSE-2.0 "Apache License 2.0"
-[13]: https://www.debian.org/ "debian"
-[14]: https://github.com/WPO-Foundation/webpagetest/pull/151 "pull request multistep"
-[15]: mailto:wpt@iteratec.de "contact us"
-[16]: http://spring.io/tools/ggts "GGTS"
-[17]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
-[18]: https://github.com/iteratec/OsmDetailAnalysis
-[19]: https://dc-js.github.io/dc.js/
-[20]: https://docs.docker.com/compose/install/
+[8]: http://docs.grails.org/3.3.5/guide/commandLine.html#gradleBuild "grails buld documentation"
+[9]: http://docs.grails.org/3.3.5/guide/single.html#supportedJavaEEContainers "grails: supported servlet containers"
+[10]: http://www.apache.org/licenses/LICENSE-2.0 "Apache License 2.0"
+[11]: https://www.debian.org/ "debian"
+[12]: mailto:wpt@iteratec.de "contact us"
+[13]: https://marketplace.eclipse.org/content/groovygrails-tool-suite-ggts-eclipse "GGTS"
+[14]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
+[15]: https://github.com/iteratec/OsmDetailAnalysis
+[16]: https://dc-js.github.io/dc.js/
+[17]: https://docs.docker.com/compose/install/
